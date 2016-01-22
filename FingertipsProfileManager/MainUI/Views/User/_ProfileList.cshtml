@@ -1,0 +1,24 @@
+﻿@model IEnumerable<Fpm.ProfileData.Entities.Profile.ProfileDetails>
+
+@if (Model.Any())
+{
+    <h3 class="subheading">Profiles this user can edit:</h3>
+    <table class="grid sortable">
+        <thead>
+            <tr><th>ID</th><th>Name</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var profileDetails in Model)
+            {
+                <tr>
+                    <td class="left">@profileDetails.Id</td>
+                    <td class="left">@profileDetails.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+     <h3 class="subheading">This user does not have permission to edit any profiles</h3>
+}

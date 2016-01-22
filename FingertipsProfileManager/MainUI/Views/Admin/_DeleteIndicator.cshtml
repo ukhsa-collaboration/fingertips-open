@@ -1,0 +1,16 @@
+﻿@model Fpm.MainUI.Models.AdminModel
+
+@if (Model.AdminType == "Delete indicator")
+{
+    <div class="left">
+        <b>Indicator ID(s):</b>
+        <input id="indicatorIds" type="text" />
+        <input id="deleteIndicators" type="submit" value="Delete indicator(s)" class="native-button" />
+        <span class="info-tooltip"><i>Enter a list of comma seperated indicator Id's.<br>
+            <br>
+            This will delete everything relating to these indicator(s) for good.<br>
+            <br>
+            We can't undo it...</i></span>
+    </div>
+}
+

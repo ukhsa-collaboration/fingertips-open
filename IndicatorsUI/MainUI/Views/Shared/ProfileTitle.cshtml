@@ -1,0 +1,18 @@
+﻿@model Profiles.MainUI.Models.Titles
+
+<div id="siteTitle">
+    <div style="display:inline-block;">
+        <a href="@(Url.Content("~/") + Model.FrontPage)">
+            <div id="titleBox">
+                <h1>
+                    @Html.Raw(Model.Title)
+                </h1>
+            </div>
+    <div id="subtitleBox">
+        <h3 id="subtitle">
+            @Html.Raw(Model.Subtitle)
+        </h3>
+    </div>
+    </a>
+</div>
+</div> 

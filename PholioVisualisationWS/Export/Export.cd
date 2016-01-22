@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PholioVisualisation.Export.BaseFileNameMaker">
+    <Position X="8.75" Y="0.5" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAABAA=</HashCode>
+      <FileName>BaseFileNameMaker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.PracticeProfileFileNameMaker">
+    <Position X="7.25" Y="2.25" Width="2.5" />
+    <Members>
+      <Field Name="groupId" Hidden="true" />
+      <Field Name="profileKey" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAAAAAAAABAABAAAAAABAAAA=</HashCode>
+      <FileName>PracticeProfileFileNameMaker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.ExcelFileWriter">
+    <Position X="2.75" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAAgAAAAKAAACAEAIkAAEAEAAAAAQECAEAAAE=</HashCode>
+      <FileName>ExcelFileWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.IndicatorIndexBuilder">
+    <Position X="15.5" Y="3" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>IndicatorIndexBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.IndicatorIndexWriter">
+    <Position X="0.5" Y="4.5" Width="1.75" />
+    <Members>
+      <Field Name="hasDomains" Hidden="true" />
+      <Field Name="rowIndex" Hidden="true" />
+      <Field Name="ws" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAABAAAAAAAAAAgAAABCAAAAAAAAAAAQAAgAAACAA=</HashCode>
+      <FileName>IndicatorIndexWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.ProfileDataBuilder">
+    <Position X="13" Y="2.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AgQAABAAAAAAACASAiQSAAAYAAAAEEABAAAAACiAAAA=</HashCode>
+      <FileName>ProfileDataBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.ProfileDataWriter">
+    <Position X="2.75" Y="6" Width="2.25" />
+    <Members>
+      <Field Name="profile" Hidden="true" />
+      <Field Name="regionToWorkSheetMap" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAIAAQAIAAQAAEAAAAAAAEAQQAAQEAQAAAAA=</HashCode>
+      <FileName>ProfileDataWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.ProfileFileNameMaker">
+    <Position X="10" Y="2.25" Width="2" />
+    <Members>
+      <Field Name="areaString" Hidden="true" />
+      <Field Name="profile" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAgAAAAAADAAAA=</HashCode>
+      <FileName>ProfileFileNameMaker.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.WorksheetInfo">
+    <Position X="8.75" Y="4.75" Width="1.75" />
+    <TypeIdentifier>
+      <HashCode>BAAAAAAAAAAAAIAAAAAAAAADAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>WorksheetInfo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.ExcelFileBuilder" Collapsed="true">
+    <Position X="15.5" Y="1" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>ExcelFileBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.PracticeProfileDataBuilder">
+    <Position X="17.75" Y="3" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAEAABEIMgAAIAgAgQAAAAEIAgAoAAAAQBcAYAIAEE=</HashCode>
+      <FileName>PracticeProfileDataBuilder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.Export.PracticeProfileDataWriter" Collapsed="true">
+    <Position X="5.25" Y="4.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AUAQACQ0AImIaEAAEQJAAAAQABAQAAIQQAYUQmICAAA=</HashCode>
+      <FileName>PracticeProfileDataWriter.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{40254974-C7E8-4303-B3FF-BF8A0F8C6491}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PholioVisualisation.ServiceActions</RootNamespace>
+    <AssemblyName>PholioVisualisation.ServiceActions</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="ActionHelper.cs" />
+    <Compile Include="AreaDetailsAction.cs" />
+    <Compile Include="AreasOfAreaTypeAction.cs" />
+    <Compile Include="AreaTypesAction.cs" />
+    <Compile Include="ChildAreasForPdfsAction.cs" />
+    <Compile Include="MostRecentData.cs" />
+    <Compile Include="MostRecentDataActionBase.cs" />
+    <Compile Include="MostRecentDataForAllAges.cs" />
+    <Compile Include="MostRecentDataForAllAgesAction.cs" />
+    <Compile Include="MostRecentDataForAllCategoriesAction.cs" />
+    <Compile Include="MostRecentDataForAllCategories.cs" />
+    <Compile Include="MostRecentDataForAllSexes.cs" />
+    <Compile Include="MostRecentDataForAllSexesAction.cs" />
+    <Compile Include="NationalValuesForPdfsAction.cs" />
+    <Compile Include="ParameterCheck.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuinaryPopulationDataAction.cs" />
+    <Compile Include="SpcForDsrLimitsAction.cs" />
+    <Compile Include="SpcForDsrLimitsResponseObject.cs" />
+    <Compile Include="SpineChartDataAction.cs" />
+    <Compile Include="SupportingInformationForPdfsAction.cs" />
+    <Compile Include="ValueLimitsAction.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Analysis\Analysis.csproj">
+      <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
+      <Name>Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{93fcce58-31af-467d-adc2-3067bea82e7d}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
+      <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
+      <Name>DataConstruction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Formatting\Formatting.csproj">
+      <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>
+      <Name>Formatting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\KeyMessages\KeyMessages.csproj">
+      <Project>{b7dac9ea-b25d-4800-9ba2-4d01570306d7}</Project>
+      <Name>KeyMessages</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PdfData\PdfData.csproj">
+      <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
+      <Name>PdfData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
+      <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
+      <Name>PholioObjects</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,24 @@
+﻿<div id="uploadSimpleSummary" style="display: none;">
+    <h2>Simple Indicator Upload</h2>
+    <p>This template was created to submit data to PHOLIO for indicators which are already set up (i.e. essential metadata is specified). </p> 
+    <p>It should be used if you are uploading data for one indicator and one distinct set of grouping data only (e.g. Age Id, Sex Id, Year Range etc.). 
+       If you want to upload data for multiple indicators then please use seperate versions of this template. Alternatively, you can use the batch upload template.
+    </p> 							
+    <p>The template consists of two worksheets: 
+        <br/><b>"IndicatorDetails"</b> requires you to select the grouping details to which this data belongs as follows:
+        <ul>
+            <li>- Indicator Id</li>        
+            <li>- Period Start Year</li>        
+            <li>- Period Length</li>        
+            <li>- Period Quarter</li>        
+            <li>- Period Month</li>        
+            <li>- Age Group</li>        
+            <li>- Sex</li>        
+        </ul>
+        <br/><b>"PholioData"</b> contains the actual data that will be uploaded. It is important that the data is entered in the format that is shown in the template. Any data entered into cells outside of this template will no be uploaded.
+    <p>Please be aware, although the form contains a range of data validation and other checks, it cannot prevent an error if the information entered is theoretically possible. Some checks are carried out on upload and provide useful feedback for you to confirm that the information is exactly what you intended to enter and, in case an upload was unsuccessful, information about the reasons for failure will help correcting the issues.</p>
+    <p>A common reason for upload failure is duplicated data: If data with the same specification already exists, these records need to be removed manually first before the new data can be uploaded. In this case please contact an administrator. This process is not automated to safeguard against accidental replacement of data by another set which might - for whatever reason - not be desireable.</p>
+    <p>
+        <input class="small-button" id="Cancel" onclick="lightbox.hide()" value="Close" />
+    </p>
+</div>

@@ -1,0 +1,28 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@using Profiles.MainUI.Models
+@model PageModel
+@{
+    
+    HtmlString recentUpdates = CommonUtilities.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
+    var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
+    var areUpdates = recentUpdates != null && recentUpdates.ToString().Length > 0;
+}
+<div id="introduction" style="width:65%;">
+    @CommonUtilities.GetContent(ContentKeys.Introduction, Model.ProfileId)
+</div>
+
+@if (Model.IsTwitterAccount)
+{
+    @Html.Partial("_TwitterBox")
+}
+<div id="recent-updates">
+    @if (areUpdates)
+    {
+        <h2>Recent updates</h2>
+        <div class="@updatesCssClass">
+            @recentUpdates
+        </div>
+    }
+    @Html.Partial("_StartButton")
+</div>

@@ -1,0 +1,501 @@
+* {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    font-family: Verdana, "DejaVu Sans", "Bitstream Vera Sans", "Lucida Sans", Arial, Helvetica, sans-serif;
+    font-size: 90%; /* Allow IE/Win to resize the document */
+    color: black;
+    background: White;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.hidden { /* Used for content that should be displayed */
+    /* by non-stylesheet-aware browsers          */
+    display: none !important;
+}
+
+h1, /* Headings (H1-H6) should only be used in */
+h2, /* the main content area                   */
+h3 {
+    font-weight: bold;
+    text-align: left;
+    padding: 0;
+}
+
+h4,
+h5,
+h6 {
+    font-weight: bold;
+    text-align: left;
+    padding: 0;
+}
+
+h1 {
+    font-size: 175%;
+}
+
+h2 {
+    font-size: 2.1em;
+}
+
+h3 {
+    font-size: 120%;
+}
+
+h4 {
+    font-size: 105%;
+}
+
+h5 {
+    font-size: 80%;
+}
+
+h6 {
+    font-size: 65%;
+}
+
+
+/* Anchors */
+
+a:link {
+    text-decoration: none;
+    color: #003399;
+    background: transparent;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #003399;
+    background: transparent;
+}
+
+a:hover,
+a:active {
+    text-decoration: underline;
+}
+
+
+/* Inline elements and classes */
+
+code,
+kbd,
+samp,
+tt {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 115%; /* Courier tends to be a little too small */
+    line-height: 1.0; /* Otherwise lines tend to spread out */
+}
+
+    kbd,
+    code.markup, /* HTML/CSS markup */
+    span.markup, /* Alternative form for HTML/CSS markup */
+    .title { /* Title in floating boxes / left sidebar */
+        font-weight: bolder;
+    }
+
+abbr,
+acronym {
+    font: inherit; /* Don't use small-caps, etc. */
+}
+
+.tooltip {
+    cursor: help;
+    border-bottom: 1px dotted #CCCCCC;
+}
+
+abbr[title],
+acronym[title] {
+    cursor: help;
+    border-bottom: 1px dotted #CCCCCC;
+}
+
+cite,
+dfn,
+var,
+.fn, /* Filename */
+.url, /* Uniform Resource Locator */
+.email { /* E-mail address */
+    font-style: italic;
+}
+
+.program, /* Command-line name of a computer program */
+.window, /* Window or dialog box name */
+.menu, /* Menu item in a computer program */
+.gui, /* Generic GUI element in a computer program */
+.key { /* Keypress in a computer program */
+    font-weight: bolder;
+}
+
+.clearboxes { /* Clear navboxes and floatboxes */
+    clear: right;
+}
+
+.unicode {
+    font-family: "Arial Unicode MS", "Lucida Sans Unicode", Verdana, "DejaVu Sans", "Bitstream Vera Sans", "Lucida Sans", Arial, Helvetica, sans-serif;
+}
+
+
+/* Block-inline elements and classes */
+
+img {
+    vertical-align: baseline;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+    img.icon16 { /* For 16x16 file-type icons */
+        vertical-align: -2px;
+    }
+
+del,
+del * { /* Required for Mozilla */
+    text-decoration: line-through;
+}
+
+ins,
+ins * { /* Required for Mozilla */
+    text-decoration: underline;
+}
+
+.floatleft { /* Left-floating images and spans */
+    margin: 0.5em 1.5em 0.5em 0;
+    float: left;
+}
+
+.floatright { /* Right-floating images and spans */
+    margin: 0.5em 0 0.5em 1.5em;
+    float: right;
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+
+/* Block elements */
+
+p {
+    margin: 1em 0;
+    padding: 0;
+}
+
+blockquote { /* Should only be used in main content area, */
+    /* floating boxes or left sidebar.           */
+    margin: 1em 2.5em;
+    padding: 0;
+}
+
+pre { /* Should only be used in main content area  */
+    /* and floating boxes.                       */
+    font-family: "Courier New", Courier, monospace;
+    font-size: 95%; /* Courier tends to be a little too small */
+    line-height: 1.2;
+    margin: 1em 2.5em;
+    padding: 0;
+}
+
+    pre code,
+    pre kbd,
+    pre samp,
+    pre tt {
+        font-size: 100%; /* PRE is already enlarged above */
+        line-height: 1.2; /* Use same value as for PRE above */
+    }
+
+hr {
+    color: #999999;
+    background: transparent;
+    height: 1px; /* Required for IE/Win */
+    margin: 0;
+    padding: 0;
+    border-color: #999999;
+    border-width: 1px;
+    border-style: none none solid none;
+}
+
+    hr.lighter { /* Warning: not printed out on paper */
+        color: #F0F0F0;
+        background: transparent;
+        border-color: #F0F0F0;
+    }
+
+/* Tables */
+/* Tables should never be used for visual */
+/* formatting: that is the role of CSS!   */
+
+table.grid {
+    color: inherit;
+    background: inherit; /* Don't make tables transparent */
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    padding: 0;
+    border: 1px solid #999999;
+    margin-top: 10px;
+}
+
+    table.grid caption {
+        text-align: center;
+        caption-side: top;
+        margin: 0 2.5em 0.75em;
+        padding: 0;
+        border: none;
+    }
+
+    table.grid td,
+    table.grid th {
+        text-align: center;
+        vertical-align: middle;
+        margin: 0;
+        padding: 0.25em 0.5em;
+        border: 1px solid #999999;
+    }
+
+        table.grid th,
+        table.grid td.highlight,
+        table.grid th.highlight {
+            font-weight: bold;
+            color: inherit;
+            background: #F0F0F0;
+        }
+
+            table.grid td.lighter,
+            table.grid th.lighter {
+                color: inherit;
+                background: #F8F8F8;
+            }
+
+            table.grid td.left,
+            table.grid th.left {
+                text-align: left;
+                font-size: 9pt;
+            }
+
+            table.grid td.center,
+            table.grid th.center {
+                text-align: center;
+            }
+
+            table.grid td.right,
+            table.grid th.right {
+                text-align: right;
+            }
+
+
+/* Forms */
+
+form {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+input,
+button,
+select,
+fieldset,
+legend {
+    font-family: Verdana, "DejaVu Sans", "Bitstream Vera Sans", "Lucida Sans", Arial, Helvetica, sans-serif;
+    font-size: 10pt;
+    color: black;
+    vertical-align: middle;
+}
+
+textarea {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 100%;
+    color: black;
+    background: inherit;
+    vertical-align: middle;
+}
+
+fieldset {
+    font-size: 100%;
+    margin: 1em 0;
+    border: none;
+    border-bottom: 5px solid #000;
+}
+
+legend {
+    font-size: 100%;
+    margin: 0 0.5em;
+    padding: 0 0.25em;
+    border: none;
+}
+
+table.formtable {
+    color: inherit;
+    background: inherit;
+    border-collapse: collapse;
+    border-spacing: 0;
+    empty-cells: show;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+    table.formtable td,
+    table.formtable th {
+        text-align: justify;
+        vertical-align: middle;
+        margin: 0;
+        padding: 0.25em 0.5em;
+        border: none;
+    }
+
+    table.formtable th {
+        text-align: center;
+        font-weight: bold;
+    }
+
+        table.formtable td.label,
+        table.formtable th.label {
+            text-align: right;
+            vertical-align: top;
+        }
+
+        table.formtable td.vertspace,
+        table.formtable th.vertspace {
+            empty-cells: show;
+            margin: 0;
+            padding: 0.5em 0;
+            height: 1em; /* Required for IE/Win */
+        }
+
+    table.formtable fieldset {
+        margin: 0;
+    }
+
+        table.formtable fieldset td,
+        table.formtable fieldset th {
+            margin: 0.25em 0.5em;
+        }
+
+.reqfield {
+    color: red;
+    background: transparent;
+    font-weight: bolder;
+}
+
+.info {
+    color: gray;
+    background: transparent;
+    font-size: 90%;
+}
+
+
+
+
+/* Other styles related to the main content */
+
+#mainlink { /* "Skip to main content" link */
+    display: none !important;
+}
+
+#navhead { /* "Path to this page" information */
+    /* Warning: not printed out on paper */
+    font-size: 90%;
+}
+
+    #navhead hr {
+        display: none;
+    }
+
+#endmain {
+    visibility: hidden;
+    clear: both; /* Doesn't always work under IE/Win */
+}
+
+/* Paging UI */
+td.pager {
+    height: 20px;
+    background-color: #eee;
+}
+
+    td.pager div {
+        font-size: smaller;
+        font-weight: bold;
+        padding: 5px;
+    }
+
+a.pagerButton, a.pagerButton:visited {
+    border: solid 1px #eee;
+    padding: 4px;
+    text-decoration: none;
+    color: #006;
+    margin: 0px 2px 0px 2px;
+}
+
+    a.pagerButton:hover {
+        border: solid 1px black;
+        color: Black;
+    }
+
+a.pagerButtonCurrentPage {
+    border: solid 1px #00a;
+    padding: 4px;
+    text-decoration: none;
+    color: White;
+    background-color: #006;
+    margin: 0px 2px 0px 2px;
+}
+
+.pagerButtonDisabled {
+    border: none;
+    color: #999;
+    padding: 4px;
+}
+
+
+/* Filtering Styles */
+.filtering {
+    background: #eee;
+    font-size: 10pt;
+    padding: 10px 0 !important;
+    border: 1px solid #999;
+}
+
+/* Sorting UI */
+a.sortAsc {
+    color: green;
+}
+
+a.sortDesc {
+    color: red;
+}
+
+
+/* Styles for validation helpers
+-----------------------------------------------------------*/
+.field-validation-error {
+    color: #ff0000;
+}
+
+.field-validation-valid {
+    display: none;
+}
+
+.input-validation-error {
+    border: 1px solid #ff0000;
+    background-color: #ffeeee;
+    padding: 8px;
+    font-style: italic;
+}
+
+.validation-summary-errors {
+    font-weight: bold;
+    color: #ff0000;
+}
+
+.validation-summary-valid {
+    display: none;
+}
+
+.mce-tinymce {
+    margin-bottom: 10px;
+}

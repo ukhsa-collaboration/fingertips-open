@@ -1,0 +1,137 @@
+
+using System;
+using System.Collections.Generic;
+using NHibernate;
+using NHibernate.Cfg;
+using PholioVisualisation.PholioObjects;
+
+namespace PholioVisualisation.DataAccess
+{
+    /// <summary>
+    /// An implementation of IDataAccessServiceFactory that uses NHibernate to persist data
+    /// </summary>
+    public sealed class ReaderFactory : IDisposable
+    {
+        /// <summary>
+        /// The session factory (very expensive to construct)
+        /// </summary>
+        private ISessionFactory sessionFactory;
+
+        private static ISessionFactory staticSessionFactory;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="assemblyNames">The names of the assemblies containing object-relational mapping information</param>
+        /// <exception cref="Exception">Thrown if an error occurred while constructing the factory</exception>
+        public ReaderFactory(IEnumerable<string> assemblyNames)
+        {
+            Exception exception = null;
+
+            // If SessionFactory build fails then retry
+            for (int tryNumber = 1; tryNumber <= 3; tryNumber++)
+            {
+                try
+                {
+                    Configuration config = new Configuration();
+
+                    // Add assemblies containing mapping definitions
+                    foreach (string assemblyName in assemblyNames)
+                    {
+                        config.AddAssembly(assemblyName);
+                    }
+
+                    config.Configure();
+                    sessionFactory = config.BuildSessionFactory();
+
+                    // SessionFactory built successfully
+                    exception = null;
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                }
+            }
+
+            if (exception != null)
+            {
+                throw new FingertipsException("Could not construct ReaderFactory instance", exception);
+            }
+        }
+
+        public static IGroupDataReader GetGroupDataReader()
+        {
+            GroupDataReader service = new GroupDataReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        public static IAreasReader GetAreasReader()
+        {
+            AreasReader service = new AreasReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        public static TrendDataReader GetTrendDataReader()
+        {
+            TrendDataReader service = new TrendDataReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        public static PholioReader GetPholioReader()
+        {
+            PholioReader service = new PholioReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        public static IContentReader GetContentReader()
+        {
+            ContentReader service = new ContentReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+
+        public static IProfileReader GetProfileReader()
+        {
+            ProfileReader service = new ProfileReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        public static ExceptionWriter GetExceptionWriter()
+        {
+            ExceptionWriter service = new ExceptionWriter(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+        private static ISessionFactory GetSessionFactory()
+        {
+            if (staticSessionFactory == null)
+            {
+                List<string> assemblyNames = new List<string>();
+                assemblyNames.Add("PholioVisualisation.PholioObjects");
+                staticSessionFactory = new ReaderFactory(assemblyNames).sessionFactory;
+            }
+
+            return staticSessionFactory;
+        }
+
+        /// <summary>
+        /// Disposes of the resources held by the factory
+        /// </summary>
+        public void Dispose()
+        {
+            if (sessionFactory != null)
+            {
+                sessionFactory.Dispose();
+                sessionFactory = null;
+            }
+        }
+    }
+}

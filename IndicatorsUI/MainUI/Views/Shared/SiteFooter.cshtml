@@ -1,0 +1,40 @@
+﻿@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+<div id="footer">
+    <div id="footer_wrap" class="clearfix">
+        <div class="footer_links">
+
+
+            @if (Model.NationalProfileCollection != null)
+            {
+                var items = Model.NationalProfileCollection.ItemsSortedByName();
+                var columnAssigner = new ColumnAssigner(items.Count, 2);
+            
+                <h3>More public health profiles</h3>
+                <ul class="col1">
+                    <li>
+                        <a class="title" href="http://datagateway.phe.org.uk">PHE Data and Knowledge Gateway</a>
+                    </li>
+                    @while (columnAssigner.IsNextIndexInCurrentColumn)
+                    {
+                        <li>
+                            @Html.Partial("_ProfileCollectionItemLink", items[columnAssigner.NextIndex])
+                        </li>
+                    }
+                </ul>
+                    columnAssigner.NewColumn();
+                <ul>
+                    @while (columnAssigner.IsNextIndexInCurrentColumn)
+                    {
+                        <li>
+                            @Html.Partial("_ProfileCollectionItemLink", items[columnAssigner.NextIndex])
+                        </li>
+                    }
+                </ul>
+            }
+
+        </div>
+
+        @Html.Partial("_PoliciesAndCopyright")
+    </div>
+</div>

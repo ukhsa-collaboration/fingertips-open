@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.LookUps">
+
+
+  <!-- Skin class -->
+  <class name="Skin" table="ui_siteskins">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="name"/>
+
+  </class>
+
+  <!-- Sex class -->
+  <class name="Sex" table="l_sexes">
+
+    <id name="SexID" column="sexid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Description" column="sex"/>
+
+  </class>
+
+  <!-- Age class -->
+  <class name="Age" table="l_ages">
+
+    <id name="AgeID" column="ageid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Description" column="age"/>
+
+  </class>
+
+ <!-- Year Type class -->
+<class name="YearType" table="l_yeartypes">
+
+  <id name="Id" column="yeartypeid" type="Int32" unsaved-value="-1">
+    <generator class="identity"/>
+  </id>
+
+  <property name="Label" column="yeartype"/>
+
+</class>
+
+  <class name="Unit" table="l_units">
+
+  <id name="Id" column="unitid" type="Int32" unsaved-value="-1">
+    <generator class="identity"/>
+  </id>
+  <property name="Label" column="unit"/>
+  <property name="IsCurrent" column="IsCurrent"/>
+
+</class>
+
+
+  <!-- ConfidenceIntervalMethod class -->
+  <class name="ConfidenceIntervalMethod" table="l_cimethods">
+
+    <id name="Id" column="cimethodid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="Description" column="description"/>
+    <property name="IsCurrent" column="IsCurrent"/>
+
+  </class>
+
+  <!-- ComparatorMethod class -->
+  <class name="ComparatorMethod" table="l_comparatormethods">
+
+    <id name="Id" column="comparatormethodid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="comparatormethod"/>
+    <property name="IsCurrent" column="iscurrent"/>
+
+  </class>
+
+  <!-- Polarity class -->
+  <class name="Polarity" table="l_polarity">
+
+    <id name="Id" column="polarityid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="polarity"/>
+
+  </class>
+
+  <!-- AreaType class -->
+  <class name="AreaType" table="l_areatypes">
+
+    <id name="Id" column="areatypeid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="areatypefull"/>
+    <property name="ShortName" column="areatype"/>
+    <property name="IsCurrent" column="iscurrent"/>
+    <property name="IsSupported" column="issupported"/>
+  </class>
+
+  <!-- Value Type class -->
+  <class name="IndicatorValueType" table="l_valuetypes">
+
+    <id name="Id" column="valuetypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Label" column="valuetype"/>
+
+  </class>
+
+  <!-- ValueNote class -->
+  <class name="ValueNote" table="l_valuenotes">
+
+    <id name="ValueNoteId" column="valuenoteid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Text" column="text"/>
+    <property name="Comment" column="comment"/>
+    <property name="IsGeneric" column="isgeneric"/>
+
+  </class>
+
+  
+  <!-- DenominatorType class -->
+  <class name="DenominatorType" table="L_DenominatorTypes">
+
+    <id name="Id" column="DenominatorTypeID" type="int" unsaved-value="-1">
+    </id>
+    <property name="Name" column="DenominatorType"/>
+    <property name="IsCurrent" column="IsCurrent"/>
+  </class>
+
+
+  <!-- DenominatorType class -->
+  <class name="Comparator" table="L_Comparators">
+
+    <id name="Id" column="ComparatorID" type="int" unsaved-value="-1">
+    </id>
+    <property name="Name" column="Comparator"/>
+    <property name="IsCurrent" column="IsCurrent"/>
+  </class>
+
+  <!-- KeyColours class -->
+  <class name="KeyColour" table="UI_KeyColours">
+
+    <id name="Id" column="key_id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Description" column="description"/>
+  </class>
+
+  <!-- CategoryType -->
+  <class name="CategoryType" table="l_categorytypes">
+    <id name="Id" column="categorytypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="name"/>
+    <property name="ShortName" column="shortname"/>
+  </class>
+
+</hibernate-mapping>
+
+

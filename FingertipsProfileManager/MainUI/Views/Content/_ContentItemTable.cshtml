@@ -1,0 +1,50 @@
+﻿@using Fpm.MainUI.Helpers
+@model IList<Fpm.ProfileData.Entities.Profile.ContentItem>
+
+@{
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+}
+
+@if (Model.Count > 0) {
+<table class="grid sortable">
+    <thead>
+        <tr>
+            @if (isUserAdmin)
+            {
+                <th class="header">ID</th>
+            }
+            <th class="header">Description</th>
+            <th class="header">Content Key</th>
+            <th>
+                Select @Html.CheckBox("select-all", false, new { @class = "select-all-check-box" })
+            </th>
+        </tr>
+    </thead>
+    @foreach (var item in Model)
+    {
+        <tr>
+            @if (isUserAdmin)
+            {
+                <td class="left">
+                    @item.Id
+                </td>
+            }
+            <td class="left">
+                @Html.ActionLink(item.Description, "EditContent",
+                            new { contentId = item.Id, profileId = item.ProfileId, profileName = item.ProfileName }, null)
+            </td>
+            <td class="left">
+                @item.ContentKey
+            </td>
+            <td class="center">
+                @Html.CheckBox(item.Id + "_selected", false,
+                                           new { @class = "indicator-check-box", @value = item.Id })
+            </td>
+        </tr>
+    }
+</table>
+}
+else
+{
+<label>No content items have been created for this profile.</label>
+}

@@ -1,0 +1,25 @@
+﻿@using Profiles.MainUI.Models;
+@model PageModel
+<div id="banner" class="standardWidth clearfix">
+    @Html.Partial(Model.GetSkinView("_PageLinks"))
+</div>
+<div id="site-link" class="standardWidth clearfix">
+    @{
+        var title = Model.PageTitle;
+        title = (Model.DisplayProfileTitle == false && string.IsNullOrEmpty(title) == false) ?
+            title :
+            Model.Skin.Title;
+    }
+    @if (Model.Skin.IsPhof || Model.Skin.IsTobacco)
+    {
+        <h1 style="@(TitleFont.GetSize(title, Model.ProfileId))">
+            <a href="/" class="homeHeader">@Html.Raw(title) </a>
+        </h1>
+    }
+    else
+    {
+        <h1 style="@(TitleFont.GetSize(title, Model.ProfileId))">
+            @Html.Raw(title)
+        </h1>    }
+    @Html.Partial("SearchBox")
+</div>

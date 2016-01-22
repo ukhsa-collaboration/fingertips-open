@@ -1,0 +1,10 @@
+﻿<script src="@(Model.JsPath)PageTwitterFeed.js" type="text/javascript"></script>
+<div id="related_content">
+    <div id="twitter_feed">
+        <h3>Twitter</h3>
+        <h4><a href="https://twitter.com/@(Model.GetTwitterHandle())" target="_blank">@Html.Raw('@'+Model.GetTwitterHandle())</a></h4>
+    </div>
+  	<div class="twitter_follow">
+		<a href="http://twitter.com/intent/user?screen_name=@(Model.GetTwitterHandle())" target="_blank">Follow @Html.Raw('@'+Model.GetTwitterHandle())</a>
+	</div>
+</div>

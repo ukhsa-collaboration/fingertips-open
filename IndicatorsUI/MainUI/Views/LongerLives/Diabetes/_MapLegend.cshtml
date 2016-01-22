@@ -1,0 +1,87 @@
+﻿@using Profiles.DomainObjects
+<!-- persistent overlay - left of map below filters containing legend -->
+@{
+    var imagePath = ViewBag.ImagesUrl + "Mortality/";
+}
+<div class="map-overlay" id="map-legend-deaths">
+    <h5>Comparison with National Average</h5>
+    <div class="legend">
+        <span class="grade">
+            <img src="@(imagePath)grade-3.png" alt="worse" />worse
+        </span>
+        <span class="grade">
+            <img src="@(imagePath)grade-2.png" alt="consistent" />consistent
+        </span>
+        <span class="grade">
+            <img src="@(imagePath)grade-0.png" alt="better" />better
+        </span>
+        <span class="grade no-data">
+            <img src="@(imagePath)no-data.png" alt="" />data unavailable
+        </span>
+    </div>
+    <ul class="filters">
+        <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data#calculated-colours">How have we calculated the colours?</a></li>
+        @{
+            if (Model.ProfileId == ProfileIds.HealthChecks)
+            {
+                <li><a href="http://www.nhs.uk/Conditions/nhs-health-check/Pages/NHS-Health-Check.aspx" target="_blank">
+                        Find out more about the NHS Health Check programme
+                    </a></li>        
+            }                    
+        }
+        
+    </ul>
+</div>
+
+<div class="map-overlay" id="map-legend-bob">
+    <h5>Comparison with National Average</h5>
+    <div class="legend">
+        <span class="grade">
+            <img src="@(imagePath)boblower.png" alt="lower" />lower
+        </span>
+        <span class="grade">
+            <img src="@(imagePath)grade-2.png" alt="consistent" />consistent
+        </span>
+        <span class="grade">
+            <img src="@(imagePath)bobhigher.png" alt="higher" />higher
+        </span>
+        <span class="grade no-data">
+            <img src="@(imagePath)no-data.png" alt="" />data unavailable
+        </span>
+    </div>
+    <ul class="filters">
+        <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data#calculated-colours">How have we calculated the colours?</a></li>
+        @{
+            if (Model.ProfileId == ProfileIds.HealthChecks)
+            {
+                <li><a href="http://www.nhs.uk/Conditions/nhs-health-check/Pages/NHS-Health-Check.aspx" target="_blank">
+                        Find out more about the NHS Health Check programme
+                    </a></li>        
+            }                    
+        }
+        
+    </ul>
+</div>
+
+<!-- persistent overlay for deprivation key -->
+<div class="map-overlay" id="map-legend-quintiles" style="display: none; position: relative;">
+    <h5>Value</h5>
+    <img id="high-to-low-arrow" src="@(imagePath)high-to-low-arrow.png" />
+    <div class="legend legend_deprivation">
+        <span class="grade level1">
+            <img src="@(imagePath)grade-quintile-5.png" alt="low" />High
+        </span>
+        <span class="grade level2">
+            <img src="@(imagePath)grade-quintile-4.png" alt="low" />&nbsp;
+        </span>
+        <span class="grade level3">
+            <img src="@(imagePath)grade-quintile-3.png" alt="low" />&nbsp;
+        </span>
+        <span class="grade level4">
+            <img src="@(imagePath)grade-quintile-2.png" alt="low" />&nbsp;
+        </span>
+        <span class="grade level5">
+            <img src="@(imagePath)grade-quintile-1.png" alt="low" />Low
+        </span>
+    </div>
+</div>

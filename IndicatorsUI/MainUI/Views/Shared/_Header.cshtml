@@ -1,0 +1,21 @@
+﻿@using Profiles.MainUI.Models;
+@model PageModel
+@* Header for Healthier Lives style profiles *@
+<div id="header_top" class="clearfix">
+    <a href="https://www.gov.uk/government/organisations/public-health-england" title="Public Health England">
+        <img src="@(ViewBag.ImagesUrl)logos/PHE30.png" height="30px" />
+    </a>
+    
+    <div id="topic-links">
+        <a href="/topic/mortality" id="mortality-topic">Premature Mortality</a>
+        <a href="/topic/diabetes" id="diabetes-topic">Diabetes</a>
+        <a href="/topic/hypertension" id="blood-pressure-topic">High Blood Pressure</a>
+        <a href="/topic/nhs-health-check" id="health-checks-topic">NHS Health Check</a>
+        <a href="/topic/drugs-and-alcohol" id="drugs-and-alcohol-topic">Alcohol & Drugs</a>
+        @if (ViewBag.ShowCancer)
+        {
+            <a href="/topic/cancer" id="cancer-topic">Cancer</a>
+        }
+    </div>
+</div>
+   

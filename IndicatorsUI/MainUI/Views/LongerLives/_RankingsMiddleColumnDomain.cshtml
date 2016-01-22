@@ -1,0 +1,30 @@
+﻿@model Profiles.DomainObjects.Domain
+
+<h5><span id="prevalence-risk-order" class="pretext"></span><span class="posttext">Select @Model.SubHeading factors to compare</span></h5>
+
+<ul class="filters" style="padding-left: 6px;">
+    @{
+        <ul class="filters" style="padding-left: 20px;">
+            @{
+                int domainIndex = 0;
+                foreach (dynamic domain in ViewBag.AvailableDomains)
+                {
+                    if (domainIndex >= ViewBag.DomainsToDisplay)
+                    {
+                        string tooltip = domain.Tooltip ?? string.Empty;
+                        
+                        <li id="domain-@domain.GroupId" class="indicator-group prev_and_risk_indicator_group " alt="@tooltip">
+                            <a href="javascript:selectSupportingDomain(@domain.GroupId)">@domain.SubHeading</a>
+                            @Html.Partial("_DomainTooltipIcon", tooltip)
+                        </li>
+                        <ul id="diabetes_prev_and_risk_list-@domain.GroupId" class="prev_causes filters prev_and_risk_filters"></ul>
+                    }
+                    domainIndex++;
+                }
+            }
+        </ul>
+    }
+</ul>
+<div class="hr">
+    <hr />
+</div>

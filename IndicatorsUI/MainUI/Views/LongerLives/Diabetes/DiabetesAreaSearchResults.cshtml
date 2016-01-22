@@ -1,0 +1,44 @@
+﻿@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
+}
+
+@section headContent {
+        <script src="@(Model.JsPath)LongerLives/Diabetes/PageDiabetesAreaSearchResults.js" type="text/javascript"></script>
+}
+
+<script type="text/javascript">
+    //<![CDATA[ 
+    easting = '@ViewBag.Easting';
+    northing = '@ViewBag.Northing';
+    searchArea = '@ViewBag.Area';    
+    //]]
+</script>
+
+@Html.Partial("_BasicBreadcrumb", "Search results")
+
+<div id="data_page_header" class="clearfix">
+    <h1 class="area_name">Practices near @ViewBag.Area</h1>
+    <h3 id="no-of-practices"></h3>
+</div>
+
+<div id="content" class="clearfix">
+    <div class="nearby-practices-table">
+        
+        <div class="table-data" id="mortality-rankings">
+            <div id="table-container" style="height: 500px; overflow-y:scroll;">
+                <table id="diabetes-rankings-table">
+                    <tbody>
+                    </tbody>
+                </table>
+                </div>
+        </div>                     
+    </div>
+        <div class="nearby-practices-map">
+            <div id="map-canvas"></div>
+        </div>    
+</div>
+
+<noscript>
+    Please enable JavaScript to view this page
+</noscript>

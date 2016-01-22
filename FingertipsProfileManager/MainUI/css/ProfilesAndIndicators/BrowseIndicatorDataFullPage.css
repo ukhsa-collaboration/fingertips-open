@@ -1,0 +1,29 @@
+﻿#lightBox {
+    display: none !important;
+}
+
+#infoBox {
+    position: inherit !important;
+    height: auto !important;
+    top: auto !important;
+    left: auto !important;
+    background: none;
+    border: none;
+    margin: 0 auto;
+    clear: both;
+}
+
+#tbl-view-data tbody {
+    height: auto;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+#tbl-view-data th:last-child {
+    width: 0;
+    padding: 0;
+}
+
+#link-full-page {
+    display: none;
+}

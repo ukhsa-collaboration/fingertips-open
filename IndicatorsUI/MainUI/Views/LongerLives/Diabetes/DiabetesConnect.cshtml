@@ -1,0 +1,55 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
+}
+@section headContent {
+    @Html.Partial("_TwitterStyle")
+    <script type="text/javascript">//<![CDATA[
+        Twitter_Handle = '@(Model.GetTwitterHandle())';
+        //]]</script>
+}
+
+@Html.Partial("_BasicBreadcrumb", "Connect")
+
+    @{
+        var contentItem = CommonUtilities.GetContentItem(ContentKeys.ConnectHeader, Model.ProfileId)
+                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectHeader, ProfileIds.LongerLives);
+        var headerText = CommonUtilities.GetContentItem(ContentKeys.ConnectHeaderText, Model.ProfileId)
+                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectHeaderText, ProfileIds.LongerLives);
+        var bodyText = CommonUtilities.GetContentItem(ContentKeys.ConnectBodyText, Model.ProfileId)
+                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectBodyText, ProfileIds.LongerLives);
+     }
+
+<div id="content" class="connect_content clearfix">
+    @Html.Partial("_TwitterFeed")
+    <div id="main_content">
+        @(contentItem.HtmlEncodedString)
+        <div class="hr">
+            <hr />
+        </div>
+        @(headerText.HtmlEncodedString)
+        <div class="hr hr_thin">
+            <hr />
+        </div>
+        @(bodyText.HtmlEncodedString)
+        <div id="disqus_thread">
+        </div>
+        <script type="text/javascript">
+            var disqus_shortname = 'longerlivesphe';
+
+             @* DON'T EDIT BELOW THIS LINE *@
+            (function () {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments
+                                                     powered by Disqus.</a>
+        </noscript>
+    </div>
+</div>
+

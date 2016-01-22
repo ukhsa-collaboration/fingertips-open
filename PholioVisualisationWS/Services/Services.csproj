@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7F25ED64-20A5-491A-BA93-04DDDDAD0C4C}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PholioVisualisation.Services</RootNamespace>
+    <AssemblyName>PholioVisualisation.Services</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <TargetFrameworkProfile />
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DundasWebChart, Version=7.0.0.1782, Culture=neutral, PublicKeyToken=90d06b0c62d592d0, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\DundasCharts\DundasWebChart.dll</HintPath>
+    </Reference>
+    <Reference Include="DundasWebExtensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=162411ffeeeba8dc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\DundasCharts\DundasWebExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="SpreadsheetGear, Version=6.0.3.222, Culture=neutral, PublicKeyToken=39c186f5904944ec, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\SpreadsheetGear.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Services" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseChart.cs" />
+    <Compile Include="HttpHandlers\Search.cs" />
+    <Compile Include="JsonBuilderAreaMapping.cs" />
+    <Compile Include="JsonBuilderParentAreaGroups.cs" />
+    <Compile Include="HttpHandlers\AreaLookup.cs" />
+    <Compile Include="JsonBuilderAreaCategories.cs" />
+    <Compile Include="JsonBuilderGroupRoots.cs" />
+    <Compile Include="DataDownloadBespoke.cs" />
+    <Compile Include="ExportHelper.cs" />
+    <Compile Include="HttpHandlers\GetDataDownload.cs" />
+    <Compile Include="HttpHandlers\GetLabelSeries.cs" />
+    <Compile Include="HttpHandlers\GetData.cs" />
+    <Compile Include="HttpHandlers\GetTrendDataBySearch.cs" />
+    <Compile Include="JsonBuilderAreaAddress.cs" />
+    <Compile Include="JsonBuilderAreaData.cs" />
+    <Compile Include="JsonBuilderAreaValues.cs" />
+    <Compile Include="JsonBuilderGroupedIndicatorNames.cs" />
+    <Compile Include="JsonBuilderHelpText.cs" />
+    <Compile Include="JsonBuilderIndicatorMetadata.cs" />
+    <Compile Include="JsonBuilderGetLabel.cs" />
+    <Compile Include="HttpHandlers\GetLabel.cs" />
+    <Compile Include="HttpHandlers\GetGroupDataAtDataPointBySearch.cs" />
+    <Compile Include="HttpHandlers\GetGroupDataAtTimePoint.cs" />
+    <Compile Include="JsonBuilderGetLabelSeries.cs" />
+    <Compile Include="JsonBuilderIndicatorStats.cs" />
+    <Compile Include="JsonBuilderParentAreas.cs" />
+    <Compile Include="JsonBuilderSearchIndicators.cs" />
+    <Compile Include="HttpHandlers\GetChart.cs" />
+    <Compile Include="HttpHandlers\GetGroupDataAtDataPoint.cs" />
+    <Compile Include="JsonBuilderGroupData.cs" />
+    <Compile Include="HttpHandlers\GetTrendData.cs" />
+    <Compile Include="JsonBuilderGroupingTree.cs" />
+    <Compile Include="JsonpBuilderAreaLookup.cs" />
+    <Compile Include="PracticeChart.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="JsonBuilderBase.cs" />
+    <Compile Include="JsonBuilderGroupDataAtDataPoint.cs" />
+    <Compile Include="JsonBuilderGroupDataAtDataPointBySearch.cs" />
+    <Compile Include="JsonBuilderGroupDataAtTimePoint.cs" />
+    <Compile Include="JsonBuilderTrendData.cs" />
+    <Compile Include="JsonBuilderTrendDataBySearch.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
+      <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>
+      <Name>ExceptionLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Analysis\Analysis.csproj">
+      <Project>{6C6F1C27-953F-4B31-8B0B-6A998E57CB68}</Project>
+      <Name>Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Cache\Cache.csproj">
+      <Project>{66469F84-9E90-4BF5-AA88-EFBB5A10503D}</Project>
+      <Name>Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
+      <Project>{A9FD008C-07B0-49BF-87B2-BC1A39242282}</Project>
+      <Name>DataConstruction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Formatting\Formatting.csproj">
+      <Project>{EE646860-6872-48B7-B67F-B2D717953139}</Project>
+      <Name>Formatting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PdfData\PdfData.csproj">
+      <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
+      <Name>PdfData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
+      <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>
+      <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Export\Export.csproj">
+      <Project>{85526825-84FB-4EAD-A98A-16ECE3CCE8CA}</Project>
+      <Name>Export</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RequestParameters\RequestParameters.csproj">
+      <Project>{99D1ECEB-E3A8-40A2-83C5-7FF9304B472E}</Project>
+      <Name>RequestParameters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SearchQuerying\SearchQuerying.csproj">
+      <Project>{618BCEBB-2D74-4146-BF59-53A58E006A8C}</Project>
+      <Name>SearchQuerying</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceActions\ServiceActions.csproj">
+      <Project>{40254974-c7e8-4303-b3ff-bf8a0f8c6491}</Project>
+      <Name>ServiceActions</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="web.config" />
+    <Content Include="packages.config" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:64959/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,145 @@
+﻿@using Fpm.MainUI
+@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
+@using Fpm.Upload
+@model List<Fpm.MainUI.Models.DomainIndicatorsSearchResult>
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Search Results";
+    var areAnySearchResults = Model != null && Model.Count > 0;
+    var wasTextSearch = string.IsNullOrEmpty(Request.QueryString["IndicatorId"]);
+    string searchedFor;
+    if (wasTextSearch)
+    {
+        searchedFor = @Request.QueryString["searchTerm"];
+    }
+    else
+    {
+        searchedFor = @Request.QueryString["IndicatorId"];
+    }
+}
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
+<script src="@(AppConfig.JsPath)jquery.watermark.min.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)PageSearchResults.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)PageCoreData.js" type="text/javascript"></script>
+
+<div class="standardWidth">
+    @using (Html.BeginForm("CopyMultipleIndicators", "Search", FormMethod.Get, new { id = "IndicatorManagementForm" }))
+    {
+        <fieldset class="filtering">
+            <div>
+                @if (wasTextSearch)
+                {
+                    //This is an indicator name search
+                    <b>Results for: "@searchedFor"</b>
+                }
+                else
+                {
+                    //This is an indicator Id search
+                    <b>Results for ID: "@searchedFor"</b>
+                }
+                <input id="IndicatorId" type="text" size="6" class="search-watermark" name="IndicatorId" placeholder="Enter Indicator ID">
+                <input id="search_text" type="text" size="50" class="search-watermark" name="search_text" placeholder="Enter Search Term - Min. 3 Characters">
+                <b>
+                    <input type="button" id="searchAll" class="search-button" value="Search Again" />
+                </b>
+            </div>
+        </fieldset>
+        @Html.Hidden("selectedIndicators", new { id = "selectedIndicators" })
+
+        if (areAnySearchResults)
+        {
+            <table id="searchResults" class="sortable">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Profile</th>
+                        <th>Domain</th>
+                        <th>Indicator Name</th>
+                        <th>Sex</th>
+                        <th>Age Id</th>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Area</th>
+                        <th>
+                            Select
+                        </th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    @foreach (var domainIndicatorsSearchResult in Model)
+                    {
+                        TimePeriodReader timePeriodReader = new TimePeriodReader();
+                        foreach (var indicatorName in domainIndicatorsSearchResult.Indicators)
+                        {
+                            <tr>
+                                <td class="left">
+                                    @indicatorName.IndicatorId
+                                </td>
+                                <td class="left">
+                                    @domainIndicatorsSearchResult.ProfileName
+                                </td>
+                                <td class="left">
+                                    @domainIndicatorsSearchResult.GroupName
+                                </td>
+                                <td class="left">
+                                    <a class="edit-link" href="@(CommonUtilities.GetIndicatorUrl(indicatorName.IndicatorId, indicatorName.AgeId, indicatorName.SexId, domainIndicatorsSearchResult.UrlKey, indicatorName.AreaTypeId, domainIndicatorsSearchResult.SequenceId))">@indicatorName.IndicatorName</a>
+                                </td>
+                                <td class="left">
+                                    @indicatorName.Sex
+                                </td>
+                                <td class="left">
+                                    @indicatorName.Age (@indicatorName.AgeId)
+                                </td>
+                                <td class="left">
+                                    @timePeriodReader.GetPeriodString(TimePeriod.GetBaseline(indicatorName), indicatorName.YearTypeId)
+                                </td>
+                                <td class="left">
+                                    @timePeriodReader.GetPeriodString(TimePeriod.GetDataPoint(indicatorName), indicatorName.YearTypeId)
+                                </td>
+                                <td class="left">
+                                    @indicatorName.AreaType
+                                </td>
+                                <td class="center">
+                                    @Html.CheckBox(indicatorName.IndicatorId + "_selected", false, new
+                                    {
+                                        @class = "indicator-check-box",
+                                        @value = indicatorName.IndicatorId,
+                                        id = domainIndicatorsSearchResult.UrlKey + '~' + domainIndicatorsSearchResult.GroupId + '~' + 
+                                             indicatorName.IndicatorId + '~' + indicatorName.AreaTypeId + '~' + indicatorName.SexId + '~' +
+                                             indicatorName.AgeId
+                                    })
+                                </td>
+                                 <td class="center">
+                                    <input type="button" class="view-indicator-data-btn" id="view-data-@indicatorName.IndicatorId " value="View Data"  indicatorname="@indicatorName.IndicatorName" />
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <div>
+                <b>Profile</b>
+                @Html.DropDownList("selectedProfileId", (IEnumerable<SelectListItem>)ViewBag.listOfProfiles, new { @Id = "selectedProfileId", @Name = "selectedProfileId", @class = "create-indicator-dropdown dropdown-selected" })
+                <b>Domain</b>
+                @Html.DropDownList("selectedDomainId", (IEnumerable<SelectListItem>)ViewBag.ListOfDomains, new { @Id = "selectedDomainId", @Name = "selectedDomainId", @class = "create-indicator-dropdown dropdown-selected" })
+                <b>
+                    <input style="display: inline" type="submit" id="copy_multiple_indicators" value="Copy Selected Indicators" />
+                </b>
+            </div>
+        }
+        else
+        {
+            <b>No indicators were found for "@searchedFor"</b>
+        }
+    }
+</div>
+
+<div class="modal">
+    <!-- Place at bottom of page -->
+</div>
+
+

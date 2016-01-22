@@ -1,0 +1,635 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="PholioVisualisation.PholioObjects"
+                   namespace="PholioVisualisation.PholioObjects">
+
+  <!-- ParentAreaGroup class -->
+  <class name="ParentAreaGroup" table="ws_profileparentareaoptions">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="ProfileId" column="profileid"/>
+    <property name="ChildAreaTypeId" column="childareatypeid"/>
+    <property name="ParentAreaTypeId" column="parentareatypeid"/>
+    <property name="CategoryTypeId" column="categorytypeid"/>
+    <property name="Sequence" column="sequence"/>
+
+  </class>
+
+  <!-- ProfileParentAreas class -->
+  <class name="ProfileParentAreas" table="ws_profileparentareas">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="ProfileId" column="ProfileId"/>
+    <property name="ParentAreaTypeId" column="ParentAreaTypeId"/>
+    <property name="ParentAreaCodeString" column="ParentAreaCodes"/>
+
+  </class>
+
+  <!-- ProfileConfig class -->
+  <class name="ProfileConfig" table="ui_profiles">
+
+    <id name="ProfileId" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="UrlKey" column="url_key"/>
+    <property name="AreaCodesIgnoredEverywhereString" column="areas_ignored_everywhere"/>
+    <property name="AreaCodesIgnoredForSpineChartString" column="areas_ignored_for_spine_chart"/>
+    <property name="AreIndicatorsExcludedFromSearch" column="exclude_indicators_from_search"/>
+    <property name="IsNational" column="is_national"/>
+    <property name="ShouldBuildExcel" column="should_build_excel"/>
+    <property name="HasTrendMarkers" column="has_trend_markers"/>
+  </class>
+
+  <!-- ValueNote class -->
+  <class name="ValueNote" table="l_valuenotes">
+
+    <id name="Id" column="valuenoteid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Text" column="text"/>
+  </class>
+
+  <!-- TargetConfig class -->
+  <class name="TargetConfig" table="L_Targets">
+
+    <id name="Id" column="targetid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="LowerLimit" column="lowerlimit"/>
+    <property name="UpperLimit" column="upperlimit"/>
+    <property name="BespokeTargetKey" column="bespoketargetkey"/>
+    <property name="PolarityId" column="polarityid"/>
+    <property name="Description" column="description"/>
+
+  </class>
+
+  <!-- HelpText class -->
+  <class name="HelpText" table="WS_HelpText">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Key" column="help_key"/>
+    <property name="Text" column="help_text"/>
+
+  </class>
+
+  <!-- ContentItem class -->
+  <class name="ContentItem" table="fpm_content">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="ContentKey" column="contentkey"/>
+    <property name="ProfileId" column="profileid"/>
+    <property name="Content" column="content"/>
+    <property name="IsPlainText" column="plaintextcontent"/>
+
+  </class>
+
+  <!-- AreaLink class -->
+  <class name="AreaLink" table="l_arealinks">
+
+    <id name="AreaCode" column="areacode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Url" column="url"/>
+
+  </class>
+
+  <!-- AreaHierarchy class -->
+  <class name="AreaHierarchy" table="l_areamapping">
+
+    <composite-id>
+      <key-property name="ParentAreaCode" column="parentlevelgeographycode" type="string" />
+      <key-property name="ChildAreaCode" column="childlevelgeographycode" type="string" />
+    </composite-id>
+
+  </class>
+
+  <!-- ComparatorConfidence class -->
+  <class name="ComparatorConfidence" table="l_comparatorconfidence">
+
+    <composite-id>
+      <key-property name="ComparatorMethodId" column="comparatormethodid" />
+      <key-property name="ConfidenceValue" column="comparatorconfidence" />
+    </composite-id>
+
+    <property name="ConfidenceVariable" column="confidencevar"/>
+
+  </class>
+
+  <!-- AreaType class -->
+  <class name="AreaType" table="l_areatypes">
+
+    <id name="Id" column="areatypeid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="areatypefull"/>
+    <property name="ShortName" column="areatype"/>
+
+  </class>
+
+  <!-- Area class -->
+  <class name="Area" table="l_areas">
+
+    <id name="Code" column="areacode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="areaname"/>
+    <property name="ShortName" column="areashortname"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+    <property name="IsCurrent" column="iscurrent"/>
+    <property name="Sequence" column="sequence"/>
+
+  </class>
+
+  <!-- PostcodeParentAreas class -->
+  <class name="PostcodeParentAreas" table="gis_postcodes">
+
+    <id name="Postcode" column="postcode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Id" column="id"/>
+    <property name="Easting" column="easting"/>
+    <property name="Northing" column="northing"/>
+    <property name="AreaCode19" column="areacode19"/>
+    <property name="AreaCode46" column="areacode46"/>
+    <property name="AreaCode101" column="areacode101"/>
+    <property name="AreaCode102" column="areacode102"/>
+    <property name="AreaCode103" column="areacode103"/>
+    <property name="AreaCode104" column="areacode104"/>
+  </class>
+
+  <!-- PlaceName class -->
+  <class name="PlaceName" table="gis_placenames">
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="placename"/>
+    <property name="PlaceType" column="placetype"/>
+    <property name="Postcode" column="postcode"/>
+    <property name="Easting" column="easting"/>
+    <property name="Northing" column="northing"/>
+
+    <many-to-one name="PostcodeParentAreas" column="postcode" lazy="false"/>
+  </class>
+
+  <!-- ConfidenceIntervalMethod class -->
+  <class name="ConfidenceIntervalMethod" table="l_cimethods">
+
+    <id name="Id" column="cimethodid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="Description" column="description"/>
+
+  </class>
+
+  <!-- EastingNorthing class -->
+  <class name="EastingNorthing" table="gis_areacoordinates">
+
+    <id name="AreaCode" column="areacode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Easting" column="easting"/>
+    <property name="Northing" column="northing"/>
+
+  </class>
+
+  <!-- AreaWithAddress class -->
+  <class name="AreaAddress" table="l_areas">
+
+    <id name="Code" column="areacode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="areaname"/>
+    <property name="ShortName" column="areashortname"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+
+    <property name="Address1" column="addressline1"/>
+    <property name="Address2" column="addressline2"/>
+    <property name="Address3" column="addressline3"/>
+    <property name="Address4" column="addressline4"/>
+    <property name="Postcode" column="postcode"/>
+    <property name="IsCurrent" column="iscurrent"/>
+
+    <many-to-one name="EastingNorthing" column="areacode" lazy="false" not-found="ignore"/>
+
+  </class>
+
+  <!-- CoreDataSet class -->
+  <class name="CoreDataSet" table="coredataset">
+
+    <id name="UniqueId" column="uid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="Value" column="value"/>
+    <property name="Count" column="count"/>
+    <property name="AreaCode" column="areacode"/>
+    <property name="Denominator" column="denominator"/>
+    <property name="Denominator2" column="denominator_2"/>
+    <property name="UpperCI" column="upperci"/>
+    <property name="LowerCI" column="lowerci"/>
+    <property name="Year" column="year"/>
+    <property name="YearRange" column="yearrange"/>
+    <property name="Quarter" column="quarter"/>
+    <property name="Month" column="month"/>
+    <property name="SexId" column="sexid"/>
+    <property name="AgeId" column="ageid"/>
+    <property name="CategoryTypeId" column="categorytypeid"/>
+    <property name="CategoryId" column="categoryid"/>
+    <property name="ValueNoteId" column="valuenoteid"/>
+  </class>
+
+  <!-- Unit class -->
+  <class name="Unit" table="l_units">
+
+    <id name="Id" column="unitid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Value" column="unitvalue"/>
+    <property name="Label" column="unitlabel"/>
+    <property name="ShowLabelOnLeftOfValue" column="showlabelonleftofvalue"/>
+
+  </class>
+  
+  <!-- Year Type class -->
+  <class name="YearType" table="l_yeartypes">
+
+    <id name="Id" column="yeartypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Label" column="yeartype"/>
+
+  </class>
+  
+  <!-- Value Type class -->
+  <class name="ValueType" table="l_valuetypes">
+
+    <id name="Id" column="valuetypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Label" column="valuetype"/>
+
+  </class>
+
+
+  <!-- IndicatorMetadata class -->
+  <class name="IndicatorMetadata" table="indicatormetadata">
+
+    <id name="IndicatorId" column="indicatorid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="ValueTypeId" column="valuetypeid"/>
+    <property name="UnitId" column="unitid"/>
+    <property name="YearTypeId" column="yeartypeid"/>
+    <property name="ConfidenceIntervalMethodId" column="cimethodid"/>
+    <property name="ConfidenceLevel" column="confidencelevel"/>
+    <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
+    <property name="TargetId" column="targetid"/>
+
+    <many-to-one name="Unit" column="unitid" lazy="false"/>
+    <many-to-one name="YearType" column="yeartypeid" lazy="false"/>
+    <many-to-one name="ValueType" column="valuetypeid" lazy="false"/>
+    <many-to-one name="TargetConfig" column="targetid" lazy="false" not-found="ignore"/>
+
+  </class>
+
+
+  <!-- IndicatorMetadataTextProperty class -->
+  <class name="IndicatorMetadataTextProperty" table="IndicatorMetadataTextProperties">
+
+    <id name="PropertyId" column="propertyid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="ColumnName" column="columnname"/>
+    <property name="DisplayName" column="displayname"/>
+    <property name="Definition" column="definition"/>
+    <property name="IsHtml" column="ishtml"/>
+    <property name="IsMandatory" column="ismandatory"/>
+    <property name="IsSearchable" column="issearchable"/>
+    <property name="IsSystemContent" column="issystemcontent"/>
+    <property name="DisplayOrder" column="displayorder"/>
+  </class>
+
+
+  <!-- Grouping class -->
+  <class name="Grouping" table="grouping">
+
+    <id name="GroupingId" column="groupingid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="GroupId" column="groupid"/>
+    <property name="SexId" column="sexid"/>
+    <property name="AgeId" column="ageid"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="ComparatorId" column="comparatorid"/>
+    <property name="Sequence" column="sequence"/>
+    <property name="PolarityId" column="polarityid"/>
+
+    <property name="YearRange" column="yearrange"/>
+
+    <property name="BaselineYear" column="baselineyear"/>
+    <property name="BaselineQuarter" column="baselinequarter"/>
+    <property name="BaselineMonth" column="baselinemonth"/>
+
+    <property name="DataPointYear" column="datapointyear"/>
+    <property name="DataPointQuarter" column="datapointquarter"/>
+    <property name="DataPointMonth" column="datapointmonth"/>
+
+    <property name="ComparatorMethodId" column="comparatormethodid"/>
+    <property name="ComparatorConfidence" column="comparatorconfidence"/>
+    <property name="ComparatorTargetId" column="comparatortargetid"/>
+
+  </class>
+
+  <!-- GroupingMetadata class -->
+  <class name="GroupingMetadata" table="groupingmetadata">
+
+    <id name="Id" column="groupid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="groupname"/>
+    <property name="Sequence" column="sequence"/>
+    <property name="ProfileId" column="profileid"/>
+    
+  </class>
+
+
+  <!-- Age class -->
+  <class name="Age" table="l_ages">
+
+    <id name="Id" column="ageid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="age"/>
+  </class>
+
+
+  <!-- Sex class -->
+  <class name="Sex" table="l_sexes">
+
+    <id name="Id" column="sexid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Name" column="sex"/>
+    <property name="Sequence" column="sequence"/>
+  </class>
+
+  
+  <!-- ExceptionLog class -->
+  <class name="ExceptionForStorage" table="t_exceptions">
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Environment" column="environment"/>
+    <property name="Application" column="application"/>
+    <property name="Date" column="date"/>
+    <property name="UserName" column="user_name"/>
+    <property name="Message" column="message"/>
+    <property name="StackTrace" column="stack_trace" type="StringClob"/>
+    <property name="Type" column="type"/>
+    <property name="Url" column="url"/>
+    <property name="Server" column="server"/>
+
+  </class>
+
+  <!-- KeyMessage Overrides -->
+  <class name="KeyMessageOverride" table="L_KeyMessageOverrides">
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="MessageId" column="messageid"/>
+    <property name="ProfileId" column="profileid"/>
+    <property name="AreaCode" column="areacode"/>
+    <property name="MessageText" column="messagetext"/>
+  </class>
+
+  <!-- CategorisedArea -->
+  <class name="CategorisedArea" table="l_categorisedareas">
+    <id name="Id" column="categorisedareaid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="AreaCode" column="areacode"/>
+    <property name="ParentAreaTypeId" column="parentareatypeid"/>
+    <property name="ChildAreaTypeId" column="childareatypeid"/>
+    <property name="CategoryTypeId" column="categorytypeid"/>
+    <property name="CategoryId" column="categoryid"/>
+  </class>
+
+  <!-- CategoryType -->
+  <class name="CategoryType" table="l_categorytypes">
+    <id name="Id" column="categorytypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="name"/>
+    <property name="ShortName" column="shortname"/>
+
+    <set name="CategoriesFromDatabase">
+      <key column="categorytypeid"  not-null="true"/>
+      <one-to-many class="Category" />
+    </set>
+    
+  </class>
+
+  <!-- Category -->
+  <class name="Category" table="l_categories">
+    <composite-id>
+      <key-property name="CategoryTypeId" column="categorytypeid" type="int" />
+      <key-property name="CategoryId" column="categoryid" type="int" />
+    </composite-id>
+    <property name="Name" column="name"/>
+    <property name="ShortName" column="shortname"/>
+  </class>
+
+  <!-- NHS area mapping -->
+  <class name="AreaCodeNhsMapping" table="l_areacodenhsmapping">
+    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="NhsChoicesId" column="NhsChoicesId"/>
+  </class>
+
+  <!-- ProfilePdf-->
+  <class name="ProfilePdf" table="ui_profilepdfs">
+    <composite-id>
+      <key-property name="ProfileId" column="profileid" type="int" />
+      <key-property name="AreaTypeId" column="areatypeid" type="int" />
+    </composite-id>
+  </class>
+  
+  <!-- NeighbourMapping -->
+  <class name="AreaCodeNeighbourMapping" table="l_areacodeneighbourmapping">
+    <id name="Id" column="Id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="AreaCode" column="areacode" />
+    <property name="Position" column="position" />
+    <property name="NeighbourAreaCode" column="NeighbourAreaCode" />
+    <property name="NeighbourTypeId" column="NeighbourTypeId" />
+  </class> 
+  
+  <!-- Get Nearby Practices by calling stored procedure  -->
+  <sql-query name="GetNearbyGpPractice_SP">
+    <query-param name="easting" type="string"/>
+    <query-param name="northing" type="string"/>
+    <query-param name="areatypeid" type="int32"/>
+
+    <return-scalar column="AreaCode" type="string"/>
+    <return-scalar column="AreaName" type="string"/>
+    <return-scalar column="AddressLine1" type="string"/>
+    <return-scalar column="AddressLine2" type="string"/>
+    <return-scalar column="Postcode" type="string"/>
+    <return-scalar column="AreaTypeID" type="string"/>
+    <return-scalar column="Distance" type="double"/>
+    <return-scalar column="Easting" type="double"/>
+    <return-scalar column="Northing" type="double"/>
+    exec [dbo].[usp_find_nearby_gp_practices] :easting, :northing, :areatypeid
+  </sql-query>
+
+  <!-- SQL Queries -->
+  <sql-query name="GetCoreDataSetCount">
+    SELECT COUNT(*)
+    FROM dbo.CoreDataSet
+    INNER JOIN dbo.L_Areas ON dbo.CoreDataSet.AreaCode = dbo.L_Areas.AreaCode
+    WHERE AreaTypeID IN (:areaTypeIds) AND IndicatorId = :indicatorId
+    AND AgeID = :ageId AND SexID = :sexId AND YearRange = :yearRange
+    AND Year = :year AND Quarter = :quarter AND Month = :month AND CategoryId = -1
+  </sql-query>
+
+  <sql-query name="GetChildAreas">
+    SELECT AreaCode, AreaName, AreaShortName, AreaTypeId
+    FROM dbo.l_areas
+    INNER JOIN dbo.L_AreaMapping ON AreaCode = ChildLevelGeographyCode
+    WHERE ParentLevelGeographyCode = :parentArea
+    AND iscurrent = 1
+    AND areatypeid IN (:childAreaTypeIds)
+    ORDER BY AreaName
+  </sql-query>
+
+  <sql-query name="GetChildAreaCodes">
+    SELECT AreaCode
+    FROM dbo.l_areas
+    INNER JOIN dbo.L_AreaMapping ON AreaCode = ChildLevelGeographyCode
+    WHERE ParentLevelGeographyCode = :parentAreaCode
+    AND iscurrent = 1
+    AND areatypeid IN (:childAreaTypeIds)
+    ORDER BY AreaName
+  </sql-query>
+
+  <sql-query name="GetParentsFromChildAreaIdAndParentAreaTypeId">
+    SELECT t1.AreaCode, t1.AreaName, t1.AreaShortName, t1.AreaTypeId, t3.AreaCode as 'ChildAreaCode'
+    FROM dbo.l_areas t1
+    INNER JOIN dbo.L_AreaMapping t2 ON t1.AreaCode = t2.ParentLevelGeographyCode
+    INNER JOIN dbo.l_areas t3 on t3.AreaCode = t2.ChildLevelGeographyCode
+    WHERE t3.areatypeid = :childAreaTypeId AND t1.areatypeid in (:parentAreaTypeIds) AND t3.iscurrent = 1
+  </sql-query>
+
+  <sql-query name="GetAllParentsFromChildAreaId">
+    SELECT t1.AreaCode, t1.AreaName, t1.AreaShortName, t1.AreaTypeId, t3.AreaCode as 'ChildAreaCode'
+    FROM dbo.l_areas t1
+    INNER JOIN dbo.L_AreaMapping t2 ON t1.AreaCode = t2.ParentLevelGeographyCode
+    INNER JOIN dbo.l_areas t3 on t3.AreaCode = t2.ChildLevelGeographyCode
+    WHERE t1.areatypeid in (:childAreaTypeId) AND t3.iscurrent = 1
+  </sql-query>
+
+  <sql-query name="GetParents">
+    SELECT t1.AreaCode, t1.AreaName, t1.AreaShortName, t1.AreaTypeId
+    FROM dbo.l_areas t1
+    INNER JOIN dbo.L_AreaMapping t2 ON t1.AreaCode = t2.ParentLevelGeographyCode
+    INNER JOIN dbo.l_areas t3 on t3.AreaCode = t2.ChildLevelGeographyCode
+    WHERE t3.areacode = :childAreaCode AND t3.iscurrent = 1
+  </sql-query>
+
+  <sql-query name="GetQuinaryPopulationLabels">
+    SELECT Age
+    FROM dbo.L_Ages
+    WHERE (AgeID BETWEEN 4 AND 19) OR (AgeID IN (28,21,281,282))
+  </sql-query>
+
+  <sql-query name="GetChildAreaCount">
+    SELECT COUNT(*) FROM dbo.L_Areas
+    INNER JOIN dbo.L_AreaMapping ON AreaCode = ChildLevelGeographyCode
+    WHERE AreaTypeId IN (:areaTypeIds)
+    AND ParentLevelGeographyCode = :parentAreaCode
+    AND IsCurrent = 1
+  </sql-query>
+
+  <sql-query name="GetIndicatorMetadataTextValuesByGroupIds">
+    SELECT IndicatorID, imtv.ProfileId, [1_Name], [2_NameLong], [3_Definition], [4_Rationale], [5_Policy], [6_DataSource], [7_Producer], [8_IndSourceLink], [9_IndMethod],
+    [10_StandardPop],[11_CIMethod], [12_CountSource],[13_CountDefinition],[14_DenomSource],[15_DenomDefinition],[16_DiscControl],[17_Caveats],[18_Copyright],
+    [19_Reuse],[20_Links],[21_RefNum],[22_Notes],[23_Frequency],[24_Rounding],[25_DataQuality],[26_IndicatorContent], ID
+    FROM IndicatorMetadataTextValues imtv
+    JOIN GroupingMetadata gm on imtv.ProfileId = gm.ProfileId
+    WHERE gm.GroupID IN (:groupIds)
+  </sql-query>
+
+  <sql-query name="GetIndicatorMetadataTextValuesByIndicatorIds">
+    SELECT *
+    FROM IndicatorMetadataTextValues
+    WHERE IndicatorID IN (:indicatorIds) AND ProfileId is NULL
+    ORDER BY IndicatorID
+  </sql-query>
+
+  <sql-query name="GetCcgPracticePopulations">
+    SELECT areacode, value
+    FROM CoreDataSet
+    INNER JOIN L_areamapping ON areacode = [ChildLevelGeographyCode]
+    WHERE indicatorid = :populationIndicatorId
+    AND CategoryId = -1
+    AND year = (SELECT MAX(year) FROM CoreDataSet WHERE indicatorid = :populationIndicatorId)
+    AND [ParentLevelGeographyCode] = :parentAreaCode
+  </sql-query>
+
+  <sql-query name="GetCategoriesWithinParentArea">
+    SELECT areacode, categoryid
+    FROM L_CategorisedAreas t1
+    INNER JOIN L_AreaMapping t2
+    ON childLevelGeographyCode = areacode
+    WHERE ParentAreaTypeID = 15 and
+    ChildAreaTypeID = :childAreaTypeId and
+    CategoryTypeID = :categoryTypeId and
+    parentLevelGeographyCode = :parentAreaCode
+  </sql-query>
+
+  <sql-query name="GetProfilesForIndicatorIds">
+    SELECT DISTINCT g.indicatorid as IndicatorId, g.groupid as GroupId, AreaTypeID as AreaTypeId,
+    gm.ProfileId as ProfileId , uip.name as ProfileName, uip.url_key as ProfileUrl,
+    skn.test_host as TestHostUrl, skn.live_host as LiveHostUrl
+    FROM grouping g
+    JOIN GroupingMetadata gm ON gm.GroupID = g.GroupID
+    JOIN UI_Profiles uip ON gm.ProfileId = uip.id
+    LEFT JOIN UI_SiteSkins skn ON uip.skin_id = skn.id
+    WHERE IndicatorID IN (:indicatorIds) AND AreaTypeID = :areaTypeId
+    ORDER BY uip.name
+  </sql-query>
+
+</hibernate-mapping>
+
+

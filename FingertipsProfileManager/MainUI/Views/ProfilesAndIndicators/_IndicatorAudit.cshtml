@@ -1,0 +1,41 @@
+﻿@using Fpm.MainUI
+@model IEnumerable<Fpm.ProfileData.Entities.Profile.IndicatorAudit>
+<script src="@(AppConfig.JsPath)common-functions.js" type="text/javascript"></script>
+<div style="height: 500px; overflow: auto">
+    <h3>
+        Indicator Audit History
+    </h3>
+    <table id="auditTable" class="sortable" style="width:auto">
+        <thead>
+            <tr>
+                <th class="header">Date</th>
+                <th class="header">Indicator</th>
+                <th class="header">User</th>
+                <th class="header">Audit</th>
+                <th class="header">Audit Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNumber = 0;
+            }
+
+            @foreach (var indicatorAudit in Model)
+            {
+                var className = rowNumber++ % 2 == 0 ? "odd" : "even";
+                
+                <tr class="@className">
+                    <td>@indicatorAudit.Timestamp</td>
+                    <td>@indicatorAudit.IndicatorId</td>
+                    <td>@indicatorAudit.User</td>
+                    <td>@indicatorAudit.ReasonForChange</td>
+                    <td>@indicatorAudit.AuditType</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <input class="small-button" id="Cancel" onclick="lightbox.hide()" value="Close" />
+</p>

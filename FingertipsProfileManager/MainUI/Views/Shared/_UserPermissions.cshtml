@@ -1,0 +1,34 @@
+﻿
+@using Fpm.MainUI.ViewModels
+@model IEnumerable<Fpm.MainUI.ViewModels.ProfileUser>
+
+<h2 class="subheading">User permissions</h2>
+
+<table class="grid">
+    <tr>
+        <th>User Name</th>
+        <th>
+            Assigned Permission <input class="select-all-check-box" id="select-all" name="select-all" type="checkbox" value="true" /><input name="select-all" type="hidden" value="false" />
+        </th>
+    </tr>
+    
+     @foreach (ProfileUser user in ViewBag.AllUsers)
+     {
+         var checkBoxId = "chk" + user.Id;
+         
+         <tr>
+            <td class="left">@user.Name</td>
+            <td class="center">
+                
+                @if (@Model.Any(item => item.Id == user.Id))
+                {
+                    @Html.CheckBox(checkBoxId , new { @class = "selectable-check-box", @value= user.Name, @checked = "checked"})    
+                }
+                else
+                {
+                    @Html.CheckBox(checkBoxId , new { @class = "selectable-check-box", @value = user.Name })    
+                }
+            </td>
+        </tr>
+     }
+</table>

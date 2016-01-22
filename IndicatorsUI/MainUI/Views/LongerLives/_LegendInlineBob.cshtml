@@ -1,0 +1,16 @@
+﻿@model string
+<p class="legend">
+    @Model <span id="outcomes-header"></span>
+    <span class="grade">
+        <img src="@(ViewBag.ImagesUrl)Mortality/bobLower.png" alt="worse" />lower
+    </span>
+    <span class="grade">
+        <img src="@(ViewBag.ImagesUrl)Mortality/grade-2.png" alt="consistent" />consistent
+    </span>
+    <span class="grade">
+        <img src="@(ViewBag.ImagesUrl)Mortality/bobHigher.png" alt="better" />higher
+    </span>
+@*    <span class="grade">*@
+@*        <img src="@(ViewBag.ImagesUrl)Mortality/no-data.png" alt="" />data unavailable*@
+@*    </span>*@
+</p>

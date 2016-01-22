@@ -1,0 +1,80 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.Upload.BaseUpload
+@{
+    var cannotUpload = new MvcHtmlString("<p style=\"color: red;\">This file cannot be uploaded. </p>");
+    const string seeMoreLinkText = "Click here to see more information";
+}
+<tr>
+    <td class="left">Filename:</td>
+    <td>@Model.ShortFileName</td>
+</tr>
+<tr>
+    <td class="left">Rows:</td>
+    <td>@Model.TotalDataRows</td>
+</tr>
+<tr>
+    <td class="left">Summary:</td>
+    <td>
+        @if (Model.DoesFileExceedMaximumSize())
+        {
+            @(cannotUpload)            
+            <p>The maximum upload file size exceeded. </p>
+        }
+        else
+        {
+            if (Model.HasPholioSheet() == false)
+            {
+                @(cannotUpload)
+                <p>
+                    The uploaded spreadsheet must contain @Model.RequiredWorksheetText().
+                </p>
+            }
+            else
+            {
+                // Don't give the user validation details if they can't upload the data anyway
+                if (UploadHelper.AnyDisallowedIndicators(ViewBag.Disallowed) == false)
+                {
+                    if (Model.UploadValidationFailures.Any())
+                    {
+                        @(cannotUpload)
+                        <p>
+                            @Model.UploadValidationFailures.Count row(s) failed data-type validation.
+                        </p>
+                        <a id="show-datatype-errors-link" class="upload-error" href="#">@seeMoreLinkText</a>
+                    }
+                    else
+                    {
+                        if (Model.CanFileBeUploaded())
+                        {
+                            if (Model.DuplicateRowInDatabaseErrors.Any())
+                            {
+                                var count = @Model.DuplicateRowInDatabaseErrors.Count;
+                                <p style="padding-top: 5px;">
+                                    <div>There @(count == 1 ? "is" : "are") @count duplicated row(s) in the PHOLIO database. This file can still be uploaded. The duplicate rows that already exist in PHOLIO will be archived and replaced with those in this file.</div>
+                                    <a id="show-duplicateData-errors-link" class="upload-error" href="#">@seeMoreLinkText</a><br/>
+                                </p>
+                            }
+                            else
+                            {
+                                <p id="show-datatype-success">
+                                    All rows have passed validation.
+                                </p>
+                            }
+                        }
+
+                        if (Model.DuplicateUploadErrorsExist)
+                        {
+                            <p style="padding-top: 5px;">
+                                @{
+                                    var duplicateIndicators = Model.DuplicateRowInSpreadsheetErrors.Count;
+                                }
+                                <div>There are @duplicateIndicators rows in the batch file that are duplicated. This file can still be uploaded. Where rows are duplicated in the batch file the first occurence of the row will be uploaded and subsequent duplicates will be ignored.</div>
+                                <a id="show-duplicateSpreadsheet-errors-link" class="upload-error" href="#">@seeMoreLinkText</a>
+                            </p>
+                        }
+                    }
+                }
+            }
+        }
+    </td>
+</tr>

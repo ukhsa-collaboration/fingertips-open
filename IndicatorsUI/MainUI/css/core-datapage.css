@@ -1,0 +1,627 @@
+
+/* ------------------------------------------------------------
+	Domain options
+------------------------------------------------------------ */
+#domainBox
+{
+    width: 1000px;
+    margin: 0 auto;
+    padding: 3px 0 0 0;
+}
+
+    #domainBox table {
+    width:100%;
+        border-collapse: collapse;
+    }
+
+.domainOption
+{
+    text-align: center;
+    cursor: pointer;
+    color: #0b0c0c;
+    text-decoration: none;
+    border-left: 2px solid transparent;
+    padding: 5px 0 3px 0;
+    font-size: 1.2em;
+    vertical-align: top;
+}
+
+.clickable
+{
+    cursor: pointer;
+}
+
+.domainOption:hover, a.pageSelector:hover, a.start:hover
+{
+    text-decoration: underline;
+}
+.selectedDomain, .selectedDomain:hover
+{
+    background-color: #0b0c0c;
+    text-decoration: none;
+    color: white;
+}
+ a.pageSelected, a.pageSelected:visited, a.pageSelected:hover, a.pageSelected:active
+{
+    background-color: #181784;
+    color: white;
+}
+
+ /* ------------------------------------------------------------
+	Area switch extra options
+------------------------------------------------------------ */
+ .area-switch-options {
+    margin-top: 10px;
+    float: right;
+}
+
+.area-switch-options table {
+    float: right;
+}
+
+.area-switch-options a{
+    padding: 1px 2px;
+    text-decoration: none;
+    color: #1f0aa1;
+    text-align: left;
+}
+
+.area-switch-options a.selected,
+.area-switch-options a.selected:hover
+ {
+    background-color: #006666;
+    color: white;
+    text-decoration: none;
+    cursor:default;
+}
+
+/* ------------------------------------------------------------
+	Tartan rug
+------------------------------------------------------------ */
+
+div.tartanText {
+    font-size: 12px;
+}
+
+#leftTartanBox {
+    float: left;
+    clear: left;
+    padding-top: 27px;
+}
+
+#leftTartanTable {
+    border-right: none;
+    table-layout: fixed;
+    float: left;
+}
+
+.scroll-pane {
+    overflow: hidden;
+    float: left;
+    position: relative;
+}
+
+.scrollbar {
+    padding: 0 0 0 0;
+    margin: 0 2px 0 2px;
+    float: left;
+    clear: both;
+    height: 27px;
+    border: none;
+}
+
+    .scrollbar table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+.tartanDivider {
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 50px;
+    background-image: url(../images/comparatorBg.gif);
+    font-size: 12px;
+    font-style: italic;
+    font-weight: bold;
+    letter-spacing: 3px;
+}
+
+.dividerBox {
+    overflow: visible;
+    z-index: 10;
+    width: 800px;
+    position: relative;
+}
+
+.dividerText {
+    position: absolute;
+    z-index: 10;
+    width: 800px;
+    color: #555;
+    top: 0;
+    height: 18px;
+}
+
+#leftTartanTable td.tartanDivider {
+    border-right: none;
+}
+
+#tartanScrollBox {
+    width: 5000px; /*need to be bigger if more areas*/
+    overflow: hidden;
+    float: left;
+}
+
+    #tartanScrollBox table {
+        border-left: none;
+        table-layout: fixed;
+        width: auto;
+    }
+
+    #tartanScrollBox .scrollbar table {
+        width: inherit;
+    }
+
+    #tartanScrollBox td.tartanDivider {
+        border-left: none;
+    }
+
+    #tartanScrollBox th.rugIndicator,
+    #tartanScrollBox .rugPeriod {
+        color: white;
+    }
+
+    #tartanScrollBox td.rugIndicator {
+        color: white;
+        border-top-color: white;
+        border-bottom-color: white;
+    }
+
+th.comparatorHeader
+{
+    background-image: url(../images/comparatorBg.gif);
+}
+
+ #tartanTableBox
+{
+    width: 100%;
+}
+
+th.rugIndicator, td.rugIndicator
+{
+    width: 224px;
+}
+
+th.rugIndicator
+{
+    font-weight: bold;
+    vertical-align: bottom;
+    text-align: left;
+    height: 230px;
+}
+th.rugIndicator div
+{
+    float: left;
+    padding-left: 70px;
+    width: 100px;
+}
+td.rugIndicator div
+{
+    width: 220px;
+    padding: 0 2px 0 2px;
+}
+
+th.rugPeriod, td.rugPeriod
+{
+    width: 58px;
+}
+
+#tartanScrollBox .rugIndicator {
+    visibility: hidden;
+}
+
+/* ------------------------------------------------------------
+	Other tabs
+------------------------------------------------------------ */
+
+#singleAreaTable
+{
+    float: left;
+    clear: left;
+    margin-top: 8px;
+}
+#indicators-container, #download-container
+{
+    width: 1000px;
+}
+#spineIndicatorHeader 
+{
+     width: 339px;
+}
+
+#spinePeriodHeader {
+    width: 80px;
+}
+
+.hide .barBox {
+    display: none;
+}
+
+
+/* ------------------------------------------------------------
+	Data quality
+------------------------------------------------------------ */
+
+.indicator-data-quality-container {
+    display: inline-block;
+    position: relative;
+    height: 17px;
+    top: 1px;
+}
+
+.data-quality-table div {
+    height: 12px;
+}
+
+.data-quality-table .label {
+    padding-left: 4px;
+}
+
+.data-quality-table td.label {
+    padding-left: 2px;
+}
+
+.data-quality-table .legendText {
+    font-style: italic;
+    text-align: right;
+}
+
+.data-quality-table{
+    font-size: 11px;
+    color: #777;
+    margin: 0 0 0 30px;
+}
+
+#data-quality-key {
+    margin-top: 9px;
+    clear: left;
+}
+
+/* ------------------------------------------------------------
+	Keys
+------------------------------------------------------------ */
+
+IMG.keyBar {
+    position: relative !important;
+    width: 20px;
+    height: 11px !important;
+    background: #ddd;
+    border-radius: 2px;
+}
+
+TD.keyBar {
+    width: 20px;
+    padding: 2px 1px 0 5px;
+}
+
+IMG.keyCircle {
+    position: relative;
+    top: 1px;
+}
+
+td.keySpine {
+    padding: 0 3px 0 3px;
+    vertical-align: middle;
+}
+
+div.keySpineText {
+    display: block;
+    height: 18px;
+    line-height: 18px;
+    float: left;
+    padding-left: 2px;
+}
+
+.keyCircleBox {
+    float: left;
+    padding-top: 3px;
+}
+
+.keyText {
+    font-style: italic;
+    text-align: right;
+}
+.keyContainer {
+    float: left;
+    margin: 10px 0 0 0;
+}
+
+#spineRangeKeyContainer {
+    position: relative;
+    top: 10px;
+    right: 0;
+}
+
+#spine-range-key {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#keyAdHoc, #key-spine-chart, #key-bar-chart {
+    position: relative;
+}
+
+#key-spine-chart .data-quality-table {
+    margin-left: 40px;
+    margin-right: 0;
+}
+
+div.keyBox, div.keyBoxNone
+{
+    height: 20px;
+    line-height: 20px;
+    width: 45px;
+    vertical-align: middle;
+}
+td.keyBoxRight
+{
+    border-right: 1px solid #eee;
+}
+td.keyBoxRight div
+{
+    width: auto;
+    padding-left: 3px;
+    padding-right: 3px;
+}
+.keyTable, .notComparedkeyTable
+{
+    font-size: 11px;
+    color: #777;
+}
+
+.notComparedkeyTable {
+    margin:6px auto 0 auto;
+}
+
+.keyTable
+{
+    float: left;
+    margin-left: 30px;
+}
+
+#map-key-part2 div {
+    background: #c9c9c9;
+}
+.keyBox .tartanText
+{
+    margin-top: 0;
+    font-size: 11px;
+}
+.keySpacer 
+{
+ width:15px;   
+}
+
+.key .tartanText {
+    width: 45px;
+}
+
+#value-note-legend {
+    margin: 9px 0 0 30px;
+    float:left;
+    clear:left;
+    font-size: 11px;
+    color: #777;
+}
+
+#spineTable, #barTable {
+    margin-left: 30px;
+    float: left;
+}
+
+#spineTable td.quintileKey, .keyBar.quintileKey {
+     padding-top: 6px;
+}
+
+#trend-marker-legend-tartan table, #trend-marker-legend-barchart table {
+    margin-top: 10px;
+}
+
+/* ------------------------------------------------------------
+	Benchmark options
+------------------------------------------------------------ */
+
+#target-benchmark-box {
+    position: absolute;
+    right: 2px;
+    top: 29px;
+    font-size: 11px;
+    z-index: 1;
+}
+#target-benchmark-box .label {
+    padding-left: 2px;
+}
+
+/* ------------------------------------------------------------
+    Trends
+------------------------------------------------------------ */
+.target-label {
+    display: block;
+    float: left;
+    padding-top: 2px;
+    padding-right: 3px;
+}
+
+.target-legend {
+    margin-bottom: 3px;
+    float: left;
+    width: 370px;
+}
+
+#singleAreaTable THEAD 
+{
+     padding: 1px 1px 3px 1px;   
+}
+
+#searchResultText 
+{
+    padding-left:10px;
+}
+
+#main h2 {
+    padding-bottom:10px;
+}
+
+#sort-many-charts {
+    float: right;
+    clear: right;
+    margin-top: 15px;
+}
+
+/* ------------------------------------------------------------
+    Inequalities
+------------------------------------------------------------ */
+#inequalities-chart-box {
+    float: left;
+    width: 75%;
+    margin-bottom: 50px;
+}
+#inequalities-chart-box p {
+    text-align: center;
+    padding: 150px 0 150px 34%; /* no data */
+}
+#inequalities-partition-menu {
+    margin-top: 20px;
+    margin-right: 5%;
+    width: 20%;
+    float: right;
+}
+#inequalities-partition-menu p {
+    padding: 5px;
+    margin: 0;
+}
+#inequalities-partition-menu a {
+    display: block;
+    width: 100%;
+    float: left;
+    clear: both;
+    padding: 5px;
+}
+#inequalities-partition-menu a.selected {
+    background-color: #006666;
+    color: white;
+    text-decoration: none;
+    cursor: default;
+}
+
+/* ------------------------------------------------------------
+	Content tabs
+------------------------------------------------------------ */
+#scatter-container {
+    margin-top: 10px;
+}
+
+
+/* ------------------------------------------------------------
+	Content tabs
+------------------------------------------------------------ */
+
+#content {
+    padding-bottom: 50px;
+}
+
+#content h2 {
+    padding: 15px 0 20px 60px;
+}
+
+#content h3 {
+    padding: 20px 0 5px 0;
+}
+ #content ul {
+    list-style: disc;
+    list-style-position: outside;
+    font-size:15px;
+    padding: 10px 0;
+}
+ #content li {
+    padding: 1px 0;
+    margin-top: 7px;
+    margin-bottom: 7px;
+    margin-left: 18px;
+}
+#content p {
+    margin: 3px 0;
+    font-size: 17px;
+    line-height: 1.3em;
+}
+
+.a-link {
+      text-align: right;
+      color: #1f0aa1;
+}
+
+/* ------------------------------------------------------------
+	Nearest neighbours
+------------------------------------------------------------ */
+
+#nearestNeighbours-wrapper {
+    position: relative;
+    top: 36px;
+    left: 451px;
+    z-index: 5;
+    width: 400px;
+}
+
+#goBack a {
+    text-decoration: none;
+    margin-right: 50px;
+}
+
+#selected-nearest-neighbour a {
+    text-decoration: none;
+}
+
+.nearest-neighbours-show {
+    display: none;
+}
+
+#nearest-neighbour-link {
+    display: none;
+}
+
+#indicatorDetailsHeader .trendHeader {
+    padding-top: 10px !important;
+}
+
+.nearest-neighbour-selected-area {
+       font-size: 14.2px;
+}
+
+.nearest-neighbour-selected-area h2{
+    display: inline-block;
+}
+.nearest-neighbour-selected-area span {
+    font-size: 19.5px;
+    font-weight: bold;
+}
+
+#nearest-neighbour-extra-text {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+/* ------------------------------------------------------------
+	Area search
+------------------------------------------------------------ */
+#no-matches-found a {
+    cursor: default;
+    color: inherit;
+}
+
+.trendLegends .legendText {
+    padding-right: 10px;
+}
+.trendLegends img {
+    padding-right: 2px;
+}

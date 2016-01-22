@@ -1,0 +1,71 @@
+﻿@using Fpm.MainUI
+@model Fpm.MainUI.Models.AreaDetail
+<script src="@(AppConfig.JsPath)jquery-ui-1.9.2.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)area-management.js" type="text/javascript"></script>
+<link href="@(AppConfig.CssPath)area-detail.css" rel="stylesheet" type="text/css" />
+
+<div class="profile-title">Area Details</div>
+
+@using (Html.BeginForm("UpdateArea", "Areas", FormMethod.Post, new { id = "EditArea" }))
+{
+    @Html.HiddenFor(x => x.SearchAreaTypeId, new { id = "searchAreaTypeId", name = "searchAreaTypeId" })
+    @Html.HiddenFor(x => x.AreaDetails.AreaTypeId, new { id = "areaTypeId", name = "areaTypeId" })
+    @Html.HiddenFor(x => x.SearchText)
+    @Html.HiddenFor(model => model.AreaDetails.AreaCode, new { Name = "originalAreaCode", Id = "originalAreaCode" })
+
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Code:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AreaCode, new { @class = "unselected-domain mandatory", @style = "width: 500px", Name = "AreaDetails.AreaCode", Id = "AreaDetails.AreaCode" })
+        @Html.ValidationMessageFor(x => x.AreaDetails.AreaCode)
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Name:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AreaName, new { @class = "unselected-domain mandatory", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Short Name:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AreaShortName, new { @class = "unselected-domain", @style = "width: 500px" })
+        @Html.ValidationMessageFor(x => x.AreaDetails.AreaShortName)
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Address 1:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AddressLine1, new { @class = "unselected-domain", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Address 2:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AddressLine2, new { @class = "unselected-domain", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Address 3:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AddressLine3, new { @class = "unselected-domain", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Area Address 4:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.AddressLine4, new { @class = "unselected-domain", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Postcode:</label>
+        @Html.TextBoxFor(model => model.AreaDetails.Postcode, new { @class = "unselected-domain", @style = "width: 500px" })
+    </div>
+    <div class="delete-indicators">
+        <label class="area-item-detail-label">Is Current?:</label>
+        @Html.CheckBoxFor(x => x.AreaDetails.IsCurrent)
+    </div>
+
+    <p>
+        <input class="medium-button" id="Confirm" type="button" value="Confirm" />
+    </p>
+    <p>
+        <input class="small-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
+    </p>
+}
+
+<div id="dialog-confirm" title="Update the area code?" style="display: none;">
+    <span>The area code will be updated in the Pholio core data as well.</span>
+    <br />
+    <br />
+    <span>Please ensure that boundary files for Longer Lives and Phof are also updated.</span>
+    <br />
+    <br />
+    <span>Do you wish to continue?</span>
+</div>

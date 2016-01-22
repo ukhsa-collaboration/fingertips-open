@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="FingertipsUploadService.ProfileData"
+                   namespace="FingertipsUploadService.ProfileData.Entities.Core">
+
+  <!-- CoreDataSet class -->
+  <class name="CoreDataSet" table="coredataset">
+
+    <id name="Uid" column="uid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="Year" column="year"/>
+    <property name="YearRange" column="yearrange"/>
+    <property name="Quarter" column="quarter"/>
+    <property name="Month" column="month"/>
+    <property name="AgeId" column="ageid"/>
+    <property name="SexId" column="sexid"/>
+    <property name="AreaCode" column="areacode"/>
+    <property name="Count" column="count"/>
+    <property name="Value" column="value"/>
+    <property name="LowerCi" column="lowerci"/>
+    <property name="UpperCi" column="upperci"/>
+    <property name="Denominator" column="denominator"/>
+    <property name="Denominator_2" column="denominator_2"/>
+    <property name="ValueNoteId" column="valuenoteid"/>
+    <property name="UploadBatchId" column="uploadbatchid"/>
+    <property name="CategoryTypeId" column="categorytypeid"/>
+    <property name="CategoryId" column="categoryid"/>
+
+  </class>
+
+  <!-- CoreDataSetArchive class -->
+  <class name="CoreDataSetArchive" table="coredataset_archive">
+
+    <id name="Uid" column="uid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="Year" column="year"/>
+    <property name="YearRange" column="yearrange"/>
+    <property name="Quarter" column="quarter"/>
+    <property name="Month" column="month"/>
+    <property name="AgeId" column="ageid"/>
+    <property name="SexId" column="sexid"/>
+    <property name="AreaCode" column="areacode"/>
+    <property name="Count" column="count"/>
+    <property name="Value" column="value"/>
+    <property name="LowerCi" column="lowerci"/>
+    <property name="UpperCi" column="upperci"/>
+    <property name="Denominator" column="denominator"/>
+    <property name="Denominator_2" column="denominator_2"/>
+    <property name="ValueNoteId" column="valuenoteid"/>
+   <property name="UploadBatchId" column=" uploadbatchid"/>
+    <property name="ReplacedByUploadBatchId" column="replacedbyuploadbatchid"/>
+
+  </class>
+  
+  <class name="Area" table="l_areas">
+
+    <id name="AreaCode" column="areacode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="AreaName" column="areaname"/>
+    <property name="AreaShortName" column="areashortname"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+    <property name="AddressLine1" column="addressline1"/>
+    <property name="AddressLine2" column="addressline2"/>
+    <property name="AddressLine3" column="addressline3"/>
+    <property name="AddressLine4" column="addressline4"/>
+    <property name="IsCurrent" column="iscurrent"/>
+    <property name="Postcode" column="postcode"/>
+  </class>
+
+ <sql-query name="Update_AreaMapping">
+    Update L_AreaMapping SET ParentLevelGeographyCode= :AreaCode Where ParentLevelGeographyCode = OriginalAreaCode
+  </sql-query>
+
+  <sql-query name="GetDistinctCategoryTypesByIndicator">
+    SELECT
+      CategoryTypeId Id
+      ,Name
+      ,ShortName
+    FROM l_categorytypes
+    WHERE CategoryTypeId In
+      (SELECT DISTINCT categorytypeid FROM coredataset  WHERE indicatorId = :indicatorId)
+  </sql-query>
+
+  <sql-query name="GetDistinctAreaTypesByIndicator">
+    SELECT distinct
+    t1.areatypeid Id
+    ,t1.areatypefull Name
+    ,t1.areatype ShortName
+    ,t1.IsCurrent
+    ,t1.IsSupported
+    FROM l_areatypes t1
+    inner join l_areas t2 on t2.AreaTypeID = t1.AreaTypeID
+    WHERE t2.areacode In
+    (SELECT DISTINCT areacode FROM coredataset  WHERE indicatorId = :indicatorId)
+  </sql-query>
+
+  <sql-query name="GetDistinctSexesByIndicator">
+    SELECT DISTINCT
+    SexID
+    ,Sex [Description]
+    FROM
+    l_sexes
+    WHERE
+    SexId IN
+    (SELECT DISTINCT SexId FROM coredataset  WHERE indicatorId = :indicatorId)
+  </sql-query>
+
+  <sql-query name="GetDistinctAgesByIndicator">
+    SELECT DISTINCT
+    AgeID
+    ,Age [Description]
+    FROM
+    l_ages
+    WHERE
+    AgeID IN
+    (SELECT DISTINCT AgeId FROM coredataset  WHERE indicatorId = :indicatorId)
+  </sql-query>
+  
+
+  <sql-query name="GetDistinctYearRangeByIndicator">
+    SELECT DISTINCT CAST(yearrange as int) yearrangenum  FROM coredataset  WHERE yearrange > 0 AND indicatorId = :indicatorId
+  </sql-query>
+
+  <sql-query name="GetDistinctYearsByIndicator">
+    SELECT DISTINCT CAST([year] as int) yearnum FROM coredataset  WHERE [year] > 0 AND indicatorId = :indicatorId
+  </sql-query>
+
+  <sql-query name="GetDistinctMonthsByIndicator">
+    SELECT DISTINCT CAST([month] as int) monthnum FROM coredataset  WHERE [month] > 0 AND indicatorId = :indicatorId
+  </sql-query>
+
+  <sql-query name="GetDistinctQuartersByIndicator">
+    SELECT DISTINCT CAST([quarter] as int) quarternum FROM coredataset  WHERE [quarter] > 0 AND indicatorId = :indicatorId
+  </sql-query>
+
+  <sql-query name="CheckIfAuthorisedUser">
+    SELECT count(*) IsAuthorised
+    FROM FPM_User t1 WHERE LOWER(t1.username) = LOWER(:userName) AND
+    t1.Id IN
+    (
+    SELECT distinct t3.UserId FROM CoreDataSet t1
+    JOIN IndicatorMetadata t2 ON t1.IndicatorID = t2.IndicatorID
+    JOIN FPM_UserGroupPermissions t3 ON t2.OwnerProfileId = t3.ProfileId
+    WHERE
+    t1.IndicatorID = :indicatorId
+    )
+  </sql-query>
+
+  <sql-query name="Insert_CoreData_DeleteAudit">
+    INSERT INTO FPM_CoreData_DeleteAudit(
+      [IndicatorId]
+      ,[WhereCondition]
+      ,[RowsDeleted]
+      ,[DeletedBy]
+      ,DeleteBatchId)
+    VALUES
+    (
+     :indicatorId
+     ,:whereClause
+     ,:rowsDeleted
+     ,:userName
+     ,:deleteBatchId
+   )
+   </sql-query>
+  
+
+</hibernate-mapping>
+
+

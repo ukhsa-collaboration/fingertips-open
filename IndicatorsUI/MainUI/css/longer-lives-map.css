@@ -1,0 +1,1209 @@
+/*
+* CSS required for home page
+*/
+
+#map {
+    position: relative;
+    border: 1px solid #CCC;
+    border-top: 0;
+    height: 960px;
+    min-height: 960px;
+    width: 962px;
+}
+
+.map-canvas {
+    height: 960px;
+    width: 100%;
+    z-index: 0;
+}
+
+    /* css resets killing google map styles */
+    .map-canvas img {
+        max-width: none;
+    }
+
+#map-box {
+    position: relative;
+}
+
+#gmap {
+    position: relative;
+    width: 100%;
+}
+
+#tooltip {
+    border-style: none;
+    background: none;
+    position: absolute;
+    display: none;
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Leave right border on ipad for moving page up and down */
+.touch #gmap {
+    width: 98%;
+}
+
+.map-overlays {
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 1px;
+    overflow: visible;
+}
+
+/* ------------------------------------------------------------
+	Area type options on map
+------------------------------------------------------------ */
+
+#area-filter li {
+    padding-left: 5px;
+    width: 120px;
+    color: white;
+}
+
+    #area-filter li.active {
+        width: 130px;
+        background-color: #585858;
+    }
+
+        #area-filter li.active a {
+            vertical-align: middle;
+            font-size: 1em;
+            color: #ffffff;
+        }
+
+.map-overlay {
+    background: #fff;
+    position: relative;
+    float: left;
+    clear: left;
+    padding: 1.5em;
+    margin: 1em 1em 0 1em;
+    border: solid 1px #000;
+    min-width: 250px;
+    max-width: 250px;
+}
+
+    .map-overlay ol {
+        padding: 0 0 0 16px;
+        font-size: 1.21em;
+    }
+
+.map-controls {
+    float: right;
+    clear: right;
+    min-width: 160px;
+    max-width: 160px;
+}
+
+.thin-map-controls {
+    float: right;
+    clear: right;
+    min-width: 30px;
+    max-width: 30px;
+}
+
+.map-controls a.btn {
+    display: block;
+    position: relative;
+    background-color: #000;
+    color: #fff;
+    text-decoration: none;
+    text-align: center;
+    width: 26px;
+    height: 26px;
+    margin: 0 auto 12px auto;
+}
+
+    .map-controls a.btn:hover {
+        background-color: #02ae94;
+        color: #000;
+    }
+
+#map-overlay-zoom {
+    display: none;
+}
+
+#map-zoom-box {
+    position: absolute;
+    top:7px;
+    right: 5px;
+}
+
+#map-zoom-buttons {
+    position: relative;
+    margin-top: -5px;
+}
+
+.map-controls a.btn-zoom {
+    background: #000 url("../images/Mortality/map_zoom.gif") no-repeat;
+}
+
+.map-controls a.btn-zoom-out {
+    background-position: 0 -26px;
+    margin-bottom: 0;
+}
+
+.map-controls a.btn-zoom:hover {
+    background-position: -26px 0;
+}
+
+.map-controls a.btn-zoom-out:hover {
+    background-position: -26px -26px;
+}
+
+.map-controls a.btn-zoom * {
+    display: none;
+}
+
+.map-overlays h5 {
+    margin: 0;
+    font-size: 1em;
+    padding-bottom: 1em;
+}
+
+.map-overlays ul.filters {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .map-overlays ul.filters li {
+        padding: 0;
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+    .map-overlays ul.filters li {
+        padding: 0;
+        margin: 0;
+        font-size: 1.2em;
+    }
+
+
+/** Legend with coloured gradings */
+.map-overlays .legend .grade {
+    display: block;
+    padding-right: 2em;
+    margin-bottom: 1.5em;
+}
+
+    .map-overlays .legend .grade img {
+        display: inline-block;
+        width: 1.2em;
+        height: 1.2em;
+    }
+
+    .map-overlays .legend .grade img {
+        width: 1.2em;
+        height: 1.2em;
+        margin-right: 7px;
+    }
+
+.map-overlays .legend .grade-0 img {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 7px;
+}
+
+.map-overlays .legend .grade-2 img {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 7px;
+}
+
+.map-overlays .legend .grade-3 img {
+    width: 1.2em;
+    height: 1.2em;
+    margin-right: 7px;
+}
+
+.map-overlays .legend .grade-1 img {
+    width: 1em;
+    height: 1em;
+    margin-right: 7px;
+    border: 1px solid #c8bb02;
+}
+
+.map-overlays .legend .no-data img {
+    width: 1em;
+    height: 1em;
+    margin-right: 7px;
+    border: 1px solid grey;
+}
+
+.map-overlays .legend .grade-2 i {
+    background-color: #FB9A02;
+}
+
+.map-overlays .legend .grade-3 i {
+    background-color: #BC1E2C;
+}
+
+/* deprivation 1-5 scale */
+.map-overlays .legend_deprivation .grade {
+    display: block;
+    margin-bottom: 1em;
+}
+
+.map-overlays .legend_deprivation img {
+    height: 1em;
+    width: 1em;
+    margin-right: 7px; /* 13/05/13 NM */
+}
+
+
+/* overlay for title of map - displayed top middle */
+.map-overlay-title {
+    background: #02ae94;
+    color: #fff;
+    width: 260px;
+    padding: 1em;
+}
+
+    .map-overlay-title a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+/** inner map overlays (info bubbles) that use InfoBox plugin */
+
+/* overide values of gm-style class created by Google Maps  */
+.map-info-box div, .map-info-box a {
+    font-size: 14px;
+    font-family: "transport_new", Arial, sans-serif;
+    font-weight: normal;
+}
+
+.map-info-box div {
+    padding: 0;
+}
+
+/* close button in InfoBox has no class - we're using a custom close button */
+.map-info-box > img {
+    display: none;
+}
+
+.map-info-box .map-info-header a,
+.map-info-box .map-info-footer a,
+.map-info-box .map-info-footer span {
+    text-decoration: none;
+    display: block;
+    position: relative;
+    padding: 0.5em 1em;
+}
+
+.map-info-box .map-info-header a {
+    font-size: 0.80em;
+    float: left;
+    margin-left: 2px;
+    margin-top: 2px;
+}
+
+.map-info-box .map-info-header span.map-info-close {
+    float: right;
+    font-size: 1.5em;
+    padding: 0 0.5em;
+}
+
+.map-info-box .map-info-body {
+    padding: 1em;
+    width: 440px;
+}
+
+.map-info-box .unit-percent {
+    font-size: 24px;
+}
+
+.map-info-box .unit-long {
+    font-size: 18px;
+}
+
+span.map-info-close {
+    cursor: pointer;
+}
+
+.map-info h4 {
+    margin: 0 0 1em 0;
+    font-size: 1.8em;
+    line-height: 1.4em;
+    float: left;
+}
+
+.hover-map-template h4 {
+    margin: 0;
+}
+
+.place-name {
+    width: 190px;
+    white-space: normal;
+}
+
+.hover-place-name {
+    width: 100%;
+    white-space: normal;
+}
+
+
+/* has info is white with greay header and black footer */
+.map-info-box .map-info-header {
+    background: #808080;
+    color: #fff;
+}
+
+    .map-info-box .map-info-header a {
+        color: #fff;
+        text-decoration: none;
+        width: 85%;
+    }
+
+        .map-info-box .map-info-header a:hover {
+            color: #000;
+        }
+
+.map-info-box .map-info-body {
+    background: #f1f1f1;
+}
+
+.map-info-box .map-info-footer {
+    background: #000 url("../images/Mortality/infoCorner.gif") right 0 no-repeat;
+    height: 30px;
+}
+
+    .map-info-box .map-info-footer a {
+        color: #fff;
+        width: 92%;
+        padding: 0.35em 8% 0.5em 0; /* NM 14/05/13 */
+        text-align: right;
+    }
+
+    .map-info-box .map-info-footer span {
+        color: #fff;
+        width: 92%;
+        padding: 0.35em 8% 0.5em 0; /* NM 14/05/13 */
+        text-align: right;
+    }
+
+    .map-info-box .map-info-footer a:hover {
+        color: #808080;
+    }
+
+.map-info-body ul.totals {
+    list-style: none;
+    float: left;
+    padding: 0;
+    width: 440px;
+}
+
+    .map-info-body ul.totals li {
+        display: inline-block;
+    }
+
+        .map-info-body ul.totals li.left {
+            width: 200px;
+            float: left;
+        }
+
+.hover-map-info-body {
+    background: #F1F1F1;
+    color: #000;
+    width: auto;
+    text-align: center;
+    padding: 1em 0;
+    width: 260px;
+}
+
+
+/* no data is black and can be narrower */
+
+.map-info-box .map-info-empty .map-info-close {
+    color: #ccc;
+}
+
+    .map-info-box .map-info-empty .map-info-close:hover {
+        color: #fff;
+    }
+
+.map-info-box .map-info-empty .map-info-header {
+    background: #000;
+}
+
+.map-info-box .map-info-empty .map-info-body {
+    background: #000;
+    color: #fff;
+    padding-top: 0;
+    min-width: 200px;
+}
+
+    .map-info-box .map-info-empty .map-info-body p {
+        clear: both;
+    }
+
+/* create dialogue tail using border arrow trick */
+.map-info-tail-right {
+    position: relative;
+}
+
+    .map-info-tail-right i {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 240px;
+        width: 0;
+        border-left: 40px solid transparent;
+        border-top: 40px solid #000;
+        cursor: pointer;
+    }
+
+
+
+/* create dialogue tail using border arrow trick */
+.map-info-tail {
+    position: relative;
+}
+
+    .map-info-tail i {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 30px;
+        width: 0;
+        border-left: 40px solid transparent;
+        border-top: 40px solid #000;
+        cursor: pointer;
+    }
+
+.map-info-box .map-info .hover-place-name {
+    margin-bottom: 0;
+    font-size: 1.3em;
+}
+
+.hover-map-template > .map-info-footer {
+    background-image: none;
+    background-color: #000;
+    height: 6px;
+    border-top: 1px solid #a29e9f;
+}
+
+.hover-map-template .map-info-tail i {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 20px solid #000;
+    left: 40%;
+}
+
+.hover-map-template {
+    border: 1px solid #a29e9f;
+}
+
+/* hide templates until used by JS */
+.map-template {
+    display: block;
+}
+
+.hover-map-template-right {
+    position: relative;
+    right: 200px;
+}
+
+/**
+ * statistics, some styles copied from mortaility table
+ */
+.map-info-stats {
+    clear: both;
+    line-height: 1.6em;
+}
+
+    .map-info-stats dl,
+    .map-info-stats dt,
+    .map-info-stats dd {
+        display: block;
+        position: relative;
+        padding: 0;
+        margin: 0;
+    }
+
+div.grey-man {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1400px no-repeat;
+    height: 45px;
+}
+
+div.grade-1 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-3 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1700px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-2 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1600px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-0 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-quintile-1 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -900px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-quintile-2 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1000px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-quintile-3 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1100px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-quintile-4 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1200px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.grade-quintile-5 {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1300px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.bobLower {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1800px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+div.bobHigher {
+    background: url("../images/Mortality/ranking_icons.png") 0 -1900px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+
+
+.map-info-stats dl {
+    background: url("../images/Mortality/ranking_icons.png") 0 -500px no-repeat;
+    float: left;
+    clear: left;
+    min-height: 45px;
+}
+
+    .map-info-stats dl.grey-man {
+        background: url("../images/Mortality/ranking_icons.png") 0 -1400px no-repeat;
+    }
+
+    .map-info-stats dl.grade-1 {
+        background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+        float: left;
+        clear: left;
+        min-height: 45px;
+    }
+
+    .map-info-stats dl.grade-3 {
+        background: url("../images/Mortality/ranking_icons.png") 0 -1700px no-repeat;
+        float: left;
+        clear: left;
+        min-height: 45px;
+    }
+
+    .map-info-stats dl.grade-2 {
+        background: url("../images/Mortality/ranking_icons.png") 0 -1600px no-repeat;
+        float: left;
+        clear: left;
+        min-height: 45px;
+    }
+
+    .map-info-stats dl.grade-0 {
+        background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+        float: left;
+        clear: left;
+        min-height: 45px;
+    }
+
+    .map-info-stats dl.links {
+        float: left;
+        clear: left;
+        margin-top: 30px;
+    }
+
+
+
+.map-info-stats .map-info-right {
+    float: right;
+    clear: none;
+    min-width: 190px;
+}
+
+.map-info-stats .premature_death_stat {
+    background-position: 0 -600px;
+}
+
+.map-info-stats dt,
+.map-info-stats dd {
+    padding-left: 30px;
+}
+
+/* ranking stat goes, in right hand column before header */
+.map-info-stats dl.ranked_stat {
+    margin-bottom: 1em;
+    background-image: none;
+    width: 100%;
+}
+
+    .map-info-stats dl.ranked_stat dt {
+        font-weight: bold;
+        padding: 0 0 0.5em 0;
+    }
+
+    .map-info-stats dl.ranked_stat dd strong {
+        display: block;
+        font-size: 2em;
+    }
+    /* colors for ranking */
+    .map-info-stats dl.ranked_stat.grade-3, .map-info-stats dl.ranked_stat dd span.grade-3 {
+        color: #BC1E2C;
+    }
+
+    .map-info-stats dl.ranked_stat.grade-2, .map-info-stats dl.ranked_stat dd span.grade-2 {
+        color: #FB9A02;
+    }
+
+    .map-info-stats dl.ranked_stat.grade-0, .map-info-stats dl.ranked_stat dd span.grade-0 {
+        color: #7CD540;
+    }
+
+    .map-info-stats dl.ranked_stat.grade-1 {
+        color: #FDEE21;
+        text-shadow: -1px -1px 0 #99928b, 1px -1px 0 #99928b, -1px 1px 0 #99928b, 1px 1px 0 #99928b;
+    }
+
+/* generic rankings colors */
+span.grade-3 {
+    color: #BC1E2C;
+}
+
+span.grade-2 {
+    color: #FB9A02;
+}
+
+span.grade-0 {
+    color: #7CD540;
+}
+
+span.plus {
+    background: url("../images/Mortality/plus.png");
+    background-repeat: no-repeat;
+    padding-right: 18px;
+}
+
+span.minus {
+    background: url("../images/Mortality/minus.png");
+    background-repeat: no-repeat;
+    padding-right: 18px;
+}
+
+#data-source {
+    margin-top: 8px;
+    font-size: 10px;
+    padding: 0;
+    line-height: initial;
+}
+
+    #data-source span {
+        font-weight: bold;
+    }
+
+    #data-source p {
+        display: inline;
+        line-height: .5;
+    }
+
+
+.no-textshadow .map-info-stats dl.ranked_stat.grade-1 {
+    filter: progid:DXImageTransform.Microsoft.Glow(Color=#99928b,Strength=1);
+}
+
+.map-info-stats dl.ranked_stat.grade-0 {
+    color: #7CD540;
+}
+
+/* image offsets for killers */
+.map-info-stats dl.ranked_stat dd {
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+.map-info-stats dl.ranked_stat i {
+    display: block;
+    position: relative;
+    width: 60px;
+    height: 75px;
+    float: left;
+    background: #F1F1F1 url("../images/Mortality/map_killers.png") 0 100px no-repeat;
+}
+
+.map-info-stats dl.stat_overall i, 
+.map-info-stats dl.stat_lung_cancer i, 
+.map-info-stats dl.stat_colorectal_cancer i,
+.map-info-stats dl.stat_breast_cancer i, 
+.map-info-stats dl.stat_stroke i, 
+.map-info-stats dl.stat_heart_disease  i {
+    width: 0;
+}
+
+/* Heart */
+.map-info-stats dl.stat_heart.grade-0 i {
+    background-position: -80px 0;
+}
+
+.map-info-stats dl.stat_heart.grade-1 i {
+    background-position: -5px 0;
+}
+
+.map-info-stats dl.stat_heart.grade-2 i {
+    background-position: -230px 0;
+}
+
+.map-info-stats dl.stat_heart.grade-3 i {
+    background-position: -155px 0;
+}
+
+/* Cancer */
+.map-info-stats dl.stat_cancer.grade-0 i {
+    background-position: -455px 0;
+}
+
+.map-info-stats dl.stat_cancer.grade-1 i {
+    background-position: -380px 0;
+}
+
+.map-info-stats dl.stat_cancer.grade-2 i {
+    background-position: -605px 0;
+}
+
+.map-info-stats dl.stat_cancer.grade-3 i {
+    background-position: -530px 0;
+}
+
+.map-info-stats dl.stat_lung_cancer.grade-0 i {
+    background-position: -455px 0;
+}
+
+.map-info-stats dl.stat_lung_cancer.grade-1 i {
+    background-position: -380px 0;
+}
+
+.map-info-stats dl.stat_lung_cancer.grade-2 i {
+    background-position: -605px 0;
+}
+
+.map-info-stats dl.stat_lung_cancer.grade-3 i {
+    background-position: -530px 0;
+}
+
+/* Liver */
+.map-info-stats dl.stat_liver i {
+    width: 75px;
+    margin-right: 5px;
+}
+
+.map-info-stats dl.stat_liver.grade-0 i {
+    background-position: -825px 0;
+}
+
+.map-info-stats dl.stat_liver.grade-1 i {
+    background-position: -750px 0;
+}
+
+.map-info-stats dl.stat_liver.grade-2 i {
+    background-position: -975px 0;
+}
+
+.map-info-stats dl.stat_liver.grade-3 i {
+    background-position: -900px 0;
+}
+
+/* Lung */
+.map-info-stats dl.stat_lung i {
+    width: 70px;
+}
+
+.map-info-stats dl.stat_lung.grade-0 i {
+    background-position: -1205px 0;
+}
+
+.map-info-stats dl.stat_lung.grade-1 i {
+    background-position: -1130px 0;
+}
+
+.map-info-stats dl.stat_lung.grade-2 i {
+    background-position: -1355px 0;
+}
+
+.map-info-stats dl.stat_lung.grade-3 i {
+    background-position: -1280px 0;
+}
+
+/* Injury */
+.map-info-stats dl.stat_injury i {
+    width: 70px;
+    margin-right: 5px;
+}
+
+.map-info-stats dl.stat_injury.grade-0 i {
+    background-position: -1580px 0;
+}
+
+.map-info-stats dl.stat_injury.grade-1 i {
+    background-position: -1505px 0;
+}
+
+.map-info-stats dl.stat_injury.grade-2 i {
+    background-position: -1730px 0;
+}
+
+.map-info-stats dl.stat_injury.grade-3 i {
+    background-position: -1655px 0;
+}
+
+.map-info-stats dl.stat_injury.grade-4 i {
+    background-position: -1805px 0;
+}
+
+/** deprivation stats goes to right of population stat  */
+.map-info dl.deprivation_stat {
+    float: right;
+    clear: none;
+}
+    /* image offsets for deprivation grades */
+    .map-info dl.deprivation_stat.level1 {
+        background-position: 0 -900px;
+    }
+
+    .map-info dl.deprivation_stat.level2 {
+        background-position: 0 -1000px;
+    }
+
+    .map-info dl.deprivation_stat.level3 {
+        background-position: 0 -1100px;
+    }
+
+    .map-info dl.deprivation_stat.level4 {
+        background-position: 0 -1200px;
+    }
+
+    .map-info dl.deprivation_stat.level5 {
+        background-position: 0 -1300px;
+    }
+
+.map-overlays .legend .level5 img {
+    display: inline-block;
+    border: 1px solid #9e7cc8;
+    height: 1em;
+    width: 1em;
+}
+
+
+/**
+ * filter styles copied from main.css - different context.
+ */
+.map-overlay p {
+    font-size: 1.2em;
+    margin: 0;
+    padding: 0;
+}
+
+.map-overlay ul.filters {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+    .map-overlay ul.filters li {
+        padding-bottom: 0.5em;
+    }
+
+        .map-overlay ul.filters li.sub {
+            padding-left: 1em;
+        }
+
+.map-overlay a {
+    color: #2E3191;
+    text-decoration: none;
+}
+
+    .map-overlay a:hover {
+        text-decoration: underline;
+    }
+
+.map-overlay ul.filters li.active a {
+    color: #02ae94;
+    font-family: "transport_new_medium", Arial, sans-serif;
+    font-size: 1.21em;
+}
+
+.map-info-right .rank-max {
+    font-size: 14px;
+}
+
+.map-overlays .legend .grade i {
+    margin-right: 2px;
+}
+
+.map-info .value-note {
+    font-size: 14px;
+    font-style: italic;
+}
+
+@media print {
+
+    .home_intro {
+        color: #333;
+        padding-left: 0;
+    }
+
+    .map-info-box {
+        border: 2px solid #000;
+    }
+
+    #map {
+        border-top: 1px solid #ccc;
+    }
+}
+
+/* LL - DIABETES*/
+.diabetes-place-name {
+    width: 100%;
+    white-space: normal;
+}
+
+
+/* ------------------------------------------------------------
+	Home header
+------------------------------------------------------------ */
+
+.home_intro {
+    background: #02ae94;
+    color: #FFF;
+    padding: 22px 10px 23px 37px;
+}
+
+    .home_intro h1 {
+        float: left;
+        font-family: 'transport_new_heavy', Arial, sans-serif;
+        font-size: 6.8em;
+        margin: 0;
+        padding: 0 0 27px 0;
+        width: 900px;
+    }
+
+    .home_intro h2 {
+        float: left;
+        font-size: 2.7em;
+        line-height: 1.25;
+        margin: 0;
+        padding: 0 150px 34px 0;
+        width: 100%;
+    }
+
+    .home_intro sup {
+        position: relative;
+        font-size: 0.5em;
+        top: -14px;
+    }
+
+    .home_intro p {
+        font-size: 1.4em;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0 0 12px;
+        width: 67%;
+    }
+
+/* ------------------------------------------------------------
+	Home search
+------------------------------------------------------------ */
+.home_search {
+    background: #000;
+    color: #FFF;
+    padding: 22px 18px 22px 39px;
+}
+
+    .home_search h2 {
+        float: left;
+        font-size: 1.6em;
+        font-weight: normal;
+        margin: 0;
+        padding: 8px 0 0;
+    }
+
+    .home_search form {
+        float: right;
+    }
+
+    .home_search #search_text {
+        background: #FFF url(../images/Mortality/search.png) right center no-repeat;
+        border: 0;
+        font-size: 1.4em;
+        height: 38px;
+        line-height: 38px;
+        padding: 0 45px 0 5px;
+        width: 336px;
+    }
+
+#home_promos {
+    padding: 31px 0 60px;
+}
+
+    #home_promos .article {
+        background: #02ae94 url(../images/Mortality/promoCorner.png) right bottom no-repeat;
+        color: #FFF;
+        float: left;
+        min-height: 115px;
+        margin: 0 27px 0 0;
+        padding: 19px 80px 10px 18px;
+        position: relative;
+        width: 205px;
+    }
+
+    #home_promos .last {
+        margin-right: 0;
+    }
+
+    #home_promos .article h3 {
+        font-size: 2.2em;
+        line-height: 1.05;
+        margin: 0;
+        padding: 0 0 16px;
+    }
+
+        #home_promos .article h3 a {
+            color: #FFF;
+            text-decoration: none;
+        }
+
+    #home_promos .article:hover {
+        cursor: hand;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+
+    #home_promos .article p {
+        font-size: 1.1em;
+        margin: 0;
+    }
+
+    #home_promos .article .corner_link {
+        bottom: 0;
+        display: block;
+        height: 29px;
+        position: absolute;
+        right: 0;
+        text-indent: -9999px;
+        width: 29px;
+    }
+
+#cbox_population {
+    display: table;
+}
+
+.width-30 {
+    width: 30px;
+}
+
+.t-cell {
+    display: table-cell;
+}
+
+/* ------------------------------------------------------------
+	Callout box
+------------------------------------------------------------ */
+
+.gp-link {
+    margin-top: 5px;
+    margin-bottom: 2px;
+    margin-left: 30px;
+    display: inline-block;
+}
+
+    .gp-link span {
+        padding-bottom: 2px !important;
+    }
+
+.ccg-link {
+    margin-top: 2px;
+    margin-left: 30px;
+    display: inline-block;
+}
+
+#selected-indicator-content {
+    display: table;
+    margin-top: 25px;
+}
+
+#selected-indicator-content .man {
+    float: left;
+    width: 30px;
+}
+
+#selected-indicator-content .selected-indicator-text  {
+    float: left;
+    width: 410px;
+}
+
+#selected-indicator-content .selected-indicator-text > strong {
+    font-size: 24px;
+}
+
+#selected-indicator-content .selected-indicator-text span > strong {
+    font-size: 24px;
+}
+
+.selected-indicator-ranking-text {
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+
+#def {
+    display: none;
+}
+#def p {
+    margin-top: 0;
+}
+
+#population-text p {
+    margin: 0;
+    padding: 0;
+}

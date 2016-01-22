@@ -1,0 +1,52 @@
+﻿@using Fpm.MainUI
+@model Fpm.MainUI.ViewModels.ProfilesAndIndicators.BrowseDataViewModel
+
+     @using (Html.BeginForm("BrowseIndicatorData", "ProfilesAndIndicators", FormMethod.Post, new { id = "CoreDataFilterForm" }))
+     {
+        <div id="browseDataView">
+            <h3>@Model.IndicatorId - {indicator-name}</h3>
+
+            <div class="filters">
+                <div class="content-row">
+                    <label>Area Type:</label>
+                    @Html.DropDownListFor(model => model.AreaTypeId, null, new { @class = "filter-item" })
+                    <a id="link-full-page" href="/BrowseData/full-page/@Model.IndicatorId">Browse full page</a>
+                </div>
+                <div class="content-row">
+                    <label>Sex:</label>
+                    @Html.DropDownListFor(model => model.SexId, null, new { @class = "filter-item" })
+                    <label>Age:</label>
+                    @Html.DropDownListFor(model => model.AgeId, null, new { @class = "filter-item" })
+                    <label>Category Type:</label>
+                    @Html.DropDownListFor(model => model.CategoryTypeId, null, new { @class = "filter-item" })
+                </div>
+
+                <div class="content-row">
+                    <label>Year Range:</label>
+                    @Html.DropDownListFor(model => model.YearRange, null, new { @class = "filter-item" })
+
+                    <label>Year:</label>
+                    @Html.DropDownListFor(model => model.Year, null, new { @class = "filter-item" })
+
+                    <label>Month:</label>
+                    @Html.DropDownListFor(model => model.Month, null, new { @class = "filter-item" })
+
+                    <label>Quarter:</label>
+                    @Html.DropDownListFor(model => model.Quarter, null, new { @class = "filter-item" })
+
+                    <input type="button" class="btn-get disabled" id="btn-get-filteredData" value="Filter data" />
+
+                    @Html.HiddenFor(model => model.IndicatorId)
+
+                </div>
+            </div>
+            <br />
+
+            <div id="coreDataView">
+                @Html.Partial("_CoreData", Model.Results)
+            </div>
+
+        </div>
+
+        <script src="@(AppConfig.JsPath)PageCoreData.js" type="text/javascript"></script>
+     }

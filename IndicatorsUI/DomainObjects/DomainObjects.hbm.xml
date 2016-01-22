@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Profiles.DomainObjects"
+                   namespace="Profiles.DomainObjects">
+
+  <!-- ProfileDetails class -->
+  <class name="ProfileDetails" table="UI_Profiles">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="ProfileUrlKey" column="url_key"/>
+    <property name="Title" column="name"/>
+    <property name="DefaultAreaType" column="default_area_type_id"/>
+    <property name="ArePdfs" column="are_pdfs"/>
+    <property name="StartZeroYAxis" column="start_zero_y_axis"/>
+    <property name="DefaultFingertipsTabId" column="default_fingertips_tab_id"/>
+    <property name="ExtraJavaScriptFilesString" column="extra_js_files"/>
+    <property name="ExtraCssFilesString" column="extra_css_files"/>
+    <property name="EnumParentDisplay" column="enum_parent_display"/>
+    <property name="RagColourId" column="key_colour_id"/>
+    <property name="AreasToIgnoreForSpineCharts" column="areas_ignored_for_spine_chart"/>
+    <property name="SkinId" column="skin_id"/>
+    <property name="HasOwnFrontPage" column="has_own_front_page"/>
+    <property name="LeadProfileForCollectionId" column="lead_profile_for_collection_id"/>
+    <property name="ShowDataQuality" column="show_data_quality"/>
+    <property name="IsNational" column="is_national"/>
+    <property name="HasTrendMarkers" column="has_trend_markers"/>
+    <property name="AccessControlGroup" column="access_control_group"/>
+    <property name="IsOfficialStatistics" column="is_official_statistics"/>
+    
+    <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
+    <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/> 
+    
+  </class>
+
+  <!-- Domain class -->
+  <class name="Domain" table="groupingmetadata">
+
+    <id name="GroupId" column="groupid" type="int" unsaved-value="-1">
+    </id>
+    
+    <property name="Number" column="Sequence"/>
+    <property name="SubHeading" column="GroupName"/>
+    <property name="Tooltip" column="Tooltip"/>
+    <property name="ProfileId" column="ProfileId"/>
+    
+  </class>
+
+  <!-- ProfileCollection class -->
+  <class name="ProfileCollection" table="ui_profilecollection">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+    
+    <property name="CollectionName" column="collectionname"/>
+    <property name="CollectionSkinTitle" column="collectionskintitle"/>
+    
+  </class>
+
+  <!-- Profiles collection items class -->
+  <class name="ProfileCollectionItem"  table="ui_profilecollectionitems">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+    
+    <property name="ProfileCollectionId" column="profilecollectionid"/>
+    <property name="ProfileId" column="profileid"/>
+    <property name="DisplayDomains" column="displaydomains"/>
+    <property name="Sequence" column="sequence"/>
+
+  </class>
+
+  <!-- ContentItem class -->
+  <class name="ContentItem" table="fpm_content">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="ContentKey" column="contentkey"/>
+    <property name="Description" column="description"/>
+    <property name="ProfileId" column="profileid"/>
+    <property name="Content" column="content"/>
+
+  </class>
+
+  <!-- SkinProfileCollections class -->
+  <class name="SkinProfileCollection" table="ui_skinprofilecollections">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+    
+    <property name="SkinId" column="skinid"/>
+    <property name="ProfileCollectionId" column="profilecollectionid"/>
+  </class>
+
+  <!-- Skin class -->
+  <class name="Skin" table="ui_siteskins">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="PartialViewFolder" column="partial_view_folder"/>
+    <property name="TemplateProfileUrlKey" column="template_profile_url_key"/>
+    <property name="GoogleAnalyticsKey" column="google_analytic_key"/>
+    <property name="MetaDescription" column="meta_description"/>
+    <property name="Title" column="title"/>
+    <property name="TestHost" column="test_host"/>
+    <property name="LiveHost" column="live_host"/>
+    <property name="AccessControlGroup" column="access_control_group"/>
+
+  </class>
+
+  <!-- Twitter class -->
+  <class name="TwitterAccountSetting" table="ui_twitter">
+
+    <id name="Handle" column="Handle" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="AccessToken" column="accesstoken"/>
+    <property name="AccessTokenSecret" column="accesstokensecret"/>
+    <property name="ConsumerKey" column="consumerkey"/>
+    <property name="ConsumerSecret" column="consumersecret"/>
+  </class>
+
+  <!-- LongerLivesProfileDetails class -->
+  <class name="LongerLivesProfileDetails" table="ui_profileslongerlives">
+
+    <id name="ProfileId" column="profileid" type="int" unsaved-value="-1">
+    </id>
+    <property name="SupportingProfileId" column="supportingprofileid"/>
+    <property name="HasPracticeData" column="haspracticedata"/>
+    <property name="ExtraJsFiles" column="extrajsfiles"/>
+    <property name="Title" column="title"/>
+    <property name="DomainsToDisplay" column="domainstodisplay"/>
+    
+    <many-to-one name="SupportingProfileDetails" column="supportingprofileid" lazy="false"/>
+  </class>
+
+  <!-- Document class-->
+  <class name="Document" table="FPM_Document">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ProfileId" column="profileid"/>
+    <property name="FileName" column="filename"/>
+    <property name="FileData" column="filedata" length="10000000" />
+    <property name="UploadedOn" column="uploadedon"/>
+    <property name="UploadedBy" column="uploadedby"/>
+  </class>
+
+
+  <class name="SpineChartMinMaxLabel" table="UI_SpineChartMinMaxLabel">
+    <id name="Id" column="LabelId" type="int" unsaved-value="-1"/>
+  </class>
+  
+</hibernate-mapping>
+
+

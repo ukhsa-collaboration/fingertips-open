@@ -1,0 +1,10 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+<div id="map-help" class="map-overlay">
+    @{
+        ContentItem contentItem = CommonUtilities.GetContentItem(ContentKeys.MapHelp, Model.ProfileId)
+                          ?? CommonUtilities.GetContentItem(ContentKeys.MapHelp, ProfileIds.LongerLives);
+    }
+    @(contentItem.HtmlEncodedString)
+</div>
+

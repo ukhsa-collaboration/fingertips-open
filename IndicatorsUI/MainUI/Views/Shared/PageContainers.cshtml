@@ -1,0 +1,18 @@
+﻿@using Profiles.MainUI.Common
+@using Profiles.MainUI.Models
+@model PageModel
+@* Page specific data *@
+
+@{ var tab = new ContentTab(Model); }
+<div id="content" style="display: none;" class="standardWidth clearfix">
+    <div class="clearfix fl">
+        @CommonUtilities.GetContent(tab.ContentKey, Model.ProfileId)
+    </div>
+</div>
+
+<div class="standardWidth">
+    <div id="global-prefooter" style="display: none;">
+        Note: East Midlands average values do not include Milton Keynes. Regional ranges
+        on the spine charts do include Milton Keynes.
+    </div>
+</div>

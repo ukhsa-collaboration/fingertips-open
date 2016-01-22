@@ -1,0 +1,34 @@
+﻿<ul id="indicatorMenuDiv" class="indicator-row" style="display: none;">
+    <li>
+        <ul style="width: 730px;">
+            <li style="width: 230px;">
+                <div id="show-all-indicators-box" class="fl" style="display:none;">
+                    <div style="display: inline-block; float: left; margin-left: 5px;">
+                        <input id="indicatorSelectAll" type="checkbox" onclick="showAllIndicatorsChanged(this.checked);" />
+                    </div>
+                    <div id="allIndicatorsLabel">
+                        Show all indicators
+                    </div>
+                </div>
+                &nbsp;
+            </li>
+            <li style="width: 500px;">
+                <select id="indicatorMenu" onchange="indicatorChanged(this.value);" style="width: 500px;">
+                    <option />
+                </select>
+            </li>
+
+        </ul>
+    </li>
+    <li>
+        <ul class="inner-menu">
+            <li>
+                <input id="next-indicator" class="menu-next" type="button" onclick="advanceIndicatorMenuClicked(1)" />
+            </li>
+            <li>
+                <input class="menu-prev" type="button" onclick="advanceIndicatorMenuClicked(-1)" />
+            </li>
+            <li class="heading">Indicator:</li>
+        </ul>
+    </li>
+</ul>

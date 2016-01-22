@@ -1,0 +1,64 @@
+﻿<script src="@(ViewBag.JsPath)jquery-1.10.2.min.js" type="text/javascript"></script>
+<script src="@(ViewBag.JsPath)TestPage.js" type="text/javascript"></script>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test pages</title>
+
+    <style>
+        * {
+            font-family: arial;
+            font-size: 22pt;
+            margin: 10px;
+        }
+
+        a,h1 {
+                        padding: 5px;
+}
+
+        a {
+            font-size: 1.0em;
+            float: left;
+            text-decoration: none;
+            clear: both;
+        }
+
+            a:hover {
+                background: #B8C6FF;
+            }
+
+            hr {
+                float:left; 
+                clear:both;
+                width:40%;
+                height:1px;
+                background:#ddd;
+                border: none;
+}
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Test pages</h1>
+    
+    <hr>
+    <a href="@Url.RouteUrl("TestPage", new RouteValueDictionary { { "page", "practice-profiles" } })">Practice Profiles</a>
+    <a href="@Url.RouteUrl("TestPage", new RouteValueDictionary { { "page", "fingertips" } })">Fingertips</a>
+    <a href="@Url.RouteUrl("TestPage", new RouteValueDictionary { { "page", "diabetes" } })">Diabetes</a>
+    <a href="@Url.RouteUrl("TestPage", new RouteValueDictionary { { "page", "diabetes-rankings" } })">Diabetes rankings</a>
+    <hr>
+    <a href="/page-that-does-not-exist">404</a>
+    <a href="@Url.RouteUrl("TestError")">500</a>
+
+    <a id="jsTestError" href="#">Javascript Test Error</a>
+</body>
+</html>
+
+    <script type="text/javascript">        //<![CDATA[  
+        FT = {};
+        FT.url = {
+            bridge: '@(ViewBag.BridgeServicesUrl)'
+        };
+        //]]</script>

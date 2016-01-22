@@ -1,0 +1,9 @@
+﻿@using System.Text
+@model Profiles.MainUI.Models.PageModel
+@{
+    var _yearRange = Model.YearRange;
+    if (_yearRange != null)
+    {
+    @:<script type="text/javascript">yearRange = { start: @(_yearRange.StartYear), end: @(_yearRange.EndYear) };</script>
+    }
+}

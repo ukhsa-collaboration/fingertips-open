@@ -1,0 +1,488 @@
+﻿body
+{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+*
+{
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    border: none;
+    outline: none;
+}
+img
+{
+    border: none;
+}
+
+h1
+{
+    font-weight: bold;
+    font-size: 3.4em;
+    margin-left: 10px;
+}
+h2
+{
+    font-size: 1.9em;
+}
+
+h3
+{
+    padding-left: 10px;
+    font-size: 14.5px;
+}
+
+th.numericWideHeader
+{
+    width: 70px;
+}
+th.vb
+{
+    vertical-align: bottom;
+}
+th.vt
+{
+    vertical-align: top;
+}
+th.sortHeader, td.sort
+{
+    background: white;
+    width: 34px;
+}
+th.sortHeader
+{
+    vertical-align: bottom;
+}
+td.sort
+{
+    vertical-align: middle;
+    text-align: center;
+}
+
+td.numeric
+{
+    text-align: right;
+    padding-right: 2px;
+}
+
+select[disabled]
+{
+    background: white;
+    color: white;
+}
+
+select
+{
+    font-size: 15px;
+    border: 1px solid #ccc;
+}
+
+.borderedTable
+{
+    border-color: #eee;
+    border-width: 1px;
+    border-style: solid;
+    border-spacing: 0;
+    table-layout: fixed;
+}
+
+.center
+{
+    text-align: center;
+}
+
+th.pLink, th.rotate, th.comparatorHeader
+{
+    width: 41px;
+    height: 120px;
+    vertical-align: bottom;
+    text-align: center;
+    z-index: 3; /*Ahead of vertical text img in FF*/
+}
+
+/*----------------------------------------
+    Indicator search 
+------------------------------------------*/
+#searchBox
+{
+    width: 200px;
+    height:26px;
+    border: solid 2px #ddd;
+    padding:0;
+    padding-left: 5px;
+    float: right;
+}
+.searchContainer
+{
+    float: right;
+}
+#searchButton {
+    background-position: 0 3px;
+}
+
+/*----------------------------------------
+    Footer
+------------------------------------------*/
+#footer {
+    margin-top:40px;
+    background: #dfe0e2;
+    font-size: 16px;
+    line-height: 1.4em;
+}
+
+    #footer,
+    #footer a {
+        color: #454a4c;
+    }
+
+        #footer a:hover {
+            color: #171819;
+        }
+
+#footer_wrap {
+    font-size:67.5%;
+    margin: 0 auto;
+    padding: 61px 0 0 0;
+    width: 964px;
+}
+
+.footer_links {
+    float: left;
+}
+
+    .footer_links h3 {
+        border-bottom: 1px solid #a1acb2;
+        font-size: 2.4em;
+        font-weight: normal;
+        margin: 0;
+        padding: 0 0 25px;
+    }
+
+    .footer_links ul {
+        float: left;
+        font-size: 1.2em;
+        list-style: none;
+        margin: 0;
+        padding: 26px 0 3px;
+        width: 264px;
+    }
+
+        .footer_links ul.col1 {
+            padding-right: 67px;
+        }
+
+        .footer_links ul li {
+            padding: 0 0 23px;
+        }
+
+#site_policies {
+    float: right;
+}
+
+#footer_copyright {
+    border-top: 1px solid #a1acb2;
+    clear: both;
+    padding: 30px 0 0;
+}
+
+    #footer_copyright p {
+        color: #929397;
+        float: left;
+        font-size: 1.1em;
+        padding: 120px 0 10px 0;
+    }
+
+    #footer_copyright a {
+        color: #929397;
+    }
+
+        #footer_copyright a:hover {
+            color: #171819;
+        }
+
+    #footer_copyright p.copyright {
+        background: url(../images/Mortality/CrownCopyright.png) 0 0 no-repeat;
+        float: right;
+        width: 227px;
+    }
+
+.indicatorPadding
+{
+    width: 70px;
+    height: 1px;
+    float: left;
+}
+
+#download, #download:active, #download:visited
+{
+    background-position: 1px 1px;
+    background-image: url(../images/excel16-grey.gif);
+    border: 2px solid #eee;
+}
+#download:hover
+{
+    background-color: white;
+    color:#333;
+    background-image: url(../images/excel16.gif);
+}
+#spineKeyBox
+{
+    float: right;
+    border: 1px solid #CCC;
+    background: white;
+    margin-bottom: 3px;
+    margin-top: -5px;
+}
+
+#noSpineBox 
+{
+    width:254px;
+    top:6px;
+    left:10px;
+    position:absolute;
+    border:2px solid #ddd;
+    background:#FFFFF0;
+    z-index:10;
+    box-shadow:0 0 10px #888;
+}
+
+
+/*----------------------------------------
+    Profile title bar 
+------------------------------------------*/
+#site-link
+{
+    padding: 10px 0;
+}
+#site-link H1
+{
+    float:left;
+    width: 75%;
+}
+
+.title-divider {
+    border-top:5px solid black;
+    border-bottom: 10px solid #02ae94;
+}
+
+
+/*----------------------------------------
+    Fingertips and page links 
+------------------------------------------*/
+LI.site-link, li.breadcrumb-separator
+{
+    float: left;
+    list-style: none;
+    list-style-type: none;
+}
+LI.site-link A, LI.site-link A:active, LI.site-link A:visited
+{
+    text-decoration: none;
+    padding-top: 5px;
+    display: block;
+    margin-left:30px;
+    color:#4b5053;
+}
+LI.site-link A:hover
+{
+    text-decoration: underline;
+}
+#breadcrumbs {
+    float: left;
+}
+li.breadcrumb-separator, #breadcrumbs LI.site-link A {
+      padding-top: 5px;
+    margin-left: 10px;
+}
+
+#banner
+{
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+/*----------------------------------------
+    PHE Banner 
+------------------------------------------*/
+
+#phe-banner {
+    background:black;
+    height:48px;
+}
+
+#phe-banner a {
+    background: url('../images/logos/phe-white-48.png') no-repeat;
+    height:48px;
+    width:260px;
+    display:block;
+    text-decoration:none;
+}
+#phe-banner span {
+    color:white;
+    visibility: hidden;
+    text-decoration:none;
+}
+
+/*----------------------------------------
+    Error page 
+------------------------------------------*/
+#error-box {
+    position: relative;
+    height: 350px;
+}
+
+#error-box h2 {
+    margin:100px 20px 0 0;
+}
+
+/*----------------------------------------
+    Content 
+------------------------------------------*/
+
+#twitter-box a, #twitter-box a:visited, #twitter-box a:active,
+#introduction a, #introduction a:visited, #introduction a:active, 
+.supporting-information a, .supporting-information a:visited, .supporting-information a:active,
+#content a, #content a:visited, #content a:active {
+    color: #2e3191;
+    text-decoration: none;
+}
+
+ #twitter-box a:hover, .supporting-information a:hover, #introduction a:hover, #content a:hover {
+    text-decoration: underline;
+}
+
+p, #introduction p, #recent-updates p {
+    margin: 3px 10px 3px 10px;
+    font-size: 17px;
+    line-height: 1.3em;
+}
+#definitionTable {
+        font-size: 17px;
+}
+
+/*----------------------------------------
+    Area search
+------------------------------------------*/
+.search-watermark {
+    color: #999999;
+}
+
+#area-search-text {
+    display: none; 
+    width: 198px;
+    height: 19px;
+    border:1px solid #ccc; 
+    font-size: 15px;
+    background: #FFF url(../images/search2.jpg) right center no-repeat;
+}
+
+#area-search-link-box {
+    text-align: right; 
+    color:#1f0aa1;
+}
+
+/*hide area search help text*/
+.ui-helper-hidden-accessible { display:none; }
+
+/*----------------------------------------
+    Chart & table export
+------------------------------------------*/
+#export-tartan-rug {
+    color: #450AA3;    
+    font-size: 14px;
+    vertical-align: middle;
+    position: relative;
+    top: 20px;
+    width: auto;
+}
+
+.export-chart-box {
+    height: 16px;
+	margin-bottom: 8px;
+    margin-top:5px;
+    color: #450AA3;
+}
+
+.export-chart-box select {
+    width: 80px;
+}
+
+.export-chart-box a {
+    text-decoration: none;
+    color: #1F0AA1;
+}
+
+.white-background {
+    background-color: #ffffff;
+}
+
+.export-chart-box .export-link {
+    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+    padding: 5px 30px;
+    text-decoration: none;
+}
+
+
+/*----------------------------------------
+    Profiles per indicators
+------------------------------------------*/
+
+#profiles-for-indicators {
+    padding: 5px;
+    padding-bottom: 10px;
+}
+
+#profiles-for-indicators h2 {
+    margin-bottom: 20px;
+}
+
+#profiles-for-indicators table {
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#profiles-for-indicators .label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#indicator-list-lbl {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#indicator-list {
+    width: 800px;
+}
+
+#profiles-for-selected-indicator {
+    padding-bottom: 10px;
+}
+
+#profiles-for-selected-indicator ul {
+    list-style-type: none;
+}
+
+#profiles-for-selected-indicator ul li {
+    padding: 3px 0;
+}
+
+
+#profiles-for-selected-indicator a {
+    color: #1f0aa1;
+    text-decoration: none;
+}
+
+.trendMarker {
+    float:left;
+    color:#333;
+    font-weight:bold;
+    margin-left: 55px;
+    margin-bottom: 5px;
+}
+
+.trendMarker img {
+    margin-left: 5px;
+    vertical-align: middle;
+}

@@ -1,0 +1,11 @@
+﻿@using Profiles.MainUI.Models
+@{
+    var labels = SearchLabels.New(ViewBag.DefaultAreaType);
+}
+<div>
+    <label for="search_text" class="visuallyhidden">Search</label>
+    <input type="text" id="search_text" class="search-watermark" name="search_text"
+           value="@labels.Watermark" title="@labels.Watermark" />
+</div>
+@Html.Partial("_SearchNoMatches")
+

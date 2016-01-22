@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="PholioVisualisation.SearchQuerying.GpPracticeSearch">
+    <Position X="5" Y="1" Width="2.25" />
+    <Members>
+      <Field Name="areasReader" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAAAAAAAAAIEAAAAAAAAAAAAAAAAAAAAgAAE=</HashCode>
+      <FileName>GpPracticeSearch.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.SearchQuerying.SearchEngine">
+    <Position X="5" Y="2.75" Width="3.25" />
+    <Members>
+      <Method Name="GetIndexDirectory" Hidden="true" />
+      <Method Name="GetTextQuery" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAABAAAAAAAAAAgAAAAAAAAAAAAoAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>SearchEngine.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.SearchQuerying.SearchUserInput">
+    <Position X="1.75" Y="1" Width="2.75" />
+    <Members>
+      <Method Name="AddWord" Hidden="true" />
+      <Method Name="IsAnd" Hidden="true" />
+      <Method Name="IsOr" Hidden="true" />
+      <Method Name="IsWordQueryPart" Hidden="true" />
+      <Field Name="terms" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>CAAACAgAAAgIAAAAQAEYEAAAAAAEAQAAAAAAAAAAAAA=</HashCode>
+      <FileName>SearchUserInput.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

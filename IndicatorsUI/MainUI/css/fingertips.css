@@ -1,0 +1,152 @@
+﻿/* File: fingertips.css 
+*
+*   Contains CSS that is common across all Fingertips profiles (i.e. Fingertips, PHOF, Practice profiles)
+*/
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+
+.clearfix {
+    *zoom: 1;
+}
+
+
+/* Lightbox */
+#lightBox
+{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #000;
+    height: 1000px;
+    width: 100%;
+    opacity: 0.50; /*IE9, etc*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
+    filter: alpha(opacity=50); /*IE6-7*/
+}
+#infoBox
+{
+    position: absolute;
+    background: white;
+    border: 5px solid #eee;
+    padding: 6px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+#infoBox h1
+{
+    width: 100%;
+    text-align: center;
+    color: #333;
+}
+#infoBox .close
+{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 16px;
+    width: 16px;
+    background-image: url(../images/close2.png);
+    cursor: pointer;
+}
+
+/* Metadata */
+#definitionTable
+{
+    float: left;
+    width: 90%;
+    margin-left: 5%;
+    margin-top: 10px;
+    clear: both;
+    overflow: hidden;
+}
+#definitionTable H3
+{
+    padding-bottom: 6px;
+    padding-left: 3px;
+}
+#definitionTable TD
+{
+    padding: 2px 3px 2px 3px;
+}
+#definitionTable TABLE
+{
+    width: 100%;
+}
+#definitionTable LI
+{
+    margin-left: 23px;
+}
+#definitionTable .header
+{
+    font-size: 12px;
+    background: #fafafa;
+    padding-top: 2px;
+}
+#definitionTable P
+{
+    margin: 3px 0 3px 0;
+}
+
+#scatterplot-filters {
+    position:relative; 
+    bottom:400px; 
+    left:700px;
+    width: 300px;
+}
+
+    #scatterplot-filters input {
+        margin-top: 9px;
+        margin-right: 2px;
+        top: 2px;
+        position: relative;
+    }
+
+#scatter-plot-chart-box-wrapper {
+    padding-top:50px;
+}
+
+#supportingIndicatorsWrapper {
+    width: 900px;
+}
+
+#supportingIndicatorsWrapper .supportingIndicators {
+    float: left;
+    margin-left: 40px;
+    padding-top: 5px;
+}
+
+#supportingIndicatorsWrapper .supportingIndicatorsMenu {
+    float: left;
+    width: 700px;
+}
+
+#indicator-not-in-area {
+    margin-left:50px; 
+    margin-right:50px; 
+    font-size: 16px;    
+}
+
+#indicator-not-in-area-ok {
+    width:200px; 
+    margin-left:200px; 
+    margin-top:10px; 
+    padding-top:10px; 
+    padding-bottom:10px;
+    font-size: 16px;
+    cursor: pointer;
+}

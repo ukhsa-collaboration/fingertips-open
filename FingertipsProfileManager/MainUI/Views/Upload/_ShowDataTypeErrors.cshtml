@@ -1,0 +1,47 @@
+﻿@using Fpm.Upload
+@model BaseUpload
+
+@{
+    var errors = Model.UploadValidationFailures;
+}
+
+@if (ViewBag.IsSimple)
+{
+    <b>The following errors have occurred for indicator @(Model as SimpleUpload).IndicatorId</b>
+    <div id="dataTypeErrors">
+        @foreach (var error in errors)
+        {
+        <div>Error: @error.ErrorMessage</div>
+        }
+    </div>
+}
+else
+{
+    <h3>Data type conversion errors occurred in the following spreadsheet rows:</h3>
+    <div id="dataTypeErrors">
+        <table class="upload-error-table">
+            <thead>
+                <tr>
+                    <th class="header">Row</th>
+                    <th class="header">Error</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{ int rowNumber = 0;  }
+
+                @foreach (var error in errors)
+                {
+                    var cssClass = (rowNumber++%2 == 0) ? "odd" : "even";
+
+                <tr class="@cssClass">
+                    <td>@error.RowNumber</td>
+                    <td>@error.ErrorMessage</td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+<p>
+    <input class="small-button" type="button" onclick=" lightbox.hide() " value="Close" />
+</p>

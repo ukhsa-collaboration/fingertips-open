@@ -1,0 +1,42 @@
+﻿@using Fpm.MainUI.Models
+@model IndicatorGridModel
+
+<div id="editDomains" style="display: none;">
+    <h3>
+        Domains of @Model.Profile.Name
+    </h3>
+
+    @using (Html.BeginForm("SaveGridDomains", "ProfilesAndIndicators", FormMethod.Post, new { id = "Domainform" }))
+    {
+        <div id="list-of-domains" class="clearfix">
+            @for (int i = 0; i < Model.Profile.GroupingMetadatas.Count(); i++)
+            {
+                <div class="clear domain-list">
+                    <div class="domain-id">@Html.HiddenFor(model => model.Profile.GroupingMetadatas[i].GroupId)</div>
+
+                    @Html.TextBoxFor(model => model.Profile.GroupingMetadatas[i].GroupName,
+                        new { @class = "unselected-domain domain-to-edit" })
+                    @Html.HiddenFor(model => model.Profile.GroupingMetadatas[i].Sequence,
+                        new { @class = "inputSequence indicator-text" })
+                    <p>
+                </div>
+            }
+
+            @Html.TextBox("newDomain", null, new { @class = "unselected-domain domain-to-edit", @style = "display: none;" })
+
+            @Html.HiddenFor(x => x.UrlKey)
+            @Html.HiddenFor(x => x.Profile.Id)
+        </div>
+        <div class="clearfix">
+            <input id="reorderUp" type="button" class="medium-button" value="Move Up" />
+            <input id="reorderDown" type="button" class="medium-button" value="Move Down" />
+            <input id="addDomain" type="button" class="medium-button" value="New Domain" />
+            <input id="DeleteDomain" type="button" class="auto-width-button" value="Delete Domain"/>
+        </div>
+
+        <div class="space-top">
+            <input class="small-button" id="save" type="submit" value="Save" />
+            <input id="cancel" type="button" onclick="lightbox.hide()" class="small-button" value="Cancel" />
+        </div>
+    }
+</div>

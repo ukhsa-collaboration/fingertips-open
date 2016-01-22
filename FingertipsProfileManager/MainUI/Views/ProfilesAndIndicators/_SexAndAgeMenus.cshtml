@@ -1,0 +1,29 @@
+﻿@using System.Activities.Expressions
+@using Fpm.MainUI.Helpers
+@using Fpm.MainUI.Models
+@using Fpm.ProfileData.Entities.LookUps
+@model MoveIndicatorsModel
+
+<div class="delete-indicators">
+    <table class="grid">
+        @foreach (var indicator in Model.IndicatorsToTransfer)
+        {
+            <tr>
+                <td class="indicator-id">
+                    @indicator.IndicatorId
+                </td>
+                <td>
+                    @(indicator.IndicatorName.Length > 100 ? indicator.IndicatorName.Substring(0, 100) + "..." : indicator.IndicatorName)
+                </td>
+                <td>
+                    @Html.DropDownList("sexId-" + @indicator.IndicatorId,  (ViewBag.SexList as IEnumerable<Sex>).GetSexes(indicator.SexId),
+                                        new { @class = "small-age-dropdown dropdown-selected" })
+                </td>
+                <td>
+                    @Html.DropDownList("ageId-" + @indicator.IndicatorId, (ViewBag.AgeList as IEnumerable<Age>).GetAges(indicator.AgeId),
+                                        new { @class = "small-age-dropdown dropdown-selected" })
+                </td>
+            </tr>
+        }
+    </table>
+</div>

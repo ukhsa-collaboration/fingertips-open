@@ -1,0 +1,26 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.AdminModel
+
+@if (Model.AdminType == "Change indicator owner")
+{
+    var profiles = new SelectList(CommonUtilities.GetProfiles().OrderBy(x => x.Name), "Id", "Name");
+
+    <div id="changeIndicatorOwner">
+        <div class="left">
+            <b>Indicator ID:</b>
+            <input id="indicatorIds" type="text" />
+            <span class="info-tooltip"><i>Enter a valid indicator ID<br>
+                <br>
+                This will reassign the ownership of this indicator<br>
+                <br>
+            </i></span>
+        </div>
+        <br/>
+        <div class="left">
+            <b>Profile:</b>
+            @Html.DropDownList("profileList", profiles)
+            <input id="changeIndicatorOwnership" type="submit" value="Set profile as new owner" class="native-button" />
+        </div>
+    </div>
+}
+

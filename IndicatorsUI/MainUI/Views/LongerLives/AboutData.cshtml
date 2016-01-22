@@ -1,0 +1,18 @@
+﻿@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
+}
+@section headContent {
+}
+
+@Html.Partial("_BasicBreadcrumb", "About the data")
+
+<div id="content" class="clearfix">
+    <div id="related_content">
+        @CommonUtilities.GetContent("about-data-related", Model.ProfileId)
+    </div>
+    <div id="main_content" class="fpm_content">
+        @CommonUtilities.GetContent("about-data-main", Model.ProfileId)
+    </div>
+</div>

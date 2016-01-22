@@ -1,0 +1,90 @@
+﻿@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml";
+    var imagePath = ViewBag.ImagesUrl + "Mortality/";
+}
+@section headContent {
+    <script src="@(Model.JsPath)infobox-1.1.12.min.js"></script>
+    <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/PageBaseLongerLivesHome.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/Mortality/PageMortalityHome.js" type="text/javascript"></script>
+}
+
+<div id="content">
+    <div class="home_intro clearfix">
+        @CommonUtilities.GetContent("home-header", Model.ProfileId)
+    </div>
+
+    @Html.Partial("_SearchArea")
+    <div id="map">
+        <div class="map-overlays">
+
+            @Html.Partial("_AreaAndMapZoomSelector")
+            
+            @Html.Partial("_MapHelp")
+
+            @Html.Partial("Mortality/_MortalityDataFilter")
+
+            <!-- persistent overlay - left of map below filters containing legend -->
+            <div class="map-overlay" id="map-legend-deaths">
+                <h5>Premature mortality outcomes</h5>
+                <div class="legend">
+                    <span class="grade">
+                        <img src="@(imagePath)grade-3.png" alt="Worst" />worst</span>
+                    <span class="grade">
+                        <img src="@(imagePath)grade-2.png" alt="Worse than average" />worse than average</span>
+                    <span class="grade">
+                        <img src="@(imagePath)grade-1.png" alt="Better than average" />better than average</span>
+                    <span class="grade">
+                        <img src="@(imagePath)grade-0.png" alt="Best" />best</span>
+                    <span class="grade">
+                        <img src="@(imagePath)no-data.png" alt="Data is unavailable" />data unavailable</span>
+                </div>
+            </div>
+            <!-- persistent overlay for deprivation key -->
+            <div class="map-overlay" id="map-legend-quintiles" style="display: none;">
+                <h5>Level of socioeconomic deprivation</h5>
+                <div class="legend legend_deprivation">
+                    <span class="grade level1">
+                        <img src="@(imagePath)grade-quintile-5.png" />most deprived</span>
+                    <span class="grade level2">
+                        <img src="@(imagePath)grade-quintile-4.png" />more deprived</span>
+                    <span class="grade level3">
+                        <img src="@(imagePath)grade-quintile-3.png" />average</span>
+                    <span class="grade level4">
+                        <img src="@(imagePath)grade-quintile-2.png" />less deprived</span>
+                    <span class="grade level5">
+                        <img src="@(imagePath)grade-quintile-1.png" />least deprived</span>
+                </div>
+            </div>
+            <!-- overlay title for use during Similar mode -->
+            <div class="map-overlay map-overlay-title" style="display: none;">
+                <h3><font id="similar-text"></font>
+                    <span class="tooltip tooltip-inverse left" id="similar-text-info-icon"><i></i></span>
+                </h3>
+                <p><a href="javascript:viewNational()">&lt; Compare with all areas on the map</a></p>
+            </div>
+
+        </div>
+        <div class="map-canvas" id="gmap">
+            <noscript>Google maps requires JavaScript</noscript>
+        </div>
+    </div>
+
+    <div id="home_promos" class="clearfix">
+        <div class="article">
+            <h3><a href="/topic/@(ViewBag.ProfileUrlKey)/about-project">Find out about Longer Lives</a></h3>
+            <p>Making England's mortality data accessible to everyone.</p>
+        </div>
+        <div class="article">
+            <h3><a href="/topic/mortality/connect">Join the conversation</a></h3>
+            <p>Let us know what you think about Longer Lives.</p>
+        </div>
+        <div class="article  last">
+            <h3><a href="topic/@Model.ProfileUrlKey/health-intervention/liver">Focus on liver disease</a></h3>
+            <p>Find out what causes it and how rates can be reduced.</p>
+        </div>
+    </div>
+    <p class="footnote"><sup>1</sup> Office for National Statistics. Mortality Statistics: Deaths Registered in England and Wales by Area of Usual Residence, 2011.</p>
+</div>

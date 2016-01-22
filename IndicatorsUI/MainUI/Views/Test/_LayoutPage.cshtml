@@ -1,0 +1,36 @@
+﻿@{
+    string jasminePath = "/jsTest/jasmine-2.3.4/";
+    // Following is copied from Jasmine SpecRunner.html
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Jasmine Spec Runner</title>
+
+    <!-- Jasmine files -->
+    <link rel="shortcut icon" type="image/png" href="@(jasminePath)jasmine_favicon.png">
+    <link rel="stylesheet" type="text/css" href="@(jasminePath)jasmine.css">
+    <script type="text/javascript" src="@(jasminePath)jasmine.js"></script>
+    <script type="text/javascript" src="@(jasminePath)jasmine-html.js"></script>
+    <script type="text/javascript" src="@(jasminePath)boot.js"></script>
+
+    <!-- 3rd party libraries -->
+    <script type="text/javascript" src="/js/underscore-min.js"></script>
+    <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="/jsTest/jasmine-jquery.js"></script>
+
+    <!-- include source files here.-->
+    <script type="text/javascript" src="/jsTest/testHelper.js"></script>
+    <script type="text/javascript" src="/js/common.js"></script>
+    <script type="text/javascript" src="/js/spineChart.js"></script>
+    <script type="text/javascript" src="/js/fingertips.js"></script>
+
+    @RenderSection("headContent", true)
+
+</head>
+
+<body>
+</body>
+</html>

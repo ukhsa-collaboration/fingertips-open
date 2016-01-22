@@ -1,0 +1,46 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@using Profiles.MainUI.Models
+@model PageModel
+
+@{
+    var profileId = Model.ProfileId;
+    var profileUrlKey = Model.ProfileUrlKey;
+}
+
+@if (Model.PageType != PageType.SiteFrontPage)
+{
+    @Html.Partial("_Breadcrumbs")
+}
+
+<ul style="float: right;">
+
+    @if (Model.PageType == PageType.SiteFrontPage)
+    {
+        // These links are only displayed on the Fingertips front page
+        <li class="site-link">
+            <a href="http://www.erpho.org.uk/viewResource.aspx?id=21914" target="_blank"
+               title="The user guide provides a detailed explanation on how to interpret and understand the data presented">User Guide</a>
+        </li>
+        <li class="site-link">
+            <a href="http://www.youtube.com/user/erphotraining?ob=0" target="_blank"
+               title="Learn more by watching the online tutorials at our YouTube video channel">Video Tutorials</a>
+        </li>
+    }
+    else
+    {
+        @*Profile specific pages*@
+        if (profileId == ProfileIds.SexualHealth)
+        {
+            <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
+        }
+        else if (profileId == ProfileIds.LiverDisease)
+        {
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
+        }
+    }
+
+    @*Contact us*@
+    <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", profileUrlKey).Link)</li>
+</ul>

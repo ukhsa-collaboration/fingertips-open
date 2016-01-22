@@ -1,0 +1,11 @@
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
+<div id="faq-content">
+    <div id="faqs">
+        <h2>Frequently Asked Questions</h2>
+        @CommonUtilities.GetContentItem("faq-content", ProfileIds.UnassignedIndicators)
+        <p>
+            <input id="cancel" class="medium-button" onclick="lightbox.hide()" value="Close" />
+        </p>
+    </div>
+</div>

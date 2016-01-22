@@ -1,0 +1,655 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{64358A8F-D044-46CE-BDF2-1BFA5AC5B3D6}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Profiles.MainUI</RootNamespace>
+    <AssemblyName>Profiles.MainUI</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>false</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+    <TargetFrameworkProfile />
+    <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Hammock.ClientProfile, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c148cfba29ed1a4d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Hammock.ClientProfile.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp">
+      <HintPath>..\lib\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Svg">
+      <HintPath>..\lib\Svg.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="TweetSharp">
+      <HintPath>..\lib\TweetSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="WebGrease, Version=1.5.2.14234, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Common\SpineChartMinMaxLabelBuilder.cs" />
+    <Compile Include="Filters\CheckUserCanAccessSkin.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Caching\CachePolicyHelper.cs" />
+    <Compile Include="Caching\CacheHelper.cs" />
+    <Compile Include="Caching\FingertipsOutputCache.cs" />
+    <Compile Include="Caching\JsonCache.cs" />
+    <Compile Include="Common\AccessControlHelper.cs" />
+    <Compile Include="Common\BrowserHelper.cs" />
+    <Compile Include="Common\ColumnAssigner.cs" />
+    <Compile Include="Common\CommonUtilities.cs" />
+    <Compile Include="Common\ContactUs.cs" />
+    <Compile Include="Common\ContentHelper.cs" />
+    <Compile Include="Common\RowAssigner.cs" />
+    <Compile Include="Common\ExceptionLogger.cs" />
+    <Compile Include="Common\SupportingPage.cs" />
+    <Compile Include="Common\UserDetails.cs" />
+    <Compile Include="Common\VerticalText.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\AjaxBridgeController.cs" />
+    <Compile Include="Controllers\DownloadController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\ImageController.cs" />
+    <Compile Include="Controllers\LongerLivesController.cs" />
+    <Compile Include="Controllers\ProfileCollectionWithFrontPageController.cs" />
+    <Compile Include="Controllers\SingleProfileWithFrontPageController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\TestController.cs" />
+    <Compile Include="Controllers\TwitterController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ContentTab.cs" />
+    <Compile Include="Models\PageType.cs" />
+    <Compile Include="Models\SearchLabels.cs" />
+    <Compile Include="Models\TitleFont.cs" />
+    <Compile Include="Models\Error.cs" />
+    <Compile Include="Models\ErrorPageModel.cs" />
+    <Compile Include="Models\HRef.cs" />
+    <Compile Include="Models\JsFolder.cs" />
+    <Compile Include="Models\JsHelper.cs" />
+    <Compile Include="Models\JsonpResult.cs" />
+    <Compile Include="Models\KeyColours.cs" />
+    <Compile Include="Models\KeyDisplay.cs" />
+    <Compile Include="Models\MortalityCommentBox.cs" />
+    <Compile Include="Models\PageModel.cs" />
+    <Compile Include="Models\PageOption.cs" />
+    <Compile Include="Models\ParentDisplay.cs" />
+    <Compile Include="Models\PhofBody.cs" />
+    <Compile Include="Models\PhofHeadings.cs" />
+    <Compile Include="Models\StartButton.cs" />
+    <Compile Include="Models\YearRange.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Results\AjaxBridgeJsonResult.cs" />
+    <Compile Include="Routes\FrontPageRoute.cs" />
+    <Compile Include="Skins\SkinFactory.cs" />
+    <Compile Include="Skins\SkinNames.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\common.css" />
+    <Content Include="css\core-contentpages.css" />
+    <Content Include="css\fingertips.css" />
+    <Content Include="css\jquery-ui-1.10.1.css" />
+    <Content Include="css\longer-lives-diabetes.css" />
+    <Content Include="css\twitter.css" />
+    <Content Include="css\Inequalities.css" />
+    <Content Include="css\leaflet.css" />
+    <Content Include="css\longer-lives-main.css" />
+    <Content Include="css\longer-lives-map.css" />
+    <Content Include="css\PageMap.css" />
+    <Content Include="css\phof.css" />
+    <Content Include="css\practice-profiles.css" />
+    <Content Include="images\basemaps.jpg" />
+    <Content Include="images\circle_quintile1_medium.png" />
+    <Content Include="images\circle_quintile1_mini.png" />
+    <Content Include="images\circle_quintile2_medium.png" />
+    <Content Include="images\circle_quintile2_mini.png" />
+    <Content Include="images\circle_quintile3_medium.png" />
+    <Content Include="images\circle_quintile3_mini.png" />
+    <Content Include="images\circle_quintile4_medium.png" />
+    <Content Include="images\circle_quintile4_mini.png" />
+    <Content Include="images\circle_quintile5_medium.png" />
+    <Content Include="images\circle_quintile5_mini.png" />
+    <Content Include="images\header-high.png" />
+    <Content Include="images\header-low.png" />
+    <Content Include="images\image-icon.png" />
+    <Content Include="images\map_width.png" />
+    <Content Include="images\Mortality\arrow-down.png" />
+    <Content Include="images\Mortality\bar-high.png" />
+    <Content Include="images\Mortality\bar-low.png" />
+    <Content Include="images\Mortality\bar-.png" />
+    <Content Include="images\Mortality\bobHigher.png" />
+    <Content Include="images\Mortality\bobLower.png" />
+    <Content Include="images\Mortality\cancer_cells.jpg" />
+    <Content Include="images\Mortality\couch_potato.jpg" />
+    <Content Include="images\Mortality\drinking.jpg" />
+    <Content Include="images\Mortality\external_link%402x.png" />
+    <Content Include="images\Mortality\external_link.png" />
+    <Content Include="images\Mortality\fryup.jpg" />
+    <Content Include="images\Mortality\grade-0.png" />
+    <Content Include="images\Mortality\grade-1.png" />
+    <Content Include="images\Mortality\grade-2.png" />
+    <Content Include="images\Mortality\grade-3.png" />
+    <Content Include="images\Mortality\grade-99.png" />
+    <Content Include="images\Mortality\grade-quintile-0.png" />
+    <Content Include="images\Mortality\grade-quintile-1.png" />
+    <Content Include="images\Mortality\grade-quintile-2.png" />
+    <Content Include="images\Mortality\grade-quintile-3.png" />
+    <Content Include="images\Mortality\grade-quintile-4.png" />
+    <Content Include="images\Mortality\grade-quintile-5.png" />
+    <Content Include="images\Mortality\loading-spinner.gif" />
+    <Content Include="images\Mortality\minus.png" />
+    <Content Include="images\Mortality\no-data-img.png" />
+    <Content Include="images\Mortality\human_heart.jpg" />
+    <Content Include="images\Mortality\human_liver.jpg" />
+    <Content Include="images\Mortality\human_lungs.jpg" />
+    <Content Include="images\Mortality\infoCorner.gif" />
+    <Content Include="images\Mortality\list_dot.png" />
+    <Content Include="images\Mortality\map_killers%402x.png" />
+    <Content Include="images\Mortality\map_killers.png" />
+    <Content Include="images\Mortality\map_zoom.gif" />
+    <Content Include="images\Mortality\nature_walk.jpg" />
+    <Content Include="images\Mortality\no_smoking.jpg" />
+    <Content Include="images\Mortality\overall-bar.png" />
+    <Content Include="images\Mortality\overall-bar1.png" />
+    <Content Include="images\Mortality\plus.png" />
+    <Content Include="images\Mortality\pp_search.png" />
+    <Content Include="images\Mortality\running.jpg" />
+    <Content Include="images\Mortality\salad.jpg" />
+    <Content Include="images\Mortality\smoking.jpg" />
+    <Content Include="images\Mortality\table.png" />
+    <Content Include="images\Mortality\tooltip%402x.png" />
+    <Content Include="images\Mortality\tooltip.png" />
+    <Content Include="images\Mortality\twitter%402x.png" />
+    <Content Include="images\Mortality\twitter.png" />
+    <Content Include="images\Mortality\twitter_corner.png" />
+    <Content Include="css\longer-lives-normalize.css" />
+    <Content Include="css\core-allpages.css" />
+    <Content Include="fonts\transportnewheavy-webfont.svg" />
+    <Content Include="fonts\transportnewlight-webfont.svg" />
+    <Content Include="fonts\transportnewmedium-webfont.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="css\core-datapage.css" />
+    <Content Include="images\department_logo.gif" />
+    <Content Include="images\dhlogo.jpg" />
+    <Content Include="images\fancybox-x.png" />
+    <Content Include="images\fancybox-y.png" />
+    <Content Include="images\fancybox.png" />
+    <Content Include="images\fancy_close.png" />
+    <Content Include="images\fancy_loading.png" />
+    <Content Include="images\fancy_nav_left.png" />
+    <Content Include="images\fancy_nav_right.png" />
+    <Content Include="images\fancy_shadow_e.png" />
+    <Content Include="images\fancy_shadow_n.png" />
+    <Content Include="images\fancy_shadow_ne.png" />
+    <Content Include="images\fancy_shadow_nw.png" />
+    <Content Include="images\fancy_shadow_s.png" />
+    <Content Include="images\fancy_shadow_se.png" />
+    <Content Include="images\fancy_shadow_sw.png" />
+    <Content Include="images\fancy_shadow_w.png" />
+    <Content Include="images\fancy_title_left.png" />
+    <Content Include="images\fancy_title_main.png" />
+    <Content Include="images\fancy_title_over.png" />
+    <Content Include="images\fancy_title_right.png" />
+    <Content Include="images\icon_listArrow.gif" />
+    <Content Include="images\ic_boxHeaderBg.jpg" />
+    <Content Include="images\i_icon_update.gif" />
+    <Content Include="images\LHOlogo.jpg" />
+    <Content Include="images\magnif_srch.gif" />
+    <Content Include="images\mainNavLeft.jpg" />
+    <Content Include="images\mainNavLeft_PHOF.jpg" />
+    <Content Include="images\mainNavRight.jpg" />
+    <Content Include="images\mainNavRight_PHOF.jpg" />
+    <Content Include="images\Mortality\breadcrumbs.png" />
+    <Content Include="images\Mortality\connect_icons.png" />
+    <Content Include="images\Mortality\CrownCopyright%402x.png" />
+    <Content Include="images\Mortality\CrownCopyright.png" />
+    <Content Include="images\Mortality\killers%402x.png" />
+    <Content Include="images\Mortality\killers.png" />
+    <Content Include="images\Mortality\PHE_logo.png" />
+    <Content Include="images\Mortality\ProfJohnNewton.jpg" />
+    <Content Include="images\Mortality\promoCorner%402x.png" />
+    <Content Include="images\Mortality\promoCorner.png" />
+    <Content Include="images\Mortality\ranking_icons.png" />
+    <Content Include="images\Mortality\search%402x.png" />
+    <Content Include="images\Mortality\search.png" />
+    <Content Include="images\opacity.jpg" />
+    <Content Include="images\pcSml.png" />
+    <Content Include="images\PDF.gif" />
+    <Content Include="images\quintile1.png" />
+    <Content Include="images\quintile2.png" />
+    <Content Include="images\quintile3.png" />
+    <Content Include="images\quintile4.png" />
+    <Content Include="images\quintile5.png" />
+    <Content Include="images\save-image-icon.png" />
+    <Content Include="images\SearchButton_background2.jpg" />
+    <Content Include="images\tick_sign.png" />
+    <Content Include="images\trends\down_green.png" />
+    <Content Include="images\trends\down_red.png" />
+    <Content Include="images\trends\no_calc.png" />
+    <Content Include="images\trends\no_change.png" />
+    <Content Include="images\trends\up_green.png" />
+    <Content Include="images\trends\up_red.png" />
+    <Content Include="images\wrapperBg.jpg" />
+    <Content Include="jsTest\commonSpec.js" />
+    <Content Include="jsTest\fingertipsSpec.js" />
+    <Content Include="jsTest\jasmine-1.3.1\jasmine-html.js" />
+    <Content Include="jsTest\jasmine-1.3.1\jasmine.css" />
+    <Content Include="jsTest\jasmine-1.3.1\jasmine.js" />
+    <Content Include="jsTest\jasmine-jquery.js" />
+    <Content Include="jsTest\LongerLives\Diabetes\PageDiabetesPracticeDetailsSpec.js" />
+    <Content Include="jsTest\LongerLives\Diabetes\PageDiabetesRankingsSpec.js" />
+    <Content Include="jsTest\LongerLives\Diabetes\SiteDiabetesSpec.js" />
+    <Content Include="jsTest\PageAreaTrendsSpec.js" />
+    <Content Include="jsTest\PageDownloadSpec.js" />
+    <Content Include="jsTest\PageInequalitiesSpec.js" />
+    <Content Include="jsTest\PagePopulationSpec.js" />
+    <Content Include="jsTest\PageTartanRugSpec.js" />
+    <Content Include="jsTest\SiteKeyIndicatorsSpec.js" />
+    <Content Include="jsTest\SiteBaseLongerLivesSpec.js" />
+    <Content Include="jsTest\SiteSearchSpec.js" />
+    <Content Include="jsTest\spineChartSpec.js" />
+    <Content Include="jsTest\testHelper.js" />
+    <Content Include="js\common.js" />
+    <Content Include="js\EnvironmentTest.js" />
+    <Content Include="js\esri-leaflet.js" />
+    <Content Include="js\Floatahead\jquery.floatThead-slim.min.js" />
+    <Content Include="js\Highcharts\exporting.js" />
+    <Content Include="js\Highcharts\highcharts-more.js" />
+    <Content Include="js\Highcharts\highcharts.js" />
+    <Content Include="js\Html2Canvas\html2canvas.js" />
+    <Content Include="js\Html2Canvas\html2canvas.min.js" />
+    <Content Include="js\Html2Canvas\html2canvas.svg.js" />
+    <Content Include="js\Html2Canvas\html2canvas.svg.min.js" />
+    <Content Include="js\js.cookie.js" />
+    <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaDetails.js" />
+    <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaSearchResults.js" />
+    <Content Include="js\LongerLives\Diabetes\CallOutBox.js" />
+    <Content Include="js\LongerLives\Diabetes\CallOutBoxHealthCheck.js" />
+    <Content Include="js\LongerLives\PageBaseLongerLivesRankings.js" />
+    <Content Include="js\LongerLives\PageBaseLongerLivesHome.js" />
+    <Content Include="js\PageScatterPlot.js" />
+    <Content Include="js\PageTwitterFeed.js" />
+    <Content Include="js\LongerLives\Diabetes\PageDiabetesPracticeDetails.js" />
+    <Content Include="js\LongerLives\Diabetes\PageDiabetesRankings.js" />
+    <Content Include="js\LongerLives\SiteBaseLongerLives.js" />
+    <Content Include="js\LongerLives\Diabetes\SiteDiabetes.js" />
+    <Content Include="js\LongerLives\Diabetes\PageDiabetesHome.js" />
+    <Content Include="js\fingertips.js" />
+    <Content Include="js\hogan.min.js" />
+    <Content Include="js\infobox-1.1.12.min.js" />
+    <Content Include="js\jquery-1.10.2.min.js" />
+    <Content Include="js\leaflet.js" />
+    <Content Include="js\modernizr-2.6.2.min.js" />
+    <Content Include="js\mortality-jquery-ui-1.10.3.custom.min.js" />
+    <Content Include="js\PageAreaProfile.js" />
+    <Content Include="js\PageAreaTrends.js" />
+    <Content Include="js\PageBarChartAndFunnelPlot.js" />
+    <Content Include="js\PageBarChart.js" />
+    <Content Include="js\PageContentEvidence.js" />
+    <Content Include="js\PageDownload.js" />
+    <Content Include="js\PageInequalities.js" />
+    <Content Include="js\PageMap.js" />
+    <Content Include="js\PageMetadata.js" />
+    <Content Include="js\LongerLives\Mortality\PageMortalityAreaDetails.js" />
+    <Content Include="js\LongerLives\Mortality\PageMortalityHome.js" />
+    <Content Include="js\LongerLives\Mortality\PageMortalityIntervention.js" />
+    <Content Include="js\LongerLives\Mortality\PageMortalityRankings.js" />
+    <Content Include="js\PagePopulation.js" />
+    <Content Include="js\PagePracticeBarChart.js" />
+    <Content Include="js\PagePracticeSearch.js" />
+    <Content Include="js\PagePracticeSpineChart.js" />
+    <Content Include="js\PagePracticeTrends.js" />
+    <Content Include="js\PageScatter.js" />
+    <Content Include="js\PageTartanRug.js" />
+    <Content Include="js\practice-profiles-ie8.js" />
+    <Content Include="js\SiteKeyIndicators.js" />
+    <Content Include="js\LongerLives\Mortality\SiteMortality.js" />
+    <Content Include="js\SitePracticeProfiles.js" />
+    <Content Include="js\SiteSearch.js" />
+    <Content Include="js\SiteSubstance.js" />
+    <Content Include="js\spineChart.js" />
+    <Content Include="js\tablesorter.min.js" />
+    <Content Include="js\TestPage.js" />
+    <Content Include="js\tooltip.js" />
+    <Content Include="js\underscore-min.js" />
+    <Content Include="Views\Search\Data.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Shared\AreaMenu.cshtml" />
+    <None Include="Controllers\Controllers.cd" />
+    <Content Include="Views\LongerLives\Mortality\_MortalityLayoutPage.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityHome.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityRankings.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityConnect.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityAreaDetails.cshtml" />
+    <Content Include="fonts\transportnewheavy-webfont.eot" />
+    <Content Include="fonts\transportnewheavy-webfont.ttf" />
+    <Content Include="fonts\transportnewheavy-webfont.woff" />
+    <Content Include="fonts\transportnewlight-webfont.eot" />
+    <Content Include="fonts\transportnewlight-webfont.ttf" />
+    <Content Include="fonts\transportnewlight-webfont.woff" />
+    <Content Include="fonts\transportnewmedium-webfont.eot" />
+    <Content Include="fonts\transportnewmedium-webfont.ttf" />
+    <Content Include="fonts\transportnewmedium-webfont.woff" />
+    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventioncancer.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionheart_disease_and_stroke.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionliver_disease.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionlung_disease.cshtml" />
+    <Content Include="Views\LongerLives\Mortality\_MortalityDataFilter.cshtml" />
+    <Content Include="Views\LongerLives\_BestWorstNationally.cshtml" />
+    <Content Include="Views\LongerLives\_InterventionHead.cshtml" />
+    <Content Include="Views\LongerLives\Error.cshtml" />
+    <Content Include="Views\LongerLives\_PhofLink.cshtml" />
+    <Content Include="Views\LongerLives\_DeprivationTooltip.cshtml" />
+    <Content Include="Views\LongerLives\_BasicBreadcrumb.cshtml" />
+    <Content Include="Views\LongerLives\PolicyPrivacy.cshtml" />
+    <Content Include="Views\LongerLives\PolicyCookies.cshtml" />
+    <Content Include="Views\LongerLives\PolicyAccessibility.cshtml" />
+    <Content Include="Views\LongerLives\_CampaignLink.cshtml" />
+    <Content Include="Views\Search\_SearchSpecificJavaScript.cshtml" />
+    <Content Include="jsTest\jasmine-1.3.1\MIT.LICENSE" />
+    <Content Include="Views\Shared\AreaTypeMenu.cshtml" />
+    <Content Include="Views\MidlandsAndEast\_PageLinks.cshtml" />
+    <Content Include="Views\MidlandsAndEast\SiteFooter.cshtml" />
+    <Content Include="Views\PracticeProfiles\FrontPage.cshtml" />
+    <Content Include="Views\PracticeProfiles\SiteFooter.cshtml" />
+    <Content Include="Views\PracticeProfiles\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\PracticeProfiles\Data.cshtml" />
+    <Content Include="js\jquery-1.10.2.min.map" />
+    <Content Include="Views\PracticeProfiles\_IE8.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\SiteFooter.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\Data.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\FrontPage.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\_PageLinks.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\PracticeProfiles\_PageLinks.cshtml" />
+    <Content Include="Views\Phof\_PageLinks.cshtml" />
+    <Content Include="Views\Phof\ContactUs.cshtml" />
+    <Content Include="Views\Phof\Faqs.cshtml" />
+    <Content Include="Views\Phof\FrontPage.cshtml" />
+    <Content Include="Views\Phof\FurtherInfo.cshtml" />
+    <Content Include="Views\Phof\SiteFooter.cshtml" />
+    <Content Include="Views\Phof\_PhofDomains.cshtml" />
+    <Content Include="Views\Phof\_SkinSpecificJavaScriptAndCssForContentPages.cshtml" />
+    <Content Include="Views\Phof\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesHome.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\_DiabetesLayoutPage.cshtml" />
+    <Content Include="Views\LongerLives\_DiabetesHeader.cshtml" />
+    <Content Include="Views\LongerLives\_DiabetesFooter.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesRankings.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesPracticeDetails.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\_DiabetesPracticeDetailsSummary.cshtml" />
+    <Content Include="Views\LongerLives\AboutData.cshtml" />
+    <Content Include="Views\LongerLives\AboutProject.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesConnect.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesKeyMessages.cshtml" />
+    <Content Include="Views\Shared\_SearchNoMatches.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesAreaSearchResults.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\_StartButton.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\_DiabetesDataFilter.cshtml" />
+    <Content Include="Views\LongerLives\_LegendInlineQuintiles.cshtml" />
+    <Content Include="Views\LongerLives\_RankingsMiddleColumnDomain.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\DiabetesAreaDetails.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\_DiabetesHelpGuide.cshtml" />
+    <Content Include="Views\LongerLives\_AreaAndMapZoomSelector.cshtml" />
+    <Content Include="Views\LongerLives\_MapHelp.cshtml" />
+    <Content Include="Views\LongerLives\Diabetes\_MapLegend.cshtml" />
+    <Content Include="Views\LongerLives\_LegendInlineBob.cshtml" />
+    <Content Include="Views\Shared\_DomainTooltipIcon.cshtml" />
+    <Content Include="Views\LongerLives\_ViewSimliar.cshtml" />
+    <Content Include="Views\Search\SearchNotAvailable.cshtml" />
+    <Content Include="Views\Shared\_PracticeProfilesDomainCollection.cshtml" />
+    <Content Include="packages.config" />
+    <Content Include="Views\Phof\Data.cshtml" />
+    <None Include="Views\Shared\Banner.cshtml" />
+    <Content Include="Views\Shared\KeyBarChart.cshtml" />
+    <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
+    <Content Include="Views\Shared\Data.cshtml" />
+    <Content Include="Views\Shared\PageContainers.cshtml" />
+    <Content Include="Views\Shared\IndicatorsMenu.cshtml" />
+    <Content Include="Views\Shared\BenchmarkMenu.cshtml" />
+    <Content Include="Views\LongerLives\_SearchAreaSmall.cshtml" />
+    <None Include="Views\Shared\Domains.cshtml" />
+    <Content Include="Views\Shared\KeyTartanRug.cshtml" />
+    <Content Include="Views\Shared\Key.cshtml" />
+    <Content Include="Views\Shared\KeySpineChart.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Views\Shared\KeyInequality.cshtml" />
+    <Content Include="Views\Shared\ParentTypeMenu.cshtml" />
+    <Content Include="Views\Shared\_Html2Canvas.cshtml" />
+    <None Include="Views\Shared\SiteFooter.cshtml" />
+    <Content Include="Views\MidlandsAndEast\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\Shared\SexMenu.cshtml" />
+    <Content Include="Views\Shared\ParentAreaMenu.cshtml" />
+    <None Include="Views\Shared\Spinner.cshtml" />
+    <Content Include="Views\Shared\_JavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\Shared\ViewOptions.cshtml" />
+    <Content Include="Views\Shared\SupportingInformation.cshtml" />
+    <None Include="Views\Shared\YearSelector.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\MidlandsAndEast\FrontPage.cshtml" />
+    <Content Include="Views\Shared\SearchBox.cshtml" />
+    <Content Include="Views\LongerLives\_SearchArea.cshtml" />
+    <Content Include="Views\Shared\_GoogleAnalytics.cshtml" />
+    <Content Include="Views\Shared\_MapCss.cshtml" />
+    <Content Include="Views\Shared\_JQuery.cshtml" />
+    <Content Include="Views\Shared\_Favicon.cshtml" />
+    <Content Include="Views\Test\Index.cshtml" />
+    <Content Include="Views\Shared\_PhofBody.cshtml" />
+    <Content Include="Views\Shared\_TwitterBox.cshtml" />
+    <Content Include="Views\Shared\_DataPageBody.cshtml" />
+    <Content Include="Views\Shared\_ProfileSpecificCssFiles.cshtml" />
+    <Content Include="Views\Shared\_ProfileSpecificJsFiles.cshtml" />
+    <Content Include="Views\Shared\_ProfileCollection.cshtml" />
+    <Content Include="Views\Shared\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\Shared\_GlobalJsVariablesForDataPage.cshtml" />
+    <Content Include="Views\Shared\_GlobalJsVariablesForContentPage.cshtml" />
+    <Content Include="Views\Shared\_PoliciesAndCopyright.cshtml" />
+    <Content Include="Views\Shared\_ProfileCollectionItemLink.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\SiteFooter.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\FrontPage.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\Data.cshtml" />
+    <Content Include="Views\Shared\_IntroductionAndRecentUpdates.cshtml" />
+    <Content Include="Views\Test\_LayoutPage.cshtml" />
+    <Content Include="Views\Test\FingertipsTest.cshtml" />
+    <Content Include="Views\Test\PracticeProfilesTest.cshtml" />
+    <Content Include="Views\Shared\_PheLogoBanner.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\_PageLinks.cshtml" />
+    <Content Include="Views\Shared\_PageLinks.cshtml" />
+    <Content Include="Views\Shared\_TwitterFeed.cshtml" />
+    <Content Include="Views\Shared\_TwitterStyle.cshtml" />
+    <Content Include="Views\Shared\KeyDataQuality.cshtml" />
+    <Content Include="Views\Test\DiabetesTest.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\ProfileFrontPage.cshtml" />
+    <Content Include="Views\Shared\_StartButton.cshtml" />
+    <Content Include="Views\Shared\_MenuEmpty.cshtml" />
+    <Content Include="Views\Shared\_MortalityHeader.cshtml" />
+    <Content Include="Views\Shared\_Header.cshtml" />
+    <Content Include="Views\Shared\_MortalityFooter.cshtml" />
+    <Content Include="Views\Shared\_Breadcrumbs.cshtml" />
+    <Content Include="Views\Test\DiabetesRankingsTest.cshtml" />
+    <Content Include="Views\Shared\_UpdateDelayedMessage.cshtml" />
+    <Content Include="Views\Shared\_KeyValueNote.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_LayoutPage.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{10d7511f-c617-480d-9b5f-4dae46241764}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
+      <Project>{9963cb61-0e95-45ad-9572-4df4dc132bd7}</Project>
+      <Name>DataConstruction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DomainObjects\DomainObjects.csproj">
+      <Project>{DB5CE84B-BE14-44BB-A83E-506FFDF58094}</Project>
+      <Name>DomainObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FingertipsBridgeWS\Cache\Cache.csproj">
+      <Project>{0918eb63-0cca-4317-82fb-32ed0c17f43c}</Project>
+      <Name>Cache</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FingertipsBridgeWS\Services\Services.csproj">
+      <Project>{44bbccab-d4bd-4c71-939b-2d94a63d0627}</Project>
+      <Name>Services</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="css\chosen\" />
+    <Folder Include="images\chosen\" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <Target Name="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(ProjectDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>False</AutoAssignPort>
+          <DevelopmentServerPort>59822</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

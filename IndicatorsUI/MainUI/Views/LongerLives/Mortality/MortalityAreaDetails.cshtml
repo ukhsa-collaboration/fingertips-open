@@ -1,0 +1,74 @@
+﻿@using Profiles.DomainObjects
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml"; 
+}
+@section headContent {
+    <script src="@(Model.JsPath)LongerLives/Mortality/PageMortalityAreaDetails.js" type="text/javascript"></script>
+}
+
+<div id="header_bottom" class="clearfix">
+    <ul id="breadcrumbs">
+        <li><a href="javascript:MT.nav.home();">Home</a></li>
+        <li><a href="javascript:MT.nav.rankings();">Mortality rankings</a></li>
+        <li class="last area_name"><a href="#"></a></li>
+    </ul>
+    @Html.Partial("_SearchAreaSmall")
+</div>
+
+<div id="data_page_header" class="clearfix"></div>
+
+<div id="content" class="data_page_content clearfix">
+    <div id="related_content">
+        <div class="compare">
+            <h3>Compare:</h3>
+            <ul id="area_display_options">
+                <li id="show_similar_areas"><a href="javascript:showSimilarAreas()">Similar local authorities</a></li>
+                <li id="show_all_areas"><a href="javascript:showAllAreas()">All local authorities</a></li>
+            </ul>
+        </div>
+        
+        <div class="similar_authorities" style="display:none;">
+            
+            <div class="aboutDecileGroup"><p><font class="area_name"></font> is in <br/><strong>Socioeconomic decile <font id="decile_number"></font></strong></p></div>
+            <div class="aboutONSGroup"><p><font class="area_name"></font> is in <br/><strong><font id="ons_name"></font></strong></p></div>
+  
+            <ul>
+                <li id="socioeconomic_ib" >
+
+                    <img src="@(ViewBag.ImagesUrl)Mortality/ranking_icons.png" />
+                </li>
+                <li class="deprivation">
+                    <span class="deprivation">Socioeconomic deprivation</span>
+                    <font class="decile_text"></font>
+                        @Html.Partial("_DeprivationTooltip")
+                </li>
+            </ul>
+            
+            
+            <div class="similar" style="display: none;">
+                <p><strong>Local authorities in this <span class="area-bracket">socioeconomic deprivation bracket</span></strong></p>
+            
+                <ul id="similar_areas_list">
+                    <li></li>
+                </ul>   
+                
+                            
+            <a href="javascript:MT.nav.rankings();" class="more_info no-print">View full rankings</a>
+            </div>
+
+        </div>
+        
+
+        <ul class="related_links no-print">
+            <li>@Html.Partial("_PhofLink", GroupIds.Phof_PrematureMortality)</li>
+            <li><a href="/topic/@(ViewBag.ProfileUrlKey)/about-data">About the data</a></li>
+            @Html.Partial("_CampaignLink")                        
+@*            <li><a id="la_link" class="external_link" target="_blank" href="#">Visit the local authority website</a></li>*@
+        </ul>
+      
+    </div>
+    <ul id="main_content" class="area-details">
+    </ul>
+
+</div>

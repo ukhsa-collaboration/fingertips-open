@@ -1,0 +1,25 @@
+﻿@using Profiles.MainUI.Models
+@if ((int)ViewBag.EnumParentDisplay == (int)ParentDisplay.NationalAndRegional)
+{
+    <ul id="benchmark-box" class="menu geo-menu right-menu" style="display:none;">
+        <li>
+            <select id="comparator" onchange="benchmarkChanged();">
+                <option value="4" selected="selected">England</option>
+                <option id="subnational-benchmark" value="1" class="parent-area-type"></option>
+            </select>
+        </li>
+        <li class="heading">
+            Benchmark:
+        </li>
+    </ul>
+    <div id="target-benchmark-box" style="display:none;">
+        <ul class="menu">
+            <li class="label">
+                Benchmark against goal where applicable
+            </li>
+            <li>
+                <input id="target-benchmark" type="checkbox" checked="checked">
+            </li>
+        </ul>
+    </div>
+}

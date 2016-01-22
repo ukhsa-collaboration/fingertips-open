@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="FingertipsUploadService.ProfileData"
+                   namespace="FingertipsUploadService.ProfileData.Entities.User">
+
+  <!-- UserGroup Permissions class -->
+  <class name="UserGroupPermissions" table="FPM_UserGroupPermissions">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="UserId" column="userid"/>
+    <property name="ProfileId" column="profileid"/>
+
+    <many-to-one name="FpmUser" column="userid" lazy="false"  insert="false"/>
+  </class>
+
+  <!-- User class -->
+  <class name="FpmUser" table="FPM_User" >
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="DisplayName" column="displayname"/>
+    <property name="UserName" column="username"/>
+    <property name="IsAdministrator" column="isadministrator"/>
+  </class>
+
+  <!-- User Audit class -->
+  <class name="UserAudit" table="FPM_UserAudit">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="UserId" column="userid"/>
+    <property name="UserName" column="username"/>
+    <property name="DisplayName" column="displayname"/>
+    <property name="IsAdministrator" column="isadministrator"/>
+    <property name="Timestamp" column="timestamp"/>
+    <property name="User" column="[user]"/>
+    <property name="AuditType" column="audittype"/>
+
+  </class>
+
+
+</hibernate-mapping>
+
+

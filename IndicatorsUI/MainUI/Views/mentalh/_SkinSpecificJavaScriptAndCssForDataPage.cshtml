@@ -1,0 +1,9 @@
+﻿@using Profiles.MainUI.Models
+@model PageModel
+<script type="text/javascript">//<![CDATA[
+    maxTartanRugWidth = 980;
+    restrictSearchProfileId = @Model.TemplateProfileId;
+//]]</script>
+
+
+@Html.Hidden("searchable-profile-list", string.Join(",", Model.ProfileCollectionIdList.ToArray()))

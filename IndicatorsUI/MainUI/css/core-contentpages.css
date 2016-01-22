@@ -1,0 +1,181 @@
+﻿
+h2 {
+    margin: 45px 10px 3px 10px;
+    padding: 0 0 3px 0;
+    border-bottom: 5px solid #02ae94;
+    font-weight: bold;
+}
+
+td {
+    vertical-align: top;
+}
+
+#introduction {
+    float: left;
+}
+
+#about-fingertips ul, #introduction ul, #recent-updates ul, .phof-domains ul {
+    font-size: 17px;
+    line-height: 1.3em;
+    margin: 0 10px 0 20px;
+    list-style: disc;
+    list-style-position: outside;
+}
+
+#about-fingertips li, #introduction li, #recent-updates li, .phof-domains li {
+    margin-left:10px;
+}
+
+#about-fingertips p, #introduction p {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+#introduction table {
+    margin: 0 10px;
+    font-size: 17px;
+}
+
+.domain-heading-link:before {
+    content: "- ";
+}
+
+.domain-heading-link {
+    list-style: none;
+    font-size: 17px;
+    line-height: 1.3em;
+    margin: 0 10px 0 10px;
+}
+
+    .domain-heading-link:hover {
+        text-decoration: underline;
+    }
+
+    .domain-heading-link p {
+        margin-top: 12px;
+        margin-bottom: 12px;
+    }
+
+.phof-domains a, .phof-domains a:visited,
+.home-profiles a.title, .home-profiles a.title:active, .home-profiles a.title:visited {
+    text-decoration: none;
+    font-style: normal;
+    color: #39836e;
+    font-size: 1.6em;
+    font-weight: bold;
+    margin: 0 10px 0 10px;
+    display: block;
+}
+
+.home-profiles a, .phof-domains a {
+    text-decoration: none;
+    color: #39836e;
+}
+
+    .home-profiles a:hover,.phof-domains a:hover {
+        text-decoration: underline;
+    }
+
+.home-profiles td {
+    padding-top: 12px;
+}
+
+#video-box {
+    margin: 10px;
+}
+
+/*----------------------------------------
+    Start button
+------------------------------------------*/
+
+#startButton {
+    float: left;
+    height: 68px;
+    width: 280px;
+    background-image: url(../images/start.png);
+    background-color: #fff;
+    background-repeat: no-repeat;
+    border: none;
+    display: block;
+    margin: 50px 0 20px 10px;
+}
+
+#startButton:hover {
+    background-position: 0 -68px;
+}
+
+/*----------------------------------------
+    Recent updates
+------------------------------------------*/
+
+#recent-updates, #twitter-box {
+    width: 30%;
+    float: left;
+    margin-left: 5%;
+}
+
+#recent-updates h3 {
+    padding-left: 10px;
+    font-size: 14.5px;
+}
+
+#recent-updates ul li {
+    padding-top:5px;
+    line-height: 1em;
+}
+
+#recent-updates div {
+    width: 96.4%;
+}
+
+#recent-updates .scrollable-box {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    height: 500px;
+}
+
+/*----------------------------------------
+    Content pages 
+------------------------------------------*/
+.supporting-information {
+    width: 75%;
+    float:left;
+}
+
+.supporting-information p {
+padding: 10px 0;
+}
+
+.supporting-information h1{
+padding-top:10px;
+font-size: 2.5em;
+}
+
+.supporting-information h3 {
+padding-top:10px;
+}
+
+.supporting-information ul {
+    list-style: disc;
+    list-style-position: outside;
+    font-size:15px;
+    padding: 10px 30px;
+}
+
+.supporting-information li {
+    padding: 1px 0;
+    margin-top:7px;
+    margin-bottom:7px;
+}
+
+#update-delayed {
+    font-size: 3.1em;
+    padding: 25px 0;
+}
+
+.practice-profiles-domain-list h2 {
+    margin: 1px 10px 3px 10px;
+    padding: 0 0 3px 0;
+    border-bottom: 5px solid #02ae94;
+    font-weight: bold;
+}

@@ -1,0 +1,31 @@
+﻿@using Profiles.MainUI.Models
+@model PageModel
+@* Tabs *@
+<div id="tabs" class="selectionBox clearfix">
+</div>
+@* Menus and key *@
+<div id="view-options" class="clearfix">
+    <div class="row">        
+        @Html.Partial("SexMenu")
+        @Html.Partial("BenchmarkMenu")
+        <span id="goBack"></span>
+        @Html.Partial("AreaTypeMenu")        
+        @Html.Partial("ParentTypeMenu")
+
+    </div>
+    <div class="row">
+        <span id="selected-nearest-neighbour"></span>   
+        @if (ViewBag.ShowNearestNeighbours && ViewBag.IsNational == "true")
+        {
+            <div id="nearestNeighbours-wrapper"><a id="nearest-neighbour-link" onclick="findNearestNeighbours()" class="a-link"></a></div>
+        }         
+        @Html.Partial("AreaMenu")        
+        @Html.Partial("ParentAreaMenu")    
+@*        @Html.Partial("_MenuEmpty")*@
+    </div>
+    <div class="row">
+        @Html.Partial("IndicatorsMenu")
+    </div>
+</div>
+@Html.Partial("Key")
+

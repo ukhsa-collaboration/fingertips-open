@@ -1,0 +1,2696 @@
+overlay-hover-menu/*
+ * HTML5 Boilerplate
+ *
+ * What follows is the result of much research on cross-browser styling.
+ * Credit left inline and big thanks to Nicolas Gallagher, Jonathan Neal,
+ * Kroc Camen, and the H5BP dev community and team.
+ */
+
+/* ==========================================================================
+   Base styles: opinionated defaults
+   ========================================================================== */
+
+html,
+button,
+input,
+select,
+textarea {
+    color: #222;
+}
+
+body {
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+/*
+ * Remove text-shadow in selection highlight: h5bp.com/i
+ * These selection declarations have to be separate.
+ * Customize the background color to match your design.
+ */
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+/*
+ * A better looking default horizontal rule
+ */
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+/*
+ * Remove the gap between images and the bottom of their containers: h5bp.com/i/440
+ */
+
+img {
+    vertical-align: middle;
+}
+
+/*
+ * Remove default fieldset styles.
+ */
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+/*
+ * Allow only vertical resizing of textareas.
+ */
+
+textarea {
+    resize: vertical;
+}
+
+/* ==========================================================================
+   Chrome Frame prompt
+   ========================================================================== */
+
+.chromeframe {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+/* FONTS */
+@font-face {
+    font-family: 'transport_new_heavy';
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.eot);
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.svg#transport_new_heavyregular) format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transport_new';
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.eot);
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.svg#transportnew_lightregular) format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'transport_new_medium';
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.eot);
+    src: url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.svg#transportnew_mediumregular) format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1, h2, h3, h4, h5, h6, b, strong {
+    font-weight: bold;
+}
+
+.external_link {
+    background: url(../images/Mortality/external_link.png) right center no-repeat;
+    padding: 0 22px 0 0;
+}
+
+body {
+    color: #000;
+    font-family: "transport_new", Arial, sans-serif;
+    font-size: 67.5%;
+}
+
+.arial {
+    font-family: Arial, sans-serif;
+}
+
+.wrap-text {
+    white-space: normal;
+}
+
+#header_top {
+    margin: 0 auto;
+    padding: 20px 40px 0 40px;
+    width: 964px;
+}
+
+#header_top a {
+    float: left;
+}
+
+    #header_top img {
+        display: block;
+    }
+
+#header_nav {
+    background: #F8F8F8;
+}
+
+#nav_wrap {
+    border-bottom: 10px solid #02ae94;
+    margin: 0 auto;
+    width: 964px;
+}
+
+#nav_border {
+    border-bottom: 5px solid #0b0c0c;
+}
+
+#header_nav p.header_summary_tag {
+    float: left;
+    font-size: 1.8em;
+    margin: 0;
+    padding: 17px 0 0 0;
+    color: #000;
+    text-decoration: none;
+}
+
+.profile-menu {
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-top: 10px solid #02ae94;
+    margin: 9px 0 0 0;
+    position: absolute
+}
+
+#overlay-hover-menu {
+    position: absolute;
+    display: none; 
+    width: 200px; 
+    color: #FFFFFF; 
+    padding-left: 1px;
+}
+
+#overlay-hover-menu ul {
+    background-color: #808080;
+}
+
+.overlay_header_summary_tag {
+    float: left;
+    font-size: 1.8em;
+    margin: 0;
+    padding: 17px 0 0 0;
+    color: #000;
+    width: 200px; 
+    text-decoration: none;
+}
+
+#header_nav a.title {
+    float: left;
+    font-size: 1.4em;
+    margin: 0;
+    padding: 17px 0 0 0;
+    color: #000;
+    text-decoration: none;
+}
+
+#header_nav ul {
+    float: right;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+    #header_nav ul li {
+        float: left;
+        font-size: 1.4em;
+        padding: 5px 0 0 3px;
+    }
+
+        #header_nav ul li a {
+            color: #000;
+            display: block;
+            float: left;
+            padding: 12px 13px 13px;
+            text-decoration: none;
+        }
+
+        #header_nav ul li.selected a {
+            background: #000;
+            color: #FEFEFE;
+            cursor: text;
+        }
+            #header_nav ul li.selected a:hover {
+            text-decoration: none;
+        }
+
+#header_nav a:hover {
+    text-decoration: underline;
+}
+
+
+.basic_breadcrumbs {
+    font-size: 1.3em;
+    padding: 10px 0 12px 0;
+}
+
+    .basic_breadcrumbs img {
+        margin-left:6px;
+        margin-top:-1px;
+    }
+
+#breadcrumbs {
+    font-size: 1.3em;
+    padding: 10px 0 12px 0;
+    float: left;
+    list-style: none;
+    margin: 0;
+}
+
+    #breadcrumbs li {
+        background: url(../images/Mortality/breadcrumbs.png) right center no-repeat;
+        float: left;
+        padding: 0 24px 0 0;
+    }
+
+#breadcrumbs li.last {
+    background: none;
+}
+
+#breadcrumbs li a, .basic_breadcrumbs a {
+    color: #000;
+}
+
+    #breadcrumbs li a:hover, .basic_breadcrumbs a:hover {
+        text-decoration: none;
+    }
+
+#header_bottom {
+    border-bottom: 1px solid #dee0e2;
+    margin: 0 auto;
+    width: 964px;
+}
+
+
+    #header_bottom div {
+        float: right;
+        padding: 8px 0 0 0;
+    }
+
+/*
+* Search
+*/
+
+.search-watermark {
+    color: #999999;
+}
+
+#header_bottom #search_text {
+    background: #FFF url(../images/Mortality/search.png) right center no-repeat;
+    font-size: 1.4em;
+    height: 30px;
+    line-height: 26px;
+    padding-left: 3px;
+    margin-bottom: 3px;
+    width: 310px;
+}
+
+#no-matches-found {
+     top: 753.25px; 
+     left: 909.5px;
+}
+
+#header_bottom div input.button {
+    background: #0c826f;
+    border: 0;
+    color: #FFF;
+    float: left;
+    font-size: 1.3em;
+    height: 28px;
+    margin: 0 0 0 4px;
+    padding: 0 8px;
+}
+
+#content {
+    margin: 0 auto;
+    width: 964px;
+}
+
+#related_content {
+    float: left;
+    font-size: 1.3em;
+    padding: 123px 0 50px 0;
+    width: 209px;
+}
+
+    #related_content a {
+        color: #2e3191;
+        text-decoration: none;
+    }
+
+        #related_content a:hover {
+            color: #2e8aca;
+            text-decoration: underline;
+        }
+
+    #related_content .contact_heading {
+        clear: both;
+        margin: 0;
+        padding: 0 5px 7px 0;
+    }
+
+    #related_content .contact {
+        display: block;
+        margin: 0;
+        padding: 0 0 17px;
+    }
+
+    #related_content .address_heading {
+        clear: both;
+        margin: 0;
+        padding: 10px 0 4px;
+        
+    }
+
+    #related_content .address {
+        line-height: 2;
+        margin: 0;
+        padding: 0 0 31px;
+    }
+
+    .contact-details p {
+        margin: 0 0 1em;
+    }
+
+    .address {
+        font-size: 1.1em;
+    }
+
+    .address_heading,
+    .contact_heading span {
+        font-size: 0.9em;
+    }
+    
+
+    #related_content .useful_links {
+        background: #f1f1f1;
+        padding: 8px 10px 0 15px;
+        width: 180px;
+    }
+
+    #related_content .related_links.no-print,
+     #related_content .useful_links ~ .no-print > ul {
+        margin-left: 17px;
+    }
+
+        #related_content .useful_links h4 {
+            color: #0b0c0c;
+            font-size: 1.4em;
+            margin: 0;
+            padding: 0 0 15px;
+        }
+
+        #related_content .useful_links ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+            #related_content .useful_links ul li {
+                padding: 0 0 16px;
+            }
+
+    #related_content .related_links {
+        list-style: none;
+        margin: 0;
+        padding: 28px 0 12px;
+    }
+
+        #related_content .related_links li {
+            padding: 0 0 10px;
+        }
+
+            #related_content .related_links li a {
+                text-decoration: underline;
+            }
+
+    #related_content .note {
+        font-size: 0.85em;
+        line-height: 1.8;
+        margin: 0;
+        padding: 11px 0 15px;
+    }
+    
+    #related_content .twitter_link {
+        font-family: Arial,sans-serif;
+    }
+
+#main_content {
+    float: right;
+    font-size: 1.2em;
+    padding: 3px 0 75px 0;
+    width: 707px;
+}
+
+    #main_content h1,
+    #main_content h2 {
+        font-family: 'transport_new_heavy', Arial, sans-serif;
+        font-size: 4.6em;
+        margin: 0.38em 0 0.22em;
+    }
+
+    #main_content h2 {
+        font-size: 2.1em;
+    }
+
+    #main_content p {
+        line-height: 2;
+        margin: 2em 0;
+        padding: 0;
+    }
+
+        #main_content p a, .nice_link a {
+            color: #2e3191;
+        }
+
+        #main_content p a:hover, .nice_link a:hover {
+            color: #2e8aca;
+        }
+
+        #main_content p.intro {
+            font-size: 1.8em;
+            font-weight: bold;
+            line-height: 1.55;
+            margin: 0 0 0;
+            padding-bottom: 27px;
+        }
+
+        #main_content p.bold {
+            font-size: 1.3em;
+            font-weight: bold;
+            line-height: 1.55;
+            margin: 1.4em 0;
+        }
+
+
+        #main_content .nice_link {
+            display:block;
+        }
+
+    #main_content .quote {
+        background: #F1F1F1;
+        margin: 52px 70px 0 0;
+        padding: 31px 0 3px 26px;
+    }
+
+    #main_content .quote_text {
+        font-family: "transport_new_medium", Arial, sans-serif;
+        font-size: 1.5em;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    #main_content .quote_author {
+        line-height: 2.2;
+    }
+
+    #main_content .hr {
+        border-top: 5px solid #000;
+        height: 4px;
+    }
+
+    #main_content .hr_thin {
+        border-top: 1px solid #000;
+    }
+
+    #main_content .hr hr {
+        display: none;
+    }
+
+/*
+* Footer
+*/
+#footer {
+    background: #dfe0e2;
+}
+
+    #footer,
+    #footer a {
+        color: #454a4c;
+    }
+
+        #footer a:hover {
+            color: #171819;
+        }
+
+#footer_wrap {
+    margin: 0 auto;
+    padding: 61px 0 0 0;
+    width: 964px;
+}
+
+.footer_links {
+    float: left;
+}
+
+    .footer_links h3 {
+        border-bottom: 1px solid #a1acb2;
+        font-size: 2.4em;
+        font-weight: normal;
+        margin: 0;
+        padding: 0 0 25px;
+    }
+
+    .footer_links ul {
+        float: left;
+        font-size: 1.2em;
+        list-style: none;
+        margin: 0;
+        padding: 26px 0 3px;
+        width: 264px;
+    }
+
+        .footer_links ul.col1 {
+            padding-right: 67px;
+        }
+
+        .footer_links ul li {
+            padding: 0 0 23px;
+        }
+
+#site_policies {
+    float: right;
+}
+
+#footer_copyright {
+    border-top: 1px solid #a1acb2;
+    clear: both;
+    padding: 30px 0 0;
+}
+
+    #footer_copyright p {
+        color: #929397;
+        float: left;
+        font-size: 1.1em;
+        padding: 120px 0 10px 0;
+    }
+
+    #footer_copyright a {
+        color: #929397;
+    }
+
+        #footer_copyright a:hover {
+            color: #171819;
+        }
+
+    #footer_copyright p.copyright {
+        background: url(../images/Mortality/CrownCopyright.png) 0 0 no-repeat;
+        float: right;
+        width: 227px;
+    }
+
+.no-js .tooltip {
+    display: block;
+    font-size: 12px !important;
+    font-weight: normal !important;
+}
+
+.js .tooltip, .tooltip-right,
+.tooltip-touch {
+    background: url("../images/Mortality/ranking_icons.png") 2px -697px no-repeat;
+    cursor: pointer;
+    display: inline-block;
+    height: 15px;
+    position: relative;
+    width: 16px;
+
+}
+
+.js .tooltip-inverse,
+.tooltip-touch-inverse {
+    background-position: 2px -797px;
+}
+
+.js .tooltip i, .tooltip-right i,
+.tooltip-touch i {
+    background: #02ae94;
+    -moz-box-shadow: 0 0 5px rgba( 200, 200, 200, .8 );
+    -webkit-box-shadow: 0 0 5px rgba( 200, 200, 200, .8 );
+    box-shadow: 0 0 5px rgba( 200, 200, 200, .8 );
+    color: #FFF;
+    display: none;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.3;
+    padding: 6px 9px;
+    position: absolute;
+    top: 28px;
+    width: 156px;
+    z-index: 100;
+}
+
+.left i {
+    right: -156px;
+}
+
+.right i {
+    right: 0;
+}
+
+.js .tooltip-inverse i,
+.tooltip-touch-inverse i {
+    background: #FFF;
+    color: #000;
+}
+
+.js .tooltip:hover i, .tooltip-right:hover i,
+.tooltip-hover i {
+    display: block;
+}
+
+    .js .tooltip:hover i:before,
+    .tooltip-hover i:before {
+        border-bottom: 12px solid #02ae94;
+        border-left: 12px solid transparent;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+        top: -12px;
+        width: 0;
+        right: 162px;       
+    }
+
+      .js .tooltip-right:hover i:before
+        {
+        border-bottom: 12px solid #02ae94;
+        border-left: 12px solid transparent;
+        content: "";
+        display: block;
+        height: 0;
+        position: absolute;
+        top: -12px;
+        width: 0;
+    
+    }
+
+.right:hover i:before {
+    border-bottom: 12px solid pink;
+    border-left: 12px solid transparent;
+    content: "";
+    display: block;
+    height: 0;
+    position: absolute;
+    top: -12px;
+    width: 0;
+    right: 0;
+}
+
+.js .tooltip-inverse:hover i:before,
+.tooltip-touch-inverse.tooltip-hover i:before {
+    border-bottom: 12px solid #FFF;
+}
+
+/* DATA PAGE */
+#data_page_header {
+    margin: 0 auto;
+    padding: 0 0 53px;
+    width: 964px;
+}
+
+    #data_page_header h1 {
+        /*TODO same-worse*/
+        font-family: 'transport_new_heavy', Arial, sans-serif;
+        border-bottom: 5px solid #585858;
+        font-size: 4.8em;
+        margin: 0;
+        padding: 15px 0 10px;
+    }
+
+    #data_page_header.low h1 {
+        border-bottom: 5px solid #585858;
+    }
+
+    #data_page_header.high h1 {
+        border-bottom: 5px solid #585858;
+    }
+
+    #data_page_header .info_box {
+        background: #F1F1F1 url(../images/Mortality/ranking_icons.png) 14px 14px no-repeat;
+        float: left;
+        margin: 10px 10px 0 0;
+        min-height: 45px;
+        padding: 9px 5px 5px;
+    }
+
+        #data_page_header .info_box h2,
+        #data_page_header .info_box p {
+            font-size: 1.2em;
+            font-weight: normal;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+            #data_page_header .info_box p span {
+                font-weight: bold;
+            }
+
+    #data_page_header .mortality_ib {
+        background-color: #f1f1f1;
+        background-image: none;
+        color: #000;
+        min-height: 49px;
+        padding-left: 21px;
+        padding-top: 5px;
+        width: 240px;
+        margin-left:0;
+    }
+
+    .verdict_box {
+        float:left;
+        width:14px;
+        margin: 10px 0 0 0;
+        padding: 0;
+    }
+
+   .verdict_box img {
+        width: 14px;
+        height: 59px;
+        margin:0;
+    }
+
+    #data_page_header .mortality_ib h2 {
+        line-height: 2.0;
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+
+    #data_page_header #population_ib {
+        background-position: 14px -491px;
+        padding-left: 44px;
+        width: 101px;
+    }
+
+    #data_page_header #premature_ib {
+        background-position: 14px -591px;
+        margin-right: 0;
+        padding-left: 44px;
+        width: 175px;
+    }
+
+    #data_page_header .info_box_3{
+        background: #F1F1F1 url(../images/Mortality/ranking_icons.png) 14px 14px no-repeat;
+        float: left;
+        margin: 10px 10px 0 0;
+        min-height: 45px;
+        padding: 9px 5px 5px;
+    }
+
+      #data_page_header .info_box_3 h2,
+        #data_page_header .info_box_3 p {
+            font-size: 1.2em;
+            font-weight: normal;
+            line-height: 1.5;
+            margin: 0;
+        }
+    
+    #data_page_header #c1 {
+        background-position: 14px -491px;
+        padding-left: 44px;
+        margin-left: 0;
+                width: 262px;
+    }
+
+    #data_page_header #c2 {
+        background-position: 14px -491px;
+        padding-left: 44px;
+        padding-right: 14px;
+        width: 262px;
+    }
+
+    #data_page_header  #c3{
+        margin-right: 0;
+        background-position: 14px -591px;
+        padding-left: 44px;
+        width: 262px;
+    }
+
+.data_page_content #related_content {
+    padding: 0;
+    width: 239px;
+}
+
+    .data_page_content #related_content .compare,
+    .data_page_content #related_content .similar_authorities {
+        background: #F1F1F1;
+        padding: 15px 15px 0 15px;
+    }
+
+.similar_authorities div.similar {
+    border-top: 1px solid #000;
+}
+
+    #related_content #socioeconomic_ib {
+        float:left;
+        height: 45px;
+ width:1.7em;
+        overflow:hidden;
+        position: relative; /* fix for IE7 overflowing image */
+    }
+
+        #related_content #socioeconomic_ib img {
+            position:relative;
+        }
+
+       #related_content #socioeconomic_ib.level1 img {
+                top: -900px;
+        }
+
+        #related_content #socioeconomic_ib.level2 img {
+                top: -1000px;
+        }
+
+        #related_content #socioeconomic_ib.level3 img {
+                top: -1100px;
+        }
+
+        #related_content #socioeconomic_ib.level4 img {
+                top: -1200px;
+        }
+
+        #related_content #socioeconomic_ib.level5 img {
+                top: -1300px;
+        }
+
+
+        .data_page_content #related_content .compare h3 {
+            font-size: 1em;
+            font-weight: normal;
+            margin: 0;
+            padding: 2px 0 13px;
+        }
+
+        .data_page_content #related_content .compare ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .data_page_content #related_content .compare li {
+            background: #FFF;
+            border: 1px solid #FFF;
+            border-bottom: 2px solid #dee0e2;
+            padding: 2px 9px 1px;
+        }
+
+            .data_page_content #related_content .compare li a {
+                color: #000;
+            }
+
+            .data_page_content #related_content .compare li.selected {
+                background: #585858;
+                border: 1px solid #4A4A4A;
+                border-bottom: 1px solid #ACACAC;
+                border-top: 2px solid #3B3B3B;
+                padding: 1px 9px 2px;
+            }
+
+                .data_page_content #related_content .compare li.selected a {
+                    color: #FFF;
+                }
+
+        .data_page_content #related_content .similar_authorities li.deprivation {
+            padding:0 0 .5em 0;
+            font-size: 1.3em;
+            margin: 0;
+        }
+
+         .data_page_content #related_content .similar_authorities span.deprivation {
+                font-family: 'transport_new', Arial, sans-serif;
+                font-size: .75em;
+                font-weight: normal;
+                display:block;
+            }
+
+
+.data_page_content .decile_text {
+    font-weight: bold;
+}
+
+        .data_page_content #related_content .similar_authorities ul {
+            font-size: 0.9em;
+            line-height: 1.5;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .data_page_content #related_content .similar_authorities a {
+            color: #000;
+            text-decoration: none;
+        }
+
+            .data_page_content #related_content .similar_authorities a:hover {
+                text-decoration: underline;
+            }
+
+        .data_page_content #related_content .similar_authorities a.more_info {
+            display: block;
+            background: #d6d6d6;
+            margin: 10px 2px -15px -15px;
+            padding: 8px 15px 8px;
+            width:209px;
+            text-decoration: underline;
+            color: #2e3191;
+    }
+
+    
+     .data_page_content #related_content .similar_authorities a.more_info:hover {
+            color: #2e8aca;
+    }
+
+
+
+.data_page_content #main_content {
+    width: 692px;
+}
+
+.data_page_content #main_content h2 {
+    font-size: 2.3em;
+    line-height: 1;
+    margin: 0;
+    padding: 0 0 16px;
+}
+
+.fpm_content li {
+    margin-left: 17px;
+    line-height: 2;
+}
+
+#main_content ol, #main_content ul {
+   padding:0;
+   margin: 0;
+}
+
+#main_content .ranking_note {
+    line-height: 1.35;
+    margin: 0;
+    padding: 0 0 15px;
+}
+
+#main_ranking {
+    width: 100%;
+}
+
+#main_ranking {
+    color: #FFF;
+}    
+    #main_ranking.grade-0 {
+        background: #7CD540;
+    }
+
+    #main_ranking.grade-1 {
+        background: #FDEE21;
+        color:#000;
+    }
+
+    #main_ranking.grade-2 {
+        background: #FB9A02;
+             color:#000;
+    }
+
+    #main_ranking.grade-3 {
+        background: #BC1E2C;
+    }
+
+    #main_ranking.no-data {
+        background: #ACACAC;
+    }
+
+    #main_ranking.similar_ranking {
+        background: #797979;
+    }
+
+    #main_ranking h3 {
+        font-size: 1.4em;
+        margin: 0;
+        padding: 23px 0 29px 19px;
+    }
+
+        #main_ranking h3 span {
+            font-size: 0.6em;
+            font-weight: normal;
+        }
+
+    #main_ranking .ranking {
+        float: left;
+    }
+
+    #main_ranking .bar_chart {
+        float: left;
+    }
+
+#data_page_table th,
+#data_page_table td {
+    background: #F1F1F1;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+}
+
+#data_page_table th {
+    padding: 20px 0 18px 0;
+}
+
+    #data_page_table th span {
+        font-size: 1.3em;
+        font-weight: bold;
+    }
+
+#data_page_table td {
+    border-top: 5px solid #FFF;
+}
+
+#data_page_table .col1 {
+    width: 151px;
+}
+
+#data_page_table th.col1 div {
+    text-align: center;
+}
+
+#data_page_table td.col1,
+#main_ranking .ranking {
+    background-repeat: no-repeat;
+    background-position: 0 500px; /*put image out of sight on ipad*/
+    color: #636363;
+    font-size: 0.8em;
+    font-weight: bold;
+    line-height: 1.2;
+    padding: 0 0 15px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+#main_ranking .ranking {
+    background: none;
+    color: #FFF;
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 57px;
+    width: 141px;
+}
+
+    #data_page_table .col1 b,
+    #main_ranking .ranking b {
+        display: block;
+        font-size: 4.5em;
+        line-height: 1.05;
+    }
+
+     #data_page_table .col1 .drugs-n-alcohol {
+         padding-top:  30px;
+     }
+
+    #main_ranking.grade-1 .ranking b, 
+    #main_ranking.grade-1 .ranking,
+    #main_ranking.grade-2 .ranking b, 
+    #main_ranking.grade-2 .ranking
+    {
+        /* Dark colouring of text on lighter backgrounds */
+        color:#000;
+    }
+
+#data_page_table .grade-0 .col1 b {
+    color: #7CD540;
+}
+
+#data_page_table .grade-1 .col1 b {
+    color: #FDEE21;
+    text-shadow: -1px -1px 0 #99928b, 1px -1px 0 #99928b, -1px 1px 0 #99928b, 1px 1px 0 #99928b;
+}
+
+.no-textshadow #data_page_table .grade-1 .col1 b {
+    /*-ms-filter: "progid:DXImageTransform.Microsoft.dropshadow(OffX=-1, OffY=-1, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=-1, OffY=1, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=-1, OffY=0, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=1, OffY=-1, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=1, OffY=1, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=1, OffY=0, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=0, OffY=-1, Color=#99928b)progid:DXImageTransform.Microsoft.dropshadow(OffX=0, OffY=1, Color=#99928b)";*/
+    filter: progid:DXImageTransform.Microsoft.Glow(Color=#99928b,Strength=1);
+}
+#data_page_table .grade-2 .col1 b {
+    color: #FB9A02;
+}
+
+#data_page_table .grade-3 .col1 b {
+    color: #BC1E2C;
+}
+
+#data_page_table .grade-quintile-1 .col1 b {
+    color: #DED3EC;
+    text-shadow: -1px -1px 0 #9e7cc8,1px -1px 0 #9e7cc8,-1px 1px 0 #9e7cc8,1px 1px 0 #9e7cc8;
+}
+
+#data_page_table .grade-quintile-2 .col1 b {
+    color: #BEA7DA;
+}
+
+#data_page_table .grade-quintile-3 .col1 b {
+    color: #9E7CC8;
+}
+
+#data_page_table .grade-quintile-4 .col1 b {
+    color: #7E50B6;
+}
+
+#data_page_table .grade-quintile-5 .col1 b {
+    color: #5E25A4;
+}
+
+
+#data_page_table .col1 b span,
+#main_ranking .ranking b span {
+    font-size: 0.3em;
+    text-transform: none;
+}
+
+#data_page_table td.col1 div {
+    position: relative;
+    overflow: hidden;
+    height: 140px;
+    width: 80%;
+    left:10%; /* see ie7.css for difference */
+}
+
+#data_page_table .col1 img {
+    position: absolute;
+}
+
+/* Health-Checks People Invited icons*/
+#data_page_table #people_invited_row.grade-0 td.col1 img {
+    left: -125px;
+}
+
+#data_page_table #people_invited_row.grade-1 td.col1 img {
+   left: 0;
+}
+
+#data_page_table #people_invited_row.grade-2 td.col1 img {
+    left: -375px;
+}
+
+#data_page_table #people_invited_row.grade-3 td.col1 img {
+    left: -250px;
+}
+
+/* Health-Checks People Receiving icons*/
+#data_page_table #people_receiving_row.grade-0 td.col1 img {
+    left: -745px;
+}
+
+#data_page_table #people_receiving_row.grade-1 td.col1 img {
+   left: -620px;
+}
+
+#data_page_table #people_receiving_row.grade-2 td.col1 img {
+    left: -995px;
+}
+
+#data_page_table #people_receiving_row.grade-3 td.col1 img {
+    left: -870px;
+}
+
+/* Health-Checks People Taking Up icons*/
+#data_page_table #people_taking_up_row.grade-0 td.col1 img {
+    left: -1375px;
+}
+
+#data_page_table #people_taking_up_row.grade-1 td.col1 img {
+   left: -1250px;
+}
+
+#data_page_table #people_taking_up_row.grade-2 td.col1 img {
+    left: -1625px;
+}
+
+#data_page_table #people_taking_up_row.grade-3 td.col1 img {
+    left: -1500px;
+}
+
+#data_page_table #people_taking_up_row.none td.col1 img {
+    left: -1750px;
+}
+
+
+/* Heart icons */
+.blank_row {
+    min-height: 50px;
+    height: 50px;
+}
+
+#data_page_table #heart_disease_and_stroke_row.grade-0 td.col1 img {
+    left: -125px;
+}
+
+#data_page_table #heart_disease_and_stroke_row.grade-1 td.col1 img {
+   left: 0;
+}
+
+#data_page_table #heart_disease_and_stroke_row.grade-2 td.col1 img {
+    left: -375px;
+}
+
+#data_page_table #heart_disease_and_stroke_row.grade-3 td.col1 img {
+    left: -250px;
+}
+
+/* Heart Disease icons */
+#data_page_table #heart_disease_row.grade-0 td.col1 img {
+    left: -3200px;
+}
+
+#data_page_table #heart_disease_row.grade-1 td.col1 img {
+    left: -3125px;
+}
+
+#data_page_table #heart_disease_row.grade-2 td.col1 img {
+    left: -3350px;
+}
+
+#data_page_table #heart_disease_row.grade-3 td.col1 img {
+    left: -3275px;
+}
+
+#data_page_table #heart_disease_row.grade-4 td.col1 img {
+    left: -3425px;
+}
+
+#data_page_table #heart_disease_row.none td.col1 img {
+    left: -3425px;
+}
+
+/* Stroke icons */
+#data_page_table #stroke_row.grade-0 td.col1 img {
+    left: -3200px;
+}
+
+#data_page_table #stroke_row.grade-1 td.col1 img {
+    left: -3125px;
+}
+
+#data_page_table #stroke_row.grade-2 td.col1 img {
+    left: -3350px;
+}
+
+#data_page_table #stroke_row.grade-3 td.col1 img {
+    left: -3275px;
+}
+
+#data_page_table #stroke_row.grade-4 td.col1 img {
+    left: -3425px;
+}
+
+#data_page_table #stroke_row.none td.col1 img {
+    left: -3425px;
+}
+
+
+
+/* Cancer icons */
+#data_page_table #cancer_row.grade-0 td.col1 img {
+    left: -745px;
+}
+
+#data_page_table #cancer_row.grade-1 td.col1 img {
+   left: -620px;
+}
+
+#data_page_table #cancer_row.grade-2 td.col1 img {
+    left: -995px;
+}
+
+#data_page_table #cancer_row.grade-3 td.col1 img {
+    left: -870px;
+}
+
+
+/* Lung Cancer icons */
+#data_page_table #lung_cancer_row.grade-0 td.col1 img {
+    left: -3575px;
+}
+
+#data_page_table #lung_cancer_row.grade-1 td.col1 img {
+   left: -3500px;
+}
+
+#data_page_table #lung_cancer_row.grade-2 td.col1 img {
+    left: -3725px;
+}
+
+#data_page_table #lung_cancer_row.grade-3 td.col1 img {
+    left: -3650px;
+}
+
+#data_page_table #lung_cancer_row.grade-4 td.col1 img {
+    left: -3800px;
+}
+
+#data_page_table #lung_cancer_row.none td.col1 img {
+    left: -3800px;
+}
+
+
+/* Breast Cancer icons */
+#data_page_table #breast_cancer_row.grade-0 td.col1 img {
+    left: -3575px;
+}
+
+#data_page_table #breast_cancer_row.grade-1 td.col1 img {
+   left: -3500px;
+}
+
+#data_page_table #breast_cancer_row.grade-2 td.col1 img {
+    left: -3725px;
+}
+
+#data_page_table #breast_cancer_row.grade-3 td.col1 img {
+    left: -3650px;
+}
+
+#data_page_table #breast_cancer_row.grade-4 td.col1 img {
+    left: -3800px;
+}
+
+#data_page_table #breast_cancer_row.none td.col1 img {
+    left: -3800px;
+}
+
+/* Colorectal Cancer icons */
+#data_page_table #colorectal_cancer_row.grade-0 td.col1 img {
+    left: -3575px;
+}
+
+#data_page_table #colorectal_cancer_row.grade-1 td.col1 img {
+   left: -3500px;
+}
+
+#data_page_table #colorectal_cancer_row.grade-2 td.col1 img {
+    left: -3725px;
+}
+
+#data_page_table #colorectal_cancer_row.grade-3 td.col1 img {
+    left: -3650px;
+}
+
+#data_page_table #colorectal_cancer_row.grade-4 td.col1 img {
+    left: -3800px;
+}
+
+#data_page_table #colorectal_cancer_row.none td.col1 img {
+    left: -3800px;
+}
+
+
+/* Liver icons */
+#data_page_table #liver_disease_row.grade-0 td.col1 img {
+    left: -1375px;
+}
+
+#data_page_table #liver_disease_row.grade-1 td.col1 img {
+   left: -1250px;
+}
+
+#data_page_table #liver_disease_row.grade-2 td.col1 img {
+    left: -1625px;
+}
+
+#data_page_table #liver_disease_row.grade-3 td.col1 img {
+    left: -1500px;
+}
+
+#data_page_table #liver_disease_row.none td.col1 img {
+    left: -1750px;
+}
+
+/* Lung icons */
+#data_page_table #lung_disease_row.grade-0 td.col1 img {
+    left: -2005px;
+}
+
+#data_page_table #lung_disease_row.grade-1 td.col1 img {
+   left: -1880px;
+}
+
+#data_page_table #lung_disease_row.grade-2 td.col1 img {
+    left: -2255px;
+}
+
+#data_page_table #lung_disease_row.grade-3 td.col1 img {
+    left: -2130px;
+}
+
+#data_page_table #lung_disease_row.none td.col1 img {
+    left: -2380px;
+}
+
+/* Injury icons */
+#data_page_table #injuries_row.grade-0 td.col1 img {
+    left: -2630px;
+}
+
+#data_page_table #injuries_row.grade-1 td.col1 img {
+   left: -2505px;
+}
+
+#data_page_table #injuries_row.grade-2 td.col1 img {
+    left: -2880px;
+}
+
+#data_page_table #injuries_row.grade-3 td.col1 img {
+    left: -2755px;
+}
+
+#data_page_table #injuries_row.none td.col1 img {
+    left: -3005px;
+}
+
+
+#data_page_table .col2 {
+    width: 355px;
+}
+
+#data_page_table th.col2 div {
+    padding: 0 0 0 6px;
+}
+
+#data_page_table td.col2 {
+    padding: 0 0 0 6px;
+}
+
+    #data_page_table td.col2 h3 {
+        font-family: "transport_new_heavy", Arial, sans-serif;
+        font-size: 2.1em;
+        margin: 0;
+        padding: 22px 0 14px;
+        padding-right: 3px;
+    }
+
+#main_content .bar_chart {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 18px;
+}
+
+#main_ranking .bar_chart {
+    padding-left: 6px;
+}
+
+#main_content .bar_chart li {
+    padding: 0 0 5px 2px;
+}
+
+#main_content .bar_chart p {
+    clear: both;
+    font-size: 0.8em;
+    font-weight: bold;
+    line-height: 1.8;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+#main_content .bar_chart .bar_max {
+    height: 27px;
+    width: 300px;
+}
+
+#main_ranking .bar_chart .bar_max {
+    width: 470px;
+}
+
+#main_content .bar_chart .bar {
+    height: 27px;
+    padding: 0;
+    position: relative;
+    background-color: #02ae94;
+}
+
+#main_content .bar_chart .low .bar {
+    background-color: #04e5d2;
+}
+
+#main_content .bar_chart .high .bar {
+    background-color: #007756;
+}
+
+#main_content .bar_chart .value {
+    display: block;
+    font-family: "transport_new_medium", Arial, sans-serif;
+    position: absolute;
+    right: -60px;
+    top: 6px;
+    width: 50px;
+}
+
+#main_content .bar_chart .zero_val {
+    right: -50px;
+}
+
+#main_content .bar_chart .high_low_message {
+    color: #D1D1D1;
+    font-size: 2.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+#main_ranking .bar_chart .high_low_message {
+    color: #FFF;
+}
+
+#main_ranking .bar_chart .bar {
+    background-color: #f1f1f1 !important;
+}
+
+#data_page_table th.col3 div {
+    padding: 0 0 0 6px;
+}
+
+#data_page_table td.col3 ul {
+    list-style: none;
+    margin: 0;
+    padding: 35px 20px 0 5px;
+}
+
+    #data_page_table td.col3 ul li {
+        padding: 0 0 12px;
+    }
+
+        #data_page_table td.col3 ul li a {
+            color: #2e3191;
+        }
+
+            #data_page_table td.col3 ul li a:hover {
+                color: #2e8aca;
+            }
+
+.more_info {
+    list-style: none;
+    margin: 0;
+    padding: 1px 0 0;
+}
+
+    .more_info li {
+        background: #D6D6D6;
+        float: left;
+        margin: 0 2px 0 0;
+        padding: 21px 0 19px;
+        text-align: center;
+        width: 345px;
+    }
+
+        .more_info li.last {
+            margin: 0;
+        }
+
+    .more_info a {
+        color: #2e3191;
+    }
+
+        .more_info a:hover {
+            color: #2e8aca;
+        }
+/* END DATA PAGE */
+
+/* CONNECT */
+.connect_content #main_content a {
+    color: #000;
+}
+
+.connect_content #main_content p.intro {
+    padding-right: 0;
+    padding-top: 20px;
+}
+
+.connect_content #main_content h2 {
+    padding-bottom: 30px;
+}
+
+.comment_count {
+    list-style: none;
+    margin: 0;
+    padding: 55px 0 20px;
+}
+
+    .comment_count li {
+        border-right: 1px solid #000;
+        float: left;
+        font-size: 1.4em;
+        height: 16px;
+        padding: 0 20px 0 0;
+    }
+
+        .comment_count li.last {
+            border: 0;
+            padding-left: 20px;
+        }
+
+        .comment_count li span {
+            display: block;
+            margin: -4px 0 0;
+        }
+
+#comments_wrap .input_text {
+    border: 1px solid #aeb1b7;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: inset 1px 1px 3px #ececec;
+    -webkit-box-shadow: inset 1px 1px 3px #ececec;
+    box-shadow: inset 1px 1px 3px #ececec;
+    height: 34px;
+    line-height: 34px;
+    padding: 0 5px;
+}
+
+.user_comment {
+    background: url(../images/Mortality/connect_icons.png) 0 0 no-repeat;
+    padding: 0 0 0 47px;
+}
+
+    .user_comment input {
+        width: 648px;
+    }
+
+.social_login {
+    float: left;
+    padding: 20px 0 0 45px;
+    width: 179px;
+}
+
+    .social_login h4 {
+        color: #666;
+        font-size: 1.3em;
+        font-weight: normal;
+        height: 28px;
+        margin: 0;
+        padding: 0 0 0 2px;
+    }
+
+    .social_login ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .social_login ul li {
+            float: left;
+        }
+
+            .social_login ul li a {
+                background: url(../images/Mortality/connect_icons.png) 0 0 no-repeat;
+                display: block;
+                height: 38px;
+                text-indent: -9999px;
+                width: 38px;
+            }
+
+            .social_login ul li.twitter a {
+                background-position: 0 -50px;
+            }
+
+            .social_login ul li.facebook a {
+                background-position: 0 -100px;
+            }
+
+            .social_login ul li.googleplus a {
+                background-position: 0 -150px;
+            }
+
+            .social_login ul li.d a {
+                background-position: 0 -200px;
+            }
+
+.user_input {
+    float: left;
+    padding: 48px 0 0 0;
+    width: 386px;
+}
+
+    .user_input .input_text {
+        margin: 0 0 18px;
+        width: 360px;
+    }
+
+.user_details .button {
+    background: #EBEBEB;
+    background-image: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#F5F5F5), to(#EBEBEB));
+    background-image: -webkit-linear-gradient(top, #F5F5F5, #EBEBEB);
+    background-image: -moz-linear-gradient(top, #F5F5F5, #EBEBEB);
+    background-image: -ms-linear-gradient(top, #F5F5F5, #EBEBEB);
+    background-image: -o-linear-gradient(top, #F5F5F5, #EBEBEB);
+    border: 1px solid #aeb1b7;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: 0 1px 2px #E8E8E8;
+    -webkit-box-shadow: 0 1px 2px #E8E8E8;
+    box-shadow: 0 1px 2px #E8E8E8;
+    color: #666;
+    font-family: "transport_new", Arial, sans-serif;
+    line-height: 34px;
+    padding: 0 20px;
+    margin: 48px 0 0 0;
+}
+
+#comments {
+    clear: both;
+}
+
+.comments_nav {
+    border-bottom: 1px solid #000;
+    padding: 49px 0 0;
+}
+
+    .comments_nav a {
+        border-bottom: 2px solid #FFF;
+        color: #000;
+        display: block;
+        float: left;
+        font-size: 1.1em;
+        padding: 0 41px 3px;
+        text-decoration: none;
+    }
+
+        .comments_nav a.share {
+            float: right;
+        }
+
+        .comments_nav a span {
+            display: block;
+            float: left;
+            padding: 0 13px 0 0;
+            position: relative;
+        }
+
+        .comments_nav a i {
+            display: block;
+            position: absolute;
+            top: 0.6em;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 4px solid #000;
+        }
+
+        .comments_nav a.share i {
+            border-top: 4px solid #7f7f7f;
+        }
+
+        .comments_nav a.selected {
+            border-bottom: 2px solid #000;
+        }
+
+#comments .pagination {
+    font-weight: bold;
+    padding: 33px 0 0;
+}
+
+    #comments .pagination h4 {
+        float: left;
+        margin: 0;
+        padding: 0 5px 0 22px;
+    }
+
+    #comments .pagination ul {
+        float: left;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #comments .pagination li {
+        float: left;
+        padding: 0 2px 0 0;
+    }
+
+        #comments .pagination li a {
+            color: #000;
+            text-decoration: none;
+        }
+
+            #comments .pagination li a:hover {
+                text-decoration: underline;
+            }
+
+#comments .article {
+    margin: 10px 0 0;
+    padding: 20px 70px 8px 23px;
+}
+
+#comments .even {
+    background: #dfe0e2;
+}
+
+#comments .response {
+    padding-left: 60px;
+}
+
+#comments .article p {
+    margin: 0;
+}
+
+#comments .article .user {
+    font-weight: bold;
+}
+
+#comments .article .PHE {
+    color: #05826f;
+}
+
+#comments .article .comment p {
+    padding: 0 0 15px;
+}
+/* END CONNECT */
+
+/* INTERVENTIONS */
+.interventions #related_content {
+    padding-top: 19px;
+}
+
+.interventions .stats_info {
+    margin: 0 0 10px;
+}
+
+    .interventions .stats_info h3 {
+        font-weight: normal;
+        margin: 0;
+    }
+
+    .interventions .stats_info p {
+        margin: 0;
+        width: 100%;
+    }
+
+.interventions .premature_deaths {
+    background: url(../images/Mortality/ranking_icons.png) 2px -597px no-repeat;
+    padding: 1px 5px 9px 29px;
+}
+
+    .interventions .premature_deaths p {
+        font-size: 1.1em;
+        line-height: 1.1;
+    }
+
+        .interventions .premature_deaths p span {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+            .interventions .premature_deaths p span.time-period {
+                font-size: 0.9em;
+                font-weight: normal;
+            }
+
+.interventions .best,
+.interventions .worst {
+    background: #7CD540;
+    color: #FFF;
+    padding: 13px 15px 6px 28px;
+}
+
+.interventions .worst {
+    background: #BC1E2C;
+}
+
+    .interventions .best h3,
+    .interventions .worst h3 {
+        font-size: 0.8em;
+    }
+
+    .interventions .best p,
+    .interventions .worst p {
+        font-size: 1.1em;
+        font-weight: bold;
+        line-height: 1.6;
+    }
+
+.interventions #related_content .useful_links {
+    margin-top: 20px;
+    width: auto;
+}
+
+.interventions #main_content h2 {
+    color: #999;
+    font-size: 2.5em;
+    font-weight: normal;
+    margin: 0;
+    padding: 9px 0 0 0;
+}
+
+.interventions #main_content h1 {
+    font-size: 4.5em;
+    line-height: 1.19;
+    margin: 0;
+    padding: 0 0 13px;
+}
+
+.interventions #main_content h4 {
+    margin: 0;
+    padding: 0 0 10px;
+}
+
+.interventions #main_content h3 {
+    clear: both;
+    color: #02ae94;
+    font-size: 1.5em;
+    margin: 0;
+    padding: 0 0 20px;
+    line-height: 1.3em;
+}
+
+    .interventions #main_content h3.no_margin {
+        padding-bottom: 2px;
+    }
+
+.interventions #main_content p {
+    margin:0;
+    padding: 0 0 30px;
+}
+
+    .interventions #main_content p.intro {
+        color: #02ae94;
+        font-size: 1.4em;
+        line-height: 1.8;
+        margin: 0;
+        padding: 36px 0 24px;
+    }
+
+    .interventions #main_content p sup {
+        font-size: 0.6em;
+    }
+
+.interventions #main_content .col {
+    float: left;
+    padding: 0 0 12px;
+    width: 320px;
+}
+
+.interventions #main_content .col2 {
+    float: right;
+}
+
+.interventions #main_content img {
+    margin: 0 0 19px;
+}
+
+.interventions #main_content ul {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 30px;
+}
+
+    .interventions #main_content ul li {
+        background: url(../images/Mortality/list_dot.png) 0 10px no-repeat;
+        line-height: 2;
+        padding: 0 0 6px 10px;
+    }
+
+.interventions #main_content .quote {
+    background: none;
+    color: #666;
+    font-size: 1.5em;
+    line-height: 2.25;
+    padding-top: 28px;
+}
+
+    .interventions #main_content .quote .author {
+        color: #000;
+        font-size: 0.7em;
+    }
+
+.interventions #main_content .foot_notes {
+    color: #666;
+    padding: 6px 0 0 0;
+}
+
+    .interventions #main_content .foot_notes p {
+        font-size: 0.9em;
+        padding-bottom: 0;
+    }
+
+.interventions #main_content span.red {
+    color: #BC1E2C;
+}
+
+.interventions #main_content span.amber {
+    /*TODO same-worse*/
+    color: #FB9A02;
+}
+
+.interventions #main_content span.green {
+    color: #7CD540;
+}
+/* END INTERVENTIONS */
+
+
+/* MORTALITY RANKINGS - table view and side bar with filters
+ @author Tim Whitlock
+*/
+
+
+/* ruled header that's full width - not just main_content column */
+.ranking_table_content > .header {
+
+    font-size: 1.2em;
+}
+
+    .ranking_table_content > .header h1 {
+        font-family: 'transport_new_heavy', Arial, sans-serif;
+        font-size: 4.6em;
+        margin: 0.38em 0 0.22em;
+    }
+
+    /* rule also copied from main_content .hr */
+    .ranking_table_content > .header .hr {
+        border-top: 5px solid #000;
+        height: 4px;
+    }
+
+        .ranking_table_content > .header .hr hr {
+            display: none;
+        }
+
+    /** statistics */
+    .ranking_table_content > .header .stats {
+        float: right;
+        padding: 0;
+        margin: 2em 0 0;
+    }
+
+        .ranking_table_content > .header .stats dl,
+        .ranking_table_content > .header .stats dt,
+        .ranking_table_content > .header .stats dd {
+            display: block;
+            position: relative;
+            padding: 0;
+            margin: 0;
+        }
+
+        .ranking_table_content > .header .stats dl {
+            background: url(../images/Mortality/ranking_icons.png) 0 -500px no-repeat;
+            float: left;
+            clear: none;
+            min-height: 45px;
+        }
+
+        .ranking_table_content > .header .stats .premature_death_stat {
+            background-position: 0 -600px;
+        }
+
+        .ranking_table_content > .header .stats dt,
+        .ranking_table_content > .header .stats dd {
+            padding-left: 30px;
+        }
+
+        .ranking_table_content > .header .stats .population_stat dt,
+        .ranking_table_content > .header .stats .population_stat dd {
+            padding-right: 63px;
+        }
+
+
+/* override related content / useful links side bar */
+.ranking_table_content #related_content {
+    padding-top: 1em;
+    margin-bottom: 1em;
+    width: 237px;
+}
+
+    .ranking_table_content #related_content .useful_links {
+        width: auto;
+    }
+
+    .ranking_table_content #related_content h5 {
+        margin: 0 0 0.5em;
+        font-family: "transport_new_medium", Arial, sans-serif;
+        font-size: 1.1em;
+        font-weight: normal;
+        line-height: 1em;
+    }
+
+    .ranking_table_content #related_content ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .ranking_table_content #related_content ul li {
+            padding-bottom: 15px;
+        }
+
+    .ranking_table_content #related_content .table_options ul li {
+        padding-bottom: 0;
+    }
+
+        .ranking_table_content #related_content .table_options ul li.sub {
+            padding-left: 1em;
+        }
+
+    .ranking_table_content #related_content .table_options {
+        margin-bottom: 2em;
+        padding-bottom: 1em;
+    }
+
+        .ranking_table_content #related_content .table_options > p {
+            margin: 0;
+        }
+
+    .ranking_table_content #related_content ul.filters li.active a {
+        color: #02ae94;
+        font-family: "transport_new_medium", Arial, sans-serif;
+    }
+
+.ranking_table_content #main_content {
+    width: 694px;
+}
+
+/* coloured gradings - lowest, average, highest*/
+.ranking_table_content .grade img {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 5px;
+}
+
+.ranking_table_content #main_content p.legend {
+    margin: 0.4em 0;
+}
+
+.ranking_table_content p.legend .grade {
+    display: inline-block;
+    padding-left: 0.8em;
+}
+
+/* generic coloured gradings */
+
+#main_content .grade img{
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 5px;
+    margin-top: -2px;
+}
+
+#main_content .grade.grade-1 img{
+    width: 0.85em;
+    height: 0.85em;
+    border: 1px solid #c8bb02;
+}
+
+#main_content .england-row {
+    background-color: #A6A6A6;
+}
+
+#main_content span.england-label{
+   font-weight: bold;
+}
+
+#main_content span.england-val{
+   margin-left: 20px;
+   font-weight: bold;
+}
+
+#main_content span.grade{
+   display: inline-block;
+   margin-left: 2px;
+}
+
+#main_content.area-details span.grade {
+   margin-left: 10px;
+}
+
+#main_content p.legend{
+   margin: 0 0 1.4em; 
+   padding:0;
+}
+
+#main_content.area-details {
+margin-top:0;
+}
+
+#main_content ul.row {
+width:100%;
+float:left;
+padding-bottom:15px;
+}
+
+.interventions #main_content ul.row li.col {
+width: 320px;
+padding-bottom:0;
+    background: none;
+}
+
+.interventions #main_content ul.row h3 {
+    padding: 0;
+}
+
+/* generic data table styles */
+
+.ranking_table_content .table-data .header {
+    position: relative;
+    background-color: #02ae94;
+    padding: 1.5em 1em 1em 1em;
+    color: #fff;
+}
+
+    .ranking_table_content .table-data .header h2 {
+        margin: 0 !important; /* <- overiding #main_content h2 */
+    }
+
+    .ranking_table_content .table-data .header h3 {
+        margin: 0.2em 0 0 0;
+        float: left;
+    }
+
+    .ranking_table_content .table-data .header h2 small {
+        font-size: 0.5714em; /* 2.1 -> 1.2 */
+    }
+
+.ranking_table_content #main_content .return_link {
+    font-size: 0.9em;
+    margin: 0;
+    padding: 4px 0 0;
+    float: right;
+}
+
+.ranking_table_content #main_content .return_link {
+    color: #FFF;
+    text-decoration: none;
+}
+
+    .ranking_table_content #main_content .return_link:hover {
+        text-decoration: underline;
+    }
+
+.ranking_table_content .table-data table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .ranking_table_content .table-data table thead {
+        background-color: #000;
+    }
+
+    .ranking_table_content .table-data table tbody tr {
+        background-color: #E6E6E6;
+    }
+
+        .ranking_table_content .table-data table tbody tr.even {
+            background-color: #CBCCCB;
+        }
+
+        .ranking_table_content .table-data table tbody tr:hover,
+        .ranking_table_content .table-data table tbody tr.selected {
+            background-color: #8FD0C6 !important;
+        }
+
+        .ranking_table_content .table-data table tbody tr.chosen {
+            background-color: #02ae94 !important;
+        }
+
+    .ranking_table_content .table-data table td,
+    .ranking_table_content .table-data table th {
+        padding: 0.4em 0.6em;
+        font-weight: normal;
+        text-align: left;
+        vertical-align: top;
+        border-right: 1px solid #fff;
+    }
+
+        .ranking_table_content .table-data table th.last-child,
+        .ranking_table_content .table-data table td.last-child {
+            border-right: none;
+        }
+
+        .ranking_table_content .table-data table th small {
+            display: block;
+        }
+
+        .ranking_table_content .table-data table th a {
+            text-decoration: none;
+            display: block;
+            position: relative;
+            color: #999;
+        }
+
+        .ranking_table_content .table-data table td a {
+            text-decoration: none;
+            color: #000;
+        }
+
+            .ranking_table_content .table-data table tr:hover td a,
+            .ranking_table_content .table-data table td a:hover {
+                text-decoration: underline;
+            }
+
+                .ranking_table_content .table-data table tr:hover td a:hover {
+                    color: #fff;
+                }
+
+
+        /* highlight sorted column and sort direction rollovers */
+        .ranking_table_content .table-data table th i {
+            display: block;
+            position: absolute;
+            top: 0.6em;
+            right: 0.2em;
+            width: 0;
+            height: 0;
+            visibility: hidden;
+            /* arrow effect created by borders - ASC by default */
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #fff;
+        }
+
+        .ranking_table_content .table-data table th.rank i {
+            right: -1px;
+        }
+
+        .ranking_table_content .table-data table th a:hover {
+            color: #fff;
+        }
+
+        .ranking_table_content .table-data table th.sorted a {
+            color: #fff;
+        }
+        /* show ASC */
+        .ranking_table_content .table-data table th.sorted i,
+        .ranking_table_content .table-data table th a:hover i {
+            visibility: visible;
+        }
+        /* show DESC */
+        .ranking_table_content .table-data table th.sorted-desc i {
+            border-top: 5px solid #fff;
+            border-bottom: none;
+        }
+
+
+ 
+
+  
+
+/* mortality rate specific table styles */
+
+#mortality-rankings .header p.tip {
+    float: right;
+    width: 11em;
+    line-height: 1.2em;
+    margin: 0;
+    padding: 0;
+}
+
+/* compare similar link on row hover */
+#mortality-rankings tbody td.last-child a {
+    display: block;
+    float: right;
+    visibility: hidden;
+}
+
+#mortality-rankings tbody tr:hover td.last-child a {
+    visibility: visible;
+}
+
+#mortality-rankings tbody td.last-child span {
+    display: block;
+    float: left;
+}
+
+/* END MORTALITY RANKINGS */
+
+
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+/*
+ * Image replacement
+ */
+
+.ir {
+    background-color: transparent;
+    border: 0;
+    overflow: hidden;
+    /* IE 6/7 fallback */
+    *text-indent: -9999px;
+}
+
+    .ir:before {
+        content: "";
+        display: block;
+        width: 0;
+        height: 150%;
+    }
+
+/*
+ * Hide from both screenreaders and browsers: h5bp.com/u
+ */
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+/*
+ * Hide only visually, but have it available for screenreaders: h5bp.com/v
+ */
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+    /*
+ * Extends the .visuallyhidden class to allow the element to be focusable
+ * when navigated to via the keyboard: h5bp.com/p
+ */
+
+    .visuallyhidden.focusable:active,
+    .visuallyhidden.focusable:focus {
+        clip: auto;
+        height: auto;
+        margin: 0;
+        overflow: visible;
+        position: static;
+        width: auto;
+    }
+
+/*
+ * Hide visually and from screenreaders, but maintain layout
+ */
+
+.invisible {
+    visibility: hidden;
+}
+
+/*
+ * Clearfix: contain floats
+ *
+ * For modern browsers
+ * 1. The space content is one way to avoid an Opera bug when the
+ *    `contenteditable` attribute is included anywhere else in the document.
+ *    Otherwise it causes space to appear at the top and bottom of elements
+ *    that receive the `clearfix` class.
+ * 2. The use of `table` rather than `block` is only necessary if using
+ *    `:before` to contain the top-margins of child elements.
+ */
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+
+.clearfix {
+    *zoom: 1;
+}
+
+/* Override */
+/*#data_page_header h1 {
+    border-bottom-color: white;
+}*/
+
+#data_page_header.average h1 {
+    /*TODO same-worse*/
+    border-bottom-color: #FB9A02;
+}
+
+/*#data_page_header #mortality_ib {
+    background-color: white;
+}*/
+
+#data_page_header.average #mortality_ib {
+        /*TODO same-worse*/
+    background-color: #FB9A02;
+}
+
+#content {
+    /* fix for white line on iPad*/
+    margin-top: -1px;
+}
+
+/* Area details page */
+.data_page_content #main_content {
+    margin: 0;
+}
+
+/* Mortality Rankings */
+#supporting_data_heading {
+    width: 120px;
+}
+
+.last-child {
+    width: 190px;
+}
+
+
+/* Error page */
+#error-box {
+    height: 400px;
+}
+
+#error-box h2 {
+    width: 100%;
+    text-align: center;
+    padding: 150px 0 250px 0;
+}
+
+
+.video {
+    margin: 0 0 0 0;    
+}
+
+.keylist {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.keylist li{
+    padding: 0;
+    margin: 0 0 10px;
+}
+
+#topic-links {
+    float: right;
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+#topic-links a, #topic-links a:visited {
+    text-decoration: none;
+    color: black;
+    padding: 10px;
+    margin-left: 5px;
+}
+
+#topic-links a.selected {
+    background: #000;
+    color: #FEFEFE;
+    cursor: text;
+}
+
+#topic-links a:hover {
+    text-decoration: underline;
+}
+
+    #topic-links a.selected:hover {
+            text-decoration: none;
+    }
+
+#overlay {
+    position: absolute;
+    left: 0;
+    top: 156px;
+    bottom: 0;
+    right: 0;
+    background: #ffffff;
+}
+
+.loading {
+    background: url(../images/Mortality/loading-spinner.gif);
+    background-repeat: no-repeat;
+    height: 100px;
+    width: 100px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -20px;
+    margin-left: -20px;
+    z-index: 9999;
+    display: block;
+}
+
+/*@media print, (-o-min-device-pixel-ratio: 5/4), (-webkit-min-device-pixel-ratio: 1.25), (min-resolution: 120dpi) */
+@media print {
+    .home_search, #header_nav, #header_bottom, #map-overlay-zoom, #hover-or-tap, .no-print {
+        display: none;
+    }
+
+    #home_promos, .footnote, #footerSpace {
+        display: none;
+    }
+
+    .print_grade_low {
+        height: 1em;
+        width: 1em;
+        display: block;
+    }
+
+    /* Area details page*/
+    .data_page_content #related_content .similar_authorities span.deprivation,
+    #socioeconomic_ib, .compare {
+        display:none;
+    }
+
+    #data_page_table #liver_row td {
+        padding-top:100px;
+    }
+
+    #related_content .similar_authorities {
+        padding-top:0;
+        margin-top:19px;
+    }
+
+    #data_page_table a {
+        display:none;
+    }
+
+    #main_ranking, #main_ranking .ranking,
+    .ranking_table_content .table-data .header,
+    .ranking_table_content .table-data table th.sorted a {
+        color:#000;
+    }
+
+    .ranking_table_content .table-data .header {
+        padding-left:0;
+    }
+}
+

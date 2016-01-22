@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{AD4A4236-BE35-4B2A-B49D-28D514949984}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PholioVisualisation.PholioObjects</RootNamespace>
+    <AssemblyName>PholioVisualisation.PholioObjects</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Age.cs" />
+    <Compile Include="Area.cs" />
+    <Compile Include="AreaAddress.cs" />
+    <Compile Include="AreaCodeNeighbourMapping.cs" />
+    <Compile Include="AreaCodeNhsMapping.cs" />
+    <Compile Include="AreaHierarchy.cs" />
+    <Compile Include="AreaLink.cs" />
+    <Compile Include="AreaRank.cs" />
+    <Compile Include="AreaType.cs" />
+    <Compile Include="CategorisedArea.cs" />
+    <Compile Include="Category.cs" />
+    <Compile Include="CategoryArea.cs" />
+    <Compile Include="CategoryAreaType.cs" />
+    <Compile Include="CategoryType.cs" />
+    <Compile Include="ChildAreasForPdfs.cs" />
+    <Compile Include="ComparatorConfidence.cs" />
+    <Compile Include="ContentItem.cs" />
+    <Compile Include="GroupRootSummary.cs" />
+    <Compile Include="IArea.cs" />
+    <Compile Include="IAreaType.cs" />
+    <Compile Include="KeyMessageOverride.cs" />
+    <Compile Include="NearByAreas.cs" />
+    <Compile Include="NearestNeighbourArea.cs" />
+    <Compile Include="NeighbourAreaType.cs" />
+    <Compile Include="PlaceName.cs" />
+    <Compile Include="PostcodeParentAreas.cs" />
+    <Compile Include="ProfilePdf.cs" />
+    <Compile Include="ExceptionForStorage.cs" />
+    <Compile Include="Decile.cs" />
+    <Compile Include="IgnoredAreaCodes.cs" />
+    <Compile Include="IndicatorStatsControlLimits.cs" />
+    <Compile Include="LogExceptions.cs" />
+    <Compile Include="ParentAreaGroup.cs" />
+    <Compile Include="GeographicalSearchResult.cs" />
+    <Compile Include="ProfileConfig.cs" />
+    <Compile Include="ProfilePerIndicator.cs" />
+    <Compile Include="Sex.cs" />
+    <Compile Include="TargetConfig.cs" />
+    <Compile Include="TimeRange.cs" />
+    <Compile Include="ValueNote.cs" />
+    <Compile Include="ValueWithCIsData.cs" />
+    <Compile Include="ConfidenceIntervalMethod.cs" />
+    <Compile Include="FingertipsException.cs" />
+    <Compile Include="Group.cs" />
+    <Compile Include="Comparator.cs" />
+    <Compile Include="ComparatorMap.cs" />
+    <Compile Include="CoreDataTimeFilter.cs" />
+    <Compile Include="GroupingMetadata.cs" />
+    <Compile Include="HelpText.cs" />
+    <Compile Include="IndicatorMetadataTextProperty.cs" />
+    <Compile Include="LatitudeLongitude.cs" />
+    <Compile Include="Limits.cs" />
+    <Compile Include="EastingNorthing.cs" />
+    <Compile Include="AreaRankGrouping.cs" />
+    <Compile Include="ParentAreaWithChildAreas.cs" />
+    <Compile Include="ProfileParentAreas.cs" />
+    <Compile Include="ParentArea.cs" />
+    <Compile Include="ParentDisplay.cs" />
+    <Compile Include="QuinaryPopulation.cs" />
+    <Compile Include="QuinaryPopulationValue.cs" />
+    <Compile Include="SparklineArea.cs" />
+    <Compile Include="SparklineTimePoint.cs" />
+    <Compile Include="SparklineRoot.cs" />
+    <Compile Include="SparklineStats.cs" />
+    <Compile Include="TimePeriod.cs" />
+    <Compile Include="RootBase.cs" />
+    <Compile Include="GroupRoot.cs" />
+    <Compile Include="TimePeriodIterator.cs" />
+    <Compile Include="TrendRoot.cs" />
+    <Compile Include="IndicatorStatsPercentilesFormatted.cs" />
+    <Compile Include="Constants.cs" />
+    <Compile Include="Significance.cs" />
+    <Compile Include="CoreDataSet.cs" />
+    <Compile Include="Grouping.cs" />
+    <Compile Include="IndicatorMetadata.cs" />
+    <Compile Include="IndicatorStatsPercentiles.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TimePoint.cs" />
+    <Compile Include="TrendDataPoint.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="ValueData.cs" />
+    <Compile Include="ValueType.cs" />
+    <Compile Include="ValueTypeId.cs" />
+    <Compile Include="YearType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="PholioObjects.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="PholioObjects.cd" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

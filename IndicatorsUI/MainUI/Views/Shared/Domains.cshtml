@@ -1,0 +1,26 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
+@model PageModel
+@{
+    var headings = (IList<Domain>)ViewBag.DomainHeadings;
+}
+
+@if (headings != null && headings.Count > 1)
+{
+    var width = Math.Round(99.0 / headings.Count, 2);
+    // NOTE - this is a table so that the domains never wrap onto a second line
+    <div id="domainBox" class="clearfix">
+        <table>
+            <tbody>
+                <tr>
+                    @foreach (var c in headings)
+                    {
+                        <td id="domain@(c.GroupId)" class="domainOption" style="width:@(width)%;" onclick="domainClicked(@(c.GroupId))">
+                            @c.SubHeading
+                        </td>
+                    }
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,218 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{A9FD008C-07B0-49BF-87B2-BC1A39242282}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PholioVisualisation.DataConstruction</RootNamespace>
+    <AssemblyName>PholioVisualisation.DataConstruction</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AgeSorter.cs" />
+    <Compile Include="AreaFactory.cs" />
+    <Compile Include="AreaTypeFactory.cs" />
+    <Compile Include="AreaTypeListProvider.cs" />
+    <Compile Include="BenchmarkDataProvider.cs" />
+    <Compile Include="CategoryAreaCoreDataSetProvider.cs" />
+    <Compile Include="ChildAreaCounter.cs" />
+    <Compile Include="ChildAreaListBuilder.cs" />
+    <Compile Include="ChildAreaListForCategoryAreaBuilder.cs" />
+    <Compile Include="ChildAreasWithAddressesBuilder.cs" />
+    <Compile Include="ContentProvider.cs" />
+    <Compile Include="CoreDataSetSorter.cs" />
+    <Compile Include="DataConstructionDIRegistry.cs" />
+    <Compile Include="FullAreaData.cs" />
+    <Compile Include="GpDeprivationDecileCoreDataSetProvider.cs" />
+    <Compile Include="CcgPopulationProvider.cs" />
+    <Compile Include="AverageCalculator.cs" />
+    <Compile Include="AverageCalculatorFactory.cs" />
+    <Compile Include="CountAverageCalculator.cs" />
+    <Compile Include="GroupDataAtDataPointRepository.cs" />
+    <Compile Include="GroupRootComparisonManager.cs" />
+    <Compile Include="GroupRootSummaryBuilder.cs" />
+    <Compile Include="GroupingListProvider.cs" />
+    <Compile Include="IgnoredAreasFilterFactory.cs" />
+    <Compile Include="IndicatorComparisonHelper.cs" />
+    <Compile Include="IndicatorStatsProcessor.cs" />
+    <Compile Include="LimitsProcessor.cs" />
+    <Compile Include="LongerLivesAreaDetails.cs" />
+    <Compile Include="LongerLivesAreaDetailsBuilder.cs" />
+    <Compile Include="NearbyAreasBuilder.cs" />
+    <Compile Include="NearestNeighbourAreaListBuilder.cs" />
+    <Compile Include="NullAverageCalculator.cs" />
+    <Compile Include="ParentAreaGroupOrganiser.cs" />
+    <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
+    <Compile Include="PostcodeProvider.cs" />
+    <Compile Include="ProfilePerIndicatorBuilder.cs" />
+    <Compile Include="ProfileUrl.cs" />
+    <Compile Include="RankDataList.cs" />
+    <Compile Include="ShapeCoreDataSetProvider.cs" />
+    <Compile Include="AreaHelper.cs" />
+    <Compile Include="AreaListBuilder.cs" />
+    <Compile Include="CoreDataSetProvider.cs" />
+    <Compile Include="CcgCoreDataSetProvider.cs" />
+    <Compile Include="ChildAreaValuesBuilder.cs" />
+    <Compile Include="AreaCodeToCategoryIdMapBuilder.cs" />
+    <Compile Include="AreaDataBuilder.cs" />
+    <Compile Include="AreaRankBuilder.cs" />
+    <Compile Include="AreaValuesBuilder.cs" />
+    <Compile Include="CcgAverageCalculator.cs" />
+    <Compile Include="CcgPopulation.cs" />
+    <Compile Include="ComparatorMapBuilder.cs" />
+    <Compile Include="CoreDataProcessor.cs" />
+    <Compile Include="CoreDataSetFilter.cs" />
+    <Compile Include="CoreDataSetListProvider.cs" />
+    <Compile Include="SimpleAreaData.cs" />
+    <Compile Include="SimpleCoreDataSetProvider.cs" />
+    <Compile Include="CoreDataSetProviderFactory.cs" />
+    <Compile Include="GroupIdProvider.cs" />
+    <Compile Include="GroupingListFilter.cs" />
+    <Compile Include="GroupingListUniquifier.cs" />
+    <Compile Include="IgnoredAreasFilter.cs" />
+    <Compile Include="PholioFilter.cs" />
+    <Compile Include="PracticeAreaValuesBuilder.cs" />
+    <Compile Include="SingleGroupingProvider.cs" />
+    <Compile Include="SparklineRootBuilder.cs" />
+    <Compile Include="TargetComparerHelper.cs" />
+    <Compile Include="WeightedAverageCalculator.cs" />
+    <Compile Include="ValueDataProcessor.cs" />
+    <Compile Include="GroupRootFilter.cs" />
+    <Compile Include="DataPointOffsetCalculator.cs" />
+    <Compile Include="AreaLabelsBuilder.cs" />
+    <Compile Include="DataProcessor.cs" />
+    <Compile Include="EthnicityLabelBuilder.cs" />
+    <Compile Include="GroupData.cs" />
+    <Compile Include="GroupDataBuilderBase.cs" />
+    <Compile Include="GroupDataBuilderByGroupings.cs" />
+    <Compile Include="GroupDataBuilderByIndicatorIds.cs" />
+    <Compile Include="GroupDataProcessor.cs" />
+    <Compile Include="GroupMetadataBuilder.cs" />
+    <Compile Include="GroupRootBuilder.cs" />
+    <Compile Include="GroupRootTrendBuilderBase.cs" />
+    <Compile Include="GroupRootTrendBuilderMonthly.cs" />
+    <Compile Include="GroupRootTrendBuilderQuarterly.cs" />
+    <Compile Include="GroupRootTrendBuilderYearly.cs" />
+    <Compile Include="ICacheable.cs" />
+    <Compile Include="AreaFilter.cs" />
+    <Compile Include="IndicatorMetadataCollection.cs" />
+    <Compile Include="IndicatorMetadataRepository.cs" />
+    <Compile Include="ITimePeriodTextListBuilder.cs" />
+    <Compile Include="LimitsBuilder.cs" />
+    <Compile Include="MapCoordinateConverter.cs" />
+    <Compile Include="NullTimePeriodTextListBuilder.cs" />
+    <Compile Include="ParentChildAreaRelationshipBuilder.cs" />
+    <Compile Include="PracticeAxis.cs" />
+    <Compile Include="PracticePerformanceIndicatorValues.cs" />
+    <Compile Include="PracticeValueCollection.cs" />
+    <Compile Include="PracticeValueCollectionBuilder.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QofListSizeProvider.cs" />
+    <Compile Include="QuinaryPopulationBuilder.cs" />
+    <Compile Include="QuinaryPopulationSorter.cs" />
+    <Compile Include="RuleAreEnoughPracticeValuesByPopulation.cs" />
+    <Compile Include="RuleShouldCcgAverageBeCalculatedForGroup.cs" />
+    <Compile Include="RuleShouldCcgAverageBeCalculated.cs" />
+    <Compile Include="TimePeriodTextFormatter.cs" />
+    <Compile Include="TimePeriodTextListBuilder.cs" />
+    <Compile Include="TimePeriodTextListBuilderFactory.cs" />
+    <Compile Include="TrendRootBuilder.cs" />
+    <Compile Include="ValueListBuilder.cs" />
+    <Compile Include="ValueWithCIsDataProcessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
+      <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>
+      <Name>ExceptionLogger</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Analysis\Analysis.csproj">
+      <Project>{6C6F1C27-953F-4B31-8B0B-6A998E57CB68}</Project>
+      <Name>Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Formatting\Formatting.csproj">
+      <Project>{EE646860-6872-48B7-B67F-B2D717953139}</Project>
+      <Name>Formatting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
+      <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>
+      <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RequestParameters\RequestParameters.csproj">
+      <Project>{99D1ECEB-E3A8-40A2-83C5-7FF9304B472E}</Project>
+      <Name>RequestParameters</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="DataConstruction.cd" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,40 @@
+﻿@using Fpm.MainUI.Helpers
+<div id="phe-header" class="standardWidth clearfix">
+    <a href="https://www.gov.uk/government/organisations/public-health-england" title="Public Health England">
+        <img src="/images/PHE30.png" height="30px" />
+    </a>
+</div>
+<div id="header" class="clearfix">
+    @Html.Partial("_FAQ")
+    @if (UserDetails.CurrentUser().IsAdministrator)
+    {
+        <div class="standardWidth clearfix">
+            <ul style="float:right;">
+                <li class="site-link"><a href="/profilemanager">Profiles</a></li>
+                <li class="site-link"><a href="/user">Users</a></li>
+                <li class="site-link"><a href="/ProfileCollectionManager">Profile collections</a></li>
+                <li class="site-link"><a href="/ExceptionLog">Exceptions</a></li>
+                <li class="site-link"><a href="/admin">Admin</a></li>
+            </ul>
+        </div>
+    }
+    <div id="site-links-box" class="standardWidth clearfix">
+        <span id="app-title">Fingertips Profile Manager</span>
+        <ul style="float:right;">
+            <li class="site-link"><a href="/">Profiles & indicators</a></li>
+            <li class="site-link"><a href="/upload">Upload data</a></li>
+            <li class="site-link"><a href="/documents">Documents</a></li>
+            <li class="site-link"><a href="/content">Content</a></li>
+            <li class="site-link"><a href="/lookup-tables">Lookup tables</a></li>
+            <li class="site-link"><a href="/ManageAreas">Areas</a></li>
+            <li class="site-link"><a href="#" id="faq-link">FAQs</a></li>
+        </ul>
+    </div>
+    @if (CommonUtilities.IsReadOnlyMode())
+    {
+        <div class="right-read-only">
+            @CommonUtilities.GetStatusUpdateMessage()
+        </div>
+    }
+    <div class="standardWidth title-divider"></div>
+</div>

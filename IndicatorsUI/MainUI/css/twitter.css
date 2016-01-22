@@ -1,0 +1,50 @@
+﻿/*----------------------------------------
+    Twitter box
+------------------------------------------*/
+
+#twitter_feed {
+    background: #464646;
+    color: #FFF;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 17px 16px 0;
+}
+
+    #twitter_feed h3 {
+        background: url(../images/Mortality/twitter.png) 0 0 no-repeat;
+        height: 42px;
+        margin: 0;
+        text-indent: -9999px;
+    }
+
+    #twitter_feed h4 {
+        margin: 0;
+        padding: 0 0 9px;
+    }
+
+    #twitter_feed .tweet {
+        border-top: 1px solid #FFF;
+        line-height: 1.75;
+        padding: 10px 0 9px;
+    }
+
+    #twitter_feed a,
+    #related_content .twitter_follow a {
+        font-family: Arial, sans-serif;
+        color: #FFF;
+    }
+
+.twitter_link {
+    font-family: Arial, sans-serif;
+}
+
+#twitter_feed a:hover,
+#related_content .twitter_follow a:hover {
+    color: #FFF;
+}
+
+.twitter_follow {
+    background: url("../images/Mortality/twitter_corner.png") no-repeat scroll right bottom #02AE94;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0 0 40px;
+    padding: 11px 15px 13px;
+}

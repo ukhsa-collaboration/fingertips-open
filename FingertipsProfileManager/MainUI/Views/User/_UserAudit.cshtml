@@ -1,0 +1,56 @@
+﻿@using Fpm.MainUI
+@model IEnumerable<Fpm.ProfileData.Entities.User.UserAudit>
+<script src="@(AppConfig.JsPath)common-functions.js" type="text/javascript"></script>
+<div style="height: 500px; overflow: auto">
+    <div class="profile-title" id="archived-indicators">
+        User Audit History
+    </div>
+    <table id="auditTable" class="sortable" style="width:auto">
+        <thead>
+            <tr>
+                <th class="header">Date</th>
+                <th class="header">User Name</th>
+                <th class="header">Display Name</th>
+                <th class="header">Is Administrator</th>
+                <th class="header">Changed By</th>
+                <th class="header">Change Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNumber = 0;
+            }
+
+            @foreach (var userAudit in Model)
+            {
+                if (rowNumber % 2 == 0)
+                {
+                <tr class="odd">
+                    <td>@userAudit.Timestamp</td>
+                    <td>@userAudit.UserName</td>
+                    <td>@userAudit.DisplayName</td>
+                    <td>@Html.Label(@userAudit.IsAdministrator ? "Yes" : "No")</td>
+                    <td>@userAudit.User</td>
+                    <td>@userAudit.AuditType</td>
+                </tr>
+                }
+                else
+                {
+                <tr class="even">
+                    <td>@userAudit.Timestamp</td>
+                    <td>@userAudit.UserName</td>
+                    <td>@userAudit.DisplayName</td>
+                    <td>@Html.Label(@userAudit.IsAdministrator ? "Yes" : "No")</td>
+                    <td>@userAudit.User</td>
+                    <td>@userAudit.AuditType</td>
+                </tr>
+                }
+                rowNumber++;
+            }
+        </tbody>
+    </table>
+</div>
+
+<p>
+    <input class="small-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
+</p>

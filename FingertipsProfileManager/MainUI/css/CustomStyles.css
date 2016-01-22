@@ -1,0 +1,77 @@
+﻿/* Sorting UI */
+a.sortAsc {
+    padding-right: 16px;
+    background-image: url(arrow_up.png);
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+a.sortDesc {
+    padding-right: 16px;
+    background-image: url(arrow_down.png);
+    background-position: right;
+    background-repeat: no-repeat;
+}
+
+
+
+
+
+/* Paging UI */
+td.pager 
+{
+    height: 20px;
+    background-color: #eee;
+}
+
+td.pager div {
+    font-size: smaller;
+    font-weight: bold;
+    padding: 5px;
+}
+
+a.pagerButton, a.pagerButton:visited
+{
+    border: solid 1px #eee;
+    padding: 4px;
+    text-decoration: none;
+    color: #006;
+    margin: 0px 2px 0px 2px;
+}
+
+a.pagerButton:hover
+{
+    border: solid 1px black;
+    color: Black;
+}
+
+a.pagerButtonCurrentPage
+{
+    border: solid 1px #00a;
+    padding: 4px;
+    text-decoration: none;
+    color: White;
+    background-color: #006;
+    margin: 0px 2px 0px 2px;
+}
+
+.pagerButtonDisabled
+{
+    border: none;
+    color: #999;
+    padding: 4px;
+}
+
+
+/* Filtering Styles */
+.filtering {
+    margin: 10px 0px 10px 10px;
+    padding: 10px 10px 10px 10px;
+    font-size: 10pt;
+    background-color: #ffc;
+}
+
+.filtering legend {
+    font-weight: bold;
+    font-size: larger;
+}

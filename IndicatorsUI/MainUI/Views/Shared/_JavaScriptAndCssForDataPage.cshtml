@@ -1,0 +1,26 @@
+﻿@using System.Web.Script.Serialization
+@using Profiles.DataAccess
+@using Profiles.MainUI.Models;
+@model PageModel
+<script type="text/javascript">//<![CDATA[
+    isInitRequired = true;    
+    groupIds = @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["groupIds"]));
+    defaultAreaType = @(ViewBag.DefaultAreaType);
+    enumParentDisplay = @ViewBag.EnumParentDisplay;
+    ignoredSpineChartAreas = '@Model.IgnoredSpineChartAreas';
+    areAnyIndicators = true;
+    spineHeaders = { min: '@Model.SpineChartMinMaxLabel.Min',
+                     max: '@Model.SpineChartMinMaxLabel.Max'
+    };
+    templateProfileId = @Model.TemplateProfileId;
+    FT.version = '@ViewBag.JavaScriptVersion';
+    showDataQuality = @(ViewBag.ShowDataQuality);
+    isNational = @(ViewBag.IsNational);
+//]]</script>
+@Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForDataPage"))
+@Html.Partial("_ProfileSpecificCssFiles")
+@Html.Partial("_ProfileSpecificJsFiles")
+@if (AppConfig.Instance.IsEnvironmentTest)
+{
+    <script src="@(Model.JsPath)EnvironmentTest.js" type="text/javascript"></script>
+}

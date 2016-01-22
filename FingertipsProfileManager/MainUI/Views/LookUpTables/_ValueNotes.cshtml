@@ -1,0 +1,25 @@
+﻿@model Fpm.MainUI.Models.LookupModel
+
+@if (Model.ValueNotes != null)
+{
+    <p style="margin-top:0;">Value notes are used for annotating specific values.</p>
+    <table id="lookup-table" class="grid left-align">
+        @Html.Partial("_TableHeader", new List<string> { "ID", "Description" })
+        <tbody>
+            @foreach (var valueNote in Model.ValueNotes)
+            {
+                <tr>
+                    @if (valueNote.IsGeneric)
+                    {
+                        <td colspan="2" class="generic-value-note">@valueNote.Text</td>
+                    }
+                    else
+                    {
+                        <td>@valueNote.ValueNoteId</td>
+                        <td>@valueNote.Text</td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}

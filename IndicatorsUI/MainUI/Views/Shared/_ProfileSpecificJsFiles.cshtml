@@ -1,0 +1,14 @@
+﻿@using System.Web.Optimization
+@using Profiles.MainUI.Models;
+@model PageModel
+@foreach (string file in (IEnumerable<string>)ViewBag.ExtraJsFiles)
+{
+    if (file[0] == '+')
+    {
+    @Scripts.Render("~/bundles/js-fingertips-maps");
+    }
+    else
+    {
+    <script src="@(JsHelper.GetIncludePath(file, Model.JsPath))" type="text/javascript"></script>
+    }
+}

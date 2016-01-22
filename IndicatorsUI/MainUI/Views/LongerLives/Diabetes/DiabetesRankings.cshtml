@@ -1,0 +1,137 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@{ Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml"; }
+@section headContent {
+    <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/PageBaseLongerLivesRankings.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/Diabetes/PageDiabetesRankings.js" type="text/javascript"></script>
+}
+
+<div id="header_bottom" class="clearfix">
+    <ul id="breadcrumbs"></ul>
+    @Html.Partial("_SearchAreaSmall")
+</div>
+<div id="content" class="clearfix ranking_table_content">
+    <div class="header">
+        <h1 id="ranking-header"></h1>
+        <div class="hr">
+            <hr />
+        </div>
+    </div>
+
+    <div id="data_page_header" class="clearfix">        
+        @{
+            var style = @Model.ProfileId == ProfileIds.HealthChecks
+                ? "width:908px;"
+                : string.Empty;
+        }
+        
+        <div id="info_box_1" class="info_box" style="@style">
+            @if (@Model.ProfileId == ProfileIds.DrugsAndAlcohol)
+            {        
+                @CommonUtilities.GetContent("page-rankings-no-of-alcohol-dependent-people", Model.ProfileId)                    
+            }
+        </div>
+            
+        <div id="info_box_2" class="info_box" style="display: none;"></div>          
+    </div>
+
+    <div id="related_content">
+
+        <div class="useful_links table_options">
+            <h5>How to use the comparison table:</h5>
+            <div class="hr">
+                <hr />
+            </div>
+
+            <div id="area-filter">
+            </div>
+
+            <h5><span id="indicator-title-order" class="pretext"></span><span class="posttext">Select @ViewBag.Title indicators you want to compare</span></h5>
+            <ul class="filters" style="padding-left: 20px;">
+                @{
+                    var domainIndex = 0;
+                    foreach (var domain in ViewBag.AvailableDomains)
+                    {
+                        if (domainIndex < ViewBag.DomainsToDisplay)
+                        {
+                            string tooltip = domain.Tooltip ?? string.Empty;
+                            <li id="domain-@domain.GroupId" class="indicator-group" alt="@tooltip">
+                                <a href="javascript:selectDomain(@domain.GroupId)">@domain.SubHeading</a>
+                                @Html.Partial("_DomainTooltipIcon", tooltip)
+                            </li>
+                            <ul id="diabetes_list-@domain.GroupId" class="causes filters"></ul>
+                        }
+                        domainIndex++;
+                    }
+                }
+            </ul>
+
+            <div class="hr">
+                <hr />
+            </div>
+
+
+            @if (ViewBag.RankingsMiddleColumnGroup != null)
+            {
+                @Html.Partial("_RankingsMiddleColumnDomain", (Domain)ViewBag.RankingsMiddleColumnGroup)
+            }
+        </div>
+
+        @*Links underneath table comparison *@
+        <div id="ranking-links" class="no-print">
+            <span class="pretext">
+                <img class="download" src="@(ViewBag.ImagesUrl)Mortality/download.png" />
+            </span>
+            <h5 class="posttext">Download</h5>
+            @CommonUtilities.GetContent(ContentKeys.DownloadLink, Model.ProfileId)
+            <ul>
+                <li id="download_data_for_england"></li>
+                <li id="download_data_for_ccg"></li>
+            </ul>
+
+            <h5>More Information</h5>
+
+            <ul>
+                <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+                <li class="external_ccg_link" style="display: none;"><a href="javascript:goToPracticeProfiles();" class="external_link">View more data about this CCG at National General Practice Profiles</a></li>
+                <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data">About the data</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main_content">
+        <span id="data_legend"></span>
+        @Html.Partial("_LegendInlineQuintiles")
+
+        <div class="table-data" id="mortality-rankings">
+            <div class="header non-similar clearfix">
+                <p id="hover-or-tap" class="tip" style="display: none;">Hover or tap on an <span id="area-type-singular"></span> to compare it to similar <span id="area-type-plural"></span></p>
+                <h2><span id="gp_count"></span></h2>
+            </div>
+            <div class="header similar clearfix" style="display: none;">
+                <a class="return_link no-print right" href="javascript:showAllAreas();">&lt; return to <span class="area_name"></span></a>
+                <h2><span id="comparison_type"></span></h2>
+                <h3>
+                    Comparing <span id="comparing_practice_name"></span> <span id="comparing_area_type"></span> <span id="comparison_category"></span> in
+                    <span class="area_name"></span><span class="tooltip tooltip-inverse"><i id="similar-areas-tooltip"></i></span>
+                </h3>
+            </div>
+
+            <table id="diabetes-rankings-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <a href="javascript:sortRankings(0);">
+                                <div id="area-type-name"></div>
+                                <i></i>
+                            </a>
+                        </th>
+                        <th id="supporting_data_heading"></th>
+                        <th class="last-child sorted"><a id="value_type_heading" href="javascript:sortRankings(2);"></a></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>

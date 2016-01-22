@@ -1,0 +1,74 @@
+﻿@using System.Web.Mvc.Html
+@using Fpm.MainUI
+@model Fpm.MainUI.Models.ProfileGridModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Profile Manager";
+}
+
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
+<script src="@(AppConfig.JsPath)content-management.js" type="text/javascript"></script>
+
+<div class="standardWidth">
+    @using (Html.BeginForm("ReloadProfileItems", "Profile", FormMethod.Get, new { id = "IndicatorManagementForm" }))
+{
+    <h2 class="subheading">Profiles in Fingertips</h2>
+
+    if (Model.ProfileGrid.Count > 0)
+    {
+            <table class="grid sortable">
+                <thead>
+                    <tr>
+                        <th class="header">ID</th>
+                        <th class="header">Name</th>
+                        <th class="header">Url Key</th>
+                        <th class="header">Live</th>
+                        <th class="header">PDFs</th>
+                        <th class="header">Default area type</th>
+                        <th class="header">Areas ignored everywhere</th>
+                        <th class="header">Areas ignored for spine chart</th>
+                    </tr>
+                </thead>
+                @foreach (var item in Model.ProfileGrid)
+                {
+                    <tr>
+                        <td class="left">
+                            @item.Id
+                        </td>
+                        <td class="left">
+                            @Html.ActionLink(item.Name, "EditProfile", new { profileId = item.Id, profileKey = item.UrlKey, profileName = item.Name }, null)
+                        </td>
+                        <td class="left">
+                            @item.UrlKey
+                        </td>
+                        <td class="left">
+                            @(item.IsLive? "Yes" : "No")
+                        </td>
+                        <td class="left">
+                            @(item.ArePdfs? "Yes" : "No")
+                        </td>
+                        <td class="left">
+                            @item.DefaultAreaTypeId
+                        </td>
+                        <td class="left">
+                            @item.AreasIgnoredEverywhere
+                        </td>
+                        <td class="left">
+                            @item.AreasIgnoredForSpineChart
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+        else
+        {
+        <label>No content items have been created for this profile.</label> 
+        }
+    }
+
+    <div class="button-box">
+        <input type="button" value="New Profile" onclick="location.href='@Url.Action("CreateProfile", "Profile")'"  />
+    </div>
+
+
+</div>

@@ -1,0 +1,142 @@
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
+@using Fpm.MainUI.Helpers
+
+@model Fpm.MainUI.ViewModels.ProfileViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+    ViewBag.Title = "FPM - Create Profile";
+}
+
+@Scripts.Render("~/bundles/profile-management")
+
+<div class="standardWidth">
+    <div class="subheading clearfix">
+        <h2 style="float: left;">Profile details</h2>
+
+        @if (Model.IsProfileViewable)
+        {
+            <div class="right-info clearfix">
+                <a href="@CommonUtilities.GetTestSiteUrl(Model.UrlKey)" target="_blank">View selected profile in Fingertips</a>
+            </div>
+        }
+    </div>
+    @using (Html.BeginForm("UpdateProfile", "Profile", FormMethod.Post))
+    {
+        <div class="content-row">
+            <label class="content-item-detail-label">ID:</label>
+            @Html.TextBoxFor(model => model.Id, new { @class = "disabled unselected-domain", @disabled = "disabled" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Name:</label>
+            @Html.TextBoxFor(model => model.Name, new { @class = "unselected-domain" })
+            <span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">URL key:</label>
+            @Html.TextBoxFor(model => model.UrlKey, new { @class = "unselected-domain" })
+            <span class="field-validation-valid" data-valmsg-for="UrlKey" data-valmsg-replace="true"></span>
+        </div>
+
+        <div class="content-row">
+            <label class="content-item-detail-label">Default area type:</label>
+            @Html.DropDownListFor(m => m.DefaultAreaTypeId, null)
+        </div>
+
+        <div class="content-row">
+            <label class="content-item-detail-label">Profile contact:</label>
+            @Html.DropDownListFor(model => model.ContactUserId, null)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Colours included in legend:</label>
+            @Html.DropDownListFor(model => model.KeyColourId, null)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Spine chart min/max header label:</label>
+            @Html.DropDownListFor(model => model.SpineChartMinMaxLabelId, null)
+        </div>
+
+        <div class="content-row">
+            <label class="content-item-detail-label">Default Fingertips tab:</label>
+            @Html.DropDownListFor(model => model.DefaultFingertipsTabId, null)
+        </div>
+
+        @Html.Partial("_AreaTypes", Model.SelectedPdfAreaTypes)
+
+
+        <div class="content-row">
+            <label class="content-item-detail-label">Areas ignored for spine chart:</label>
+            @Html.TextBoxFor(model => model.AreasIgnoredForSpineChart, new { @class = "unselected-domain" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Areas ignored everywhere:</label>
+            @Html.TextBoxFor(model => model.AreasIgnoredEverywhere, new { @class = "unselected-domain" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Extra JS files:</label>
+            @Html.TextBoxFor(model => model.ExtraJsFiles, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Extra CSS files:</label>
+            @Html.TextBoxFor(model => model.ExtraCssFiles, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Access control group:</label>
+            @Html.TextBoxFor(model => model.AccessControlGroup, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+    <div class="content-row">
+        <label class="content-item-detail-label">Skin:</label>
+        @Html.DropDownListFor(model => model.SkinId, null)
+    </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Trend chart y axis always starts at zero?</label>
+            @Html.CheckBoxFor(model => model.StartZeroYAxis)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Is profile live?</label>
+            @Html.CheckBoxFor(model => model.IsLive)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Has own front page?</label>
+            @Html.CheckBoxFor(model => model.HasOwnFrontPage)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Show data quality flags?</label>
+            @Html.CheckBoxFor(model => model.ShowDataQuality)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Is national?</label>
+            @Html.CheckBoxFor(model => model.IsNational)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Exclude indicators from global search?</label>
+            @Html.CheckBoxFor(model => model.AreIndicatorsExcludedFromSearch)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Is viewable in test site? (@AppConfig.DefaultTestUrl):</label>
+            @Html.CheckBoxFor(model => model.IsProfileViewable)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Should Excel files for England be built overnight?</label>
+            @Html.CheckBoxFor(model => model.ShouldBuildExcel)
+        </div>
+        <div class="content-row">
+             <label class="content-item-detail-label">Has trend markers?</label>
+            @Html.CheckBoxFor(model => model.HasTrendMarkers)
+        </div>
+
+        <div class="button-box clearfix">
+            <input class="medium-button" id="update_profile" type="submit" value="Update" />
+            <input class="medium-button" id="cancel_profile" type="button" onclick="location.href='@Model.ReturnUrl'" value="Cancel" />
+        </div>
+
+        @Html.Partial("_UserPermissions", Model.ProfileUsers)
+
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.ReturnUrl)
+
+        @Html.HiddenFor(m => m.SelectedPdfAreaTypes, "")
+        @Html.HiddenFor(m => m.ProfileUsers, "")
+    }
+
+</div>

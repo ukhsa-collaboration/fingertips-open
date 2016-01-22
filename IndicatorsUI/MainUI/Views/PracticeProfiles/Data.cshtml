@@ -1,0 +1,387 @@
+﻿@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForDataPage")
+    <link href="@(Model.CssPath)practice-profiles.css" rel="stylesheet" type="text/css" />
+    @Html.Partial("../PracticeProfiles/_IE8")
+}
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos&sensor=false" type="text/javascript"></script>
+
+<div class="full-width title-divider"></div>
+<div id="topSelectionBox" class="standardWidth clearfix">
+    <div id="ccgBox" class="clearfix">
+        <table id="areaMenus">
+            <tr>
+                <td class="first"></td>
+                <td>
+                    <input id="searchText" type="text" placeholder="Enter postcode or place name" class="chosen-select" style="color: #999999;" />
+                </td>
+            </tr>
+            <tr>
+                <td class="first">CCG:
+                </td>
+                <td>
+                    <select id="parentAreaMenu" class="chosen-select">
+                    </select>
+                    <a id="all_ccg_practices" href="javascript:showAllPracticesInCCG();" title="Display all practices within this CCG on the map" class="select-area-link">Show all practices</a>
+                </td>
+            </tr>
+            <tr>
+                <td id="practiceHeading" class="first">Practice:
+                </td>
+                <td id="practiceMenuBox">
+                    <select id="practiceMenu" class="chosen-select" onchange="practiceChanged(this.value);">
+                    </select>
+                    <span id="practiceTitle"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+    
+    @Html.Partial("_SearchNoMatches")
+
+    <div id="yearBox">
+    </div>
+    <a id="exportExcel" href="javascript:showExport()" title="Export the data in Excel format">
+        <div class="icon">
+        </div>
+        <div class="text">
+            Export data
+        </div>
+    </a><a id="downloadPdf" href="javascript:downloadPdf()" title="Download a summary of the current practice in PDF format">
+        <div class="icon">
+        </div>
+        <div class="text">
+            Summary PDF
+        </div>
+    </a>
+</div>
+<div class="fullWidth clearfix">
+    <div class="standardWidth clearfix">
+        <div id="page-map" class="page" onclick="ifNoLock(goToPracticeSearchPage)">
+            <div>&nbsp;</div>
+            <span>Map</span>
+        </div>
+        <div id="page-population" class="page" onclick="ifNoLock(goToPopulationPage)">
+            <div>&nbsp;</div>
+            <span>Population</span>
+        </div>
+        <div id="page-indicators" class="page" onclick="ifNoLock(goToIndicatorsPage)">
+            <div>&nbsp;</div>
+            <span>Spine<br>charts</span>
+        </div>
+        <div id="page-bar" class="page" onclick="ifNoLock(goToBarChartPage)">
+            <div>&nbsp;</div>
+            <span>Bar<br>chart</span>
+        </div>
+        <div id="page-trends" class="page" onclick="ifNoLock(goToTrendsPage)">
+            <div>&nbsp;</div>
+            <span>Trends</span>
+        </div>
+        <div id="page-scatter" class="page" onclick="ifNoLock(goToScatterPage)">
+            <div>&nbsp;</div>
+            <span>Scatter<br>plot</span>
+        </div>
+        <div id="page-metadata" class="page" onclick="ifNoLock(goToMetadataPage)">
+            <div>&nbsp;</div>
+            <span>Definitions</span>
+        </div>
+        <div id="tabLine">
+        </div>
+    </div>
+
+    <div id="mapBox" class="clearfix pageBox">
+        <div id="data_page_header" class="clearfix">
+        </div>
+        <div class="nearby-practices-table" style="display: none;">
+            <div class="table-data" id="mortality-rankings">
+                <div id="table-container" style="height: 500px; overflow-y: scroll;">
+                    <table id="search-table">
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <h3 id="default_search_header"></h3>
+        <div class="nearby-practices-map">
+            <div id="map-canvas"></div>
+        </div>
+    </div>
+
+
+    <div id="main" class="clearfix" style="display: none;">
+        <div class="clearfix standardWidth">
+            <!-- Selection menus -->
+            <div id="subgroupSelection" class="subgroupSelection" style="display: none;">
+                <table cellspacing="0">
+                    <tr>
+                        <td class="topicLabel">Topic:
+                        </td>
+                        <td>
+                            <select id="subgroupMenu" onchange="subgroupChanged(this.value);">
+                                @(ViewBag.ImagesUrl)
+                            </select>
+                        </td>
+                        <td class="indicatorLabel indicatorSelection">Indicator:
+                        </td>
+                        <td class="indicatorSelection">
+                            <select id="indicatorMenu" class="indicatorMenu" onchange="indicatorChanged(this.value);">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="mapBox" class="pageBox clearfix standardWidth" style="display: none;">
+        </div>
+        <div id="populationBox" class="pageBox clearfix standardWidth" style="display: none;">
+            <div id="age-distribution-info-icon" class="infoTooltip" onclick="showMetadata(populationGroupId,337)">
+            </div>
+            <div id="popChartBox" class="clearfix">
+                <div class="export-chart-box">
+                    <a class="export-link" href="javascript:exportPopulationChart()">Export chart as image</a></div>
+                <div id="populationChart">
+                </div>
+                
+                <div id="populationKeyBox">
+                    <div class="margin200 fl">
+                        &nbsp;
+                    </div>
+                    <div class="fl">
+                        <table id="populationKey" cellspacing="0">
+                            <tr>
+                                <td class="popKey">
+                                    <img src="@(ViewBag.ImagesUrl)national.png" alt="" />
+                                </td>
+                                <td>ENGLAND
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="popKey">
+                                    <img src="@(ViewBag.ImagesUrl)pct.png" alt="" />
+                                </td>
+                                <td id="pctLabel"></td>
+                            </tr>
+                            <tr>
+                                <td class="popKey">
+                                    <img src="@(ViewBag.ImagesUrl)practice-male.png" alt="" />
+                                </td>
+                                <td>Practice (Male)
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="popKey">
+                                    <img src="@(ViewBag.ImagesUrl)practice-female.png" alt="" />
+                                </td>
+                                <td>Practice (Female)
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div style="float: right; width: 380px;">
+                <div id="populationTableBox">
+                    <div style="float: left; text-align: center; width: 100%; font-weight: bold; position: relative;">
+                        <div class="right-tooltip-icon infoTooltip" onclick="showMetadata(populationGroupId,114)">
+                        </div>
+                        <div>Registered Persons</div>
+                    </div>
+                    <table id="popTable" class="borderedTable" cellspacing="0">
+                    </table>
+                </div>
+                <div id="populationInfo" style="display: none;">
+                    <div id="practicePopInfo">
+                        <div id="practiceLabel" class="popLabel">
+                        </div>
+                        <table id="furtherInfoTable" class="borderedTable" cellspacing="0">
+                            <tr>
+                                <td></td>
+                            </tr>
+                        </table>
+                        <table id="deprivationTable" class="borderedTable" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="w100" style="position: relative;">
+                                            Deprivation
+                                            <div class="right-tooltip-icon infoTooltip" onclick="showMetadata(populationGroupId,91872)">
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="deprivation" style="border-bottom: none;"></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-top: none;">
+                                        <table id="decileKey" cellspacing="0">
+                                            <tr>
+                                                <td id="d1"></td>
+                                                <td id="d2"></td>
+                                                <td id="d3"></td>
+                                                <td id="d4"></td>
+                                                <td id="d5"></td>
+                                                <td id="d6"></td>
+                                                <td id="d7"></td>
+                                                <td id="d8"></td>
+                                                <td id="d9"></td>
+                                                <td id="d10"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="decile1"></td>
+                                                <td class="decile2"></td>
+                                                <td class="decile3"></td>
+                                                <td class="decile4"></td>
+                                                <td class="decile5"></td>
+                                                <td class="decile6"></td>
+                                                <td class="decile7"></td>
+                                                <td class="decile8"></td>
+                                                <td class="decile9"></td>
+                                                <td class="decile10"></td>
+                                            </tr>
+                                        </table>
+                                        <div class="fl keyLabel">
+                                            More deprived
+                                        </div>
+                                        <div class="fr keyLabel">
+                                            Less deprived
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <table id="ethnicityTable" class="borderedTable" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <div class="w100" style="position: relative;">
+                                            Ethnicity Estimate
+                                            <div class="right-tooltip-icon infoTooltip" onclick="showMetadata(populationGroupId,1679)">
+                                            </div>
+                                        </div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td id="ethnicity"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="noPractice" class="selectLabel">
+                </div>
+            </div>
+        </div>
+        <div id="indicatorsBox" class="pageBox clearfix standardWidth" style="display: none;">
+            <div class="fl margin20" style="height: 20px;">
+            </div>
+            <div id="benchmarkSelection">
+                <table cellspacing="0">
+                    <tr>
+                        <td>Comparator:
+                        </td>
+                        <td style="padding: 0 2px 0 2px;">
+                            <img id="benchmarkImg" src="@(ViewBag.ImagesUrl)circle_white_mini_tri_tp.png"
+                                 alt="" />
+                        </td>
+                        <td>
+                            <select id="benchmarkMenu" onchange="benchmarkChanged(this);">
+                                <option id="benchmarkParentOption" value="0" selected="selected">CCG</option>
+                                <option value="1">Deprivation Decile</option>
+                            </select>
+                        </td>
+                        <td>
+                            <div class="infoTooltip" style="margin-left: 2px; display: none;" onclick="showBenchmarkInfo(this)">
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <table id="spineKeyTable">
+                <tr>
+                    <td style="background-color: #682EE3;" class="key">&nbsp;
+                    </td>
+                    <td>Significantly different from England average
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: #F5C720;" class="key">&nbsp;
+                    </td>
+                    <td>No significant difference from England average
+                    </td>
+                </tr>
+                <tr>
+                    <td style="background-color: #fff;" class="key">&nbsp;
+                    </td>
+                    <td>Significance not calculated
+                    </td>
+                </tr>
+            </table>
+            <div id="spineTableBox" class="fl w100">
+            </div>
+        </div>
+        <div id="scatterBox" class="pageBox clearfix standardWidth" style="display: none;">
+            <div class="fl w100">
+                <!-- Selection menus -->
+                <div class="subgroupSelection">
+                    <table cellspacing="0">
+                        <tr>
+                            <td class="topicLabel">Topic:
+                            </td>
+                            <td>
+                                <select id="group2Menu" onchange="group2Changed(this.value);">
+                                </select>
+                            </td>
+                            <td class="indicatorLabel">Indicator:
+                            </td>
+                            <td>
+                                <select id="indicator2Menu" onchange="indicator2Changed(this.value);">
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div id="scatterKeyBox">
+                                    <table id="scatterKeyTable" cellspacing="0">
+                                        <tr>
+                                            <td id="scatterPractice"></td>
+                                            <td id="scatterPct" class="noLeft"></td>
+                                            <td class="noLeft">
+                                                <img src="@(ViewBag.ImagesUrl)scatter-other.png" alt="" />Other practices
+                                                in England
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="scatter">
+            </div>
+        </div>
+        <div id="barBox" class="pageBox clearfix standardWidth" style="display: none;">
+        </div>
+        <div id="trendsBox" class="pageBox clearfix" style="display: none;">
+        </div>
+        <div id="metadataBox" class="pageBox clearfix standardWidth" style="display: none;">
+        </div>
+        <div id="clusterBox" class="pageBox clearfix standardWidth" style="display: none;">
+        </div>
+    </div>
+</div>
+<div class="standardWidth">
+    <div id="spinner">
+        <img src="@(ViewBag.ImagesUrl)spinner.gif" alt="" class="spinner" />
+        <div id="spinnerLabel">
+            loading
+        </div>
+    </div>
+</div>
+<input id="hashState" type="hidden" value="" />

@@ -1,0 +1,17 @@
+﻿@model Profiles.MainUI.Models.PageModel
+<div class="standardWidth clearfix">
+    <div id="spineRangeKeyContainer" style="display: none;">
+        <img id="spine-range-key" src="@(ViewBag.ImagesUrl)spine-key-label-id-@(Model.SpineChartMinMaxLabel.LabelId).png" alt="" />
+    </div>
+    <div id="areaSwitch" class="area-switch-options" style="display: none;"></div>
+    @Html.Partial("KeybarChart")
+    @Html.Partial("KeySpineChart")
+    @Html.Partial("KeyTartanRug")
+    @Html.Partial("KeyInequality")
+    @Html.Partial("KeyDataQuality")
+    @* used for dynamically generated keys *@
+    <div id="keyAdHoc" class="keyContainer" style="display: none;"></div>
+    @Html.Partial("_KeyValueNote")
+    @Html.Partial("_SortMultipleCharts")
+</div>
+

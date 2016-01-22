@@ -1,0 +1,55 @@
+﻿@using Fpm.MainUI
+@model List<Fpm.Upload.DuplicateRowInDatabaseError>
+<script src="@(AppConfig.JsPath)common-functions.js" type="text/javascript"></script>
+
+<b>The following indicator data already exists in the database:</b>
+
+<div id="dataTypeErrors">
+    <table id="auditTable" class="sortable" style="width:auto">
+        <thead>
+            <tr>
+                <th class="header">Excel Row</th>
+                <th class="header">Indicator</th>
+                <th class="header">Age Id</th>
+                <th class="header">Sex Id</th>
+                <th class="header">Area Code</th>
+                <th class="header">Excel Value</th>
+                <th class="header">Database Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int rowNumber = 0;
+            }
+
+            @foreach (var indicator in Model)
+            {
+                double diffValue = Math.Abs(indicator.DbValue - indicator.ExcelValue);
+                string diffClass = null;
+
+                if (Math.Abs(diffValue - 0) > 0.000001)
+                {
+                    diffClass = "upload-difference";
+                }
+
+                var cssClass = rowNumber++ % 2 == 0 ? "odd" : "even";
+                <tr class="@cssClass">
+                    <td>@indicator.RowNumber</td>
+                    <td>@indicator.IndicatorId</td>
+                    <td>@indicator.AgeId</td>
+                    <td>@indicator.SexId</td>
+                    <td>@indicator.AreaCode</td>
+                    <td class="@diffClass">@indicator.ExcelValue</td>
+                    <td class="@diffClass">@indicator.DbValue</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+<p>
+    The above data will be archived and replaced with the data in your spreadsheet if you continue with the upload.
+</p>
+<p>
+    <input class="small-button" type="button" onclick="lightbox.hide()" value="Close" />
+</p>

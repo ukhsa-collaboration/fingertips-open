@@ -1,0 +1,71 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
+@model PageModel
+@{
+    var profileKey = Model.ProfileUrlKey;
+    var pageType = Model.PageType;
+}
+
+<ul id="breadcrumbs">
+
+    @* Introduction *@
+    <li class="site-link"><a href="/">Home</a></li>
+
+    @* Profile group introduction *@
+    @if (pageType == PageType.ProfileCollectionFrontPage ||
+        pageType == PageType.FrontPageOfProfileInCollection ||
+        pageType == PageType.DataPageOfProfileInCollection)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link">
+            <a href="/profile-group/@ViewBag.LeadProfileUrlKey">@Model.ProfileCollection[0].CollectionName</a>
+        </li>
+    }
+
+    @* Introduction *@
+    @if (pageType == PageType.FrontPageOfStandaloneProfileWithFrontPage ||
+         pageType == PageType.DataPageOfStandaloneProfileWithFrontPage ||
+        pageType == PageType.SupportingInformation)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link"><a href="/profile/@profileKey">Introduction</a></li>
+    }
+    else if (pageType == PageType.FrontPageOfProfileInCollection ||
+            pageType == PageType.DataPageOfProfileInCollection)
+    {
+        @* Introduction of profile in profile group *@
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link">
+            <a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey">Introduction</a>
+        </li>
+    }
+
+    @* Data page *@
+    @if (pageType == PageType.DataPageOfStandaloneProfileWithFrontPage)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link"><a href="/profile/@profileKey/data">Data</a></li>
+    }
+    else if (pageType == PageType.DataPageOfProfileWithoutFrontPage)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link"><a href="/@profileKey">Data</a></li>
+    }
+    else if (pageType == PageType.DataPageOfProfileInCollection)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link"><a href="/profile-group/@Model.ProfileUrlKey/profile/@profileKey/data">Data</a></li>
+    }
+
+    @* Other page *@
+    @if (pageType == PageType.SupportingInformation)
+    {
+        var contentItem = (ContentItem)ViewBag.SupportingInformationContentItem;
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link">
+            <a href="/profile/@profileKey/supporting-information/@contentItem.ContentKey">
+                @contentItem.Description
+            </a>
+        </li>
+    }
+</ul>

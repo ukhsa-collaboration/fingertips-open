@@ -1,0 +1,12 @@
+User-agent: UbiCrawler
+Disallow: /
+
+User-agent: nokia6110I
+Disallow: /
+
+User-agent: *
+Disallow: /bin/
+Disallow: /css/
+Disallow: /fonts/
+Disallow: /js/
+Disallow: /views/

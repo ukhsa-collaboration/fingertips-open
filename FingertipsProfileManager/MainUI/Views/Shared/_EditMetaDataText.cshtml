@@ -1,0 +1,12 @@
+﻿<div id="editMetaData" style="display: none;">
+    <div>
+        @Html.TextArea("mtv", new { @id = "metaDataText", style = "width: 100%;" })
+    </div>
+    <p>
+        <input class="medium-button" id="editor-done" type="button"  value="Done" />
+        <input class="medium-button" id="editor-cancel" onclick="lightbox.hide()"  value="Cancel" />
+    </p>
+</div>
+
+@Html.Hidden("textValueId")
+

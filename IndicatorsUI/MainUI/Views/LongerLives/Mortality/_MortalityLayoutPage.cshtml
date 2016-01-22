@@ -1,0 +1,54 @@
+﻿@using System.Web.Optimization
+@using System.Web.Script.Serialization
+@using Profiles.MainUI.Models;
+@model PageModel
+@* Mortality/_LayoutPage.cshtml *@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="keywords" content="@ViewBag.MetaKeywords" />
+        <meta name="author" content="Public Health England (PHE)" />
+        <meta name="description" content="@ViewBag.MetaDescription" />
+        <title>
+            @Model.Title - @Model.PageTitle
+        </title>
+        @Html.Partial("_Favicon")
+        @Styles.Render("~/bundles/css-longer-lives")
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos&sensor=false" type="text/javascript"></script>
+        @Scripts.Render("~/bundles/js-longer-lives") 
+        <script src="@(Model.JsPath)LongerLives/Mortality/SiteMortality.js" type="text/javascript"></script>
+        <script type="text/javascript">        //<![CDATA[  
+            FT = {version:'@ViewBag.JavaScriptVersion'};
+            FT.url = {
+                img: '@(ViewBag.ImagesUrl)',
+                bridge: '@Model.BridgeServicesUrl',
+                corews: '@Model.CoreServicesUrl'
+            };
+
+            groupIds = @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["groupIds"]));            
+            MT.model.groupId = groupIds[0];
+            profileUrlKey = '@ViewBag.ProfileUrlKey';
+            MT.model.profileId = @Model.ProfileId;
+            MT.model.areaTypeId = @(ViewBag.DefaultAreaType);    
+            useJsonp =  @JsHelper.GetJsBool(ViewBag.UseJsonp);
+            restrictSearchProfileId = @Model.TemplateProfileId;
+            profileCollectionIdList = [@Model.TemplateProfileId];
+        //]]</script>
+
+        @Html.Partial("_GoogleAnalytics")
+
+        @RenderSection("headContent", true)
+        
+    </head>
+<body>
+    <div class="standardWidth">
+        @Html.Partial("_MortalityHeader")
+    </div>
+    @RenderBody()
+    <div id="footerSpace">
+        @Html.Partial("_MortalityFooter")
+    </div>
+</body>
+</html>

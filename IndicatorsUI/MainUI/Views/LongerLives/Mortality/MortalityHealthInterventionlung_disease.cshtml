@@ -1,0 +1,97 @@
+﻿@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml";
+}
+@section headContent {
+     @Html.Partial("_InterventionHead")
+}
+
+<div id="header_bottom" class="clearfix">
+    <ul id="breadcrumbs">
+        <li><a href="javascript:MT.nav.home();">Home</a></li>
+        <li><a href="javascript:MT.nav.rankings();">Mortality rankings</a></li>
+        <li class="last">Lung disease</li>
+    </ul>
+</div>
+
+<div id="content" class="interventions clearfix">
+    <div id="related_content">
+        @Html.Partial("_BestWorstNationally")
+        <div class="useful_links">
+            <h4>Useful links:</h4>
+            <ul>
+                <li><a href="http://www.nhs.uk/conditions/Chronic-obstructive-pulmonary-disease/Pages/Introduction.aspx" class="external_link" target="_blank">Learn more about the causes of lung disease</a></li>
+                <li><a href="http://publications.nice.org.uk/tobacco-phb1" class="external_link" target="_blank">Find more about tobacco control at NICE</a></li>
+                @Html.Partial("_CampaignLink")
+            </ul>
+        </div>
+    </div>
+	<div id="main_content">
+		<h2>Health interventions</h2>
+		<h1>Lung disease</h1>
+		<div class="hr"><hr /></div>
+		<p class="intro">Lung disease, also known as respiratory disease, is a category of conditions ranging from asthma to chronic obstructive pulmonary disease (COPD) – one of the most common causes of death in England.<sup>1</sup></p>
+		<p>COPD is progressive, largely preventable, and strongly linked to deprivation in England. It’s the fifth largest cause of emergency hospital admissions, and an estimated 85 per cent of cases are caused by smoking.<sup>1</sup></p>
+		<img src="@(ViewBag.ImagesUrl)Mortality/human_lungs.jpg" alt="Human lungs" />
+        
+        @* Headers *@
+        <ul class="row">
+            <li class="col col1">
+             <img src="@(ViewBag.ImagesUrl)Mortality/smoking.jpg" alt="Smoking" />
+			<h3>Common causes of lung disease:</h3>                           
+            </li>
+            <li class="col col2">
+                <img src="@(ViewBag.ImagesUrl)Mortality/no_smoking.jpg" alt="No smoking sign" />
+    			<h3>Lung disease interventions:</h3>  
+            </li>  
+        </ul>
+        
+        @* Smoking *@
+	    <ul class="row">
+	        <li class="col col1">
+	            <h4>1. Smoking</h4>  
+                	        <p>Smoking is a major factor contributing to health inequalities. It damages the lungs and destroys the cells that should protect them. Around half of all smokers develop some airflow obstruction, while 10–20 percent develop COPD.<sup>2</sup>
+	            <span class="nice_link"><a href="http://www.nice.org.uk/advice/lgb1" class="external_link" target="_blank">More about smoking-related mortality</a></span>
+	        </p>                         
+	        </li>
+	        <li class="col col2">
+	            <h4>1. Smoking</h4>  
+                	        <ul>
+	            <li>Provision of smoking cessation services within primary care and the workplace, and possible provision of pharmacotherapy</li>
+	            <li>Regular, targeted campaigns designed to prevent smoking uptake among under-18s and promote smoke-free homes and cars</li>
+	            <li>Greater enforcement of underage sales and counterfeit tobacco penalties</li>
+	        </ul>
+	        </li>  
+	    </ul>
+        
+         @* Air pollution *@
+        <ul class="row">
+            <li class="col col1">
+                <h4>2. Air pollution</h4>   
+                	        <p>Almost all the air we breathe contains very low levels of pollution, mostly caused by petrol and diesel fumes. Most are harmless, however, some can cause breathing problems and aggravate existing lung conditions.</p>
+                        
+            </li>
+            <li class="col col2">
+                <h4>2. Air pollution</h4> 
+                	        <ul>
+	            <li>Reinforce the importance of monitoring the local environment to determine levels of air pollution</li>
+	            <li>Consider reducing pollution from vehicle exhausts through measures such as congestion reduction and pedestrianisation.</li>
+	        </ul> 
+            </li>  
+        </ul>
+        
+
+	    <h3 class="no_margin">Case study: Fresh North East’s ‘Every Breath’ campaign</h3>
+		<p>Authority type: <b>12 North East PCOs</b><br />Political affiliation: <b>Varied</b></p>
+		<p><strong>The North East has the highest rates of COPD in England, with nearly 9,000 cases diagnosed in 2008–2009 and an estimated 32,000 more undiagnosed. Around one fifth of the area’s adult population smokes.</strong></p>
+		<p>Fresh – Smoke Free North East – was set up in 2005 as the UK’s first dedicated regional tobacco control office and programme. Funded by all 12 Primary Care Organisations (PCOs) in the North East and hosted by County Durham and Darlington NHS Trust, Fresh is dedicated to shifting the social norms around tobacco use and won a gold medal in the inaugural public health awards of the Chief Medical Officer in 2009.</p>
+		<p>Fresh’s 2011 Every Breath campaign targeted smokers with TV, cinema and radio adverts that raised awareness of the risk of developing COPD by highlighting personal stories from those caring for sufferers. Support from the British Lung Foundation and Sting, who hails from the area and gave permission for his song ‘every breath you take’ to be used in the campaign, contributed to its success.</p>
+		<p>Figures from the NHS Information Centre revealed the first phase of the campaign inspired a huge rise in the number of people quitting smoking with local NHS Stop Smoking Services. From October to December 2011 there was a 17 per cent increase in people setting quit dates through NHS Stop Smoking Services in the North East and a 21 per cent increase in people making it successfully to week four of their quit. As a result of its impact, the campaign was re-launched in 2012.</p>
+		<p>Ailsa Rutter, Director of Fresh, said: ‘The ‘Every Breath’ campaign has been a real wake-up call to many smokers. It was news to many people who thought that being short of breath was normal, when in many cases it is an early sign of COPD and it makes quitting even more urgent.’</p>
+		<p class="quote">‘The ‘Every Breath’ campaign has been a real wake-up call to many smokers. It was news to many people who thought that being short of breath was normal, when in many cases it is an early sign of COPD and it makes quitting even more urgent.’ <span class="author">– Ailsa Rutter, Director, Fresh</span></p>
+		<div class="foot_notes">
+			<p><sup>1</sup> National Clinical Guideline Centre. (2010) Chronic obstructive pulmonary disease: management of chronic obstructive pulmonary disease in adults in primary and secondary care. London: National Clinical Guideline Centre.</p>
+			<p><sup>2</sup> Devereux, G. ABC of chronic obstructive pulmonary disease. Definition, epidemiology and risk factors. BMJ 2006; 332: 1142-1144</p>
+		</div>
+	</div>
+</div>

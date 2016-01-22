@@ -1,0 +1,263 @@
+/* CSS Document */
+#maps_map {
+	background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+	width: 470px;
+	margin-left: 10px;
+	height: 600px;
+	float: left;
+	margin-bottom: 10px;
+}
+#maps_resize_width {
+    border-top: 1px solid #CCCCCC;
+    border-right: 1px solid #CCCCCC;
+    border-bottom: 1px solid #CCCCCC;
+	float: left;
+	height: 600px;
+	width: 5px;
+	background-color: #eee;
+    background-image: url(../images/map_width.png);
+    background-position: -7px 50%;
+    background-repeat: no-repeat;
+}
+#maps_resize_width:hover {
+	background-color: #CCC;
+}
+#maps_resize_width.fullWidth {
+    background-position: -1px 50%;
+}
+#maps_info {
+	margin-left: 10px;
+	margin-bottom: 10px;
+	width: 490px;
+	height: 350px;
+	float: left;
+	overflow: auto;
+}
+#maps_chart {
+	height: 242px;
+	width: 490px;
+	margin-left: 10px;
+    float: left;
+}
+
+.info {
+	padding: 2px;
+	font: 14px/16px Arial, Helvetica, sans-serif;
+	background: white;
+	background: rgba(255,255,255,0.8);
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	border-radius: 5px;
+}
+.info h4 {
+	margin: 0;
+	color: #777;
+	padding: 0;
+}
+#maps_info table {
+	width: 100%;
+	border: 1px solid #CCC;
+	padding: 0;
+	border-collapse: separate;
+}
+#maps_info table th {
+	font-weight: normal;
+	text-align: right;
+	padding-right: 10px;
+	background-color: #EEEEEE;
+	cursor: pointer;
+}
+#map_table tr th:first-child { 
+	text-align: left;
+	padding-left: 10px;
+}
+#map_colour_box {
+	border: 1px solid #CCC;
+	background-color: #EEE;
+	padding: 5px 10px;
+	margin-bottom: 10px;
+}
+#maps_info table td {
+	font-weight: normal;
+	color: #999999;
+	padding-right: 10px;
+}
+#map_table_body tr.selected {
+	background-color: aliceblue;
+	font-weight: bold;
+	font-style: italic;
+	cursor: pointer;
+}
+#map_table_body tr.selected td {
+	border: 1px solid gainsboro;
+}
+#map_table_body tr.hover {
+	background-color: lavender;
+	cursor: pointer;
+}
+#map_table_body tr td {
+	text-align: right;
+}
+#map_table_body tr td:first-child {
+	padding-left: 5px;
+	border-left-width: 5px;
+	border-left-style: solid;
+	text-align: left;
+}
+#map_table_body tr.hover td:first-child  {
+	border-left-style: solid;
+}
+
+table.customKeyTable {
+
+}
+table.customKeyTable td {
+	width: 90px;
+	text-align: center;
+	padding: 2px;
+}
+
+td.continual_range
+{
+	width: 200px !important;
+	background: url("continuous_range.png") repeat-y scroll center center;
+}
+td.whiteText {
+	color: #FFFFFF;
+}
+
+
+/* Export map to PDF */
+.my-pdf-control {
+	background-image: url(PDF2.png);
+   /* width: 26px;*/
+    height: 26px;
+    background-position: 3px 50%;
+    background-repeat: no-repeat;
+    display: block;
+    padding: 3px 3px 3px 32px;
+    border-radius: 4px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
+    cursor: auto;
+    text-align: center;
+    background-color: #FFFFFF;
+}
+
+div#createTrendPDF {
+	float: left;
+	width: auto;
+	padding: 3px 10px;
+	background-color: rgb(0,174,158);
+	color: #fff;
+	margin: 10px;
+}
+div#createTrendPDF:hover {
+	background-color: rgb(152,0,46);
+}
+
+#PDFPreview {
+	border: 2px solid #EEE;
+	height: 600px;
+	width: 100%;
+}
+
+#ExportToPDFStatus {
+    font-size: 1.2em;
+    padding-top: 1px;
+    vertical-align: bottom;
+}
+/* Allow the PDF and the map layers buttons to both float on same line */
+.leaflet-right .leaflet-control {
+	clear: none;
+}
+.layerControl p {
+	margin-left: 5px;
+}
+.layerControl div.basemap {
+	margin: 3px 0;
+	padding-right: 3px;
+}
+.layerControl div.basemap:hover,
+.layerControl div.opacity:hover {
+	background-color: rgba(220,220,220,.7);
+}
+.layerControl div:hover span {
+	border: 1px solid #666;
+}
+.layerControl div.selected span {
+	border: 1px solid #66F;
+}
+.layerControl div span {
+	border: 1px solid #CCC;
+	width: 70px;
+	height: 30px;
+	background: url(../images/basemaps.jpg) no-repeat;
+	display: inline-block;
+	vertical-align: middle;
+}
+.layerControl div.basemap span{
+	margin: 0 5px;
+}
+.layerControl div.None span {
+	background: #FFF;
+}
+.layerControl div.Topographic span {
+	background-position: 0px 0px;
+}
+.layerControl div.Streets span {
+	background-position: -6px -113px;
+}
+.layerControl div.NationalGeographic span {
+	background-position: 0px -192px;
+}
+.layerControl div.Oceans span {
+	background-position: -6px -278px;
+}
+.layerControl div.Gray span {
+	background-position: -7 -383px;
+}
+.layerControl div.DarkGray span {
+	background-position: -13px -645px;
+}
+.layerControl div.Imagery span {
+	background-position: -50px -480px;
+}
+.layerControl div.ShadedRelief span {
+	background-position: -2px -538px;
+}
+.layerControl div#opacity {
+	margin-left: 5px;
+}
+.layerControl div.opacity {
+	display: inline-block;
+	width: 34px;
+	text-align: center;
+}
+.layerControl div.opacity span {
+	border: 1px solid #CCC;
+	display: inline-block;
+	width: 30px;
+	height: 25px;
+}
+.layerControl div.opacity:hover span,
+.layerControl div.opacity.selected span {
+	border-color: #666;
+}
+
+.layerControl div.opacity label {
+	font-size: .65em;
+}
+.layerControl div.opacity span {
+	background: url(../images/opacity.jpg) no-repeat;    
+}
+.layerControl input {
+	display: none;
+}
+
+.layerControl > label {
+    display: block;
+    height: 100%;
+    width: 100%;
+}

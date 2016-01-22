@@ -1,0 +1,36 @@
+﻿@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
+}
+@section headContent {
+    <script src="@(Model.JsPath)infobox-1.1.12.min.js"></script>
+    <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/PageBaseLongerLivesHome.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/Diabetes/PageDiabetesHome.js" type="text/javascript"></script>
+}
+
+<div id="content">
+    <div class="home_intro clearfix">
+        @CommonUtilities.GetContent("home-header", Model.ProfileId)
+    </div>
+
+    @Html.Partial("_SearchArea")
+    <div id="map">
+        <div class="map-overlays">
+            @Html.Partial("_AreaAndMapZoomSelector")
+
+            @Html.Partial("_MapHelp")
+
+            @Html.Partial("Diabetes/_DiabetesDataFilter")
+            
+            @Html.Partial("Diabetes/_MapLegend")
+            
+            @Html.Partial("_ViewSimliar")
+        </div>
+
+        <div class="map-canvas" id="gmap">
+            <noscript>Google maps requires JavaScript</noscript>
+        </div>
+    </div>
+</div>

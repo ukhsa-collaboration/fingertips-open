@@ -1,0 +1,43 @@
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.MainUI.Models
+@model MoveIndicatorsModel
+<div id="moveIndicators" style="display: none;">
+    @using (Html.BeginForm("ConfirmMoveIndicators", "ProfilesAndIndicators", FormMethod.Get, new { id = "MoveIndicatorForm" }))
+    {
+        <div>
+            @Html.Partial("_FromMenus", Model)
+
+            <h3>To:</h3>
+
+            @{ const string cssClasses = "create-indicator-dropdown dropdown-selected"; }
+             <p>
+                <label class="short-associated-detail-label">Profile:</label>
+                @Html.DropDownList("selectedProfileId", 
+                (IEnumerable<SelectListItem>)ViewBag.listOfProfiles,
+                     new { @Id = "selectedProfileId", @Name = "selectedProfileId", @class = cssClasses })
+            </p>
+
+            <p>
+                <label class="short-associated-detail-label">Domain:</label>
+                @Html.DropDownListFor(model => model.DomainName, Model.ListOfDomains,
+                    new { @Id = "selectedDomainId", @Name = "selectedDomainId", @class = cssClasses })
+            </p>
+
+            <p>
+                <label class="short-associated-detail-label">Area:</label>
+                @Html.DropDownListFor(model => model.AreaTypeId, CommonUtilities.GetListOfSupportedAreaTypes(PleaseSelectOption.NotRequired),
+                    new { @Id = "selectedAreaTypeId", @Name = "selectedAreaTypeId", @class = cssClasses })
+            </p>
+
+            @Html.Partial("_SexAndAgeMenus")
+
+        </div>
+        
+        <p>
+            <input class="auto-width-button" id="ConfirmMove" type="button" value="Move indicators" />
+        </p>
+        <p>
+            <input class="medium-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
+        </p>
+    }
+</div>

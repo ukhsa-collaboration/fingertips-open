@@ -1,0 +1,9 @@
+﻿@using Profiles.MainUI.Models
+@model PageModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+@section headContent {
+     @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForContentPages"))
+}
+@Html.Partial("_PhofBody", PhofBody.Faqs(Model.ProfileId))

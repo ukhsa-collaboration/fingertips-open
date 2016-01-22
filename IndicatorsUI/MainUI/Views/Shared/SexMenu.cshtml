@@ -1,0 +1,22 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
+@model PageModel
+@if (Model.ProfileId == ProfileIds.HealthInequalities) 
+{
+    <div class="fr" style="width: 30px; height: 25px;">
+    </div>
+    <div class="selectionBox fr">
+        <table cellspacing="0">
+            <tr>
+                <td>
+                    Sex:
+                </td>
+                <td id="sexSelection">
+                    <a id="sex1" href="javascript:sexClicked(1);" class="pageSelector">Male</a><a id="sex2"
+                        href="javascript:sexClicked(2);" class="pageSelector">Female</a> <a id="sex4" href="javascript:sexClicked(4);"
+                            class="pageSelector pageSelected">Persons</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+}

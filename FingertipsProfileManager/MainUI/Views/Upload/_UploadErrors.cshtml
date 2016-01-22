@@ -1,0 +1,12 @@
+﻿@model Fpm.Upload.BaseUpload
+<div id="show-datatype-errors" style="display: none;">
+    @Html.Partial("_ShowDataTypeErrors", Model)
+</div>
+
+<div id="show-duplicateData-errors" style="display: none;">
+    @Html.Partial("_ShowDuplicateDataErrors", Model.DuplicateRowInDatabaseErrors)
+</div>
+
+<div id="show-duplicateSpreadsheet-errors" style="display: none;">
+    @Html.Partial("_ShowDuplicateSpreadsheetErrors", Model.DuplicateRowInSpreadsheetErrors)
+</div>

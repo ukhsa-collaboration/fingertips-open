@@ -1,0 +1,612 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{64358A8F-D044-46CE-BDF2-1BFA5AC5B3D6}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Fpm.MainUI</RootNamespace>
+    <AssemblyName>Fpm.MainUI</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <MvcBuildViews>false</MvcBuildViews>
+    <UseIISExpress>true</UseIISExpress>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
+    <TargetFrameworkProfile />
+    <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime">
+      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="itextsharp">
+      <HintPath>..\lib\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.ComponentModel.DataAnnotations">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Optimization">
+      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Abstractions" />
+    <Reference Include="System.Web.Routing" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebGrease">
+      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppConfig.cs" />
+    <Compile Include="App_Start\AutoMapperConfig.cs" />
+    <Compile Include="App_Start\BundleConfig.cs" />
+    <Compile Include="App_Start\MainUIRegistry.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\LookupController.cs" />
+    <Compile Include="Controllers\DocumentsController.cs" />
+    <Compile Include="Controllers\LookUpTablesController.cs" />
+    <Compile Include="Controllers\ExceptionLogController.cs" />
+    <Compile Include="Helpers\AjaxOnlyAttribute.cs" />
+    <Compile Include="Helpers\ApplicationConfiguration.cs" />
+    <Compile Include="Helpers\AreaTypeSelectListBuilder.cs" />
+    <Compile Include="Helpers\CommonUtilities.cs" />
+    <Compile Include="Controllers\ContentController.cs" />
+    <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\ProfilesAndIndicatorsController.cs" />
+    <Compile Include="Controllers\IndicatorNewController.cs" />
+    <Compile Include="Controllers\AreasController.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\UploadController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Helpers\CurrentUser.cs" />
+    <Compile Include="Helpers\FileNameHelper.cs" />
+    <Compile Include="Helpers\IndicatorOwnerChanger.cs" />
+    <Compile Include="Helpers\UIHelper.cs" />
+    <Compile Include="Helpers\UploadHelper.cs" />
+    <Compile Include="Helpers\UserDetails.cs" />
+    <Compile Include="Helpers\ExceptionLogger.cs" />
+    <Compile Include="Helpers\IndicatorSpecifier.cs" />
+    <Compile Include="Helpers\IndicatorSpecifierParser.cs" />
+    <Compile Include="Helpers\IndicatorMetadataTextParser.cs" />
+    <Compile Include="Helpers\TimePeriodHelper.cs" />
+    <Compile Include="Helpers\PleaseSelectOption.cs" />
+    <Compile Include="Helpers\ProfileDetailsCleaner.cs" />
+    <Compile Include="Mappers\Mapper.cs" />
+    <Compile Include="Models\AreaGridModel.cs" />
+    <Compile Include="Models\AreaGridDetail.cs" />
+    <Compile Include="Models\AdminModel.cs" />
+    <Compile Include="Models\DocumentsGridModel.cs" />
+    <Compile Include="Models\DomainIndicatorsSearchResult.cs" />
+    <Compile Include="Models\ExceptionGridModel.cs" />
+    <Compile Include="Models\LookupModel.cs" />
+    <Compile Include="Models\ProfileCollectionGridModel.cs" />
+    <Compile Include="Helpers\Dynamic.cs" />
+    <Compile Include="Helpers\MyAuthorizeAttribute.cs" />
+    <Compile Include="Helpers\RouteValueDictionaryExtensions.cs" />
+    <Compile Include="Models\BaseDataModel.cs" />
+    <Compile Include="Models\ContentGridModel.cs" />
+    <Compile Include="Models\ProfileGridModel.cs" />
+    <Compile Include="Models\CopyIndicatorsModel.cs" />
+    <Compile Include="Models\MoveIndicatorsModel.cs" />
+    <Compile Include="Models\DeleteIndicatorsModel.cs" />
+    <Compile Include="Models\Error.cs" />
+    <Compile Include="Models\IndicatorEdit.cs" />
+    <Compile Include="Models\IndicatorGridModel.cs" />
+    <Compile Include="Models\ProfileIndex.cs" />
+    <Compile Include="Models\ProfileMembers.cs" />
+    <Compile Include="Models\TargetEditModel.cs" />
+    <Compile Include="Models\UserGridModel.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Routes\CoreRoutes.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\BrowseDataViewModel.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\CoreDataSetViewModel.cs" />
+    <Compile Include="ViewModels\ProfileAreaType.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\BrowseIndicatorDataFullPageViewModel.cs" />
+    <Compile Include="ViewModels\ProfileUser.cs" />
+    <Compile Include="ViewModels\ProfileViewModel.cs" />
+    <Compile Include="ViewModels\Upload\UploadIndexViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="css\bootstrap-theme.css" />
+    <Content Include="css\bootstrap-theme.min.css" />
+    <Content Include="css\bootstrap.css" />
+    <Content Include="css\bootstrap.min.css" />
+    <Content Include="css\asc.gif" />
+    <Content Include="css\bg.gif" />
+    <Content Include="css\desc.gif" />
+    <Content Include="css\fingertips.css" />
+    <Content Include="css\profile-manager.css" />
+    <Content Include="css\dashboard.css" />
+    <Content Include="css\ProfilesAndIndicators\BrowseIndicatorDataFullPage.css" />
+    <Content Include="css\site.css" />
+    <Content Include="css\TableSorter.css" />
+    <Content Include="fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Global.asax" />
+    <Content Include="images\ajax-loader.gif" />
+    <Content Include="images\BatchUpload.png" />
+    <Content Include="images\Info.png" />
+    <Content Include="images\navigate-next.png" />
+    <Content Include="images\navigate-previous.png" />
+    <Content Include="images\reorder.png" />
+    <Content Include="images\SimpleUpload.png" />
+    <Content Include="js\PageCoreData.js" />
+    <Content Include="js\document-manager.js" />
+    <Content Include="js\lookup-tables.js" />
+    <Content Include="js\PageAdmin.js" />
+    <Content Include="js\PageSearchResults.js" />
+    <Content Include="js\jquery-1.8.3.js" />
+    <Content Include="js\jquery-ui-1.9.2.js" />
+    <Content Include="js\chosen.jquery.min.js" />
+    <Content Include="js\common-functions.js" />
+    <Content Include="js\content-management.js" />
+    <Content Include="js\area-management.js" />
+    <Content Include="js\modernizr-2.6.2.min.js" />
+    <Content Include="js\PageProfilesAndIndicators.js" />
+    <Content Include="js\exception-log.js" />
+    <Content Include="js\profile-collection-management.js" />
+    <Content Include="js\jquery.watermark.min.js" />
+    <Content Include="js\user-management.js" />
+    <Content Include="js\profile-management.js" />
+    <Content Include="js\jquery.tablesorter.js" />
+    <Content Include="js\jquery.tablesorter.widgets.js" />
+    <Content Include="js\tiny_mce\jquery.tinymce.min.js" />
+    <Content Include="js\tiny_mce\license.txt" />
+    <Content Include="js\tiny_mce\plugins\advlist\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\anchor\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\autolink\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\autoresize\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\autosave\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\bbcode\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\charmap\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\code\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\compat3x\editable_selects.js" />
+    <Content Include="js\tiny_mce\plugins\compat3x\form_utils.js" />
+    <Content Include="js\tiny_mce\plugins\compat3x\mctabs.js" />
+    <Content Include="js\tiny_mce\plugins\compat3x\tiny_mce_popup.js" />
+    <Content Include="js\tiny_mce\plugins\compat3x\validate.js" />
+    <Content Include="js\tiny_mce\plugins\contextmenu\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\directionality\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-cool.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-cry.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-embarassed.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-foot-in-mouth.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-frown.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-innocent.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-kiss.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-laughing.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-money-mouth.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-sealed.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-smile.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-surprised.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-tongue-out.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-undecided.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-wink.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\img\smiley-yell.gif" />
+    <Content Include="js\tiny_mce\plugins\emoticons\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\example\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\example_dependency\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\fullpage\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\fullscreen\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\hr\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\image\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\insertdatetime\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\layer\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\legacyoutput\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\link\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\lists\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\media\moxieplayer.swf" />
+    <Content Include="js\tiny_mce\plugins\media\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\nonbreaking\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\noneditable\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\pagebreak\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\paste\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\preview\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\print\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\save\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\searchreplace\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\spellchecker\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\tabfocus\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\table\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\template\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\textcolor\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\visualblocks\css\visualblocks.css" />
+    <Content Include="js\tiny_mce\plugins\visualblocks\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\visualchars\plugin.min.js" />
+    <Content Include="js\tiny_mce\plugins\wordcount\plugin.min.js" />
+    <Content Include="js\tiny_mce\skins\lightgray\content.inline.min.css" />
+    <Content Include="js\tiny_mce\skins\lightgray\content.min.css" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon-small.svg" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.svg" />
+    <Content Include="js\tiny_mce\skins\lightgray\img\anchor.gif" />
+    <Content Include="js\tiny_mce\skins\lightgray\img\loader.gif" />
+    <Content Include="js\tiny_mce\skins\lightgray\img\object.gif" />
+    <Content Include="js\tiny_mce\skins\lightgray\img\trans.gif" />
+    <Content Include="js\tiny_mce\skins\lightgray\img\wline.gif" />
+    <Content Include="js\tiny_mce\skins\lightgray\skin.ie7.min.css" />
+    <Content Include="js\tiny_mce\skins\lightgray\skin.min.css" />
+    <Content Include="js\tiny_mce\themes\modern\theme.min.js" />
+    <Content Include="js\tiny_mce\tinymce.min.js" />
+    <Content Include="js\upload-manager.js" />
+    <Content Include="js\PageIndicatorEdit.js" />
+    <Content Include="js\jquery.unobtrusive-ajax.js" />
+    <Content Include="js\jquery.unobtrusive-ajax.min.js" />
+    <Content Include="js\jquery.validate.js" />
+    <Content Include="js\jquery.validate.min.js" />
+    <Content Include="js\jquery.validate.unobtrusive.min.js" />
+    <Content Include="js\included-on-all-pages.js" />
+    <Content Include="js\underscore-min.js" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="css\bootstrap-theme.css.map" />
+    <Content Include="css\bootstrap.css.map" />
+    <Content Include="js\bootstrap.js" />
+    <Content Include="js\bootstrap.min.js" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\IndicatorNew\IndicatorNew.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\ProfilesAndIndicators.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_CopySelectedIndicators.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_IndicatorAudit.cshtml" />
+    <Content Include="Views\Content\ContentIndex.cshtml" />
+    <Content Include="js\tiny_mce\langs\readme.md" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon-small.eot" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon-small.ttf" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon-small.woff" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.eot" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.ttf" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.woff" />
+    <Content Include="js\tiny_mce\skins\lightgray\fonts\readme.md" />
+    <Content Include="Views\Content\CreateContent.cshtml" />
+    <Content Include="Views\Content\_ContentAudit.cshtml" />
+    <Content Include="Views\Profile\ManageProfiles.cshtml" />
+    <Content Include="Views\Profile\CreateProfile.cshtml" />
+    <Content Include="Views\Profile\EditProfile.cshtml" />
+    <Content Include="Views\Search\SearchAll.cshtml" />
+    <Content Include="Views\Profile\ManageProfileCollections.cshtml" />
+    <Content Include="Views\Profile\EditProfileCollection.cshtml" />
+    <Content Include="Views\Profile\CreateProfileCollection.cshtml" />
+    <Content Include="Views\ExceptionLog\Index.cshtml" />
+    <Content Include="Views\ExceptionLog\_ExceptionDetail.cshtml" />
+    <Content Include="Views\Areas\ManageAreas.cshtml" />
+    <Content Include="Views\Areas\_AreaDetail.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_MoveSelectedIndicators.cshtml" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Web.Debug.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Web.Release.config">
+      <DependentUpon>Web.config</DependentUpon>
+    </Content>
+    <Content Include="Views\Web.config">
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Views\Profile\IndicatorEdit.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_ReorderIndicators.cshtml" />
+    <Content Include="Views\Shared\_LayoutPage.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_DeleteSelectedIndicators.cshtml" />
+    <Content Include="Views\Upload\Index.cshtml" />
+    <Content Include="Views\Upload\SpreadsheetBatchSummary.cshtml" />
+    <Content Include="Views\Upload\_ShowDataTypeErrors.cshtml" />
+    <Content Include="Views\Upload\_ShowDuplicateDataErrors.cshtml" />
+    <Content Include="Views\Upload\_ShowDuplicateSpreadsheetErrors.cshtml" />
+    <Content Include="Views\Upload\SpreadsheetSimpleSummary.cshtml" />
+    <Content Include="Views\Upload\_UploadBatchHelp.cshtml" />
+    <Content Include="Views\Upload\_UploadSimpleHelp.cshtml" />
+    <Content Include="Views\Upload\InsertSummary.cshtml" />
+    <Content Include="Views\Content\EditContent.cshtml" />
+    <Content Include="Views\Shared\_EditMetaDataText.cshtml" />
+    <Content Include="Views\User\UserIndex.cshtml" />
+    <Content Include="Views\User\EditUser.cshtml" />
+    <Content Include="Views\User\CreateUser.cshtml" />
+    <Content Include="Views\User\_UserAudit.cshtml" />
+    <Content Include="Views\Shared\_LightboxAndInfobox.cshtml" />
+    <Content Include="Views\Shared\_FAQ.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="js\css\" />
+    <Folder Include="Upload Templates\" />
+    <Folder Include="Uploads\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DIResolver\DIResolver.csproj">
+      <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
+      <Name>DIResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ProfileData\ProfileData.csproj">
+      <Project>{DB5CE84B-BE14-44BB-A83E-506FFDF58094}</Project>
+      <Name>ProfileData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Search\Search.csproj">
+      <Project>{dacfbced-dd56-4418-a17c-5542d36030f1}</Project>
+      <Name>Search</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Upload\Upload.csproj">
+      <Project>{a028ee38-7d6d-4014-b91d-f3cdb46613a0}</Project>
+      <Name>Upload</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_Banner.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_Footer.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\_FromMenus.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Upload\_UploadValidationSummary.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Upload\_UploadAndArchiveButton.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Upload\_UploadErrors.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\LookUpTablesIndex.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\LookUpList.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_LookupSidebar.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_TableHeader.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_Categories.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_Sexes.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_Ages.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_ValueNotes.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\_Targets.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\LookUpTables\TargetEdit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\Admin.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\_ProfileList.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Content\_ContentItemTable.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Documents\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\_DeleteIndicator.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\_ChangeIndicatorOwner.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Admin\_AdminSidebar.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\_SexAndAgeMenus.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\_ViewStart.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_UserPermissions.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_AreaTypes.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\CoreData\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\BrowseIndicatorData.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\_CoreData.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_LayoutPageB.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_BannerB.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\LookUpTablesIndexB.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_FooterB.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_Ages.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_Categories.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_LookupSidebar.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_Sexes.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_TableHeader.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_Targets.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\_ValueNotes.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\LookUpList.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\LookUpTablesIndex.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Lookup\TargetEdit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ProfilesAndIndicators\BrowseIndicatorDataFullPage.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\ExceptionLog\ExceptionDetails.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Upload\_DisallowedIndicators.cshtml" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target> -->
+  <Target Name="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
+    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(ProjectDir)" />
+  </Target>
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>59917</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:52501/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

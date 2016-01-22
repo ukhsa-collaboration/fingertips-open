@@ -1,0 +1,13 @@
+﻿@using Fpm.MainUI.Models;
+@model Error
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+<div class="standardWidth" style="position: relative; height: 300px;">
+    <div style="padding: 100px 0 200px 100px; float: left;">
+        <h2>
+            @(Model.Message)
+        </h2>
+    </div>
+</div>

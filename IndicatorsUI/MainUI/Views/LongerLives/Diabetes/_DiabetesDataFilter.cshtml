@@ -1,0 +1,24 @@
+﻿@using Profiles.DomainObjects
+<div class="map-overlay" id="map-overlay-filters">
+    <h5>Show data for:</h5>
+    <ul class="filters">
+        @{
+            var availableDomains = (IList<Domain>)ViewBag.AvailableDomains;
+            foreach (var domain in availableDomains)
+            {
+                var activeLink = domain.Number == 1 
+                    ? "active" 
+                    : string.Empty;
+
+                string tooltip = domain.Tooltip ?? string.Empty;
+                var groupId = domain.GroupId;
+                
+                <li id="domain-@groupId" class="@activeLink indicator-group" alt="@tooltip">
+                    <a href="javascript:selectDomain(@groupId)">@domain.SubHeading</a>
+                    @Html.Partial("_DomainTooltipIcon", tooltip)
+                </li>
+                <ul id="diabetes_list-@groupId" class="causes filters"></ul>
+            }
+        }
+    </ul>
+</div>

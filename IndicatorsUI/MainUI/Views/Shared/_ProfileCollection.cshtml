@@ -1,0 +1,64 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@model ProfileCollection
+
+@if (Model.IsNationalProfilesCollection == false)
+{
+    <h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
+}
+
+<table class="home-profiles">
+    <tbody>
+        @{
+            int itemCount = Model.ProfileCollectionItems.Count();
+            int columnCount = itemCount == 4
+                ? 2 // 2 x 2
+                : 3;
+            int columnWidth = 100 / columnCount;
+            var rowAssigner = new RowAssigner(columnCount);
+        }
+
+        @foreach (var profileCollectionItem in Model.ProfileCollectionItems)
+        {
+            if (rowAssigner.IsItemFirstOfRow)
+            {
+                @Html.Raw("<tr>")
+            }
+
+        <td style="width:@(columnWidth)%;">
+            @Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)
+
+            @CommonUtilities.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
+
+            @if (profileCollectionItem.DisplayDomains)
+            {
+                <ul>
+                    @foreach (var domain in profileCollectionItem.ProfileDetails.Domains)
+                    {
+                        <li class="domain-heading-link">
+                            @if (profileCollectionItem.ProfileDetails.HasExclusiveSkin)
+                            {
+                                <a href="@profileCollectionItem.ExternalUrl/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
+                            }
+                            else if (Model.IsCollectionFrontPage)
+                            {
+                                <a href="/profile-group/@Model.UrlKey/profile/@profileCollectionItem.ProfileDetails.ProfileUrlKey/data#gid/@domain.GroupId">@domain.SubHeading</a>
+                            }
+                            else
+                            {
+                                <a href="/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </td>
+            if (rowAssigner.IsItemLastOfRow)
+            {
+                @Html.Raw("</tr>")
+            }
+
+            rowAssigner.ItemAdded();
+        }
+        </tbody>
+    </table>

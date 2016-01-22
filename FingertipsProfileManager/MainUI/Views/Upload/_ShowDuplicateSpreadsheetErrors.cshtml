@@ -1,0 +1,11 @@
+﻿@model List<Fpm.Upload.DuplicateRowInSpreadsheetError>
+<b>The following rows occur more than once in the spreadsheet:-</b>
+<div id="dataTypeErrors">
+    @foreach (var indicator in Model)
+    {
+        <div>Row: @indicator.RowNumber / @indicator.DuplicateRowMessage</div>
+    }
+</div>
+<p>
+    <input class="small-button" type="button" onclick="lightbox.hide()" value="Close" />
+</p>

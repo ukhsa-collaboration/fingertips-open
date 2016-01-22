@@ -1,0 +1,5 @@
+﻿@model Profiles.MainUI.Models.PageModel
+@if (Model.IsOfficialStatistics && ViewBag.ShowUpdateDelayedMessage)
+{
+    <div><h1 id="update-delayed">Today's update has been delayed for technical reasons. We hope to publish it shortly.</h1></div>
+}

@@ -1,0 +1,421 @@
+﻿@using Fpm.MainUI
+@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
+@model Fpm.MainUI.Models.IndicatorEdit
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Edit Indicator";
+    var doesUserHaveWritePermission = Model.DoesUserHaveWritePermission();
+    var doesProfileOwnIndicator = Model.DoesProfileOwnIndicator();
+    var ownerProfileName = CommonUtilities.GetProfile(Model.IndicatorMetadata.OwnerProfileId).Name;
+}
+<script src="@(AppConfig.JsPath)chosen.jquery.min.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)PageIndicatorEdit.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)tiny_mce/tinymce.min.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)tiny_mce/jquery.tinymce.min.js" type="text/javascript"></script>
+<link href="@(AppConfig.CssPath)chosen/chosen.min.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+@{ Html.BeginForm("IndicatorEditSave", "Profile", FormMethod.Post, new { id = "IndicatorEditForm" }); }
+@Html.Hidden("userMTVChanges")
+@Html.Hidden("userOtherChanges")
+@Html.HiddenFor(x => x.ReturnUrl)
+@Html.HiddenFor(x => x.Profile.GetSelectedGroupingMetadata(Model.Profile.SelectedDomain).GroupName, new { @Id = "domainName", @Name = "domainName" })
+@Html.HiddenFor(x => x.TextValues[0].ValueGeneric, new { @Id = "indicatorName", @Name = "indicatorName" })
+@Html.HiddenFor(x => x.Grouping.Sequence, new { @Id = "indicatorSequence", @Name = "indicatorSequence" })
+@Html.HiddenFor(x => x.Grouping.AgeId, new { @Name = "currentAgeId" })
+@Html.HiddenFor(x => x.Grouping.SexId, new { @Name = "currentSexId" })
+@Html.HiddenFor(x => x.Grouping.AreaTypeId, new { @Name = "currentAreaTypeId" })
+@Html.Hidden("isReadOnly", CommonUtilities.IsReadOnlyMode())
+@Html.Hidden("doesProfileOwnIndicator", doesProfileOwnIndicator)
+@Html.Hidden("doesUserHaveWritePermission", doesUserHaveWritePermission)
+@Html.Hidden("indicatorId", Model.SelectedIndicatorId)
+
+<div class="standardWidth clearfix">
+    <div class="clearfix" style="width: 100%; float: left; clear: both;">
+        @if (Model.DoesIndicatorDataExist())
+        {
+            Model.AreAnySpecificTextValues();
+            if (Model.Profile != null)
+            {
+                var displayMode = CommonUtilities.IsReadOnlyMode() ? "none" : "block";
+                <div id="button-box" class="filtering clearfix">
+                    <input id="Back" class="medium-button" type="button" value="Cancel" style="margin-left:10px;" onclick="location.href='@Model.ReturnUrl'" />
+                    <input id="save" class="medium-button" type="button" value="Save" style="display: @displayMode" />
+
+                    <span class="info-tooltip right" style="float:right;margin-right:10px;">
+                        <i>
+                            This will create a new indicator by copying the metadata and other details below. This is a quick way to create a new indicator where
+                            much of these details are the same.<br><br>
+                            If instead you simply want include this indicator in your profile then you can copy it on the previous page.
+                        </i>
+                    </span>
+                    <input id="saveAs" class="auto-width-button" type="button" style="float:right;" value="Create new indicator by copying this metadata" />
+                </div>
+
+                <table class="info-table">
+                    <tr>
+                        <td class="left">Profile:</td>
+                        <td class="right">@Model.Profile.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Domain:</td>
+                        <td class="right">@Model.Profile.GetSelectedGroupingMetadata(Model.Profile.SelectedDomain).GroupName</td>
+                    </tr>
+                    <tr>
+                        <td class="left">Indicator:</td>
+                        <td class="right">@Model.IndicatorMetadata.IndicatorId - @Model.TextValues[0].ValueGeneric</td>
+                    </tr>
+                </table>
+            }
+            else
+            {
+                <div class="profile-title">
+                    Generic Metadata
+                </div>
+            }
+        }
+    </div>
+    @if (doesUserHaveWritePermission == false)
+    {
+        <p class="warning">You do not have permission to edit indicators for "@Model.Profile.Name"</p>
+    }
+    <div id="tabs">
+        <ul>
+            <li id="tab1" class="section-tab">
+                <a class="sub-title-error" href="#tabs-1">
+                    Step 1 -
+                    Indicator Metadata Text
+                </a>
+            </li>
+            <li id="tab2" class="section-tab sub-title-error">
+                <a href="#tabs-2">
+                    Step 2 - Indicator
+                    Metadata Other
+                </a>
+            </li>
+            <li id="tab3" class="section-tab sub-title-error">
+                <a href="#tabs-3">
+                    Step 3 - Profile
+                    Data Selection
+                </a>
+            </li>
+        </ul>
+        <div id="tabs-1">
+            <div style="width: 100%; float: left; clear: both;">
+                @if (doesUserHaveWritePermission && doesProfileOwnIndicator == false)
+                {
+                    <p class="warning">
+                        This indicator is owned by another profile (@ownerProfileName), to use
+                        alternative text click 'Override' on the right
+                    </p>
+                }
+                @if (Model.DoesIndicatorDataExist())
+                {
+                    var areAnyOverriddenProperties = Model.AreAnySpecificTextValues();
+
+                    <table id="text-properties" class="text-properties">
+                        <tr>
+                            <td></td>
+                            <td style="vertical-align: middle;">
+                                <a id="show-empty" href="javascript:toggleShowEmpty();"></a>
+                            </td>
+                            <td style="vertical-align: text-bottom; text-align: center">
+                                @{var tooltip = doesUserHaveWritePermission
+                                      ? "Click 'Override' to replace existing metadata that cannot be edited directly, to revert back to the original text just delete the new text"
+                                      : "Fields are marked 'Overridden' where the original metadata has been replaced with alternative text";}
+                                <span class="info-tooltip right"><i>@tooltip</i></span>
+                            </td>
+                        </tr>
+
+                        @foreach (IndicatorText text in Model.TextValues)
+                        {
+                            var isOverridden = text.HasSpecificValue();
+                            var isHtmlAllowed = text.IndicatorMetadataTextProperty.IsHtml;
+                            var propertyId = text.IndicatorMetadataTextProperty.PropertyId;
+
+                            <tr class="indicator-text-editor">
+                                <td class="property-heading">
+                                    @* standardise across group/profile *@
+                                    @text.IndicatorMetadataTextProperty.DisplayName
+                                </td>
+                                <td>
+                                    <textarea id="v@(propertyId)" onfocus="textEnter(this)" onblur="textOut(this)" onkeydown="textKeyDown(this)" class="mtvArea indicator-text @(isHtmlAllowed ? "html-allowed" : "") @(isOverridden ? "overridden" : "")">@(isOverridden ? text.ValueSpecific : text.ValueGeneric)</textarea>
+                                </td>
+                                <td class="property-attributes">
+                                    @{ bool showOverridden = areAnyOverriddenProperties && isOverridden; }
+                                    @if (showOverridden)
+                                    {
+                                        <span id="override-v@(propertyId)" class="overridden-label" title="The original metadata has been overridden" onclick="clearOverride(this)"><strong>Clear Override</strong></span>
+                                    }
+                                    else if (doesUserHaveWritePermission)
+                                    {
+                                        if (!doesProfileOwnIndicator)
+                                        {
+                                            <a id="override@(propertyId)" title="Override this metadata"
+                                               href="javascript:override(@(propertyId))">
+                                                Override
+                                            </a>
+                                        }
+                                    }
+
+                                    @if (text.IndicatorMetadataTextProperty.IsSearchable)
+                                    {
+                                        <span title="This text is used for a Fingertips indicator search">Searchable</span>
+                                    }
+                                    @if (text.IndicatorMetadataTextProperty.IsHtml)
+                                    {
+                                        <span title="This property can be displayed as either HTML or plain text">HTML</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                }
+                else
+                {
+                    <div class="indicator-not-exist">
+                        Indicator does not exist
+                    </div>
+                }
+            </div>
+        </div>
+        <div id="tabs-2">
+            <div>
+                @if (doesUserHaveWritePermission && doesProfileOwnIndicator == false)
+                {
+                    <p class="warning">This metadata can only be changed in the profile (@ownerProfileName) that owns this indicator</p>
+                }
+                <label class="associated-detail-label">
+                    Value Type
+                </label>
+
+                @Html.DropDownListFor(x => x.IndicatorMetadata.ValueTypeId, (SelectList) ViewBag.ValueTypeId, 
+                new { @Name = "valueTypeId", @Id = "valueTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    CI Method
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.CIMethodId, (SelectList) ViewBag.CIMethodId,
+                new { @Name = "CIMethodID", @Id = "CIMethodID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    CI Confidence Level
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.ConfidenceLevel, CommonUtilities.GetListOfCiConfidenceLevels(),
+                new { @Name = "CIComparatorConfidence", @Id = "CIComparatorConfidence", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Unit
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.UnitId, (SelectList) ViewBag.UnitId,
+                new { @Name = "UnitId", @Id = "UnitId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Denominator
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.DenominatorTypeId, (SelectList) ViewBag.DenominatorTypeId,
+                new { @Name = "DenominatorTypeID", @Id = "DenominatorTypeID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Year Type
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.YearTypeId, (SelectList) ViewBag.YearTypeId,
+                new { @Name = "YearTypeId", @Id = "YearTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Decimal places to display
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.DecimalPlacesDisplayed, CommonUtilities.GetListOfDecimalPlaces(),
+                    new { @Name = "DecimalPlaces", @Id = "DecimalPlaces", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Target
+                </label>
+                @Html.DropDownListFor(x => x.IndicatorMetadata.TargetId, CommonUtilities.GetListOfTargets(),
+                    new { @Name = "TargetId", @Id = "TargetId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+        </div>
+        <div id="tabs-3">
+            <div style="display: none;">
+                <label class="associated-detail-label">
+                    Profile
+                </label>
+                @Html.DropDownListFor(x => x.urlKey, (IEnumerable<SelectListItem>)ViewBag.ListOfProfiles, new { @Name = "selectedProfile", @Id = "selectedProfile", @class = "create-indicator-dropdown dropdown-selected", @disabled = "disabled" })
+            </div>
+            <div style="display: none;">
+                <label class="associated-detail-label">
+                    Domain
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.Sequence, (IEnumerable<SelectListItem>)ViewBag.listOfDomains, new { @Name = "selectedDomain", @Id = "selectedDomain", @class = "create-indicator-dropdown dropdown-selected", @disabled = "disabled" })
+            </div>
+            <div class="separator" style="display: none;">
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Area Type
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.AreaTypeId,
+                    CommonUtilities.GetListOfSupportedAreaTypes(PleaseSelectOption.NotRequired),
+                    new { @Name = "AreaTypeId", @Id = "AreaTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Sex
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.SexId, (SelectList) ViewBag.SexId,
+                new { @Name = "SexId", @Id = "SexId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Age Range
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.AgeId,  (SelectList) ViewBag.AgeId, new { @Name = "AgeId", @Id = "AgeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Comparator
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.ComparatorId, CommonUtilities.GetListOfComparators(Model.Grouping.ComparatorId),
+                new { @Name = "ComparatorId", @Id = "ComparatorId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Comparator Methods
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.ComparatorMethodId, CommonUtilities.GetListOfComparatorMethods(PleaseSelectOption.NotRequired),
+                    new { @Name = "ComparatorMethodId", @Id = "ComparatorMethodId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div id="comparatorConfidenceDiv">
+                <label class="associated-detail-label">
+                    Comparator Confidence
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.ComparatorConfidence, CommonUtilities.GetListOfComparatorConfidences(),
+                    new { @Name = "ComparatorConfidence", @Id = "ComparatorConfidence", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Year Range
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.YearRange, CommonUtilities.GetListOfYearRanges(PleaseSelectOption.NotRequired),
+                    new { @Name = "YearRange", @Id = "YearRange", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Time Series
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.TimeSeries, CommonUtilities.GetFrequencies(PleaseSelectOption.NotRequired),
+                    new { @Name = "selectedFrequency", @Id = "selectedFrequency", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    Polarity
+                </label>
+                @Html.DropDownListFor(x => x.Grouping.PolarityId, CommonUtilities.GetListOfPolarityTypes(PleaseSelectOption.NotRequired),
+                new { @Name = "PolarityId", @Id = "PolarityId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+            </div>
+            <div id="annual-range-selection" style="display: block;">
+                <div>
+                    <label class="associated-detail-label">
+                        Start Year
+                    </label>
+                    @Html.TextBoxFor(x => x.Grouping.BaselineYear, new { @Name = "BaselineYear", @Id = "BaselineYear", @class = "year-Range create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+                <div>
+                    <label class="associated-detail-label">
+                        End Year
+                    </label>
+                    @Html.TextBoxFor(x => x.Grouping.DataPointYear, new { @Name = "DatapointYear", @Id = "DatapointYear", @class = "year-Range create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+            </div>
+
+            @{
+                var quarters = CommonUtilities.GetQuarters(Model.IndicatorMetadata.YearTypeId, Model.Grouping.YearRange).ToList();
+            }
+            <div id="quarterly-range-selection" style="display: block;">
+                <div>
+                    <label class="associated-detail-label">
+                        Start Quarter
+                    </label>
+                    @Html.DropDownListFor(x => x.Grouping.BaselineQuarter, quarters, new { @Name = "startQuarterRange", @Id = "startQuarterRange", @class = "create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+                <div>
+                    <label class="associated-detail-label">
+                        End Quarter
+                    </label>
+                    @Html.DropDownListFor(x => x.Grouping.DataPointQuarter, quarters, new { @Name = "endQuarterRange", @Id = "endQuarterRange", @class = "create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+            </div>
+            <div id="monthly-range-selection" style="display: block;">
+                <div>
+                    <label class="associated-detail-label">
+                        Start Month
+                    </label>
+                    @Html.DropDownListFor(x => x.Grouping.BaselineMonth, CommonUtilities.GetMonths(), new { @Name = "startMonthRange", @Id = "startMonthRange", @class = "create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+                <div>
+                    <label class="associated-detail-label">
+                        End Month
+                    </label>
+                    @Html.DropDownListFor(x => x.Grouping.DataPointMonth, CommonUtilities.GetMonths(), new { @Name = "endMonthRange", @Id = "endMonthRange", @class = "create-indicator-dropdown dropdown-selected", @Style = "Width: 100px;" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_EditMetaDataText")
+
+@{ Html.EndForm(); }
+
+<div class="modal"><!-- Place at bottom of page --></div>
+
+<div id="confirmNewFromOld" style="display: none;">
+    <h3>
+        Copy metadata to create new indicator in:
+    </h3>
+    <div>
+        <p>
+            <label class="short-associated-detail-label">Profile</label>
+            @Html.DropDownList("selectedProfileId", (IEnumerable<SelectListItem>)ViewBag.ListOfProfiles, "Please select...", new { @class = "save-as-indicator-dropdown" })
+        </p>
+
+        <p>
+            <label class="short-associated-detail-label">Domain</label>
+            @Html.DropDownList("selectedDomainId", (IEnumerable<SelectListItem>)ViewBag.listOfDomains, "Please select...", new { @class = "save-as-indicator-dropdown" })
+        </p>
+    </div>
+
+    <p>
+        <input class="medium-button" id="confirmOldFromNew" type="button" onclick="lightbox.hide()" value="Confirm" />
+    </p>
+    <p>
+        <input class="medium-button" onclick="lightbox.hide()" value="Cancel" />
+    </p>
+</div>
+
+<div id="newFromOldSuccess" style="display: none;">
+    @{ Html.BeginForm("RedirectToNew", "Profile", FormMethod.Post, new { id = "RedirectToNewForm" }); }
+    @Html.Hidden("redirectUrl")
+    @Html.Hidden("areaType")
+    <div class="profile-title domain return-url" id="archived-indicators">
+        New Indicator <label id="newIndicatorId"></label> Successfully Created
+        <p><input id="confirmSaveAs" class="medium-button" type="submit" value="OK" /></p>
+    </div>
+    @{ Html.EndForm(); }
+</div>
+
+

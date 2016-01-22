@@ -1,0 +1,28 @@
+﻿@model Profiles.DomainObjects.ProfileCollectionItem
+@{
+    var details = Model.ProfileDetails;
+    var fingertipsUrl = ViewBag.FingertipsUrl;
+}
+
+@if (details.HasExclusiveSkin)
+{
+    <a class="title" href="@(ViewBag.Protocol)@Model.ExternalUrl">@details.Title</a>
+}
+else if (Model.IsBeingDisplayedOnCollectionFrontPage)
+{
+    // When displayed on profile collection's own front page
+    <a class="title" href="@(fingertipsUrl)/profile-group/@Model.ParentCollection.UrlKey/profile/@details.ProfileUrlKey">@details.Title</a>
+}
+else if (details.HasOwnFrontPage)
+{
+    <a class="title" href="@(fingertipsUrl)/profile/@details.ProfileUrlKey">@details.Title</a>
+}
+else if (details.LeadProfileForCollectionId.HasValue)
+{
+    // When displayed on front page of site
+    <a class="title" href="@(fingertipsUrl)/profile-group/@details.ProfileUrlKey">@details.Title</a>
+}
+else
+{
+    <a class="title" href="@(fingertipsUrl)/@details.ProfileUrlKey">@details.Title</a>
+}

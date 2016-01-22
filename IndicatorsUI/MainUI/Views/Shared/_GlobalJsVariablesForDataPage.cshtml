@@ -1,0 +1,17 @@
+﻿@using Profiles.MainUI.Models
+<script type="text/javascript">//<![CDATA[
+FT.url = {
+        img: '@ViewBag.ImagesUrl',
+        bridge: '@Model.BridgeServicesUrl',
+        corews: '@Model.CoreServicesUrl',
+        search: '@(Url.Content("~/search/"))',
+        pdf: '@ViewBag.PdfUrl'
+};
+profileUrlKey = '@Model.ProfileUrlKey';
+FT.model.profileId = @Model.ProfileId;
+useJsonp = @JsHelper.GetJsBool(ViewBag.UseJsonp);
+arePdfs = @JsHelper.GetJsBool(Model.ArePdfs);
+startZeroYAxis = @JsHelper.GetJsBool(Model.StartZeroYAxis);
+indicatorIds = @Html.Raw(ViewData.ContainsKey("indicatorIds") ? ("'" + ViewData["indicatorIds"] + "'") : "null");
+FT.features = @ViewBag.FeatureSwitch;
+//]]</script>

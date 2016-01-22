@@ -1,0 +1,46 @@
+﻿@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml"; 
+}
+@section headContent {
+    @Html.Partial("_TwitterStyle")
+    <script type="text/javascript">//<![CDATA[
+        Twitter_Handle = '@(Model.GetTwitterHandle())';
+        //]]</script>
+}
+
+@Html.Partial("_BasicBreadcrumb", "Connect")
+
+<div id="content" class="connect_content clearfix">
+    @Html.Partial("_TwitterFeed")
+    <div id="main_content">
+        <h1>Connect</h1>
+        <div class="hr">
+            <hr />
+        </div>
+        <p class="intro">Longer Lives is just beginning, and you have an opportunity to help shape its future.
+        </p>
+        <div class="hr hr_thin">
+            <hr />
+        </div>
+        <p class="bold">Please use the comment section below to share your feedback on this beta version of the Longer Lives website and data, 
+            and ways it can be developed to better support your needs, in line with the government’s digital service standards.</p>
+        <div id="disqus_thread">
+        </div>
+        <script type="text/javascript">
+            var disqus_shortname = 'longerlivesphe';
+
+             @* DON'T EDIT BELOW THIS LINE *@
+            (function () {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>
+            Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments
+                                                     powered by Disqus.</a>
+        </noscript>
+    </div>
+</div>
+

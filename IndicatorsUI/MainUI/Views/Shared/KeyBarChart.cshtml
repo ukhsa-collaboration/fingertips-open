@@ -1,0 +1,104 @@
+﻿@using Profiles.MainUI.Models
+@model Profiles.MainUI.Models.PageModel
+<div class="keyContainer clearfix" id="key-bar-chart" style="display: none;">
+    <table class="keyTable" cellspacing="0">
+        <tr>
+            <td class="keyText"></td>
+            @if (Model.DisplayRagKey)
+            {
+                <td class="keySpacer"></td>
+                <td class="keyBar">
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)better.png" />
+                </td>
+                <td>
+                    Better
+                </td>
+                <td class='keyBar'>
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)same.png" />
+                </td>
+                <td>
+                    Similar
+                </td>
+                <td class='keyBar'>
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)red.png" />
+                </td>
+                <td>
+                    Worse
+                </td>
+            }
+            @if (Model.DisplayBlueKey)
+            {
+                <td class="keySpacer"></td>
+                <td class="keyBar">
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)bobLower.png" />
+                </td>
+                <td>
+                    Lower
+                </td>
+                <td class='keyBar'>
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)same.png" />
+                </td>
+                <td>
+                    Similar
+                </td>
+                <td class='keyBar'>
+                    <img class="bar keyBar" src="@(ViewBag.ImagesUrl)bobHigher.png" />
+                </td>
+                <td>
+                    Higher
+                </td>
+            }
+            <td class="keySpacer"></td>
+            <td class='keyBar'>
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)lightGrey.png" />
+            </td>
+            <td>
+                Not compared
+            </td>
+        </tr>
+
+        <tr>
+            <td></td>
+            @*Show quintile legend*@
+            <td class="keySpacer"></td>
+            <td class='keyBar quintileKey' colspan="7" style="display: none;">
+                Low
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile1.png" alt="" />&nbsp;
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile2.png" alt="" />&nbsp;
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile3.png" alt="" />&nbsp;
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile4.png" alt="" />&nbsp;
+                <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile5.png" alt="" />&nbsp;
+                High
+            </td>
+        </tr>
+
+    </table>
+    
+    @if (Model.HasTrendMarkers)
+    {
+        <div class="trendLegends" id="trend-marker-legend-barchart" >
+            <table class="keyTable" cellspacing="0">
+            <tr>
+                <td ><img src="~/images/trends/no_calc.png" /></td>
+                <td class="legendText">Could not be calculated</td>
+            
+                <td ><img src="~/images/trends/up_red.png" /></td>
+                <td class="legendText">Increasing and worse</td>
+            
+                <td ><img src="~/images/trends/up_green.png" /></td>
+                <td class="legendText">Increasing and better</td>
+            
+                <td ><img src="~/images/trends/down_red.png" /></td>
+                <td class="legendText">Decreasing and worse</td>
+
+                <td ><img src="~/images/trends/down_green.png" /></td>
+                <td class="legendText">Decreasing and better</td>
+
+                <td ><img src="~/images/trends/no_change.png" /></td>
+                <td class="legendText">No signficant change</td>
+            </tr>
+        </table>
+        </div>
+    }
+
+</div>

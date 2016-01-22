@@ -1,0 +1,18 @@
+﻿@using Profiles.MainUI.Models
+@using Profiles.MainUI.Common
+@model PageModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+@section headContent {
+    <link href="@(Model.CssPath)core-contentpages.css" rel="stylesheet" type="text/css" />
+    <link href="@(Model.CssPath)practice-profiles.css" rel="stylesheet" type="text/css" />
+
+    @Html.Partial("../PracticeProfiles/_IE8")
+}
+<div class="full-width title-divider"></div>
+<div class="standardWidth clearfix">
+    @Html.Partial("_IntroductionAndRecentUpdates")
+    @Html.Partial("_PracticeProfilesDomainCollection")
+</div>
+

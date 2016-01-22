@@ -1,0 +1,115 @@
+<html>
+
+<head>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://documentcloud.github.com/underscore/underscore-min.js"></script>
+  <script type="text/javascript" src="hogan.min.js"></script>
+  <script type="text/javascript" src="jdoc.js"></script>
+
+  <style >
+  
+  BODY {
+  font-family:arial,sans-serif;
+  font-size:12pt;
+  }
+  
+  TABLE.bordered-table {
+    margin:5px 0 0 30px;
+  }
+  
+  TABLE.bordered-table, TABLE.bordered-table TD, TABLE.bordered-table TH {
+    border: 2px solid #ddd;
+    border-collapse: border-collapse;
+  }
+  
+  TABLE.bordered-table TD, TABLE.bordered-table TH {
+    text-align:left;
+    font-size:90%;
+    padding:2px 4px 2px 4px;
+    background: #F9E8E8;
+  }
+  
+  BUTTON {
+  border-radius: 6px 6px 6px 6px;
+  font-size: 16px;
+  line-height: normal;
+  width:100%;
+  padding:0;
+  margin:2px 0;
+  }
+
+  BUTTON:hover {
+
+  }
+  
+  .heading {
+    margin: 10px 0 10px 0;
+    font-size:120%;
+    background:#eee;
+    padding:4px 0 4px 20px;
+  }
+  
+  #url, #output {
+    margin-left:30px;
+  }
+  
+  .pageColumn {
+    vertical-align:top;
+    padding:10px;
+  }
+  
+  h3 {
+  color:#333;
+  }
+  </style>
+</head>
+
+<body>
+
+<table id="main">
+<tr>
+<td class="pageColumn" style="width:200px;border-right:#ddd 2px solid;">
+
+  <h2>Web Services</h2>
+
+  <h3>Indicator data</h3>
+  <button onclick="call('GetData.ashx','s=sg&gid=1000010')">Grouping details</button>
+  <button onclick="call('GetGroupDataAtDataPoint.ashx','gid=1000022&ati=2&par=EMSHA&pid=2')">Group data at data point</button>
+  <button onclick="call('GetTrendData.ashx','gid=1000022&ati=2&par=EMSHA&pid=2')">Trend data</button>
+  <button onclick="call('GetData.ashx','s=is&gid=1000022&off=0&par=E92000001&ati=2')">Indicator Stats</button>
+  <button onclick="call('GetData.ashx','s=ad&gid=2000005&are=E83044&ati=7&com=Eng,5A9&tim=yes')">Area Data (practice)</button>
+  <button onclick="call('GetData.ashx','s=ad&gid=2000005&are=E92000001&ati=7&tim=yes')">Area Data (national)</button>
+  <button onclick="call('GetData.ashx','s=av&par=E92000001&gid=1000041&off=0&iid=10301&sex=4&age=193&ati=102&com=4&res=19')">Area Values</button>
+  <button onclick="call('GetQuinaryPopulationData.ashx','area=G82688&off=0&gid=1200006')">Quinary Population Data</button>
+  
+  <h3>Indicator metadata</h3>
+  <button onclick="call('GetData.ashx','s=im&def=yes&gid=2000005')">Indicator Metadata</button>
+  <button onclick="call('GetData.ashx','s=ip')">Indicator Metadata Properties</button>
+  
+  <h3>Area information</h3>
+  <button onclick="call('GetData.ashx','s=aa&are=N84026')">Area Address</button>
+  <button onclick="call('GetChildAreas.ashx','par=E92000001&ati=5')">Child Areas</button>
+  <button onclick="call('GetData.ashx','s=at&ati=102&ign=00HF,00AA')">Areas by area type</button>
+  <button onclick="call('GetData.ashx','s=ax&pid=2')">Get profile area types</button>
+  <button onclick="call('GetData.ashx','s=ac&ati=102&pat=23')">Area deciles</button>
+
+  <h3>Labels & lookups</h3>
+  <button onclick="call('GetLabel.ashx','key=1&yr=2&age=1&cm=5&cim=2')">Label</button>
+  <button onclick="call('GetLabelSeries.ashx','id=qpop')">Label Series</button>
+
+  
+</td>
+<td class="pageColumn">
+  <h2>URL & Parameters</h2>
+  <div id="url"></div>
+  <div id="parameter-explanation"></div>
+
+  <h2>JSON Data Structure</h2>
+  <div id="output"></div>
+</td>
+</tr>
+</table>
+
+</body>
+
+</html>

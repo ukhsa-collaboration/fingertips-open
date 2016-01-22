@@ -1,0 +1,1488 @@
+﻿/*
+* CSS that is common amongst all Fingertips profiles except Practice Profiles
+*/
+a {
+    cursor: pointer;
+}
+
+/* Lightbox */
+.lightbox-button-box {
+    float: left;
+    width: 100%;
+    padding: 20px 0 15px 130px;
+    clear: both;
+}
+
+h2.lightbox-title {
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#infoBox select {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #333;
+    margin: 5px 0 5px 5px;
+}
+
+.exportBtn {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    color: #333;
+    padding: 2px 5px 2px 5px;
+    margin: 0 26px 0 0;
+    width: 60px;
+    border: 1px solid #DDD;
+    cursor: pointer;
+}
+
+    .exportBtn:hover {
+        background: #ccc;
+        cursor: pointer;
+    }
+
+.greyBoxed {
+    background: none repeat scroll 0 0 #f6f7f7;
+    border: 1px solid #DDD;
+}
+
+.export {
+    padding: 3%;
+    margin: 30px 7% 10px 7%;
+    width: 80%;
+    float: left;
+}
+
+    .export TD {
+        vertical-align: top;
+        text-align: left;
+        padding-top: 4px;
+    }
+
+    .export INPUT {
+        margin-top: 2px;
+    }
+
+    .export span {
+        display: block;
+        padding: 5px;
+        text-align: right;
+    }
+
+    .export select {
+        width: 65%;
+    }
+
+/* Button options */
+a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
+    color: #2e3191;
+    text-decoration: none;
+    margin-left: 4px;
+    padding: 2px 3px 2px 3px;
+    float: left;
+    display: block;
+    font-weight: bold;
+    font-size: 90%;
+}
+
+    a.pageSelector:hover {
+        text-decoration: underline;
+    }
+
+#sortSelectionBox {
+    padding-top: 5px;
+}
+
+/* Spine charts */
+#singleAreaTable th div {
+    line-height: 1.1em;
+}
+
+.noSpine {
+    height: 23px;
+    line-height: 23px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.q1, .q2, .q4, .spine {
+    height: 23px;
+    float: left;
+}
+
+.spine {
+    overflow: hidden;
+    padding: 0 0 0 0;
+}
+
+.spine250 {
+    width: 274px; /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
+    position: relative;
+}
+
+.average250 {
+    width: 2px;
+    left: 136px; /*half spine250 width - 1(i.e. half average bar width)*/
+    position: absolute;
+    height: 23px;
+}
+
+.marker {
+    position: absolute;
+    top: 2px;
+}
+
+div.close {
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    margin-top: 6px;
+}
+
+
+/* ------------------------------------------------------------
+	Tooltip
+------------------------------------------------------------ */
+
+#tooltip, .plain {
+    font-family: verdana;
+    font-size: 12px;
+}
+
+#tooltip {
+    border-style: dotted;
+    border-width: thin;
+    border-color: #aaa;
+    background-color: #eee;
+    position: absolute;
+    display: none;
+    padding: 5px;
+    z-index: 10;
+    width: 200px;
+    cursor: pointer;
+}
+
+#tooltipIndicator {
+    float: left;
+    clear: left;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#tooltip-target {
+    float: left;
+    clear: left;
+    font-weight: bold;
+}
+
+#tooltipArea {
+    width: 100%;
+    clear: left;
+    float: left;
+    font-size: 14px;
+}
+
+.tooltipValueNote {
+    width: 100%;
+    clear: left;
+    float: left;
+    font-style: italic;
+}
+
+#tooltipQualifier {
+    clear: left;
+    float: left;
+    width: 100%;
+    font-style: italic;
+}
+
+#tooltipData {
+    width: 100%;
+    float: left;
+    font-weight: bold;
+}
+
+
+div#main {
+    padding-top: 9px;
+}
+
+#footerSpace {
+    width: 100%;
+    height: 20px;
+    float: left;
+    clear: both;
+}
+
+.borderedTable td, .borderedTable th, .key {
+    border-spacing: 0;
+    border-style: solid;
+    border-width: 2px;
+    border-color: #eeeeee;
+}
+
+th.header, td.header {
+    font-weight: bold;
+    text-align: center;
+    background-color: #eeeeee;
+    vertical-align: top;
+}
+
+td.header {
+    width: 120px;
+    text-align: left;
+}
+
+td.pLink, td.search-area-type, a.pLink {
+    color: #1f0aa1;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+    td.search-area-type:hover, a.pLink:hover {
+        text-decoration: underline;
+    }
+
+    td.search-area-type {
+        padding: 0 5px;
+    }
+
+a.linkButton, a.linkButton:hover {
+    color: #1f0aa1;
+    font-size: 125%;
+    text-decoration: none;
+}
+
+    a.linkButton:hover {
+        color: black;
+    }
+
+th#areaHeader {
+    width: 150px;
+    padding-top: 5px;
+}
+
+th.indicatorHeader {
+    width: 300px;
+}
+
+th.numericHeader, th.numericWideHeader {
+    text-align: center;
+    vertical-align: top;
+    width: 55px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+
+.tallCentralMessage {
+    margin-top: 140px;
+    height: 180px;
+    width: 100%;
+    text-align: center;
+    float: left;
+    color: #444;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+img.verticalText {
+    border: 0 none white;
+}
+
+img.pLink {
+    border: 1px solid #eeeeee;
+    background: white;
+}
+
+    img.pLink:hover, img.sortedBy {
+        border: 1px solid blue;
+        background: #fdfdd7;
+    }
+
+a.descLink {
+    margin-right: 2px;
+}
+
+#dataContainer {
+    float: left;
+    width: 100%;
+}
+
+#spinner {
+    position: relative;
+    height: 400px;
+    width: 510px;
+    color: #999;
+    font-size: 10px;
+    float: left;
+    clear: both;
+}
+
+img.spinner {
+    position: absolute;
+    right: 4px;
+    top: 200px;
+}
+
+#spinnerLabel {
+    position: absolute;
+    right: 0;
+    top: 231px;
+}
+
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.cl {
+    clear: left;
+}
+
+.w100 {
+    width: 100%;
+}
+
+#pholioHeader {
+    vertical-align: top;
+    background: #eeeeee;
+    height: 105px;
+    padding: 4px;
+    position: relative;
+}
+
+.homeHeader {
+    color: #333;
+    text-decoration: none;
+}
+
+.homeHeader:hover {
+    color: #333;
+}
+
+#pageTitle {
+    width: 365px;
+    height: 25px;
+    text-align: left;
+    margin-left: 120px;
+    margin-top: 10px;
+    float: left;
+    font-size: 18px;
+    line-height: 20px;
+}
+
+.yearRange {
+    font-size: 12px;
+}
+
+.indicatorOption, .indicatorOptionB {
+    float: left;
+    clear: left;
+    width: 100%;
+    background: white;
+    cursor: pointer;
+    text-align: left;
+    padding: 0 0 1px 15px;
+    border-color: #eeeeee;
+    border-style: solid;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 2px;
+    border-right-width: 2px;
+}
+
+.indicatorOptionB {
+    background-color: #f7f7f7;
+}
+
+    .indicatorOption:hover, .indicatorOptionB:hover {
+        background-color: #fdfdd7;
+    }
+
+.selectedIndicator {
+    background-image: url('../images/indicatorOptionArrow.gif');
+    background-repeat: no-repeat;
+    font-weight: bold;
+    background-color: #3d3d3d;
+    color: White;
+}
+
+    .selectedIndicator:hover {
+        background-color: #3d3d3d;
+    }
+
+#areaSort {
+    left: 57px;
+    position: absolute;
+    bottom: 1px;
+}
+
+.tartanFill {
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.printOnly {
+    display: none;
+}
+
+/* Sort image links */
+div.rowSort {
+    height: 35px;
+}
+
+a.rowSort, a.rowSort:visited, a.columnSort, a.columnSort:visited {
+    text-decoration: none;
+    display: block;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+    a.rowSort, a.rowSort:visited {
+        height: 35px;
+        background-image: url('../images/sortRowDisabled.png');
+    }
+
+        a.rowSort:hover {
+            text-decoration: none;
+            background-image: url('../images/sortRowEnabled.png');
+        }
+
+    a.columnSort, a.columnSort:visited {
+        height: 16px;
+        background-image: url('../images/sortColumnDisabled.png');
+    }
+
+        a.columnSort:hover {
+            text-decoration: none;
+            background-image: url('../images/sortColumnEnabled.png');
+        }
+
+.bold {
+    font-weight: bold;
+}
+
+.menuHeader {
+    margin-top: 2px;
+    margin-right: 3px;
+}
+
+#rug-container {
+    width: 100%;
+}
+
+div.tartanBox {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    position: relative;
+    height: 23px;
+}
+
+div.tartanText {
+    width: 100%;
+    margin-top: 4px;
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+td.worse, td.same, td.better, td.none, .bobLower, .bobHigher, .grade-quintile-1, .grade-quintile-2, .grade-quintile-3, .grade-quintile-4, .grade-quintile-5  {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    text-align: center;
+    cursor: default;
+}
+
+td.grade-quintile-1, span.grade-quintile-1 {
+    background-color: #DED3EC;
+    color: Black;
+}
+
+td.grade-quintile-2, span.grade-quintile-2 {
+    background-color: #BEA7DA;
+    color: Black;
+}
+
+td.grade-quintile-3, span.grade-quintile-3 {
+    background-color: #9E7CC8;
+    color: White;
+}
+
+td.grade-quintile-4, span.grade-quintile-4 {
+    background-color: #7E50B6;
+    color: White;
+}
+
+td.grade-quintile-5, span.grade-quintile-5 {
+    background-color: #5E25A4;
+    color: White;
+}
+
+td.worse, span.worse {
+    background-color: #c00000;
+    color: White;
+}
+
+td.same, span.same {
+    background-color: #ffc000;
+    color: #333;
+}
+
+td.better, span.better {
+    background-color: #92d050;
+        color: #333;
+}
+
+span.target {
+    padding: 0 2px;
+    margin: 2px 0 0 0;
+    display: inline-block;
+    border-right: 4px solid #fff;
+}
+
+.keyTable span.target {
+    padding: 2px 4px;
+    margin: 0;
+    font-size: 14px;
+}
+
+.target-label {
+    font-size: 11px;
+    color: #777;
+    font-style: italic;
+}
+
+#trends-container .target-box {
+    width: 100%;
+    text-align: right;
+}
+
+.target .unit {
+    color: #333;
+}
+.worse .unit {
+    color: white;
+}
+
+td.bobLower, span.bobLower {
+    background-color: rgb(85,85,230);
+    color: White;
+}
+
+td.bobHigher, span.bobHigher, td.overlapping-cis {
+    background-color: rgb(190,210,255);
+}
+
+td.none {
+    background-color: white;
+}
+
+/* ------------------------------------------------------------
+	Tartan rug
+------------------------------------------------------------ */
+th.rugPeriod {
+    vertical-align: bottom;
+}
+
+.scroll-place {
+    background: #aaa;
+    height: 3px;
+}
+
+.rug-scroll-left, .rug-scroll-right {
+    height: 20px;
+    width: 50%;
+    background-color: #aaa;
+    background-repeat: no-repeat;
+    background-position: 50% 5px;
+    border-top: 2px solid white;
+}
+
+    .rug-scroll-left:hover, .rug-scroll-right:hover {
+        background-color: #666;
+    }
+
+.rug-scroll-left {
+    background-image: url('../images/back2.png');
+    border-right: 2px solid white;
+}
+
+.rug-scroll-right {
+    background-image: url('../images/forward2.png');
+}
+
+.tartanText span {
+    font-style: normal;
+    font-size: 1.4em;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    margin-top: -3px;
+    cursor: default;
+}
+
+    .tartanText span.value-note-symbol {
+        font-size: 1.2em;
+        margin-top: 1px;
+    }
+
+.tartanText .noData {
+    cursor: default;
+}
+
+/* ------------------------------------------------------------
+	Search
+------------------------------------------------------------ */
+.searchBlur {
+    color: #aaa;
+}
+
+#searchButton {
+    font-size: 13px;
+    width: 24px;
+    height: 24px;
+    float: right;
+    border: 0 solid #eee;
+    border-left: none;
+    font-weight: bold;
+    cursor: pointer;
+    background: white;
+    background-image: url(../images/search2.jpg);
+    background-repeat: no-repeat;
+}
+
+#noMatch {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    font-size: 150%;
+}
+
+#searchContents {
+    width: 100%;
+    margin: auto;
+    float: left;
+}
+
+#searchResultText td.selected {
+    text-decoration: underline;
+}
+
+#indicator-profile-origin-link {
+    padding: 10px 0 10px 10px;
+    color: #1f0aa1;
+}
+
+/* ------------------------------------------------------------
+	Tabs
+------------------------------------------------------------ */
+.page {
+    background: #D7EBE8;  /*#E5F0EE; */
+    margin-right:3px;
+    color:#666;
+    text-decoration: none;
+    width: 90px;
+    height: 58px;
+    float: left;
+    cursor: pointer;
+    position: relative;
+    padding-bottom: 5px;
+}
+
+.page:hover {
+background:#CAE4E0;
+color:#333;
+}
+
+div.pageSelected, div.pageSelected:hover
+{
+    color:white;
+    background-color: #02ae94;
+}
+
+.page div {
+    position: absolute;
+    height: 30px;
+    width: 34px;
+    top: 3px;
+    left: 28px;
+    background-repeat: no-repeat;
+    opacity:0.5;
+}
+
+#page-overview div {
+    background-image: url('../images/tabs/overview.gif');
+}
+
+#page-trends div {
+    background-image: url('../images/tabs/trends.gif');
+}
+
+#page-areas div {
+    background-image: url('../images/tabs/areas.gif');
+}
+
+#page-indicators div, #page-bar div {
+    background-image: url('../images/tabs/indicators.gif');
+}
+
+#page-metadata div {
+    background-image: url('../images/tabs/metadata.gif');
+}
+
+#page-content div {
+background-image: url('../images/tabs/inequalities.gif');
+    width: 60px;
+    left: 15px;
+}
+
+#page-map div {
+    background-image: url('../images/tabs/map.gif');
+}
+
+#page-scatter div {
+    background-image: url('../images/tabs/scatter.gif');
+}
+
+#page-download div {
+    background-image: url('../images/tabs/download.gif');
+}
+
+div.pageSelected div {
+    opacity:1.0;
+}
+
+div.pageSelected
+{
+    color:white;
+}
+div.page:hover span
+{
+    text-decoration: underline;
+}
+div.page span
+{
+    font-weight: bold;
+    display:block;
+    padding-top:34px;
+    text-align: center;
+    line-height: 0.95em;
+}
+
+.show-ci {
+    padding-left: 30px;
+}
+
+
+/* ------------------------------------------------------------
+	General
+------------------------------------------------------------ */
+
+.rightSpacer {
+    float: right;
+    width: 15px;
+    height: 28px;
+}
+
+.standardWidth {
+    width: 1000px;
+    margin: 0 auto 0 auto;
+    clear: both;
+}
+
+.full-width {
+    width: 100%;
+    clear: both;
+}
+
+.grey {
+    background: #eee;
+}
+
+.centered {
+    margin: 0 auto 0 auto;
+}
+
+TH.topRow {
+    height: 14px;
+    line-height: 14px;
+    padding-bottom: 1px;
+}
+
+/* ------------------------------------------------------------
+	Menu previous & next buttons
+------------------------------------------------------------ */
+.menu-prev, .menu-next {
+    height: 22px;
+    width: 22px;
+    background-image: url(../images/left-right-arrows.png);
+    background-repeat: no-repeat;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.menu-prev {
+    background-position: 6px 3px;
+    left: 2px;
+}
+
+.menu-next {
+    background-position: -16px 3px;
+    left: -2px;
+}
+
+    .menu-prev:hover, .menu-next:hover {
+        background-color: white;
+    }
+
+/* ------------------------------------------------------------
+	Indicator details bar chart
+------------------------------------------------------------ */
+TH.bar {
+    text-align: left;
+    width: 240px;
+    vertical-align: top;
+    border-left: none;
+}
+
+TD.bar {
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+TD.barFirst {
+    border-top: 2px solid #eee;
+}
+
+TD.barLast {
+    border-bottom: 2px solid #eee;
+}
+
+.barBox {
+    position: relative;
+    width: 100%;
+    height: 17px;
+}
+
+IMG.bar {
+    top: 0;
+    left: 0;
+    height: 17px;
+    position: absolute;
+    background: #C9C9C9;
+    border: none;
+}
+
+.error, .errorMid {
+    top: 2px;
+    position: absolute;
+    width: 1px;
+    height: 11px;
+    line-height: 0;
+}
+
+.errorMid {
+    height: 2px;
+    top: 7px;
+}
+
+/* ------------------------------------------------------------
+	Sparkline view options
+------------------------------------------------------------ */
+#sparkLineViews {
+    float: right;
+}
+
+#view0, #view1 {
+    text-decoration: none;
+    display: block;
+    width: 28px;
+    height: 28px;
+    float: right;
+}
+
+#view0 {
+    background-image: url(../images/oneAreaOff.png);
+}
+
+#view1 {
+    margin-left: 5px;
+    background-image: url(../images/multiAreaOff.png);
+}
+
+#view0.selected, #view0:hover {
+    background-image: url(../images/oneArea.png);
+}
+
+#view1.selected, #view1:hover {
+    background-image: url(../images/multiArea.png);
+}
+
+/* ------------------------------------------------------------
+	Sparkline view options
+------------------------------------------------------------ */
+div.sparklineIndicator {
+    width: 240px;
+}
+
+img.sparklineIndicator {
+    /*To improve layout on rendering*/
+    height: 140px;
+    width: 240px;
+}
+/* Sparkline navigation elements */
+div.sparklineIndicator, img.sparklineArea {
+    border: 3px solid white;
+}
+
+    div.sparklineIndicator:hover, img.sparklineArea:hover {
+        border: 3px solid #bbb;
+    }
+
+.sparklineBox {
+    width: 100%;
+    float: left;
+    text-align: center;
+}
+
+.front-page-text {
+    margin-left: 40px;
+    margin-top: 20px;
+    color: #444;
+    line-height: 20px;
+}
+
+/* ------------------------------------------------------------
+	Bar chart and funnel plot
+------------------------------------------------------------ */
+#indicatorDetailsData {
+    width: 100%;
+}
+
+#indicatorDetailsTable {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+
+#indicatorDetailsNoData, #funnelPlotNoData {
+    margin: 120px 0 100px 0;
+}
+
+#indicatorDetailsNoData {
+    float: left;
+    margin-left: 480px;
+    font-style: italic;
+}
+
+div.noData, div.noData300 {
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+}
+
+div.noData300 {
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+#funnelPlotBox {
+    float: left;
+}
+
+#funnelPlot, #funnelPlotBox {
+    width: 400px;
+}
+
+#indicatorDetailsBox {
+    width: 600px;
+    float: right;
+}
+
+#indicatorDetailsHeader {
+    background: #eee;
+    width: 100%;
+    font-weight: bold;
+    text-align: right;
+}
+
+.trendTitle {
+    float: left;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-align: left;
+}
+.trendTitle a {
+    margin-right: 20px;
+}
+
+.trendUnit {
+    padding: 6px 0 0 0;
+    float: right;
+    font-size: 11px;
+}
+
+.trendArea {
+    font-size: 11px;
+    padding-top: 6px;
+}
+
+td.coloured {
+    background: #a8a8cc;
+    color: White;
+}
+
+.light {
+    background: #cfcfe2;
+}
+
+#areaTrendsContainer {
+    width: 100%;
+    float: left;
+    clear: left;
+}
+
+.trendContainer {
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 6px;
+    margin-bottom: 20px;
+    float: left;
+}
+
+.trendChart {
+    width: 400px;
+    height: 300px;
+    float: left;
+}
+
+.trendHeader, .multiTrendHeader {
+    float: left;
+    clear: both;
+}
+
+.multiTrendHeader {
+    padding: 30px 0 0 0;
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
+    font-weight: bold;
+}
+
+.trendHeader {
+    padding: 20px 0 5px 0;
+    border-bottom: 5px solid #0b0c0c;
+    width: 100%;
+    font-weight: bold;
+}
+
+.trendPeriod {
+    width: 85px;
+}
+
+.trendPeriodWide {
+    width: 120px;
+}
+
+.trendTableBox {
+    float: right;
+    width: 520px;
+}
+
+.trendTableBoxWide {
+    float: right;
+    width: 535px;
+}
+
+.trendSig {
+    width: 40px;
+}
+
+.trendSource {
+    width: 100%;
+    text-align: left;
+    float: right;
+    font-style: italic;
+    font-size: 11px;
+}
+
+#trendHelper {
+    border-style: dotted;
+    border-width: thin;
+    border-color: #aaa;
+    background-color: white;
+    z-index: 5;
+    position: absolute;
+    font-style: italic;
+    padding: 0 3px 0 3px;
+}
+
+a.trendLink, a.trendLink:visited, a.trendLink:active {
+    color: Black;
+    text-decoration: none;
+}
+
+    a.trendLink:hover {
+        color: Black;
+        text-decoration: underline;
+    }
+
+td span.value-note-symbol {
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: default;
+}
+
+td span.unit {
+    color: #777;
+}
+
+a.start, a.start:active, a.start:visited {
+    display: block;
+    font-size: 18px;
+    padding: 5px;
+    width: 100px;
+    text-align: center;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 5px 5px 5px #ccc;
+}
+
+#global-prefooter {
+    float: left;
+    text-align: center;
+    width: 100%;
+    margin-top: 24px;
+}
+
+.data-header {
+    font-size: 12px;
+}
+
+/* ------------------------------------------------------------
+	Trends
+------------------------------------------------------------ */
+#trends-chart-sorter-az {
+    font-size:14px;
+}
+
+#trends-chart-sorter-az a {
+    margin: 0 3px;
+    text-decoration: none;
+    color: #1f0aa1;
+}
+
+#trends-chart-sorter-az a:hover {
+    text-decoration: underline;
+}
+
+#trendsBox {
+     display:inline-block; overflow:hidden; text-align: left; margin-left:3%;
+}
+
+#trends-chart-sorter-az {
+    margin-left: 180px;
+}
+
+
+/* ------------------------------------------------------------
+	Menus
+------------------------------------------------------------ */
+ul.menu {
+    list-style: none;
+    float: left;
+    width: 350px;
+}
+
+ul.inner-menu {
+    list-style: none;
+    float: right;
+    width: 150px;
+}
+
+ul.menu li {
+    display: inline-block;
+    float: right;
+}
+
+ul.menu .heading {
+    padding-top: 2px;
+}
+
+ul.menu select {
+    width: 200px;
+}
+
+ul.right-menu {
+    list-style: none;
+    width: 240px;
+    float: right;
+}
+
+    #benchmark-box select {
+        width: 150px;
+    }
+
+#indicatorMenu {
+    width: 550px;
+}
+
+.marginTop5 {
+    margin-top:5px;
+}
+
+/* ------------------------------------------------------------
+	Tabs and view menus
+------------------------------------------------------------ */
+.viewOptions
+{
+    float: left;
+    width: 100%;
+}
+
+#tabs, #view-options {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+#tabs {
+    background: none;
+    border: none;
+    margin-top: 6px;
+}
+
+#view-options {
+    padding: 5px 0;
+    background: #eee;
+}
+
+    #view-options .row {
+        clear: both;
+        width: 98%;
+        margin-left: 1%;
+        padding: 5px 0;
+        float: left;
+        position: relative;
+    }
+
+/* ------------------------------------------------------------
+	Indicator select all
+------------------------------------------------------------ */
+#indicatorSelectAll {
+    float: left;
+    height: 20px;
+    line-height: 20px;
+}
+
+#indicatorSelectAllTd {
+    font-weight: bold;
+    font-size: 11px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+#allIndicatorsLabel {
+    display: inline-block;
+    float: left;
+    width: 200px;
+    padding-left: 2px;
+    line-height: 20px;
+}
+
+ .indicator-row {
+    list-style: none;
+    float: left;
+    width: 880px;
+}
+
+.indicator-row li {
+    display: inline-block;
+    float: right;
+}
+
+/* ------------------------------------------------------------
+	Download tab
+------------------------------------------------------------ */
+#download-container {
+    color: #666;
+    padding: 70px 0 120px 0;
+}
+
+#download-container h2 {
+    padding: 0;
+    margin-top: 60px;
+    color: #555;
+}
+
+#download-container a.pdf {
+    background-image: url('../images/pdf.gif');
+    background-position: 0 3px;
+}
+
+#download-container a.excel {
+    background-image: url('../images/excel.gif');
+    background-position: 0 4px;
+}
+
+#download-container a {
+    font-size: 20px;
+    color: #39836e;
+    margin: 15px 0 0 0;
+    padding-left: 20px;
+    background-repeat: no-repeat;
+    display: block;
+    text-decoration: none;
+}
+
+#download-container a:hover {
+    text-decoration: underline;
+}
+
+#download-container p {
+    line-height: 1.4em;
+    width: 80%;
+    margin: 0;
+}
+
+#download-container div {
+    width: 25%;
+    text-align: left;
+    float: left;
+}
+
+#download-container div.text {
+    width: 23%;
+    padding:0 1%;
+}
+
+#download-container img{
+    height: 300px;
+    border: 2px solid #eee;
+    float: right;
+}
+
+#download-container img.pdf:hover, #download-container img.pdf:active {
+    border: 2px solid #bbb;
+    cursor: pointer;
+}
+
+#trendDisplayOptions {
+    float: left;
+    width: auto;
+    margin-bottom: 5px;
+    height: 23px;
+    margin-top: -27px;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#trendDisplayOptions span {
+    font-weight: bold;
+    line-height: 24px;
+}
+
+#trendDisplayOptions #options {
+    float: right;
+    margin-right: 20px;
+    margin-left: 10px;
+}
+
+
+.optionButton {
+ 
+    background: #D7EBE8;
+    margin-right: 2px;
+    color: #666;
+    text-decoration: none;
+    height: 30px;
+    float: left;
+    cursor: pointer;
+    position: relative;
+    font-weight: bold;
+    padding: 6px 10px 10px 10px;
+    line-height: 0.95em;
+    font-size: 14px;
+
+}
+
+button.buttonSelected, button.optionButton:hover {
+    color: white;
+    background-color: #02ae94;
+}
+
+.tartanTrend {
+    margin-left: 12px;
+}
+
+.tartanValueAndTrend {
+    text-align: center;
+}
+
+.tartanValueAndTrend img {
+    border: 0;
+    vertical-align: top;
+    margin-top: 3px;
+}
+
+
+
+@media print {
+    th.sortHeader, td.sort, .noPrint, .arrowUnselected, .arrowUnselected70, #download {
+        display: none;
+    }
+
+    .printOnly {
+        display: block; /*inherit not work IE6/7*/
+    }
+
+    div.tartanText {
+        color: black;
+    }
+
+    #leftTartanTable {
+        width: 38px;
+    }
+
+     #tabs, div.pageSelector, a.pageSelector, .domainOption, #indicator-menu-prev, #indicator-menu-next {
+        display: none !important;
+    }
+
+    div.pageSelected, a.pageSelected {
+        display: block !important;
+    }
+
+    .domainOption {
+        border: none;
+        width: 0 !important;
+    }
+
+    .selectedDomain {
+        display: block !important;
+        width: 100% !important;
+        font-size: 125%;
+    }
+
+    #view-options {
+        border: none;
+    }
+
+    #copyright {
+        font-style: italic;
+    }
+}
+

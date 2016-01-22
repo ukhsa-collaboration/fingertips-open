@@ -1,0 +1,405 @@
+﻿/* 
+* LL - Primary Care - Diabetes
+*/
+span.asterisk {
+    font-size: 16px;
+    clear: left;
+    float: left;
+    font-weight: bold;
+    position: relative;
+    left: 4px;
+    top: 1px;
+}
+
+span.asterisk-text {
+    float: left;
+    padding: 2px 0 0 6px;
+}
+
+h5.asterisk {
+    margin-top: 10px;
+    margin-left: -4px;
+}
+
+/* Tooltip*/
+.indicator-tooltip {
+    float: left;
+    clear: left;
+    font-weight: bold;
+    width: 100%;
+    font-size: 1.4em;
+    border-style: dotted;
+    border-width: thin;
+    border-color: #aaaaaa;
+    background-color: #eeeeee;
+    position: absolute;
+    padding: 5px;
+    z-index: 5;
+    width: 250px;
+    cursor: pointer;
+}
+
+/*
+* Practice Details
+*/
+
+#diabetes-rankings-table th {
+    color: white;
+}
+
+#data_page_header h1 {
+    border: none;
+    font-size: 4.0em;
+    padding-bottom: 5px;
+}
+
+#data_page_header h3 {
+    border-bottom: 5px solid #585858;
+    font-size: 2.0em;
+    margin: 0;
+    padding-bottom: 0.5em;
+    font-weight: normal;
+}
+
+#data_page_header {
+    padding-bottom: 30px;
+}
+
+
+#data_page_header .hr{
+    border-top: 5px solid #000;
+    height: 4px;
+}
+    
+
+#summary-score {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+        #data_page_header .summary_score_ib h2 {
+            line-height: 2.0;
+            font-size: 1.3em;
+        }
+
+    #data_page_header .summary_score_ib {
+        background-color: #f1f1f1;
+        background-image: none;
+        color: #000;
+        min-height: 49px;
+        padding-left: 21px;
+        padding-top: 5px;
+        width: 274px;
+        margin-right: 0;
+    }
+
+    #data_page_header #practice_list_size_ib {
+        background-position: 14px -491px;
+        padding-left: 44px;
+        width: 423px;
+    }
+
+    #data_page_header #adults_with_diabetes_ib {
+        background-position: 14px -591px;
+        padding-left: 44px;
+        width: 423px;
+    }
+
+    #data_page_header #info_box_1 {
+        background-position: 14px -491px;
+        padding-left: 51px;
+        width: 423px;
+    }
+
+     #data_page_header #info_box_2 {
+        background-position: 14px -591px;
+        padding-left: 51px;
+        width: 423px;
+        margin-right: 0;
+        padding-right: 0;
+    }
+
+
+.diabetes-advisors-list .diabetes-indicators-list .numeric-bullet {
+    padding: 0;
+    margin: 0;
+    padding-left: 10px;
+}
+
+.diabetes-advisors-list li {
+    background: url(../images/Mortality/list_dot.png) 0 10px no-repeat;
+    line-height: 2;
+    padding: 0 0 0 10px;
+    list-style: none;
+}
+
+.diabetes-indicators-list li {
+    line-height: 2;
+    padding: 0 0 5px 10px;
+    list-style: none;
+}
+
+/*
+* Home page
+*/
+
+#map {
+    margin-bottom: 60px;
+}
+
+.map-info-stats dl.ranked_stat dd strong {
+    display: inline;
+    font-size: 2em;
+}
+
+.premature_death_stat dd strong {
+    padding-left: 30px;
+}
+
+.premature_death_stat span.complication_premature_death_stat strong {
+    padding-left: 0;
+}
+
+.map-info h4 {
+    margin-bottom: 0.5em;
+}
+
+.map-info-stats dl.ranked_stat dt {
+    padding-bottom: 0;
+}
+
+
+.popup_description {
+    width: 92%;
+    white-space: normal;
+    display: block;
+    padding-bottom: 20px;
+}
+
+.popup_ranking {
+    font-size: 0.8em;
+    width: 92%;
+    white-space: normal;
+    display: block;
+    padding-bottom: 15px;
+}
+
+.map-info-box .map-info-footer span {
+    color: #808080;
+}
+
+.map-info-box a, .map-info-box a:visited {
+    color: #000;
+}
+
+    .map-info-box a:hover {
+        color: #666;
+    }
+
+.map-info-body ul.totals li.left-indirect-rate {
+    width: 100%;
+    float: left;
+}
+
+.complication-left-indirect-rate {
+    width: 210px;
+    float: left;
+}
+
+.diabetes-totals  {
+    margin: 0;
+    padding: 0 0 0 0;
+    list-style: none;
+    list-style-image: none;
+}
+
+
+.map-overlay ul.filters li.sub a {
+    font-size: 1.1em;
+}
+
+.indicator-group a {
+    font-size: 1.21em;
+}
+
+.map-info-header a {
+    font-size: 0.80em;
+    float: left;
+    margin-left: 2px;
+    margin-top: 2px;
+}
+
+dl,
+menu,
+ol,
+ul {
+    margin: 0 0 1em 0;
+}
+/*
+* Rankings page
+*/
+.ranking_table_content > .header h1 {
+    font-size: 4.0em;
+}
+
+.ranking_table_content .table-data table thead {
+    background-color: #000;
+    height: 50px;
+}
+
+.ranking_table_content #related_content ul li.prev_risk_active a {
+    color: #02ae94;
+    font-family: "transport_new_medium", Arial, sans-serif;
+}
+
+.ranking_table_content #related_content .areaFilters {
+    padding-left: 18px;
+}
+
+.data-column {
+    width: 90px;
+}
+
+.ranking_table_content .table-data table th a {
+    text-decoration: none;
+    display: block;
+    position: relative;
+    color: #999;
+    width: 150px;
+}
+
+.ranking_table_content .table-data table th i {
+    display: block;
+    position: absolute;
+    top: 0.6em;
+    right: -.3em;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+    /* arrow effect created by borders - ASC by default */
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 5px solid #fff;
+}
+
+.show-compare {
+    display: block;
+}
+
+.hide-compare {
+    display: none;
+}
+
+/*
+ * Search page
+ */
+
+.nearby-practices-table {
+    float: left;
+    width: 45%;
+}
+
+.nearby-practices-map {
+    width: 55%;
+    float: right;
+}
+
+.nearby-practices-map #map-canvas {
+    width:100%;
+    height:500px;    
+    margin-bottom: 10px;
+}
+
+.nearby-practices-table .header {
+    position: relative;
+    background-color: #02ae94;
+    padding: 10px;
+    color: #fff;
+}
+   
+.nearby-practices-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nearby-practices-table td, .nearby-practices-table th {
+    padding: 0;
+font-weight: normal;
+text-align: left;
+vertical-align: top;
+    font-size: 16px;
+}
+
+.nearby-practices-table .highlight .header {
+    background-color: #525252;
+}
+
+.nearby-practices-table .empty {
+    height: 5px;
+    line-height: 5px;
+}
+
+.highlight {
+    background-color: #E6E6E6;
+}
+
+.center-text {
+    text-align: center;
+}
+
+/*
+ * Quintiles legend
+ */
+
+#high-to-low-arrow {
+    position: absolute;
+    top: 65px;
+    left: 40px;
+}
+
+.ranking_table_content #high-to-low-legend .grade {
+    padding: 0;
+    margin-left: 30px !important;
+}
+
+#high-to-low-legend #horizontal-arrow {
+    width:75px;
+    height:11px;
+}
+
+#high-to-low-legend .quintile-1, #high-to-low-legend.grade-quintile-1 img {
+    border: 1px solid #9e7cc8;
+    width: 11px !important;
+    height: 11px !important; 
+}
+
+.practice_in_area {
+    font-size: 1.21em;
+}
+
+.pretext {
+    display:table-cell; white-space: nowrap; padding-right: 6px;
+}
+
+.areaFilters li {
+    padding-left: 20px;
+}
+
+/*
+ * Rankings - more information and download link
+ */
+#ranking-links {
+    padding-left: 17px;
+}
+#ranking-links h5.posttext {
+    padding-bottom: 0.5em;
+}
+#related_content #ranking-links ul {
+    margin-left: 0;
+}
+#related_content img.download {
+    margin-top: -6px;
+}
+.posttext {
+    display:table-cell;
+}

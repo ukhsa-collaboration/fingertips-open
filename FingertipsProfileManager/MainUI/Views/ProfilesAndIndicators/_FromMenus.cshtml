@@ -1,0 +1,38 @@
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.MainUI.Models
+@model MoveIndicatorsModel
+
+@* Include the current sex and age Id's in the view in order to populate the model binding on postback*@
+@for (int i = 0; i < Model.IndicatorsToTransfer.Count(); i++)
+{
+    @Html.HiddenFor(model => Model.IndicatorsToTransfer[i].IndicatorId)
+    @Html.HiddenFor(model => Model.IndicatorsToTransfer[i].SexId)
+    @Html.HiddenFor(model => Model.IndicatorsToTransfer[i].AgeId)
+}
+
+@Html.HiddenFor(x => x.Profile.Id)
+@Html.HiddenFor(x => x.DomainId)
+@Html.HiddenFor(x => x.UrlKey)
+@Html.HiddenFor(x => x.DomainName)
+@Html.HiddenFor(x => x.ProfileName)
+@Html.HiddenFor(x => x.AreaTypeId)
+
+@Html.Hidden("indicatorTransferDetails")
+@Html.Hidden("targetProfile")
+
+@{
+    var actionLabel = Model is CopyIndicatorsModel
+        ? "Copy"
+        : "Move";
+}
+
+<h2>@actionLabel the following indicators</h2>
+
+<h3>From:</h3>
+<div class="delete-indicators">
+    <p>
+        <label class="short-associated-detail-label">Profile:</label>@Model.ProfileName<br />
+        <label class="short-associated-detail-label">Domain:</label>@Model.DomainName<br />
+        <label class="short-associated-detail-label">Area:</label>@CommonUtilities.GetAreaTypesLookUp()[Model.AreaTypeId]
+    </p>
+</div>

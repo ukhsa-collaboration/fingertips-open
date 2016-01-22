@@ -1,0 +1,15 @@
+﻿@{ var uploadType = ViewBag.IsSimple ? "Simple" : "Batch";}
+
+@using (Html.BeginForm("Upload" + uploadType + "DataAndArchiveDuplicates", "Upload", FormMethod.Post,
+    new { id = "removeDuplicatesForm" }))
+{
+    @Html.Hidden("excelFilePath", (object)ViewBag.ExcelFilePath)
+    @Html.Hidden("shortFilename", (object)Model.ShortFileName)
+    @Html.Hidden("selectedWorksheet", (object)ViewBag.SelectedWorksheet)
+    @Html.Hidden("uploadBatchId", (object)ViewBag.UploadBatchId)
+    <p>
+        <input id="archive_@(uploadType.ToLower())_duplicates" class="auto-width-button show-spinner"
+               type="submit" value="Archive duplicates & upload" />
+    </p>
+}
+

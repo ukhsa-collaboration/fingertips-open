@@ -1,0 +1,16 @@
+﻿@using Profiles.MainUI.Models;
+@model ErrorPageModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+@section headContent {
+    <script type="text/javascript">//<![CDATA[
+        isInitRequired = false;
+        //]]</script>
+}
+<div class="full-width title-divider"></div>
+<div id="error-box" class="standardWidth">
+        <h2>
+            @(Model.Error.Message)
+        </h2>
+</div>

@@ -1,0 +1,42 @@
+﻿@model Fpm.ProfileData.Entities.Profile.ExceptionLog
+<div id="exceptionDetail" style="display: none;">
+    <h2>Exception Detail</h2>
+
+    <div>
+        <label class="exception-detail-label">Id:</label><span class="exception-detail">@Model.Id</span>
+    </div>
+    <div>
+        <label class="exception-detail-label">Date:</label><span class="exception-detail">@Model.Date.ToShortDateString()</span>
+    </div>
+    <div>
+        <label class="exception-detail-label">Time:</label><span class="exception-detail">@Model.Date.ToShortTimeString()</span>
+    </div>
+    <div>
+        <label class="exception-detail-label">Application:</label><span class="exception-detail">@Model.Application</span>
+    </div>
+    <div>
+        <label class="exception-detail-label">Message:</label><div class="exception-detail">@Model.Message</div>
+    </div>
+    <div>
+        <label class="exception-detail-label">Type:</label><div class="exception-detail">@Model.Type</div>
+    </div>
+    <div>
+        <label class="exception-detail-label">Username:</label><div class="exception-detail">@Model.UserName</div>
+    </div>
+    <div>
+        <label class="exception-detail-label">Stack Trace:</label><div class="exception-detail">@Model.StackTrace</div>
+    </div>
+    <div>
+        <label class="exception-detail-label">Server:</label><span class="exception-detail">@Model.Server</span>
+    </div>
+    <div>
+        <label class="exception-detail-label">URL</label><span class="exception-detail">@Model.Url</span>
+    </div>
+</div>
+
+<p id="exception-detail-buttons">
+    <input class="small-button" id="Close" onclick="lightbox.hide()" value="Close" />
+    <a href="/exceptionlog/@Model.Id">View full screen</a>
+</p>
+
+

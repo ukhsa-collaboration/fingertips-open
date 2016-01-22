@@ -1,0 +1,1254 @@
+﻿
+.searchContainer {
+display:none;
+}
+
+SELECT {
+    font-size: 16px;
+}
+
+#site-link H1 {
+    width: auto;
+}
+
+H3 {
+    color: #333;
+    font-size: 125%;
+}
+
+p {
+    margin: 20px 0;
+}
+
+a, a:visited, a:active, a:hover {
+    color: #1D1DAE;
+}
+
+IMG.change {
+    float: left;
+}
+
+.appTitle {
+    float: left;
+    font-size: 20px;
+    padding: 6px;
+    font-weight: bold;
+    padding-left: 9px;
+}
+
+#header-links {
+    text-align: right;
+    padding: 12px 0;
+}
+
+/* National GP Profiles styles: START */
+div.APHO_GPP_ContentDiv {
+    width: 100%;
+    background: #fff;
+    float: left;
+}
+
+span.divider {
+    color: White;
+    padding: 0 3px 0 3px;
+}
+
+div.left, table.left {
+    float: left;
+}
+
+div.column3 {
+    width: 310px;
+    padding: 10px;
+    float: left;
+    text-align: left;
+}
+
+#ic-logo {
+    height: 60px;
+}
+
+/*----------------------------------------
+    Practice trends 
+------------------------------------------*/
+#trendsBox TABLE {
+    border: none;
+}
+
+#trendsBox TH {
+    font-weight: normal;
+    background: #F6F7F7;
+    font-style: italic;
+}
+
+#trendsBox TD, #trendsBox TH {
+    width: 25%;
+    border: none;
+    padding: 0 2px 0 2px;
+    text-align: center;
+}
+
+#trendsBox TD {
+    border-bottom: 1px solid #eee;
+}
+
+#trendsBox IMG {
+    margin-top: 6px;
+}
+
+.highlightTrend {
+    border: 1px solid #5B0FA0 !important;
+}
+
+.small-trend-box {
+    margin: 24px 0 0 20px;
+    float: left;
+    width: 300px;
+    height: 325px; /* Fixed height so boxes wrap into rows and columns - need to increase size every year */
+    border: 1px solid #ddd;
+}
+
+#trendsBox th.indicator {
+    font-weight: bold;
+    font-style: normal;
+    padding-bottom: 6px;
+}
+
+#trendsBox div.indicator {
+    width: 95%;
+    padding: 1px 0 0 5%;
+    position: relative;
+}
+
+#trendsBox table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+#trendsBox .infoTooltip {
+    position: absolute;
+    top: 1px;
+    left: -1px;
+}
+
+/*----------------------------------------
+    Population 
+------------------------------------------*/
+
+#populationChart {
+    float: left;
+    clear: both;
+    width: 500px;
+    height: 450px;
+}
+
+.onTop {
+    z-index: 5;
+}
+
+/* ------------------------------------------------------------
+	Tabs
+------------------------------------------------------------ */
+
+#page-indicators div {
+    background-image: url('../images/tabs/areas.gif');
+}
+
+#page-population div {
+    background-image: url('../images/tabs/population.gif');
+}
+
+#ccgBox {
+    float: left;
+    width: 900px;
+    height:190px;
+}
+
+#furtherInfoLabel {
+    float: left;
+    text-align: center;
+    width: 100%;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#populationBox {
+    padding-bottom: 30px;
+    position: relative;
+}
+
+#indicatorsBox {
+    position: relative;
+}
+
+#noPopulationData {
+    float: left;
+    width: 100%;
+    margin-top: 100px;
+    margin-bottom: 100px;
+    text-align: center;
+}
+
+#populationInfo, #populationTableBox {
+    width: 355px;
+    float: left;
+    margin-top: 6px;
+}
+
+#populationInfo {
+    margin-top: 15px;
+}
+
+    #populationInfo TABLE, #popTable {
+        width: 100%;
+    }
+
+        #popTable TD, #furtherInfoTable TD {
+            padding-left: 2px;
+        }
+
+    #populationInfo #decileKey {
+        width: 100%;
+    }
+
+.averageLabel {
+    font-size: 9px;
+}
+
+.keyLabel {
+    font-size: 10px;
+    line-height: 10px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.borderedTable {
+    border: 1px solid #ddd;
+}
+
+    .borderedTable td, .borderedTable th {
+        border-color: #ddd;
+        border-spacing: 0;
+        border-style: solid;
+        border-width: 1px;
+    }
+
+    .borderedTable th {
+        background: #f6f7f7; /*!!!*/
+        vertical-align: bottom;
+    }
+
+TH.pop {
+    width: 16.67%;
+}
+
+.decile1 {
+    background: #C00000;
+    color: White;
+}
+
+.decile2 {
+    background: #BB1809;
+    color: White;
+}
+
+.decile3 {
+    background: #B52F12;
+    color: White;
+}
+
+.decile4 {
+    background: #B1451B;
+    color: White;
+}
+
+.decile5 {
+    background: #AB5E24;
+    color: White;
+}
+
+.decile6 {
+    background: #A6742D;
+    color: White;
+}
+
+.decile7 {
+    background: #A18C36;
+}
+
+.decile8 {
+    background: #9CA33F;
+}
+
+.decile9 {
+    background: #97B947;
+}
+
+.decile10 {
+    background: #92D050;
+}
+
+#decileKey TD {
+    height: 9px;
+    width: 30px;
+    border: 1px solid white;
+    border-top: 2px solid white;
+    border-bottom: none;
+}
+
+DIV.decile {
+    float: left;
+    font-weight: bold;
+    border-radius: 2px;
+    text-align: center;
+    padding: 1px 0 1px 0;
+    width: 24px;
+    margin: 3px 0 0 0;
+}
+
+DIV.decileSpacer {
+    float: left;
+    height: 10px;
+    width: 4px;
+}
+
+#deprivationTable, #ethnicityTable {
+    margin-top: 15px;
+}
+
+.right-tooltip-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#age-distribution-info-icon {
+    position: absolute;
+    top: 47px;
+    left: 130px;
+    z-index: 5;
+}
+
+#deprivation {
+    text-align: center;
+}
+
+#populationKeyBox {
+    float: left;
+    width: 100%;
+    clear: left;
+}
+
+#populationKey {
+    font-size: 11px;
+    color: #666;
+    line-height: 16px;
+    margin-left: 15px;
+}
+
+.left {
+    text-align: left;
+}
+
+.center {
+    text-align: center;
+}
+
+.numeric {
+    text-align: right;
+}
+
+.spineTable {
+    width: 100%;
+    margin-top: 6px;
+}
+
+    .spineTable a {
+        text-decoration: none;
+    }
+
+        .spineTable a:hover {
+            text-decoration: underline;
+        }
+
+.rowTitle {
+    text-align: left;
+    padding-left: 2px;
+}
+
+.unit {
+    font-size: 85%;
+}
+
+th.period {
+    width: 100px;
+}
+
+TH.value {
+    width: 65px;
+}
+
+TH.range {
+    width: 224px;
+    position: relative;
+}
+
+TH.sex {
+    width: 33%;
+}
+
+.popLabel {
+    width: 100%;
+    float: left;
+    text-align: center;
+    font-size: 14px;
+}
+
+#practiceLabel {
+    margin: 12px 0 6px 0;
+}
+
+#practicePopInfo {
+    width: 100%;
+    height: 270px;
+    float: left;
+}
+
+DIV.noData {
+    width: 100%;
+    background-color: white;
+    text-align: center;
+}
+
+TD.popKey {
+    width: 26px;
+}
+
+.w100 {
+    width: 100%;
+}
+
+a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
+    background: #ccc;
+    color: #444;
+    border: 2px solid white;
+    margin-left: 4px;
+    padding: 1px 2px 1px 2px;
+    float: left;
+    display: block;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+    a.pageSelector:hover {
+        background: #666;
+        color: #eee;
+    }
+
+a.pageSelected, a.pageSelected:visited, a.pageSelected:hover, a.pageSelected:active {
+    background-color: black;
+    color: white;
+}
+
+#tabLine {
+    width: 100%;
+    float: left;
+    height: 1px;
+    background: #aaa;
+}
+
+#maincontainer {
+    height: auto;
+    margin: 1em auto 10px auto;
+    padding-bottom: 40px;
+}
+
+#topSelectionBox {
+    position: relative;
+}
+
+.greyBoxed {
+    background: none repeat scroll 0 0 #f6f7f7; /*!!!*/
+    border: 1px solid #DDD;
+}
+
+#practiceSelection {
+    position: absolute;
+    top: 37px;
+    left: 30px;
+    width: 835px;
+    height: 57px;
+    padding: 2px;
+}
+
+#sortPracticeBox {
+    padding: 2px;
+    text-align: center;
+    width: 110px;
+    float: right;
+    margin: 100px 20px 0 0;
+}
+
+#sortPracticeBox a.pageSelector {
+    font-size: 80% !important;
+    text-decoration: none;
+    padding:4px 1px 3px 1px !important;
+    text-align: center;
+    width: 94%;
+    margin: 0 !important;
+    display:block;
+}
+
+
+/* Area options */
+#areaMenus TD {
+    font-size: 18px;
+    padding: 12px 0 12px 0;
+}
+
+#areaMenus SELECT {
+    font-size: 16px;
+    color: #333;
+}
+
+#practiceHeading {
+    vertical-align: top;
+    color: #fff;
+}
+
+#areaMenus .first {
+    text-align: right;
+    padding: 0 !important;
+    padding-top: 0;
+    width: 80px;
+}
+
+#practiceTitle {
+    width: 500px;
+    float: left;
+    clear: left;
+    line-height: 21px;
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+#tabSearch {
+    margin-left: 2px;
+}
+
+/* Year options */
+#yearBox {
+    position: absolute;
+    top: 20px;
+    right: 15px;
+    color: #999;
+    font-size: 12px;
+}
+
+    #yearBox TD {
+        text-align: center;
+        cursor: pointer;
+    }
+
+        #yearBox TD:hover {
+            color: #333; /*background:#FFFFD7*/
+        }
+
+TD#timeline {
+    position: relative;
+    cursor: default;
+    font-weight: bold;
+    padding-top: 3px;
+}
+
+    TD#timeline:hover {
+        color: #999;
+        background: none;
+    }
+
+.selectedYear {
+    color: #333;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.firstYearLine, .lastYearLine, .yearLine {
+    height: 20px;
+    width: 50px;
+    background-image: url(../images/year-line.png);
+    background-repeat: no-repeat;
+}
+
+.firstYearLine {
+    background-position: 20px 0;
+}
+
+.lastYearLine {
+    background-position: -53px 0;
+}
+
+.yearLine {
+    background-position: -16px 0;
+}
+
+.selectedYearLine {
+    background-position: -140px 0;
+}
+
+.selectedYearLineLast {
+    background-position: -185px 0;
+}
+
+.selectedYearLineFirst {
+    background-position: -93px 0;
+}
+
+#address {
+    position: absolute;
+    top: 25px;
+    left: 65px;
+    width: 600px;
+    font-style: italic;
+}
+
+.subgroupSelection {
+    width: 100%;
+    margin-top: 6px;
+    float: left;
+}
+
+/*----------------------------------------
+    Population 
+------------------------------------------*/
+
+#benchmarkImg {
+    height: 18px;
+    width: 18px;
+    margin-top: 5px;
+}
+
+
+#benchmarkSelection {
+    position: absolute;
+    top: -25px;
+    left: 390px;
+    width: 320px;
+    font-size: 18px;
+}
+
+#benchmarkSelection select {
+    width: 200px;
+}
+
+/*----------------------------------------
+   Other 
+------------------------------------------*/
+
+#main {
+    float: left;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    width: 100%;
+}
+
+.selectLabel {
+    float: left;
+    width: 100%;
+    margin: 150px 0 150px 0;
+    text-align: center;
+    font-style: italic;
+    font-size: 16px;
+    line-height: 25px;
+}
+
+#noPractice {
+    margin-top: 80px;
+    width: 90%;
+}
+
+/* Spinner */
+
+#spinner {
+    position: relative;
+    height: 400px;
+    width: 460px;
+    color: #999999;
+    font-size: 10px;
+    float: left;
+    clear: both;
+}
+
+img.spinner {
+    position: absolute;
+    right: 4px;
+    top: 200px;
+}
+
+#spinnerLabel {
+    position: absolute;
+    right: 0;
+    top: 231px;
+}
+
+/* Spine chart */
+.noSpine {
+    height: 23px;
+    line-height: 23px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.q1, .q2, .q4, .spine {
+    height: 22px;
+    float: left;
+}
+
+.spine {
+    overflow: hidden;
+    padding: 0 0 0 0;
+}
+
+.spine200 {
+    width: 224px; /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
+    position: relative;
+}
+
+.average200 {
+    width: 2px;
+    left: 111px; /*half spine200 width - 1(i.e. half average bar width)*/
+    position: absolute;
+    height: 23px;
+}
+
+.marker {
+    position: absolute;
+}
+
+.line {
+    width: 100%;
+    float: left;
+    border-top: 2px solid #EEEAF8;
+    background: #B8A1EA;
+    height: 1px;
+    margin-bottom: 50px;
+}
+
+/* Tooltip*/
+#tooltip {
+    border-style: dotted;
+    border-width: thin;
+    border-color: #aaaaaa;
+    background-color: #eeeeee;
+    position: absolute;
+    display: none;
+    padding: 5px;
+    z-index: 5;
+    width: 200px;
+    cursor: pointer;
+}
+
+#tooltipIndicator {
+    float: left;
+    clear: left;
+    font-weight: bold;
+    width: 100%;
+}
+
+#tooltipArea {
+    width: 100%;
+    clear: left;
+    float: left;
+    font-style: italic;
+}
+
+#tooltipQualifier {
+    clear: left;
+    float: left;
+    width: 100%;
+}
+
+#tooltipData {
+    width: 100%;
+    float: left;
+}
+
+/* Definition table*/
+th.header, td.header {
+    background-color: #f6f7f7; /*!!!*/
+    font-weight: bold;
+    text-align: center;
+    vertical-align: top;
+}
+
+td.header {
+    text-align: left;
+    width: 120px;
+}
+
+TD.info {
+    width: 250px;
+    padding: 3px 3px 3px 0;
+    text-align: right;
+}
+
+#furtherInfoTable TD.info {
+    width: 200px;
+}
+
+/* Info tooltip */
+DIV.infoTooltip {
+    margin: 0 auto 0 auto;
+    height: 16px;
+    width: 16px;
+    background-image: url(../images/info3.png);
+}
+
+    DIV.infoTooltip:hover {
+        background-image: url(../images/info3-hover.png);
+    }
+
+.spineInfo {
+    position: absolute;
+    top: -16px;
+    left: 103px;
+}
+
+.indicatorLabel, .topicLabel {
+    font-size: 18px;
+}
+
+.indicatorLabel {
+padding-left:25px;
+}
+
+/* IE Spacers*/
+
+.margin200 {
+    width: 200px;
+    height: 10px;
+}
+
+.margin20 {
+    width: 20px;
+    height: 10px;
+}
+
+/* Keys */
+
+.key {
+    width: 12px;
+    height: 11px;
+    border: 1px solid #000;
+}
+
+#spineKeyTable {
+    position: absolute;
+    right: 0;
+    top: -32px;
+    line-height: 12px;
+    font-size: 12px;
+}
+
+#barChartKeyTable {
+    position: absolute;
+    right: 0;
+    top: -35px;
+    line-height: 10px;
+    font-size: 12px;
+}
+
+#scatterKeyTable {
+    border: 0 solid #ccc;
+    padding: 0 0 0 0;
+}
+
+    #scatterKeyTable IMG {
+        margin: 0 3px 0 3px;
+    }
+
+    #scatterKeyTable TD {
+        background: white;
+        border: 1px solid #ccc;
+        line-height: 12px;
+        padding: 0 12px 3px 5px;
+    }
+
+.noLeft {
+    border-left: 0 none #fff;
+}
+
+#scatterKeyBox {
+    position: relative;
+    float: left;
+    margin-top: 0;
+    top: 15px;
+    left: 100px;
+}
+
+#scatter {
+    float: left;
+    height: 550px;
+}
+
+#barChart {
+    float: left;
+    margin-top: 21px;
+}
+
+.barChartTitle {
+    width: 750px;
+    top: -11px;
+    position: relative;
+    text-align: center;
+}
+
+#metadataBox {
+    width: 890px;
+}
+
+#popChartBox {
+    float: left;
+    width: 510px;
+}
+
+#areaMenus {
+    width: 100%;
+}
+
+#indicatorMenu {
+    width: auto;
+    max-width:530px;
+}
+
+/* Export dialogue */
+#downloadPdf, #exportExcel {
+    width: 115px;
+    float: right;
+    margin: 6px 21px 0 0;
+    display: block;
+    color: #999;
+    font-weight: bold;
+    padding: 0;
+    font-size: 11px;
+    letter-spacing: 1px;
+    height: 17px;
+    cursor: pointer;
+    position: absolute;
+}
+
+#exportExcel {
+    top: 85px;
+    right: -27px;
+}
+
+#downloadPdf {
+    top: 115px;
+    right: -25px;
+}
+
+    #downloadPdf:hover, #exportExcel:hover {
+        color: #333;
+        background: #FFFFD7;
+        text-decoration: none;
+    }
+
+    #downloadPdf .text, #exportExcel .text {
+        height: 15px;
+        line-height: 15px;
+        margin-right: 6px;
+    }
+
+    #downloadPdf .icon, #exportExcel .icon {
+        margin-top: 2px;
+        height: 13px;
+        width: 10px;
+        background-image: url(../images/download2.png);
+        background-repeat: no-repeat;
+    }
+
+    #downloadPdf .icon {
+        width: 12px;
+        background-position: -20px 0;
+    }
+
+    #downloadPdf:hover .icon {
+        background-position: -32px 0;
+    }
+
+#exportExcel .icon {
+    background-position: 0 0;
+}
+
+#exportExcel:hover .icon {
+    background-position: -10px 0;
+}
+
+#downloadPdf DIV, #exportExcel DIV {
+    float: left;
+    margin-left: 3px;
+}
+
+.exportBtn {
+    padding: 2px 5px 2px 5px;
+    margin: 0 6px 0 0;
+    width: 60px;
+}
+
+#popupTitle h2 {
+    background-image: url(../images/excel24.gif);
+    background-repeat: no-repeat;
+    background-position: 94px 4px; 
+    text-align: center;
+}
+
+#infoBox select {
+margin-top:0;
+}
+
+#infoBox h2 {
+text-align: center;
+}
+
+TABLE.export {
+    padding: 5px;
+    margin: 15px 20px 0 20px;
+    width: 358px;
+    float: left;
+}
+
+    TABLE.export TD {
+        vertical-align: top;
+        text-align: left;
+        padding-top: 4px;
+    }
+
+    TABLE.export INPUT {
+        margin-top: 2px;
+    }
+
+P.export {
+    margin-left: 25px;
+    margin-top: 25px;
+}
+
+.noDataText {
+    color: #999;
+}
+
+#searchMap {
+    float: right;
+    width: 500px;
+    height: 500px;
+    background: #ddd;
+    margin: 10px 10px 0 0;
+    border: 2px solid #ddd;
+    font-size: 14px;
+}
+
+#searchText {
+    background: #FFF url(../images/search2.jpg) right center no-repeat;
+    float: left;
+    padding-left: 5px;
+    padding-right: 25px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    color: #333;
+    height: 25px;
+    width: 300px;
+}
+
+#searchButton {
+    margin: 20px 0 0 0;
+    float: left;
+    background-repeat: no-repeat;
+    background-position: 3px 3px;
+    background-image: url(../images/search.png);
+    height: 30px;
+    width: 30px;
+    border: 1px solid #ddd;
+    border-left: none;
+    cursor: pointer;
+}
+
+#searchResults {
+    float: left;
+    width: 600px;
+    margin: 0 0 0 10px;
+    padding: 12px;
+    padding-top: 0px;
+}
+
+    #searchResults p {
+        font-size: 1.4em;
+    }
+
+    #no-matches-found a {
+        cursor: default;
+        color: inherit;
+    }
+
+    .map-popup-content {
+        height: 40px;
+        width: 100%;
+        float: left;
+        font-size: 15px;
+    }
+
+    .map-popup-content a {
+         text-decoration: underline;
+    }
+
+     .map-popup-content a:hover {
+
+           text-decoration: none;
+    }
+
+TD.result, TD.resultCode {
+    color: #333;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    vertical-align: top;
+}
+
+TD.resultCode {
+    width: 52px;
+    color: #666;
+}
+
+.result-highlight {
+    background: #FFFFC7;
+}
+
+#no-search-results {
+    width: 100%;
+    text-align: center;
+    margin-top: 20px;
+    font-style: italic;
+    color: #666;
+}
+
+#practiceMenuBox {
+    padding-top: 0 !important;
+}
+
+#practiceMenu {
+    float: left;
+}
+
+#info-spinechart {
+    position: absolute;
+    left: 103px;
+    top: 3px;
+}
+
+#info-timeline {
+    position: absolute;
+    bottom: 0;
+    right: 80px;
+}
+
+.ajax-loading {
+    width: 100%;
+    text-align: center;
+    padding: 100px 0 100px 0;
+}
+
+.chosen-container, .chosen-select {
+    font-size: 18px;
+    width: 500px;
+}
+
+@media print {
+    #downloadPdf, #exportExcel {
+        display: none;
+    }
+}
+
+/* ------------------------------------------------------------
+	Practice search map
+------------------------------------------------------------ */
+
+#default_search_header {
+    width: 400px;
+    padding-top: 10px;
+    position: absolute;
+}
+
+#mapBox {
+    margin: 0 auto;
+    width: 1000px;
+}
+
+#mapBox h2 {
+    padding: 12px 0 5px 0;
+}
+
+#mapBox h3 {
+    padding: 8px 0;
+}
+
+#mapBox.default {
+    padding-top: 10px;
+}
+
+.nearby-practices-table {
+    float: left;
+    width: 45%;
+}
+
+.nearby-practices-map {
+    width: 55%;
+    float: right;
+}
+
+.nearby-practices-map #map-canvas {
+    width:100%;
+    height:500px;    
+    margin-bottom: 10px;
+}
+
+.nearby-practices-table .header {
+    position: relative;
+    background-color: #02ae94;
+    padding: 10px;
+    color: #fff;
+}
+   
+.nearby-practices-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nearby-practices-table td, .nearby-practices-table th {
+    padding: 0;
+font-weight: normal;
+text-align: left;
+vertical-align: top;
+    font-size: 16px;
+}
+
+.nearby-practices-table .highlight .header {
+    background-color: #525252;
+}
+
+.nearby-practices-table .empty {
+    height: 5px;
+    line-height: 5px;
+}
+
+#search-table .highlight {
+    background-color: #E6E6E6;
+}
+
+.domainContent {
+    margin: 3px 10px 3px 10px;
+    font-size: 17px;
+    line-height: 1.3em;
+}
+.export-chart-box {
+    margin-top: 10px;
+}

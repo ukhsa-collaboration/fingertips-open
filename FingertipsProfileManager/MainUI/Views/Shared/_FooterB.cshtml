@@ -1,0 +1,57 @@
+﻿@using System.Globalization
+
+<div id="footer" class="row">
+
+    <div class="col-md-3">
+        <h3>Test sites</h3>
+        <ul class="list-unstyled">
+            <li><a href="https://testphof.phe.org.uk">Public Health Outcomes Framework</a></li>
+            <li><a href="https://testhealthierlives.phe.org.uk">Longer Lives</a></li>
+            <li><a href="https://testprofiles.phe.org.uk">Fingertips</a></li>
+        </ul>
+    </div>
+
+    <div class="col-md-3">
+        <h3>Live sites</h3>
+        <ul class="list-unstyled">
+            <li><a href="http://www.phoutcomes.info">Public Health Outcomes Framework</a></li>
+            <li><a href="http://longerlives.phe.org.uk">Longer Lives</a></li>
+            <li><a href="http://fingertips.phe.org.uk">Fingertips</a></li>
+        </ul>
+    </div>
+
+    <div class="col-md-3">
+        <h3>Live updates</h3>
+        @{
+            var dates = new List<DateTime>
+            {
+                new DateTime(2016, 2, 2),
+                new DateTime(2016, 3, 1),
+                new DateTime(2016, 4, 5),
+                new DateTime(2016, 5, 4), // Bank holiday week
+                new DateTime(2016, 6, 7),
+                new DateTime(2016, 7, 5),
+                new DateTime(2016, 8, 2),
+                new DateTime(2016, 9, 6),
+                new DateTime(2016, 10, 4),
+                new DateTime(2016, 11, 1),
+                new DateTime(2016, 12, 6),
+            };
+        }
+        <ul class="list-unstyled">
+            @foreach (var date in dates.Where(x => x > DateTime.Now).Take(6))
+            {
+                <li>@date.DayOfWeek.ToString().Substring(0, 3) @date.Day @date.ToString("MMM", CultureInfo.InvariantCulture) @date.Year</li>
+            }
+        </ul>
+
+
+    </div>
+
+    <div class="col-md-3">
+        <a id="email-fpm-admin" href="mailto:daniel.flint@phe.gov.uk;doris.hain@phe.gov.uk?Subject=Fingertips%20Profile%20Manager%20-%20Support">Contact the FPM Administrator</a>
+    </div>
+
+</div>
+
+

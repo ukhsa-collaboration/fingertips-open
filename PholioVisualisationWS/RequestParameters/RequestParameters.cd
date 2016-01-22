@@ -1,0 +1,176 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" GroupingSetting="Access">
+  <Class Name="PholioVisualisation.RequestParameters.BarChartParameters">
+    <Position X="0.75" Y="5" Width="1.75" />
+    <Members>
+      <Method Name="BarChartParameters" Hidden="true" />
+      <Method Name="ParseComparatorValue" Hidden="true" />
+      <Method Name="ParseLabels" Hidden="true" />
+      <Method Name="ParseValues" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAEABABAAAAAAgCAAAEAEAACABAAQgAAAIADE=</HashCode>
+      <FileName>BarChartParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.BaseParameters">
+    <Position X="0.75" Y="1.5" Width="1.5" />
+    <Members>
+      <Method Name="BaseParameters" Hidden="true" />
+      <Method Name="ParseBool" Hidden="true" />
+      <Method Name="ParseDouble" Hidden="true" />
+      <Method Name="ParseInt" Hidden="true" />
+      <Method Name="ParseIntToStringDictionary" Hidden="true" />
+      <Method Name="ParseString" Hidden="true" />
+      <Method Name="ParseStringList" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAgAABAAAAAAAAYgAAEAAAAYAAAAIAACQ=</HashCode>
+      <FileName>BaseParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupAreasParameters">
+    <Position X="14.25" Y="1.5" Width="2.5" />
+    <Members>
+      <Method Name="GroupAreasParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAIAAgAAAAAAAAAAAAAAAIACAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>GroupAreasParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupDataAtDataPointParameters">
+    <Position X="14.25" Y="12" Width="2.5" />
+    <Members>
+      <Method Name="GroupDataAtDataPointParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>GroupDataAtDataPointParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupDataAtTimePointParameters">
+    <Position X="17.25" Y="9" Width="2.75" />
+    <Members>
+      <Method Name="GroupDataAtTimePointParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AIACAAAAAAAAAAABAAAAAAAAIACAAAAAAAgAAAAAACA=</HashCode>
+      <FileName>GroupDataAtTimePointParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupDataParameters">
+    <Position X="11" Y="5.25" Width="2.25" />
+    <Members>
+      <Method Name="GroupDataParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAIAAgAAAAAAAAAAAAAAAIAAAAAAAAAAAgAAAAgA=</HashCode>
+      <FileName>GroupDataParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.SpcForDsrParameters">
+    <Position X="6" Y="4" Width="2" />
+    <Members>
+      <Method Name="SpcForDsrParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAABAQBAAAAIRAAQAAAIACAACAAAAAAQAAAACA=</HashCode>
+      <FileName>SpcForDsrParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.TrendDataParameters">
+    <Position X="11.75" Y="12" Width="1.75" />
+    <Members>
+      <Method Name="TrendDataParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>TrendDataParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupDataAtDataPointBySearchParameters">
+    <Position X="7.5" Y="8.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>GroupDataAtDataPointBySearchParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.DataDownloadParameters">
+    <Position X="17.75" Y="1.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>DataDownloadParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.GroupDataWithGroupingsParameters">
+    <Position X="11.75" Y="8.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAECAAAAAAAAAAAAAAAIAAAABAAAAAAECAAAAA=</HashCode>
+      <FileName>GroupDataWithGroupingsParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.TrendDataBySearchParameters">
+    <Position X="7.75" Y="11.5" Width="2.5" />
+    <Members>
+      <Method Name="TrendDataBySearchParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TrendDataBySearchParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.DataParameters">
+    <Position X="11" Y="1.5" Width="2" />
+    <Members>
+      <Method Name="DataParameters" Hidden="true" />
+      <Method Name="ParseIndicatorIds" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAIAAAAAAIAAAAAAAACAAAAACAAAAAAAgBA=</HashCode>
+      <FileName>DataParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.JsonParameters">
+    <Position X="4.5" Y="1.5" Width="2" />
+    <Members>
+      <Method Name="JsonParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>JsonParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.SparklineDataParameters">
+    <Position X="15.75" Y="5.75" Width="2.25" />
+    <Members>
+      <Method Name="SparklineDataParameters" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAACgAAAAAIAIAAAAAAAAAAAIAiAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>SparklineDataParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.LabelParameters">
+    <Position X="8.5" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAYAAIAAAAAAAIBAIAAAACAIAAAAAAAACAAAgAAAIA=</HashCode>
+      <FileName>LabelParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.LabelSeriesParameters">
+    <Position X="8.5" Y="5.75" Width="2" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>LabelSeriesParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.RequestParameters.DataDownloadBespokeParameters">
+    <Position X="3" Y="3.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAAIECAAAAAAAAAQAAAAAAAEAAgAAAAAAESAAAAA=</HashCode>
+      <FileName>DataDownloadBespokeParameters.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

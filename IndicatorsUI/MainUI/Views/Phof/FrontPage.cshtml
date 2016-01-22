@@ -1,0 +1,61 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Common
+@using Profiles.MainUI.Models
+@model PageModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+@section headContent {
+    @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForContentPages")) 
+    @Html.Partial("_TwitterStyle")
+    <script type="text/javascript">//<![CDATA[
+        Twitter_Handle = '@(Model.GetTwitterHandle())';
+    //]]</script>
+}
+
+<div class="full-width title-divider"></div>
+@{
+    HtmlString recentUpdates = CommonUtilities.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
+    var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
+    var areUpdates = recentUpdates != null;
+    var introductionWidth = areUpdates ? 65 : 100;
+}
+<div class="standardWidth">
+    @Html.Partial("_UpdateDelayedMessage")
+    <div  style="width: @(introductionWidth)%; float: left;">
+        <div class="">
+            @if (Model.Skin.IsPhof)
+            {
+                @Html.Partial(Model.GetSkinView("_PhofDomains"))
+            }
+        </div>
+    </div>
+    <div style="width: @(95 - introductionWidth)%; float: right;">
+        @if (Model.Skin.IsPhof)
+        {
+            @Html.Partial("_TwitterFeed")
+        }
+    </div>
+</div>
+<div class="standardWidth clearfix">
+    <div id="introduction" style="width: @(introductionWidth)%; margin-top: 0px;">
+        @CommonUtilities.GetContent(ContentKeys.Introduction, Model.ProfileId)
+    </div>
+    @if (areUpdates)
+    {
+        <div id="recent-updates">
+            <h2>Recent updates</h2>
+            <div class="@updatesCssClass">
+                @recentUpdates
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.Skin.IsTobacco)
+{
+    <div class="standardWidth clearfix">
+        <a id="startButton" href="/tobacco-control"></a>
+    </div>
+}

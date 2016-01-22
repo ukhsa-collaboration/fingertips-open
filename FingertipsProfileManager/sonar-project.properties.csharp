@@ -1,0 +1,16 @@
+sonar.projectKey=fingertips.fpm-cs
+sonar.projectVersion=1.0
+sonar.projectName=FPM-CSharp
+
+sonar.sources=.
+sonar.language=cs
+sonar.sourceEncoding=UTF-8
+# Dynamic.cs is Microsoft dynamic LINQ library
+sonar.exclusions=**/Dynamic.cs,**/Properties/AssemblyInfo.cs
+
+sonar.visualstudio.enable=true
+sonar.visualstudio.testProjectPattern=.+Test
+sonar.visualstudio.skippedProjectPattern=.+Test
+
+sonar.fxcop.mode=skip
+sonar.gallio.mode=skip

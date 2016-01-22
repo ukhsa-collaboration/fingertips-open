@@ -1,0 +1,8 @@
+﻿@using Profiles.MainUI.Common
+@* Include of html2canvas throws exception in browser for IE8 *@
+@if (BrowserHelper.IsIe8(Request) == false)
+{
+    <script>L_PREFER_CANVAS = true;</script> // Force Leaflet to render maps in Canvas required for html2Image
+    <script src="@(Model.JsPath)Html2Canvas/html2canvas.min.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)Html2Canvas/html2canvas.svg.min.js" type="text/javascript"></script>
+}

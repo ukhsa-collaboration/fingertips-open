@@ -1,0 +1,14 @@
+﻿@model Profiles.MainUI.Models.PageModel
+<div class="searchContainer">
+    <input id="searchButton" type="button" onclick="doSearch();" 
+        title="Find the indicators in Fingertips that contain your specified keywords"
+        value="" />
+    @Html.TextBox("search", "Indicator keywords", new
+{
+    id = "searchBox",
+    onkeypress = "searchKeyPress(event)",
+    onfocus = "searchFocus(this)",
+    onblur = "searchBlur(this)",
+    @class = "searchBlur"
+})
+</div>

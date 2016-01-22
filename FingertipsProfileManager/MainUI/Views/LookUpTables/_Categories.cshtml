@@ -1,0 +1,42 @@
+﻿@using iTextSharp.text.pdf.qrcode
+@model Fpm.MainUI.Models.LookupModel
+
+@if (Model.CategoryTypes != null)
+{
+    var categoryTypes = Model.CategoryTypes;
+    var categories = Model.Categories;
+    var selectList = categoryTypes
+        .Select(x => new SelectListItem
+        {
+            Text = x.Name + " (ID:" + x.Id + ")", 
+            Value = x.Id.ToString()
+        });
+
+    using (Html.BeginForm("Categories", "LookUpTables", FormMethod.Post, new { id = "CategoriesForm" }))
+    {
+        <p style="margin-top:0;">Categories are used to specify inequality data in a batch indicator data upload.</p>
+        <h3>Category type:</h3>
+        @Html.DropDownListFor(x => x.CategoryTypeId, selectList,
+                     new
+                     {
+                         @Name = "categoryTypeId",
+                         @Id = "categoryTypeId",
+                         @class = "",
+                         @onchange = "submitForm('Categories');"
+                     })
+
+        <h3 style="margin-top:40px;">Categories of @Model.GetSelectedCategoryType().ShortName:</h3>
+    <table id="lookup-table" class="grid sortable">
+        @Html.Partial("_TableHeader", new List<string> { "ID", "Name" })
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>@category.CategoryId</td>
+                    <td>@category.Name</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }
+}

@@ -1,0 +1,112 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
+@{ Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml"; }
+@section headContent {
+    <script src="@(Model.JsPath)LongerLives/PageBaseLongerLivesRankings.js" type="text/javascript"></script>
+    <script src="@(Model.JsPath)LongerLives/Mortality/PageMortalityRankings.js" type="text/javascript"></script>
+}
+
+<div id="header_bottom" class="clearfix">
+    <ul id="breadcrumbs">
+        <li><a href="javascript:MT.nav.home();">Home</a></li>
+        <li class="last">Mortality rankings</li>
+    </ul>
+    @Html.Partial("_SearchAreaSmall")
+</div>
+
+<div id="content" class="clearfix ranking_table_content">
+    <div class="header">
+        <div class="stats">
+            <dl class="stat population_stat">
+                <dt>Population</dt>
+                <dd><strong id="national-population"></strong></dd>
+            </dl>
+            <dl class="stat premature_death_stat">
+                <dt>Premature deaths</dt>
+                <dd><strong id="national-overall"></strong> <span class="national_overall_period"></span><span class="tooltip-right right"><i>Total premature deaths (deaths before age 75) in England over <span class="national_overall_period"></span></i></span></dd>
+            </dl>
+        </div>
+        <h1>Mortality rankings</h1>
+        <div class="hr">
+            <hr />
+        </div>
+    </div>
+    <div id="related_content">
+        <div class="useful_links table_options">
+            <h4>Table options</h4>
+            <small class="no-print">Select the data to display</small>
+            <div class="hr">
+                <hr />
+            </div>
+            
+            <div id="area-filter"></div>               
+
+            <h5>Cause of premature death</h5>
+            <ul id="mortality_list" class="filters">
+                <li>&nbsp;</li>
+                <li>&nbsp;</li>
+                <li>&nbsp;</li>
+                <li>&nbsp;</li>
+                <li>&nbsp;</li>
+            </ul>
+            <div class="hr">
+                <hr />
+            </div>
+            <h5>Premature death statistic</h5>
+            <ul id="value_types" class="filters">
+                <li class="active"><a href="javascript:selectValueType(0)">Premature deaths <small>per 100,000</small></a></li>
+                <li><a href="javascript:selectValueType(1)">Total premature deaths</a></li>
+            </ul>
+            <small>(Rankings are always based on the rate per 100,000)</small>
+            <div class="hr">
+                <hr />
+            </div>
+            <h5>Supporting data</h5>
+            <ul id="supporting_data" class="filters">
+                <li class="active"><a href="javascript:selectSupportingData(0)">Population</a></li>
+                <li><a href="javascript:selectSupportingData(1)">Socioeconomic deprivation</a>@Html.Partial("_DeprivationTooltip")</li>
+            </ul>
+        </div>
+        <div class="no-print">
+            <ul>
+                <li>@Html.Partial("_PhofLink", GroupIds.Phof_PrematureMortality)</li>
+                <li><a href="/topic/@(ViewBag.ProfileUrlKey)/about-data">About the data</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="main_content">
+        <p class="legend">
+            Premature mortality outcomes
+                       
+            <span class="grade"><img src="@(ViewBag.ImagesUrl)Mortality/grade-3.png" alt="worst" />worst</span>
+            <span class="grade"><img src="@(ViewBag.ImagesUrl)Mortality/grade-2.png" alt="below average" />worse than average</span>
+            <span class="grade"><img src="@(ViewBag.ImagesUrl)Mortality/grade-1.png" alt="above average" />better than average</span>
+            <span class="grade"><img src="@(ViewBag.ImagesUrl)Mortality/grade-0.png" alt="best" />best</span>
+        </p> @* Added by NM 08/05/13 (list order and added new key) *@
+
+        <div class="table-data" id="mortality-rankings">
+            <div class="header national clearfix">
+                <p id="hover-or-tap" class="tip">Hover or tap on a local authority to compare it to similar areas</p>
+                <h2>National rankings <small id="indicator-name"></small></h2>
+                <h3>Ranking <span id="la_count">150</span> local authorities in England</h3>
+            </div>
+            <div class="header similar clearfix" style="display: none;">
+                <h2>Similar Areas Ranking</h2>
+                <h3>Ranking similar areas to <font id="area-name"></font> in <font id="comparator-name"></font><span class="tooltip tooltip-inverse"><i id="similar-areas-tooltip"></i></span></h3>
+                <a class="return_link no-print" href="javascript:showAllAreas()">&lt; return to national rankings</a>
+            </div>
+            <table id="mortality-rankings-table">
+                <thead>
+                    <tr>
+                        <th class="rank sorted"><a href="javascript:sortRankings(0);">Rank <i></i></a></th>
+                        <th><a href="javascript:sortRankings(1);">Local authority <i></i></a></th>
+                        <th id="supporting_data_heading"></th>
+                        <th class="last-child"><a id="value_type_heading" href="javascript:sortRankings(3);"></a></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

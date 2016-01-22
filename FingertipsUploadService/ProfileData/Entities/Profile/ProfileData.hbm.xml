@@ -1,0 +1,371 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="FingertipsUploadService.ProfileData"
+                   namespace="FingertipsUploadService.ProfileData.Entities.Profile">
+
+  
+  <!-- ComparatorConfidence class -->
+  <class name="ComparatorConfidence" table="l_comparatorconfidence">
+
+    <composite-id>
+      <key-property name="ComparatorMethodId" column="comparatormethodid" />
+      <key-property name="ConfidenceValue" column="comparatorconfidence" />
+    </composite-id>
+
+  </class>
+
+ <!-- ProfileDetails class -->
+  <class name="ProfileDetails" table="UI_Profiles">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="UrlKey" column="url_key"/>
+    <property name="Name" column="name"/>
+    <property name="ArePdfs" column="are_pdfs"/>
+    <property name="StartZeroYAxis" column="start_zero_y_axis"/>
+    <property name="IsLive" column="is_profile_live"/>
+    <property name="IsProfileViewable" column="is_profile_viewable"/>
+    <property name="ShowDataQuality" column="show_data_quality"/>
+    <property name="IsNational" column="is_national"/>
+    <property name="HasOwnFrontPage" column="has_own_front_page"/>
+    <property name="DefaultAreaTypeId" column="default_area_type_id"/>
+    <property name="KeyColourId" column="key_colour_id"/>
+    <property name="SkinId" column="skin_id"/>
+    <property name="AreasIgnoredForSpineChart" column="areas_ignored_for_spine_chart"/>
+    <property name="AreasIgnoredEverywhere" column="areas_ignored_everywhere"/>
+    <property name="AreIndicatorsExcludedFromSearch" column="exclude_indicators_from_search"/>
+    <property name="ExtraJsFiles" column="extra_js_files"/>
+    <property name="ExtraCssFiles" column="extra_css_files"/>
+    <property name="AccessControlGroup" column="access_control_group"/>
+    <property name="DefaultFingertipsTabId" column="default_fingertips_tab_id"/>
+    <property name="ContactUserId" column="contact_user_id"/>
+    <property name="SpineChartMinMaxLabelId" column="spinechart_minmax_label_id"/>
+    <property name="EnumParentDisplay" column="enum_parent_display"/>
+    <property name="ShouldBuildExcel" column="should_build_excel"/>
+    <property name="HasTrendMarkers" column="has_trend_markers"/>
+  </class>
+
+  
+  <!-- GroupingMetadata class -->
+  <class name="GroupingMetadata" table="groupingmetadata">
+
+    <id name="GroupId" column="groupid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="GroupName" column="groupname"/>
+    <property name="Description" column="description"/>
+    <property name="Sequence" column="sequence"/>
+    <property name="ProfileId" column="profileid"/>
+
+  </class>
+
+  <!-- Grouping class -->
+  <class name="Grouping" table="grouping">
+    <id name="GroupingId" column="groupingid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="GroupId" column="groupid"/>
+    <property name="SexId" column="sexid"/>
+    <property name="AgeId" column="ageid"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="ComparatorId" column="comparatorid"/>
+    <property name="ComparatorMethodId" column="comparatormethodid"/>
+    <property name="ComparatorConfidence" column="comparatorconfidence"/>
+    <property name="YearRange" column="yearrange"/>
+    <property name="Sequence" column="sequence"/>
+
+    <property name="BaselineYear" column="baselineyear"/>
+    <property name="BaselineQuarter" column="baselinequarter"/>
+    <property name="BaselineMonth" column="baselinemonth"/>
+
+    <property name="DataPointYear" column="datapointyear"/>
+    <property name="DataPointQuarter" column="datapointquarter"/>
+    <property name="DataPointMonth" column="datapointmonth"/>
+    <property name="ComparatorTargetId" column="comparatortargetid"/>
+    <property name="PolarityId" column="polarityid"/>
+  </class>
+
+  <!-- IndicatorMetadata class -->
+  <class name="IndicatorMetadata" table="IndicatorMetadata">
+
+    <id name="IndicatorId" column="indicatorid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="DenominatorTypeId" column="denominatortypeid"/>
+    <property name="CIMethodId" column="cimethodid"/>
+    <property name="ValueTypeId" column="valuetypeid"/>
+    <property name="UnitId" column="unitid"/>
+    <property name="YearTypeId" column="yeartypeid"/>
+    <property name="ConfidenceLevel" column="confidencelevel"/>
+    <property name="OwnerProfileId" column="ownerprofileId"/>
+    <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
+    <property name="TargetId" column="targetid"/>
+    <property name="DateEntered" column="DateEnteredInPHOLIO"/>
+  </class>
+
+  <!-- IndicatorMetadataTextProperty class -->
+  <class name="IndicatorMetadataTextProperty" table="IndicatorMetadataTextProperties">
+
+    <id name="PropertyId" column="propertyid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="ColumnName" column="columnname"/>
+    <property name="DisplayName" column="displayname"/>
+    <property name="Definition" column="definition"/>
+    <property name="IsHtml" column="ishtml"/>
+    <property name="IsMandatory" column="ismandatory"/>
+    <property name="IsSearchable" column="issearchable"/>
+    <property name="DisplayOrder" column="displayorder"/>
+  </class>
+
+  <!-- IndicatorMetadataTextValue class -->
+  <class name="IndicatorMetadataTextValue" table="IndicatorMetadataTextValues">
+
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid" />
+    <property name="ProfileId" column="profileid"/>
+    <property name="Name" column="[1_name]"/>
+    <property name="NameLong" column="[2_namelong]" />
+    <property name="Definition" column="[3_Definition]" />
+    <property name="Rationale" column="[4_Rationale]" />
+    <property name="Policy" column="[5_Policy]" />
+    <property name="DataSource" column="[6_DataSource]" />
+    <property name="Producer" column="[7_Producer]" />
+    <property name="IndSourceLink" column="[8_IndSourceLink]" />
+    <property name="IndMethod" column="[9_IndMethod]" />
+    <property name="StandardPop" column="[10_StandardPop]" />
+    <property name="CIMethod" column="[11_CIMethod]" />
+    <property name="CountSource" column="[12_CountSource]" />
+    <property name="CountDefinition" column="[13_CountDefinition]" />
+    <property name="DenomSource" column="[14_DenomSource]" />
+    <property name="DenomDefinition" column="[15_DenomDefinition]" />
+    <property name="DiscControl" column="[16_DiscControl]" />
+    <property name="Caveats" column="[17_Caveats]" />
+    <property name="Copyright" column="[18_Copyright]" />
+    <property name="Reuse" column="[19_Reuse]" />
+    <property name="Links" column="[20_Links]" />
+    <property name="RefNum" column="[21_RefNum]" />
+    <property name="Notes" column="[22_Notes]" />
+    <property name="Frequency" column="[23_Frequency]" />
+    <property name="Rounding" column="[24_Rounding]" />
+    <property name="DataQuality" column="[25_DataQuality]" />
+    <property name="IndicatorContent" column="[26_IndicatorContent]" />
+    
+  </class>
+
+  <!-- Indicator Audit class -->
+  <class name="IndicatorAudit" table="FPM_ChangeLog">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="GroupId" column="groupid"/>
+    <property name="Timestamp" column="timestamp"/>
+    <property name="User" column="[user]"/>
+    <property name="ReasonForChange" column="reasonforchange"/>
+    <property name="AuditType" column="audittype"/>
+
+  </class>
+
+  <!-- ContentItem class -->
+  <class name="ContentItem" table="FPM_Content">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ProfileId" column="profileid"/>
+    <property name="ContentKey" column="contentkey"/>
+    <property name="Description" column="description"/>
+    <property name="Content" column="content" type="StringClob"/>
+    <property name="PlainTextContent" column="plaintextcontent"/>
+  </class>
+  
+  <!-- ContentAudit class -->
+  <class name="ContentAudit" table="FPM_ContentAudit">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ContentId" column="contentid"/>
+    <property name="ContentKey" column="contentkey"/>
+    <property name="FromContent" column="fromcontent" type="StringClob"/>
+    <property name="ToContent" column="tocontent" type="StringClob"/>
+    <property name="UserName" column="username"/>
+    <property name="Timestamp" column="timestamp"/>
+  </class>
+
+  <!-- Exception Log class -->
+  <class name="ExceptionLog" table="t_exceptions">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Application" column="application"/>
+    <property name="Date" column="date"/>
+    <property name="UserName" column="user_name"/>
+    <property name="Message" column="message"/>
+    <property name="StackTrace" column="stack_trace"/>
+    <property name="Type" column="type"/>
+    <property name="Url" column="url"/>
+    <property name="Server" column="server"/>
+  </class>
+
+  <!-- ProfileCollection class -->
+  <class name="ProfileCollection" table="ui_profilecollection">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="CollectionName" column="collectionname"/>
+    <property name="CollectionSkinTitle" column="collectionskintitle"/>
+
+  </class>
+
+  <class name="ProfileCollectionItem" table="ui_profilecollectionitems">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="ProfileCollectionId" column="profilecollectionid"/>
+    <property name="ProfileId" column="profileid"/>
+    <property name="DisplayDomains" column="displaydomains"/>
+  </class>
+
+  <!-- TargetConfig -->
+  <class name="TargetConfig" table="L_Targets">
+
+    <id name="Id" column="targetid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="LowerLimit" column="lowerlimit"/>
+    <property name="UpperLimit" column="upperlimit"/>
+    <property name="BespokeTargetKey" column="bespoketargetkey"/>
+    <property name="PolarityId" column="polarityid"/>
+    <property name="Description" column="description"/>
+  </class>
+
+  <!-- TargetConfigAudit -->
+  <class name="TargetConfigAudit" table="fpm_targetsaudit">
+
+    <id name="AuditId" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <!-- Audit properties -->
+    <property name="Timestamp" column="timestamp"/>
+    <property name="UserId" column="userid"/>
+    <property name="Change" column="change"/>
+
+    <!-- TargetConfig properties -->
+    <property name="Id" column="targetid"/>
+    <property name="LowerLimit" column="lowerlimit"/>
+    <property name="UpperLimit" column="upperlimit"/>
+    <property name="BespokeTargetKey" column="bespoketargetkey"/>
+    <property name="PolarityId" column="polarityid"/>
+    <property name="Description" column="description"/>
+  </class>
+
+  <!-- Category class -->
+  <class name="Category" table="l_categories">
+    <composite-id>
+      <key-property name="CategoryTypeId" column="categorytypeid" />
+      <key-property name="CategoryId" column="categoryid" />
+    </composite-id>
+
+    <property name="Name" column="name" />
+    <property name="ShortName" column="shortname" />
+  </class>
+
+  <!-- Document class-->
+  <class name="Document" table="FPM_Document">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ProfileId" column="profileid"/>
+    <property name="FileName" column="filename"/>    
+    <property name="FileData" column="filedata" length="10000000" />
+    <property name="UploadedOn" column="uploadedon"/>
+    <property name="UploadedBy" column="uploadedby"/>
+  </class>
+
+  <class name="SpineChartMinMaxLabel" table="UI_SpineChartMinMaxLabel">
+    <id name="Id" column="LabelId" type="int" unsaved-value="-1"/>
+    <property name="Description" column="description"/>
+  </class>
+
+  <!-- SQL Queries -->
+  <sql-query name="GetIndicatorMetadataTextValues">
+    SELECT * FROM IndicatorMetadataTextValues 
+    WHERE (IndicatorID = :indicatorId) AND (ProfileId = :profileId OR ProfileId IS NULL) 
+    Order By ProfileId
+  </sql-query>
+  
+  <sql-query name="GetOverriddenIndicatorMetadataTextValuesForProfileId">
+    SELECT * FROM IndicatorMetadataTextValues 
+    WHERE (IndicatorID = :indicatorId) AND (ProfileId = :profileId) 
+  </sql-query>
+
+  <sql-query name="GetIndicatorDefaultMetadataTextValues">
+    SELECT * FROM IndicatorMetadataTextValues
+    WHERE (IndicatorID = :indicatorId) AND ProfileId IS NULL
+  </sql-query>
+
+  <sql-query name="GetAreaTypesForProfileId">
+      SELECT distinct t1.AreaTypeID as Id , t3.AreaType as Name
+      FROM [grouping] t1
+      inner join GroupingMetadata t2 on t1.Groupid = t2.groupid
+      inner join L_AreaTypes t3 on t1.AreaTypeID = t3.AreaTypeID
+      where t2.profileid = :profileId
+  </sql-query>
+
+  <sql-query name="GetPDFEnabledAreaTypesForProfileId">
+    SELECT distinct t1.AreaTypeID as Id, t2.AreaType as Name
+    FROM UI_ProfilePdfs t1
+    inner join L_AreaTypes t2 on t1.AreaTypeId = t2.AreaTypeID
+    where t1.profileid = :profileId
+  </sql-query>
+
+  <sql-query name="Delete_ProfilePDFs">
+    DELETE FROM UI_ProfilePdfs WHERE profileId = :ProfileId
+  </sql-query>
+
+  <sql-query name="Insert_ProfilePDFs">
+    INSERT INTO UI_ProfilePdfs (ProfileId, AreaTypeId) Values (:ProfileId, :AreaTypeId)
+ </sql-query>
+
+  <sql-query name="GetGroupingPlusNames">
+    SELECT Distinct [1_Name] as IndicatorName, imtv.IndicatorID as IndicatorId, imtv.ProfileId as ProfileId,
+    g.GroupId, g.Sequence, g.AgeId, g.SexId, AreaTypeId,
+    YearRange, BaselineYear, BaselineQuarter, BaselineMonth, DatapointYear, DatapointQuarter, DatapointMonth,
+    s.Sex, cast(g.ComparatorConfidence as VARCHAR) as ComparatorConfidence ,
+    g.ComparatorMethodId, cm.ShortName as ComparatorMethod, im.YearTypeID as YearTypeId ,
+    L_Ages.Age
+    FROM IndicatorMetadataTextValues imtv
+    INNER JOIN grouping g ON imtv.IndicatorID = g.IndicatorID
+    INNER JOIN L_Sexes s ON g.SexID = s.SexID
+    INNER JOIN L_ComparatorMethods cm ON g.ComparatorMethodID = cm.ComparatorMethodID
+    INNER JOIN IndicatorMetadata im ON imtv.IndicatorID = im.IndicatorID
+    INNER JOIN L_Ages ON g.AgeID = L_Ages.AgeID
+    WHERE (imtv.IndicatorID =  :IndicatorId  )
+    AND g.GroupID =   :SelectedDomainId
+    AND (imtv.ProfileId =  :ProfileId   OR  imtv.ProfileId IS NULL)
+    AND (g.AreaTypeID =  :AreaTypeId )
+    ORDER BY g.GroupID DESC
+  </sql-query>
+
+</hibernate-mapping>
+
+

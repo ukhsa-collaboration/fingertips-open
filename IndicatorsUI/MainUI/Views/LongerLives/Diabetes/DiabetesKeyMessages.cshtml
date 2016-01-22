@@ -1,0 +1,18 @@
+﻿@using Profiles.MainUI.Common
+@model Profiles.MainUI.Models.PageModel
+@{
+    Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
+}
+@section headContent {
+}
+
+@Html.Partial("_BasicBreadcrumb", "Key messages")
+
+<div id="content" class="clearfix">
+    <div id="related_content">
+        @CommonUtilities.GetContent("messages-related", Model.ProfileId)
+    </div>
+	<div id="main_content">
+        @CommonUtilities.GetContent("messages-main", Model.ProfileId)
+	</div>
+</div>

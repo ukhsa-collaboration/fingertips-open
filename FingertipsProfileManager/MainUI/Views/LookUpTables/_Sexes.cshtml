@@ -1,0 +1,17 @@
+﻿@model Fpm.MainUI.Models.LookupModel
+
+@if (Model.Sexes != null)
+{
+    <table id="lookup-table" class="grid sortable">
+        @Html.Partial("_TableHeader", new List<string> { "ID", "Description" })
+        <tbody>
+            @foreach (var sex in Model.Sexes)
+            {
+                <tr>
+                    <td>@sex.SexID</td>
+                    <td>@sex.Description</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
