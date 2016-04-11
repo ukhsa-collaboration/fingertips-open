@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace CkanTest.Model
+namespace PholioVisualisation.CkanTest.Model
 {
     [TestClass]
     public class CkanGroupTest

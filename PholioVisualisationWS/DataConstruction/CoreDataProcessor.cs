@@ -53,7 +53,8 @@ namespace PholioVisualisation.DataConstruction
 
         private static void RoundCount(CoreDataSet data)
         {
-            if (data.Count.HasValue)
+            if (data.Count.HasValue && 
+                data.Count.Value.Equals(ValueWithCIsData.CountMinusOne) == false)
             {
                 data.Count = Round(data.Count.Value);
             }

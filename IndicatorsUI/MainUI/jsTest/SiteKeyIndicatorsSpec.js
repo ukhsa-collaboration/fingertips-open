@@ -571,7 +571,7 @@ describe('getTargetLegendHtml', function () {
     });
 
     it('should result contain bobHigher for last-year-england BespokeKey and Polarity 99', function () {
-        metaData.Target.PolarityId = 99;
+        metaData.Target.PolarityId = PolarityIds.BlueOrangeBlue;
         metaData.Target.BespokeKey = lastYearEngland;
         var result = getTargetLegendHtml(compareConfig, metaData);
         expect(result).toContain('target bobHigher');

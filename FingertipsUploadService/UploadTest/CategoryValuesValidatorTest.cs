@@ -1,10 +1,10 @@
 ﻿using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Profile;
-using Fpm.Upload;
+using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace UploadTest
+namespace FingertipsUploadService.UploadTest
 {
     [TestClass]
     public class WhenUsingCategoryValuesValidator

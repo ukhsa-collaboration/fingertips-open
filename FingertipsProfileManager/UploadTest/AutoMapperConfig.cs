@@ -1,7 +1,7 @@
 ﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Core;
 
-namespace UploadTest
+namespace Fpm.UploadTest
 {
     public static class AutoMapperConfig
     {

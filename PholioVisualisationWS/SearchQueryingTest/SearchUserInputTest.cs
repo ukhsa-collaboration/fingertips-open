@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.SearchQuerying;
 
-namespace SearchQueryingTest
+namespace PholioVisualisation.SearchQueryingTest
 {
     [TestClass]
     public class SearchUserInputTest

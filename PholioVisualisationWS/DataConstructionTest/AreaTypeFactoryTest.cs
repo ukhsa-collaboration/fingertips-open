@@ -7,7 +7,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class AreaTypeFactoryTest
@@ -34,8 +34,9 @@ namespace DataConstructionTest
             var name = "deprivation decile";
             var id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), new ParentAreaGroup { CategoryTypeId = id });
-            Assert.AreEqual(name, areaType.Name.ToLower());
-            Assert.AreEqual(name, areaType.ShortName.ToLower());
+
+            Assert.IsTrue(areaType.Name.ToLower().Contains(name));
+            Assert.IsTrue(areaType.ShortName.ToLower().Contains(name));
         }
 
         [TestMethod]

@@ -4,7 +4,7 @@ using PholioVisualisation.KeyMessages;
 using PholioVisualisation.PholioObjects;
 
 
-namespace KeyMessagesTest
+namespace PholioVisualisation.KeyMessagesTest
 {
     [TestClass]
     public class HealthProfilesKeyMessage3BuilderTest

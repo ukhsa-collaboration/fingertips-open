@@ -9,8 +9,8 @@
     <ProjectGuid>{BA0AEAE0-7FEA-4772-9EF9-658E3C51090E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ServicesTest</RootNamespace>
-    <AssemblyName>ServicesTest</AssemblyName>
+    <RootNamespace>IndicatorsUI.ServicesTest</RootNamespace>
+    <AssemblyName>IndicatorsUI.ServicesTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

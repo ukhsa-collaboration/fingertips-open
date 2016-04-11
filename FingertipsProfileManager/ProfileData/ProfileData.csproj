@@ -75,10 +75,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DuplicateRowInDatabaseError.cs" />
+    <Compile Include="AreaTypeIdSplitter.cs" />
+    <Compile Include="Entities\JobError\UploadJobError.cs" />
+    <Compile Include="Entities\Job\UploadJob.cs" />
+    <Compile Include="Entities\Job\UploadJobStatus.cs" />
+    <Compile Include="Entities\Job\UploadJobType.cs" />
     <Compile Include="Entities\LookUps\Age.cs" />
     <Compile Include="Entities\LookUps\AreaType.cs" />
-    <Compile Include="AreaTypeIdSplitter.cs" />
     <Compile Include="BaseReader.cs" />
     <Compile Include="Entities\Core\Area.cs" />
     <Compile Include="Entities\LookUps\Skin.cs" />
@@ -104,15 +107,13 @@
     <Compile Include="Entities\LookUps\KeyColour.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Entities\LookUps\Polarity.cs" />
-    <Compile Include="Helpers\Mapper.cs" />
-    <Compile Include="ProfileDataRegistry.cs" />
     <Compile Include="ProfilesWriter.cs" />
     <Compile Include="Entities\Profile\ExceptionLog.cs" />
     <Compile Include="FpmException.cs" />
     <Compile Include="Entities\Profile\ProfileCollectionItem.cs" />
     <Compile Include="Entities\Profile\ProfileCollection.cs" />
-    <Compile Include="AllowedData.cs" />
     <Compile Include="Entities\LookUps\IndicatorValueType.cs" />
+    <Compile Include="Repositories\IFpmUploadRepository.cs" />
     <Compile Include="Repositories\LoggingRepository.cs" />
     <Compile Include="Repositories\LookUpsRepository.cs" />
     <Compile Include="Repositories\CoreDataRepository.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="NHibernateSessionFactory.cs" />
     <Compile Include="Repositories\ProfileRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
+    <Compile Include="Repositories\UploadJobRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
     <Compile Include="Entities\Profile\SpineChartMinMaxLabel.cs" />
     <Compile Include="Entities\Profile\TargetConfig.cs" />
@@ -147,7 +149,6 @@
     <Compile Include="ProfilesReader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReaderFactory.cs" />
-    <Compile Include="UploadDataModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entities\Profile\ProfileData.hbm.xml">
@@ -172,11 +173,16 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\Job\uploadjob.hbm.xml" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entities\User\User.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\JobError\JobError.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

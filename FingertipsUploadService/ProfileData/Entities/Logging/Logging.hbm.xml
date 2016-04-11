@@ -3,33 +3,6 @@
                    assembly="FingertipsUploadService.ProfileData"
                    namespace="FingertipsUploadService.ProfileData.Entities.Logging">
 
-
-  <class name="IndicatorMetadataLog" table="indicatormetadatatextvalues_changelog">
-    <id name="Id" column="id" type="int" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-
-    <property name="IndicatorId" column="indicatorid"/>
-    <property name="GroupId" column="groupid"/>
-    <property name="PropertyId" column="propertyid"/>
-    <property name="OldText" column="oldtext"/>
-    <property name="Timestamp" column="timestamp"/>
-    <property name="UserName" column="[user]"/>
-  </class>
-
-  <class name="AuditLog" table="FPM_ChangeLog">
-    <id name="Id" column="id" type="int" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-
-    <property name="IndicatorId" column="indicatorid"/>
-    <property name="GroupId" column="groupid"/>
-    <property name="ReasonForChange" column="ReasonForChange"/>
-    <property name="AuditType" column="AuditType"/>
-    <property name="Timestamp" column="timestamp"/>
-    <property name="UserName" column="[user]"/>
-  </class>
-
   <class name="UploadAudit" table="FPM_UploadAudit">
     <id name="Id" column="id" type="int" unsaved-value="-1">
       <generator class="identity"/>

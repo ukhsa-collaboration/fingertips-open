@@ -130,7 +130,7 @@ function addSpineChartHeader(h) {
     addTh(h, 'Practice<br/>Count', CSS_VAL);
     addTh(h, 'Practice<br/>Value', CSS_VAL);
     addTh(h, getBenchmarkHeader(), CSS_VAL + ' benchmark');
-    addTh(h, 'England<br>Average', CSS_VAL);
+    addTh(h, 'England<br>Value', CSS_VAL);
     addTh(h, 'England<br>Lowest', CSS_VAL);
     addTh(h, '<div class="fl w100" style="position:relative;height:20px;">' + 
 '<div id="info-spinechart" class="infoTooltip" onclick="showSpineInfo()" title="More information about these charts"></div></div><div style="float:left;width:100%;clear:both;">England Range</div>', 'range');
@@ -539,26 +539,15 @@ function getAreaInfo(isArea, cellIndex, indicatorMetadata, subgroupData, row, ro
         dataIndex = dataArray.length - yearOffset - 1,
         data = dataArray[dataIndex]; 
         
-        // Use data from previous year if necessary
-        if (!data && yearOffset == 0 && nationalItem.Data[dataIndex]/*only use previous year 
-            when national data not available*/) {
-            
-            dataIndex = dataArray.length - 2;
-            if (dataIndex < 0) {
-                dataIndex = 0;   
-            }
-            data = dataArray[dataIndex];
+        var dataInfo = new CoreDataSetInfo(data);
+
+        // Practice count
+        if (isPractice) {
+            var count = formatCount(dataInfo);
+            row.children(':eq(2)').html(count);
         }
 
-        var dataInfo = new CoreDataSetInfo(data);
-        if (dataInfo.isValue()) {
-            
-            // Practice count
-            if (isPractice) {
-                var count = formatCount(dataInfo);
-                row.children(':eq(2)').html(count);
-            }
-
+        if (dataInfo.isValue()) {          
             var unit = getUnitLabel(indicatorMetadata),
             valF =  getValF(data, unit);
             

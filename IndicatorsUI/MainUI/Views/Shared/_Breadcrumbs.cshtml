@@ -2,13 +2,13 @@
 @using Profiles.MainUI.Models
 @model PageModel
 @{
-    var profileKey = Model.ProfileUrlKey;
+    var profileKey = ViewBag.ProfileUrlKey;
     var pageType = Model.PageType;
 }
 
 <ul id="breadcrumbs">
 
-    @* Introduction *@
+    @* Home *@
     <li class="site-link"><a href="/">Home</a></li>
 
     @* Profile group introduction *@
@@ -25,7 +25,8 @@
     @* Introduction *@
     @if (pageType == PageType.FrontPageOfStandaloneProfileWithFrontPage ||
          pageType == PageType.DataPageOfStandaloneProfileWithFrontPage ||
-        pageType == PageType.SupportingInformation)
+        pageType == PageType.SupportingInformation ||
+        pageType == PageType.AreaSearchResults)
     {
         <li class="breadcrumb-separator">></li>
         <li class="site-link"><a href="/profile/@profileKey">Introduction</a></li>
@@ -54,7 +55,16 @@
     else if (pageType == PageType.DataPageOfProfileInCollection)
     {
         <li class="breadcrumb-separator">></li>
-        <li class="site-link"><a href="/profile-group/@Model.ProfileUrlKey/profile/@profileKey/data">Data</a></li>
+        <li class="site-link"><a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey/data">Data</a></li>
+    }
+
+    @* Area search results *@
+    @if (pageType == PageType.AreaSearchResults)
+    {
+        <li class="breadcrumb-separator">></li>
+        <li class="site-link">
+            <span>Area search results</span>
+        </li>
     }
 
     @* Other page *@

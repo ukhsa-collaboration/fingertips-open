@@ -7,7 +7,7 @@ using Profiles.DataAccess;
 using Profiles.DataConstruction;
 using Profiles.DomainObjects;
 
-namespace DataConstructionTest
+namespace IndicatorsUI.DataConstructionTest
 {
     [TestClass]
     public class FingertipsUrlTest

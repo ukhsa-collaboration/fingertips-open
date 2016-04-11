@@ -4,7 +4,7 @@ using Profiles.MainUI.Skins;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     [TestClass]
     public class BaseUnitTest

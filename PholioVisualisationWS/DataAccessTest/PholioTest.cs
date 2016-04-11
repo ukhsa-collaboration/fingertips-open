@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     /// <summary>
     /// Tests on the contents of the database.

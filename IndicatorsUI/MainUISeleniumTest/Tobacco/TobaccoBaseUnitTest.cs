@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.MainUI.Skins;
 
-namespace MainUISeleniumTest.Tobacco
+namespace IndicatorsUI.MainUISeleniumTest.Tobacco
 {
     [TestClass]
     public class TobaccoBaseUnitTest : BaseUnitTest

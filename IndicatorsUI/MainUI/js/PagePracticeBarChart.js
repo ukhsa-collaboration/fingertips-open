@@ -373,7 +373,7 @@ function createBarChart(dataAllPractices, dataPractice, practiceLabels, rootInde
 
     var country = 'England',
             parentColour = chartColours.pink,
-            average = ' (average)';
+            average = ' (value)';
     // Add lines last so that they are displayed over the bars
     series.push(
         {
@@ -558,7 +558,7 @@ function getPracticeDataForBarChart(areaValues, practices) {
 function sortPractices(practices) {
 
     if (barChartState.sortType === 0) {
-        var sorter = sortArea;
+        var sorter = sortAreasByName;
     } else if (barChartState.sortType === 1) {
         sorter = sortByCode;
     } else {
@@ -619,13 +619,13 @@ function resortBarChart(dataAllPractices, dataPractice, practiceLabels) {
     //NOTE: Series are accessed by index... brittle method
 
     // Modify practice data
-    barChart.series[0].setData(dataAllPractices, false);
+    chart.series[0].setData(dataAllPractices, false);
     if (PP.model.isPractice()) {
-        barChart.series[1].setData(dataPractice, false);
+        chart.series[1].setData(dataPractice, false);
     }
-    barChart.xAxis[0].setCategories(practiceLabels, false);
+    chart.xAxis[0].setCategories(practiceLabels, false);
 
-    barChart.redraw();
+    chart.redraw();
 }
 
 function sortByCode(a, b) {

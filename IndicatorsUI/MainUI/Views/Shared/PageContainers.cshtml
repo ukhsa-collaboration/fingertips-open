@@ -1,4 +1,4 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @using Profiles.MainUI.Models
 @model PageModel
 @* Page specific data *@
@@ -6,7 +6,7 @@
 @{ var tab = new ContentTab(Model); }
 <div id="content" style="display: none;" class="standardWidth clearfix">
     <div class="clearfix fl">
-        @CommonUtilities.GetContent(tab.ContentKey, Model.ProfileId)
+        @ContentProvider.GetContent(tab.ContentKey, Model.ProfileId)
     </div>
 </div>
 

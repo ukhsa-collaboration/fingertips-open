@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.Mvc;
 using Profiles.DataConstruction;
 using Profiles.MainUI.Filters;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.DomainObjects;
 
 namespace Profiles.MainUI.Controllers
@@ -36,7 +36,6 @@ namespace Profiles.MainUI.Controllers
             ViewBag.SearchText = searchText ?? string.Empty;
 
             PageModel.RagColourId = templateProfile.RagColourId;
-            PageModel.ArePdfs = templateProfile.ArePdfs;
             PageModel.StartZeroYAxis = templateProfile.StartZeroYAxis;
             PageModel.DefaultFingertipsTabId = templateProfile.DefaultFingertipsTabId;
             PageModel.IgnoredSpineChartAreas = templateProfile.AreasToIgnoreForSpineCharts;
@@ -66,13 +65,13 @@ namespace Profiles.MainUI.Controllers
         private void GetProfileCollection()
         {
             //get a list of ProfileCollections for this skin
-            var skinProfileCollection = CommonUtilities.GetSkinProfileCollections(PageModel.Skin.Id);
+            var skinProfileCollection = ProfileCollectionProvider.GetSkinProfileCollections(PageModel.Skin.Id);
 
             foreach (var pc in skinProfileCollection)
             {
-                var profileCollection = CommonUtilities.GetProfileCollection(pc.ProfileCollectionId);
+                var profileCollection = ProfileCollectionProvider.GetProfileCollection(pc.ProfileCollectionId);
 
-                profileCollection.ProfileCollectionItems = CommonUtilities.GetProfileCollectionItems(profileCollection.Id);
+                profileCollection.ProfileCollectionItems = ProfileCollectionProvider.GetProfileCollectionItems(profileCollection.Id);
                 foreach (var pci in profileCollection.ProfileCollectionItems)
                 {
                     pci.ProfileDetails = new ProfileDetailsBuilder(pci.ProfileId).Build();

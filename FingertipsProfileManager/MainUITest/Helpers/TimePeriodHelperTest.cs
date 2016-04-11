@@ -5,7 +5,7 @@ using Fpm.MainUI.Helpers;
 using Fpm.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class TimePeriodHelperTest

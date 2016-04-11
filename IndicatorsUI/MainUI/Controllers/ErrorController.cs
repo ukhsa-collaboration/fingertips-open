@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.Routing;
 using System.Web.Mvc;
 using Profiles.DataAccess;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Models;
 using Profiles.MainUI.Skins;
 

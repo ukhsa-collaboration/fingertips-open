@@ -6,7 +6,7 @@ using Profiles.DataAccess;
 using Profiles.DomainObjects;
 using Profiles.MainUI.Skins;
 
-namespace DataAccessTest
+namespace IndicatorsUI.DataAccessTest
 {
     [TestClass]
     public class ProfileReaderTest

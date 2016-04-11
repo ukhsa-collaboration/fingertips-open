@@ -1,11 +1,10 @@
 ﻿using System;
-using System.IO;
 using Fpm.MainUI.Helpers;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class FileNameHelperTest

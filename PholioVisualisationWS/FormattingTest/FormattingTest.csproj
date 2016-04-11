@@ -9,8 +9,8 @@
     <ProjectGuid>{60937855-2113-4C0D-880B-CA3FB918E3A9}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FormattingTest</RootNamespace>
-    <AssemblyName>FormattingTest</AssemblyName>
+    <RootNamespace>PholioVisualisation.FormattingTest</RootNamespace>
+    <AssemblyName>PholioVisualisation.FormattingTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

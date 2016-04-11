@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.SearchQuerying;
 
-namespace SearchQueryingTest
+namespace PholioVisualisation.SearchQueryingTest
 {
     [TestClass]
     public class GeographicalSearchTest
@@ -73,6 +73,28 @@ namespace SearchQueryingTest
             AssertMatchSingleResult(expected, GetResults("cb2  1na"));
             AssertMatchSingleResult(expected, GetResults("cb2   1na"));
             AssertMatchSingleResult(expected, GetResults("cb2    1na"));
+        }
+
+        [TestMethod]
+        public void TestFullPostcodeNoSpacesWithOneDigitInFirstHalf()
+        {
+            var expected = "cb2 1na";
+            AssertMatchSingleResult(expected, GetResults("cb21na"));
+        }
+
+        [TestMethod]
+        public void TestFullPostcodeNoSpacesWithTwoDigitsInFirstHalf()
+        {
+            var expected = "cb22 3aa";
+            AssertMatchSingleResult(expected, GetResults("cb223aa"));
+        }
+
+        [TestMethod]
+        public void TestFullPostcodeNoSpacesWithTwoDigitsInFirstHalfAndNoLettersYet()
+        {
+            var expected = "cb22 3aa";
+            var results = GetResults("cb223");
+            Assert.AreEqual(expected, results.First().PlaceName.ToLower());
         }
 
         private void AssertMatchSingleResult(string expected, IList<GeographicalSearchResult> results)
@@ -211,6 +233,13 @@ namespace SearchQueryingTest
         public void TestPolygonAreaNameIsDefinedForParentAreas()
         {
             CheckPolygonAreaNameIsDefined(GetResults("Cambridgeshire").First());
+        }
+
+        [TestMethod]
+        public void TestRegionsCanBeSearched()
+        {
+            var results = new GeographicalSearch().SearchPlacePostcodes("Peterborough", AreaTypeIds.GoRegion);
+            Assert.AreNotEqual(0, results.Count);
         }
 
         [TestMethod]

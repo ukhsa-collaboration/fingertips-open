@@ -5,8 +5,10 @@
 <link rel="Stylesheet" type="text/css" href="@(Model.CssPath)chosen/chosen.min.css" />
 @Scripts.Render("~/bundles/js-practice-profiles")
 @{
-    var pdfUrl = "http://www.nepho.org.uk/gpp/" +
-        (AppConfig.Instance.IsEnvironmentLive ? "index.php" : "staging.php");
+    // Set Practice profiles PDF URL
+    var pdfUrl = AppConfig.Instance.IsEnvironmentLive 
+        ? "http://fingertipsreports.phe.org.uk/gpp/index.php"
+        : "http://www.nepho.org.uk/gpp/staging.php";
 }
 <script type="text/javascript">//<![CDATA[
     populationGroupId = @GroupIds.PracticeProfiles_SupportingIndicators;

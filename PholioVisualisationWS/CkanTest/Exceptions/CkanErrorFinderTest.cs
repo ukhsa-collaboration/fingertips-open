@@ -5,7 +5,7 @@ using Ckan;
 using Ckan.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CkanTest.Exceptions
+namespace PholioVisualisation.CkanTest.Exceptions
 {
     [TestClass]
     public class CkanErrorFinderTest

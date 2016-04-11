@@ -2,7 +2,7 @@
 using PholioVisualisation.Analysis;
 using PholioVisualisation.PholioObjects;
 
-namespace AnalysisTest
+namespace PholioVisualisation.AnalysisTest
 {
     [TestClass]
     public class BespokeTargetPercentileRangeComparerTest

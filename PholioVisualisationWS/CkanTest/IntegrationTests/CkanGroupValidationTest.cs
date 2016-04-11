@@ -3,7 +3,7 @@ using System.Linq;
 using Ckan.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CkanTest.IntegrationTests
+namespace PholioVisualisation.CkanTest.IntegrationTests
 {
     [TestClass]
     public class CkanGroupValidationTest

@@ -1,4 +1,4 @@
-﻿namespace ExportTest
+﻿namespace PholioVisualisation.ExportTest
 {
     public class ExcelColumnIndexes
     {

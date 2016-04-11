@@ -1,13 +1,13 @@
 ﻿using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Core;
 using FingertipsUploadService.ProfileData.Repositories;
-using Fpm.Upload;
+using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace UploadTest
+namespace FingertipsUploadService.UploadTest
 {
     [TestClass]
     public class UploadTest
@@ -51,13 +51,13 @@ namespace UploadTest
                 Uid = 999999999
             });
 
-            var newId = _coreDataRepository.InsertCoreData(GetRecordToInsert(), batchId);
+            _coreDataRepository.InsertCoreData(GetRecordToInsert(), batchId);
 
             var records = ArchivedRecords(batchUpload);
             Assert.IsTrue(records.Any());
 
             //var duplicateRows = string.Join(",", records.Select(x => x.Uid).Take(10).ToList());
-            var duplicateRows = records.Select(x => new DuplicateRowInDatabaseError() { Uid = x.Uid }).Take(10).ToList();
+            var duplicateRows = records.Select(x => new DuplicateRowInDatabaseError { Uid = x.Uid }).Take(10).ToList();
 
             //Insert the duplicates to the CoreDataset Archive table and delete the coredataset rows
             // in question (All in one transaction)
@@ -87,7 +87,7 @@ namespace UploadTest
         private static CoreDataSet GetRecordToInsert()
         {
             var val = new Random(150).Next();
-            return new CoreDataSet()
+            return new CoreDataSet
             {
                 IndicatorId = IndicatorIds.ObesityYear6,
                 Year = 2014,

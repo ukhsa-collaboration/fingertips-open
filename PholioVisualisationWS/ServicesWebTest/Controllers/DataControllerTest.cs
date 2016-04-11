@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServicesWeb.Controllers;
 using PholioVisualisation.PholioObjects;
 
-namespace ServicesWebTest.Controllers
+namespace PholioVisualisation.ServicesWebTest.Controllers
 {
     [TestClass]
     public class DataControllerTest
@@ -23,6 +23,13 @@ namespace ServicesWebTest.Controllers
         {
             var nhsChoicesId = new DataController().GetNhsChoicesAreaId(AreaCodes.Gp_Burnham);
             Assert.AreEqual("43611", nhsChoicesId);
+        }
+
+        [TestMethod]
+        public void TestGetChimatResourceId()
+        {
+            var id = new DataController().GetChimatResourceId(AreaCodes.CountyUa_Cumbria);
+            Assert.AreEqual(ChimatResourceIds.Cumbria, id);
         }
 
         [TestMethod]
@@ -72,6 +79,19 @@ namespace ServicesWebTest.Controllers
                 AreaCodes.Gor_SouthWest, ProfileIds.Phof);
 
             Assert.IsTrue(areas.Select(x => x.Code).Contains(AreaCodes.CountyUa_IslesOfScilly));
+        }
+
+        [TestMethod]
+        public void TestGetAreasOfAreaType_WhenAreaCodesListSubmitted()
+        {
+            var codes = new List<string> { AreaCodes.CountyUa_Cumbria , AreaCodes.CountyUa_Leicestershire};
+
+            var areas = new DataController().GetAreasOfAreaType(
+                area_codes: string.Join(",", codes));
+
+            // Assert
+            Assert.AreEqual(2, areas.Count);
+            Assert.IsNotNull(areas.FirstOrDefault(x => x.Code == AreaCodes.CountyUa_Cumbria));
         }
 
         [TestMethod]

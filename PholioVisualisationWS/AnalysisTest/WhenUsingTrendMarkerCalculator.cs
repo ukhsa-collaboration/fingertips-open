@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.PholioObjects;
 
-namespace AnalysisTest
+namespace PholioVisualisation.AnalysisTest
 {
     [TestClass]
     public class WhenUsingTrendMarkerCalculator
@@ -340,7 +340,8 @@ namespace AnalysisTest
             {
                 ValueTypeId = valueType,
                 ComparatorConfidence = comparatorConfidence,
-                Data = trendData
+                Data = trendData,
+                YearRange = 1
             };
         }
 
@@ -526,6 +527,7 @@ namespace AnalysisTest
             {
                 ValueTypeId = valueType,
                 ComparatorConfidence = comparatorConfidence,
+                YearRange = 1
             };
 
         }

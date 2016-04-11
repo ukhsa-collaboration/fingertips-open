@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class PholioReaderTest

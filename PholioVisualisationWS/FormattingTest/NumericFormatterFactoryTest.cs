@@ -4,7 +4,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 
-namespace FormattingTest
+namespace PholioVisualisation.FormattingTest
 {
     [TestClass]
     public class NumericFormatterByNationalLimitsTest

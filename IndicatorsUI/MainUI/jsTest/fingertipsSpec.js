@@ -542,14 +542,17 @@ describe('FT.model', function() {
 
     it('toString', function () {
         model.update();
+        pages.setCurrent(PAGE_MODES.TARTAN);
 
-        expect(model.toString()).toBe('page//gid/1/ati/2');
+        expect(model.toString()).toBe('page/0/gid/1/ati/2');
     });
 
     it('toString nearestNeighbour', function () {
         model.update();
         model.nearestNeighbour = 'a';
-        expect(model.toString()).toBe('page//gid/1/ati/2/nn/a');
+        pages.setCurrent(PAGE_MODES.TARTAN);
+
+        expect(model.toString()).toBe('page/0/gid/1/ati/2/nn/a');
     });
 
 });

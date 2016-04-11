@@ -2,7 +2,7 @@
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class PracticePerformanceIndicatorValuesTest

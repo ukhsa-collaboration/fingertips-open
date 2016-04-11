@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 
-namespace MainUISeleniumTest.HealthierLives
+namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
     [TestClass]
     public class PageMortalityAreaDetailsTest : BaseUnitTest

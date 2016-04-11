@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace KeyMessagesTest
+namespace PholioVisualisation.KeyMessagesTest
 {
     [TestClass]
     public class HealthProfilesKeyMessageBuilderTest

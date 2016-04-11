@@ -46,8 +46,11 @@ describe('TartanRugCellBuilder', function () {
         }
         var comparisonConfig = { useRagColours: useRag, comparatorId: comparatorId };
 
+        var trendMarkerMode = TrendDisplayOption.ValuesOnly;
+        var hasTrendMarker = false;
+
         return new TartanRugCellBuilder(data, columnNumber, rowNumber,
-            comparisonConfig).getHtml();
+            comparisonConfig, trendMarkerMode, hasTrendMarker).getHtml();
     };
 
     it('validate generated HTML', function () {

@@ -7,7 +7,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.RequestParameters;
 
-namespace RequestParametersTest
+namespace PholioVisualisation.RequestParametersTest
 {
     [TestClass]
     public class DataParametersTest

@@ -1,8 +1,8 @@
-﻿using MainUISeleniumTest.Fingertips;
+﻿using IndicatorsUI.MainUISeleniumTest.Fingertips;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest.Tobacco
+namespace IndicatorsUI.MainUISeleniumTest.Tobacco
 {
     [TestClass]
     public class TobaccoIndicatorSearchTest : TobaccoBaseUnitTest

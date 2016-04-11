@@ -1,7 +1,7 @@
 ﻿using FingertipsUploadService.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ProfileDataTest
+namespace FingertipsUploadService.ProfileDataTest
 {
     [TestClass]
     public class TimePeriodTest

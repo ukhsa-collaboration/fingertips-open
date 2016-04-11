@@ -4,7 +4,7 @@ using System.Linq;
 using Ckan.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CkanTest
+namespace PholioVisualisation.CkanTest
 {
     [TestClass]
     public class CkanPackageTest

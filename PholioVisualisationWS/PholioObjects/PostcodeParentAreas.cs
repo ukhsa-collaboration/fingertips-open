@@ -8,6 +8,11 @@
         public int Northing { get; set; }
 
         /// <summary>
+        /// Region
+        /// </summary>
+        public string AreaCode6 { get; set; }
+
+        /// <summary>
         /// CCG
         /// </summary>
         public string AreaCode19 { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.PholioObjects;
 
-namespace AnalysisTest
+namespace PholioVisualisation.AnalysisTest
 {
     /// <summary>
     /// Test helper methods

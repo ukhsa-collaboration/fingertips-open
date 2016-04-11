@@ -9,8 +9,8 @@
     <ProjectGuid>{C8255150-2FAD-439A-958B-B74EFBF44916}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>IndicatorsUITest</RootNamespace>
-    <AssemblyName>IndicatorsUITest</AssemblyName>
+    <RootNamespace>IndicatorsUI.MainUITest</RootNamespace>
+    <AssemblyName>IndicatorsUI.MainUITest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -50,18 +50,18 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ContactUsTest.cs" />
-    <Compile Include="ContentHelperTest.cs" />
-    <Compile Include="PageModelTest.cs" />
-    <Compile Include="RowAssignerTest.cs" />
-    <Compile Include="TitleFontTest.cs" />
-    <Compile Include="JsHelperTest.cs" />
+    <Compile Include="Helpers\ContactUsTest.cs" />
+    <Compile Include="Helpers\ContentHelperTest.cs" />
+    <Compile Include="Models\PageModelTest.cs" />
+    <Compile Include="Helpers\RowAssignerTest.cs" />
+    <Compile Include="Models\TitleFontTest.cs" />
+    <Compile Include="Models\JsHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ColumnAssignerTest.cs" />
+    <Compile Include="Helpers\ColumnAssignerTest.cs" />
     <Compile Include="AjaxBridgeTest.cs" />
-    <Compile Include="UserDetailsTest.cs" />
-    <Compile Include="VerticalTextTest.cs" />
-    <Compile Include="SpineChartMinMaxLabelBuilderTest.cs" />
+    <Compile Include="Helpers\UserDetailsTest.cs" />
+    <Compile Include="Helpers\VerticalTextTest.cs" />
+    <Compile Include="Helpers\SpineChartMinMaxLabelBuilderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

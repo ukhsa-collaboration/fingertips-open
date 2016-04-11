@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
@@ -14,12 +14,12 @@
 @Html.Partial("_BasicBreadcrumb", "Connect")
 
     @{
-        var contentItem = CommonUtilities.GetContentItem(ContentKeys.ConnectHeader, Model.ProfileId)
-                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectHeader, ProfileIds.LongerLives);
-        var headerText = CommonUtilities.GetContentItem(ContentKeys.ConnectHeaderText, Model.ProfileId)
-                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectHeaderText, ProfileIds.LongerLives);
-        var bodyText = CommonUtilities.GetContentItem(ContentKeys.ConnectBodyText, Model.ProfileId)
-                        ?? CommonUtilities.GetContentItem(ContentKeys.ConnectBodyText, ProfileIds.LongerLives);
+        var contentItem = ContentProvider.GetContentItem(ContentKeys.ConnectHeader, Model.ProfileId)
+                        ?? ContentProvider.GetContentItem(ContentKeys.ConnectHeader, ProfileIds.LongerLives);
+        var headerText = ContentProvider.GetContentItem(ContentKeys.ConnectHeaderText, Model.ProfileId)
+                        ?? ContentProvider.GetContentItem(ContentKeys.ConnectHeaderText, ProfileIds.LongerLives);
+        var bodyText = ContentProvider.GetContentItem(ContentKeys.ConnectBodyText, Model.ProfileId)
+                        ?? ContentProvider.GetContentItem(ContentKeys.ConnectBodyText, ProfileIds.LongerLives);
      }
 
 <div id="content" class="connect_content clearfix">

@@ -1,10 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
+using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
@@ -64,9 +66,26 @@ namespace Fpm.MainUI.Helpers
                 if (_fpmUser == null)
                 {
                     _fpmUser = reader.GetUserByUserName(Name);
+
+                    if (_fpmUser == null)
+                    {
+                        CreateNewUser();
+                        _fpmUser = reader.GetUserByUserName(Name);
+                    }
                 }
+
                 return _fpmUser;
             }
+        }
+
+        public static string ConvertUserNameToDisplayName(string name)
+        {
+            name = name
+                 .Replace('.', ' ')
+                 .Substring(4); // Remove "phe\" prefix
+
+            TextInfo textInfo = new CultureInfo("en-GB", false).TextInfo;
+            return textInfo.ToTitleCase(name);
         }
 
         public int Id
@@ -79,16 +98,7 @@ namespace Fpm.MainUI.Helpers
             get
             {
                 FpmUser user = FpmUser;
-                CheckUserExists(user);
                 return user.IsAdministrator;
-            }
-        }
-
-        private void CheckUserExists(FpmUser user)
-        {
-            if (user == null)
-            {
-                throw new FpmException("FPM user does not exist for " + Name);
             }
         }
 
@@ -97,7 +107,6 @@ namespace Fpm.MainUI.Helpers
             get
             {
                 FpmUser user = FpmUser;
-                CheckUserExists(user);
                 return user.Id == FpmUserIds.Doris;
             }
         }
@@ -117,6 +126,15 @@ namespace Fpm.MainUI.Helpers
             return reader.GetProfiles()
                 .Where(x => permissionIds.Contains(x.Id))
                 .OrderBy(x => x.Name);
+        }
+
+        private void CreateNewUser()
+        {
+            new UserRepository().CreateUserItem(new FpmUser
+            {
+                UserName = Name,
+                DisplayName = ConvertUserNameToDisplayName(Name)
+            }, Name);
         }
     }
 }

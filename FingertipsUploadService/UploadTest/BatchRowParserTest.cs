@@ -1,8 +1,9 @@
-﻿using Fpm.Upload;
+﻿
+using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Data;
 
-namespace IndicatorsUITest
+namespace FingertipsUploadService.UploadTest
 {
     [TestClass]
     public class UploadBatchRowParserTest

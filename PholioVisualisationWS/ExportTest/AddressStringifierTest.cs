@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class AddressStringifierTest

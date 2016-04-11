@@ -1,11 +1,12 @@
 ﻿using System.Configuration;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     internal class AppConfig
     {
         public static string GetPholioWs()
         {
+
             return GetAppSetting("CoreWsUrl");
         }
 

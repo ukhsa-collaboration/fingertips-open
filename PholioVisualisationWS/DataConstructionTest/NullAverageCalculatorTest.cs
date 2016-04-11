@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataConstruction;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class NullAverageCalculatorTest

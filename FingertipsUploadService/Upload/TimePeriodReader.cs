@@ -3,7 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class TimePeriodReader
     {
@@ -30,6 +30,7 @@ namespace Fpm.Upload
             return period;
         }
 
+        //TODO : remove this call with local (NO PWS)
         public static string GetPeriodFromWebService(TimePeriod timePeriod, int yearTypeId)
         {
             string period;

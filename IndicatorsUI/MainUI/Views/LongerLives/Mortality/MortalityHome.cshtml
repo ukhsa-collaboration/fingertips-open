@@ -1,4 +1,4 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml";
@@ -13,7 +13,7 @@
 
 <div id="content">
     <div class="home_intro clearfix">
-        @CommonUtilities.GetContent("home-header", Model.ProfileId)
+        @ContentProvider.GetContent("home-header", Model.ProfileId)
     </div>
 
     @Html.Partial("_SearchArea")
@@ -82,7 +82,7 @@
             <p>Let us know what you think about Longer Lives.</p>
         </div>
         <div class="article  last">
-            <h3><a href="topic/@Model.ProfileUrlKey/health-intervention/liver">Focus on liver disease</a></h3>
+            <h3><a href="topic/@ViewBag.ProfileUrlKey/health-intervention/liver">Focus on liver disease</a></h3>
             <p>Find out what causes it and how rates can be reduced.</p>
         </div>
     </div>

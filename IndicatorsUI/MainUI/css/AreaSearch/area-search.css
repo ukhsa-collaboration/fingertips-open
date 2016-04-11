@@ -1,0 +1,84 @@
+﻿/* ------------------------------------------------------------
+	Introduction area search, Views/AreaSearch
+------------------------------------------------------------ */
+#area-search td {
+    padding: 10px 0;
+}
+
+    #area-search td:first-child {
+        text-align: right;
+        vertical-align: middle;
+    }
+
+#area-search input, #health-profile-search select {
+    border: solid 2px #ddd;
+    height: 26px;
+    padding: 0;
+    padding-left: 5px;
+    width: 290px;
+}
+
+#area-search select {
+    width: 299px;
+    height: 28px;
+}
+
+table.area-search-results {
+    border-collapse: collapse;
+    margin: 0 0 18px 11px;
+}
+
+.area-search-results tr td {
+    padding: 3px;
+    padding-right: 50px;
+    padding-left: 0;
+    border: none;
+    border-top: 2px solid #eee;
+}
+
+    /* area name column*/
+    .area-search-results tr td:nth-child(1) {
+        padding-right: 0;
+        width: 230px;
+    }
+
+.area-search-results tr:hover td:nth-child(1) {
+    font-weight: bold;
+}
+
+.area-search-results tr:hover {
+    background: #C2EAE4;
+}
+
+#area-results-box h3 {
+    margin-top: 25px;
+    font-size: 18px;
+}
+
+ul#no-matches-found {
+    list-style: none;
+}
+
+#no-data-message {
+    padding-top: 12px;
+}
+
+/* ------------------------------------------------------------
+	Spinner
+------------------------------------------------------------ */
+
+#spinner {
+    width: 100%;
+    height: 149px;
+}
+
+#spinnerLabel {
+    top: 75px;
+    left:315px
+}
+
+img.spinner {
+    top: 40px;
+    left: 315px;
+}
+

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
@@ -29,7 +30,7 @@ namespace PholioVisualisation.SearchQuerying
 
                 // Setup the fields to search through
                 BooleanQuery finalQuery = isPostcode ?
-                    GetCodeQuery(userSearch.SearchText, FieldNames.Postcode) :
+                    GetPostcodeQuery(userSearch.SearchText, FieldNames.Postcode) :
                     GetPlaceNameQuery(userSearch, childAreaTypeId);
 
                 // Perform the search
@@ -73,7 +74,7 @@ namespace PholioVisualisation.SearchQuerying
 
                     if (!ExcludeCcGs)
                     {
-                        searchResults.Add(geographicalSearchResult);                   
+                        searchResults.Add(geographicalSearchResult);
                     }
                     else
                     {
@@ -116,8 +117,10 @@ namespace PholioVisualisation.SearchQuerying
             return masterQuery;
         }
 
-        protected static BooleanQuery GetCodeQuery(string searchText, params string[] fieldNames)
+        protected static BooleanQuery GetPostcodeQuery(string searchText, params string[] fieldNames)
         {
+            searchText = InsertSpaceIfNonePresent(searchText);
+
             var terms = GetCodeTerms(searchText);
 
             var masterQuery = new BooleanQuery();
@@ -130,6 +133,24 @@ namespace PholioVisualisation.SearchQuerying
                 }
             }
             return masterQuery;
+        }
+
+        private static string InsertSpaceIfNonePresent(string searchText)
+        {
+            if (searchText.IndexOf(" ") == -1 &&
+                searchText.Length > 4 &&
+                Regex.IsMatch(searchText, @"\w\d+\d\w*"))
+            {
+                // Insert space if none present e.g. "cb123"
+                searchText = Regex.Replace(searchText, @"(\w+)(\d+)(\d)(\w*)",
+                    m => string.Format("{0}{1} {2}{3}",
+                        m.Groups[1].Value,
+                        m.Groups[2].Value,
+                        m.Groups[3].Value,
+                        m.Groups[4].Value
+                        ));
+            }
+            return searchText;
         }
 
         private static List<string> GetCodeTerms(string rawSearchText)

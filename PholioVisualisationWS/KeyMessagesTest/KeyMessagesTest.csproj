@@ -6,8 +6,8 @@
     <ProjectGuid>{9AEE4236-AF52-4D1C-BCD1-18FD95E6BC2B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KeyMessagesTest</RootNamespace>
-    <AssemblyName>KeyMessagesTest</AssemblyName>
+    <RootNamespace>PholioVisualisation.KeyMessagesTest</RootNamespace>
+    <AssemblyName>PholioVisualisation.KeyMessagesTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

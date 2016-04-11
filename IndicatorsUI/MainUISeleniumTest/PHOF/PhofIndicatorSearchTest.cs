@@ -1,7 +1,7 @@
-﻿using MainUISeleniumTest.Fingertips;
+﻿using IndicatorsUI.MainUISeleniumTest.Fingertips;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MainUISeleniumTest.Phof
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
     public class PhofIndicatorSearchTest : PhofBaseUnitTest

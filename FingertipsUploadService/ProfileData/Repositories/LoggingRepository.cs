@@ -27,7 +27,7 @@ namespace FingertipsUploadService.ProfileData.Repositories
         public int InsertUploadAudit(Guid uploadBatchId, string userName, int rowCount, string excelFile, string selectedWorksheet)
         {
             return
-                (int)CurrentSession.Save(new UploadAudit()
+                (int)CurrentSession.Save(new UploadAudit
                 {
                     UploadId = uploadBatchId,
                     UploadedBy = userName,

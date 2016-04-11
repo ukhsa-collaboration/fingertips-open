@@ -7,7 +7,7 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Profiles.DataAccess;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Controllers;
 using Profiles.MainUI.Routes;
 

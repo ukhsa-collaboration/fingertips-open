@@ -1143,8 +1143,7 @@ function downloadPdf() {
         if (!ajaxLock) {
             var practiceCode = PP.model.practiceCode;
             if (practiceCode) {
-                //var url = FT.url.pdf + '?' + 
-                var url = 'http://www.nepho.org.uk/gpp/staging.php?urls&' +
+                var url = FT.url.pdf + '?' + 
                     'CCG=' + PP.model.parentCode +
                     '&PracCode=' + practiceCode;
 

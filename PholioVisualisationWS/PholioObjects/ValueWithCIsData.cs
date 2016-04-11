@@ -5,6 +5,8 @@ namespace PholioVisualisation.PholioObjects
 {
     public class ValueWithCIsData : ValueData
     {
+        public const double CountMinusOne = -1.000001;
+
         public ValueWithCIsData GetValueWithCIsData()
         {
             return new ValueWithCIsData

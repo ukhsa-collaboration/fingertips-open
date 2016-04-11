@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Data;
 using FingertipsUploadService.ProfileData;
-using Fpm.Upload;
+using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace UploadTest
+namespace FingertipsUploadService.UploadTest
 {
     [TestClass]
     public class UploadSimpleRowParserTest

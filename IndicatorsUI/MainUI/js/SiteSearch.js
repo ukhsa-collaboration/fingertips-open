@@ -1,3 +1,11 @@
+/**
+* Functions of the indicator search.
+* @module indicatorSearch
+*/
+
+var indicatorSearch = {};
+
+
 function getGroupingData() {
 
     if (!indicatorIdList.anyForAreaType(FT.model.areaTypeId)) {
@@ -247,31 +255,30 @@ function highlightSearchSummaryAreaType(areaTypeId) {
     $('#search-area-type-' + areaTypeId).addClass(selected);
 }
 
-function searchIndicatorChange(rootIndex) {
-    var iid = groupRoots[rootIndex].IID;
-    renderProfilesForSelectedIndicator(iid);
-}
-
 function showIndicatorProfileOrigin() {
 
     if (!ajaxLock) {
         lock();
         var model = FT.model;
-        var listOfIndicators = indicatorIdList.getIds(model.areaTypeId);
+        var indicatorIds = indicatorIdList.getIds(model.areaTypeId);
 
         var parameters = new ParameterBuilder(
-        ).add('indicator_ids', listOfIndicators
+        ).add('indicator_ids', indicatorIds
         ).add('area_type_id', model.areaTypeId);
 
         ajaxGet('data/profiles_containing_indicators', parameters.build(),
             function (data) {
                 searchState.profilesPerIndicator = data;
-                displayProfilesForIndicator(listOfIndicators[0]);
+
+                displayProfilesForIndicatorPopUp();
+
+                var iid = indicatorSearch.getSelectedOriginIndicatorId();
+                renderProfilesForSelectedIndicator(iid);
             });
     }
 }
 
-function displayProfilesForIndicator(indicatorId) {
+function displayProfilesForIndicatorPopUp() {
 
     var html = '<div id="profiles-for-indicators">' +
         '<h2>Originating profiles</h2>' +
@@ -290,11 +297,27 @@ function displayProfilesForIndicator(indicatorId) {
     var top = 200;
     lightbox.show(html, top, left, popupWidth);
 
-    var $indicatorList = $('#indicatorMenu').clone().prop('id', 'search-indicator-list');
-    $('#indicator-list').append($indicatorList);
-    $('#search-indicator-list').attr('onchange', 'searchIndicatorChange(this.value);');
+    // Display pop up indicator menu
+    var $indicatorMenu = $('#indicatorMenu');
+    var $indicatorMenuCloned = $indicatorMenu.clone().prop('id', 'search-indicator-list');
+    $('#indicator-list').append($indicatorMenuCloned);
 
-    renderProfilesForSelectedIndicator(indicatorId);
+    // Init pop up indicator menu
+    var $popUpIndicatorMenu = $('#search-indicator-list');
+    $popUpIndicatorMenu.bind('change', function () {
+        var iid = indicatorSearch.getSelectedOriginIndicatorId();
+        renderProfilesForSelectedIndicator(iid);
+    });
+    $popUpIndicatorMenu.val($indicatorMenu.val());
+}
+
+/**
+* Get the ID of the indicator selected in the origin profiles pop up.
+* @class indicatorSearch.getSelectedOriginIndicatorId
+*/
+indicatorSearch.getSelectedOriginIndicatorId = function() {
+    var groupRootIndex = $('#search-indicator-list').val();
+    return groupRoots[groupRootIndex].IID;
 }
 
 function renderProfilesForSelectedIndicator(indicatorId) {

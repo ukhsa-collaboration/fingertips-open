@@ -27,7 +27,7 @@
     <IISExpressUseClassicPipelineMode />
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <TargetFrameworkProfile />
-    <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -50,19 +50,23 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr3.Runtime, Version=3.4.1.9004, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Hammock.ClientProfile, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c148cfba29ed1a4d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Hammock.ClientProfile.dll</HintPath>
     </Reference>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\lib\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -70,8 +74,8 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Svg">
@@ -129,13 +133,15 @@
     <Reference Include="TweetSharp">
       <HintPath>..\lib\TweetSharp.dll</HintPath>
     </Reference>
-    <Reference Include="WebGrease, Version=1.5.2.14234, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\SpineChartMinMaxLabelBuilder.cs" />
+    <Compile Include="Helpers\ContentProvider.cs" />
+    <Compile Include="Helpers\SpineChartMinMaxLabelBuilder.cs" />
+    <Compile Include="Controllers\AreaSearchController.cs" />
     <Compile Include="Filters\CheckUserCanAccessSkin.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -143,17 +149,17 @@
     <Compile Include="Caching\CacheHelper.cs" />
     <Compile Include="Caching\FingertipsOutputCache.cs" />
     <Compile Include="Caching\JsonCache.cs" />
-    <Compile Include="Common\AccessControlHelper.cs" />
-    <Compile Include="Common\BrowserHelper.cs" />
-    <Compile Include="Common\ColumnAssigner.cs" />
-    <Compile Include="Common\CommonUtilities.cs" />
-    <Compile Include="Common\ContactUs.cs" />
-    <Compile Include="Common\ContentHelper.cs" />
-    <Compile Include="Common\RowAssigner.cs" />
-    <Compile Include="Common\ExceptionLogger.cs" />
-    <Compile Include="Common\SupportingPage.cs" />
-    <Compile Include="Common\UserDetails.cs" />
-    <Compile Include="Common\VerticalText.cs" />
+    <Compile Include="Helpers\AccessControlHelper.cs" />
+    <Compile Include="Helpers\BrowserHelper.cs" />
+    <Compile Include="Helpers\ColumnAssigner.cs" />
+    <Compile Include="Helpers\ProfileCollectionProvider.cs" />
+    <Compile Include="Helpers\ContactUs.cs" />
+    <Compile Include="Helpers\ContentHelper.cs" />
+    <Compile Include="Helpers\RowAssigner.cs" />
+    <Compile Include="Helpers\ExceptionLogger.cs" />
+    <Compile Include="Helpers\SupportingPage.cs" />
+    <Compile Include="Helpers\UserDetails.cs" />
+    <Compile Include="Helpers\VerticalText.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\AjaxBridgeController.cs" />
     <Compile Include="Controllers\DownloadController.cs" />
@@ -196,6 +202,7 @@
     <Compile Include="Skins\SkinNames.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="css\AreaSearch\area-search.css" />
     <Content Include="css\common.css" />
     <Content Include="css\core-contentpages.css" />
     <Content Include="css\fingertips.css" />
@@ -341,6 +348,7 @@
     <Content Include="images\trends\up_green.png" />
     <Content Include="images\trends\up_red.png" />
     <Content Include="images\wrapperBg.jpg" />
+    <Content Include="jsTest\AreaSearch\area-search-spec.js" />
     <Content Include="jsTest\commonSpec.js" />
     <Content Include="jsTest\fingertipsSpec.js" />
     <Content Include="jsTest\jasmine-1.3.1\jasmine-html.js" />
@@ -360,6 +368,7 @@
     <Content Include="jsTest\SiteSearchSpec.js" />
     <Content Include="jsTest\spineChartSpec.js" />
     <Content Include="jsTest\testHelper.js" />
+    <Content Include="js\AreaSearch\area-search.js" />
     <Content Include="js\common.js" />
     <Content Include="js\EnvironmentTest.js" />
     <Content Include="js\esri-leaflet.js" />
@@ -511,6 +520,8 @@
     <Content Include="Views\Shared\_PracticeProfilesDomainCollection.cshtml" />
     <Content Include="packages.config" />
     <Content Include="Views\Phof\Data.cshtml" />
+    <Content Include="Views\AreaSearch\AreaSearchResults.cshtml" />
+    <Content Include="Views\AreaSearch\_IntroductionAreaSearch.cshtml" />
     <None Include="Views\Shared\Banner.cshtml" />
     <Content Include="Views\Shared\KeyBarChart.cshtml" />
     <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
@@ -593,6 +604,7 @@
     <Content Include="Views\Test\DiabetesRankingsTest.cshtml" />
     <Content Include="Views\Shared\_UpdateDelayedMessage.cshtml" />
     <Content Include="Views\Shared\_KeyValueNote.cshtml" />
+    <Content Include="Views\Shared\_JsUrls.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutPage.cshtml" />

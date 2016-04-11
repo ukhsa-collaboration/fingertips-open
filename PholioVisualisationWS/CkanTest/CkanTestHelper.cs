@@ -4,7 +4,7 @@ using Ckan;
 using Ckan.Client;
 using Ckan.Model;
 
-namespace CkanTest
+namespace PholioVisualisation.CkanTest
 {
     public class CkanTestHelper
     {

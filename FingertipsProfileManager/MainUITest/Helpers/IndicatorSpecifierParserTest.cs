@@ -4,7 +4,7 @@ using System.Linq;
 using Fpm.MainUI.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class IndicatorSpecifierParserTest

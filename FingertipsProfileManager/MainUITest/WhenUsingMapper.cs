@@ -1,13 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Fpm.MainUI;
-using Fpm.MainUI.Mapper;
+﻿using Fpm.MainUI;
+using Fpm.MainUI.Mappers;
 using Fpm.MainUI.ViewModels;
-using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace MainUITest
+namespace Fpm.MainUITest
 {
     [TestClass]
     public class WhenUsingMapper
@@ -17,7 +16,7 @@ namespace MainUITest
         {
             AutoMapperConfig.RegisterMappings();
         }
-        
+
         [TestMethod]
         public void ToProfileViewModel_Returns_Model_WithSameValues()
         {
@@ -104,7 +103,7 @@ namespace MainUITest
 
             // Assert
             Assert.IsTrue(result.UserPermissions != null &&
-                          result.UserPermissions.Any()  &&
+                          result.UserPermissions.Any() &&
                           result.UserPermissions.ToList()[0].UserId == profileViewModel.ProfileUsers.ToList()[0].Id);
 
         }

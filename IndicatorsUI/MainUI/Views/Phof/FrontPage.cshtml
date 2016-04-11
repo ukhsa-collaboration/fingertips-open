@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @using Profiles.MainUI.Models
 @model PageModel
 @{
@@ -16,7 +16,7 @@
 
 <div class="full-width title-divider"></div>
 @{
-    HtmlString recentUpdates = CommonUtilities.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
+    HtmlString recentUpdates = ContentProvider.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
     var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
     var areUpdates = recentUpdates != null;
     var introductionWidth = areUpdates ? 65 : 100;
@@ -40,7 +40,7 @@
 </div>
 <div class="standardWidth clearfix">
     <div id="introduction" style="width: @(introductionWidth)%; margin-top: 0px;">
-        @CommonUtilities.GetContent(ContentKeys.Introduction, Model.ProfileId)
+        @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
     </div>
     @if (areUpdates)
     {

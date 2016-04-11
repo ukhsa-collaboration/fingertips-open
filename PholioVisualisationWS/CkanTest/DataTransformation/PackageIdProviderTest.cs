@@ -4,7 +4,7 @@ using System.Linq;
 using Ckan.DataTransformation;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CkanTest.DataTransformation
+namespace PholioVisualisation.CkanTest.DataTransformation
 {
     [TestClass]
     public class PackageIdProviderTest

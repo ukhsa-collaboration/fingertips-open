@@ -3,18 +3,6 @@
                    assembly="FingertipsUploadService.ProfileData"
                    namespace="FingertipsUploadService.ProfileData.Entities.LookUps">
 
-
-  <!-- Skin class -->
-  <class name="Skin" table="ui_siteskins">
-
-    <id name="Id" column="id" type="int" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-
-    <property name="Name" column="name"/>
-
-  </class>
-
   <!-- Sex class -->
   <class name="Sex" table="l_sexes">
 
@@ -81,17 +69,6 @@
 
     <property name="Name" column="comparatormethod"/>
     <property name="IsCurrent" column="iscurrent"/>
-
-  </class>
-
-  <!-- Polarity class -->
-  <class name="Polarity" table="l_polarity">
-
-    <id name="Id" column="polarityid" type="int" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-
-    <property name="Name" column="polarity"/>
 
   </class>
 

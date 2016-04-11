@@ -7,7 +7,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.Export;
 using SpreadsheetGear;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class ExcelFileWriterTest

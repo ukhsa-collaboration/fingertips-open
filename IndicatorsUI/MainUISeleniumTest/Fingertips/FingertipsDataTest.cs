@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using Profiles.DomainObjects;
 
-namespace MainUISeleniumTest.Fingertips
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class FingertipsDataTest : FingertipsBaseUnitTest

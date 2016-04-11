@@ -1,25 +1,24 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections.Generic;
+﻿using Fpm.MainUI.Helpers;
+using Fpm.MainUI.ViewModels.Upload;
+using Fpm.ProfileData.Entities.Job;
+using Fpm.ProfileData.Repositories;
+using Microsoft.Ajax.Utilities;
+using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Mime;
 using System.Web;
 using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
-using Fpm.MainUI.ViewModels.Upload;
-using Fpm.ProfileData;
-using Fpm.ProfileData.Repositories;
-using Fpm.Upload;
 
 namespace Fpm.MainUI.Controllers
 {
     public class UploadController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-
+        private readonly IFpmUploadRepository _fpmUploadRepository = new UploadJobRepository();
         private CoreDataRepository _coreDataRepository;
         private LoggingRepository _loggingRepository;
-
+        // Upload Index
         public ActionResult Index()
         {
             const string simpleTemplateRelativePath = "/upload-templates/simple-indicator-upload-template.xlsx";
@@ -36,145 +35,160 @@ namespace Fpm.MainUI.Controllers
             return View(viewModel);
         }
 
+        // Upload simple file
         [HttpPost]
-        public ActionResult ValidateSimpleUpload(HttpPostedFileBase excelFile)
+        public ActionResult UploadSimpleFile(HttpPostedFileBase indicatorDataFile)
         {
-            ViewBag.IsSimple = true;
+            var response = SaveFile(indicatorDataFile, UploadJobType.Simple);
+            return Content(response ? "ok" : "fail");
+        }
 
-            var validator = new SimpleUploadValidator(excelFile, _coreDataRepository, _loggingRepository);
+        // Upload batch file
+        [HttpPost]
+        [Route("UploadBatchUpload")]
+        public ActionResult UploadBatchUpload(HttpPostedFileBase indicatorDataFile)
+        {
+            var response = SaveFile(indicatorDataFile, UploadJobType.Batch);
+            return Content(response ? "ok" : "fail");
+        }
 
-            if (validator.IsFileTooLarge ||
-                validator.AreValidWorksheets == false)
+        // Helper to save files and create job in database
+        public bool SaveFile(HttpPostedFileBase indicatorDataFile, UploadJobType jobType)
+        {
+            bool response;
+
+            if (Request.Files == null)
             {
-                // No point validating spreadsheet
-                return View("SpreadsheetSimpleSummary", validator.SimpleUpload);
+                return false;
             }
 
-            // Validate spreadsheet
-            SimpleUpload simpleUpload = validator.Validate();
+            var guid = Guid.NewGuid();
+            var file = Request.Files[0];
+            var actualFileName = file.FileName;
+            var fileName = guid + Path.GetExtension(file.FileName);
 
-            // Check if Current user has permission for the profile
-            var indicatorIds = new List<int> { simpleUpload.IndicatorId };
-            ViewBag.Disallowed = CheckIndicatorPermissionForCurrentUser(indicatorIds);
-
-            ViewBag.ExcelFilePath = simpleUpload.FileName;
-            ViewBag.SelectedWorksheet = simpleUpload.SelectedWorksheet;
-            ViewBag.UploadBatchId = simpleUpload.UploadBatchId;
-
-            return View("SpreadsheetSimpleSummary", simpleUpload);
-        }
-
-        [HttpPost]
-        public ActionResult UploadSimpleData(string excelFilePath, string shortFilename, string selectedWorksheet,
-            Guid uploadBatchId)
-        {
-            var simpleUpload = new SimpleWorkSheetProcessor(_coreDataRepository, _loggingRepository).UploadData(
-                excelFilePath, shortFilename, selectedWorksheet, uploadBatchId, UserDetails.CurrentUser().Name);
-
-            return View("InsertSummary", simpleUpload);
-        }
-
-        public ActionResult UploadSimpleDataAndArchiveDuplicates(string excelFilePath, string shortFilename,
-            string selectedWorksheet, Guid uploadBatchId)
-        {
-            var simpleUpload = new SimpleWorkSheetProcessor(_coreDataRepository, _loggingRepository).UploadSimpleDataAndArchiveDuplicates(
-                excelFilePath, shortFilename, selectedWorksheet, uploadBatchId, UserDetails.CurrentUser().Name);
-
-            return View("InsertSummary", simpleUpload);
-        }
-
-        [HttpPost]
-        [Route("ValidateBatchUpload")]
-        public ActionResult ValidateBatchUpload(HttpPostedFileBase excelFile)
-        {
-            ViewBag.IsSimple = false;
-
-            var validator = new BatchUploadValidator(excelFile);
-
-            if (validator.IsFileTooLarge ||
-                validator.IsPholioSheet == false)
+            try
             {
-                // No point validating spreadsheet 
-                return View("SpreadsheetBatchSummary", validator.BatchUpload);
-            }
-
-            // Validate spreadsheet
-            BatchUpload batchUpload = validator.Validate();
-
-            // List of indicator ids in current batch
-            var indicatorIds = validator.IndicatorIdsInBatch;
-            ViewBag.Disallowed = CheckIndicatorPermissionForCurrentUser(indicatorIds);
-
-            ViewBag.ExcelFilePath = batchUpload.FileName;
-            ViewBag.SelectedWorksheet = batchUpload.SelectedWorksheet;
-            ViewBag.UploadBatchId = batchUpload.UploadBatchId;
-
-            return View("SpreadsheetBatchSummary", batchUpload);
-        }
-
-        private List<string> CheckIndicatorPermissionForCurrentUser(List<int> indicators)
-        {
-            var permissions = new List<string>();
-            // List of indicator ids in current batch
-            var listOfIndicatorsInCurrentBatch = indicators;
-            // Get list of profiles where current user has permission
-            var user = UserDetails.CurrentUser();
-            var userProfiles = user.GetProfilesUserHasPermissionsTo().ToList();
-            var userProfileIds = userProfiles.Select(x => x.Id).ToList();
-
-            // Get the dictionary for indicators and owner profiles 
-            var indicatorIds = _reader.GetIndicatorIdsByProfileIds(userProfileIds);
-
-            var disallowedIndicators = new List<int>();
-
-            foreach (var i in listOfIndicatorsInCurrentBatch)
-            {
-                if (!indicatorIds.ContainsKey(i))
+                file.SaveAs(Path.Combine(AppConfig.UploadFolder, fileName));
+                var uploadJob = new UploadJob
                 {
-                    disallowedIndicators.Add(i);
-                }
+                    DateCreated = DateTime.Now,
+                    Guid = guid,
+                    Filename = actualFileName,
+                    JobType = jobType,
+                    Status = UploadJobStatus.NotStart,
+                    UserId = UserDetails.CurrentUser().Id
+                };
+
+                _fpmUploadRepository.CreateJob(uploadJob);
+                response = true;
             }
-            if (disallowedIndicators.Count > 0)
+            catch (Exception ex)
             {
-                disallowedIndicators.Reverse();
-                foreach (var indicatorId in disallowedIndicators)
-                {
-                    var disallowedProfile = _reader.GetOwnerProfilesByIndicatorIds(indicatorId);
-                    var message = disallowedProfile != null
-                        ? " is owned by " + disallowedProfile.Name
-                        : " does not exist";
-                    permissions.Add("Indicator " + indicatorId + message);
-                }
+                response = false;
             }
 
-            return permissions;
+            return response;
         }
 
-        [HttpPost]
-        public ActionResult UploadBatchData(string excelFilePath, string shortFilename,
-            string selectedWorksheet, Guid uploadBatchId, int duplicateSpreadsheetErrors)
+        // Returns list of jobs for current user
+        [HttpGet]
+        public ActionResult CurrentUserJobProgress()
         {
-            BatchUpload batchUpload = new BatchUploader(_coreDataRepository, _loggingRepository).UploadBatchData(excelFilePath,
-                shortFilename, selectedWorksheet, uploadBatchId, UserDetails.CurrentUser().Name, duplicateSpreadsheetErrors);
+            var userId = UserDetails.CurrentUser().Id;
+            var jobs = _fpmUploadRepository.GetJobsForCurrentUser(userId);
 
-            return View("InsertSummary", batchUpload);
+            var response = new UploadProgressViewModel
+            {
+                InProgress = jobs.Count(x => x.Status == UploadJobStatus.InProgress),
+                InQueue = jobs.Count(x => x.Status == UploadJobStatus.NotStart),
+                AwaitingConfomation = jobs.Count(x => x.Status == UploadJobStatus.ConfirmationAwaited),
+                Jobs = jobs
+            };
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult UploadBatchDataAndArchiveDuplicates(string excelFilePath, string shortFilename,
-            string selectedWorksheet, Guid uploadBatchId)
+        // Returns job summary, i.e. number of processed rows or error
+        [HttpGet]
+        public ActionResult JobSummary(string guid)
         {
-            BatchUpload batchUpload = new BatchUploader(_coreDataRepository, _loggingRepository).UploadDataAndArchiveDuplicates(excelFilePath, shortFilename,
-                selectedWorksheet, uploadBatchId, UserDetails.CurrentUser().Name);
+            var response = new UploadSummaryViewModel();
 
-            return View("InsertSummary", batchUpload);
+            if (guid.IsNullOrWhiteSpace())
+                return Json(response, JsonRequestBehavior.AllowGet);
+
+            var jobGuid = Guid.Parse(guid);
+            var job = _fpmUploadRepository.GetJob(jobGuid);
+            var summary = _fpmUploadRepository.FindJobErrorsByJobGuid(jobGuid).FirstOrDefault();
+
+            response.JobStatus = job.Status;
+            response.ErrorType = summary.ErrorType;
+            response.ErrorText = summary.ErrorText;
+            response.ErrorJson = summary.ErrorJson;
+
+            return Json(response, JsonRequestBehavior.AllowGet);
         }
 
+        // Change the job starts from ConfirmationAwaited to ConfirmationGiven
+        [HttpGet]
+        public ActionResult ChangeStatus(string guid, int actionCode)
+        {
+            if (guid.IsNullOrWhiteSpace() || actionCode == null)
+            {
+                Response.StatusCode = (int)HttpStatusCode.NotFound;
+                var errorResponse = new { Success = "false", Message = "guid or action code missing" };
+                return Json(errorResponse, JsonRequestBehavior.AllowGet);
+            }
+
+            var jobGuid = Guid.Parse(guid);
+            var uploadJob = _fpmUploadRepository.GetJob(jobGuid);
+            uploadJob.Status = (UploadJobStatus)actionCode;
+
+            var isUpdated = _fpmUploadRepository.UpdateJob(uploadJob);
+            var response = new { Success = isUpdated ? "true" : "false", Message = "" };
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        // Returns xls or csv file
+        [HttpGet]
+        public ActionResult Download(string guid)
+        {
+            if (guid.IsNullOrWhiteSpace())
+            {
+                Response.StatusCode = (int)HttpStatusCode.NotFound;
+                var errorResponse = new { Success = "false", Message = "file not found" };
+                return Json(errorResponse, JsonRequestBehavior.AllowGet);
+            }
+
+            try
+            {
+                var jobGuid = Guid.Parse(guid);
+                var job = _fpmUploadRepository.GetJob(jobGuid);
+                var fileExt = Path.GetExtension(job.Filename);
+                var filePath = Path.Combine(AppConfig.UploadFolder, jobGuid + fileExt);
+                var fileData = System.IO.File.ReadAllBytes(filePath);
+                var contentType = MimeMapping.GetMimeMapping(filePath);
+
+                var cd = new ContentDisposition
+                {
+                    FileName = job.Filename,
+                    Inline = true
+                };
+
+                Response.AppendHeader("Content-Disposition", cd.ToString());
+                return File(fileData, contentType);
+            }
+            catch (Exception ex)
+            {
+                return Redirect("/NotFound");
+            }
+        }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             _coreDataRepository = new CoreDataRepository();
             _loggingRepository = new LoggingRepository();
-
             base.OnActionExecuting(filterContext);
         }
 
@@ -182,10 +196,7 @@ namespace Fpm.MainUI.Controllers
         {
             _coreDataRepository.Dispose();
             _loggingRepository.Dispose();
-
             base.OnActionExecuted(filterContext);
         }
-
-
     }
 }

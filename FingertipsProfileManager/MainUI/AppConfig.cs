@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
+using System.IO;
 
 namespace Fpm.MainUI
 {
@@ -6,6 +8,7 @@ namespace Fpm.MainUI
     {
         private static string jsPath;
         private static string cssPath;
+        private static string angularAppPath;
 
         public static string LastUpdatedDateBatchTemplate
         {
@@ -32,6 +35,11 @@ namespace Fpm.MainUI
             get { return GetAppSetting("DefaultTestUrl"); }
         }
 
+        public static string UploadFolder
+        {
+            get { return Path.Combine(AppDomain.CurrentDomain.BaseDirectory, GetAppSetting("UploadFolder")); }
+        }
+
         public static string JsPath
         {
             get { return jsPath ?? (jsPath = GetPath("js")); }
@@ -42,6 +50,10 @@ namespace Fpm.MainUI
             get { return cssPath ?? (cssPath = GetPath("css")); }
         }
 
+        public static string AngularAppPath
+        {
+            get { return angularAppPath ?? (angularAppPath = GetPath("AngularApps")); }
+        }
         private static string GetPath(string folderName)
         {
             string version = GetAppSetting("JavaScriptVersionFolder");

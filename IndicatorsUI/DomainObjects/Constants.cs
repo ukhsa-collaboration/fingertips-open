@@ -72,6 +72,7 @@ namespace Profiles.DomainObjects
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
         public const int LongerLives = 22;
+        public const int HealthProfiles = 26;
         public const int MentalHealth = 36;
         public const int SevereMentalIllness = 41;
         public const int SexualHealth = 45;
@@ -100,6 +101,7 @@ namespace Profiles.DomainObjects
     public class TabIds
     {
         public const int BarChart = 3;
+        public const int ScatterPlot = 10;
     }
 
     public class SexIds
@@ -116,6 +118,7 @@ namespace Profiles.DomainObjects
 
     public class AreaTypeIds
     {
+        public const int DistrictAndUnitaryAuthority = 101;
         public const int CountyAndUnitaryAuthority = 102;
         public const int CCG = 19;
     }
@@ -138,6 +141,10 @@ namespace Profiles.DomainObjects
         public const string GpPracticeWestminsterAndPimlico = "E87014";
         public const string Cambridge = "Cambridge";
 
+        //Regions
+        public const string RegionEastOfEngland = "E12000006";
+
+        // Country
         public const string England = "E92000001";
     }
 

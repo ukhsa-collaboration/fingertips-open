@@ -1171,18 +1171,34 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
         $searchBox.val('').removeClass(cssSearchWatermark);
     }).blur(function () {
         if ($searchBox.val() === '' && $searchBox.attr(title) !== '') {
+            // Display watermark
             $searchBox.val($searchBox.attr(title)).addClass(cssSearchWatermark);
         }
+        $noMatches.hide();
     }).keydown(function (e) {
         var code = (e.keyCode ? e.keyCode : e.which);
         if ($noMatches.is(':visible') && code == 13) {
             e.preventDefault();
         }
     }).keyup(function () {
+        // Hide no matches if search box empty
         if (!$searchBox.val().length) {
             $noMatches.hide();
         }
     });
+
+    // No results match
+    var showSearchNotFound = function() {
+        var position = $searchBox.position();
+        $noMatches.width($searchBox.width()).css(
+            {
+                top: position.top + SEARCH_NO_RESULT_TOP_OFFSET,
+                left: position.left + SEARCH_NO_RESULT_LEFT_OFFSET
+            }).show();
+
+        // Hide suggestions
+        $('#ui-id-1').hide();
+    }
 
     $searchBox.autocomplete({
         source: function (request, response) {
@@ -1192,7 +1208,7 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
                         $noMatches.hide();
                         response(new AreaSearchResults(data).suggestions);
                     } else {
-                        showSearchNotFound($searchBox, $noMatches, SEARCH_NO_RESULT_TOP_OFFSET);
+                        showSearchNotFound();
                     }
                 },
                 excludeCCGs
@@ -1216,36 +1232,26 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
     });
 }
 
-function showSearchNotFound($searchBox, $noMatches, topOffset) {
-    var position = $searchBox.position();
-    $noMatches.width($searchBox.width()).css(
-        {
-            top: position.top + topOffset,
-            left: position.left
-        }).show();
-    $('#ui-id-1').hide();
-}
-
 /**
 * AJAX call to fetch results of an area search
 * @class ajaxAreaSearch
 */
-function ajaxAreaSearch(text, successFunction, excludeCCGs) {
-    getAreaSearchResults(text, successFunction, AreaTypeIds.CCG, true, excludeCCGs);
+function ajaxAreaSearch(text, successFunction, excludeCcgs) {
+    getAreaSearchResults(text, successFunction, AreaTypeIds.CCG, true, excludeCcgs);
 }
 
 /**
 * AJAX call to fetch results of an area search
 * @class getAreaSearchResults
 */
-function getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, excludeCCGs) {
+function getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, excludeCcgs) {
 
     $.ajax({
         type: 'GET',
         url: FT.url.corews + 'AreaLookup.ashx?s=aa&text=' + text +
             '&polygon_area_type_id=' + areaTypeId +
             '&include_coordinates=' + shouldSearchRetreiveCoordinates +
-            '&exclude_ccgs=' + excludeCCGs,
+            '&exclude_ccgs=' + excludeCcgs,
         data: {},
         cache: false,
         contentType: 'application/json',
@@ -1461,6 +1467,42 @@ function formatCount(dataInfo) {
         NO_DATA;
 }
 
+/**
+* Get the HTML of a trend marker image.
+* @class getTrendMarkerImage
+*/
+function getTrendMarkerImage(trendMarker, polarity) {
+
+    var lowIsGood = PolarityIds.RAGLowIsGood;
+    var highIsGood = PolarityIds.RAGHighIsGood;
+    var blueOrangeBlue = PolarityIds.BlueOrangeBlue;
+
+    var imageName;
+    switch (trendMarker) {
+        case TrendMarkerValue.Up:
+            imageName = 'up_' +
+                (polarity === blueOrangeBlue ? 'blue' :
+                polarity === lowIsGood ? 'red' :
+                polarity === highIsGood ? 'green' :
+                'grey');
+            break;
+        case TrendMarkerValue.Down:
+            imageName = 'down_' +
+                (polarity === blueOrangeBlue ? 'blue' :
+                polarity === lowIsGood ? 'green' :
+                polarity === highIsGood ? 'red' :
+                'grey');
+            break;
+        case TrendMarkerValue.NoChange:
+            imageName = 'no_change';
+            break;
+        default:
+            imageName = 'no_calc';
+            break;
+    }
+    return "<img src='/images/trends/" + imageName + ".png" + "'/>";
+}
+
 
 // Constants
 REGIONAL_COMPARATOR_ID = 1;
@@ -1468,15 +1510,20 @@ NATIONAL_COMPARATOR_ID = 4;
 TARGET_COMPARATOR_ID = 2;
 NOT_APPLICABLE = 'n/a';
 NATIONAL_CODE = 'E92000001';
+SEARCH_NO_RESULT_TOP_OFFSET = 0;
+SEARCH_NO_RESULT_LEFT_OFFSET = 0;
 
 /**
 * Enum of PHOLIO area type IDs.
 * @class AreaTypeIds
 */
 AreaTypeIds = {
-    Regions: 6,
+    District: 2,
+    Region: 6,
     Practice: 7,
+    County: 9,
     Country: 15,
+    UnitaryAuthority : 16,
     GpShape: 18,
     CCG: 19,
     DeprivationDecile: 23,
@@ -1534,12 +1581,15 @@ ProfileIds = {
     SearchResults: 13,
     PracticeProfiles: 20, 
     Mortality: 22,
+    HealthProfiles: 26,
+    CommunityMentalHealth: 50,
     Diabetes: 51,
     Liver: 55,
     Hypertension: 67,
     Cancer: 71,
     DrugsAndAlcohol: 75,
-    HealthChecks: 77
+    HealthChecks: 77,
+    ChildHealth: 105
 };
 
 TrendMarkerValue = {

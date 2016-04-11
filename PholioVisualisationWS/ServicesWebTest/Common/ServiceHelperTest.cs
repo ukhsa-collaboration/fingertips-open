@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ServicesWeb.Common;
 
-namespace ServicesWebTest.Common
+namespace PholioVisualisation.ServicesWebTest.Common
 {
     [TestClass]
     public class ServiceHelperTest

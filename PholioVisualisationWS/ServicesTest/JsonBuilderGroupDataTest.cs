@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.Services;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     [TestClass]
     public class JsonBuilderGroupDataTest

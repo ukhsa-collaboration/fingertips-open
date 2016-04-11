@@ -9,7 +9,7 @@ using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.Services;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     [TestClass]
     public class JsonBuilderAreaCategoriesTest

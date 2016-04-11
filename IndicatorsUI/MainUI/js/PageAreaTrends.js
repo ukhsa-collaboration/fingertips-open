@@ -763,8 +763,8 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
             // Trend table contents
             if (root.TrendMarkers)
             {
-                h.push('<div class="trendMarker">Overall Trend:' + 
-                    GetTrendMarkerImage(root.TrendMarkers[areaCode], root.PolarityId) + 
+                h.push('<div class="trendMarker">Recent trend:' + 
+                    getTrendMarkerImage(root.TrendMarkers[areaCode], root.PolarityId) + 
                     '</div>');
             }
 
@@ -877,37 +877,38 @@ function getMultiAreaTrendsHtml() {
                 getTargetLegendHtml(comparisonConfig, metadata), '</div>');
         }
 
-        var isNearestNeighbourAdded = false;
-
         for (x in sortedAreasForTrends) {
-            var area = sortedAreasForTrends[x],
-                areaCode = area.Code,
-                areaType = area.AreaTypeId;
+            var area = sortedAreasForTrends[x];
+            var areaCode = area.Code;
+            var areaTypeId = area.AreaTypeId;
             var dataList = root.Data[areaCode];
 
+            // Do not include areas without data
             if (isDefined(dataList)) {
-                // Do not include areas without data
                 for (var d in dataList) {
                     if (isValidValue(dataList[d].D)) {
-                        var args = {};
-                        args.cssClass = cssClass;
-                        var shortAreaName;
-                        if (!isNearestNeighbourAdded && FT.model.isNearestNeighbours() || _.size(sortedAreasForTrends) == 16) {
-                            shortAreaName = area.Code === FT.model.areaCode ? area.Short : area.Rank + ' - ' + area.Short;
-                            isNearestNeighbourAdded = true;
+   
+                        // Set area name as chart title
+                        if (areaTypeId === AreaTypeIds.Practice) {
+                            var chartTitle = areaCode + ' - ' + area.Short;
+                        }
+                        else if (FT.model.isNearestNeighbours()) {
+                            chartTitle = areaCode === FT.model.areaCode
+                                ? area.Short
+                                : area.Rank + ' - ' + area.Short;
                         } else {
-                            shortAreaName = areaHash[areaCode].Short;
+                            chartTitle = area.Short;
                         }
 
-                        if (areaType == AreaTypeIds.Practice) {
-                            shortAreaName = areaCode + ' - ' + shortAreaName;
-                        }
+                        // Define view model
+                        var viewModel = {};
+                        viewModel.cssClass = cssClass;
+                        viewModel.areaNameShort = trimName(chartTitle, 23);
+                        viewModel.areaCode = areaCode;
+                        viewModel.chartId = 'at-' + areaCode;
 
-                        args.areaNameShort = trimName(shortAreaName, 23);
+                        h.push(templates.render('areaTrends', viewModel));
 
-                        args.areaCode = areaCode;
-                        args.chartId = 'at-' + areaCode;
-                        h.push(templates.render('areaTrends', args));
                         chartCount++;
                         break;
                     }
@@ -1181,18 +1182,18 @@ function viewClicked(viewMode) {
 function TrendData() {
 
     var benchmarkPoints = [],
-    areaPoints = [],
-    CIPoints = [],
-    getValue = function (v) {
-        return isValidValue(v) ? v : null;
-    };
+        areaPoints = [],
+        CIPoints = [];
 
-    this.addAreaPoint = function (d, markerColor) {
+    this.addAreaPoint = function (trendDataPoint, markerColor) {
+
+        var isValid = trendDataPoint.V !== '-';
+
         areaPoints.push({
-            y: getValue(d.D),
-            ValF: getValue(parseFloat(d.V)),
+            y: isValid ? trendDataPoint.D : null,
+            ValF: isValid ? parseFloat(trendDataPoint.V) : null,
             color: markerColor,
-            noteId: d.NoteId,
+            noteId: trendDataPoint.NoteId,
             marker: {
                 fillColor: markerColor,
                 states: {
@@ -1201,12 +1202,17 @@ function TrendData() {
             }
         });
 
-        CIPoints.push([parseFloat(d.L), parseFloat(d.U)]);
+        CIPoints.push([
+            parseFloat(trendDataPoint.L),
+            parseFloat(trendDataPoint.U)]);
     };
 
     this.addBenchmarkPoint = function (value, valueF) {
+
+        var y = isValidValue(value) ? value : null;
+
         benchmarkPoints.push({
-            y: getValue(value),
+            y: y,
             ValF: valueF,
             isBenchmark: true
         });

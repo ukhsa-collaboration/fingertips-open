@@ -5,7 +5,7 @@ using Fpm.MainUI.Helpers;
 using Fpm.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class UserDetailsTest
@@ -24,6 +24,13 @@ namespace IndicatorsUITest.Helpers
             var user = UserWithRights().FpmUser;
             Assert.IsNotNull(user, "No user object found");
             Assert.AreEqual(FpmUserIds.Doris, user.Id, "UserDetails ID not as expected");
+        }
+
+        [TestMethod]
+        public void TestConvertUserNameToDisplayName()
+        {
+            var user = UserDetails.ConvertUserNameToDisplayName(UserNames.Doris);
+            Assert.AreEqual("Doris Hain", user);
         }
 
         [TestMethod]

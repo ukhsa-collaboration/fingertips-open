@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
@@ -12,9 +12,9 @@
 
 <div id="content" class="clearfix">
     <div id="related_content" class="contact-details">
-        @CommonUtilities.GetContent("about-project-related", ProfileIds.LongerLives)
+        @ContentProvider.GetContent("about-project-related", ProfileIds.LongerLives)
     </div>
     <div id="main_content" class="fpm_content">
-        @CommonUtilities.GetContent("about-project-main", ProfileIds.LongerLives)
+        @ContentProvider.GetContent("about-project-main", ProfileIds.LongerLives)
     </div>
 </div>

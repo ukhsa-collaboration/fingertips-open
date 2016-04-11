@@ -45,8 +45,10 @@
     <property name="EnumParentDisplay" column="enum_parent_display"/>
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
+    <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
+    <property name="IsProfileWithOnlyStaticReports" column="is_profile_with_only_static_reports"/>
+    <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
   </class>
-
   
   <!-- GroupingMetadata class -->
   <class name="GroupingMetadata" table="groupingmetadata">

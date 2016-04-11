@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @model ProfileCollection
 
 @if (Model.IsNationalProfilesCollection == false)
@@ -27,8 +27,10 @@
 
         <td style="width:@(columnWidth)%;">
             @Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)
+            
 
-            @CommonUtilities.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
+            @ContentProvider.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
+            
 
             @if (profileCollectionItem.DisplayDomains)
             {

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     [TestClass]
     public class GetData_IndicatorMetadataTest

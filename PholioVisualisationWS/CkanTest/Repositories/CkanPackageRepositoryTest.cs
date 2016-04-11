@@ -9,7 +9,7 @@ using Ckan.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace CkanTest.Repositories
+namespace PholioVisualisation.CkanTest.Repositories
 {
     [TestClass]
     public class WhenUsingCkanPackageProvider

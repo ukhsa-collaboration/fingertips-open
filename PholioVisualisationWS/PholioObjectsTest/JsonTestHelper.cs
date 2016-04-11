@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 
-namespace PholioObjectsTest
+namespace PholioVisualisation.PholioObjectsTest
 {
     public static class JsonTestHelper
     {

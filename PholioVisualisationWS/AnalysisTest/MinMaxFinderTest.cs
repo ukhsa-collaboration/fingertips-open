@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Analysis;
 
-namespace AnalysisTest
+namespace PholioVisualisation.AnalysisTest
 {
     [TestClass]
     public class MinMaxFinderTest

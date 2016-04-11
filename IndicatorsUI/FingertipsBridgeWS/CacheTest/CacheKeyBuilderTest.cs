@@ -6,7 +6,8 @@ using System.Linq;
 using FingertipsBridgeWS.Cache;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace CacheTest
+namespace IndicatorsUI.FingertipsBridgeWS.CacheTest
+ 
 {
     /// <summary>
     /// Summary description for UnitTest1
@@ -14,7 +15,6 @@ namespace CacheTest
     [TestClass]
     public class CacheKeyBuilderTest
     {
-
         [TestMethod]
         public void TestWithoutKey()
         {

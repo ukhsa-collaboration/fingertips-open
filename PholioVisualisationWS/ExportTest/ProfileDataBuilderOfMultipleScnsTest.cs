@@ -7,7 +7,7 @@ using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class ProfileDataBuilderOfMultipleScnsTest

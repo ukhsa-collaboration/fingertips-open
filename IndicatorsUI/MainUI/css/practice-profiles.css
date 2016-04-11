@@ -1084,11 +1084,6 @@ P.export {
         font-size: 1.4em;
     }
 
-    #no-matches-found a {
-        cursor: default;
-        color: inherit;
-    }
-
     .map-popup-content {
         height: 40px;
         width: 100%;

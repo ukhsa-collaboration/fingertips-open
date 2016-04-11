@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.KeyMessages;
 using PholioVisualisation.PholioObjects;
 
-namespace KeyMessagesTest
+namespace PholioVisualisation.KeyMessagesTest
 {
     [TestClass]
     public class StaticMessageProviderTest

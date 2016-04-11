@@ -93,13 +93,21 @@ namespace ServicesWeb.Controllers
         /// </summary>
         [HttpGet]
         [Route("areas")]
-        public IList<IArea> GetAreasOfAreaType(int area_type_id,
+        public IList<IArea> GetAreasOfAreaType(int area_type_id = AreaTypeIds.Undefined,
             int profile_id = ProfileIds.Undefined, string parent_area_code = null,
             int template_profile_id = ProfileIds.Undefined,
-            string retrieve_ignored_areas = null)
+            string retrieve_ignored_areas = null, string area_codes = null)
         {
             try
             {
+                if (area_codes != null)
+                {
+                    var codes = new StringListParser(area_codes).StringList;
+                    var areaListBuilder = new AreaListBuilder(ReaderFactory.GetAreasReader());
+                    areaListBuilder.CreateAreaListFromAreaCodes(codes);
+                    return areaListBuilder.Areas;
+                }
+
                 if (parent_area_code != null)
                 {
                     return GetChildAreas(area_type_id, parent_area_code, profile_id);
@@ -206,6 +214,21 @@ namespace ServicesWeb.Controllers
             try
             {
                 return ReaderFactory.GetAreasReader().GetNhsChoicesAreaId(area_code);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        [HttpGet]
+        [Route("chimat_resource_id")]
+        public int GetChimatResourceId(string area_code)
+        {
+            try
+            {
+                return ReaderFactory.GetAreasReader().GetChimatResourceId(area_code);
             }
             catch (Exception ex)
             {

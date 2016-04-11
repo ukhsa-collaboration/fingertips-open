@@ -37,6 +37,11 @@ namespace PholioVisualisation.DataAccess
             get { return ConfigurationManager.AppSettings["SearchIndexDirectory"]; }
         }
 
+        public static string StaticReportsDirectory
+        {
+            get { return ConfigurationManager.AppSettings["StaticReportsDirectory"]; }
+        }
+
         public static string UrlUI
         {
             get { return ConfigurationManager.AppSettings["UrlUI"]; }

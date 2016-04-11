@@ -6,7 +6,7 @@ using Fpm.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest
+namespace Fpm.MainUISeleniumTest
 {
     [TestClass]
     public class UserTest : BaseUnitTest

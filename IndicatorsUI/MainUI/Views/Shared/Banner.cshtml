@@ -4,22 +4,30 @@
     @Html.Partial(Model.GetSkinView("_PageLinks"))
 </div>
 <div id="site-link" class="standardWidth clearfix">
+    
+    @* Define title *@
     @{
-        var title = Model.PageTitle;
-        title = (Model.DisplayProfileTitle == false && string.IsNullOrEmpty(title) == false) ?
-            title :
-            Model.Skin.Title;
+        var pageTitle = Model.PageTitle;
+        var isPageTitleDefined = string.IsNullOrEmpty(pageTitle) == false;
+        var title = (Model.DisplayProfileTitle && isPageTitleDefined)
+           ? pageTitle
+           : Model.Skin.Title;
     }
-    @if (Model.Skin.IsPhof || Model.Skin.IsTobacco)
-    {
-        <h1 style="@(TitleFont.GetSize(title, Model.ProfileId))">
+    
+    @* Display title*@
+    @{
+        var fontSize = TitleFont.GetSize(title, Model.ProfileId);
+    }
+    <h1 style="@fontSize">
+        @if (Model.Skin.IsPhof || Model.Skin.IsTobacco)
+        {
             <a href="/" class="homeHeader">@Html.Raw(title) </a>
-        </h1>
-    }
-    else
-    {
-        <h1 style="@(TitleFont.GetSize(title, Model.ProfileId))">
+        }
+        else
+        {
             @Html.Raw(title)
-        </h1>    }
+        }
+    </h1>
+
     @Html.Partial("SearchBox")
 </div>

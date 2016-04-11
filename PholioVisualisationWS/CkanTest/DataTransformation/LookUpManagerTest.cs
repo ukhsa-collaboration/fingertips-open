@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace CkanTest.DataTransformation
+namespace PholioVisualisation.CkanTest.DataTransformation
 {
     [TestClass]
     public class LookUpManagerTest

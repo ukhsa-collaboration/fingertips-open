@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DataConstruction;
 using Profiles.DomainObjects;
 
-namespace DataConstructionTest
+namespace IndicatorsUI.DataConstructionTest
 {
     /// <summary>
     /// Summary description for ProfileDetailsBuilderTest

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
+using System;
+using System.Collections.Generic;
 
-namespace MainUISeleniumTest.HealthierLives
+namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
     [TestClass]
     public class PageDiabetesAreaDetailsTest : BaseUnitTest
@@ -31,7 +31,7 @@ namespace MainUISeleniumTest.HealthierLives
             LoadHealthChecksAreaDetailsPage(driver, parameters.HashParameterString);
 
             // ImplicitlyWait for the area filter to render
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
             wait.Until(d => d.FindElement(By.Id("main_ranking")));
 
             Assert.IsTrue(driver.FindElement(By.Id("main_ranking")).Text.Contains("NO DATA"));
@@ -82,7 +82,7 @@ namespace MainUISeleniumTest.HealthierLives
 
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.Until(d => d.FindElement(By.Id("main_ranking")));
-            
+
             Assert.IsTrue(driver.FindElement(By.Id("main_ranking")).GetAttribute("class").Contains("no-data"));
         }
 
@@ -94,10 +94,10 @@ namespace MainUISeleniumTest.HealthierLives
             parameters.AddParentAreaCode(AreaCodes.England);
 
             LoadDrugsAndAlcoholAreaDetailsPage(driver, parameters.HashParameterString);
-            
+
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.Until(d => d.FindElement(By.Id("data_page_table")));
-            
+
             Assert.IsTrue(driver.FindElement(By.Id("data_page_header")).Text.Contains("Croydon"));
         }
 
@@ -128,8 +128,8 @@ namespace MainUISeleniumTest.HealthierLives
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
             wait.Until(d => d.FindElement(By.Id("data_page_table")));
 
-            var rankingTableElements = driver.FindElements(By.Id("drug_treatment_row"));
-                                              
+            var rankingTableElements = driver.FindElements(By.Id("a_row"));
+
             foreach (var webElement in rankingTableElements)
             {
                 Assert.AreEqual("none", webElement.GetAttribute("class"));

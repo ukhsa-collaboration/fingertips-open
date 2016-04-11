@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
 using Fpm.MainUI.Controllers;
-using Fpm.MainUI.ViewModels;
 using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MainUITest.Controllers
+namespace Fpm.MainUITest.Controllers
 {
     [TestClass]
     public class WhenUsingProfilesAndIndicatorsController

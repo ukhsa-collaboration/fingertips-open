@@ -8,7 +8,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class ChildAreaValuesBuilderTest

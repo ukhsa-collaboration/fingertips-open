@@ -5,7 +5,7 @@ using Profiles.DataConstruction;
 using Profiles.DomainObjects;
 using Profiles.MainUI.Filters;
 using Profiles.MainUI.Caching;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Models;
 
 namespace Profiles.MainUI.Controllers
@@ -69,9 +69,9 @@ namespace Profiles.MainUI.Controllers
             }
 
             PageModel.Skin.PartialViewFolder = "ProfileCollectionWithFrontPage";
-
+            PageModel.DisplayProfileTitle = true;
             PageModel.PageTitle = details.Title;
-            PageModel.ProfileUrlKey = details.ProfileUrlKey;
+            ViewBag.ProfileUrlKey = details.ProfileUrlKey;
 
             SetProfileCollection(leadProfileUrlKey);
 

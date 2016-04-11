@@ -60,29 +60,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
-    <Compile Include="BaseUpload.cs" />
-    <Compile Include="BatchUpload.cs" />
-    <Compile Include="BatchUploader.cs" />
-    <Compile Include="BatchUploadValidator.cs" />
-    <Compile Include="CategoryValuesValidator.cs" />
-    <Compile Include="DataUploadValidation.cs" />
-    <Compile Include="DuplicateRowInSpreadsheetError.cs" />
-    <Compile Include="BatchWorkSheetValidator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleWorkSheetProcessor.cs" />
-    <Compile Include="SimpleUpload.cs" />
-    <Compile Include="SimpleUploadValidator.cs" />
     <Compile Include="TimePeriodReader.cs" />
-    <Compile Include="TimePeriodTranslater.cs" />
-    <Compile Include="BatchRowParser.cs" />
-    <Compile Include="UploadColumnNames.cs" />
-    <Compile Include="UploadRegistry.cs" />
-    <Compile Include="UploadValidationFailure.cs" />
-    <Compile Include="UploadExcelSheets.cs" />
-    <Compile Include="UploadFileHelper.cs" />
-    <Compile Include="UploadRowParser.cs" />
-    <Compile Include="SimpleRowParser.cs" />
-    <Compile Include="WorksheetNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProfileData\ProfileData.csproj">

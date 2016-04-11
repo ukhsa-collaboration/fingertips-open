@@ -17,12 +17,13 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
     // Trend
     if (groupRoot.TrendMarkers) {
         if (coreDataSet) {
-            addTd(html, GetTrendMarkerImage(groupRoot.TrendMarkers[coreDataSet.AreaCode], groupRoot.PolarityId), CSS_CENTER);
+            var image = getTrendMarkerImage(groupRoot.TrendMarkers[coreDataSet.AreaCode], groupRoot.PolarityId);
         } else {
-            addTd(html, GetTrendMarkerImage(TrendMarkerValue.CannotCalculate, 0), CSS_CENTER); 
+            image = getTrendMarkerImage(TrendMarkerValue.CannotCalculate, 0);
         }
+
+        addTd(html, image, CSS_CENTER);
     }
-   
 
     // Count
     var count = formatter.getAreaCount();
@@ -58,11 +59,17 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
 
     if (areaProfileState.isAreaIgnored) {
         if (rowNumber === 1) {
+            // Use first row to display an explanation why spine charts are not displayed for the area
             html.push(areaProfileState.ignoreMessage);
         } else {
+            // No spine chart for all other rows
             addTd(html, '<div style="height:23px;">' + NO_DATA + '</div>');
         }
+    } else if (min === max && min !== NO_DATA) {
+        // Min and max are the same so spine chart does not make sense
+        addTd(html, '<div class="noSpine">All values are ' + min + '</div>');
     } else {
+        // Display the spine chart
         addTd(html, spine, 'spine250');
     }
 
@@ -138,7 +145,7 @@ function initAreaProfile() {
        !isParentCountry();
 
     var trendMarkerFound = isDefined(groupRoots) && isDefined(groupRoots[0]) && isDefined(groupRoots[0].TrendMarkers);
-    
+
     pages.getContainerJq().html(
         templates.render('areaProfile', {
             colSpan: isNationalAndRegional && !FT.model.isNearestNeighbours() ? 3 : 4,
@@ -410,14 +417,13 @@ ID_SINGLE_AREA_TABLE = 'singleAreaTable';
 NO_SPINE_DATA = '<div class="noSpine">-</div>';
 INSUFFICIENT_DATA = '<div class="noSpine">Insufficient number of values for a spine chart</div>';
 
-
 templates.add('areaProfile',
     showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') +
     '<table id="' + ID_SINGLE_AREA_TABLE + '" class="borderedTable" style="table-layout: auto;" cellspacing="0" cellpadding="0"><thead>\
 <tr><th id="spineIndicatorHeader" rowspan="2">Indicator</th><th id="spinePeriodHeader" rowspan="2">Period</th><th style="position: relative;" class="numericHeader areaName topRow" colspan="{{trendColSpan}}">-</th>\
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader topRow parent-area-type">{{parentType}}</th>{{/isNotNN}}<th class="numericHeader topRow">England</th>\
 {{/isNationalAndRegional}}<th colspan="{{colSpan}}" class="numericHeader topRow" style="width: 390px;">-</th></tr><tr>\
-{{#trendHeaderIfEnabled}} <th class="numericHeader">Trend</th> {{/trendHeaderIfEnabled}}\
+{{#trendHeaderIfEnabled}} <th class="numericHeader">Recent Trend</th> {{/trendHeaderIfEnabled}}\
 <th class="numericHeader">Count</th><th class="numericHeader">Value</th>\
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader">Value</th>{{/isNotNN}}{{/isNationalAndRegional}}\
 <th class="numericHeader">Value</th><th class="numericHeader">{{lowest}}</th>\

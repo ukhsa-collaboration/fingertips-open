@@ -65,19 +65,12 @@ namespace FingertipsUploadService.ProfileData
             return service;
         }
 
-        public static ProfilesWriter GetProfilesWriter()
-        {
-            ProfilesWriter service = new ProfilesWriter(GetSessionFactory());
-            service.OpenSession();
-            return service;
-        }
-
         private static ISessionFactory GetSessionFactory()
         {
             if (staticSessionFactory == null)
             {
                 List<string> assemblyNames = new List<string>();
-                assemblyNames.Add("Fpm.ProfileData");
+                assemblyNames.Add("FingertipsUploadService.ProfileData");
                 staticSessionFactory = new ReaderFactory(assemblyNames).sessionFactory;
             }
 

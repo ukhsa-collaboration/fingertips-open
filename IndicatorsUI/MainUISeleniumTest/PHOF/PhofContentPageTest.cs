@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest.Phof
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
     public class PhofContentPageTest : PhofBaseUnitTest

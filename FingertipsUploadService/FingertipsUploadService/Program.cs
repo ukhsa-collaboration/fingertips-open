@@ -1,25 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using System.Threading;
+using NLog;
 
 namespace FingertipsUploadService
 {
-    static class Program
+    internal static class Program
     {
+        private static readonly Logger Logger = LogManager.GetLogger("Program");
+
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
-        static void Main()
+        private static void Main(string[] args)
         {
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[] 
-            { 
-                new Service1() 
-            };
-            ServiceBase.Run(ServicesToRun);
+#if(DEBUG)
+            // Debug code execution path
+            var service = new FingertipsUploadService();
+            service.Start();
+            Logger.Info("Started in Debug");
+            Thread.Sleep(Timeout.Infinite);
+#else
+            System.ServiceProcess.ServiceBase[] ServicesToRun;
+            ServicesToRun = new System.ServiceProcess.ServiceBase[]
+                {
+                    new FingertipsUploadService()
+                };
+            System.ServiceProcess.ServiceBase.Run(ServicesToRun);
+            Logger.Info("Started in Normal");
+#endif
         }
+
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Formatting;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class HtmlCleanerTest

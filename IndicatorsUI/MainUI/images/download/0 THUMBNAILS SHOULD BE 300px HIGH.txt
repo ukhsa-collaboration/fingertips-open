@@ -1,0 +1,2 @@
+
+These PDF preview images should be 300px high. They can be any width < 250px.

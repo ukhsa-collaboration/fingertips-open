@@ -22,10 +22,12 @@ namespace Profiles.MainUI
             AddScripts(bundles, jsPath, "js-longer-lives", GetJsLongerLives());
             AddScripts(bundles, jsPath, "js-practice-profiles", GetJsPracticeProfiles());
             AddScripts(bundles, jsPath, "js-fingertips-maps", GetJsFingertipsMaps());
+            AddScripts(bundles, jsPath, "js-area-search", GetJsAreaSearch());
 
             // Add styles
             AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
             AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
+            AddStyles(bundles, cssPath, "css-area-search", new []{ "AreaSearch/area-search.css"});
         }
 
         private static string[] GetJsPracticeProfiles()
@@ -38,6 +40,25 @@ namespace Profiles.MainUI
                 "PagePracticeSearch.js", "PageCluster.js", "SitePracticeProfiles.js"
             };
             return jsFiles;
+        }
+
+        private static string[] GetJsAreaSearch()
+        {
+            var jsFiles = new List<string>
+            {
+                "PageDownload.js",
+                "AreaSearch/area-search.js"
+            };
+            AddEnvironmentFiles(jsFiles);
+            return jsFiles.ToArray();
+        }
+
+        private static void AddEnvironmentFiles(List<string> jsFiles)
+        {
+            if (AppConfig.Instance.IsEnvironmentTest)
+            {
+                jsFiles.Add("EnvironmentTest.js");
+            }
         }
 
         private static string[] GetJsLongerLives()

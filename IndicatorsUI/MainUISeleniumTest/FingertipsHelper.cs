@@ -1,10 +1,8 @@
-﻿using MainUISeleniumTest.Fingertips;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using Profiles.DomainObjects;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     public class FingertipsHelper
     {
@@ -40,6 +38,14 @@ namespace MainUISeleniumTest
             }
 
             return lastText;
+        }
+
+        public static void SelectFingertipsTab(IWebDriver driver, string pageId)
+        {
+            var tab = driver.FindElement(By.Id(pageId));
+            tab.Click();
+            WaitFor.ThreadWait(0.1);
+            new WaitFor(driver).AjaxLockToBeUnlocked();
         }
 
         public static string GetSelectedAreaNameFromMenu(IWebDriver driver)

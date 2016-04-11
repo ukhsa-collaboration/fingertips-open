@@ -18,7 +18,9 @@ namespace Ckan.DataTransformation
         // Common for all profiles
         public string OrganisationTitle = "Public Health England";
         public string OrganisationId = OrganisationNames.PublicHealthEngland;
-        public string LicenceTitle = "UK Open Government Licence (OGL)";
+
+        // List of available licences api/action/license_list
+        public string LicenceId = "uk-ogl";
 
         /// <summary>
         /// Empty constructor for testing

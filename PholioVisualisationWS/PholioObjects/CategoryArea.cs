@@ -100,7 +100,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsGpDeprivationDecile
         {
-            get { return CategoryTypeId == CategoryTypeIds.DeprivationDecileGp2015; }
+            get { return CategoryTypeId == CategoryTypeIds.DeprivationDecileGp2015 || CategoryTypeId == CategoryTypeIds.DeprivationDecileGp2010; }
         }
 
         /// <summary>

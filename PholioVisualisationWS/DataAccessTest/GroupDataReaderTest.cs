@@ -4,7 +4,7 @@ using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class GroupDataReaderTest

@@ -9,7 +9,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class ProfileFileInfoTest

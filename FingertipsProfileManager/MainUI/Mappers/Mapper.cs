@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mime;
-using Fpm.MainUI.Helpers;
 using Fpm.MainUI.ViewModels;
-using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 
-namespace Fpm.MainUI.Mapper
+namespace Fpm.MainUI.Mappers
 {
     public static class Mapper
     {
@@ -80,9 +76,7 @@ namespace Fpm.MainUI.Mapper
                                     Id = areaType.Id,
                                     Value = areaType.Name
                                 });
-        }
-
-       
+        }       
     }
 
    

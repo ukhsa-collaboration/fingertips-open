@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     public class WaitFor
     {
@@ -86,7 +86,7 @@ namespace MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("national_verdict"));
         }
 
-        public void PracticeProfilesSearchResultsToBeDisplayed()
+        public void AutoCompleteSearchResultsToBeDisplayed()
         {
             ExpectedElementToBeVisible(By.Id(LongerLivesIds.AreaSearchAutocompleteOptions));
             GoogleMapToLoad();
@@ -123,6 +123,16 @@ namespace MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("indicatorDetailsTable"));
         }
 
+        public void FingertipsScatterPlotChartToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("scatter-plot-chart-box"));
+        }
+
+        public void ChosenSearch()
+        {
+            ExpectedElementToBeVisible(By.ClassName("chosen-search"));
+        }
+
         public void FingertipsNearestNeighboursMenuToLoad()
         {
             ExpectedElementToBeVisible(By.Id("goBack"));
@@ -131,6 +141,11 @@ namespace MainUISeleniumTest
         public void FingertipsNearestNeighboursTartunRugToLoad()
         {
             ExpectedElementToBeVisible(By.Id("rightTartanTable"));
+        }
+
+        public void FingertipsAreaSearchResultsPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("area-results-box"));
         }
         
         public void PhofDomainsToLoad()
@@ -174,6 +189,10 @@ namespace MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("trendTable0"));
         }
 
+       public void FingertipsProfileFrontPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("introduction"));
+        }
 
         public void HealthInterventionPageToLoad()
         {

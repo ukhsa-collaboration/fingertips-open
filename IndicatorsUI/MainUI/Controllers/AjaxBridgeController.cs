@@ -4,7 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using Profiles.DataAccess;
 using Profiles.MainUI.Caching;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Results;
 
 namespace Profiles.MainUI.Controllers

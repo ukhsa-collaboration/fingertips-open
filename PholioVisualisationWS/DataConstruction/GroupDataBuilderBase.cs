@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
@@ -161,31 +160,30 @@ namespace PholioVisualisation.DataConstruction
 
             foreach (var groupRoot in GroupData.GroupRoots)
             {
-                groupRoot.TrendMarkers = new Dictionary<string, TrendMarker>();
+                    groupRoot.TrendMarkers = new Dictionary<string, TrendMarker>();
 
-                var indicatorMetaData =
-                    GroupData.IndicatorMetadata.FirstOrDefault(i => i.IndicatorId == groupRoot.IndicatorId);
+                    var indicatorMetaData =
+                        GroupData.IndicatorMetadata.FirstOrDefault(i => i.IndicatorId == groupRoot.IndicatorId);
 
-                if (indicatorMetaData == null) continue;
+                    if (indicatorMetaData == null) continue;
 
-                foreach (var area in GroupData.Areas)
-                {
-                    var grouping = groupRoot.Grouping.FirstOrDefault();
-
-                    var trendRequest = new TrendRequest()
+                    foreach (var area in GroupData.Areas)
                     {
-                        ValueTypeId = indicatorMetaData.ValueTypeId,
-                        ComparatorConfidence = grouping.ComparatorConfidence,
-                        Data = trendReader.GetTrendData(grouping, area.Code),
-                    };
+                        var grouping = groupRoot.Grouping.FirstOrDefault();
 
-                    var trendResponse = trendCalculator.GetResults(trendRequest);
+                        var trendRequest = new TrendRequest()
+                        {
+                            ValueTypeId = indicatorMetaData.ValueTypeId,
+                            ComparatorConfidence = grouping.ComparatorConfidence,
+                            Data = trendReader.GetTrendData(grouping, area.Code),
+                            YearRange = grouping.YearRange,
+                        };
 
-                    groupRoot.TrendMarkers.Add(area.Code, trendResponse.Marker);
-                }
+                        var trendResponse = trendCalculator.GetResults(trendRequest);
+
+                        groupRoot.TrendMarkers.Add(area.Code, trendResponse.Marker);
+                    }
             }
-
-
         }
     }
 }

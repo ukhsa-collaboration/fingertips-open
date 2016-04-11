@@ -10,6 +10,7 @@
         ProfileCollectionFrontPage = 5,
         FrontPageOfProfileInCollection = 6,
         DataPageOfProfileInCollection = 7,
-        SupportingInformation = 8
+        SupportingInformation = 8,
+        AreaSearchResults = 9
     }
 }

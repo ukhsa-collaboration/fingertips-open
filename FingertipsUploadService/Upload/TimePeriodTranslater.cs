@@ -1,6 +1,6 @@
 ﻿using FingertipsUploadService.ProfileData;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class TimePeriodTranslater
     {

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.Search;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SearchTest
+namespace Fpm.SearchTest
 {
     [TestClass]
     public class DistinctGroupComparerTest

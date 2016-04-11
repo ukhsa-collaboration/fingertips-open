@@ -1,4 +1,4 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
@@ -10,9 +10,9 @@
 
 <div id="content" class="clearfix">
     <div id="related_content">
-        @CommonUtilities.GetContent("about-data-related", Model.ProfileId)
+        @ContentProvider.GetContent("about-data-related", Model.ProfileId)
     </div>
     <div id="main_content" class="fpm_content">
-        @CommonUtilities.GetContent("about-data-main", Model.ProfileId)
+        @ContentProvider.GetContent("about-data-main", Model.ProfileId)
     </div>
 </div>

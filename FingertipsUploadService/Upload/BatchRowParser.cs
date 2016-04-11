@@ -1,7 +1,7 @@
 ﻿using FingertipsUploadService.ProfileData;
 using System.Data;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class BatchRowParser : UploadRowParser
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PdfData;
 
-namespace PdfDataTest
+namespace PholioVisualisation.PdfDataTest
 {
     [TestClass]
     public class LocalAndEnglandChartDataWithDeprivationTest

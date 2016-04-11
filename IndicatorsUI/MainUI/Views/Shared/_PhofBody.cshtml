@@ -1,8 +1,8 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PhofBody
 <div class="full-width title-divider"></div>
 <div class="standardWidth clearfix">
     <div class="supporting-information">
-        @CommonUtilities.GetContent(Model.ContentKey, Model.ProfileId)
+        @ContentProvider.GetContent(Model.ContentKey, Model.ProfileId)
     </div>
 </div>

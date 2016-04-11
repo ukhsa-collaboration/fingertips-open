@@ -1,4 +1,4 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
     <div class="standardWidth clearfix practice-profiles-domain-list" style="position: relative;">
         <h2>Topics</h2>
         <table class="home-profiles">
@@ -24,7 +24,7 @@
                                 string tooltip = domain.Tooltip ?? string.Empty;
                                 const int currentYear = 2015;
                             }
-                            <a class="title" href="/profile/@Model.ProfileUrlKey/data#mod,1,pyr,@currentYear,pat,19,par,-,are,-,sid1,@domain.GroupId,ind1,-,sid2,-,ind2,-">@domain.SubHeading</a>
+                            <a class="title" href="/profile/@ViewBag.ProfileUrlKey/data#mod,1,pyr,@currentYear,pat,19,par,-,are,-,sid1,@domain.GroupId,ind1,-,sid2,-,ind2,-">@domain.SubHeading</a>
                             <p class="domainContent">@tooltip</p>                                
                     </td>
 

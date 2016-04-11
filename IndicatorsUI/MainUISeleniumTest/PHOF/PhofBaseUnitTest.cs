@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.MainUI.Skins;
 
-namespace MainUISeleniumTest.Phof
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
     public class PhofBaseUnitTest : BaseUnitTest

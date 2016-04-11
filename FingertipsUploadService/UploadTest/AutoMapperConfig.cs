@@ -1,7 +1,8 @@
-﻿using FingertipsUploadService.ProfileData;
+﻿
+using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Core;
 
-namespace UploadTest
+namespace FingertipsUploadService.UploadTest
 {
     public static class AutoMapperConfig
     {

@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DomainObjects;
 
-namespace DomainObjectsTest
+namespace IndicatorsUI.DomainObjectsTest
 {
     [TestClass]
     public class SkinTest

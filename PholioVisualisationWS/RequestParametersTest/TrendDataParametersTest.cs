@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.PholioObjects;
 
-namespace RequestParametersTest
+namespace PholioVisualisation.RequestParametersTest
 {
     [TestClass]
     public class TrendDataParametersTest

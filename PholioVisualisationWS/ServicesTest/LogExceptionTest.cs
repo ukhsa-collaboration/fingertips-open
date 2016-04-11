@@ -6,7 +6,7 @@ using System.Runtime.Serialization.Json;
 using System.Web.Script.Serialization;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     [TestClass]
     public class LogExceptionTest

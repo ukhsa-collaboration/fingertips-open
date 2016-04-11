@@ -1,6 +1,6 @@
 ﻿using StructureMap.Configuration.DSL;
 
-namespace CkanTest
+namespace PholioVisualisation.CkanTest
 {
     public class CkanTestDIRegistry : Registry
     {

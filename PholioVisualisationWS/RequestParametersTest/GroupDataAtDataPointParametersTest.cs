@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 
-namespace RequestParametersTest
+namespace PholioVisualisation.RequestParametersTest
 {
     [TestClass]
     public class GroupDataAtDataPointParametersTest

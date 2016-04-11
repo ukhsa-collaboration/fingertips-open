@@ -5,7 +5,7 @@ using Profiles.MainUI.Skins;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace MainUISeleniumTest.Fingertips
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class FingertipsBaseUnitTest : BaseUnitTest

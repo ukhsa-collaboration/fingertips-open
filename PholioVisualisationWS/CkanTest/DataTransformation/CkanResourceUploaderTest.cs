@@ -9,7 +9,7 @@ using Ckan.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace CkanTest.DataTransformation
+namespace PholioVisualisation.CkanTest.DataTransformation
 {
     [TestClass]
     public class WhenUsingCkanResourceUploader

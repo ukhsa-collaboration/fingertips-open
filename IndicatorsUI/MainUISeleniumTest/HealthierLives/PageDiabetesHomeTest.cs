@@ -4,7 +4,7 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 
-namespace MainUISeleniumTest.HealthierLives
+namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
     [TestClass]
     public class PageDiabetesHomeTest : BaseUnitTest

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace MainUISeleniumTest.HealthierLives
+namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
     [TestClass]
     public class PageMortalityRankingsTest : BaseUnitTest
@@ -15,7 +15,7 @@ namespace MainUISeleniumTest.HealthierLives
         public void TestRankingsPageLoads()
         {
             LoadMortalityRankingsPage();
-            new WaitFor(driver).CountyUaRankingsToLoad();
+            waitFor.CountyUaRankingsToLoad();
 
             // Check population
             var population = driver.FindElement(By.Id(LongerLivesIds.MortalityRankingPopulation)).Text;
@@ -35,11 +35,11 @@ namespace MainUISeleniumTest.HealthierLives
         public void TestRankingsPageLoadsForCountyUa()
         {
             LoadMortalityRankingsPage();
-            new WaitFor(driver).CountyUaRankingsToLoad();
+            waitFor.CountyUaRankingsToLoad();
             
             driver.FindElement(By.XPath(XPaths.AreaTypeLinkCountyUas)).Click();
 
-            new WaitFor(driver).CountyUaRankingsToLoad();
+            waitFor.CountyUaRankingsToLoad();
 
             List<string> countyUaAreas = GetAreaNamesFromRankingTable();
             Assert.IsTrue(countyUaAreas.Contains("Westminster"));
@@ -49,11 +49,11 @@ namespace MainUISeleniumTest.HealthierLives
         public void TestRankingsPageLoadsForDistrictUa()
         {
             LoadMortalityRankingsPage();
-            new WaitFor(driver).CountyUaRankingsToLoad();
+            waitFor.CountyUaRankingsToLoad();
 
             driver.FindElement(By.XPath(XPaths.AreaTypeLinkDistrictUas)).Click();
 
-            new WaitFor(driver).DistrictUaRankingsToLoad();
+            waitFor.DistrictUaRankingsToLoad();
 
             List<string> districtUaAreas = GetAreaNamesFromRankingTable();
             Assert.IsTrue(districtUaAreas.Contains("Fenland"));
@@ -97,72 +97,78 @@ namespace MainUISeleniumTest.HealthierLives
         public void ClickEachIndicatorInTurnAndCheckRankingTableChanges()
         {
             LoadMortalityRankingsPage();
-            new WaitFor(driver).CountyUaRankingsToLoad();
+            waitFor.CountyUaRankingsToLoad();
 
             // Overall mortality
             driver.FindElement(By.Id("Overall-Premature")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var prematureDeathsTable = GetRankingTable(driver);
 
             // Overall Cancer
             driver.FindElement(By.Id("Overall-Cancer")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var cancerDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(cancerDeathsTable.Equals(prematureDeathsTable));
 
             // Overall Lung Cancer
             driver.FindElement(By.Id("Overall-Lung-Cancer")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var lungCancerDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(lungCancerDeathsTable.Equals(cancerDeathsTable));
 
             // Overall Breast Cancer
             driver.FindElement(By.Id("Overall-Breast-Cancer")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var breastCancerDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(breastCancerDeathsTable.Equals(lungCancerDeathsTable));
 
             // Overall Colorectal Cancer
             driver.FindElement(By.Id("Overall-Colorectal-Cancer")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var colorectalCancerDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(colorectalCancerDeathsTable.Equals(breastCancerDeathsTable));
 
             // Overall Heart disease & stroke
             driver.FindElement(By.Id("Overall-Heart-Disease-And-Stroke")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var heartDiseaseAndStrokeDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(heartDiseaseAndStrokeDeathsTable.Equals(colorectalCancerDeathsTable));
 
             // Overall Heart disease
             driver.FindElement(By.Id("Overall-Heart-Disease")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var heartDiseaseDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(heartDiseaseDeathsTable.Equals(heartDiseaseAndStrokeDeathsTable));
 
             // Overall stroke
             driver.FindElement(By.Id("Overall-Stroke")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var strokeDeathsTable = GetRankingTable(driver);
             Assert.IsFalse(strokeDeathsTable.Equals(heartDiseaseDeathsTable));
 
             // Overall Lung disease
             driver.FindElement(By.Id("Overall-Lung-Disease")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var lungDiseaseTable = GetRankingTable(driver);
             Assert.IsFalse(lungDiseaseTable.Equals(heartDiseaseAndStrokeDeathsTable));
 
             // Overall Liver disease
             driver.FindElement(By.Id("Overall-Liver-Disease")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var liverDiseaseTable = GetRankingTable(driver);
             Assert.IsFalse(liverDiseaseTable.Equals(lungDiseaseTable));
 
             // Overall Injury
             driver.FindElement(By.Id("Overall-Injury")).Click();
-            WaitFor.ThreadWait(1);
+            WaitForElementsToRefresh();
             var injuryTable = GetRankingTable(driver);
             Assert.IsFalse(injuryTable.Equals(liverDiseaseTable));
+        }
+
+        private void WaitForElementsToRefresh()
+        {
+            WaitFor.ThreadWait(0.1);
+            waitFor.PageToFinishLoading();
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 <div id="twitter-box">
     <div id="twitter-image-link">
@@ -7,6 +7,6 @@
             <img src="@(ViewBag.ImagesUrl)bird_48_blue.png" alt=""/></a>
     </div>
     <div id="twitter-text">
-        @CommonUtilities.GetContent(ContentKeys.Twitter, Model.ProfileId)
+        @ContentProvider.GetContent(ContentKeys.Twitter, Model.ProfileId)
     </div>
 </div>

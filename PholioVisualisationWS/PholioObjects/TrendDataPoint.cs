@@ -39,6 +39,9 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "C")]
         public double? Count { get; set; }
 
+        [JsonProperty(PropertyName = "IsC")]
+        public bool IsCountValid { get; set; }
+
         /// <summary>
         /// Whether or not ValueNoteId should be serialised to JSON.
         /// </summary>

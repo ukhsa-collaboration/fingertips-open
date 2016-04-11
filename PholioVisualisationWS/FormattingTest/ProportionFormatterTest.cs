@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 
-namespace FormattingTest
+namespace PholioVisualisation.FormattingTest
 {
     [TestClass]
     public class ProportionFormatterTest

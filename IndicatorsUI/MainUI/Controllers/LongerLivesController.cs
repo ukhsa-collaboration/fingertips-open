@@ -5,7 +5,7 @@ using Profiles.DataConstruction;
 using Profiles.DomainObjects;
 using Profiles.MainUI.Filters;
 using Profiles.MainUI.Caching;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 
 namespace Profiles.MainUI.Controllers
 {

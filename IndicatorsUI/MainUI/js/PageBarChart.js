@@ -18,8 +18,6 @@ function goToIndicatorDetailsPage(rootIndex) {
             $window.scrollTop(0);
         }
 
-       
-
         // Set root index
         if (!isDefined(rootIndex)) {
             rootIndex = getIndicatorIndex();
@@ -106,7 +104,7 @@ function addBarChartTemplate() {
         '<div style="float:none; clear: both; width: 1000px;"><div id="indicatorDetailsHeader"></div><div id="indicatorDetailsBox" style="width:100%;">' +
         '<table id="indicatorDetailsTable" class="borderedTable" cellspacing="0">' +
         '<thead><tr><th style="width: 200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th>' +
-        '{{#hasTrendMarkers}} <th>Trend</th> {{/hasTrendMarkers}}' +
+        '{{#hasTrendMarkers}} <th>Recent<br>Trend</th> {{/hasTrendMarkers}}' +
         '<th class="nearest-neighbours-show" style="border-right:none"><div class="center">Rank</div><a class="columnSort" href="javascript:sortIndicatorDetailsByRank();" title="Sort by rank"></a></th>' +
         '<th style="border-right: none;"><div class="center">Count</div><a class="columnSort" href="javascript:sortIndicatorDetailsByCount();" title="Sort by count"></a></th>' +
         '<th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th>' +
@@ -338,9 +336,9 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
     if(isDefined(root) && isDefined(root.TrendMarkers))
     {
         if (root.TrendMarkers[areaCode]) {
-            addTd(html, GetTrendMarkerImage(root.TrendMarkers[areaCode], root.PolarityId), CSS_CENTER);
+            addTd(html, getTrendMarkerImage(root.TrendMarkers[areaCode], root.PolarityId), CSS_CENTER);
         } else {
-            addTd(html, GetTrendMarkerImage(TrendMarkerValue.CannotCalculate, root.PolarityId), CSS_CENTER);
+            addTd(html, getTrendMarkerImage(TrendMarkerValue.CannotCalculate, root.PolarityId), CSS_CENTER);
         }
     }
 
@@ -676,7 +674,7 @@ pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     gotoName: 'goToIndicatorDetailsPage',
     needsContainer: true,
     showHide: displayBarChartLegend,
-    jqIds: ['indicatorMenuDiv', '.geo-menu', 'areaSwitch', 'value-note-legend', 'nearest-neighbour-link','trend-marker-legend-barchart'],
+    jqIds: ['indicatorMenuDiv', '.geo-menu', 'areaSwitch', 'value-note-legend', 'nearest-neighbour-link','trend-marker-legend-tartan'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'keyAdHoc', 'key-bar-chart', 'key-spine-chart' ]
 });
 

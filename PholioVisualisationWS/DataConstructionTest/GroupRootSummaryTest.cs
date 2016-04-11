@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class GroupRootSummaryTest

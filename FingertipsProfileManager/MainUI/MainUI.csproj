@@ -28,6 +28,7 @@
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <TargetFrameworkProfile />
     <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -206,9 +207,12 @@
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseIndicatorDataFullPageViewModel.cs" />
     <Compile Include="ViewModels\ProfileUser.cs" />
     <Compile Include="ViewModels\ProfileViewModel.cs" />
+    <Compile Include="ViewModels\Upload\UploadProgressViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadIndexViewModel.cs" />
+    <Compile Include="ViewModels\Upload\UploadSummaryViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AngularApps\upload\app.js" />
     <Content Include="css\bootstrap-theme.css" />
     <Content Include="css\bootstrap-theme.min.css" />
     <Content Include="css\bootstrap.css" />
@@ -231,12 +235,16 @@
     <Content Include="images\navigate-previous.png" />
     <Content Include="images\reorder.png" />
     <Content Include="images\SimpleUpload.png" />
+    <Content Include="js\angular-route.js" />
+    <Content Include="js\angular.js" />
+    <Content Include="js\es5-sham.min.js" />
+    <Content Include="js\es5-shim.min.js" />
+    <Content Include="js\jquery-1.12.1.js" />
     <Content Include="js\PageCoreData.js" />
     <Content Include="js\document-manager.js" />
     <Content Include="js\lookup-tables.js" />
     <Content Include="js\PageAdmin.js" />
     <Content Include="js\PageSearchResults.js" />
-    <Content Include="js\jquery-1.8.3.js" />
     <Content Include="js\jquery-ui-1.9.2.js" />
     <Content Include="js\chosen.jquery.min.js" />
     <Content Include="js\common-functions.js" />
@@ -391,14 +399,6 @@
     <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_DeleteSelectedIndicators.cshtml" />
     <Content Include="Views\Upload\Index.cshtml" />
-    <Content Include="Views\Upload\SpreadsheetBatchSummary.cshtml" />
-    <Content Include="Views\Upload\_ShowDataTypeErrors.cshtml" />
-    <Content Include="Views\Upload\_ShowDuplicateDataErrors.cshtml" />
-    <Content Include="Views\Upload\_ShowDuplicateSpreadsheetErrors.cshtml" />
-    <Content Include="Views\Upload\SpreadsheetSimpleSummary.cshtml" />
-    <Content Include="Views\Upload\_UploadBatchHelp.cshtml" />
-    <Content Include="Views\Upload\_UploadSimpleHelp.cshtml" />
-    <Content Include="Views\Upload\InsertSummary.cshtml" />
     <Content Include="Views\Content\EditContent.cshtml" />
     <Content Include="Views\Shared\_EditMetaDataText.cshtml" />
     <Content Include="Views\User\UserIndex.cshtml" />
@@ -439,15 +439,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ProfilesAndIndicators\_FromMenus.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Upload\_UploadValidationSummary.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Upload\_UploadAndArchiveButton.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Upload\_UploadErrors.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\LookUpTables\LookUpTablesIndex.cshtml" />
@@ -575,7 +566,7 @@
     <Content Include="Views\ExceptionLog\ExceptionDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Upload\_DisallowedIndicators.cshtml" />
+    <Content Include="js\jquery-migrate-1.3.0.js" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -9,7 +9,7 @@ using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 
-namespace CkanTest.Repositories
+namespace PholioVisualisation.CkanTest.Repositories
 {
     [TestClass]
     public class CkanGroupRepositoryTest

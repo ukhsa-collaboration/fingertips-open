@@ -5,7 +5,7 @@ using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class CommonUtilitiesTest

@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 using Profiles.DataAccess;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Skins;
 
 namespace Profiles.MainUI.Filters

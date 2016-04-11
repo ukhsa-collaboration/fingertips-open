@@ -23,6 +23,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,8 +35,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
@@ -43,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
@@ -76,12 +77,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DuplicateRowInDatabaseError.cs" />
+    <Compile Include="Entities\JobError\UploadJobErrorType.cs" />
+    <Compile Include="Entities\JobError\UploadJobError.cs" />
+    <Compile Include="Entities\Job\UploadJob.cs" />
+    <Compile Include="Entities\Job\UploadJobStatus.cs" />
+    <Compile Include="Entities\Job\UploadJobType.cs" />
     <Compile Include="Entities\LookUps\Age.cs" />
     <Compile Include="Entities\LookUps\AreaType.cs" />
-    <Compile Include="AreaTypeIdSplitter.cs" />
     <Compile Include="BaseReader.cs" />
     <Compile Include="Entities\Core\Area.cs" />
-    <Compile Include="Entities\LookUps\Skin.cs" />
     <Compile Include="Entities\Profile\Category.cs" />
     <Compile Include="Entities\LookUps\CategoryType.cs" />
     <Compile Include="Entities\Logging\UploadAudit.cs" />
@@ -90,58 +94,29 @@
     <Compile Include="Entities\LookUps\DenominatorType.cs" />
     <Compile Include="Entities\LookUps\Unit.cs" />
     <Compile Include="Entities\LookUps\YearType.cs" />
-    <Compile Include="Entities\Profile\Indicator.cs" />
     <Compile Include="Helpers\Extensions.cs" />
-    <Compile Include="IndicatorMetadataTextItem.cs" />
-    <Compile Include="Entities\Profile\ComparatorConfidence.cs" />
     <Compile Include="Entities\LookUps\ComparatorMethod.cs" />
-    <Compile Include="Entities\Profile\ContentAudit.cs" />
-    <Compile Include="DefaultProfileContentWriter.cs" />
-    <Compile Include="Entities\Profile\Document.cs" />
-    <Compile Include="Entities\Logging\AuditLog.cs" />
-    <Compile Include="Entities\Logging\IndicatorMetadataLog.cs" />
-    <Compile Include="GroupingListProcessor.cs" />
     <Compile Include="Entities\LookUps\KeyColour.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="Entities\LookUps\Polarity.cs" />
     <Compile Include="Helpers\Mapper.cs" />
-    <Compile Include="ProfileDataRegistry.cs" />
-    <Compile Include="ProfilesWriter.cs" />
-    <Compile Include="Entities\Profile\ExceptionLog.cs" />
+    <Compile Include="Repositories\UploadJobErrorRepository.cs" />
+    <Compile Include="UploadJobRepository.cs" />
     <Compile Include="FpmException.cs" />
-    <Compile Include="Entities\Profile\ProfileCollectionItem.cs" />
-    <Compile Include="Entities\Profile\ProfileCollection.cs" />
     <Compile Include="AllowedData.cs" />
     <Compile Include="Entities\LookUps\IndicatorValueType.cs" />
+    <Compile Include="Repositories\IFusUploadRepository.cs" />
     <Compile Include="Repositories\LoggingRepository.cs" />
-    <Compile Include="Repositories\LookUpsRepository.cs" />
     <Compile Include="Repositories\CoreDataRepository.cs" />
     <Compile Include="Repositories\IRepositoryBase.cs" />
     <Compile Include="NHibernateSessionFactory.cs" />
-    <Compile Include="Repositories\ProfileRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
-    <Compile Include="Repositories\UserRepository.cs" />
-    <Compile Include="Entities\Profile\SpineChartMinMaxLabel.cs" />
-    <Compile Include="Entities\Profile\TargetConfig.cs" />
-    <Compile Include="Entities\Profile\TargetConfigAudit.cs" />
     <Compile Include="TimePeriod.cs" />
     <Compile Include="Entities\LookUps\ValueNote.cs" />
-    <Compile Include="Entities\Profile\IndicatorMetadataTextValue.cs" />
-    <Compile Include="Entities\User\UserAudit.cs" />
     <Compile Include="Entities\User\FPMUser.cs" />
     <Compile Include="Entities\Core\CoreDataSetArchive.cs" />
-    <Compile Include="Entities\Profile\ContentItem.cs" />
-    <Compile Include="Entities\Profile\IndicatorAudit.cs" />
     <Compile Include="Entities\Core\CoreDataSet.cs" />
     <Compile Include="Entities\LookUps\Sex.cs" />
-    <Compile Include="Entities\Profile\Grouping.cs" />
-    <Compile Include="Entities\Profile\GroupingMetadata.cs" />
     <Compile Include="Entities\Profile\IndicatorMetaData.cs" />
-    <Compile Include="Entities\Profile\IndicatorMetadataTextProperty.cs" />
-    <Compile Include="GroupingPlusName.cs" />
-    <Compile Include="IndicatorText.cs" />
-    <Compile Include="Profile.cs" />
-    <Compile Include="ProfileBuilder.cs" />
     <Compile Include="Entities\Profile\ProfileDetails.cs" />
     <Compile Include="Entities\User\UserGroupPermissions.cs" />
     <Compile Include="ProfilesReader.cs" />
@@ -176,6 +151,12 @@
     <EmbeddedResource Include="Entities\User\User.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\Job\uploadjob.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\JobError\JobError.hbm.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

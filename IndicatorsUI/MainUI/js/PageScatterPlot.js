@@ -67,20 +67,27 @@ scatterplot.getDataForSelectedArea = function () {
 */
 scatterplot.getSecondaryData = function () {
 
+    //Set the supporting indicator (Y-Axis) to the currently selected one if it exists. Otherwise set it to the first in the list.
+    var selectedSupportingIndicatorIndex = 0;
+    var currentlySelectedYIndicator = $('#supportingIndicators option:selected').attr('key');
+
     // populate supporting indicators
     var $supportingIndicators = $('#supportingIndicators');
     for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
         var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
         var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
-        $supportingIndicators.append('<option value="' + i + '">' + indicatorName + '</option>');
+        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].SexId;
+        $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
+        if (key==currentlySelectedYIndicator) {
+            selectedSupportingIndicatorIndex = i;
+        }
     }
 
     scatterplot.makeAreaNamesAndCodes();
     ajaxMonitor.setCalls(1);
 
     var supportingGroupRoots = loaded.groupingDataForProfile,
-        model = FT.model,
-        selectedSupportingIndicatorIndex = $supportingIndicators.val();
+        model = FT.model;
 
     var groupRoot = supportingGroupRoots[selectedSupportingIndicatorIndex];
 
@@ -105,8 +112,9 @@ scatterplot.getSecondaryData = function () {
 */
 scatterplot.displayPage = function () {
 
-    $('#supportingIndicators').chosen({ width: '95%', search_contains: true });
     var viewManager = scatterplot.viewManager;
+
+    scatterplot.reloadSupportingIndicators();
 
     scatterplot.transformDataForIndicator();
 
@@ -124,6 +132,26 @@ scatterplot.displayPage = function () {
     $('#filterSelectedAreaName').text(areaName);
 };
 
+scatterplot.reloadSupportingIndicators = function () {
+    //Reload the Y-Axis indicator list and set to the previous selected one if it is available
+    var currentSelectionValue = $('#supportingIndicators option:selected').attr('key');
+
+    $('#supportingIndicators').empty();
+
+    // Re-populate supporting indicators
+    var $supportingIndicators = $('#supportingIndicators');
+    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
+        var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
+        var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
+        var IID = loaded.groupingDataForProfile[i].IID;
+        var sexId = loaded.groupingDataForProfile[i].SexId;
+        $supportingIndicators.append('<option key="' + IID + '-' + sexId + '" value="' + i + '">' + indicatorName + '</option>');
+    }
+
+    $('#supportingIndicators [key="' + currentSelectionValue + '"]').attr('selected', 'selected');
+    $supportingIndicators.chosen({ width: '95%', search_contains: true });
+    $supportingIndicators.prop('disabled', false).trigger("chosen:updated");
+}
 /**
 * Manages the views on the scatterplot page
 * @class scatterplot.ViewManager
@@ -321,16 +349,12 @@ scatterplot.getGroupingDataForProfile = function (model) {
     ).add('profile_id', model.profileId
     ).add('area_type_id', model.areaTypeId);
 
-    if (_.size(loaded.groupingDataForProfile) > 0) {
-        ajaxMonitor.callCompleted();
-    } else {
-        ajaxGet('data/grouproot_summaries',
-            parameters.build(),
-            function (obj) {
-                loaded.groupingDataForProfile = obj;
-                ajaxMonitor.callCompleted();
-            });
-    }
+    ajaxGet('data/grouproot_summaries',
+        parameters.build(),
+        function (obj) {
+            loaded.groupingDataForProfile = obj;
+            ajaxMonitor.callCompleted();
+        });
 };
 
 /**

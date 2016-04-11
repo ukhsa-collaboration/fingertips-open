@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServiceActions;
 
-namespace ServiceActionsTest
+namespace PholioVisualisation.ServiceActionsTest
 {
     [TestClass]
     public class ValueLimitsActionTest

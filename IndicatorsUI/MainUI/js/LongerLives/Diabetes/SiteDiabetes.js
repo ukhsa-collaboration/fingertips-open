@@ -1,5 +1,7 @@
-/*
+/**
+* SiteDiabetes namespace
 * SiteDiabetes.js inherits from SiteBaseLongerLives.js
+* @module SiteDiabetes
 */
 
 function initSite() {

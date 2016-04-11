@@ -79,12 +79,6 @@ function IndicatorFormatter(groupRoot, metadata, coreDataSet, indicatorStatsF) {
     };
 }
 
-function formatCount(dataInfo) {
-    return dataInfo.isCount() ?
-        new CommaNumber(dataInfo.data.Count).rounded() : // Rounded for DSR with decimal denominators
-        NO_DATA;
-}
-
 function addTd(html, text, cssClass, tooltip, noteId) {
 
     var isNote = !!noteId;
@@ -417,9 +411,9 @@ function getCurrentPageTitle() {
 function restoreLastViewedAreaTypeId(model) {
 
     // Is area type ID defined for current profile
-    var preferredAreaTypeIds = FT.preferredAreaTypeIds;
     if (!ftHistory.isParameterDefinedInHash('ati')) {
         // No area type in bookmarked state
+        var preferredAreaTypeIds = FT.preferredAreaTypeIds;
         if (preferredAreaTypeIds.containsProfileId()) {
             model.areaTypeId = preferredAreaTypeIds.getAreaTypeId();
         }
@@ -750,10 +744,11 @@ function getParentCode() {
 }
 
 function doSearch() {
+    var model = FT.model;
 
     var searchText = new SearchText($('#searchBox').val());
     if (searchText.isOk) {
-        setUrl(FT.url.search + encodeURIComponent(searchText.text));
+        setUrl(FT.url.search + encodeURIComponent(searchText.text) + '#pat/' + model.parentAreaType + '/ati/' + model.areaTypeId + '/par/' + model.parentCode);
     }
 }
 
@@ -1207,7 +1202,6 @@ function getAllAreas(areaTypeId) {
                 ajaxMonitor.callCompleted();
             });
     } else {
-
         ajaxMonitor.callCompleted();
     }
 }
@@ -1472,8 +1466,11 @@ function getTargetLegendHtml(comparisonConfig, metadata) {
         var targetConfig = metadata.Target,
             bespokeKey = targetConfig.BespokeKey,
             start = '<span class="target ',
-            end = '</span>',
-            worseOrBetter = targetConfig.PolarityId == 99 ? ['bobLower', 'bobHigher'] : ['worse', 'better'];
+            end = '</span>';
+        var worseOrBetter = targetConfig.PolarityId == PolarityIds.BlueOrangeBlue
+            ? ['bobLower', 'bobHigher']
+            : ['worse', 'better'];
+
         if (bespokeKey) {
             // Bespoke comparison
             if (bespokeKey === 'last-year-england') {
@@ -1561,8 +1558,7 @@ TrendDataInfo.prototype = {
     },
 
     isCount: function () {
-        var data = this.data;
-        return data.C !== null && data.C !== -1;
+        return this.data.IsC;
     },
 
     isNote: CoreDataSetInfo.prototype.isNote,
@@ -1713,7 +1709,8 @@ function ParentTypeMenu(jquerySelector, model) {
     };
 
     _this.getName = function () {
-        return selectedOption().text();
+        var isDepDecRegex = /(IMD \d+)/i;
+        return isDepDecRegex.test(selectedOption().text()) ? 'Deprivation decile' : selectedOption().text();
     };
 
     _this.count = function () {
@@ -1792,6 +1789,8 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
 
     _this.setOptions = function () {
 
+        var parentTypeId = model.parentTypeId;
+
         // Change parentAreaCode to keep same child area
         var parentAreaCode = new AreaMappings(model).getParentAreaCode(model.areaCode);
         if (parentAreaCode) {
@@ -1799,15 +1798,21 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
         }
 
         // Populate parent menu
-        var parents = loadedAreas[model.parentTypeId],
+        var parents = loadedAreas[parentTypeId],
             j = 0,
             options = $menu[0].options;
 
         options.length = 0;
 
+        // Name type
+        var nameType = parentTypeId === AreaTypeIds.CountyUA
+            ? 'Name'
+            :'Short';
+
+        // Populate menu options
         for (var i in parents) {
             var parent = parents[i];
-            options[j++] = new Option(parent.Short, parent.Code);
+            options[j++] = new Option(parent[nameType], parent.Code);
         }
 
         // Set default parent if not specified in hash
@@ -1888,6 +1893,7 @@ function AreaMenu(jquerySelector, model) {
         }
     };
 
+    //TODO this has nothing to do with the area menu and should be moved elsewhere
     _this.setAdditionalParameters = function (iid, ageId, sexId) {
         if (iid) {
             model.iid = iid;
@@ -2275,6 +2281,7 @@ function searchOptionClicked() {
 
 function canAreaTypeBeSearched(areaTypeId) {
     return _.contains([
+        AreaTypeIds.Region,
         AreaTypeIds.CCG, AreaTypeIds.DistrictUA,
         AreaTypeIds.Subregion, AreaTypeIds.CountyUA,
         AreaTypeIds.PheCentres2013, AreaTypeIds.PheCentres2015
@@ -2347,7 +2354,7 @@ function getSignificanceFunction(polarityId) {
     var c = colours;
     var noComparison = c.noComparison, same = c.same;
 
-    if (polarityId === 99) {
+    if (polarityId === PolarityIds.BlueOrangeBlue) {
         // Use blue
         return function (sig) {
             switch (sig) {
@@ -2548,7 +2555,11 @@ function AreaSwitch(options) {
 
 function setNearestNeighbourLinkText() {
     var areaTypeId = FT.model.areaTypeId;
-    if (areaTypeId === AreaTypeIds.CountyUA || areaTypeId === AreaTypeIds.DistrictUA) {
+    var profileId = FT.model.profileId;
+
+    if (profileId !== ProfileIds.ChildHealth &&
+        (areaTypeId === AreaTypeIds.CountyUA || areaTypeId === AreaTypeIds.DistrictUA)
+        ) {
         var areaName = areaHash.hasOwnProperty(FT.model.areaCode)
         ? areaHash[FT.model.areaCode].Name
             : '?????';
@@ -2581,7 +2592,7 @@ function showAndHideNearestNeighboursMenu() {
     var selectedNearestNeighboursInnerHtml = '';
 
     if (FT.model.isNearestNeighbours()) {
-        goBackInnerHtml = '<a onclick="backToMenu()" class="a-link">Back to menus</a><a href="/documents/Nearest_Neighbour_Methodology.docx" class="a-link">More information</a>';
+        goBackInnerHtml = '<a onclick="backToMenu()" class="a-link">Exit nearest neighbours</a><a href="/documents/Nearest_Neighbour_Methodology.docx" class="a-link">More information</a>';
         selectedNearestNeighboursInnerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
             areaHash[FT.model.areaCode].Name + '</h2> <span>and its CIPFA nearest neighbours</span><div id="nearest-neighbour-extra-text">To send feedback, or to provide suggestions regarding this new feature please contact  <a href="mailto:ProfileFeedback@phe.gov.uk" class="a-link">ProfileFeedback@phe.gov.uk</a></div></span>';
     } else {

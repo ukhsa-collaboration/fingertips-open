@@ -2,11 +2,10 @@
 using System.Linq;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
-using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.LookUps;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace IndicatorsUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class AreaTypeDataAssignerTest

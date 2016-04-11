@@ -6,7 +6,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class AreaTypeListProviderTest
@@ -56,6 +56,15 @@ namespace DataConstructionTest
                 .GetParentAreaTypeIdsUsedInProfile(ProfileIds.Phof);
 
             Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.OnsClusterGroup2011));
+        }
+
+        [TestMethod]
+        public void TestGetParentAreaTypeIdsUsedInProfile_When_Generic_Parent_Options_Are_Used()
+        {
+            var areaTypeIds = AreaTypeListProvider()
+                .GetParentAreaTypeIdsUsedInProfile(ProfileIds.CancerServices, AreaTypeIds.GpPractice);
+
+            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.Ccg));
         }
 
         [TestMethod]

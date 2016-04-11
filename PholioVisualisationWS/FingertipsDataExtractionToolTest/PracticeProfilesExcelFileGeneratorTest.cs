@@ -9,7 +9,7 @@ using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
-namespace FingertipsDataExtractionToolTest
+namespace PholioVisualisation.FingertipsDataExtractionToolTest
 {
     [TestClass]
     public class PracticeProfilesExcelFileGeneratorTest

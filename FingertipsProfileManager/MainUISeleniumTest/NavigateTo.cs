@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using OpenQA.Selenium;
 using Fpm.MainUI.Helpers;
 
-namespace MainUISeleniumTest
+namespace Fpm.MainUISeleniumTest
 {
     public class NavigateTo
     {

@@ -6,8 +6,8 @@
     <ProjectGuid>{95175C0E-CD5D-4E1B-9B9D-553B3EA75A5D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SearchTest</RootNamespace>
-    <AssemblyName>SearchTest</AssemblyName>
+    <RootNamespace>Fpm.SearchTest</RootNamespace>
+    <AssemblyName>Fpm.SearchTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

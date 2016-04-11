@@ -1,14 +1,12 @@
-﻿using System;
+﻿using Fpm.ProfileData.Entities.Core;
+using Fpm.ProfileData.Entities.LookUps;
+using NHibernate;
+using NHibernate.Transform;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Fpm.ProfileData.Entities.Core;
-using Fpm.ProfileData.Entities.LookUps;
-using Fpm.ProfileData.Helpers;
-using Fpm.Upload;
-using NHibernate;
-using NHibernate.Transform;
 
 namespace Fpm.ProfileData.Repositories
 {
@@ -25,58 +23,11 @@ namespace Fpm.ProfileData.Repositories
         {
         }
 
-        public IEnumerable<CoreDataSet> GetCoreDataSets(IEnumerable<DuplicateRowInDatabaseError> duplicateRows)
-        {
-            return CurrentSession
-                    .CreateQuery("from CoreDataSet cds where cds.Uid in (:Id)")
-                    .SetParameterList("Id", duplicateRows.Select(x => x.Uid).ToList())
-                    .List<CoreDataSet>();
-        }
-
-        public void InsertCoreDataArchive(IEnumerable<DuplicateRowInDatabaseError> duplicateRows, Guid replacementUploadloadBatchId)
-        {
-            try
-            {
-                foreach (var duplicateBatch in duplicateRows.Batch(100))
-                {
-                    if (duplicateBatch != null)
-                    {
-                        transaction = CurrentSession.BeginTransaction();
-
-                        foreach (var coreDataSet in GetCoreDataSets(duplicateBatch))
-                        {
-                            var coreDataSetArchive = coreDataSet.ToCoreDataSetArchive();
-                            coreDataSetArchive.ReplacedByUploadBatchId = replacementUploadloadBatchId;
-                            CurrentSession.Save(coreDataSetArchive);
-                        }
-
-
-                        CurrentSession.CreateQuery("delete CoreDataSet c where c.Uid in (:idList)")
-                       .SetParameterList("idList", duplicateBatch.Select(x => x.Uid).ToList())
-                       .ExecuteUpdate();
-
-                        transaction.Commit();
-                    }
-                }
-
-            }
-            catch (Exception exception)
-            {
-                HandleException(exception);
-            }
-        }
-
         public IEnumerable<CoreDataSetArchive> GetCoreDataArchives(string areaCode)
         {
             var query = CurrentSession.CreateQuery("from CoreDataSetArchive cds where cds.AreaCode = :areaCode");
             query.SetParameterList("areaCode", areaCode);
             return query.List<CoreDataSetArchive>();
-        }
-
-        public int InsertCoreData(CoreDataSet coreDataSet, Guid uploadBatchId)
-        {
-            coreDataSet.UploadBatchId = uploadBatchId;
-            return (int)CurrentSession.Save(coreDataSet);
         }
 
         public void DeleteCoreDataArchive(Guid uploadBatchId)
@@ -252,7 +203,7 @@ namespace Fpm.ProfileData.Repositories
                .SetParameter("indicatorId", indicatorId)
                .List<int>();
         }
-        
+
         public virtual IEnumerable<int> GetMonths(int indicatorId)
         {
             return CurrentSession.GetNamedQuery("GetDistinctMonthsByIndicator")
@@ -283,11 +234,11 @@ namespace Fpm.ProfileData.Repositories
             const string sqlSelectCount = "SELECT count(*) totalRows FROM Coredataset cds ";
 
             var sqlWhere = "WHERE indicatorId = " + indicatorId;
-            
+
             var sqlFilters = filters != null ? GetSqlFromFilters(filters) : string.Empty;
 
             Debug.WriteLine(sqlSelectCount + sqlWhere + sqlFilters);
-            
+
             totalRows = CurrentSession.CreateSQLQuery(sqlSelectCount + sqlWhere + sqlFilters)
                  .UniqueResult<int>();
 
@@ -300,26 +251,26 @@ namespace Fpm.ProfileData.Repositories
 
         public int DeleteCoreDataSet(int indicatorId, Dictionary<string, int> filters, string userName)
         {
-           
+
             const string sqlColumns = " [IndicatorID] ,[Year] ,[YearRange] ,[Quarter] ,[Month] ,[AgeID] ,[SexID] ,[AreaCode] " +
                                       ",[Count] ,[Value] ,[LowerCI] ,[UpperCI] ,[Denominator] ,[Denominator_2] ,[ValueNoteId] " +
                                       ",[uploadbatchid] ,[CategoryTypeID] ,[CategoryID]";
 
             var deleteBatchId = Guid.NewGuid();
-            
+
             var sqlWhere = " WHERE indicatorId = " + indicatorId + GetSqlFromFilters(filters);
 
             var sqlInsertArchive = "INSERT INTO Coredataset_Archive(" + sqlColumns + ", DeleteBatchId) " +
-                                   "SELECT " + sqlColumns + ", '" + deleteBatchId  + "' FROM Coredataset " +
+                                   "SELECT " + sqlColumns + ", '" + deleteBatchId + "' FROM Coredataset " +
                                    sqlWhere;
 
             var sqlDeleteCoreData = "DELETE FROM Coredataset " + sqlWhere;
 
 
-           Debug.WriteLine(sqlInsertArchive);
-           Debug.WriteLine(sqlDeleteCoreData);
+            Debug.WriteLine(sqlInsertArchive);
+            Debug.WriteLine(sqlDeleteCoreData);
 
-            
+
             try
             {
                 transaction = CurrentSession.BeginTransaction();
@@ -327,8 +278,8 @@ namespace Fpm.ProfileData.Repositories
                 CurrentSession.CreateSQLQuery(sqlInsertArchive)
                     .ExecuteUpdate();
 
-               var rowsDeleted = CurrentSession.CreateSQLQuery(sqlDeleteCoreData)
-                   .ExecuteUpdate();
+                var rowsDeleted = CurrentSession.CreateSQLQuery(sqlDeleteCoreData)
+                    .ExecuteUpdate();
 
                 CurrentSession.GetNamedQuery("Insert_CoreData_DeleteAudit")
                     .SetParameter("indicatorId", indicatorId)
@@ -346,7 +297,7 @@ namespace Fpm.ProfileData.Repositories
             catch (Exception exception)
             {
                 HandleException(exception);
-               
+
             }
             return -1;
         }

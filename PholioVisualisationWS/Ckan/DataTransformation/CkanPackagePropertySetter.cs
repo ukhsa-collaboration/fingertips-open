@@ -30,7 +30,7 @@ namespace Ckan.DataTransformation
             string homePage = parameters.ProfileUrl;
             package.Source = homePage;
             package.Homepage = homePage;
-            package.LicenseTitle = parameters.LicenceTitle;
+            package.LicenseId = parameters.LicenceId;
             string emailAddress = AuthorDetails.GetEmailAddress(parameters.ProfileId);
             package.Author = emailAddress;
             package.AuthorEmail = emailAddress;

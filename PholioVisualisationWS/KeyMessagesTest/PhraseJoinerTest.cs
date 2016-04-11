@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.KeyMessages;
 
-namespace FormattingTest
+namespace PholioVisualisation.FormattingTest
 {
     [TestClass]
     public class PhraseJoinerFormatterTest

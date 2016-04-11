@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class StringListParserTest

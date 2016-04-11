@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public abstract class BaseUpload : IEnumerable
     {
@@ -30,11 +30,6 @@ namespace Fpm.Upload
             throw new NotImplementedException();
         }
 
-        public bool DoesFileExceedMaximumSize()
-        {
-            return UploadFileHelper.IsFileTooLarge(FileSize);
-        }
-
         public bool HasPholioSheet()
         {
             return SelectedWorksheet != null;
@@ -43,7 +38,6 @@ namespace Fpm.Upload
         public bool CanFileBeUploaded()
         {
             return UploadValidationFailures.Any() == false
-                && DoesFileExceedMaximumSize() == false
                 && HasPholioSheet();
         }
     }

@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 
-namespace IndicatorsUITest
+namespace IndicatorsUI.MainUITest
 {
     /// <summary>
     /// NOTE: The web application must be running before these tests can pass.

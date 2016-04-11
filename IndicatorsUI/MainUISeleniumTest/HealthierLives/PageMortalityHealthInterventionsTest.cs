@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest.HealthierLives
+namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
     [TestClass]
     public class PageMortalityHealthInterventionsTest : BaseUnitTest

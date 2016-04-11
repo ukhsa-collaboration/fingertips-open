@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NHibernate.Linq.Functions;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class AreasReaderTest
@@ -99,7 +98,7 @@ namespace DataAccessTest
             }
             catch (FingertipsException ex)
             {
-                Assert.AreEqual(ex.Message, "Area cannot be found: " + code);
+                Assert.AreEqual(ex.Message, "Area cannot be found: '" + code + "'");
                 return;
             }
             Assert.Fail();
@@ -425,6 +424,13 @@ namespace DataAccessTest
         {
             var nhsId = ReaderFactory.GetAreasReader().GetNhsChoicesAreaId("A81001");
             Assert.IsTrue(nhsId == "36798");
+        }
+
+        [TestMethod]
+        public void TestGetChimatResourceId()
+        {
+            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria);
+            Assert.AreEqual(ChimatResourceIds.Cumbria, id);
         }
 
         [TestMethod]

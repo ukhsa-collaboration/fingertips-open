@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.SearchIndexing;
 
-namespace SearchIndexingTest
+namespace PholioVisualisation.SearchIndexingTest
 {
     [TestClass]
     public class SearchIndexingTestHelper

@@ -237,7 +237,7 @@ th.pLink, th.rotate, th.comparatorHeader
 
 #noSpineBox 
 {
-    width:254px;
+    width:200px;
     top:6px;
     left:10px;
     position:absolute;
@@ -291,9 +291,13 @@ LI.site-link A:hover
 #breadcrumbs {
     float: left;
 }
-li.breadcrumb-separator, #breadcrumbs LI.site-link A {
-      padding-top: 5px;
+li.breadcrumb-separator, #breadcrumbs LI.site-link A,
+#breadcrumbs LI.site-link span, ul.link-list LI.site-link A {
+    padding-top: 5px;
     margin-left: 10px;
+}
+#breadcrumbs LI.site-link span {
+    display: block;
 }
 
 #banner

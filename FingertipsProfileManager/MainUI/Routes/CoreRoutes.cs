@@ -1,5 +1,4 @@
-﻿using System;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Fpm.MainUI.Routes
@@ -21,7 +20,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Admin",
                     action = "Admin",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "AdminDeleteIndicator", // Route name
@@ -52,7 +51,7 @@ namespace Fpm.MainUI.Routes
                     action = "DeleteIndicator",
                 },
                 new { httpMethod = new HttpMethodConstraint("POST") }
-            );
+                );
 
             routes.MapRoute(
                 "ManageAreas", // Route name
@@ -62,7 +61,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Areas",
                     action = "ManageAreas",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SearchAreas", // Route name
@@ -72,7 +71,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Areas",
                     action = "SearchAreas",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "UpdateArea", // Route name
@@ -82,7 +81,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Areas",
                     action = "UpdateArea",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ShowAreaDetails", // Route name
@@ -92,7 +91,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Areas",
                     action = "ShowAreaDetails",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SearchAll", // Route name
@@ -102,7 +101,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Search",
                     action = "SearchAll",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SortPageAndFilter", // Route name
@@ -112,7 +111,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "SortPageAndFilter",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SortProfilesAndFilter", // Route name
@@ -122,7 +121,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "SortProfilesAndFilter",
                 }
-            );
+                );
 
 
             routes.MapRoute(
@@ -133,7 +132,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "EditUser",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "UpdateUser", // Route name
@@ -143,7 +142,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "UpdateUser",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CreateUser", // Route name
@@ -153,7 +152,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "CreateUser",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "InsertUser", // Route name
@@ -163,7 +162,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "InsertUser",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "GetUserAudit", // Route name
@@ -173,7 +172,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "GetUserAudit",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ProfileManager", // Route name
@@ -183,7 +182,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "ManageProfiles",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ProfileCollectionManager", // Route name
@@ -193,7 +192,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "ManageProfileCollections",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ExceptionLog", // Route name
@@ -203,7 +202,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ExceptionLog",
                     action = "Index",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ShowExceptionDetails", // Route name
@@ -213,7 +212,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ExceptionLog",
                     action = "ShowExceptionDetails",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ReloadExceptions", // Route name
@@ -223,7 +222,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ExceptionLog",
                     action = "ReloadExceptions",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "EditProfileCollection", // Route name
@@ -233,7 +232,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "EditProfileCollection",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "InsertProfileCollection", // Route name
@@ -243,7 +242,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "InsertProfileCollection",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "UpdateProfileCollection", // Route name
@@ -253,7 +252,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "UpdateProfileCollection",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CreateProfileCollection", // Route name
@@ -263,17 +262,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "CreateProfileCollection",
                 }
-            );
-
-            routes.MapRoute(
-                "UploadSimpleDataAndArchiveDuplicates", // Route name
-                "UploadSimpleDataAndArchiveDuplicates", // URL with parameters
-                new
-                {
-                    controller = "Upload",
-                    action = "UploadSimpleDataAndArchiveDuplicates",
-                }
-            );
+                );
 
             routes.MapRoute(
                 "DocumentsIndex",
@@ -283,7 +272,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Documents",
                     action = "Index",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "DocumentUpload",
@@ -293,7 +282,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Documents",
                     action = "Upload",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ValidateUploadDocumentName",
@@ -303,17 +292,8 @@ namespace Fpm.MainUI.Routes
                     controller = "Documents",
                     action = "IsFileNameUnique",
                 }
-            );
+                );
 
-            routes.MapRoute(
-                "UploadBatchDataAndArchiveDuplicates", // Route name
-                "UploadBatchDataAndArchiveDuplicates", // URL with parameters
-                new
-                {
-                    controller = "Upload",
-                    action = "UploadBatchDataAndArchiveDuplicates",
-                }
-            );
 
             routes.MapRoute(
                 "UserIndex", // Route name
@@ -323,7 +303,7 @@ namespace Fpm.MainUI.Routes
                     controller = "User",
                     action = "UserIndex",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "IndicatorNew", // Route name
@@ -333,7 +313,7 @@ namespace Fpm.MainUI.Routes
                     controller = "IndicatorNew",
                     action = "IndicatorNew",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ProfilesAndIndicators", // Route name
@@ -343,7 +323,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "Index",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "GetAudit", // Route name
@@ -353,7 +333,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "GetAudit",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "UploadIndex", // Route name
@@ -363,37 +343,17 @@ namespace Fpm.MainUI.Routes
                     controller = "Upload",
                     action = "Index",
                 }
-            );
+                );
 
             routes.MapRoute(
-                "UploadBatchData", // Route name
-                "UploadBatchData", // URL with parameters
+                "UploadSimpleFile", // Route name
+                "UploadSimpleFile", // URL with parameters
                 new
                 {
                     controller = "Upload",
-                    action = "UploadBatchData",
+                    action = "UploadSimpleFile"
                 }
-            );
-
-            routes.MapRoute(
-                "UploadSimpleData", // Route name
-                "UploadSimpleData", // URL with parameters
-                new
-                {
-                    controller = "Upload",
-                    action = "UploadSimpleData",
-                }
-            );
-
-            routes.MapRoute(
-                "ValidateSimpleUpload", // Route name
-                "ValidateSimpleUpload", // URL with parameters
-                new
-                {
-                    controller = "Upload",
-                    action = "ValidateSimpleUpload",
-                }
-            );
+                );
 
             routes.MapRoute(
                 "getWorksheets", // Route name
@@ -403,7 +363,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Upload",
                     action = "getWorksheets",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "reloadDomains", // Route name
@@ -413,7 +373,7 @@ namespace Fpm.MainUI.Routes
                     controller = "IndicatorNew",
                     action = "reloadDomains",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ShowDataTypeErrors", // Route name
@@ -424,7 +384,57 @@ namespace Fpm.MainUI.Routes
                     action = "ShowDataTypeErrors",
                 },
                 new { httpMethod = new HttpMethodConstraint("POST") }
-            );
+                );
+
+            routes.MapRoute(
+                "CurrentUserJobProgress",
+                "upload/progress",
+                new
+                {
+                    controller = "Upload",
+                    action = "CurrentUserJobProgress"
+                }
+                );
+
+            routes.MapRoute(
+                "UploadJobSummary",
+                "upload/summary/{guid}",
+                new
+                {
+                    controller = "Upload",
+                    action = "JobSummary"
+                }
+                );
+
+            routes.MapRoute(
+                "UploadJobChangeStatus",
+                "upload/change-status/{guid}/{actioncode}",
+                new
+                {
+                    controller = "Upload",
+                    action = "ChangeStatus"
+                }
+                );
+
+            routes.MapRoute(
+                "UploadJobDownloadFile",
+                "upload/download/{guid}",
+                new
+                {
+                    controller = "Upload",
+                    action = "Download"
+                }
+                );
+
+            routes.MapRoute(
+                "UploadJobSaveFile",
+                "upload/file/save",
+                new
+                {
+                    controller = "Upload",
+                    action = "SaveFile"
+                }
+                );
 
             routes.MapRoute(
                 "reloadGridDomains", // Route name
@@ -434,7 +444,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "reloadGridDomains",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SaveNewIndicator", // Route name
@@ -444,7 +454,7 @@ namespace Fpm.MainUI.Routes
                     controller = "indicatorNew",
                     action = "SaveNewIndicator",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CreateNewFromOld", // Route name
@@ -454,7 +464,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "CreateNewFromOld",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "SetDataPoint", // Route name
@@ -464,8 +474,8 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "SetDataPoint",
                 },
-               new { httpMethod = new HttpMethodConstraint("POST") }
-            );
+                new { httpMethod = new HttpMethodConstraint("POST") }
+                );
 
             routes.MapRoute(
                 "RedirectToNew", // Route name
@@ -475,7 +485,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Profile",
                     action = "RedirectToNew",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "saveDomains", // Route name
@@ -485,7 +495,7 @@ namespace Fpm.MainUI.Routes
                     controller = ProfileController,
                     action = "SaveDomains",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "saveGridDomains", // Route name
@@ -495,7 +505,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "saveGridDomains",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "DeleteDomain", // Route name
@@ -505,7 +515,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "DeleteDomain",
                 } // Parameter defaults
-            );
+                );
 
             routes.MapRoute(
                 "ConfirmDeleteIndicators", // Route name
@@ -515,7 +525,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "ConfirmDeleteIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ConfirmMoveIndicators", // Route name
@@ -525,7 +535,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "ConfirmMoveIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ConfirmCopyIndicators", // Route name
@@ -535,7 +545,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "ConfirmCopyIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "saveIndicators", // Route name
@@ -545,7 +555,7 @@ namespace Fpm.MainUI.Routes
                     controller = ProfileController,
                     action = "saveIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "saveReorderedIndicators", // Route name
@@ -555,7 +565,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "saveReorderedIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "Reorder", // Route name
@@ -565,7 +575,7 @@ namespace Fpm.MainUI.Routes
                     controller = ProfileController,
                     action = "Reorder",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ReorderIndicators", // Route name
@@ -575,7 +585,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "ReorderIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "DeleteIndicators", // Route name
@@ -585,7 +595,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "DeleteIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "MoveIndicators", // Route name
@@ -595,7 +605,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "MoveIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CopyIndicators", // Route name
@@ -605,7 +615,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "CopyIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CopyMultipleIndicators", // Route name
@@ -615,84 +625,86 @@ namespace Fpm.MainUI.Routes
                     controller = "Search",
                     action = "CopyMultipleIndicators",
                 }
-            );
+                );
 
             routes.MapRoute(
-               "genericIndicatorSave", // Route name
-               "indicator/{indicatorId}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "GenericIndicatorSave"
-               },
-               new { httpMethod = new HttpMethodConstraint("POST") }
-            );
+                "genericIndicatorSave", // Route name
+                "indicator/{indicatorId}", // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "GenericIndicatorSave"
+                },
+                new { httpMethod = new HttpMethodConstraint("POST") }
+                );
 
             routes.MapRoute(
-               "genericIndicator", // Route name
-               "indicator/{indicatorId}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "GenericIndicator"
-               },
-               new { httpMethod = new HttpMethodConstraint("GET") }
-            );
+                "genericIndicator", // Route name
+                "indicator/{indicatorId}", // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "GenericIndicator"
+                },
+                new { httpMethod = new HttpMethodConstraint("GET") }
+                );
 
             routes.MapRoute(
-               "indicatorEditSave", // Route name
-               "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "IndicatorEditSave",
-                   valueTypeId = UrlParameter.Optional,
-                   baselineQuarter = UrlParameter.Optional
-               },
-               new { httpMethod = new HttpMethodConstraint("POST") }
-            );
+                "indicatorEditSave", // Route name
+                "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}",
+                // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "IndicatorEditSave",
+                    valueTypeId = UrlParameter.Optional,
+                    baselineQuarter = UrlParameter.Optional
+                },
+                new { httpMethod = new HttpMethodConstraint("POST") }
+                );
 
             routes.MapRoute(
-               "indicatorEdit", // Route name
-               "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}/ageId/{ageId}/sexId/{sexId}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "IndicatorEdit",
-                   urlKey = UrlParameter.Optional,
-                   areaType = UrlParameter.Optional,
-                   selectedDomainNumber = UrlParameter.Optional,
-                   indicatorId = UrlParameter.Optional,
-                   ageId = UrlParameter.Optional,
-                   sexId = UrlParameter.Optional,
-               },
-               new { httpMethod = new HttpMethodConstraint("GET") }
-            );
+                "indicatorEdit", // Route name
+                "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}/ageId/{ageId}/sexId/{sexId}",
+                // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "IndicatorEdit",
+                    urlKey = UrlParameter.Optional,
+                    areaType = UrlParameter.Optional,
+                    selectedDomainNumber = UrlParameter.Optional,
+                    indicatorId = UrlParameter.Optional,
+                    ageId = UrlParameter.Optional,
+                    sexId = UrlParameter.Optional,
+                },
+                new { httpMethod = new HttpMethodConstraint("GET") }
+                );
 
             routes.MapRoute(
-               "domainIndicators", // Route name
-               "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "Profile",
-                   urlKey = UrlParameter.Optional,
-                   areaType = UrlParameter.Optional,
-                   selectedDomainNumber = UrlParameter.Optional
-               }
-           );
+                "domainIndicators", // Route name
+                "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}", // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "Profile",
+                    urlKey = UrlParameter.Optional,
+                    areaType = UrlParameter.Optional,
+                    selectedDomainNumber = UrlParameter.Optional
+                }
+                );
 
             routes.MapRoute(
-               "profile2", // Route name
-               "profile/{urlKey}/area-type/{areatype}", // URL with parameters
-               new
-               {
-                   controller = ProfileController,
-                   action = "Profile",
-                   urlKey = UrlParameter.Optional,
-                   areaType = UrlParameter.Optional
-               }
-            );
+                "profile2", // Route name
+                "profile/{urlKey}/area-type/{areatype}", // URL with parameters
+                new
+                {
+                    controller = ProfileController,
+                    action = "Profile",
+                    urlKey = UrlParameter.Optional,
+                    areaType = UrlParameter.Optional
+                }
+                );
 
             routes.MapRoute(
                 "default", // Route name
@@ -702,8 +714,7 @@ namespace Fpm.MainUI.Routes
                     controller = "ProfilesAndIndicators",
                     action = "Index"
                 }
-            );
-
+                );
         }
 
         private static void RegisterLookupTableRoutes(RouteCollection routes)
@@ -822,7 +833,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "InsertContent",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "UpdateContent", // Route name
@@ -832,7 +843,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "UpdateContent",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "CreateContent", // Route name
@@ -842,7 +853,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "CreateContent",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "GetContentAuditList", // Route name
@@ -852,7 +863,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "GetContentAuditList",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "Content", // Route name
@@ -862,7 +873,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "ContentIndex",
                 }
-            );
+                );
 
             routes.MapRoute(
                 "ReloadContentItems", // Route name
@@ -872,9 +883,7 @@ namespace Fpm.MainUI.Routes
                     controller = "Content",
                     action = "ReloadContentItems",
                 }
-            );
-
-
+                );
         }
     }
 }

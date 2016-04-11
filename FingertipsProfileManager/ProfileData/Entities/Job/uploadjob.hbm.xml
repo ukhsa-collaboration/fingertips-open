@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.Job">
+
+  <!--Job class -->
+  <class name="UploadJob" table="uploadjob">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="Guid" column="guid"/>
+    <property name="Status" column="status"/>
+    <property name="DateCreated" column="datecreated"/>
+    <property name="UserId" column="userid"/>
+    <property name="TotalRows" column="totalrows"/>
+    <property name="JobType" column="jobtype"/>
+    <property name="Filename" column="filename"/>
+    <property name="ProgressStage" column="progressstage"/>
+  </class>
+</hibernate-mapping>

@@ -1,7 +1,7 @@
 ﻿using FingertipsUploadService.ProfileData;
 using System.Collections.Generic;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class BatchUpload : BaseUpload
     {

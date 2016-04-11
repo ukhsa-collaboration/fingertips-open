@@ -6,7 +6,7 @@ using Fpm.ProfileData;
 using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace MainUITest.Helpers
+namespace Fpm.MainUITest.Helpers
 {
     [TestClass]
     public class IndicatorOwnerChangerTest
@@ -24,7 +24,7 @@ namespace MainUITest.Helpers
         [TestMethod]
         public void TestAssignIndicatorToProfile()
         {
-            const int indicatorId = IndicatorIds.IDAOPI;
+            const int indicatorId = IndicatorIds.PeopleWhoDieAtHome;
 
             var changer = new IndicatorOwnerChanger(_profilesReader, _profileRepository);
 

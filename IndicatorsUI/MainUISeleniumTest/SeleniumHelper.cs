@@ -6,7 +6,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Configuration;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     public class SeleniumHelper
     {

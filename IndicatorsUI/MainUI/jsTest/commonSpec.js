@@ -131,6 +131,18 @@ describe('isDefined', function () {
     });
 });
 
+describe('ftHistory.isParameterDefinedInHash', function() {
+
+    it('where parameter is defined', function() {
+        ftHistory.getHash = function() { return 'a/1'; }
+        expect(ftHistory.isParameterDefinedInHash('a')).toBe(true);
+    });
+
+    it('where parameter is not defined', function () {
+        ftHistory.getHash = function () { return 'a/1'; }
+        expect(ftHistory.isParameterDefinedInHash('b')).toBe(false);
+    });
+});
 
 describe('ftHistory.parseParameterString', function () {
 
@@ -166,47 +178,47 @@ describe('ftHistory.parseParameterString', function () {
 });
 
 
-describe('GetTrendMarkerImage', function () {
+describe('getTrendMarkerImage', function () {
 
     it('should return html that contains up-red', function () {
         var trendMarker = 1;
         var polarity = PolarityIds.RAGLowIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('up_red');
     });
 
     it('should return html that contains up-green', function () {
         var trendMarker = 1;
         var polarity = PolarityIds.RAGHighIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('up_green');
     });
 
     it('should return html that contains down-green', function () {
         var trendMarker = 2;
         var polarity = PolarityIds.RAGLowIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('down_green');
     });
 
     it('should return html that contains down-red', function () {
         var trendMarker = 2;
         var polarity = PolarityIds.RAGHighIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('down_red');
     });
 
     it('should return html that contains no-change', function () {
         var trendMarker = 3;
         var polarity = PolarityIds.RAGLowIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('no_change');
     });
 
     it('should return html that contains no-calc', function () {
         var trendMarker = null;
         var polarity = PolarityIds.RAGLowIsGood;
-        var result = GetTrendMarkerImage(trendMarker, polarity);
+        var result = getTrendMarkerImage(trendMarker, polarity);
         expect(result).toContain('no_calc');
     });
 

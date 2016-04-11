@@ -9,8 +9,8 @@
     <ProjectGuid>{8891FD1F-87F2-4BB4-96AD-882AC147B58E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ProfileDataTest</RootNamespace>
-    <AssemblyName>ProfileDataTest</AssemblyName>
+    <RootNamespace>FingertipsUploadService.ProfileDataTest</RootNamespace>
+    <AssemblyName>FingertipsUploadService.ProfileDataTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,13 +37,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Moq">
-      <HintPath>..\..\PholioVisualisationWS\lib\Moq.dll</HintPath>
+    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -57,20 +60,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutoMapperConfig.cs" />
-    <Compile Include="DefaultProfileContentWriterTest.cs" />
     <Compile Include="FpmUserTest.cs" />
-    <Compile Include="GroupingListProcessorTest.cs" />
-    <Compile Include="ProfileBuilderTest.cs" />
-    <Compile Include="ProfileDataAccessTest.cs" />
     <Compile Include="ProfilesReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProfilesWriterTest.cs" />
     <Compile Include="AllowedDataTest.cs" />
-    <Compile Include="Respositories\WhenUsingLooksUpRepository.cs" />
+    <Compile Include="Respositories\WhenUsingFusUploadRepository.cs" />
+    <Compile Include="Respositories\WhenUsingJobErrorRepository.cs" />
+    <Compile Include="Respositories\WhenUsingJobRepository.cs" />
     <Compile Include="Respositories\WhenUsingCoreDataRepository.cs" />
-    <Compile Include="Respositories\WhenUsingProfileRepository.cs" />
-    <Compile Include="Respositories\WhenUsingUserRepository.cs" />
-    <Compile Include="TargetConfigTest.cs" />
     <Compile Include="TimePeriodTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -78,10 +75,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MainUI\MainUI.csproj">
-      <Project>{64358A8F-D044-46CE-BDF2-1BFA5AC5B3D6}</Project>
-      <Name>MainUI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ProfileData\ProfileData.csproj">
       <Project>{DB5CE84B-BE14-44BB-A83E-506FFDF58094}</Project>
       <Name>ProfileData</Name>

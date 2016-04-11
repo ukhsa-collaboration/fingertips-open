@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 
-namespace PholioObjectsTest
+namespace PholioVisualisation.PholioObjectsTest
 {
     [TestClass]
     public class TrendDataPointTest

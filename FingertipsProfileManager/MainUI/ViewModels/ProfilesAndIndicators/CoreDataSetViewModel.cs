@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Fpm.ProfileData.Entities.Core;
+﻿using Fpm.ProfileData.Entities.Core;
+using System.Collections.Generic;
 
-namespace Fpm.MainUI.ViewModels
+namespace Fpm.MainUI.ViewModels.ProfilesAndIndicators
 {
     public class CoreDataSetViewModel
     {

@@ -6,8 +6,8 @@
     <ProjectGuid>{318AC2BF-8B87-4260-8D9D-F55E85E51929}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FingertipsDataExtractionToolTest</RootNamespace>
-    <AssemblyName>FingertipsDataExtractionToolTest</AssemblyName>
+    <RootNamespace>PholioVisualisation.FingertipsDataExtractionToolTest</RootNamespace>
+    <AssemblyName>PholioVisualisation.FingertipsDataExtractionToolTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -44,7 +44,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.2.0\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SpreadsheetGear">

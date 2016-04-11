@@ -43,27 +43,5 @@
 
             return false;
         }
-
-        public static TimePeriod GetBaseline(GroupingPlusName grouping)
-        {
-            return new TimePeriod
-            {
-                Year = grouping.BaselineYear,
-                YearRange = grouping.YearRange,
-                Quarter = grouping.BaselineQuarter,
-                Month = grouping.BaselineMonth
-            };
-        }
-
-        public static TimePeriod GetDataPoint(GroupingPlusName grouping)
-        {
-            return new TimePeriod
-            {
-                Year = grouping.DatapointYear,
-                YearRange = grouping.YearRange,
-                Quarter = grouping.DatapointQuarter,
-                Month = grouping.DatapointMonth
-            };
-        }
     }
 }

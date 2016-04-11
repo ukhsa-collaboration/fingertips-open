@@ -1,7 +1,8 @@
-﻿using Profiles.DataConstruction;
+﻿using System.Web.UI;
+using Profiles.DataConstruction;
 using Profiles.DomainObjects;
 using Profiles.MainUI.Caching;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Filters;
 using Profiles.MainUI.Models;
 using System.Web.Mvc;
@@ -50,7 +51,7 @@ namespace Profiles.MainUI.Controllers
             PageType pageType)
         {
             InitPageModel();
-
+      
             details = new ProfileDetailsBuilder(urlKey).Build();
 
             if (details == null)
@@ -66,7 +67,6 @@ namespace Profiles.MainUI.Controllers
             }
 
             PageModel.PageTitle = details.Title;
-            PageModel.ProfileUrlKey = details.ProfileUrlKey;
 
             ConfigureWithProfile(details);
 
@@ -76,6 +76,7 @@ namespace Profiles.MainUI.Controllers
             }
 
             PageModel.PageType = pageType;
+            PageModel.DisplayProfileTitle = true;
 
             return View(PageModel.GetSkinView(viewName), PageModel);
         }

@@ -1,11 +1,15 @@
-function TartanRugCellBuilder(coreDataSet, columnNumber, rowNumber, comparisonConfig, trendDisplay) {
+/**
+* Functions of the Overview tab.
+* @module tartanRug
+*/
+
+function TartanRugCellBuilder(coreDataSet, columnNumber, rowNumber, comparisonConfig,
+    trendDisplay, hasTrends) {
     
     this.data = coreDataSet;
     this.dataInfo = new CoreDataSetInfo(coreDataSet);
     this.isValue = this.dataInfo.isValue();
     
-    var hasTrends = (isDefined(groupRoots) && isDefined(groupRoots[rowNumber]) && isDefined(groupRoots[rowNumber].TrendMarkers) );
-
     var html = ['<td id="tc-', columnNumber, '-', rowNumber, '"'],
         useRag = comparisonConfig.useRagColours,
         useQuintileColouring = comparisonConfig.useQuintileColouring;
@@ -70,16 +74,14 @@ TartanRugCellBuilder.prototype = {
     },
     
     addTrend: function (html, root, areaCode) {
-        var trendMarkerCode = areaCode ? root.TrendMarkers[areaCode] : TrendMarkerValue.CannotCalculate;
-        var trendMarker = GetTrendMarkerImage(trendMarkerCode, root.PolarityId);
+        var trendMarker = this._getTrendMarker(root, areaCode);
         html.push('<div class="tartanTrend">',
             trendMarker,
             '</div>');
     },
 
     addTrendWithText: function (html, root, areaCode) {
-        var trendMarkerCode = areaCode ? root.TrendMarkers[areaCode] : TrendMarkerValue.CannotCalculate;
-        var trendMarker = GetTrendMarkerImage(trendMarkerCode, root.PolarityId);
+        var trendMarker = this._getTrendMarker(root, areaCode);
         html.push('<div class="tartanValueAndTrend">',
             trendMarker,
             '<br/>',
@@ -87,6 +89,12 @@ TartanRugCellBuilder.prototype = {
             '</div>');
     },
 
+    _getTrendMarker : function(root, areaCode) {
+        var trendMarkerCode = this.dataInfo.isValue()
+            ? root.TrendMarkers[areaCode]
+            : TrendMarkerValue.CannotCalculate;
+        return getTrendMarkerImage(trendMarkerCode, root.PolarityId);
+    },
 
     getSigClass: function (useRag, useQuintileColouring) {
         
@@ -117,10 +125,10 @@ function setTartanRugHtml(isDownloadable, trendDisplay) {
 
     var isRegionalDisplayed = isSubnationalColumn();
 
+    // Ensure trend marker mode is defined
     if (!trendDisplay && isDefined(tartanRugState) && isDefined(tartanRugState.rug)) {
         trendDisplay = tartanRugState.rug.trendDisplaySelected;
     }
-
     if (!trendDisplay) {
         trendDisplay = TrendDisplayOption.ValuesOnly;
     }
@@ -158,6 +166,7 @@ function setTartanRugHtml(isDownloadable, trendDisplay) {
         var useQuintileColouring=false;
 
         if (indicatorMetadataHash) {
+
             for (var groupRootIndex in groupRoots) {
                 
                 var groupRoot = groupRoots[groupRootIndex],
@@ -167,6 +176,7 @@ function setTartanRugHtml(isDownloadable, trendDisplay) {
                 data = groupRoot.Data,
                 regionalGrouping = getRegionalComparatorGrouping(groupRoot);
                 var columnNumber = 1;
+                var hasTrends = groupRoot.TrendMarkers;
                 
                 // Choose comparator & Colouring: RAG, Quintile or not
                 var comparisonConfig = new ComparisonConfig(groupRoot, indicatorMetadata);
@@ -186,14 +196,16 @@ function setTartanRugHtml(isDownloadable, trendDisplay) {
                 if (isNationalDisplayed) {  
                     var nationalGrouping = getNationalComparatorGrouping(groupRoot);
                     html = new TartanRugCellBuilder(nationalGrouping.ComparatorData,
-                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay).getHtml();
+                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay,
+                        hasTrends).getHtml();
                     rug.addBenchmarkValue(html);
                 }
                 
                 // Subnational data
                 if (isRegionalDisplayed) {
                     html = new TartanRugCellBuilder(regionalGrouping.ComparatorData,
-                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay).getHtml();
+                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay,
+                        hasTrends).getHtml();
                     rug.addBenchmarkValue(html);
                 }
                 
@@ -207,7 +219,8 @@ function setTartanRugHtml(isDownloadable, trendDisplay) {
                 for (var j in sortedAreas) {
                     var code = sortedAreas[j].Code;
                     html = new TartanRugCellBuilder(getDataFromAreaCode(data,code),
-                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay).getHtml();
+                        columnNumber++, groupRootIndex, comparisonConfig, trendDisplay,
+                        hasTrends).getHtml();
                     rug.addRowValue(html);
                 }
             }

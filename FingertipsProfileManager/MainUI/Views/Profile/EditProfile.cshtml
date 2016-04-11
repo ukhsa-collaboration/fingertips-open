@@ -121,8 +121,20 @@
             @Html.CheckBoxFor(model => model.ShouldBuildExcel)
         </div>
         <div class="content-row">
-             <label class="content-item-detail-label">Has trend markers?</label>
+            <label class="content-item-detail-label">Has trend markers?</label>
             @Html.CheckBoxFor(model => model.HasTrendMarkers)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Use target benchmark by default?</label>
+            @Html.CheckBoxFor(model => model.UseTargetBenchmarkByDefault)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Has only static PDF reports?</label>
+            @Html.CheckBoxFor(model => model.IsProfileWithOnlyStaticReports)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Static report time periods:<br><small>(comma separated list or empty, most recent period first)</small></label>
+            @Html.TextBoxFor(model => model.StaticReportsTimePeriods, new { @class = "unselected-domain wide-profile-textbox" })
         </div>
 
         <div class="button-box clearfix">

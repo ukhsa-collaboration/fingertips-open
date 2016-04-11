@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DomainObjects;
 
-namespace MainUISeleniumTest.Tobacco
+namespace IndicatorsUI.MainUISeleniumTest.Tobacco
 {
     [TestClass]
     public class TobaccoDataTest : TobaccoBaseUnitTest

@@ -147,7 +147,7 @@ div.tartanText {
 }
 
 #tartanScrollBox {
-    width: 5000px; /*need to be bigger if more areas*/
+    width: 10000px; /*need to be bigger if more areas*/
     overflow: hidden;
     float: left;
 }
@@ -612,13 +612,8 @@ td.keyBoxRight div
 }
 
 /* ------------------------------------------------------------
-	Area search
+	Trend legend
 ------------------------------------------------------------ */
-#no-matches-found a {
-    cursor: default;
-    color: inherit;
-}
-
 .trendLegends .legendText {
     padding-right: 10px;
 }

@@ -2,7 +2,7 @@
 using PholioVisualisation.Formatting;
 
 
-namespace FormattingTest
+namespace PholioVisualisation.FormattingTest
 {
     [TestClass]
     public class NumberRounderTest

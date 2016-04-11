@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest.Fingertips
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class FingertipsIndicatorSearchTest : FingertipsBaseUnitTest

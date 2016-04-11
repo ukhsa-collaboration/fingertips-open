@@ -9,7 +9,7 @@ using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     [TestClass]
     public class ProfileDataBuilderOfSingleDeprivationDecileTest
@@ -49,7 +49,7 @@ namespace ExportTest
         [TestMethod]
         public void TestCreatesParentAreaWorksheet()
         {
-            Assert.AreEqual("Deprivation decile", DeprivationDecileWorksheet().Name);
+            Assert.IsTrue(DeprivationDecileWorksheet().Name.Contains("Deprivation decile"));
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace ExportTest
 
         private static IWorksheet DeprivationDecileWorksheet()
         {
-            return workbook.Worksheets["Deprivation decile"];
+            return workbook.Worksheets["Deprivation decile (IMD..."];
         }
     }
 }

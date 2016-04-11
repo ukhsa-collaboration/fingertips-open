@@ -13,6 +13,7 @@ namespace Profiles.DomainObjects
         public IList<string> ExtraJavaScriptFiles { get; set; }
         public IList<string> ExtraCssFiles { get; set; }
         public string AreasToIgnoreForSpineCharts { get; set; }
+        public string AreasToIgnoreEverywhere { get; set; }
         public int DefaultAreaType { get; set; }
         public int EnumParentDisplay { get; set; }
         public int RagColourId { get; set; }
@@ -27,9 +28,13 @@ namespace Profiles.DomainObjects
         public bool ShowDataQuality { get; set; }
         public bool IsNational { get; set; }
         public bool HasTrendMarkers { get; set; }
+        public bool UseTargetBenchmarkByDefault { get; set; }
         public string AccessControlGroup { get; set; }
         public LongerLivesProfileDetails LongerLivesProfileDetails { get; set; }
         public bool IsOfficialStatistics { get; set; }
+        public bool IsProfileWithOnlyStaticReports { get; set; }
+        public string StaticReportsTimePeriods { get; set; }
+
         public bool HasDomains
         {
             get { return Domains.Any(); }

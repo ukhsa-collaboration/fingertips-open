@@ -1,17 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
-using Fpm.MainUI.Models;
+﻿using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Core;
 using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 using Fpm.ProfileData.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 using IndicatorAudit = Fpm.ProfileData.Entities.Profile.IndicatorAudit;
 
 namespace Fpm.MainUI.Helpers
@@ -19,7 +18,7 @@ namespace Fpm.MainUI.Helpers
     public static class CommonUtilities
     {
         private static readonly ProfilesReader Reader = ReaderFactory.GetProfilesReader();
-      
+
         public const int QuartersInOneYear = 4;
 
         public enum AuditType
@@ -29,7 +28,7 @@ namespace Fpm.MainUI.Helpers
             Change,
             Delete
         }
-        
+
         private static void AddPleaseSelectOption(List<SelectListItem> list)
         {
             list.Insert(0, new SelectListItem { Text = "Please select...", Value = "-1" });
@@ -48,7 +47,7 @@ namespace Fpm.MainUI.Helpers
         }
 
 
-        
+
         private static List<SelectListItem> GetAreaTypeItems(PleaseSelectOption pleaseSelectOption, int selectedAreaTypeId,
             IList<AreaType> areaTypes)
         {
@@ -70,18 +69,18 @@ namespace Fpm.MainUI.Helpers
         {
             var listOfComparators = new List<SelectListItem>
                 {
-                    new SelectListItem { 
+                    new SelectListItem {
                         Text = "National & Subnational",
                         Value = ComparatorIds.NationalAndSubnational.ToString(),
                         Selected = comparatorId == ComparatorIds.NationalAndSubnational
                     },
-                    new SelectListItem { 
-                        Text = "National Only", 
+                    new SelectListItem {
+                        Text = "National Only",
                         Value = ComparatorIds.National.ToString(),
                         Selected = comparatorId == ComparatorIds.National
-                    }, 
-                    new SelectListItem { 
-                        Text = "Subnational Only", 
+                    },
+                    new SelectListItem {
+                        Text = "Subnational Only",
                         Value = ComparatorIds.Subnational.ToString(),
                         Selected = comparatorId == ComparatorIds.Subnational
                     }
@@ -100,8 +99,8 @@ namespace Fpm.MainUI.Helpers
         {
             var listOfComparators = new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "95", Value = "95" }, 
-                    new SelectListItem { Text = "99.8", Value = "99.8" }, 
+                    new SelectListItem { Text = "95", Value = "95" },
+                    new SelectListItem { Text = "99.8", Value = "99.8" },
                     new SelectListItem { Text = "Not Applicable", Value = "-1" }
                 };
 
@@ -114,7 +113,7 @@ namespace Fpm.MainUI.Helpers
         {
             var listOfFrequencies = new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "Annual", Value = Frequencies.Annual.ToString() }, 
+                    new SelectListItem { Text = "Annual", Value = Frequencies.Annual.ToString() },
                     new SelectListItem { Text = "Monthly", Value = Frequencies.Monthly.ToString()},
                     new SelectListItem { Text = "Quarterly", Value = Frequencies.Quarterly.ToString() }
                 };
@@ -149,22 +148,13 @@ namespace Fpm.MainUI.Helpers
         {
             var items = Reader.GetAllComparatorConfidences()
                 .Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString()
-            }).ToList();
+                {
+                    Value = x.ToString(),
+                    Text = x.ToString()
+                }).ToList();
 
             AddPleaseSelectOption(items);
             return items;
-        }
-
-        private static void SetSelectedValue(List<SelectListItem> items, string idString)
-        {
-            var selectedItem = items.FirstOrDefault(x => x.Value == idString);
-            if (selectedItem != null)
-            {
-                selectedItem.Selected = true;
-            }
         }
 
         public static IEnumerable<SelectListItem> GetOrderedListOfDomainsWithGroupId(ProfileMembers domains, SelectListItem defaultProfile, ProfileRepository profileRepository)
@@ -240,10 +230,10 @@ namespace Fpm.MainUI.Helpers
             foreach (var targetConfig in targets)
             {
                 var listItem = new SelectListItem
-                    {
-                        Value = targetConfig.Id.ToString(),
-                        Text = targetConfig.Description
-                    };
+                {
+                    Value = targetConfig.Id.ToString(),
+                    Text = targetConfig.Description
+                };
                 selectListItems.Add(listItem);
             }
 
@@ -270,8 +260,8 @@ namespace Fpm.MainUI.Helpers
         {
             var listOfYearRanges = new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "1 Year", Value = "1" }, 
-                    new SelectListItem { Text = "2 Years", Value = "2" }, 
+                    new SelectListItem { Text = "1 Year", Value = "1" },
+                    new SelectListItem { Text = "2 Years", Value = "2" },
                     new SelectListItem { Text = "3 Years", Value = "3" },
                     new SelectListItem { Text = "4 Years", Value = "4" },
                     new SelectListItem { Text = "5 Years", Value = "5" },
@@ -390,7 +380,7 @@ namespace Fpm.MainUI.Helpers
         public static IEnumerable<SelectListItem> GetOrderedListOfProfilesForCurrentUser(string urlKey)
         {
             var profiles = UserDetails.CurrentUser().GetProfilesUserHasPermissionsTo();
-            
+
             return GetOrderedListOfProfilesWithSpecificProfileSelected(profiles, urlKey);
         }
 
@@ -521,11 +511,11 @@ namespace Fpm.MainUI.Helpers
             var listOfDecimalPlaces = new List<SelectListItem>
                 {
                     new SelectListItem { Text = "Automatic",
-                        Value = string.Empty/*will be interpreted as null on postback convertion to int?*/}, 
-                    new SelectListItem { Text = "0", Value = "0" }, 
-                    new SelectListItem { Text = "1", Value = "1" }, 
-                    new SelectListItem { Text = "2", Value = "2" }, 
-                    new SelectListItem { Text = "3", Value = "3" }, 
+                        Value = string.Empty/*will be interpreted as null on postback convertion to int?*/},
+                    new SelectListItem { Text = "0", Value = "0" },
+                    new SelectListItem { Text = "1", Value = "1" },
+                    new SelectListItem { Text = "2", Value = "2" },
+                    new SelectListItem { Text = "3", Value = "3" },
                 };
 
             return listOfDecimalPlaces;
@@ -536,8 +526,8 @@ namespace Fpm.MainUI.Helpers
         {
             var listOfQuarters = new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "0", Value = "0"}, 
-                    new SelectListItem { Text = "1", Value = "1"}, 
+                    new SelectListItem { Text = "0", Value = "0"},
+                    new SelectListItem { Text = "1", Value = "1"},
                     new SelectListItem { Text = "2", Value = "2" },
                     new SelectListItem { Text = "3", Value = "3" },
                     new SelectListItem { Text = "4", Value = "4" },

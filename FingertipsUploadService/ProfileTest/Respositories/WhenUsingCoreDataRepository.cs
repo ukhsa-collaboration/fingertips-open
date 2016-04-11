@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ProfileDataTest.Respositories
+namespace FingertipsUploadService.ProfileDataTest.Respositories
 {
     [TestClass]
     public class WhenUsingCoreDataRepository
@@ -73,78 +73,6 @@ namespace ProfileDataTest.Respositories
         }
 
         [TestMethod]
-        public void GetCategoryTypes_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetCategoryTypes(108);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetAreaTypes_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetAreaTypes(indicatorId);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetSexes_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetSexes(indicatorId);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetAges_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetAges(indicatorId);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetYearRanges_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetYearRanges(indicatorId);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetYears_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetYears(indicatorId);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetMonths_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetMonths(IndicatorIds.LongTermUnemployment);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetQuarters_Returns_Non_Zero_Result()
-        {
-            var result = _coreDataRepository.GetQuarters(IndicatorIds.PeopleWhoDieAtHome);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
         public void GetCoreDataSet_Returns_Non_Zero_Result()
         {
             int rowsCount;
@@ -174,34 +102,6 @@ namespace ProfileDataTest.Respositories
             Console.WriteLine("Total records " + dataSetRowsCount);
 
             Assert.IsTrue(dataSetRowsCount <= 500 && rowsFound >= dataSetRowsCount);
-        }
-
-        [TestMethod]
-        public void CanDeleteDataSet_Returns_True_For_AuthorisedUser()
-        {
-            var userName = @"phe\doris.hain";
-
-            var result = _coreDataRepository.CanDeleteDataSet(indicatorId, userName);
-
-            Assert.IsTrue(result);
-        }
-
-        [TestMethod]
-        public void CanDeleteDataSet_Returns_False_For_UnInvalidUser()
-        {
-            var result = _coreDataRepository.CanDeleteDataSet(indicatorId, @"phe\shan.sivamx");
-
-            Assert.IsFalse(result);
-        }
-
-        [TestMethod]
-        public void CanDeleteDataSet_Returns_False_For_IncorrectIndicatorId()
-        {
-            var userName = @"phe\shan.sivam";
-
-            var result = _coreDataRepository.CanDeleteDataSet(11119999, userName);
-
-            Assert.IsTrue(result == false);
         }
 
     }

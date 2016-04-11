@@ -37,6 +37,8 @@ namespace PholioVisualisation.PholioObjects
 
     public class CategoryIds
     {
+        public const int Undefined = -1;        
+
         // Deprivation
         public const int MostDeprived = 1;
         public const int LeastDeprived = 5;
@@ -344,6 +346,7 @@ namespace PholioVisualisation.PholioObjects
         public const int HealthChecks = 65;
         public const int HyperTension = 67;
         public const int LocalAlcoholProfilesForEngland = 87;
+        public const int CancerServices = 92;
         public const int PhysicalActivity = 99;
     }
 
@@ -404,6 +407,13 @@ namespace PholioVisualisation.PholioObjects
         public const string Staging = "staging";
         public const string Live = "live";
     }
+
+    public class ChimatResourceIds
+    {
+        public const int NotFound = -1;
+        public const int Cumbria = 273454;
+    }
+
     
     public enum TrendMarker
     {

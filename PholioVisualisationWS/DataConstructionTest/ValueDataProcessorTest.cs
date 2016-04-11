@@ -5,7 +5,7 @@ using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 
-namespace DataConstructionTest
+namespace PholioVisualisation.DataConstructionTest
 {
     [TestClass]
     public class ValueDataProcessorTest

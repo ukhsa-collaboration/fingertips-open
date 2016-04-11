@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest
+namespace Fpm.MainUISeleniumTest
 {
     public class WaitFor
     {
@@ -19,7 +19,7 @@ namespace MainUISeleniumTest
         public void PageWithModalPopUpToLoad()
         {
             SeleniumHelper.WaitForExpectedElement(driver,
-                By.ClassName("modal"));
+                By.ClassName("a-modal"));
         }
 
         public void EditUserPageToLoad()

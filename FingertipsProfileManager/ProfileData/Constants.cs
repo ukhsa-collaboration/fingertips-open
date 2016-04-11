@@ -11,6 +11,13 @@
         public const string UserWithNoRightsToAnything = @"Tim Packer";
     }
 
+    public class UserNames
+    {
+        public const string NotAGenuineUserName = @"phe\yyy.zzz";
+        public const string Doris = @"phe\doris.hain";
+        public const string Shan = @"phe\shan.sivam";
+    }
+
     public class ContentKeys
     {
         public const string Description = "description";

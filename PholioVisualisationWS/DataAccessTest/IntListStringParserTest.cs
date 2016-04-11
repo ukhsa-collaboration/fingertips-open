@@ -6,7 +6,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 
-namespace DataAccessTest
+namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class IntListStringParserTest

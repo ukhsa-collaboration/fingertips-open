@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 using Profiles.DataAccess;
 
 
-namespace MainUISeleniumTest.Fingertips
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class FingertipsBookmarkTest : FingertipsBaseUnitTest

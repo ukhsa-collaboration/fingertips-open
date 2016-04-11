@@ -69,7 +69,8 @@ namespace PholioVisualisation.DataAccess
 
         public IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode)
         {
-            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode, -1 , -1);
+            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode, 
+                CategoryTypeIds.Undefined , CategoryIds.Undefined);
             return RestrictDataToTimePeriodsLimits(grouping, data);
         }
 

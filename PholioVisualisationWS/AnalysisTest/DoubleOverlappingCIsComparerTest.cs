@@ -4,7 +4,7 @@ using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace AnalysisTest
+namespace PholioVisualisation.AnalysisTest
 {
     [TestClass]
     public class DoubleOverlappingCIsComparerTest

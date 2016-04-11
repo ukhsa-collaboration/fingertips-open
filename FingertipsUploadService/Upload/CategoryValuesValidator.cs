@@ -3,7 +3,7 @@ using FingertipsUploadService.ProfileData.Entities.Profile;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class CategoryValuesValidator
     {

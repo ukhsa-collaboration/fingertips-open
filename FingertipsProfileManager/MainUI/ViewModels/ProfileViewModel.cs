@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Fpm.ProfileData;
 
 namespace Fpm.MainUI.ViewModels
 {
@@ -43,10 +42,13 @@ namespace Fpm.MainUI.ViewModels
         public bool ShowDataQuality { get; set; }
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
+        public bool UseTargetBenchmarkByDefault { get; set; }
+        public bool IsProfileWithOnlyStaticReports { get; set; }
         public bool IsNational { get; set; }
         public bool HasOwnFrontPage { get; set; }
         public bool AreIndicatorsExcludedFromSearch { get; set; }
         public string AccessControlGroup { get; set; }
+        public string StaticReportsTimePeriods { get; set; }
 
         public string SortBy { get; set; }
         

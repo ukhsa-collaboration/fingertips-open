@@ -73,32 +73,5 @@
         </tr>
 
     </table>
-    
-    @if (Model.HasTrendMarkers)
-    {
-        <div class="trendLegends" id="trend-marker-legend-barchart" >
-            <table class="keyTable" cellspacing="0">
-            <tr>
-                <td ><img src="~/images/trends/no_calc.png" /></td>
-                <td class="legendText">Could not be calculated</td>
-            
-                <td ><img src="~/images/trends/up_red.png" /></td>
-                <td class="legendText">Increasing and worse</td>
-            
-                <td ><img src="~/images/trends/up_green.png" /></td>
-                <td class="legendText">Increasing and better</td>
-            
-                <td ><img src="~/images/trends/down_red.png" /></td>
-                <td class="legendText">Decreasing and worse</td>
-
-                <td ><img src="~/images/trends/down_green.png" /></td>
-                <td class="legendText">Decreasing and better</td>
-
-                <td ><img src="~/images/trends/no_change.png" /></td>
-                <td class="legendText">No signficant change</td>
-            </tr>
-        </table>
-        </div>
-    }
 
 </div>

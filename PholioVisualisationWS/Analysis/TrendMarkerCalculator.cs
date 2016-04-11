@@ -17,25 +17,32 @@ namespace PholioVisualisation.Analysis
     }
 
 
-    public class TrendRequest 
+    public class TrendRequest
     {
         public int ValueTypeId { get; set; }
         public double ComparatorConfidence { get; set; }
         public IEnumerable<CoreDataSet> Data { get; set; }
+        public int YearRange { get; set; }
 
         public bool IsValid(ref string validationMessage)
         {
-            var valid =  (this.ValueTypeId == ValueTypeIds.Proportion
+            var valid = (this.ValueTypeId == ValueTypeIds.Proportion
                     || this.ValueTypeId == ValueTypeIds.CrudeRate
                     || this.ValueTypeId == ValueTypeIds.DirectlyStandardisedRate);
 
             if (!valid)
             {
-                validationMessage = string.Format( "Value Type {0} is not relevant for the calculation", this.ValueTypeId);
+                validationMessage = string.Format("Value Type {0} is not relevant for the calculation", this.ValueTypeId);
                 return false;
             }
-          
-            if(this.Data == null)
+
+            if (this.YearRange != 1)
+            {
+                validationMessage = string.Format("Year Range {0} is not relevant for the calculation", this.YearRange);
+                return false;
+            }
+
+            if (this.Data == null)
             {
                 validationMessage = "No data points found ";
                 return false;
@@ -54,10 +61,9 @@ namespace PholioVisualisation.Analysis
 
             return true;
         }
-
     }
 
-    public class TrendMarkerCalculator 
+    public class TrendMarkerCalculator
     {
         public TrendResponse GetResults(TrendRequest trendRequest)
         {
@@ -69,20 +75,20 @@ namespace PholioVisualisation.Analysis
             var message = string.Empty;
             var chiSquare = 0.0;
 
-            if (!IsSignificant(trendRequest,ref pointsUsed, ref chiSquare, ref message))
+            if (!IsSignificant(trendRequest, ref pointsUsed, ref chiSquare, ref message))
             {
                 return new TrendResponse()
                 {
                     Slope = null,
                     Intercept = null,
                     NumberOfPointsUsedInCalculation = pointsUsed,
-                    Marker = pointsUsed > 0 ? TrendMarker.NoChange :  TrendMarker.CannotBeCalculated,
+                    Marker = pointsUsed > 0 ? TrendMarker.NoChange : TrendMarker.CannotBeCalculated,
                     IsSignificant = false,
                     ChiSquare = chiSquare,
                     Message = message
                 };
             }
-            
+
             var sumOfx = 0.0;
             var sumOfxLog = 0.0;
             var sumOft = 0.0;
@@ -93,7 +99,7 @@ namespace PholioVisualisation.Analysis
 
             foreach (var dataItem in trendRequest.Data.OrderByDescending(t => t.Year).Take(n).Reverse())
             {
-                var x = dataItem.Value /100;
+                var x = dataItem.Value / 100;
 
                 var xLog = trendRequest.ValueTypeId == ValueTypeIds.Proportion ?
                     Math.Log(x / (1 - x), Math.E)
@@ -131,11 +137,11 @@ namespace PholioVisualisation.Analysis
         private bool IsSignificant(TrendRequest trendRequest, ref int pointsUsed, ref double chiSquare, ref string message)
         {
             chiSquare = 0.0;
-            
-            if ( trendRequest.IsValid(ref message) == false )
+
+            if (trendRequest.IsValid(ref message) == false)
             {
                 pointsUsed = 0;
-                
+
                 return false;
             }
 
@@ -152,7 +158,7 @@ namespace PholioVisualisation.Analysis
 
             var chiSquaredConfidence = trendRequest.ComparatorConfidence <= 95 ? chiSquared95 : chiSquared98;
 
-            foreach (var dataItem in trendRequest.Data.OrderByDescending(t=> t.Year).Reverse())
+            foreach (var dataItem in trendRequest.Data.OrderByDescending(t => t.Year).Reverse())
             {
 
                 var r = dataItem.Count.Value;
@@ -165,9 +171,9 @@ namespace PholioVisualisation.Analysis
                 sumOfnAndt += n * t;
                 sumOfnAndtSq += n * (t * t);
 
-                var sumPart1 = (sumOfn*sumOfrAndt - sumOfr*sumOfnAndt);
+                var sumPart1 = (sumOfn * sumOfrAndt - sumOfr * sumOfnAndt);
 
-                chiSquare = (sumOfn *  (sumPart1 * sumPart1)   ) /
+                chiSquare = (sumOfn * (sumPart1 * sumPart1)) /
                                 (sumOfr * (sumOfn - sumOfr) * (sumOfn * sumOfnAndtSq - (sumOfnAndt * sumOfnAndt)));
 
                 if (pointsUsed > 4 && chiSquare > chiSquaredConfidence)
@@ -176,7 +182,7 @@ namespace PholioVisualisation.Analysis
                 }
 
                 pointsUsed++;
-                
+
             }
 
             pointsUsed--;

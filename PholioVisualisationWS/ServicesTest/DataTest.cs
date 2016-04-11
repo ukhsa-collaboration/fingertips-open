@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     /// <summary>
     /// Tests that services can be connected to.
@@ -106,6 +106,14 @@ namespace ServicesTest
         }
 
         [TestMethod]
+        public void TestGetAreas()
+        {
+            byte[] data = GetData("areas?" +
+                "area_codes=" + AreaCodes.Gor_EastMidlands);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetChildAreasWithAddresses()
         {
             byte[] data = GetData("areas_with_addresses?" +
@@ -129,6 +137,14 @@ namespace ServicesTest
             byte[] data = GetData("profiles_containing_indicators?" + 
                 "area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
                 "&indicator_ids=" + IndicatorIds.TeenagePregnancy);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetChimatResourceId()
+        {
+            byte[] data = GetData("chimat_resource_id?" +
+                "area_code=" + AreaCodes.CountyUa_Buckinghamshire);
             TestHelper.IsData(data);
         }
 

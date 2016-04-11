@@ -6,7 +6,7 @@ using NHibernate.Collection.Generic;
 using NHibernate.Engine;
 using PholioVisualisation.PholioObjects;
 
-namespace PholioObjectsTest
+namespace PholioVisualisation.PholioObjectsTest
 {
     [TestClass]
     public class CategoryTypeTest

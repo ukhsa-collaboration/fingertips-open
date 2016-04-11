@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace MainUISeleniumTest.Phof
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
     public class PhofNearestNeighboursTest : PhofBaseUnitTest
@@ -35,7 +35,7 @@ namespace MainUISeleniumTest.Phof
 
             // Check the back button text
             var backToMenuText = driver.FindElement(By.Id("goBack")).Text;
-            TestHelper.AssertTextContains(backToMenuText, "Back to menus");
+            TestHelper.AssertTextContains(backToMenuText, "Exit nearest neighbours");
             TestHelper.AssertTextContains(backToMenuText, "More information");
 
             // Check NN text loaded correctly

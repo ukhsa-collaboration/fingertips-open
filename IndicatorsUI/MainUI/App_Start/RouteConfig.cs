@@ -65,13 +65,24 @@ namespace Profiles.MainUI
                 );
 
             routes.MapRoute(
+                "AreaSearchResultsFingertips", // Route name
+                "profile/{profileKey}/area-search-results/{areaCodeList}", // URL with parameters
+                new
+                {
+                    controller = "AreaSearch",
+                    action = "AreaSearchResults",
+                    place_name = UrlParameter.Optional,
+                    search_type = UrlParameter.Optional
+                }
+                );
+
+            routes.MapRoute(
                 "SupportingInformation", // Route name
                 "profile/{profileKey}/supporting-information/{contentKey}", // URL with parameters
                 new
                 {
                     controller = "Profile",
-                    action = "SupportingInformation",
-                    indicatorList = UrlParameter.Optional
+                    action = "SupportingInformation"
                 }
                 );
 
@@ -438,7 +449,7 @@ namespace Profiles.MainUI
                 );
 
             routes.MapRoute(
-                "AreaSearchResults", // Route name
+                "AreaSearchResultsLongerLives", // Route name
                 "topic/{profileKey}/area-search-results", // URL with parameters
                 new
                 {
@@ -514,6 +525,6 @@ namespace Profiles.MainUI
                     action = "Log"
                 }
                 );
-        } 
+        }
     }
 }

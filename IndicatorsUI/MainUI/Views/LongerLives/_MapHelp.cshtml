@@ -1,9 +1,9 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 <div id="map-help" class="map-overlay">
     @{
-        ContentItem contentItem = CommonUtilities.GetContentItem(ContentKeys.MapHelp, Model.ProfileId)
-                          ?? CommonUtilities.GetContentItem(ContentKeys.MapHelp, ProfileIds.LongerLives);
+        ContentItem contentItem = ContentProvider.GetContentItem(ContentKeys.MapHelp, Model.ProfileId)
+                          ?? ContentProvider.GetContentItem(ContentKeys.MapHelp, ProfileIds.LongerLives);
     }
     @(contentItem.HtmlEncodedString)
 </div>

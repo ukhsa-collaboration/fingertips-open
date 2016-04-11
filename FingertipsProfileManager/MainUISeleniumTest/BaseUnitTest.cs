@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-namespace MainUISeleniumTest
+namespace Fpm.MainUISeleniumTest
 {
     [TestClass]
     public class BaseUnitTest
@@ -14,7 +15,7 @@ namespace MainUISeleniumTest
 
         public BaseUnitTest()
         {
-            _driver = new ChromeDriver();
+            _driver = new ChromeDriver(ConfigurationManager.AppSettings["ChromeDriver"]);
         }
 
         [TestInitialize]

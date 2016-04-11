@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     [TestClass]
     public class GetData_AreaCategoriesTest

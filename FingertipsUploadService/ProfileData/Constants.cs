@@ -1,41 +1,5 @@
 ﻿namespace FingertipsUploadService.ProfileData
 {
-    public class ExceptionOptions
-    {
-        public const string AllServers = "ALL SERVERS";
-    }
-
-    public class ServerNames
-    {
-        public const string TestServer = "londevapppor01";
-    }
-
-    public class UserDisplayNames
-    {
-        public const string Doris = @"Doris Hain";
-        public const string UserWithNoRightsToAnything = @"Tim Packer";
-    }
-
-    public class ContentKeys
-    {
-        public const string Description = "description";
-        public const string Introduction = "introduction";
-        public const string RecentUpdates = "recent-updates";
-    }
-
-    public class SiteUrls
-    {
-        public const string TargetIndex = "/lookup-tables/targets";
-    }
-
-    public class YearTypeIds
-    {
-        public const int Calendar = 1;
-        public const int Financial = 2;
-        public const int Academic = 3;
-        public const int FinancialMultiYearCumulativeQuarter = 10;
-    }
-
     public class AreaTypeIds
     {
         public const int Undefined = 0;
@@ -72,18 +36,6 @@
         public const int Male = 1;
         public const int Female = 2;
         public const int Persons = 4;
-    }
-
-    public class GroupIds
-    {
-        public const int SubstanceMisuse = 1000009;
-        public const int TobaccoControlProfiles_KeyIndicators = 1938132885;
-        public const int PhofWiderDeterminantsOfHealth = 1000041;
-        public const int GpProfileSupportingIndicators = 1200006;
-        public const int ArchivedIndicators = 3006000;
-        public const int SevereMentalIllness_RiskFactors = 8000027;
-        public const int SevereMentalIllness_Prevalence = 8000030;
-        public const int SevereMentalIllness_Finance = 8000040;
     }
 
     public class IndicatorIds
@@ -129,28 +81,6 @@
         public const string SevereMentalIllness = "severe-mental-illness";
     }
 
-    public class Frequencies
-    {
-        public const int Annual = 1;
-        public const int Quarterly = 2;
-        public const int Monthly = 3;
-    }
-
-    public class FpmUserIds
-    {
-        public const int Doris = 11;
-        public const int UserWithNoRightsToAnything = 34/*Tim Packer*/;
-        public const int FarrukhAyub = 54;
-    }
-
-    public class PolarityIds
-    {
-        public const int NotApplicable = -1;
-        public const int RagLowIsGood = 0;
-        public const int RagHighIsGood = 1;
-        public const int UseBlues = 99;
-    }
-
     public class ValueNoteIds
     {
         public const int ThereIsDataQualityIssueWithThisValue = 401;
@@ -172,27 +102,6 @@
     public class SkinIds
     {
         public const int Core = 2;
-    }
-
-    public class IndicatorTextMetadataPropertyIds
-    {
-        public const int Name = 1;
-    }
-
-    public class ComparatorIds
-    {
-        public const int Subnational = 1;
-        public const int National = 4;
-
-        /// <summary>
-        /// This is internal application constant and should not be saved to the database
-        /// </summary>
-        public const int NationalAndSubnational = 999;
-    }
-
-    public class DocumentNames
-    {
-        public const string DiabetesHospitalData = "Diabetes_Hospital_Data.xlsx";
     }
 
     public class CoreDataFilters

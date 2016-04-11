@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
-using Fpm.MainUI.Helpers;
-using Fpm.MainUI.Mapper;
+﻿using Fpm.MainUI.Helpers;
+using Fpm.MainUI.Mappers;
 using Fpm.MainUI.Models;
 using Fpm.MainUI.ViewModels;
 using Fpm.ProfileData;
@@ -12,6 +7,11 @@ using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 using Fpm.ProfileData.Repositories;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Fpm.MainUI.Controllers
 {
@@ -20,8 +20,8 @@ namespace Fpm.MainUI.Controllers
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
 
-        private  ProfileRepository _profileRepository;
-        private  UserRepository _userRepository;
+        private ProfileRepository _profileRepository;
+        private UserRepository _userRepository;
         private LookUpsRepository _lookUpsRepository;
 
         private string _userName;
@@ -150,9 +150,9 @@ namespace Fpm.MainUI.Controllers
             var listOfProfiles = CommonUtilities.GetOrderedListOfProfilesForCurrentUser(urlKey);
 
             ViewBag.listOfProfiles = listOfProfiles;
-            
+
             var domains = new ProfileMembers();
-            
+
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
             defaultProfile.Selected = true;
 
@@ -179,7 +179,7 @@ namespace Fpm.MainUI.Controllers
             ViewBag.UnitId = unitList;
 
             ViewBag.DenominatorTypeId = new SelectList(_lookUpsRepository.GetDenominatorTypes(), "Id", "Name");
-            
+
             return View("IndicatorEdit", model);
         }
 
@@ -349,11 +349,11 @@ namespace Fpm.MainUI.Controllers
         public ActionResult EditProfile(ProfileViewModel profileViewModel)
         {
             profileViewModel.SelectedPdfAreaTypes = JsonConvert.DeserializeObject<IEnumerable<ProfileAreaType>>(Request["SelectedPdfAreaTypes"]);
-            
+
             profileViewModel.ProfileUsers = JsonConvert.DeserializeObject<IEnumerable<ProfileUser>>(Request["ProfileUsers"]);
-            
+
             var profile = profileViewModel.ToProfileDetails();
-            
+
             ProfileDetailsCleaner.CleanUserInput(profile);
 
             _profileRepository.UpdateProfile(profile);
@@ -409,7 +409,7 @@ namespace Fpm.MainUI.Controllers
             return View("CreateProfileCollection", profileCollection);
         }
 
-        public ActionResult SortProfilesAndFilter(string sortBy = "Id", 
+        public ActionResult SortProfilesAndFilter(string sortBy = "Id",
             bool ascending = true, int page = 1, int pageSize = 200)
         {
             var model = new ProfileGridModel
@@ -454,7 +454,7 @@ namespace Fpm.MainUI.Controllers
             return View("ManageProfiles", model);
         }
 
-        public ActionResult UpdateProfileCollection(int id, string assignedProfiles, 
+        public ActionResult UpdateProfileCollection(int id, string assignedProfiles,
             string collectionName, string collectionSkinTitle)
         {
             _profileRepository.UpdateProfileCollection(id, assignedProfiles,
@@ -477,17 +477,17 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult SetDataPoint(int profileId, int areaTypeId, int indicatorId, 
+        public ActionResult SetDataPoint(int profileId, int areaTypeId, int indicatorId,
             int sexId, int ageId, int year, int quarter, int month, int yearRange)
         {
             if (UserDetails.CurrentUser().HasWritePermissionsToProfile(profileId) == false)
             {
                 throw new FpmException("User does not have rights to change time period");
             }
-   
+
             var groupIds = _reader.GetGroupingIds(profileId);
-            var groupings = _writer.GetGroupings(groupIds, areaTypeId, indicatorId,sexId,
-                ageId,yearRange);
+            var groupings = _writer.GetGroupings(groupIds, areaTypeId, indicatorId, sexId,
+                ageId, yearRange);
 
             // Change data points
             foreach (var grouping in groupings)
@@ -535,29 +535,29 @@ namespace Fpm.MainUI.Controllers
             IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
 
             int nextIndicatorId;
-           
-             nextIndicatorId = _profileRepository.GetNextIndicatorId();
-            
-            if (string.IsNullOrWhiteSpace(mtvText) == false)
-                {
-                   
-                    CommonUtilities.CreateNewIndicatorTextValues(selectedDomain, mtvText, properties, nextIndicatorId,
-                        _userName, _profileRepository);
 
-                    _profileRepository.CreateGroupingAndMetaData(_reader.GetProfileDetails(selectedProfileId).Id,
-                        Convert.ToInt32(selectedDomain),
-                        nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator,
-                        selectedComparatorMethod,
-                        Convert.ToDouble(selectedComparatorConfidence), selectedYearType, selectedYearRange,
-                        selectedValueType, selectedCiMethodType,
-                        Convert.ToSingle(selectedCiConfidenceLevel), selectedPolarityType, selectedUnitType,
-                        selectedDenominatorType, startYear, endYear,
-                        startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId);
-                }
-            
+            nextIndicatorId = _profileRepository.GetNextIndicatorId();
+
+            if (string.IsNullOrWhiteSpace(mtvText) == false)
+            {
+
+                CommonUtilities.CreateNewIndicatorTextValues(selectedDomain, mtvText, properties, nextIndicatorId,
+                    _userName, _profileRepository);
+
+                _profileRepository.CreateGroupingAndMetaData(_reader.GetProfileDetails(selectedProfileId).Id,
+                    Convert.ToInt32(selectedDomain),
+                    nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator,
+                    selectedComparatorMethod,
+                    Convert.ToDouble(selectedComparatorConfidence), selectedYearType, selectedYearRange,
+                    selectedValueType, selectedCiMethodType,
+                    Convert.ToSingle(selectedCiConfidenceLevel), selectedPolarityType, selectedUnitType,
+                    selectedDenominatorType, startYear, endYear,
+                    startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId);
+            }
+
             return nextIndicatorId;
         }
-       
+
         public ActionResult RedirectToNew(string redirectUrl, string areaType)
         {
             return RedirectToAction("SortPageAndFilter", "ProfilesAndIndicators",
@@ -579,7 +579,7 @@ namespace Fpm.MainUI.Controllers
                 };
         }
 
-   
+
         private IEnumerable<SelectListItem> GetFpmUserList()
         {
             return new SelectList(_userRepository.GetAllFpmUsers()
@@ -590,9 +590,9 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-           _profileRepository = new ProfileRepository();
-           _userRepository = new UserRepository();
-           _lookUpsRepository = new LookUpsRepository();
+            _profileRepository = new ProfileRepository();
+            _userRepository = new UserRepository();
+            _lookUpsRepository = new LookUpsRepository();
 
             base.OnActionExecuting(filterContext);
         }
@@ -602,13 +602,13 @@ namespace Fpm.MainUI.Controllers
             _profileRepository.Dispose();
             _userRepository.Dispose();
             _lookUpsRepository.Dispose();
-            
+
             base.OnActionExecuted(filterContext);
         }
 
 
 
 
-         
+
     }
 }

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 
-namespace Fpm.Upload
+namespace FingertipsUploadService.Upload
 {
     public class DataUploadValidation
     {

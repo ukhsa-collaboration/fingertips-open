@@ -1,7 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     public class LongerLivesHelper
     {
@@ -42,7 +42,7 @@ namespace MainUISeleniumTest
             searchBox.SendKeys(text);
             searchBox.Click();
 
-            new WaitFor(driver).PracticeProfilesSearchResultsToBeDisplayed();
+            waitFor.AutoCompleteSearchResultsToBeDisplayed();
 
             searchBox.SendKeys(Keys.Return);
         }

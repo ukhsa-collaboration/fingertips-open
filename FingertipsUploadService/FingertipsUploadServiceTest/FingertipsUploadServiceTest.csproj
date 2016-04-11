@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,7 +37,17 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -53,7 +64,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="UploadWorkerTest.cs" />
+    <Compile Include="AutoMapperConfig.cs" />
+    <Compile Include="WorkerTestBase.cs" />
+    <Compile Include="SimpleJobWorkerTest.cs" />
+    <Compile Include="FilePathHelperTest.cs" />
+    <Compile Include="BatchJobWorkerTest.cs" />
     <Compile Include="UploadManagerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,11 +77,25 @@
       <Project>{7b7a48e8-3cc7-4bd1-a2d6-77a8f4cff381}</Project>
       <Name>FingertipsUploadService</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProfileData\ProfileData.csproj">
+      <Project>{DB5CE84B-BE14-44BB-A83E-506FFDF58094}</Project>
+      <Name>ProfileData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Upload\Upload.csproj">
       <Project>{a028ee38-7d6d-4014-b91d-f3cdb46613a0}</Project>
       <Name>Upload</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+    <None Include="TestFiles\batch-indicator-upload-duplicate-rows.xlsx" />
+    <None Include="TestFiles\batch-indicator-upload-new-data.xlsx" />
+    <None Include="TestFiles\upload-simple-duplicate-row-in-file.xlsx" />
+    <None Include="TestFiles\upload-simple-duplicate-row-in-pholio.xlsx" />
+    <None Include="TestFiles\upload-simple-new-data.xlsx" />
+  </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

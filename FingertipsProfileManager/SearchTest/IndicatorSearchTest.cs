@@ -4,7 +4,7 @@ using Fpm.ProfileData;
 using Fpm.Search;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace SearchTest
+namespace Fpm.SearchTest
 {
     [TestClass]
     public class IndicatorSearchTest

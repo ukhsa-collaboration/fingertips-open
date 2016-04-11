@@ -162,6 +162,7 @@
     <property name="Id" column="id"/>
     <property name="Easting" column="easting"/>
     <property name="Northing" column="northing"/>
+    <property name="AreaCode6" column="areacode6"/>
     <property name="AreaCode19" column="areacode19"/>
     <property name="AreaCode46" column="areacode46"/>
     <property name="AreaCode101" column="areacode101"/>
@@ -474,6 +475,14 @@
       <generator class="identity"/>
     </id>
     <property name="NhsChoicesId" column="NhsChoicesId"/>
+  </class>
+
+  <!-- Chimat reource ID mapping -->
+  <class name="AreaCodeChimatResourceIdMapping" table="l_areacodechimatresource">
+    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ChimatResourceId" column="ChimatResourceId"/>
   </class>
 
   <!-- ProfilePdf-->

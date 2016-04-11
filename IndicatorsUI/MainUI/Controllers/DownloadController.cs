@@ -5,7 +5,6 @@ using System.Web.Mvc;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 using System.Net.Mime;
-using Profiles.MainUI.Common;
 
 namespace Profiles.MainUI.Controllers
 {

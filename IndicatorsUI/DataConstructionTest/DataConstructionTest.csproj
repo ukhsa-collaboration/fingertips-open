@@ -6,8 +6,8 @@
     <ProjectGuid>{AAAE3632-9944-4E7B-8A80-EC33DD00B3A8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DataConstructionTest</RootNamespace>
-    <AssemblyName>DataConstructionTest</AssemblyName>
+    <RootNamespace>IndicatorsUI.DataConstructionTest</RootNamespace>
+    <AssemblyName>IndicatorsUI.DataConstructionTest</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>

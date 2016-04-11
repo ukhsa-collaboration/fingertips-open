@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.SearchIndexing;
 
-namespace SearchIndexingTest
+namespace PholioVisualisation.SearchIndexingTest
 {
     [TestClass]
     public class IndicatorSearchIndexBuilderTest
@@ -18,7 +18,7 @@ namespace SearchIndexingTest
         }
 
         [TestMethod]
-        public void TestBuildPlacePostcodes()
+        public void TestBuildIndicatorSearchIndex()
         {
             var builder = new IndicatorSearchIndexBuilder(ApplicationConfiguration.SearchIndexDirectory);
             SearchIndexingTestHelper.BuildIndexesThenCheckIndexFolderExists(builder,

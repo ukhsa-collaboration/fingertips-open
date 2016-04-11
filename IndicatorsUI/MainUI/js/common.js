@@ -246,16 +246,16 @@ ftHistory = (function () {
     _hashChange = 'hashchange',
     _location = window.location;
 
-    //
-    // Either return the URL hash or null if none defined
-    // 
-    var getHash = function () {
-        var bits = _location.href.split('#');
-        return bits.length === 2 ?
-                bits[1] : null;
-    };
-
     return {
+
+        //
+        // Either return the URL hash or null if none defined
+        // 
+        getHash : function () {
+            var bits = _location.href.split('#');
+            return bits.length === 2 ?
+                    bits[1] : null;
+        },
 
         //
         // Initialises the history object.
@@ -277,11 +277,8 @@ ftHistory = (function () {
         },
 
         isParameterDefinedInHash: function (parameterName) {
-            var hash = getHash();
-            if (hash) {
-                return !!hash[parameterName];
-            }
-            return false;
+            var hash = this.getKeyValuePairsFromHash();
+            return !!hash[parameterName];
         },
 
         //
@@ -289,7 +286,7 @@ ftHistory = (function () {
         //
         getKeyValuePairsFromHash: function () {
 
-            var hashString = getHash();
+            var hashString = this.getHash();
             return this.parseParameterString(hashString);
         },
 
@@ -466,36 +463,3 @@ function exportTableAsImage(containerId, fileNamePrefix, legends) {
         $(containerId + ' .columnSort').show();
     }
 }
-
-function GetTrendMarkerImage(trendMarker, polarity) {
-    var imageName;
-    var altText;
-    var lowIsGood = PolarityIds.RAGLowIsGood;
-    switch (trendMarker) {
-        case TrendMarkerValue.Up:
-            imageName = 'up_' + (polarity === lowIsGood ? 'red' : 'green');
-            altText = "Upward - " + (polarity === lowIsGood ? 'negative' : 'positive') + ' trend';
-            break;
-        case TrendMarkerValue.Down:
-            imageName = 'down_' + (polarity === lowIsGood ? 'green' : 'red');
-            altText = "Downward - " + (polarity === lowIsGood ? 'positive' : 'negative') + ' trend';
-            break;
-        case TrendMarkerValue.NoChange:
-            imageName = 'no_change';
-            altText = 'No Change';
-            break;
-        default:
-            imageName = 'no_calc';
-            altText = 'Cannot be calculated';
-            break;
-    }
-    return "<img src='\\images/trends/" + imageName + ".png" + "' title ='" +  altText + "'/>";
- } 
-
-
-
-
-
-
-
-

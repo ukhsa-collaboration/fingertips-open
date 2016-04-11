@@ -5,7 +5,7 @@ using System.Text;
 using System.Web.Mvc;
 using Profiles.DataAccess;
 using Profiles.DataConstruction;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Models;
 using Profiles.MainUI.Skins;
 using Profiles.DomainObjects;
@@ -80,8 +80,31 @@ namespace Profiles.MainUI.Controllers
             }
         }
 
+        protected ProfileDetails ConfigureFingertipsProfileAndPageModelWithProfileDetails(string profileKey)
+        {
+            ProfileDetails details = new ProfileDetailsBuilder(profileKey).Build();
+
+            if (details != null)
+            {
+                ConfigureWithProfile(details);
+                CheckSkinIsNotLongerLives();
+            }
+            return details;
+        }
+
+        private void CheckSkinIsNotLongerLives()
+        {
+            if (PageModel.Skin.IsLongerLives)
+            {
+                throw new FingertipsException("This view is not available for Longer Lives skin");
+            }
+        }
+
         protected void ConfigureWithProfile(ProfileDetails details)
         {
+            ViewBag.ProfileDetails = details;
+            ViewBag.ProfileUrlKey = details.ProfileUrlKey;
+
             if (PageModel != null)
             {
                 PageModel.ProfileId = details.Id;
@@ -100,14 +123,13 @@ namespace Profiles.MainUI.Controllers
                     ViewBag.Title = details.Title;
                 }
 
-                ViewBag.ProfileDetails = details;
-                ViewBag.ProfileUrlKey = details.ProfileUrlKey;
                 ViewBag.DefaultAreaType = details.DefaultAreaType;
                 PageModel.RagColourId = details.RagColourId;
-                PageModel.ArePdfs = details.ArePdfs;
                 PageModel.StartZeroYAxis = details.StartZeroYAxis;
                 PageModel.DefaultFingertipsTabId = details.DefaultFingertipsTabId;
                 PageModel.HasTrendMarkers = details.HasTrendMarkers;
+                PageModel.UseTargetBenchmarkByDefault = details.UseTargetBenchmarkByDefault;
+                PageModel.AreAnyPdfsForProfile = details.ArePdfs;
 
                 ViewBag.EnumParentDisplay = details.EnumParentDisplay;
                 ViewBag.ExtraJsFiles = details.ExtraJavaScriptFiles;
@@ -123,6 +145,8 @@ namespace Profiles.MainUI.Controllers
 
                 ViewBag.FingertipsUrl = new FingertipsUrl(appConfig).Host;
                 PageModel.IsOfficialStatistics = details.IsOfficialStatistics;
+                PageModel.IsProfileWithOnlyStaticReports = details.IsProfileWithOnlyStaticReports;
+                ViewBag.StaticReportsTimePeriods = details.StaticReportsTimePeriods ?? string.Empty;
 
                 PageModel.SpineChartMinMaxLabel = new SpineChartMinMaxLabelBuilder(
                     details.SpineChartMinMaxLabel, 

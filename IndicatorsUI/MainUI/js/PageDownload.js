@@ -7,6 +7,12 @@
 * Entry point to displaying download page
 * @class goToDownloadPage
 */
+download = {};
+
+/**
+* Entry point to displaying download page
+* @class goToDownloadPage
+*/
 function goToDownloadPage() {
     if (!groupRoots.length) {
         noDataForAreaType();
@@ -16,7 +22,7 @@ function goToDownloadPage() {
         ajaxMonitor.setCalls(1);
         getArePdfsAvailable();
         ajaxMonitor.monitor(displayDownload);
-    }    
+    }
 }
 
 /**
@@ -26,7 +32,7 @@ function goToDownloadPage() {
 function getArePdfsAvailable() {
     var model = FT.model;
     var key = getArePdfsKey();
-    
+
     if (!loaded.arePdfs[key]) {
         var parameters = new ParameterBuilder(
         ).add('profile_id', model.profileId
@@ -45,9 +51,9 @@ function getArePdfsAvailable() {
 
 /**
 * Returns true if PDFs are available for the user to download.
-* @class isPdfAvailable
+* @class isPdfAvailableForCurrentAreaType
 */
-function isPdfAvailable() {
+function isPdfAvailableForCurrentAreaType() {
     return loaded.arePdfs[getArePdfsKey()];
 }
 
@@ -94,12 +100,12 @@ function displayDownload() {
     var noPdfsMessage = null;
     if (model.profileId === ProfileIds.SearchResults) {
         noPdfsMessage = 'search results';
-    } else if (!isPdfAvailable(model)) {
+    } else if (!isPdfAvailableForCurrentAreaType(model)) {
         noPdfsMessage = areaTypeName;
     }
 
     var areaName = areaHash[FT.model.areaCode].Name;
-    var pdfHtml = arePdfs ?
+    var pdfHtml = areAnyPdfsForProfile ?
         templates.render('pdf', {
             noPdfsMessage: noPdfsMessage,
             images: imgUrl,
@@ -118,7 +124,7 @@ function displayDownload() {
         parentCode: model.parentCode,
         showSubnational: !isParentCountry(),
         isNotNN: !FT.model.isNearestNeighbours(),
-        excelExportText: excelExportText === null ? '' : excelExportText
+        excelExportText: download.excelExportText
     });
 
     pages.getContainerJq().html(pdfHtml + excelHtml);
@@ -134,7 +140,22 @@ function displayDownload() {
 */
 function exportPdf(areaCode) {
     downloadCachedPdf(areaCode);
-    logEvent('Download', 'PDF', areaHash[areaCode].Name);
+
+    // areaHash will not be defined for health profiles area search
+    if (areaHash) {
+        logEvent('Download', 'PDF', areaHash[areaCode].Name);
+    }
+}
+
+/**
+* Download a child health PDF from the Chimat site.
+* @class downloadChildHealthPdf
+*/
+function downloadChildHealthPdf(areaCode) {
+    ajaxGet('data/chimat_resource_id', 'area_code=' + areaCode,
+        function (resourceId) {
+            window.open('http://www.chimat.org.uk/resource/view.aspx?RID=' + resourceId, '_blank');
+        });
 }
 
 /**
@@ -144,16 +165,42 @@ function exportPdf(areaCode) {
 function downloadCachedPdf(areaCode) {
 
     var profileId = FT.model.profileId;
+    var url;
 
-    if (profileId === ProfileIds.Liver) {
-        // Liver profiles
-        var url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
-    } else {
-        url = FT.url.pdf + profileUrlKey /*global set elsewhere*/ +
-            '/' + areaCode + '.pdf';
+    // Child Health profiles are hosted on Chimat site
+    if (profileId === ProfileIds.ChildHealth) {
+        downloadChildHealthPdf(areaCode);
+        return;
     }
 
+    if (FT.isProfileWithOnlyStaticReports) {
+        // Static reports
+        url = FT.url.corews + 'static-reports?profile_key=' + profileUrlKey + '&file_name=' + areaCode + '.pdf';
+
+        if (download.timePeriod) {
+            // Add time period parameter to url
+            url = url + '&time_period=' + download.timePeriod;
+
+            // Reset time period
+            download.timePeriod = null;
+        }
+    }
+    else if (profileId === ProfileIds.Liver) {
+        // Liver profiles
+        url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
+    } else {
+        url = getPdfUrl(areaCode);
+    }
     window.open(url.toLowerCase(), '_blank');
+}
+
+/**
+* Gets the URL for a PDF.
+* @class getPdfUrl
+*/
+function getPdfUrl(areaCode) {
+    return FT.url.pdf + profileUrlKey /*global set elsewhere*/ +
+    '/' + areaCode + '.pdf';
 }
 
 pages.add(PAGE_MODES.DOWNLOAD, {
@@ -167,9 +214,9 @@ pages.add(PAGE_MODES.DOWNLOAD, {
 
 templates.add('pdf',
     '<div><img src="{{images}}download/{{fileName}}"{{#isAvailable}} class="pdf" onclick="exportPdf(\'{{areaCode}}\', {{profileId}})"{{/isAvailable}}/></div>\
-<div id="download-text" class="text"><h2>Area profile</h2>\
+<div id="pdf-download-text" class="text"><h2>Area profile</h2>\
 {{^noPdfsMessage}}<p>Download a detailed profile of the data for</p><a class="pdf" href="javascript:exportPdf(\'{{areaCode}}\', {{profileId}})">{{areaName}}</a>{{/noPdfsMessage}}\
-{{#noPdfsMessage}}PDF profiles are not<br>currently available<br>for {{{noPdfsMessage}}}{{/noPdfsMessage}}</div>');
+{{#noPdfsMessage}}<p>PDF profiles are not currently available for {{{noPdfsMessage}}}</p>{{/noPdfsMessage}}</div>');
 
 templates.add('excel',
     '<div><img src="{{images}}download/excel.png"/></div>\
@@ -184,4 +231,8 @@ templates.add('excel',
 */
 loaded.arePdfs = {};
 
-excelExportText = null;
+// Text for extra message to be displayed on test site
+download.excelExportText = '';
+
+// Optional if a time period needs to be specified for a PDF
+download.timePeriod = null;

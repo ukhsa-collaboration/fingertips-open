@@ -3,7 +3,7 @@ using OpenQA.Selenium;
 using Profiles.DomainObjects;
 using System.Linq;
 
-namespace MainUISeleniumTest.Fingertips
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class PracticeProfilesTest : FingertipsBaseUnitTest
@@ -101,13 +101,11 @@ namespace MainUISeleniumTest.Fingertips
         private void SearchForAndGoToPractice(string area)
         {
             waitFor.PageToFinishLoading();
-            var searchBox = driver.FindElement(By.Id("searchText"));
-           
-            searchBox.Click();
 
-            // Enter practice code in search box
+            var searchBox = driver.FindElement(By.Id("searchText"));          
+            searchBox.Click();
             searchBox.SendKeys(area);
-            waitFor.PracticeProfilesSearchResultsToBeDisplayed();
+            waitFor.AutoCompleteSearchResultsToBeDisplayed();
             searchBox.SendKeys(Keys.Return);
 
             // Wait for search results

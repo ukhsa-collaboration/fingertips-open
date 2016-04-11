@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
-namespace MainUISeleniumTest
+namespace Fpm.MainUISeleniumTest
 {
     [TestClass]
     public class ProfilesAndIndicatorsTest : BaseUnitTest

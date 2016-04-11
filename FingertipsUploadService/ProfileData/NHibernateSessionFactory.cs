@@ -60,9 +60,9 @@ namespace FingertipsUploadService.ProfileData
         {
             if (staticSessionFactory == null)
             {
-                var assemblyNames = new List<string>()
+                var assemblyNames = new List<string>
                 {
-                    "Fpm.ProfileData"
+                    "FingertipsUploadService.ProfileData"
                 };
                 staticSessionFactory = new NHibernateSessionFactory(assemblyNames).sessionFactory;
             }

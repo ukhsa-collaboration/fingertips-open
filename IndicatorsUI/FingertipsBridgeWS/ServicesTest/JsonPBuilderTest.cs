@@ -5,7 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FingertipsBridgeWS.Services;
 
-namespace ServicesTest
+namespace IndicatorsUI.ServicesTest
 {
     [TestClass]
     public class JsonPBuilderTest

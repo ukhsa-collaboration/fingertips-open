@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PdfData;
 using PholioVisualisation.PholioObjects;
 
-namespace PdfDataTest
+namespace PholioVisualisation.PdfDataTest
 {
     /// <summary>
     /// Much of DomainNationalValuesBuilder is covered by SpineChartDataBuilderTest

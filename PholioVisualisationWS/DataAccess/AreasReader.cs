@@ -12,6 +12,7 @@ namespace PholioVisualisation.DataAccess
     public interface IAreasReader
     {
         IList<ParentAreaGroup> GetParentAreaGroups(int profileId);
+        IList<ParentAreaGroup> GetParentAreaGroups(int profileId, int childAreaTypeId);
         Area GetAreaFromCode(string code);
         IList<Area> GetAreasFromCodes(IEnumerable<string> codes);
         IList<Area> GetAreasByAreaTypeId(int areaTypeId);
@@ -60,6 +61,7 @@ namespace PholioVisualisation.DataAccess
         CategoryType GetCategoryType(int categoryTypeId);
         IList<CategoryType> GetCategoryTypes(IList<int> categoryTypeIds);
         string GetNhsChoicesAreaId(string areaCode);
+        int GetChimatResourceId(string areaCode);
         IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId);
         IList<AreaCodeNeighbourMapping> GetNearestNeighbours(string areaCode);
 
@@ -98,6 +100,14 @@ namespace PholioVisualisation.DataAccess
             .List<ParentAreaGroup>();
         }
 
+        public virtual IList<ParentAreaGroup> GetParentAreaGroups(int profileId, int childAreaTypeId)
+        {
+            return CurrentSession.CreateCriteria<ParentAreaGroup>()
+            .Add(Restrictions.Eq("ProfileId", profileId))
+            .Add(Restrictions.Eq("ChildAreaTypeId", childAreaTypeId))
+            .List<ParentAreaGroup>();
+        }
+
         public virtual Area GetAreaFromCode(string code)
         {
             IQuery q = CurrentSession.CreateQuery("from Area a where a.Code = :code");
@@ -111,7 +121,7 @@ namespace PholioVisualisation.DataAccess
         {
             if (area == null)
             {
-                throw new FingertipsException("Area cannot be found: " + code);
+                throw new FingertipsException("Area cannot be found: '" + code + "'");
             }
         }
 
@@ -310,7 +320,6 @@ namespace PholioVisualisation.DataAccess
             return result;
         }
 
-
         public IList<CategorisedArea> GetCategorisedAreasForOneCategory(int parentAreaTypeId, int childAreaTypeId, int categoryTypeId, int categoryId)
         {
 
@@ -393,6 +402,15 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<AreaCodeNhsMapping>();
 
             return mapping == null ? string.Empty : mapping.NhsChoicesId;
+        }
+
+        public int GetChimatResourceId(string areaCode)
+        {
+            var mapping = CurrentSession.CreateCriteria<AreaCodeChimatResourceIdMapping>()
+                .Add(Restrictions.Eq("AreaCode", areaCode))
+                .UniqueResult<AreaCodeChimatResourceIdMapping>();
+
+            return mapping == null ? ChimatResourceIds.NotFound : mapping.ChimatResourceId;
         }
 
         public IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId)

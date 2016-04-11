@@ -40,35 +40,38 @@ namespace FingertipsDataExtractionTool
             var allProfiles = _profileReader.GetAllProfiles();
             foreach (var profile in allProfiles)
             {
-                if (profile.ShouldBuildExcel && profile.IsNational)
+                if (ShouldExcelFilesBeBuiltForProfile(profile))
                 {
                     var childAreaTypeIds = GetChildAreaTypeIdsForProfile(profile.ProfileId);
 
                     foreach (var childAreaTypeId in childAreaTypeIds)
                     {
-                        // Ignore Practice data
-                        if (childAreaTypeId != AreaTypeIds.GpPractice)
+                        var parentAreaTypeIds = _areaTypeListProvider
+                            .GetParentAreaTypeIdsUsedInProfile(profile.ProfileId, childAreaTypeId);
+
+                        foreach (var parentAreaTypeId in parentAreaTypeIds)
                         {
-                            var parentAreaTypeIds = _areaTypeListProvider
-                                .GetParentAreaTypeIdsUsedInProfile(profile.ProfileId);
+                            _logger.Info("Creating Excel file with " +
+                                GetProfileDetailsText(profile.ProfileId,
+                                parentAreaTypeId, childAreaTypeId));
+                            var watch = new ExcelFileTimer(_logger);
 
-                            foreach (var parentAreaTypeId in parentAreaTypeIds)
-                            {
-                                _logger.Info("Creating Excel file with " +
-                                    GetProfileDetailsText(profile.ProfileId,
-                                    parentAreaTypeId, childAreaTypeId));
-                                var watch = new ExcelFileTimer(_logger);
+                            CreateExcelFilesForCoreProfiles(profile.ProfileId, childAreaTypeId,
+                                parentAreaTypeId);
 
-                                CreateExcelFilesForCoreProfiles(profile.ProfileId, childAreaTypeId,
-                                    parentAreaTypeId);
-
-                                watch.Stop();
-                            }
+                            watch.Stop();
                         }
                     }
                 }
             }
             _logger.Info("Core profiles generation completed.");
+        }
+
+        private static bool ShouldExcelFilesBeBuiltForProfile(ProfileConfig profile)
+        {
+            return profile.ShouldBuildExcel && 
+                profile.IsNational &&
+                profile.ProfileId != ProfileIds.PracticeProfiles;
         }
 
         private void CreateExcelFilesForCoreProfiles(int profileId, int areaTypeId, int subnationalAreaTypeId)

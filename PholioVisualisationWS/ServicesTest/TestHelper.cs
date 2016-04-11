@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ServicesTest
+namespace PholioVisualisation.ServicesTest
 {
     public class TestHelper
     {

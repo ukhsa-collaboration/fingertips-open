@@ -1,4 +1,4 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
@@ -12,7 +12,7 @@
 
 <div id="content">
     <div class="home_intro clearfix">
-        @CommonUtilities.GetContent("home-header", Model.ProfileId)
+        @ContentProvider.GetContent("home-header", Model.ProfileId)
     </div>
 
     @Html.Partial("_SearchArea")

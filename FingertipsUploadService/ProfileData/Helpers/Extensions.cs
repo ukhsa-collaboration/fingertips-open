@@ -1,15 +1,9 @@
-﻿using FingertipsUploadService.ProfileData.Entities.Profile;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace FingertipsUploadService.ProfileData.Helpers
 {
     public static class Extensions
     {
-
-        public static void SetPropertyValue(this IndicatorMetadataTextValue obj, string propName, object value)
-        {
-            obj.GetType().GetProperty(propName).SetValue(obj, value, null);
-        }
 
         public static IEnumerable<IEnumerable<T>> Batch<T>(this IEnumerable<T> collection, int batchSize)
         {

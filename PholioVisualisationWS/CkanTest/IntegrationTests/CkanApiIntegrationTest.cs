@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CkanTest.IntegrationTests
+namespace PholioVisualisation.CkanTest.IntegrationTests
 {
     [TestClass]
     public class CkanApiIntegrationTest

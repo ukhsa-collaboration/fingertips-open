@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DataAccess;
 
-namespace DataAccessTest
+namespace IndicatorsUI.DataAccessTest
 {
     [TestClass]
     public class ReaderFactoryTest

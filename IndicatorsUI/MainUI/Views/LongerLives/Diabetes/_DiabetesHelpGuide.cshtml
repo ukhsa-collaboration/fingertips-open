@@ -1,5 +1,5 @@
-﻿@using Profiles.MainUI.Common
+﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 <div class="map-overlay">
-    @CommonUtilities.GetContent("help-guide", Model.ProfileId)
+    @ContentProvider.GetContent("help-guide", Model.ProfileId)
 </div>

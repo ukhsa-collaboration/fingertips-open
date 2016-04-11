@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System.Collections.Generic;
 
-namespace ProfileDataTest
+namespace FingertipsUploadService.ProfileDataTest
 {
     [TestClass]
     public class AllowedDataTest
@@ -34,7 +34,7 @@ namespace ProfileDataTest
         public void TestAllDataAreLazyLoaded()
         {
             var reader = new Mock<ProfilesReader>(MockBehavior.Strict);
-            var validData = new AllowedData(reader.Object);
+            new AllowedData(reader.Object);
             reader.VerifyAll();
         }
     }

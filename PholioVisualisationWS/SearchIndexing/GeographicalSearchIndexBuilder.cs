@@ -15,8 +15,12 @@ namespace PholioVisualisation.SearchIndexing
 
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
+        /// <summary>
+        /// IMPORTANT: To add an area type you must also change the AddParentAreaCodes method below.
+        /// </summary>
         private readonly List<int> parentAreaTypeIds = new List<int>
             {
+                AreaTypeIds.GoRegion,
                 AreaTypeIds.CountyAndUnitaryAuthority,
                 AreaTypeIds.Ccg,
                 AreaTypeIds.DistrictAndUnitaryAuthority,
@@ -159,7 +163,10 @@ namespace PholioVisualisation.SearchIndexing
 
         private void AddParentAreaCodes(PostcodeParentAreas parentAreas, Document doc)
         {
-            var areaCode = parentAreas.AreaCode102;
+            var areaCode = parentAreas.AreaCode6;
+            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.GoRegion);
+
+            areaCode = parentAreas.AreaCode102;
             AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.CountyAndUnitaryAuthority);
 
             areaCode = parentAreas.AreaCode101;

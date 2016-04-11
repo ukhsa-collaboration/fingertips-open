@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.JobError">
+
+  <class name="UploadJobError" table="uploadjoberror">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="JobGuid" column="jobguid"/>
+    <property name="ErrorType" column="errortype"/>
+    <property name="ErrorText" column="errortext" type="StringClob"/>
+    <property name="ErrorJson" column="errorjson" type="StringClob"/>
+    <property name="CreatedAt" column="createdat"/>
+  </class>
+</hibernate-mapping>

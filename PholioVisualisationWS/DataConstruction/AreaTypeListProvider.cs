@@ -21,6 +21,7 @@ namespace PholioVisualisation.DataConstruction
         IList<AreaType> GetChildAreaTypesUsedInProfiles(IEnumerable<int> profileIds);
         IList<int> GetChildAreaTypeIdsUsedInProfiles(IEnumerable<int> profileIds);
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId);
+        IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetCategoryTypeIdsUsedInProfile(int profileId);
     }
 
@@ -40,16 +41,17 @@ namespace PholioVisualisation.DataConstruction
 
         public List<int> GetAllAreaTypeIdsUsedInProfile(int profileId)
         {
-            var allAreaTypeIds = new List<int>();
             var compositeChildAreaTypeIds = GetChildAreaTypeIdsUsedInProfiles(
                 new List<int> { profileId });
             var childAreaTypeIds = new AreaTypeIdSplitter(compositeChildAreaTypeIds).Ids;
-            var parentAreaTypeIds = GetParentAreaTypeIdsUsedInProfile(profileId);
 
+            var compositeParentAreaTypeIds = GetParentAreaTypeIdsUsedInProfile(profileId);
+            var parentAreaTypeIds = new AreaTypeIdSplitter(compositeParentAreaTypeIds).Ids;
+
+            var allAreaTypeIds = new List<int>();
             allAreaTypeIds.AddRange(childAreaTypeIds);
             allAreaTypeIds.AddRange(parentAreaTypeIds);
             allAreaTypeIds.Add(AreaTypeIds.Country);
-
             return allAreaTypeIds;
         }
 
@@ -64,6 +66,26 @@ namespace PholioVisualisation.DataConstruction
             var allGroupIds = GetAllGroupIdsBelongingToProfiles(profileIds);
             var areaTypeIds = groupDataReader.GetDistinctGroupingAreaTypeIds(allGroupIds);
             return areaTypeIds;
+        }
+
+        public IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId, int childAreaTypeId)
+        {
+            var parentAreaGroups = areasReader.GetParentAreaGroups(profileId, childAreaTypeId);
+
+            if (parentAreaGroups.Any() == false)
+            {
+                // Use generic parents
+                parentAreaGroups = areasReader.GetParentAreaGroups(ProfileIds.Undefined, childAreaTypeId);
+            }
+
+            var parentAreaTypeIds = parentAreaGroups
+                .Where(x => x.ParentAreaTypeId != null)
+                .Select(x => x.ParentAreaTypeId)
+                .Distinct()
+                .Cast<int>()
+                .ToList();
+
+            return parentAreaTypeIds;
         }
 
         public IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId)

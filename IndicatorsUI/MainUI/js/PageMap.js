@@ -404,7 +404,7 @@ function NEPHOMaps() {
     }
 
     var backgroundLayer = false;
-    this.fillOpacity = 0.7;
+    this.fillOpacity = 1.0;
 
     this.initMap = function (id, areaType) {
         this.map = L.map(id);
@@ -696,7 +696,7 @@ function NEPHOMaps() {
         }
 
         // Blues
-        if (polarityId === 99) {
+        if (polarityId === PolarityIds.BlueOrangeBlue) {
             return function (sig) {
                 // Blues
                 return sig === 1 ? c.bobLower :
@@ -1050,8 +1050,8 @@ function buildChartTitle() {
     var root = groupRoots[getIndicatorIndex()],
         unit = ui.getMetadataHash()[root.IID].Unit,
         unitLabel = !String.isNullOrEmpty(unit.Label) ? unit.Label + ', ' : '',
-        period = getFirstGrouping(root).Period;
-    return '<p style="font-size: 11px;font-weight: 500;">' + mapState.metadata.ValueType.Label + ' - ' + unitLabel + period + '</p>';
+        period = getFirstGrouping(root).Period;        
+        return mapState.metadata.ValueType.Label + ' - ' + unitLabel + period;   
 }
 
 function addMapBarChart() {
@@ -1305,14 +1305,8 @@ function exportMapChart() {
             width: 490,
             events: {
                 load: function () {
-
-                    var menus = FT.menus;
-                    var root = groupRoots[getIndicatorIndex()];
-                    var indicatorName = ui.getMetadataHash()[root.IID].Descriptive.Name + new SexAndAge().getLabel(root);
-                    var chartTitle = buildChartTitle();
-
-                    this.renderer.text('<b>Distribution of ' + menus.areaType.getName() + 's in ' +
-                        getCurrentComparator().Name + ' for ' + indicatorName + ' (' + chartTitle + ')</b>', 250, 15)
+                    var title = getTitle();
+                    this.renderer.text(title, 250, 15)
                                 .attr({
                                     align: 'center'
                                 })
@@ -1331,12 +1325,25 @@ function exportMapChart() {
 function exportMap() {
     if (isIE8()) {
         browserUpgradeMessage();
-    } else {
+    } else {          
         $('.leaflet-top').hide(); // hide the map options buttons
-        var mapContainer = $('.leaflet-zoom-animated');
+        var title = getTitle();
+        // Add title div
+        $('<div id="map-export-title" style="text-align: center; font-family:Arial;">' + title + '</div>').appendTo('#maps_map');
+        var mapContainer = $('#maps_map');
         saveElementAsImage(mapContainer, 'Map');
+        $('#map-export-title').remove(); // Remove title div
         $('.leaflet-top').show(); // restore the map options
     }
+}
+
+function getTitle() {
+    var menus = FT.menus;
+    var root = groupRoots[getIndicatorIndex()];
+    var indicatorName = ui.getMetadataHash()[root.IID].Descriptive.Name + new SexAndAge().getLabel(root);
+    var chartTitle = buildChartTitle();
+    var title = '<b>Map of ' + menus.areaType.getName() + 's in ' + getCurrentComparator().Name + ' for ' + indicatorName + '<br/> (' + chartTitle + ')</b>';
+    return title;
 }
 
 var baseMaps = [

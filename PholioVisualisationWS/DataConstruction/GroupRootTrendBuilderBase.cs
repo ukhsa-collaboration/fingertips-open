@@ -21,7 +21,7 @@ namespace PholioVisualisation.DataConstruction
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         private PholioReader pholioReader = ReaderFactory.GetPholioReader();
         private CoreDataProcessor dataProcessor;
-        
+
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
         public static GroupRootTrendBuilderBase New(Grouping grouping, IndicatorMetadata indicatorMetadata)
@@ -70,20 +70,15 @@ namespace PholioVisualisation.DataConstruction
                 {
                     var categoryTypeId = categoryArea.CategoryTypeId;
 
-                    // Currently deprivation deciles are the only category areas expected to provide trend data
-                    if (categoryTypeId != CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority &&
-                        categoryTypeId != CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority &&
-                        categoryTypeId != CategoryTypeIds.DeprivationDecileGp2010 &&
-                        categoryTypeId != CategoryTypeIds.DeprivationDecileGp2015)
-                    {
-                        throw new FingertipsException("Unexpected Category Type ID for trend data");
-                    }
+                    CheckCategoryTypeIsAllowedForTrendData(categoryTypeId);
 
-                    comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, trendReader.GetTrendDataForSpecificCategory(Grouping, AreaCodes.England, categoryTypeId, categoryArea.CategoryId));
+                    var categoryAreaDataList = trendReader.GetTrendDataForSpecificCategory(Grouping, AreaCodes.England, categoryTypeId, categoryArea.CategoryId);
+                    comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, categoryAreaDataList);
                 }
                 else
                 {
-                    comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, trendReader.GetTrendData(Grouping, comparator.Area.Code));
+                    var comparatorAreaDataList = trendReader.GetTrendData(Grouping, comparator.Area.Code);
+                    comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, comparatorAreaDataList);
                 }
             }
 
@@ -104,9 +99,27 @@ namespace PholioVisualisation.DataConstruction
                     }
                 }
                 hasData = true;
-                trendRoot.DataPoints[areaCode] = periods.Select(period => GetPoint(root, period)).ToList();
 
-             
+                // Create trend data points
+                IList<TrendDataPoint> trendDataPoints = new List<TrendDataPoint>();
+                foreach (var timePeriod in periods)
+                {
+                    var dataPoint = GetDataAtSpecificTimePeriod(dataList, timePeriod)
+                        ?? CoreDataSet.GetNullObject(areaCode);
+                    var significances = AssignSignificanceToTrendDataPoint(dataPoint, Grouping, timePeriod);
+
+                    // Need to assess count before data is truncated
+                    var isCountValid = dataPoint.IsCountValid;
+
+                    dataProcessor.FormatAndTruncate(dataPoint);
+                    var trendDataPoint = new TrendDataPoint(dataPoint)
+                    {
+                        Significance = significances,
+                        IsCountValid = isCountValid
+                    };
+                    trendDataPoints.Add(trendDataPoint);
+                }
+                trendRoot.DataPoints[areaCode] = trendDataPoints;
             }
 
             trendRoot.TrendMarkers = root.TrendMarkers;
@@ -128,10 +141,24 @@ namespace PholioVisualisation.DataConstruction
             return trendRoot;
         }
 
+        /// <summary>
+        /// Currently deprivation deciles are the only category areas expected to provide trend data
+        /// </summary>
+        private static void CheckCategoryTypeIsAllowedForTrendData(int categoryTypeId)
+        {
+            if (categoryTypeId != CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority &&
+                categoryTypeId != CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority &&
+                categoryTypeId != CategoryTypeIds.DeprivationDecileGp2010 &&
+                categoryTypeId != CategoryTypeIds.DeprivationDecileGp2015)
+            {
+                throw new FingertipsException("Unexpected Category Type ID for trend data");
+            }
+        }
+
         private void AssignPeriods(TrendRoot trendRoot)
         {
             trendRoot.Periods = periods.Select(p =>
-                new SpecifiedTimePeriodFormatter {TimePeriod = p}.Format(IndicatorMetadata)).ToList();
+                new SpecifiedTimePeriodFormatter { TimePeriod = p }.Format(IndicatorMetadata)).ToList();
         }
 
         private void CreateComparers()
@@ -163,11 +190,10 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        protected TrendDataPoint GetPoint(GroupRoot root, TimePeriod period)
+        protected Dictionary<int, Significance> AssignSignificanceToTrendDataPoint(
+            CoreDataSet data, Grouping grouping, TimePeriod period)
         {
-            CoreDataSet data = GetFormattedPointValueData(period, dataList);
-
-            TrendDataPoint point = new TrendDataPoint(data);
+            Dictionary<int, Significance> sig = new Dictionary<int, Significance>();
 
             if (comparer is ICategoryComparer == false)
             {
@@ -177,12 +203,12 @@ namespace PholioVisualisation.DataConstruction
                     var comparatorId = keyValuePair.Key;
                     CoreDataSet comparatorCoreData =
                         GetDataAtSpecificTimePeriod(keyValuePair.Value, period);
-                    point.Significance.Add(comparatorId,
-                        comparer.Compare(data, comparatorCoreData, IndicatorMetadata));
+                    var significance = comparer.Compare(data, comparatorCoreData, IndicatorMetadata);
+                    sig.Add(comparatorId, significance);
                 }
             }
 
-            //Compare quintiles
+            // Category comparison
             if (comparer is ICategoryComparer)
             {
                 ICategoryComparer categoryComparer = comparer as ICategoryComparer;
@@ -190,9 +216,10 @@ namespace PholioVisualisation.DataConstruction
                 Area nationalArea = areasReader.GetAreaFromCode(AreaCodes.England);
                 Area regionalArea = areasReader.GetAreaFromCode(data.AreaCode);
 
-                var nationalComparatorValues = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(root.FirstGrouping, nationalArea, period);
-                var rootComparatorValues = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(root.FirstGrouping, regionalArea, period);
-                
+                var provider = new CoreDataSetListProvider(groupDataReader);
+                var nationalComparatorValues = provider.GetChildAreaData(grouping, nationalArea, period);
+                var rootComparatorValues = provider.GetChildAreaData(grouping, regionalArea, period);
+
                 // Compare against benchmarks
                 foreach (KeyValuePair<int, IList<CoreDataSet>> keyValuePair in comparatorIdToComparatorTrendData)
                 {
@@ -213,7 +240,7 @@ namespace PholioVisualisation.DataConstruction
 
                     categoryComparer.SetDataForCategories(comparatorValues);
 
-                    point.Significance.Add(comparatorId, (Significance)categoryComparer.GetCategory(data));
+                    sig.Add(comparatorId, (Significance)categoryComparer.GetCategory(data));
                 }
             }
 
@@ -234,7 +261,7 @@ namespace PholioVisualisation.DataConstruction
                     {
                         var bespokeComparer = targetComparer as BespokeTargetPercentileRangeComparer;
 
-                        var nationalValues = groupDataReader.GetCoreDataForAllAreasOfType(root.FirstGrouping, period);
+                        var nationalValues = groupDataReader.GetCoreDataForAllAreasOfType(grouping, period);
                         var percentileCalculator = new BespokeTargetPercentileRangeCalculator(nationalValues.Where(x => x.IsValueValid).Select(x => x.Value).ToList());
 
                         bespokeComparer.LowerTargetPercentileBenchmarkData =
@@ -242,28 +269,13 @@ namespace PholioVisualisation.DataConstruction
 
                         bespokeComparer.UpperTargetPercentileBenchmarkData =
                             new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetUpperTargetPercentile()) };
-
                     }
                 }
 
-                point.Significance.Add(ComparatorIds.Target, targetComparer.CompareAgainstTarget(data));
+                sig.Add(ComparatorIds.Target, targetComparer.CompareAgainstTarget(data));
             }
 
-            return point;
-        }
-
-        private CoreDataSet GetFormattedPointValueData(TimePeriod period, IList<CoreDataSet> coreDataSetList)
-        {
-            CoreDataSet data = GetDataAtSpecificTimePeriod(coreDataSetList, period);
-            if (data == null)
-            {
-                var parentArea = new Area { Code = coreDataSetList.Select(x => x.AreaCode).FirstOrDefault() };
-                data = CoreDataSet.GetNullObject(parentArea.Code);
-            }
-
-            dataProcessor.FormatAndTruncate(data);
-
-            return data;
+            return sig;
         }
 
         private CoreDataSet GetFormattedValueData(TimePeriod period, IList<CoreDataSet> coreDataSetList, Grouping grouping,

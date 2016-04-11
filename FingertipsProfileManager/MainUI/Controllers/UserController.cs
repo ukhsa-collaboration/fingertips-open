@@ -1,18 +1,17 @@
-﻿using System;
+﻿using Fpm.MainUI.Helpers;
+using Fpm.MainUI.Models;
+using Fpm.ProfileData.Entities.User;
+using Fpm.ProfileData.Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
-using Fpm.MainUI.Models;
-using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.User;
-using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Controllers
 {
     public class UserController : Controller
     {
-        private UserRepository  _userRepository;
+        private UserRepository _userRepository;
 
         [AuthorizedUsers]
         public ActionResult UserIndex()

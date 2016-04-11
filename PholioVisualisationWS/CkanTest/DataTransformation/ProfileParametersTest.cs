@@ -7,7 +7,7 @@ using Moq;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
-namespace CkanTest.DataTransformation
+namespace PholioVisualisation.CkanTest.DataTransformation
 {
     [TestClass]
     public class ProfileParametersTest

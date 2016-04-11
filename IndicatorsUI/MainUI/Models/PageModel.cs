@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
-using Profiles.MainUI.Common;
+using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Skins;
 
 namespace Profiles.MainUI.Models
@@ -15,7 +15,7 @@ namespace Profiles.MainUI.Models
         public PageModel(AppConfig appConfig)
         {
             this.appConfig = appConfig;
-            ProfileId = -1;
+            ProfileId = ProfileIds.Undefined;
         }
 
         public PageType PageType = PageType.Undefined;
@@ -35,7 +35,6 @@ namespace Profiles.MainUI.Models
         public string BridgeServicesUrl { get; set; }
         public string CoreServicesUrl { get; set; }
         public string PageTitle { get; set; }
-        public string ProfileUrlKey { get; set; }
         public string IgnoredSpineChartAreas { get; set; }
         public string SpineLowest { get; set; }
         public string SpineHighest { get; set; }
@@ -44,13 +43,31 @@ namespace Profiles.MainUI.Models
 
         public bool UseMinifiedJavaScript { get; set; }
 
+        public string GetTwitterHandle()
+        {
+            if (skin.IsPhof)
+            {
+                return "PHoutcomes";
+            }
+
+            if (skin.IsLongerLives)
+            {
+                return "PHE_uk";
+            }
+
+            return "";
+        }
+
+        public bool IsOfficialStatistics { get; set; }
+        public bool HasTrendMarkers { get; set; }
+        public bool UseTargetBenchmarkByDefault { get; set; }
         public int RagColourId { get; set; }
         public SpineChartMinMaxLabelBuilder.MinMaxLabel SpineChartMinMaxLabel { get; set; }
       
         /// <summary>
         /// Whether or not PDFs are available for the profile.
         /// </summary>
-        public bool ArePdfs { get; internal set; }
+        public bool AreAnyPdfsForProfile { get; internal set; }
 
         public bool StartZeroYAxis { get; set; }
         public int DefaultFingertipsTabId { get; set; }
@@ -61,6 +78,8 @@ namespace Profiles.MainUI.Models
         public bool DisplayProfileTitle { get; set; }
 
         public bool HasExclusiveSkin { get; set; }
+
+        public bool IsProfileWithOnlyStaticReports { get; set; }
 
         public int ProfileId { get; set; }
 
@@ -114,20 +133,20 @@ namespace Profiles.MainUI.Models
             return skinViewPrefix + name + ".cshtml";
         }
 
-        private void InitSkinViewPrefix()
-        {
-            // Define this on first pass
-            skinViewPrefix = skin != null && skin.PartialViewFolder != null
-                ? "~/Views/" + skin.PartialViewFolder + "/"
-                : "~/Views/Shared/";
-        }
-
         public void SetJavaScriptVersionFolder(string folder)
         {
             string url = appConfig.StaticContentUrl + folder;
 
             JsPath = url + "js/";
             CssPath = url + "css/";
+        }
+
+        private void InitSkinViewPrefix()
+        {
+            // Define this on first pass
+            skinViewPrefix = skin != null && skin.PartialViewFolder != null
+                ? "~/Views/" + skin.PartialViewFolder + "/"
+                : "~/Views/Shared/";
         }
 
         private bool IsPageTitle()
@@ -144,23 +163,5 @@ namespace Profiles.MainUI.Models
             return "Public Health Profiles" + tagLine;
         }
 
-        public string GetTwitterHandle()
-        {
-            if (skin.IsPhof)
-            {
-                return "PHoutcomes";
-            }
-
-            if (skin.IsLongerLives)
-            {
-                return "PHE_uk";
-            }
-
-            return "";
-        }
-
-        public bool IsOfficialStatistics { get; set; }
-
-        public bool HasTrendMarkers { get; set; }
     }
 }

@@ -1,0 +1,54 @@
+﻿@using System.Web.Optimization
+@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
+@model PageModel
+
+@if (Model.ProfileId == ProfileIds.HealthProfiles || Model.IsProfileWithOnlyStaticReports)
+{
+    const int searchAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+    var labels = SearchLabels.New(searchAreaTypeId);
+
+    @* Area search title *@
+if (Model.ProfileId == ProfileIds.HealthProfiles)
+{
+    <h2>
+        Find your Health Profile
+    </h2>
+}
+else
+{
+    <h2>
+        Find reports for your area
+    </h2>
+}
+
+    @Html.Partial("Spinner")
+
+
+    <table id="area-search" style="display:none;">
+        <tr>
+            <td>Search by place name:</td>
+            <td>
+                <input id="area-search-text" type="text" class="search-watermark" name="search_text"
+                       value="@labels.Watermark" title="@labels.Watermark" />
+            </td>
+        </tr>
+        <tr><td>List areas by region:</td><td><select id="parent-area-menu"><option /></select></td></tr>
+    </table>
+    @Html.Partial("_SearchNoMatches")
+    @Html.Partial("_JsUrls")
+    @Styles.Render("~/bundles/css-area-search")
+    @Scripts.Render("~/bundles/js-area-search")
+    <script type="text/javascript">
+        // Globals
+        FT.model.areaTypeId = @searchAreaTypeId;
+        FT.model.profileId = @Model.ProfileId;
+        templateProfileId = -1;
+        FT.version = '@ViewBag.JavaScriptVersion';
+
+        // Initialisation
+        $(document).ready(function() {
+            areaSearch.init();
+        });
+    </script>
+}

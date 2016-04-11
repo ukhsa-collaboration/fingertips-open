@@ -1,5 +1,5 @@
 ﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Common
+@using Profiles.MainUI.Helpers
 @{ Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml"; }
 @section headContent {
     <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
@@ -29,7 +29,7 @@
         <div id="info_box_1" class="info_box" style="@style">
             @if (@Model.ProfileId == ProfileIds.DrugsAndAlcohol)
             {        
-                @CommonUtilities.GetContent("page-rankings-no-of-alcohol-dependent-people", Model.ProfileId)                    
+                @ContentProvider.GetContent("page-rankings-no-of-alcohol-dependent-people", Model.ProfileId)                    
             }
         </div>
             
@@ -84,7 +84,7 @@
                 <img class="download" src="@(ViewBag.ImagesUrl)Mortality/download.png" />
             </span>
             <h5 class="posttext">Download</h5>
-            @CommonUtilities.GetContent(ContentKeys.DownloadLink, Model.ProfileId)
+            @ContentProvider.GetContent(ContentKeys.DownloadLink, Model.ProfileId)
             <ul>
                 <li id="download_data_for_england"></li>
                 <li id="download_data_for_ccg"></li>

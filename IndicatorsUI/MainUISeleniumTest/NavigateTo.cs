@@ -1,31 +1,38 @@
-﻿using MainUISeleniumTest.Fingertips;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 
-namespace MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest
 {
     public class NavigateTo
     {
         public static string BaseUrl = AppConfig.Instance.BridgeWsUrl;
 
         private IWebDriver driver;
+        private WaitFor waitFor;
 
         public NavigateTo(IWebDriver driver)
         {
             this.driver = driver;
+            waitFor = new WaitFor(driver);
         }
 
         public void FingertipsDataForProfile(string profileUrlKey)
         {
             GoToUrl("profile/" + profileUrlKey + "/data");
-            new WaitFor(driver).FingertipsTartanRugToLoad();
+            waitFor.FingertipsTartanRugToLoad();
+        }
+
+        public void FingertipsFrontPageForProfile(string profileUrlKey)
+        {
+            GoToUrl("profile/" + profileUrlKey);
+            waitFor.FingertipsProfileFrontPageToLoad();
         }
 
         public void FingertipsDataForPracticeProfiles(string profileUrlKey)
         {
             GoToUrl("profile/" + profileUrlKey + "/data");
-            new WaitFor(driver).GoogleMapToLoad();
+            waitFor.GoogleMapToLoad();
         }
 
         public void JavaScriptTestPage(string testPage)
@@ -36,7 +43,7 @@ namespace MainUISeleniumTest
         public void MortalityHome()
         {
             GoToUrl("topic/mortality");
-            new WaitFor(driver).GoogleMapToLoad();
+            waitFor.GoogleMapToLoad();
         }
 
         public void MortalityRankings()
@@ -52,7 +59,7 @@ namespace MainUISeleniumTest
         public void DiabetesHome()
         {
             GoToUrl("topic/diabetes");
-            new WaitFor(driver).GoogleMapToLoad();
+            waitFor.GoogleMapToLoad();
         }
 
         public void DiabetesPracticeDetails(string hashParameters)

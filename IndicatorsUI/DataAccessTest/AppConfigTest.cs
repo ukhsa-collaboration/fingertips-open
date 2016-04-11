@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 
-namespace DataAccessTest
+namespace IndicatorsUI.DataAccessTest
 {
     [TestClass]
     public class AppConfigTest

@@ -4,7 +4,7 @@
 using PholioVisualisation.PdfData;
 using PholioVisualisation.PholioObjects;
 
-namespace PdfDataTest
+namespace PholioVisualisation.PdfDataTest
 {
     [TestClass]
     public class HealthProfilesSupportingInformationBuilderTest

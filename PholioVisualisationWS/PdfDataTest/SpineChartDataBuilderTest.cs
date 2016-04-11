@@ -7,7 +7,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.PdfData;
 using PholioVisualisation.PholioObjects;
 
-namespace PdfDataTest
+namespace PholioVisualisation.PdfDataTest
 {
     [TestClass]
     public class SpineChartDataBuilderTest
@@ -77,7 +77,10 @@ namespace PdfDataTest
             foreach (var spineChartTableData in Data())
             {
                 isPolaritySet = spineChartTableData.IndicatorData
-                    .Any(x => x.PolarityId == PolarityIds.UseBlues);
+                    .Any(x => 
+                        x.PolarityId == PolarityIds.UseBlues ||
+                        x.PolarityId == PolarityIds.RagLowIsGood ||
+                        x.PolarityId == PolarityIds.RagHighIsGood);
             }
 
             Assert.IsTrue(isPolaritySet);

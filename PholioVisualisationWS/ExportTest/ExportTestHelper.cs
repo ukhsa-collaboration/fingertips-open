@@ -1,6 +1,6 @@
 ﻿using SpreadsheetGear;
 
-namespace ExportTest
+namespace PholioVisualisation.ExportTest
 {
     public class ExportTestHelper
     {

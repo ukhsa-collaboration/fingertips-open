@@ -20,6 +20,7 @@
     <property name="EnumParentDisplay" column="enum_parent_display"/>
     <property name="RagColourId" column="key_colour_id"/>
     <property name="AreasToIgnoreForSpineCharts" column="areas_ignored_for_spine_chart"/>
+    <property name="AreasToIgnoreEverywhere" column="areas_ignored_everywhere"/>
     <property name="SkinId" column="skin_id"/>
     <property name="HasOwnFrontPage" column="has_own_front_page"/>
     <property name="LeadProfileForCollectionId" column="lead_profile_for_collection_id"/>
@@ -28,7 +29,10 @@
     <property name="HasTrendMarkers" column="has_trend_markers"/>
     <property name="AccessControlGroup" column="access_control_group"/>
     <property name="IsOfficialStatistics" column="is_official_statistics"/>
-    
+    <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
+    <property name="IsProfileWithOnlyStaticReports" column="is_profile_with_only_static_reports"/>
+    <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
+
     <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
     <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/> 
     
