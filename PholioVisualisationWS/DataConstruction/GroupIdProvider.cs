@@ -42,7 +42,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 // Ensure group IDs are in correct order
                 return ReaderFactory.GetGroupDataReader()
-                    .GetGroupMetadata(profile.GroupIds)
+                    .GetGroupMetadataList(profile.GroupIds)
                     .Select(x => x.Id)
                     .ToList();
             }

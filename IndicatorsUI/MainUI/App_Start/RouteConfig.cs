@@ -248,6 +248,18 @@ namespace Profiles.MainUI
                     urlKey = UrlParameter.Optional
                 }
                 );
+
+            routes.MapRoute(
+                "SingleProfileSupportingPage", // Route name
+                "profile/{urlKey}/supporting-information/{contentKey}", // URL with parameters
+                new
+                {
+                    controller = "SingleProfileWithFrontPage",
+                    action = "SupportingPage",
+                    urlKey = UrlParameter.Optional,
+                    contentKey = UrlParameter.Optional
+                }
+                );
         }
 
         private static void AddProfileCollectionRoutes(RouteCollection routes)
@@ -272,6 +284,18 @@ namespace Profiles.MainUI
                     action = "Data",
                     leadProfileUrlKey = UrlParameter.Optional,
                     profileUrlKey = UrlParameter.Optional
+                }
+                );
+
+            routes.MapRoute(
+                "ProfileCollectionAreaSearchResultsPage", // Route name
+                "profile-group/{leadProfileUrlKey}/profile/{profileKey}/area-search-results/{areaCodeList}", // URL with parameters
+                new
+                {
+                    controller = "AreaSearch",
+                    action = "AreaSearchResults",
+                    place_name = UrlParameter.Optional,
+                    search_type = UrlParameter.Optional
                 }
                 );
 
@@ -498,7 +522,7 @@ namespace Profiles.MainUI
         {
             routes.MapRoute(
                 "AjaxBridgeData", // Route name
-                "data/{serviceAction}", // URL with parameters
+                "data/{serviceAction1}", // URL with parameters
                 new
                 {
                     controller = "AjaxBridge",
@@ -508,7 +532,59 @@ namespace Profiles.MainUI
 
             routes.MapRoute(
                 "AjaxBridgeDataForPdfs", // Route name
-                "data/pdf/{serviceAction}", // URL with parameters
+                "data/{serviceAction1}/{serviceAction2}", // URL with parameters
+                new
+                {
+                    controller = "AjaxBridge",
+                    action = "Data"
+                }
+                );
+
+
+            routes.MapRoute(
+                "ApiDocs", // Route name
+                "api", // URL with parameters
+                new
+                {
+                    controller = "SwaggerBridge",
+                    action = "ApiDocsPage"
+                }
+                );
+
+            routes.MapRoute(
+                "ApiServiceDetails", // Route name
+                "swagger/docs/v1", // URL with parameters
+                new
+                {
+                    controller = "SwaggerBridge",
+                    action = "ApiServiceDetails"
+                }
+                );
+
+            routes.MapRoute(
+                "ApiAsset", // Route name
+                "api/asset/{part1}/{part2}", // URL with parameters
+                new
+                {
+                    controller = "SwaggerBridge",
+                    action = "ApiAsset",
+                    part2 = UrlParameter.Optional
+                }
+                );
+
+            routes.MapRoute(
+                "AjaxBridgeApi", // Route name
+                "api/{serviceAction1}", // URL with parameters
+                new
+                {
+                    controller = "AjaxBridge",
+                    action = "Data"
+                }
+                );
+
+            routes.MapRoute(
+                "AjaxBridgeApiForPdfs", // Route name
+                "api/{serviceAction1}/{serviceAction2}", // URL with parameters
                 new
                 {
                     controller = "AjaxBridge",

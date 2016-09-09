@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using System;
 
 namespace Fpm.MainUISeleniumTest
 {
     public class WaitFor
     {
         private IWebDriver driver;
+        public const int TimeoutLimitInSeconds = 30;
+
 
         public WaitFor(IWebDriver driver)
         {
@@ -26,6 +25,15 @@ namespace Fpm.MainUISeleniumTest
         {
             SeleniumHelper.WaitForExpectedElement(driver,
                 By.Id("Confirm"));
+        }
+
+        /// <summary>
+        /// Wait for an element to be present on the page.
+        /// </summary>
+        public void ExpectedElementToBePresent(By element)
+        {
+            new WebDriverWait(driver, TimeSpan.FromSeconds(TimeoutLimitInSeconds))
+                .Until(ExpectedConditions.ElementExists(element));
         }
     }
 }

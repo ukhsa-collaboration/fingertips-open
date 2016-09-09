@@ -12,81 +12,137 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.SearchQuerying
 {
+    public enum ResultsToInclude
+    {
+        PlaceNamesAndPostcodesOnly,
+        ParentAreasOnly,
+        PlaceNamesAndPostcodesAndParentAreas
+    }
+
+
     public class GeographicalSearch : SearchEngine
     {
         public bool AreEastingAndNorthingRetrieved = true;
-        public bool ExcludeCcGs = false;
 
-        public List<GeographicalSearchResult> SearchPlacePostcodes(string searchText, int childAreaTypeId)
+        private readonly TextInfo _textInfo= CultureInfo.CurrentCulture.TextInfo;
+
+        public List<GeographicalSearchResult> SearchPlacePostcodes(string searchText, 
+            int polygonAreaTypeId, IList<int> parentAreaTypesToInclude)
         {
-            var searchResults = new List<GeographicalSearchResult>();
-
             var userSearch = new SearchUserInput(searchText);
 
             if (userSearch.IsQueryValid)
             {
-                var textInfo = CultureInfo.CurrentCulture.TextInfo;
-                var isPostcode = userSearch.ContainsAnyNumbers;
+                // Search polygon area type
+                bool includePolygonAreaType = parentAreaTypesToInclude.Any() && parentAreaTypesToInclude.Contains(polygonAreaTypeId);
+                var resultsToInclude = includePolygonAreaType
+                    ? ResultsToInclude.PlaceNamesAndPostcodesAndParentAreas
+                    : ResultsToInclude.PlaceNamesAndPostcodesOnly;
+                var searchResults = GetSearchResults(userSearch, polygonAreaTypeId, resultsToInclude);
 
-                // Setup the fields to search through
-                BooleanQuery finalQuery = isPostcode ?
-                    GetPostcodeQuery(userSearch.SearchText, FieldNames.Postcode) :
-                    GetPlaceNameQuery(userSearch, childAreaTypeId);
-
-                // Perform the search
-                var directory = FSDirectory.Open(new DirectoryInfo(
-                    Path.Combine(ApplicationConfiguration.SearchIndexDirectory, "placePostcodes")));
-                var searcher = new IndexSearcher(directory, true);
-
-                //Add the sorting parameters
-                var sortBy = new Sort(
-                    new SortField(FieldNames.PlaceTypeWeighting, SortField.INT, true)
-                   );
-                var docs = searcher.Search(finalQuery, null, ShortResultCount, sortBy);
-
-                int resultCount = docs.ScoreDocs.Length;
-                for (int i = 0; i < resultCount; i++)
+                // Extra parent areas
+                var extraParentAreaTypesToSearchFor = parentAreaTypesToInclude.Where(x => x != polygonAreaTypeId);
+                foreach (var parentAreaTypeId in extraParentAreaTypesToSearchFor)
                 {
-                    ScoreDoc scoreDoc = docs.ScoreDocs[i];
+                    var parentSearchResults = GetSearchResults(userSearch, parentAreaTypeId,
+                        ResultsToInclude.ParentAreasOnly);
 
-                    Document doc = searcher.Doc(scoreDoc.Doc);
-
-                    var name = isPostcode ?
-                        doc.Get(FieldNames.Postcode).ToUpper() :
-                        doc.Get(FieldNames.NameFormatted);
-
-                    var geographicalSearchResult = new GeographicalSearchResult
-                    {
-                        PlaceName = name,
-                        County = textInfo.ToTitleCase(doc.Get(FieldNames.County)),
-                        PolygonAreaCode = doc.Get("Parent_Area_Code_" + childAreaTypeId),
-                        PolygonAreaName = doc.Get("Parent_Area_Name_" + childAreaTypeId)
-                    };
-
-                    // Check parent area code was found
-                    if (geographicalSearchResult.PolygonAreaCode == null)
-                    {
-                        throw new FingertipsException(string.Format(
-                            "Area type id not supported for search: {0}", childAreaTypeId));
-                    }
-
-                    AssignEastingAndNorthing(doc, geographicalSearchResult);
-
-                    if (!ExcludeCcGs)
-                    {
-                        searchResults.Add(geographicalSearchResult);
-                    }
-                    else
-                    {
-                        if (geographicalSearchResult.Easting != 0 && geographicalSearchResult.Northing != 0)
-                        {
-                            searchResults.Add(geographicalSearchResult);
-                        }
-                    }
+                    searchResults.InsertRange(0, parentSearchResults);
                 }
+
+                return searchResults;
             }
 
+            return new List<GeographicalSearchResult>();
+        }
+
+        private List<GeographicalSearchResult> GetSearchResults(SearchUserInput userSearch, int polygonAreaTypeId, ResultsToInclude resultsToInclude)
+        {
+            var isPostcode = userSearch.ContainsAnyNumbers;
+
+            // Setup the fields to search through
+            BooleanQuery finalQuery = isPostcode
+                ? GetPostcodeQuery(userSearch.SearchText, FieldNames.Postcode)
+                : GetPlaceNameQuery(userSearch, polygonAreaTypeId);
+
+            // Perform the search
+            var directory = FSDirectory.Open(new DirectoryInfo(
+                Path.Combine(ApplicationConfiguration.SearchIndexDirectory, "placePostcodes")));
+            var searcher = new IndexSearcher(directory, true);
+
+            //Add the sorting parameters
+            var sortBy = new Sort(
+                new SortField(FieldNames.PlaceTypeWeighting, SortField.INT, true)
+                );
+            var docs = searcher.Search(finalQuery, null, ShortResultCount, sortBy);
+
+            List<GeographicalSearchResult> searchResults = new List<GeographicalSearchResult>();
+            int resultCount = docs.ScoreDocs.Length;
+            for (int i = 0; i < resultCount; i++)
+            {
+                ScoreDoc scoreDoc = docs.ScoreDocs[i];
+
+                Document doc = searcher.Doc(scoreDoc.Doc);
+
+                var geographicalSearchResult = NewGeographicalSearchResult(doc, polygonAreaTypeId, isPostcode);
+
+                CheckPolygonAreaCodeIsDefined(polygonAreaTypeId, geographicalSearchResult);
+
+                AssignEastingAndNorthing(doc, geographicalSearchResult);
+
+                AddResultIfRequired(resultsToInclude, geographicalSearchResult, searchResults);
+            }
             return searchResults;
+        }
+
+        private GeographicalSearchResult NewGeographicalSearchResult(Document doc, int polygonAreaTypeId, bool isPostcode)
+        {
+            var name = GetName(isPostcode, doc);
+
+            var geographicalSearchResult = new GeographicalSearchResult
+            {
+                PlaceName = name,
+                County = _textInfo.ToTitleCase(doc.Get(FieldNames.County)),
+                PolygonAreaCode = doc.Get("Parent_Area_Code_" + polygonAreaTypeId),
+                PolygonAreaName = doc.Get("Parent_Area_Name_" + polygonAreaTypeId)
+            };
+            return geographicalSearchResult;
+        }
+
+        private static string GetName(bool isPostcode, Document doc)
+        {
+            var name = isPostcode
+                ? doc.Get(FieldNames.Postcode).ToUpper()
+                : doc.Get(FieldNames.NameFormatted);
+            return name;
+        }
+
+        private static void AddResultIfRequired(ResultsToInclude resultsToInclude,
+            GeographicalSearchResult geographicalSearchResult, List<GeographicalSearchResult> searchResults)
+        {
+            bool addResult = true;
+            switch (resultsToInclude)
+            {
+                case ResultsToInclude.ParentAreasOnly:
+                    addResult = geographicalSearchResult.AreCoordinatesValid() == false;
+                    break;
+                case ResultsToInclude.PlaceNamesAndPostcodesOnly:
+                    addResult = geographicalSearchResult.AreCoordinatesValid();
+                    break;
+            }
+            if (addResult)
+            {
+                searchResults.Add(geographicalSearchResult);
+            }
+        }
+
+        private static void CheckPolygonAreaCodeIsDefined(int childAreaTypeId, GeographicalSearchResult geographicalSearchResult)
+        {
+            if (geographicalSearchResult.PolygonAreaCode == null)
+            {
+                throw new FingertipsException(string.Format(
+                    "Area type id not supported for search: {0}", childAreaTypeId));
+            }
         }
 
         private void AssignEastingAndNorthing(Document doc, GeographicalSearchResult pp)

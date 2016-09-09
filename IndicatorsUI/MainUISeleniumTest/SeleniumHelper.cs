@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Configuration;
+using OpenQA.Selenium.Firefox;
 
 namespace IndicatorsUI.MainUISeleniumTest
 {
@@ -32,8 +33,8 @@ namespace IndicatorsUI.MainUISeleniumTest
             return new List<IWebDriver>
             {
                /* new InternetExplorerDriver(new InternetExplorerOptions{IgnoreZoomLevel = true}),  We cannot test IE as we don't have admin rights on our machines to change Zoom Level */
-                // new FirefoxDriver(GetFirefoxProfile()) ,
-                new ChromeDriver(ConfigurationManager.AppSettings["ChromeDriver"])                
+                new FirefoxDriver()
+                //new ChromeDriver(ConfigurationManager.AppSettings["DriverPath"])                
             };
         }
 

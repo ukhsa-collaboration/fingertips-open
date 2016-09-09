@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using FingertipsUploadService.Helpers;
 using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Core;
@@ -83,5 +82,6 @@ namespace FingertipsUploadService
             var fpmUser = _profilesReader.GetUserByUserId(job.UserId);
             job.Username = fpmUser.UserName;
         }
+
     }
 }

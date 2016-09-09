@@ -5,11 +5,11 @@ namespace PholioVisualisation.DataConstruction
 {
     public abstract class CoreDataSetProvider
     {
-        protected IArea area;
+        protected IArea Area;
 
         protected CoreDataSetProvider(IArea area)
         {
-            this.area = area;
+            Area = area;
         }
 
         public abstract CoreDataSet GetData(Grouping grouping, TimePeriod timePeriod,

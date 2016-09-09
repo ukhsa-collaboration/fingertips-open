@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var builder = new NullTimePeriodTextListBuilder();
             builder.Add(new TimePeriod());
-            Assert.IsNull(builder.ToList());
+            Assert.IsNull(builder.GetTimePeriodStrings());
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 
 namespace PholioVisualisation.ServiceActions
@@ -20,7 +21,10 @@ namespace PholioVisualisation.ServiceActions
             Dictionary<string, object> responseObjects = new Dictionary<string, object>();
 
             responseObjects.Add("Code", areaCode);
+
+            // Quinary population
             responseObjects.Add("Values", builder.Values);
+            responseObjects.Add("Labels", ReaderFactory.GetPholioReader().GetQuinaryPopulationLabels());
 
             // Practice specific information
             if (builder.EthnicityText != null)

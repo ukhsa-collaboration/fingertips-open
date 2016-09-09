@@ -21,7 +21,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var parameters = new NameValueCollection();
             parameters.Add(ParameterNames.AreaTypeId, AreaTypeIds.CountyAndUnitaryAuthority.ToString());
-            parameters.Add(ParameterNames.CategoryTypeId, CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority.ToString());
+            parameters.Add(ParameterNames.CategoryTypeId, CategoryTypeIds.DeprivationDecileCountyAndUA2010.ToString());
             parameters.Add(ParameterNames.ProfileIdFull, ProfileIds.LongerLives.ToString());
 
             var request = new Mock<HttpContextBase>();

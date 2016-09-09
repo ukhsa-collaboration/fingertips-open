@@ -74,15 +74,25 @@
     <Compile Include="CategoryType.cs" />
     <Compile Include="ChildAreasForPdfs.cs" />
     <Compile Include="ComparatorConfidence.cs" />
+    <Compile Include="ComparatorMethod.cs" />
+    <Compile Include="ComparatorSignificance.cs" />
     <Compile Include="ContentItem.cs" />
     <Compile Include="GroupRootSummary.cs" />
     <Compile Include="IArea.cs" />
     <Compile Include="IAreaType.cs" />
+
+    <Compile Include="IInequalitiesTrendOptions.cs" />
+    <Compile Include="InequalitiesTrendOption.cs" />
+    <Compile Include="InequalitiesTrendPoint.cs" />
+    <Compile Include="InequalitiesTrendRoot.cs" />
+
+    <Compile Include="INamedObject.cs" />
     <Compile Include="KeyMessageOverride.cs" />
     <Compile Include="NearByAreas.cs" />
     <Compile Include="NearestNeighbourArea.cs" />
     <Compile Include="NeighbourAreaType.cs" />
     <Compile Include="PlaceName.cs" />
+    <Compile Include="Polarity.cs" />
     <Compile Include="PostcodeParentAreas.cs" />
     <Compile Include="ProfilePdf.cs" />
     <Compile Include="ExceptionForStorage.cs" />
@@ -97,6 +107,7 @@
     <Compile Include="Sex.cs" />
     <Compile Include="TargetConfig.cs" />
     <Compile Include="TimeRange.cs" />
+    <Compile Include="TrendMarkerResult.cs" />
     <Compile Include="ValueNote.cs" />
     <Compile Include="ValueWithCIsData.cs" />
     <Compile Include="ConfidenceIntervalMethod.cs" />

@@ -9,16 +9,19 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "IID")]
         public int IndicatorId { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public int ValueTypeId { get; set; }
 
         [JsonIgnore]
         public int UnitId { get; set; }
 
         [JsonIgnore]
+        public int ConfidenceIntervalMethodId { get; set; }
+
+        [JsonIgnore]
         public int? DecimalPlacesDisplayed { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public int YearTypeId { get; set; }
 
         [JsonProperty]
@@ -27,14 +30,14 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public ValueType ValueType { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public YearType YearType { get; set; }
 
         [JsonProperty]
         public double ConfidenceLevel { get; set; }
 
-        [JsonProperty(PropertyName = "CIMethodId")]
-        public int ConfidenceIntervalMethodId { get; set; }
+        [JsonProperty]
+        public ConfidenceIntervalMethod ConfidenceIntervalMethod { get; set; }
 
         [JsonProperty]
         public IDictionary<string,string> Descriptive { get; set; }

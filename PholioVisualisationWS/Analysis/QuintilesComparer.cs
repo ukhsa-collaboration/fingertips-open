@@ -30,14 +30,14 @@ namespace PholioVisualisation.Analysis
                 return 0;
             }
 
-            int category = 1;
-            while (category <= 6)
+            int boundsIndex = 1;
+            while (boundsIndex <= 5)
             {
-                if (data.Value <= bounds[category])
+                if (data.Value <= bounds[boundsIndex])
                 {
-                    return category;
+                    return boundsIndex;
                 }
-                category++;
+                boundsIndex++;
             }
 
             throw new FingertipsException("Value does not fall within expected boundaries: " +

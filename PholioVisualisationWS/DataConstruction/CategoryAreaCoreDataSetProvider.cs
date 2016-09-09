@@ -14,7 +14,7 @@ namespace PholioVisualisation.DataConstruction
 
         public override CoreDataSet GetData(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata indicatorMetadata)
         {
-            return groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, (CategoryArea)area);
+            return groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, (CategoryArea)Area);
         }
     }
 }

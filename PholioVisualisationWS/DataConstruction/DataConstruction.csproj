@@ -75,8 +75,8 @@
     <Compile Include="ChildAreaListForCategoryAreaBuilder.cs" />
     <Compile Include="ChildAreasWithAddressesBuilder.cs" />
     <Compile Include="ContentProvider.cs" />
-    <Compile Include="CoreDataSetSorter.cs" />
     <Compile Include="DataConstructionDIRegistry.cs" />
+    <Compile Include="FilterChildAreaListProvider.cs" />
     <Compile Include="FullAreaData.cs" />
     <Compile Include="GpDeprivationDecileCoreDataSetProvider.cs" />
     <Compile Include="CcgPopulationProvider.cs" />
@@ -96,15 +96,16 @@
     <Compile Include="NearbyAreasBuilder.cs" />
     <Compile Include="NearestNeighbourAreaListBuilder.cs" />
     <Compile Include="NullAverageCalculator.cs" />
-    <Compile Include="ParentAreaGroupOrganiser.cs" />
+    <Compile Include="AreaTypesWithParentAreaTypesBuilder.cs" />
     <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
+    <Compile Include="PartitionTrendDataDictionaryBuilder.cs" />
     <Compile Include="PostcodeProvider.cs" />
     <Compile Include="ProfilePerIndicatorBuilder.cs" />
     <Compile Include="ProfileUrl.cs" />
     <Compile Include="RankDataList.cs" />
     <Compile Include="ShapeCoreDataSetProvider.cs" />
     <Compile Include="AreaHelper.cs" />
-    <Compile Include="AreaListBuilder.cs" />
+    <Compile Include="AreaListProvider.cs" />
     <Compile Include="CoreDataSetProvider.cs" />
     <Compile Include="CcgCoreDataSetProvider.cs" />
     <Compile Include="ChildAreaValuesBuilder.cs" />
@@ -130,11 +131,12 @@
     <Compile Include="SingleGroupingProvider.cs" />
     <Compile Include="SparklineRootBuilder.cs" />
     <Compile Include="TargetComparerHelper.cs" />
+    <Compile Include="TrendMarkersProvider.cs" />
+    <Compile Include="TrendMarkerWriter.cs" />
     <Compile Include="WeightedAverageCalculator.cs" />
     <Compile Include="ValueDataProcessor.cs" />
     <Compile Include="GroupRootFilter.cs" />
     <Compile Include="DataPointOffsetCalculator.cs" />
-    <Compile Include="AreaLabelsBuilder.cs" />
     <Compile Include="DataProcessor.cs" />
     <Compile Include="EthnicityLabelBuilder.cs" />
     <Compile Include="GroupData.cs" />
@@ -203,7 +205,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="DataConstruction.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

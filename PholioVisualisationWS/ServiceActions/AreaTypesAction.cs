@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
@@ -13,8 +14,13 @@ namespace PholioVisualisation.ServiceActions
 
         public IList<AreaType> GetResponse(IList<int> profileIds)
         {
-            return new AreaTypeListProvider(new GroupIdProvider(profileReader), areasReader, groupDataReader)
-                .GetChildAreaTypesUsedInProfiles(profileIds);
+            var areaTypeListProvider = new AreaTypeListProvider(new GroupIdProvider(profileReader), areasReader, groupDataReader);
+
+            if (profileIds.Any())
+            {
+                return areaTypeListProvider.GetChildAreaTypesUsedInProfiles(profileIds);
+            }
+            return areaTypeListProvider.GetAllAreaTypes();
         }
     }
 }

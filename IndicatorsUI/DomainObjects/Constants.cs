@@ -61,6 +61,8 @@ namespace Profiles.DomainObjects
         public const string HealthProfiles = "health-profiles";
         public const string SexualHealth = "sexualhealth";
         public const string PracticeProfiles = "general-practice";
+        public const string MarmotHealthyLifeExpectancy = "marmot-healthy-life-expectancy";
+        public const string MarmotIndicatorsForLocalAuthorities = "marmot-indicators";
     }
 
     public class ProfileIds

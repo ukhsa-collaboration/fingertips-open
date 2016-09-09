@@ -50,7 +50,7 @@ namespace PholioVisualisation.KeyMessages
             var sentenceData = new Dictionary<string, string>
             {
                 {"ComparisonText", comparisonText},
-                {"Area", data.AreaName}
+                {"Area", data.Area.Name}
             };
             return Render.StringToString(SentenceTemplate, sentenceData);
         }

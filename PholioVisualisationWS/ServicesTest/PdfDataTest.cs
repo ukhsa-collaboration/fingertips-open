@@ -36,7 +36,7 @@ namespace PholioVisualisation.ServicesTest
 
         private byte[] GetData(string path)
         {
-            var url = TestHelper.BaseUrl + "data/pdf/" + path;
+            var url = TestHelper.BaseUrl + "api/pdf/" + path;
             return new WebClient().DownloadData(url);
         }
 

@@ -51,25 +51,19 @@ namespace FingertipsDataExtractionTool
             {
                 case "1":
                 case "excel":
-                    try
-                    {
-                        _excelFileDeleter.DeleteAllExistingFiles();
-                        _excelFileGenerator.Generate();
-                        _practiceProfilesExcelFileGenerator.Generate();
-                    }
-                    catch (Exception ex)
-                    {
-                        NLogHelper.LogException(_logger, ex);
-                        ExceptionLog.LogException(ex, null);
-                    }
+                    GenerateExcelFiles();
                     break;
                 case "2":
+                case "coredataset":
+                    CalculateCoreDataSetAverages();
                     break;
                 default:
                     Main(null);
                     break;
             }
         }
+
+
 
         public void Init()
         {
@@ -83,7 +77,35 @@ namespace FingertipsDataExtractionTool
             Console.Clear();
             Console.WriteLine("Please select from the following options");
             Console.WriteLine("1- Generate Excel files");
-            Console.WriteLine("2- Exit");
+            Console.WriteLine("2- Calculate CoreDataSet Averages");
+            Console.WriteLine("3- Exit");
+        }
+
+        private void GenerateExcelFiles()
+        {
+            try
+            {
+                _excelFileDeleter.DeleteAllExistingFiles();
+                _excelFileGenerator.Generate();
+                _practiceProfilesExcelFileGenerator.Generate();
+            }
+            catch (Exception ex)
+            {
+                NLogHelper.LogException(_logger, ex);
+                ExceptionLog.LogException(ex, null);
+            }
+        }
+
+        private void CalculateCoreDataSetAverages()
+        {
+            try
+            {
+                Console.WriteLine("Processing CoreDataSet");
+            }catch(Exception ex)
+            {
+                NLogHelper.LogException(_logger, ex);
+                ExceptionLog.LogException(ex, null);
+            }
         }
     }
 }

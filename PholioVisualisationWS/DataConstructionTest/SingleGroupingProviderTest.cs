@@ -12,7 +12,7 @@ namespace PholioVisualisation.DataConstructionTest
     [TestClass]
     public class SingleGroupingProviderTest
     {
-        private int indicatorId = IndicatorIds.ChildrenInPoverty;
+        private int indicatorId = IndicatorIds.ChildrenInLowIncomeFamilies;
         private int sexId = SexIds.Persons;
         private int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
         private int ageId = AgeIds.Under16;
@@ -30,7 +30,7 @@ namespace PholioVisualisation.DataConstructionTest
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(),
                 groupIdProvider.Object);
 
-            var grouping = provider.GetGrouping(ProfileIds.Phof, 
+            var grouping = provider.GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Phof, 
                 AreaTypeIds.CountyAndUnitaryAuthority,
                 indicatorId, sexId, ageId);
 
@@ -47,7 +47,7 @@ namespace PholioVisualisation.DataConstructionTest
 
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(),
                 GroupIdProviderThatWontBeUsed());
-            var grouping = provider.GetGrouping(ProfileIds.Phof, groupId, areaTypeId, indicatorId, sexId, ageId);
+            var grouping = provider.GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Phof, groupId, areaTypeId, indicatorId, sexId, ageId);
 
             Assert.AreEqual(groupId, grouping.GroupId);
             AssertIdsAreSameAsRequested(grouping);
@@ -69,7 +69,7 @@ namespace PholioVisualisation.DataConstructionTest
 
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(),
                 groupIdProvider.Object);
-            var grouping = provider.GetGrouping(ProfileIds.Phof, groupId, areaTypeId, indicatorId, sexId, ageId);
+            var grouping = provider.GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Phof, groupId, areaTypeId, indicatorId, sexId, ageId);
 
             Assert.AreEqual(expectedGroupId, grouping.GroupId);
             AssertIdsAreSameAsRequested(grouping);
@@ -83,7 +83,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(), 
                 new GroupIdProvider(ReaderFactory.GetProfileReader()));
-            var grouping = provider.GetGrouping(ProfileIds.Undefined,
+            var grouping = provider.GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Undefined,
                 GroupIds.Search, areaTypeId, indicatorId, sexId, ageId);
 
             AssertIdsAreSameAsRequested(grouping);
@@ -94,7 +94,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(), 
                 new GroupIdProvider(ReaderFactory.GetProfileReader()));
-            var grouping = provider.GetGrouping(ProfileIds.Undefined, 1, 2, 3, 4, 5);
+            var grouping = provider.GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Undefined, 1, 2, 3, 4, 5);
             Assert.IsNull(grouping);
         }
 

@@ -13,13 +13,14 @@ namespace Fpm.ProfileDataTest.Respositories
         public void Init()
         {
             _uploadJobRepository = new UploadJobRepository();
+            _uploadJobRepository.DeleteAllJobs();
         }
 
         [TestMethod]
         public void TestGetJobsForCurrentUser()
         {
             var jobs = _uploadJobRepository.GetJobsForCurrentUser(11);
-            Assert.IsTrue(jobs.ToList().Count > 0);
+            Assert.IsTrue(jobs.ToList().Count == 0);
         }
 
         [TestMethod]

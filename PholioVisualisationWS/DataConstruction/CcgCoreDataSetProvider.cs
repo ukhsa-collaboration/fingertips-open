@@ -27,18 +27,18 @@ namespace PholioVisualisation.DataConstruction
 
         private CoreDataSet GetDataFromDatabase(Grouping grouping, TimePeriod timePeriod)
         {
-            return groupDataReader.GetCoreData(grouping, timePeriod, area.Code).FirstOrDefault();
+            return groupDataReader.GetCoreData(grouping, timePeriod, Area.Code).FirstOrDefault();
         }
 
         private CoreDataSet CalculateData(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata indicatorMetadata)
         {
             if (RuleShouldCcgAverageBeCalculatedForGroup.Validates(grouping))
             {
-                var dataList = coreDataSetListProvider.GetChildAreaData(grouping, area, timePeriod);
+                var dataList = coreDataSetListProvider.GetChildAreaData(grouping, Area, timePeriod);
 
                 if (dataList.Any())
                 {
-                    var population = ccgPopulationProvider.GetPopulation(area.Code);
+                    var population = ccgPopulationProvider.GetPopulation(Area.Code);
                     return new CcgAverageCalculator(dataList, population, indicatorMetadata).Average;
                 }
             }

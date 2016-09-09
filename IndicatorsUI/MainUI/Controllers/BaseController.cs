@@ -42,7 +42,7 @@ namespace Profiles.MainUI.Controllers
             PageModel.SetJavaScriptVersionFolder(versionFolder);
             PageModel.Skin = SkinFactory.GetSkin();
 
-            PageModel.ProfileCollection = new List<ProfileCollection>();
+            PageModel.ProfileCollections = new List<ProfileCollection>();
             PageModel.ProfileCollectionIdList = new int[] { };
 
             PageModel.NationalProfileCollection = ProfileCollectionBuilder.GetCollection(ProfileCollectionIds.NationalProfiles);
@@ -51,7 +51,6 @@ namespace Profiles.MainUI.Controllers
             ViewBag.ImagesUrl = appConfig.StaticContentUrl + versionFolder + "images/";
             ViewBag.PdfUrl = appConfig.PdfUrl;
             ViewBag.UseGoogleAnalytics = appConfig.UseGoogleAnalytics;
-            ViewBag.UseJsonp = appConfig.UseJsonp;
             ViewBag.JavaScriptVersion = versionFolder;
             ViewBag.ShowCancer = appConfig.ShowCancer;
             ViewBag.ShowNearestNeighbours = appConfig.ShowNearestNeighbours;
@@ -123,11 +122,13 @@ namespace Profiles.MainUI.Controllers
                     ViewBag.Title = details.Title;
                 }
 
+                PageModel.PageTitle = details.Title;
+
                 ViewBag.DefaultAreaType = details.DefaultAreaType;
                 PageModel.RagColourId = details.RagColourId;
                 PageModel.StartZeroYAxis = details.StartZeroYAxis;
                 PageModel.DefaultFingertipsTabId = details.DefaultFingertipsTabId;
-                PageModel.HasTrendMarkers = details.HasTrendMarkers;
+                PageModel.HasRecentTrends = details.HasRecentTrends;
                 PageModel.UseTargetBenchmarkByDefault = details.UseTargetBenchmarkByDefault;
                 PageModel.AreAnyPdfsForProfile = details.ArePdfs;
 
@@ -184,6 +185,22 @@ namespace Profiles.MainUI.Controllers
             {
                 ViewBag.DomainHeadings = details.Domains;
             }
+        }
+
+        public void SetProfileCollection(ProfileDetails details, string leadProfileUrlKey)
+        {
+            ViewBag.IsPageRootProfileCollection = true;
+            ViewBag.LeadProfileUrlKey = leadProfileUrlKey;
+
+            // Get appropriate profile details
+            var profileDetails = details.ProfileUrlKey == leadProfileUrlKey
+                ? details
+                : new ProfileDetailsBuilder(leadProfileUrlKey).Build();
+
+            var profileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), appConfig);
+
+            PageModel.ProfileCollections = new ProfileCollectionListBuilder(profileCollectionBuilder)
+                .GetProfileCollections(leadProfileUrlKey, profileDetails.ProfileCollectionIds);
         }
     }
 }

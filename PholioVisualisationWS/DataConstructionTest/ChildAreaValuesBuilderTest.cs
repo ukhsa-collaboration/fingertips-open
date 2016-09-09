@@ -110,7 +110,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AreaTypeId = grouping.AreaTypeId,
                 DataPointOffset = 0,
                 ParentAreaCode = CategoryArea.CreateAreaCode(
-                    CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 1),
+                    CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1),
                 ComparatorId = grouping.ComparatorId
             };
 

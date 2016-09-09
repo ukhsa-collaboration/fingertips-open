@@ -10,7 +10,7 @@ namespace PholioVisualisation.PdfDataTest
     public class LimitsWithStepTest
     {
         [TestMethod]
-        public void TestMethod1()
+        public void Test()
         {
             LimitsWithStep limitsWithStep = new LimitsWithStep(
                 new Limits{Min =1, Max = 2}, 3);

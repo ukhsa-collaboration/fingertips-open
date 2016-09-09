@@ -36,6 +36,7 @@
     opacity: 0.50; /*IE9, etc*/
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
     filter: alpha(opacity=50); /*IE6-7*/
+    z-index: 1;
 }
 #infoBox
 {

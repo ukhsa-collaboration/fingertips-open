@@ -377,34 +377,34 @@ describe('ValueDisplayer', function () {
     });
 });
 
-describe('SearchText', function () {
+describe('SearchTextValidator', function () {
 
     it('valid text available unchanged', function () {
-        expect(new SearchText('a').text).toEqual('a');
+        expect(new SearchTextValidator('a').text).toEqual('a');
     });
 
     it('hyphen replaced with space', function () {
-        expect(new SearchText('a-b').text).toEqual('a b');
+        expect(new SearchTextValidator('a-b').text).toEqual('a b');
     });
 
     it('+ replaced with and', function () {
-        expect(new SearchText('a+b').text).toEqual('a and b');
+        expect(new SearchTextValidator('a+b').text).toEqual('a and b');
     });
 
     it('& replaced with and', function () {
-        expect(new SearchText('a&b').text).toEqual('a and b');
+        expect(new SearchTextValidator('a&b').text).toEqual('a and b');
     });
 
     it('non alphanumerics removed', function () {
-        expect(new SearchText('a"b').text).toEqual('ab');
+        expect(new SearchTextValidator('a"b').text).toEqual('ab');
     });
 
     it('isTextOk false if matches place holder text', function () {
-        expect(new SearchText('Indicator keywords').isOk).toEqual(false);
+        expect(new SearchTextValidator('Indicator keywords').isOk).toEqual(false);
     });
 
     it('isTextOk true', function () {
-        expect(new SearchText('a').isOk).toEqual(true);
+        expect(new SearchTextValidator('a').isOk).toEqual(true);
     });
 });
 
@@ -597,17 +597,6 @@ describe('getTargetLegendHtml', function () {
         metaData.Target.PolarityId = 1;
         var result = getTargetLegendHtml(compareConfig, metaData);
         expect(result).toContain(expectedLowerRed);
-    });
-});
-
-describe('canAreaTypeBeSearched', function () {
-
-    it('yes', function () {
-        expect(canAreaTypeBeSearched(AreaTypeIds.PheCentres2015)).toBe(true);
-    });
-
-    it('no', function () {
-        expect(canAreaTypeBeSearched(AreaTypeIds.DeprivationDecile)).toBe(false);
     });
 });
 

@@ -21,7 +21,7 @@ namespace PholioVisualisation.ServiceActions
             var ignoredAreasFilter = IgnoredAreasFilterFactory.New(profileId);
 
             var parentAreaWithChildren = new ParentChildAreaRelationshipBuilder(
-                ignoredAreasFilter, new AreaListBuilder(areasReader))
+                ignoredAreasFilter, new AreaListProvider(areasReader))
                      .GetParentAreaWithChildAreas(parentArea, childAreaTypeId, false/*retrieve ignored areas*/);
 
             // Benchmark hard coded for now

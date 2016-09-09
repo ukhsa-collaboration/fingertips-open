@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.KeyMessages;
+using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.KeyMessagesTest
 {
@@ -16,7 +17,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData 
                 { 
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = true,
                     IsFemaleSlopeIndexOfInequalitySignificant = true,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "7.5",
@@ -35,7 +36,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = false,
                     IsFemaleSlopeIndexOfInequalitySignificant = true,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "7.5",
@@ -54,7 +55,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = true,
                     IsFemaleSlopeIndexOfInequalitySignificant = false,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "7.5",
@@ -73,7 +74,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = false,
                     IsFemaleSlopeIndexOfInequalitySignificant = false,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "7.5",
@@ -92,7 +93,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = true,
                     IsFemaleSlopeIndexOfInequalitySignificant = true,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "4.0",
@@ -111,7 +112,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = true,
                     IsFemaleSlopeIndexOfInequalitySignificant = true,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = null,
@@ -129,7 +130,7 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AreaName = AreaName,
+                    Area = Area(),
                     IsMaleSlopeIndexOfInequalitySignificant = true,
                     IsFemaleSlopeIndexOfInequalitySignificant = true,
                     MaleSlopeIndexOfInequalityForLifeExpectancy = "1",
@@ -138,6 +139,14 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             Assert.AreEqual(string.Empty, builder.GetSentence());
+        }
+
+        private IArea Area()
+        {
+            return new Area
+            {
+                Name = AreaName
+            };
         }
     }
 }

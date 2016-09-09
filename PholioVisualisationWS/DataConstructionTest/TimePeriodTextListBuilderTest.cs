@@ -12,7 +12,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestEmptyListReturnedIfNoPeriodsAdded()
         {
-            Assert.AreEqual(0, ListBuilder().ToList().Count);
+            Assert.AreEqual(0, ListBuilder().GetTimePeriodStrings().Count);
         }
 
         [TestMethod]
@@ -21,7 +21,7 @@ namespace PholioVisualisation.DataConstructionTest
             var builder = ListBuilder();
             builder.Add(new TimePeriod { Year = 2000, YearRange = 1});
             builder.Add(new TimePeriod { Year = 2001, YearRange = 1 });
-            Assert.AreEqual(2, builder.ToList().Count);
+            Assert.AreEqual(2, builder.GetTimePeriodStrings().Count);
         }
 
         [TestMethod]
@@ -34,7 +34,7 @@ namespace PholioVisualisation.DataConstructionTest
                 new TimePeriod {Year = 2001, YearRange = 1}
             };
             builder.AddRange(periods);
-            Assert.AreEqual(2, builder.ToList().Count);
+            Assert.AreEqual(2, builder.GetTimePeriodStrings().Count);
         }
 
         private static TimePeriodTextListBuilder ListBuilder()

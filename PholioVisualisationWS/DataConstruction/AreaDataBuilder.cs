@@ -152,11 +152,11 @@ namespace PholioVisualisation.DataConstruction
                             Significances = significanceHash,
                             Data = dataList,
                             StateSex = root.StateSex,
-                            SexId = grouping.SexId,
-                            AgeId = grouping.AgeId,
+                            Sex = grouping.Sex,
+                            Age = grouping.Age,
                             ComparatorConfidence = grouping.ComparatorConfidence,
                             ComparatorMethodId = grouping.ComparatorMethodId,
-                            Periods = timePeriodTextListBuilder.ToList()
+                            Periods = timePeriodTextListBuilder.GetTimePeriodStrings()
                         };
                     }
                     else

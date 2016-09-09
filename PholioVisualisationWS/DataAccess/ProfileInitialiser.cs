@@ -21,12 +21,14 @@ namespace PholioVisualisation.DataAccess
                 }
 
                 var groupIds = ReaderFactory.GetGroupDataReader().GetGroupingIds(profileConfig.ProfileId);
+
                 return new Profile(groupIds)
                 {
                     Id = profileConfig.ProfileId,
                     Name = profileConfig.Name,
                     UrlKey = profileConfig.UrlKey,
-                    IsNational = profileConfig.IsNational
+                    IsNational = profileConfig.IsNational,
+                    HasTrendMarkers = profileConfig.HasTrendMarkers
                 };
             }
         }

@@ -23,7 +23,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewCategoryAreaType()
         {
-            var id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
+            var id = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), new ParentAreaGroup { CategoryTypeId = id });
             Assert.IsNotNull(areaType);
         }
@@ -32,7 +32,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void NewCategoryAreaType_NameIsDefined()
         {
             var name = "deprivation decile";
-            var id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
+            var id = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), new ParentAreaGroup { CategoryTypeId = id });
 
             Assert.IsTrue(areaType.Name.ToLower().Contains(name));
@@ -42,7 +42,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewAreaTypeFromCategoryAreaTypeId()
         {
-            var areaTypeId = CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
+            var areaTypeId = CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(CategoryTypeIds.DeprivationDecileCountyAndUA2010);
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), areaTypeId);
             Assert.AreEqual(areaTypeId, areaType.Id);
         }

@@ -54,7 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HealthProfilesAreaTypeHelper.cs" />
     <Compile Include="HealthProfilesKeyMessage1Builder.cs" />
+    <Compile Include="HealthProfilesKeyMessage1DeprivationLevel.cs" />
     <Compile Include="HealthProfilesKeyMessage2Builder.cs" />
     <Compile Include="HealthProfilesKeyMessage3Builder.cs" />
     <Compile Include="HealthProfilesKeyMessage4Builder.cs" />

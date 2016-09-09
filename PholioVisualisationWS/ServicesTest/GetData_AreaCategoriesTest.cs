@@ -14,7 +14,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = new WebClient().DownloadData(TestHelper.BaseUrl +
                 "GetData.ashx?s=ac" + 
-                "&category_type_id=" + CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority + 
+                "&category_type_id=" + CategoryTypeIds.DeprivationDecileCountyAndUA2010 + 
                 "&ati=" + AreaTypeIds.CountyAndUnitaryAuthority);
 
             AssertDataOk(data);

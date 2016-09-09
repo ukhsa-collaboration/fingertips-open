@@ -64,10 +64,10 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoreDataCollectorTest.cs" />
     <Compile Include="ExcelColumnIndexes.cs" />
     <Compile Include="ExportTestHelper.cs" />
     <Compile Include="PracticeProfileDataBuilderTest.cs" />
-    <Compile Include="ProfileDataBuilderOfMidlandsAndEastTest.cs" />
     <Compile Include="ProfileDataBuilderOfMultipleScnsTest.cs" />
     <Compile Include="ProfileDataBuilderOfMultipleRegionsTest.cs" />
     <Compile Include="HtmlCleanerTest.cs" />
@@ -82,9 +82,15 @@
     <Compile Include="ProfileDataBuilderOfSingleRegionTest.cs" />
     <Compile Include="ExcelFileWriterTest.cs" />
     <Compile Include="ProfileDatabuilderTest.cs" />
+    <Compile Include="TrendMarkerWriterFactoryTest.cs" />
+    <Compile Include="TrendMarkerWriterTest.cs" />
     <Compile Include="WorksheetInfoTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Analysis\Analysis.csproj">
+      <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
+      <Name>Analysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
       <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
       <Name>DataAccess</Name>

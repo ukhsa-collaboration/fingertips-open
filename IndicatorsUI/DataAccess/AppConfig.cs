@@ -115,11 +115,6 @@ namespace Profiles.DataAccess
             get { return ParseBool("UseInMemoryCaching"); }
         }
 
-        public bool UseJsonp
-        {
-            get { return ParseBool("UseJsonp"); }
-        }
-
         public string ExceptionLogFilePath
         {
             get { return GetAppSetting("ExceptionLogFilePath"); }

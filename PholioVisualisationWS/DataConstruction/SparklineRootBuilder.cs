@@ -99,7 +99,7 @@ namespace PholioVisualisation.DataConstruction
 
                     var builder = new TimePeriodTextListBuilder(metadata);
                     builder.AddRange(timePeriods);
-                    IList<string> xLabels = builder.ToList();
+                    IList<string> xLabels = builder.GetTimePeriodStrings();
 
                     SparklineStats sparklineStats = new SparklineStats(xLabels);
                     sparklineStats.IndicatorId = grouping.IndicatorId;

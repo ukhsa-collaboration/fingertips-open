@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstruction
 
         public override CoreDataSet GetData(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata indicatorMetadata)
         {
-            double val = practiceDataAccess.GetPracticeAggregateDataValue(grouping, timePeriod, area.Code);
+            double val = practiceDataAccess.GetPracticeAggregateDataValue(grouping, timePeriod, Area.Code);
 
             return val.Equals(ValueData.NullValue) ?
                 null :

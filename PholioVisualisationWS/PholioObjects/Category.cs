@@ -1,9 +1,9 @@
 ﻿
 namespace PholioVisualisation.PholioObjects
 {
-    public class Category
+    public class Category : INamedEntity
     {
-        public int CategoryId { get; set; }
+        public int Id { get; set; }
         public int CategoryTypeId { get; set; }
         public string Name { get; set; }
         public string ShortName { get; set; }
@@ -14,7 +14,7 @@ namespace PholioVisualisation.PholioObjects
 
             if (other != null)
             {
-                return CategoryId == other.CategoryId &&
+                return Id == other.Id &&
                        CategoryTypeId == other.CategoryTypeId;
             }
             return false;
@@ -22,7 +22,7 @@ namespace PholioVisualisation.PholioObjects
 
         public override int GetHashCode()
         {
-            return (CategoryTypeId + "-" + CategoryId).GetHashCode();
+            return (CategoryTypeId + "-" + Id).GetHashCode();
         }
     }
 }

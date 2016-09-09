@@ -9,11 +9,11 @@ namespace PholioVisualisation.DataConstruction
 {
     public class TimePeriodTextFormatter
     {
-        private int yearTypeId;
+        private readonly int _yearTypeId;
 
         public TimePeriodTextFormatter(IndicatorMetadata metadata)
         {
-            yearTypeId = metadata.YearTypeId;
+            _yearTypeId = metadata.YearTypeId;
         }
 
         /// <summary>
@@ -22,7 +22,7 @@ namespace PholioVisualisation.DataConstruction
         /// <returns>Formatted time period</returns>
         public string Format(TimePeriod timePeriod)
         {
-            return TimePeriodFormatter.GetTimePeriodString(timePeriod, yearTypeId);
+            return TimePeriodFormatter.GetTimePeriodString(timePeriod, _yearTypeId);
         }
 
     }

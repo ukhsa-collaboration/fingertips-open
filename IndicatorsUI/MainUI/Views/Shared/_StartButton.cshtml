@@ -1,6 +1,6 @@
 ﻿@using Profiles.MainUI.Models
 @model PageModel
-@if (!Model.HasExclusiveSkin && !Model.IsProfileWithOnlyStaticReports)
+@if (Model.HasExclusiveSkin == false && Model.IsProfileWithOnlyStaticReports == false)
 {
     if (Model.DefaultFingertipsTabId == -1)
     {

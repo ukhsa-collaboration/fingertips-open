@@ -15,7 +15,8 @@ namespace Profiles.MainUI.Controllers
         }
 
         [CheckUserCanAccessSkin]
-        public ActionResult AreaSearchResults(string profileKey, string areaCodeList, string search_type, string place_name = null)
+        public ActionResult AreaSearchResults(string profileKey, string areaCodeList, string search_type, 
+            string place_name = null, string leadProfileUrlKey = null)
         {
             var details = ConfigureFingertipsProfileAndPageModelWithProfileDetails(profileKey);
 
@@ -23,8 +24,13 @@ namespace Profiles.MainUI.Controllers
             ViewBag.PlaceName = place_name;
             ViewBag.SearchType = search_type;
             ViewBag.AreasToIgnoreEverywhere = details.AreasToIgnoreEverywhere;
+            PageModel.PageType = PageType.AreaSearchResultsOfProfileWithFrontPage;
 
-            PageModel.PageType = PageType.AreaSearchResults;
+            if (string.IsNullOrEmpty(leadProfileUrlKey) == false)
+            {
+                SetProfileCollection(details, leadProfileUrlKey);
+            }
+
             PageModel.PageTitle = details.Title;
             PageModel.DisplayProfileTitle = true;
 

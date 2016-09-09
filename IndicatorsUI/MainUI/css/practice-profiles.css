@@ -324,7 +324,7 @@ DIV.decileSpacer {
 
 #age-distribution-info-icon {
     position: absolute;
-    top: 47px;
+    top: 36px;
     left: 130px;
     z-index: 5;
 }
@@ -803,6 +803,7 @@ DIV.infoTooltip {
     height: 16px;
     width: 16px;
     background-image: url(../images/info3.png);
+    cursor: pointer;
 }
 
     DIV.infoTooltip:hover {
@@ -1244,6 +1245,20 @@ vertical-align: top;
     font-size: 17px;
     line-height: 1.3em;
 }
+
+/*----------------------------------------
+    Chart & table export
+------------------------------------------*/
 .export-chart-box {
-    margin-top: 10px;
+    height: 16px;
+    margin-top:10px;
+    color: #450AA3;
+}
+
+.export-chart-box a.export-link {
+    text-decoration: none;
+    color: #1F0AA1;
+    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+    padding: 5px 30px;
+    text-decoration: none;
 }

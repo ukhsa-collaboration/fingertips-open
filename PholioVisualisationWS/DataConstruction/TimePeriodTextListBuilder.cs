@@ -7,7 +7,7 @@ namespace PholioVisualisation.DataConstruction
 {
     public class TimePeriodTextListBuilder : TimePeriodTextFormatter, ITimePeriodTextListBuilder
     {
-        private List<string> periods = new List<string>();
+        private List<string> periodStrings = new List<string>();
 
         public TimePeriodTextListBuilder(IndicatorMetadata metadata) : base(metadata)
         {
@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstruction
 
         public void Add(TimePeriod timePeriod)
         {
-            periods.Add(Format(timePeriod));
+            periodStrings.Add(Format(timePeriod));
         }
 
         public void AddRange(IEnumerable<TimePeriod> timePeriods)
@@ -26,9 +26,9 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        public IList<string> ToList()
+        public IList<string> GetTimePeriodStrings()
         {
-            return periods;
+            return periodStrings;
         }
 
     }

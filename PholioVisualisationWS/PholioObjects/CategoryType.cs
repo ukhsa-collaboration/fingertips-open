@@ -1,8 +1,8 @@
 ﻿
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using NHibernate.Collection.Generic;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.PholioObjects
 {
@@ -30,9 +30,36 @@ namespace PholioVisualisation.PholioObjects
             {
                 return CategoriesFromDatabase
                     .ToList()
-                    .OrderBy(x => x.CategoryId)
+                    .OrderBy(x => x.Id)
                     .ToList();
             }
+        }
+
+        public static bool IsDeprivationDecile(int categoryTypeId)
+        {
+            return
+                IsCountyAndUADeprivationDecile(categoryTypeId) ||
+                IsDistrictAndUADeprivationDecile(categoryTypeId) ||
+                IsGpDeprivationDecile(categoryTypeId);
+        }
+
+        public static bool IsCountyAndUADeprivationDecile(int categoryTypeId)
+        {
+            return categoryTypeId == CategoryTypeIds.DeprivationDecileCountyAndUA2010;
+        }
+
+        public static bool IsDistrictAndUADeprivationDecile(int categoryTypeId)
+        {
+            return
+                categoryTypeId == CategoryTypeIds.DeprivationDecileDistrictAndUA2010 ||
+                categoryTypeId == CategoryTypeIds.DeprivationDecileDistrictAndUA2015;
+        }
+
+        public static bool IsGpDeprivationDecile(int categoryTypeId)
+        {
+            return
+                categoryTypeId == CategoryTypeIds.DeprivationDecileGp2010 ||
+                categoryTypeId == CategoryTypeIds.DeprivationDecileGp2015;
         }
     }
 }

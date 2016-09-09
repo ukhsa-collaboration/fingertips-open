@@ -28,7 +28,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestNewCategoryArea()
         {
-            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 5);
+            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 5);
             var area = AreaFactory.NewArea(ReaderFactory.GetAreasReader(), categoryArea.Code);
 
             Assert.IsNotNull(area as CategoryArea);

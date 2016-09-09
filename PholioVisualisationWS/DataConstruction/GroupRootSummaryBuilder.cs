@@ -29,8 +29,8 @@ namespace PholioVisualisation.DataConstruction
 
                     var duplicate = groupRootSummaries.FirstOrDefault(
                         x =>
-                            x.AgeId == groupRoot.AgeId &&
-                            x.SexId == groupRoot.SexId &&
+                            x.Age.Id == groupRoot.AgeId &&
+                            x.Sex.Id == groupRoot.SexId &&
                             x.IndicatorId == groupRoot.IndicatorId);
 
                     if (duplicate == null)
@@ -39,11 +39,12 @@ namespace PholioVisualisation.DataConstruction
                             new GroupRootSummary
                             {
                                 GroupId = groupRoot.FirstGrouping.GroupId,
-                                AgeId = groupRoot.AgeId,
-                                SexId = groupRoot.SexId,
+                                Age = groupRoot.Age,
+                                Sex = groupRoot.Sex,
                                 IndicatorId = groupRoot.IndicatorId,
                                 IndicatorName = indicatorMetadata.Descriptive[IndicatorMetadataTextColumnNames.Name],
                                 StateSex = groupRoot.StateSex,
+                                StateAge = groupRoot.StateAge,
                                 IndicatorUnit = indicatorMetadata.Unit
                             });
                     }

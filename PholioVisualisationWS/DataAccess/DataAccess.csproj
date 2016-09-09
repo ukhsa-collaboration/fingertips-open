@@ -72,6 +72,7 @@
     <Compile Include="ApplicationConfiguration.cs" />
     <Compile Include="ConnectionStrings.cs" />
     <Compile Include="ContentReader.cs" />
+    <Compile Include="CsvWriter.cs" />
     <Compile Include="DataAccessDIRegistry.cs" />
     <Compile Include="ExceptionWriter.cs" />
     <Compile Include="GroupDataReader.cs" />

@@ -13,27 +13,39 @@ namespace PholioVisualisation.Services
 {
     public class JsonBuilderIndicatorMetadata : JsonBuilderBase
     {
-        private IndicatorMetadataParameters parameters;
+        private IndicatorMetadataParameters _parameters;
 
         public JsonBuilderIndicatorMetadata(HttpContextBase context)
             : base(context)
         {
-            parameters = new IndicatorMetadataParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new IndicatorMetadataParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderIndicatorMetadata(IndicatorMetadataParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
+        {
+            var metadataMap = GetIndicatorMetadatas();
+            return JsonConvert.SerializeObject(metadataMap);
+        }
+
+        public Dictionary<int, IndicatorMetadata> GetIndicatorMetadatas()
         {
             IndicatorMetadataRepository indicatorMetadataRepository = IndicatorMetadataRepository.Instance;
             IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
             IProfileReader profileReader = ReaderFactory.GetProfileReader();
 
             IList<IndicatorMetadata> indicatorMetadataList;
-            if (parameters.UseIndicatorIds)
+            if (_parameters.UseIndicatorIds)
             {
-                var profileIds = parameters.RestrictResultsToProfileIds;
+                var profileIds = _parameters.RestrictResultsToProfileIds;
 
-                var indicatorIds = parameters.IndicatorIds;
+                var indicatorIds = _parameters.IndicatorIds;
 
                 if (profileIds.Any())
                 {
@@ -53,25 +65,25 @@ namespace PholioVisualisation.Services
             }
             else
             {
-                IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIds(parameters.GroupIds);
+                IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIds(_parameters.GroupIds);
                 indicatorMetadataList = indicatorMetadataRepository.GetIndicatorMetadata(groupings);
             }
 
             Dictionary<int, IndicatorMetadata> metadataMap = indicatorMetadataList.ToDictionary(
                 indicatorMetadata => indicatorMetadata.IndicatorId);
 
-            if (parameters.IncludeDefinition == false)
+            if (_parameters.IncludeDefinition == false)
             {
                 indicatorMetadataRepository.ReduceDescriptiveMetadata(indicatorMetadataList);
             }
 
-            if (parameters.IncludeSystemContent==false)
+            if (_parameters.IncludeSystemContent == false)
             {
                 //Remove the system content fields (This is the default)
                 indicatorMetadataRepository.RemoveSystemContentFields(indicatorMetadataList);
             }
-            
-            return JsonConvert.SerializeObject(metadataMap);
+
+            return metadataMap;
         }
     }
 }

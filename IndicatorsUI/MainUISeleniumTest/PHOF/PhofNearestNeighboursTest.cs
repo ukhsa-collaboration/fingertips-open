@@ -39,7 +39,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             TestHelper.AssertTextContains(backToMenuText, "More information");
 
             // Check NN text loaded correctly
-            var selectAreaText = driver.FindElement(By.Id("selected-nearest-neighbour")).Text;
+            var selectAreaText = driver.FindElement(By.Id("nearest-neighbour-header")).Text;
             Assert.IsTrue(selectAreaText.StartsWith(selectedAreaName + " and its CIPFA nearest neighbours"));
         }
 
@@ -71,10 +71,10 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             ClickBackToMenuLink();
             new WaitFor(driver).AjaxLockToBeUnlocked();
 
-            var rightTartanTable = driver.FindElement(By.XPath("//*[@id='rightTartanTable']"));
-            var columns = rightTartanTable.FindElements(By.XPath("//*[@id='rightTartanTable']/thead/tr/th"));
+            var columns = driver.FindElements(By.XPath("//*[@id='rightTartanTable']/thead/tr/th"));
             
-            Assert.AreEqual(9, columns.Count - ExtraColumns);     
+            // Assert: number of area columns is 1 area + 15 neighbours
+            Assert.AreEqual(16, columns.Count - ExtraColumns);     
         }
 
         private void LoadPhofPage()

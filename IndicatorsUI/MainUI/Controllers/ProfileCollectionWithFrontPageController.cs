@@ -34,7 +34,7 @@ namespace Profiles.MainUI.Controllers
         public ActionResult ProfileFrontPage(string leadProfileUrlKey, string profileUrlKey)
         {
             InitPageModel();
-            PageModel.PageType = PageType.FrontPageOfProfileInCollection;
+            PageModel.PageType = PageType.FrontPageOfProfileWithFrontPage;
             details = new ProfileDetailsBuilder(profileUrlKey).Build();
 
             if (AccessControlHelper.ShouldDenyAccess(details))
@@ -49,7 +49,7 @@ namespace Profiles.MainUI.Controllers
         public ActionResult Data(string leadProfileUrlKey, string profileUrlKey)
         {
             InitPageModel();
-            PageModel.PageType = PageType.DataPageOfProfileInCollection;
+            PageModel.PageType = PageType.DataPageOfProfileWithFrontPage;
             details = new ProfileDetailsBuilder(profileUrlKey).Build();
 
             if (AccessControlHelper.ShouldDenyAccess(details))
@@ -73,29 +73,11 @@ namespace Profiles.MainUI.Controllers
             PageModel.PageTitle = details.Title;
             ViewBag.ProfileUrlKey = details.ProfileUrlKey;
 
-            SetProfileCollection(leadProfileUrlKey);
+            SetProfileCollection(details, leadProfileUrlKey);
 
             ConfigureWithProfile(details);
 
-            ViewBag.LeadProfileUrlKey = leadProfileUrlKey;
-
             return View(viewName, PageModel);
-        }
-
-        private void SetProfileCollection(string leadProfileUrlKey)
-        {
-            int? id = details.ProfileUrlKey == leadProfileUrlKey ?
-                details.LeadProfileForCollectionId :
-                new ProfileDetailsBuilder(leadProfileUrlKey).Build().LeadProfileForCollectionId;
-
-            var profileCollection = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), appConfig)
-                .GetCollection(id.Value);
-            profileCollection.UrlKey = leadProfileUrlKey;
-            foreach (var item in profileCollection.ProfileCollectionItems)
-            {
-                item.ParentCollection = profileCollection;
-            }
-            PageModel.ProfileCollection = new List<ProfileCollection> { profileCollection };
         }
     }
 }

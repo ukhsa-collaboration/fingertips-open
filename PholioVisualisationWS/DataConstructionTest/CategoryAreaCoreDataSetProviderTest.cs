@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestConstructor()
         {
-            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 1);
+            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1);
             var provider = new CategoryAreaCoreDataSetProvider(categoryArea, ReaderFactory.GetGroupDataReader());
             Assert.IsNotNull(provider);
         }
@@ -21,7 +21,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestGetData()
         {
-            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 1);
+            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1);
             var grouping = new Grouping();
             var timePeriod = new TimePeriod();
 

@@ -7,269 +7,37 @@
 
 @section ExtraScripts{
     <script src="@(AppConfig.JsPath)angular.js" type="text/javascript"></script>
+    <script src="@(AppConfig.JsPath)angular-route.js" type="text/javascript"></script>
+    <script src="@(AppConfig.JsPath)jquery.form.js" type="text/javascript"></script>
 }
 
 @section AngularApp
 {
-    <script src="@(AppConfig.AngularAppPath)upload/app.js" type="text/javascript"></script>
+    <script src="@(AppConfig.AngularAppPath)upload/upload-app.js" type="text/javascript"></script>
 }
 
+@{
+    <script>
+        var pageConst = {
+            simpleTemplateUrl: '@Model.SimpleTemplateUrl',
+            simpleLastUpdated: '@Model.SimpleLastUpdated',
+            batchTemplateUrl: '@Model.BatchTemplateUrl',
+            batchLastUpdated: '@Model.BatchLastUpdated'
+        }
+    </script>
+}
 
 <div class="standardWidth">
     <h2 class="subheading">Upload data to PHOLIO</h2>
 </div>
-<div class="container" ng-app="uploadApp" ng-controller="IndexCtrl">
-<div id="upload-alert" ng-cloak class="{{alertClass}}">{{fileUploadStatus}}</div>
-<ul class="nav nav-tabs" ng-init="tab =1" id="upload-tabs">
-    <li ng-class="{active: isActive('/')}" class="cursor-pointer">
-        <a id="upload-tab" data-toggle="tab" ng-click="select(1)">Upload new data</a>
-    </li>
-    <li ng-class="{active: isActive('/jobs')}" class="cursor-pointer">
-        <a id="progress-tab" data-toggle="tab" ng-click="select(2)">Upload jobs&nbsp;</a>
-    </li>
-</ul>
-<div>
-    <!-- File upload tab -->
-    <div ng-show="selected_tab == 1" id="upload-menu" class="tab-pane">
-        <div id="upload-container" class="main standardWidth">
-            <div class="upload-simple">
-                <div>
-                    <img src="/images/SimpleUpload.png" onclick="uploadSimple();"/>
-                </div>
-                <div class="text">
-                    <h2 title="What does this do?">
-                        Simple Indicator Upload
-                    </h2>
-                    <p>
-                        Upload an Excel spreadsheet for one indicator.<br><br>
-                    </p>
-                    <a href="#" class="upload-help upload-simple-help">Find out more about this way to upload data</a>
-                    <a href="@Model.SimpleTemplateUrl">Download the latest template <small>(last updated @Model.SimpleLastUpdated)</small></a>
-                    <input type="button" class="medium-button" value="Upload Data" onclick="uploadSimple();"/>
-                </div>
-            </div>
-            <div class="upload-batch">
-                <div>
-                    <img src="/images/BatchUpload.png" onclick="uploadBatch();"/>
-                </div>
-                <div class="text">
-                    <h2 title="What does this do?">Batch Indicator Upload</h2>
-                    <p>Upload an Excel spreadsheet or CSV file for a batch of indicators.</p>
-                    <a href="#" class="upload-help upload-batch-help">Find out more about this way to upload data</a>
-                    <a href="@Model.BatchTemplateUrl">Download the latest template <small>(last updated @Model.BatchLastUpdated)</small></a>
-                    <input type="button" class="medium-button" value="Upload Data" onclick="uploadBatch();"/>
-                </div>
-            </div>
-        </div>
-        <div class="allowed-filetypes standardWidth" ng-if="fileTypeAllowed" ng-cloak><strong>Wrong file type, only allowed files are csv, xls and xlsx</strong></div>
-
-        <!-- Simple file upload -->
-        <iframe id="upload-iframe" name="upload-iframe" src=""></iframe>
-
-        <div id="upload-simple-browse-control" class="standardWidth hidden upload-browse-control filtering clearfix">
-            @using (Html.BeginForm("UploadSimpleFile", "Upload", FormMethod.Post,
-                new {enctype = "multipart/form-data", Id = "validateSimpleSpreadsheetForm", target = "upload-iframe"}))
-            {
-                <div>
-                    <div class="browse-control">
-                        <b>Select file to upload:&nbsp;</b>
-                        <input type="file" class="excel-file" id="simple-excel-file" name="excelFile" size="47" custom-on-change="uploadSimpleFile"/>
-                    </div>
-                    <div id="selected-upload-file" style="display: none;" class="upload-browse"></div>
-                    <input type="button" id="select-simple-spreadsheet" style="display: none;"
-                           class="select-spreadsheet auto-width-button" value="Validate spreadsheet"/>
-                </div>
-            }
-        </div>
-        <!-- Batch file upload -->
-        <div id="upload-batch-browse-control" class="standardWidth hidden upload-browse-control filtering clearfix">
-            @using (Html.BeginForm("UploadBatchUpload", "Upload", FormMethod.Post,
-                new {enctype = "multipart/form-data", Id = "validateBatchSpreadsheetForm", target = "upload-iframe"}))
-            {
-                <div>
-                    <div class="browse-control">
-                        <b style="float: left;">Select batch file to upload:&nbsp;</b>
-                        <input type="file" class="excel-file" id="batch-excel-file" name="excelFile" size="47" custom-on-change="uploadBatchFile"/>
-                    </div>
-                    <div id="selected-batch-upload-file" style="display: none;" class="upload-browse"></div>
-                    <input type="button" id="select-batch-spreadsheet" style="display: none;"
-                           class="show-spinner select-spreadsheet auto-width-button" value="Validate spreadsheet"/>
-                </div>
-            }
-        </div>
-    </div>
-    <!-- Progress tab -->
-    <div ng-show="selected_tab == 2" id="progress-menu" class="tab-pane" ng-cloak>
-        <div class="row">
-            <h3 class="col-md-2">My pending files</h3>
-        </div>
-        <div class="row"></div>
-        <div class="row">
-            <div>
-                <div class="col-md-2">
-                    <span class="in-progress">In progress:<span class="progress-count">{{progress.InProgress}}</span></span></div>
-                <div class="col-md-2">
-                    <span class="in-queue">In the queue:<span class="progress-count">{{progress.InQueue}}</span></span></div>
-                <div class="col-md-3">
-                    <span class="awaiting-confirmation">Awaiting confirmation:<span class="progress-count">{{progress.AwaitingConfomation}}</span></span></div>
-            </div>
-        </div>
-        <br/>
-        <div class="row">
-            <h3 class="col-md-2">All my files</h3>
-        </div>
-        <div class="row">
-            <div class="container">
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <th class="col-md-2">Date</th>
-                        <th class="col-md-1 text-center">No of rows</th>
-                        <th class="col-md-2 text-center">Status</th>
-                        <th class="col-md-2 text-center">Summary</th>
-                        <th class="col-md-1 text-center">Actions</th>
-                        <th class="col-md-1 text-center">Type</th>
-                        <th>Download original files</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="job in progress.Jobs" ng-class="getRowClass(job)">
-                        <td>{{job.DateCreatedF}}</td>
-                        <td class="text-center">
-                            <span ng-if="job.TotalRows==0">-</span>
-                            <span ng-if="job.TotalRows!=0">{{job.TotalRows}}</span>                            
-                        </td>
-                        <td class="text-center" ng-switch="job.Status">
-                            <span ng-switch-when="0">In queue</span>
-                            <span ng-switch-when="200">In progress</span>
-                            <span ng-switch-when="300">Awaiting confirmation that file should be uploaded and existing data be replaced</span>
-                            <span ng-switch-when="302">Cancelled</span>
-                            <span ng-switch-when="400">Validation Failed</span>
-                            <span ng-switch-when="1000">Successful Upload</span>
-                            <span ng-switch-default>Unknown</span>
-                        </td>
-                        <td class="text-center" ng-switch="job.Status">
-                            
-                            <div ng-switch-when="200"  class="progress">
-                                <div class="progress-bar active progress-bar-striped" role="progressbar" aria-valuenow="{{getProgress(job).percent}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : ( getProgress(job).percent + '%' ) }">
-                                    {{getProgress(job).percent}}%
-                                </div>
-                            </div>
-                            <div ng-switch-when="200">{{getProgress(job).text}}</div>
-                            <a ng-switch-when="300" ng-click="showSummary(job)" class="cursor-pointer">View existing data</a>
-                            <a ng-switch-when="400" ng-click="showSummary(job)" class="cursor-pointer">View validation failures</a>
-                            <div ng-switch-when="1000" class="progress">
-                                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
-                                    100%
-                                </div>
-                            </div>
-                            <span ng-switch-default>-</span>
-                        </td>
-                        <td class="text-center">
-                            <span ng-if="job.Status!=300">-</span>
-                            <span ng-if="job.Status==300">
-                                <a ng-click="updateStatus(job,301)">Upload</a>
-                                <br />
-                                <span>or</span>
-                                <br/>
-                                <a ng-click="updateStatus(job,302)">Cancel</a>
-                            </span>
-                        </td>
-                        <td class="text-center">
-                            <span ng-if="job.JobType==0">Simple</span>
-                            <span ng-if="job.JobType==1">Batch</span>
-                        </td>
-                        <td>
-                            <a href="/upload/download/{{job.Guid}}">{{job.OriginalFile}}</a>
-                        </td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Summary Modal -->
-<div id="summary" class="modal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header" ng-switch="summary.JobStatus">
-                <button type="button" class="close" data-dismiss="modal">X</button>
-                <h2 ng-switch-when="200">Upload progress</h2>
-                <h2 ng-switch-when="300">
-                    <span ng-if="summary.ErrorType==40003">Duplicate data in spreadsheet</span>
-                    <span ng-if="summary.ErrorType==40004">Date already exists in database</span>
-                </h2>
-                <h2 ng-switch-when="400">Validation errors</h2>
-                <h2 ng-switch-default></h2>
-            </div>
-            <!-- Modal body-->
-            <div class="modal-body" ng-switch="summary.JobStatus">
-                <!-- Progress Status -->
-                <div ng-switch-when="200">
-                    <div class="row">
-                        <h4 class="col-md-4">Rows scanned:</h4>                
-                        <h4 class="col-md-2"></h4>
-                    </div>
-                </div>
-                <!-- Duplication Errors -->
-                <div ng-switch-when="300">
-                    <div>
-                        {{summary.ErrorText}}
-                    </div>
-                    <br/>
-                    <!-- Error body for duplicate in file ErrorType 40003 -->
-                    <div class="modal-table-height-400" ng-if="summary.ErrorType==40003">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>Row</th>
-                                <th>Error</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber">
-                                <td>{{err.RowNumber}}</td>
-                                <td>{{err.DuplicateRowMessage}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <!-- Error body for duplicate in database ErrorType 40004 -->
-                    <div class="modal-table-height-400" ng-if="summary.ErrorType==40004">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>Row</th>
-                                <th>Indicator</th>
-                                <th>Age Id</th>
-                                <th>Area Code</th>
-                                <th>Excel Value</th>
-                                <th>Database Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber">
-                                <td>{{err.RowNumber}}</td>
-                                <td>{{err.IndicatorId}}</td>
-                                <td>{{err.AgeId}}</td>
-                                <td>{{err.SexId}}</td>
-                                <td>{{err.AreaCode}}</td>
-                                <td>{{err.ExcelValue}}</td>
-                                <td>{{err.DbValue}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <!-- Validation Errors -->
-                <div ng-switch-when="400">{{summary.ErrorText}}</div>
-                <span ng-switch-default></span>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<div class="container" ng-app="uploadApp">
+    <ul class="nav nav-tabs" id="upload-tabs">
+        <li class="cursor-pointer" id="upload-tab">
+            <a data-target="#" data-toggle="tab" ng-href="#/">Upload new data</a>
+        </li>
+        <li class="cursor-pointer" id="progress-tab">
+            <a data-toggle="tab" ng-href="#status">Upload jobs&nbsp;</a>
+        </li>
+    </ul>
+    <div ng-view></div>
 </div>

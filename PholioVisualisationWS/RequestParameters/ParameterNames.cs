@@ -22,7 +22,7 @@ namespace PholioVisualisation.RequestParameters
         public const string PolygonAreaTypeId = "polygon_area_type_id";
         public const string CategoryTypeId = "category_type_id";
         public const string AreEastingAndNorthingRequired = "include_coordinates";
-        public const string ExcludeCcGs = "exclude_ccgs";
+        public const string ExcludeCcgs = "exclude_ccgs";
         public const string Text = "text";
         public const string IgnoredAreas = "ign"; // DO NOT USE - read codes from PHOLIO instead
         public const string AreaCodes = "acs";
@@ -34,7 +34,6 @@ namespace PholioVisualisation.RequestParameters
         public const string SexId = "sex";
         public const string AgeId = "age";
         public const string Type = "typ";
-        public const string JsonpCallback = "callback";
 
         public const string Quarter = "qtr";
         public const string Month = "month";
@@ -44,6 +43,7 @@ namespace PholioVisualisation.RequestParameters
         public const string ComparatorId = "com";
 
         public const string RetrieveIgnoredAreas = "ria";
+        public const string ParentAreaTypesToIncludeInResults = "parent_area_types_to_include_in_results";
 
         //Exception Logging Parameters
         public const string Application = "app";

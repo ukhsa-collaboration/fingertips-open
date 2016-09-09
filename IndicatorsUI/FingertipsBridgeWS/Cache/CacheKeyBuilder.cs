@@ -18,20 +18,13 @@ namespace FingertipsBridgeWS.Cache
         public const string ParameterAjaxCallId = "_";
 
         /// <summary>
-        /// Parameter is used by JQuery to allow json to be encoded as jsonp.
-        /// </summary>
-        public const string ParameterJsonp = "callback";
-
-        /// <summary>
         /// Parameter used to indicate the json response of a call should not be cached.
         /// </summary>
         public const string ParameterNoCache = "nocache";
 
-        public string JsonPValue { get; set; }
         public string ServiceId { get; set; }
 
         public bool CanJsonBeCached = true;
-        public bool IsJsonP;
 
         private NameValueCollection parameters;
 
@@ -54,10 +47,6 @@ namespace FingertipsBridgeWS.Cache
                         break;
                     case ParameterNoCache:
                         CanJsonBeCached = false;
-                        break;
-                    case ParameterJsonp:
-                        IsJsonP = true;
-                        JsonPValue = parameters[ParameterJsonp];
                         break;
                     default:
                         keysToUse.Add(key);

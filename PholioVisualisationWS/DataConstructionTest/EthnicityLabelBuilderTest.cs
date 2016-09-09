@@ -82,7 +82,7 @@ namespace PholioVisualisation.DataConstructionTest
             foreach (var category in categories)
             {
                 dataList.Add(
-                    new CoreDataSet { CategoryId = category.CategoryId}
+                    new CoreDataSet { CategoryId = category.Id}
                     );
             }
             return dataList;

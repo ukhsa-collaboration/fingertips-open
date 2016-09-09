@@ -56,7 +56,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             var areaName = "Middlesbrough";
 
             FingertipsHelper.SwitchToAreaSearchMode(driver);
-            FingertipsHelper.SearchForAnArea(driver, areaName);
+            FingertipsHelper.SearchForAnAreaAndSelectFirstResult(driver, areaName);
             FingertipsHelper.LeaveAreaSearchMode(driver);
 
             // Leave and return to data page
@@ -74,7 +74,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             var areaName = "Croydon";
 
             FingertipsHelper.SwitchToAreaSearchMode(driver);
-            FingertipsHelper.SearchForAnArea(driver, areaName);
+            FingertipsHelper.SearchForAnAreaAndSelectFirstResult(driver, areaName);
             FingertipsHelper.LeaveAreaSearchMode(driver);
 
             // Check area menu contains searched for area
@@ -158,7 +158,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
 
             // Assert PDF message is correct
             var text = driver.FindElement(By.Id("pdf-download-text")).Text;
-            TestHelper.AssertTextContains(text, "Download a detailed profile", "");
+            TestHelper.AssertTextContains(text, "Download a detailed report", "");
 
             // Assert PDF link is visible
             waitFor.ExpectedElementToBeVisible(By.ClassName("pdf"));

@@ -11,7 +11,6 @@ namespace PholioVisualisation.DataConstruction
     public class IndicatorComparisonHelper
     {
         private IndicatorMetadata indicatorMetadata;
-        private bool useTarget;
         private IndicatorComparer comparer;
         private TargetComparer targetComparer;
         private Grouping grouping;

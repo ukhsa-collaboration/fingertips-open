@@ -257,7 +257,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence3();
             Assert.AreEqual(
-                "Levels of teenage pregnancy, GCSE attainment, breastfeeding and smoking at time of delivery are worse than the England average.",
+                "Levels of teenage pregnancy, GCSE attainment, breastfeeding initiation and smoking at time of delivery are worse than the England average.",
                 sentence);
         }
 
@@ -312,7 +312,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             var sentence = builder.GetSentence3();
-            Assert.AreEqual("Levels of breastfeeding are worse than the England average.", sentence);
+            Assert.AreEqual("Levels of breastfeeding initiation are worse than the England average.", sentence);
         }
 
         [TestMethod]
@@ -369,7 +369,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence3();
             Assert.AreEqual(
-                "Levels of teenage pregnancy, breastfeeding and smoking at time of delivery are worse than the England average.",
+                "Levels of teenage pregnancy, breastfeeding initiation and smoking at time of delivery are worse than the England average.",
                 sentence);
         }
 
@@ -392,7 +392,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             var sentence = builder.GetSentence4();
-            Assert.AreEqual("Levels of teenage pregnancy, GCSE attainment, breastfeeding and smoking at time of delivery are better than the England average.", sentence);
+            Assert.AreEqual("Levels of teenage pregnancy, GCSE attainment, breastfeeding initiation and smoking at time of delivery are better than the England average.", sentence);
         }
 
         [TestMethod]
@@ -428,7 +428,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             var sentence = builder.GetSentence4();
-            Assert.AreEqual("Levels of GCSE attainment, breastfeeding and smoking at time of delivery are better than the England average.", sentence);
+            Assert.AreEqual("Levels of GCSE attainment, breastfeeding initiation and smoking at time of delivery are better than the England average.", sentence);
         }
 
         [TestMethod]
@@ -446,7 +446,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             var sentence = builder.GetSentence4();
-            Assert.AreEqual("Levels of teenage pregnancy, breastfeeding and smoking at time of delivery are better than the England average.", sentence);
+            Assert.AreEqual("Levels of teenage pregnancy, breastfeeding initiation and smoking at time of delivery are better than the England average.", sentence);
         }
 
         [TestMethod]
@@ -482,7 +482,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
 
             var sentence = builder.GetSentence4();
-            Assert.AreEqual("Levels of teenage pregnancy, GCSE attainment and breastfeeding are better than the England average.", sentence);
+            Assert.AreEqual("Levels of teenage pregnancy, GCSE attainment and breastfeeding initiation are better than the England average.", sentence);
         }
 
         [TestMethod]
@@ -501,7 +501,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence4();
             Assert.AreEqual(
-                "Levels of GCSE attainment and breastfeeding are better than the England average.",
+                "Levels of GCSE attainment and breastfeeding initiation are better than the England average.",
                 sentence);
         }
 

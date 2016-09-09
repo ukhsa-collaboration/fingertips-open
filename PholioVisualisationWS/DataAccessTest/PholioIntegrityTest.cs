@@ -36,18 +36,30 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestAllChildAreaTypesThatHaveGroupingsAlsoHaveDefaultParentOptionsDefined()
         {
-            var defaultChildAreaTypeIds = GetChildAreaTypeIdsThatHaveParentOptionDefined(
+            var childAreaTypeIdsWithParents = GetChildAreaTypeIdsThatHaveParentOptionDefined(
                 ProfileIds.Undefined);
                 
             var areaTypeIdsOnGroupings = ReaderFactory.GetGroupDataReader()
                 .GetDistinctGroupingAreaTypeIdsForAllProfiles();
 
+            var areaTypeIdsWithoutAnyParents = new List<int>();
             foreach (var areaTypeId in areaTypeIdsOnGroupings)
             {
-                Assert.IsTrue(defaultChildAreaTypeIds.Contains(areaTypeId),
-                    "Default parent area type option not defined for child area type Id:" +
-                    areaTypeId + ". You need to add row to WS_ProfileParentAreaOptions");
+                if (childAreaTypeIdsWithParents.Contains(areaTypeId) == false)
+                {
+                    areaTypeIdsWithoutAnyParents.Add(areaTypeId);
+                }
             }
+
+            // Assert
+            if (areaTypeIdsWithoutAnyParents.Any())
+            {
+                Assert.Fail(
+                    "Default parent area type option not defined for child area type Id(s): " +
+                    string.Join(",",areaTypeIdsWithoutAnyParents) + Environment.NewLine + 
+                    "You need to add row(s) to WS_ProfileParentAreaOptions");
+            }
+            Assert.IsTrue(true);
         }
 
         private List<int> GetChildAreaTypeIdsThatHaveParentOptionDefined(int profileId)

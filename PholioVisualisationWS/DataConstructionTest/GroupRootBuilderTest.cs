@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestPolarityAssignedFromGrouping()
         {
-            var polarity = PolarityIds.UseBlues;
+            var polarity = PolarityIds.BlueOrangeBlue;
             List<Grouping> grouping = new List<Grouping>();
             grouping.Add(new Grouping { PolarityId = polarity });
 
@@ -158,9 +158,9 @@ namespace PholioVisualisation.DataConstructionTest
             IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
 
             Assert.AreEqual(3, roots.Count);
-            Assert.IsNull(roots[0].AgeLabel);
-            Assert.AreEqual("All ages", roots[1].AgeLabel);
-            Assert.AreEqual("0-4 yrs", roots[2].AgeLabel);
+            Assert.IsFalse(roots[0].StateAge);
+            Assert.IsTrue(roots[1].StateAge);
+            Assert.IsTrue(roots[2].StateAge);
         }
 
         [TestMethod]

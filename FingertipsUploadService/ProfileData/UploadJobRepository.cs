@@ -22,7 +22,7 @@ namespace FingertipsUploadService.ProfileData
         public IEnumerable<UploadJob> GetNotStartedOrConfirmationGivenUploadJobs()
         {
             // Must clear the session otherwise old object will be returned.
-            CurrentSession.Clear();
+            //            CurrentSession.Clear();
 
             return CurrentSession
                 .CreateCriteria<UploadJob>()
@@ -52,8 +52,9 @@ namespace FingertipsUploadService.ProfileData
 
                 CurrentSession.Update(uploadJob);
                 CurrentSession.Flush();
-
+                CurrentSession.Refresh(uploadJob);
                 transaction.Commit();
+
             }
             catch (Exception exception)
             {
@@ -69,7 +70,10 @@ namespace FingertipsUploadService.ProfileData
 
                 CurrentSession.Save(job);
 
+                CurrentSession.Flush();
+                CurrentSession.Refresh(job);
                 transaction.Commit();
+
             }
             catch (Exception exception)
             {
@@ -88,5 +92,15 @@ namespace FingertipsUploadService.ProfileData
                 .SetParameter("guid", guid)
                 .ExecuteUpdate();
         }
+
+        // Only used to clean the test environment 
+        public void DeleteAllJob()
+        {
+            const string query = "delete from uploadjob";
+            CurrentSession
+                .CreateSQLQuery(query)
+                .ExecuteUpdate();
+        }
+
     }
 }

@@ -40,7 +40,7 @@ namespace PholioVisualisation.DataConstructionTest
             var indicators = new List<int>
             {
                 IndicatorIds.DeprivationScoreIMD2010,
-                IndicatorIds.ChildrenInPoverty
+                IndicatorIds.ChildrenInLowIncomeFamilies
             };
             var builder = new ProfilePerIndicatorBuilder(isEnvironmentLive);
             return builder.Build(indicators, AreaTypeIds.DistrictAndUnitaryAuthority);

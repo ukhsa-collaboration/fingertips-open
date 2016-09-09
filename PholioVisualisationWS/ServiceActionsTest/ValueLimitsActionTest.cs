@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServiceActions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.ServiceActionsTest
 {

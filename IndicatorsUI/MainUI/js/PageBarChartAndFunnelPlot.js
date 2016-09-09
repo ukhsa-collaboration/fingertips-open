@@ -1,3 +1,5 @@
+'use strict';
+
 function goToIndicatorDetailsPage(rootIndex) {
 
     if (!groupRoots.length) {
@@ -68,13 +70,13 @@ function displayIndicatorDetails() {
             
             state.currentData = getDataSortedByArea(root.Data);
             
-            addPopulationToData(state.currentData, comparatorGrouping);
+            addPopulationToData(state.currentData, comparatorGrouping, root.YearRange);
             
             displayIndicatorTable(root, regionalGrouping, nationalGrouping, comparisonConfig);
         }
         
         if (hasStateChanged) {
-            setIndicatorTableHeaderHtml(root, rootIndex);
+            barChart.setIndicatorTableHeaderHtml(root, rootIndex);
             displayFunnelPlot(root, comparatorGrouping, comparisonConfig);
         }  
     } 
@@ -131,6 +133,7 @@ function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
             REGIONAL_COMPARATOR_ID, comparisonConfig);
     }
 
+    var sortedAreas = FT.data.sortedAreas;
     for (var i in data) {
         var area = sortedAreas[i];
         
@@ -164,7 +167,7 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
             'barFirst ' : 
             '';
 
-        if (barChartState.metadata.ValueTypeId === ValueTypeIds.Count) {
+        if (barChartState.metadata.ValueType.Id === ValueTypeIds.Count) {
             extraBarClass = 'hide ';
         }
         
@@ -172,7 +175,7 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
         if (compId !== comparatorId) {
             // Not benchmark
             extraBarClass += 'clickable ';
-            behaviour = ' onclick="selectBenchmarkClicked(' + compId + ')" ';
+            behaviour = ' onclick="barChart.selectBenchmarkClicked(' + compId + ')" ';
             var extraLabelClass = '';
         } else {
             // Current benchmark
@@ -200,7 +203,7 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
     
     // Bar
     var bar = isValue ?
-        getBarHtml(data, comparisonConfig) :
+        barChart.getBarHtml(data, comparisonConfig) :
         EMPTY_TD_CONTENTS;
     
     html.push('<td class="',extraBarClass,'bar"', behaviour, '>', bar, '</td>');
@@ -223,12 +226,13 @@ function addIndicatorTableComparatorRow(html, grouping, comparatorId, comparison
 };
 
 function getDataSortedByArea(data) {
-    var a = [];
+    var dataList = [];
+    var sortedAreas = FT.data.sortedAreas;
     for (var i in sortedAreas) {
         var d = getDataFromAreaCode(data, sortedAreas[i].Code);
-        a.push(d);
+        dataList.push(d);
     }
-    return a;
+    return dataList;
 };
 
 function colourRow(dataIndex) {
@@ -247,8 +251,8 @@ function displayFunnelPlot(root, comparatorGrouping, comparisonConfig) {
     var data = barChartState.currentData,
     plot = $('#funnelPlot'),
     noData = $('#funnelPlotNoData'),
-    valueTypeId = barChartState.metadata.ValueTypeId,
-    methodId = comparatorGrouping.MethodId;
+    valueTypeId = barChartState.metadata.ValueType.Id,
+    methodId = comparatorGrouping.ComparatorMethodId;
     
     var isPopulation = false;
     for (var i in data) {
@@ -265,13 +269,13 @@ function displayFunnelPlot(root, comparatorGrouping, comparisonConfig) {
         // No funnel plot
         plot.hide();
         noData.show();
-        chart = null;
+        barChartState.chart = null;
     } else {
         noData.hide();
         plot.show();
         var options = getFunnelPlotOptions(root, data, comparatorGrouping, comparisonConfig);
         setProportionMax(options, barChartState.metadata, root, 95);
-        chart = new Highcharts.Chart(options);
+        barChartState.chart = new Highcharts.Chart(options);
     }
 };
 
@@ -280,9 +284,9 @@ function canDrawFunnelPlotForComparatorMethod(methodId) {
 }
 
 function canDrawFunnelPlotForValueType(valueTypeId) {
-    return valueTypeId !== 6 /*Ratio*/ &&
-        valueTypeId !== 4 /*Indirectly standardised rates*/ &&
-        valueTypeId !== 11 /*Life expectancy*/;
+    return valueTypeId !== ValueTypeIds.Ratio &&
+        valueTypeId !== ValueTypeIds.IndirectlyStandardisedRate &&
+        valueTypeId !== ValueTypeIds.LifeExpectancy;
 }
 
 function setProportionMax(options, metadata, root, max) {
@@ -296,9 +300,9 @@ function setProportionMax(options, metadata, root, max) {
 function getFunnelPlotOptions(root, data, comparatorGrouping, comparisonConfig) {
     
     var comparatorData = comparatorGrouping.ComparatorData;
-    var isComparatorValue = isDefined(comparatorData) && comparatorData.Val != -1;
-    var isDsr = (comparatorGrouping.MethodId == 6);
-    var showLimits = (comparatorGrouping.MethodId == 5 || isDsr) && isComparatorValue;
+    var isComparatorValue = isDefined(comparatorData) && comparatorData.Val !== -1;
+    var isDsr = (comparatorGrouping.ComparatorMethodId === 6);
+    var showLimits = (comparatorGrouping.ComparatorMethodId === 5 || isDsr) && isComparatorValue;
     
     var valueArrays = divideValuesBySignificance(data, comparisonConfig);
     
@@ -450,7 +454,7 @@ function getFunnelPlotOptions(root, data, comparatorGrouping, comparisonConfig) 
             var values = new CoreDataSetList(data).getValidValues('Population');  
             data[key] = new MinMaxFinder(values);  
         }
-        addFunnelPlotLimits(options, data[key], comparatorGrouping);
+        addFunnelPlotLimits(options, data[key], comparatorGrouping, root.YearRange);
     }
     
     return options;
@@ -463,7 +467,8 @@ function sortIndicatorDetailsByValue() {
     var rootIndex = getIndicatorIndex();
     var newOrder = invertSortOrder(barChartState.valueOrder);
     barChartState.valueOrder = newOrder;
-    sortedAreas = new AreaAndDataSorter(newOrder, groupRoots[rootIndex].Data, sortedAreas, areaHash).byValue();
+    FT.data.sortedAreas = new AreaAndDataSorter(newOrder, groupRoots[rootIndex].Data,
+        FT.data.sortedAreas, areaHash).byValue();
     
     displayIndicatorDetails(rootIndex);
     logEvent('BarChart', 'DataSortedByValue');
@@ -522,17 +527,6 @@ function getSpcForProportionsLimits(comparatorValue, denominatorMin, denominator
 
     return points;
 }
-
-function setIndicatorTableHeaderHtml(root, rootIndex) {
-    var grouping = getFirstGrouping(root);
-    var period = isDefined(grouping)
-        ? grouping.Period
-        : '';
-    
-    var html = getTrendHeader(barChartState.metadata, root, period,
-        'goToMetadataPage(' + rootIndex + ')');
-    $('#indicatorDetailsHeader').html(html);
-};
 
 var barChartState = {
     
@@ -606,7 +600,7 @@ function getSpcForDsrLimits(comparatorValue, populationMin, populationMax, yearR
     parameters.add('year_range',yearRange);
     
     barChartState.comparatorValue = comparatorValue;
-    ajaxGet('data/spc_for_dsr_limits', parameters.build(), getSpcForDsrLimitsCallback);
+    ajaxGet('api/spc_for_dsr_limits', parameters.build(), getSpcForDsrLimitsCallback);
 };
 
 function getSpcForDsrLimitsCallback(obj) {
@@ -629,10 +623,11 @@ function getSpcForDsrLimitsCallback(obj) {
             // Reset immediately to reduce chance of race condition
             barChartState.comparatorValue = null;
             
-            points = obj.Points;
+            var points = obj.Points;
             var max = barChartState.currentData['PopulationMinMax'].max;
             barChartState.setFunnelLimits(val, max, points);
-            
+
+            var chart = barChartState.chart;
             var serieses = chart.series,
             u3 = serieses[1],
             u2 = serieses[2],
@@ -697,7 +692,7 @@ function divideValuesBySignificance(data, comparisonConfig) {
     return { worse: worse, same: same, better: better, none: none};
 };
 
-function addFunnelPlotLimits(options, minAndMax, comparatorGrouping) {
+function addFunnelPlotLimits(options, minAndMax, comparatorGrouping, yearRange) {
     
     var comparatorData = comparatorGrouping.ComparatorData;
     
@@ -708,71 +703,25 @@ function addFunnelPlotLimits(options, minAndMax, comparatorGrouping) {
     
     var series = options.series;
     var limits = null;
-    if (comparatorGrouping.MethodId == 5) {
+    var comparatorMethodId = comparatorGrouping.ComparatorMethodId;
+    if (comparatorMethodId === 5) {
         
         limits = getSpcForProportionsLimits(value, min, max);
         
-    } else if (comparatorGrouping.MethodId == 6) {
+    } else if (comparatorMethodId === 6) {
         
         limits = barChartState.getFunnelLimits(value, max);
         if (!limits) {
-            getSpcForDsrLimits(value, min, max, comparatorGrouping.YearRange);
+            getSpcForDsrLimits(value, min, max, yearRange);
         }
     }
     else {
-        throw 'Cannot draw funnel plot for current comparator method ID: ' + comparatorGrouping.MethodId;
+        throw 'Cannot draw funnel plot for current comparator method ID: ' + comparatorMethodId;
     }
     
     if (limits) {
         setFunnelPlotLimitsSeriesData(limits, series, value, min, max);   
     }
-};
-
-function getBarHtml(data, comparisonConfig) {
-    
-    // No bar or CIs if everything is zero
-    var info = new CoreDataSetInfo(data);
-    if (info.areValueAndCIsZero()) {
-        return '';
-    }
-
-    var barScale = barChartState.barScale,
-    imgUrl = FT.url.img;
-
-    var img = getSignificanceImg(data.Sig[comparisonConfig.comparatorId],
-        comparisonConfig.useRagColours, comparisonConfig.useQuintileColouring);
-    if (!img) { img = 'lightGrey.png'; }
-    
-    var width = parseInt(barScale.pixelsPerUnit * data.Val, 10);
-    width = Math.abs(width);
-    
-    var left = data.Val < 0 ?
-        barScale.negativePixels - width :
-        barScale.negativePixels;
-    
-    var h = ['<div class="barBox"><img class="bar" style="width:', width, 
-        'px;left:', left,
-        'px" src="', imgUrl, img, '"/>'];
-    
-    if (data.UpCIF) {
-
-        // Add the error bars
-        var lower = getErrorBarPixelStart(data.LoCI, barScale),
-        upper = getErrorBarPixelStart(data.UpCI, barScale),
-        pixelSpan = upper - lower - 2;
-        
-        var start = '<img class="error',
-        end = 'px;"/>',
-        src = ' src="' + imgUrl + 'black.png" style="left:';
-        
-        h.push(start, '"', src, lower, end);
-        if (pixelSpan > 0) {
-            h.push(start, 'Mid"', src, (lower + 1), 'px;width:', pixelSpan, end);
-        }
-        h.push(start, '"', src, (upper - 1), end);
-    }
-    h.push('</div>');
-    return h.join('');
 };
 
 function getErrorBarPixelStart(cI, barScale) {
@@ -790,11 +739,14 @@ function getErrorBarPixelStart(cI, barScale) {
 function overBar(td, dataIndex) {
     
     highlightRow(td);
+
+    var state = barChartState;
+    var chart = state.chart;
     
     if (isDefined(chart)) {
         
         // {population:areacode}
-        var data = barChartState.currentData[dataIndex];
+        var data = state.currentData[dataIndex];
         
         if (data) {
             var pop = data.Population;
@@ -807,7 +759,7 @@ function overBar(td, dataIndex) {
                         for (var j in points) {      
                             var point = points[j];
                             if (point.x === pop && point.y === data.Val) {
-                                barChartState.selectedPoint = point;
+                                state.selectedPoint = point;
                                 point.select(true, false);
                                 return;
                             }
@@ -822,18 +774,20 @@ function overBar(td, dataIndex) {
 function outBar() {
     
     resetBarCells();
-    
-    if (isDefined(chart)) {
+
+    var state = barChartState;
+
+    if (isDefined(state.chart)) {
         // Unselect currently selected point
-        var point = barChartState.selectedPoint;
-        if (point !== null) {
+        var point = state.selectedPoint;
+        if (point) {
             point.select(false,false);
-            barChartState.selectedPoint = null;
+            state.selectedPoint = null;
         }
     }
 };
 
-function addPopulationToData(data, comparatorGrouping) {
+function addPopulationToData(data, comparatorGrouping, yearRange) {
     
     // Check population not already added
     for (var i in data) {
@@ -847,9 +801,7 @@ function addPopulationToData(data, comparatorGrouping) {
     }
     
     // DSR - divide denominator by year range to get population
-    var isDsr = (comparatorGrouping.MethodId == 6);
-    
-    var yearRange = comparatorGrouping.YearRange;
+    var isDsr = (comparatorGrouping.ComparatorMethodId === 6);
     
     for (i in data) {
         
@@ -902,34 +854,26 @@ function setFunnelPlotLimitsSeriesData(limits, series, value, min, max) {
     series[0].data = [[min, value], [comparatorMax, value]];
 }
 
-function selectBenchmarkClicked(comparatorId) {
-    if (!ajaxLock) {
-        FT.menus.benchmark.setComparatorId(comparatorId);
-        benchmarkChanged();
-        logEvent('BarChart', 'ComparatorChangedByClickOnBar');
-    }
-}
-
 function resetBarCells() {
-    
-    if (highlightedRowCells !== null) {
+    var data = FT.data;
+    if (data.highlightedRowCells !== null) {
         
         unhighlightRow();
         
-        highlightedRowCells.filter(':eq(2)').css({
+        data.highlightedRowCells.filter(':eq(2)').css({
                 'border-top-color': '#fff',
                 'border-bottom-color': '#fff'
         });
-        highlightedRowCells = null;
+        data.highlightedRowCells = null;
     }
 }
 
-highlightedRowCells = null;
+FT.data.highlightedRowCells = null;
 
 templates.add('indicators',
     '<div id="indicatorDetailsData" style="display: none;"><div style="float:none; clear: both; width:100%;"><div id="indicatorDetailsHeader"></div>\
     <div id="funnelPlotBox">' +
-    showExportChartLink() +
+    showExportChartLink('barChartState.chart') +
     '<div id="funnelPlot" style="display: none;"></div><div id="funnelPlotNoData" style="" class="noData">Funnel plot is<br>not available</div></div>\
     <div id="indicatorDetailsBox">' +
     showExportTableLink('indicatorDetailsBox', 'CompareAreasTable') +

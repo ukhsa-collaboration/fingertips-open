@@ -15,10 +15,13 @@ namespace PholioVisualisation.PholioObjects
 
         public Grouping(Grouping templateGrouping)
         {
+            // TODO use automapper
             GroupingId = templateGrouping.GroupingId;
             GroupId = templateGrouping.GroupId;
             SexId = templateGrouping.SexId;
+            Sex = templateGrouping.Sex;
             AgeId = templateGrouping.AgeId;
+            Age = templateGrouping.Age;
             AreaTypeId = templateGrouping.AreaTypeId;
             IndicatorId = templateGrouping.IndicatorId;
             PolarityId = templateGrouping.PolarityId;
@@ -40,7 +43,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public int GroupingId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int GroupId { get; set; }
 
         [JsonIgnore]
@@ -48,6 +51,12 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         public int AgeId { get; set; }
+
+        [JsonIgnore]
+        public Sex Sex { get; set; }
+
+        [JsonIgnore]
+        public Age Age { get; set; }
 
         [JsonIgnore]
         public int AreaTypeId { get; set; }
@@ -61,7 +70,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public int PolarityId { get; set; }
 
-        [JsonProperty(PropertyName = "MethodId")]
+        [JsonProperty(PropertyName = "ComparatorMethodId")]
         public int ComparatorMethodId { get; set; }
 
         [JsonProperty(PropertyName = "SigLevel")]
@@ -91,7 +100,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public int DataPointMonth { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public int YearRange { get; set; }
 
         [JsonProperty(PropertyName = "Period")]

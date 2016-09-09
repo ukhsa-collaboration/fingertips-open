@@ -7,11 +7,11 @@ namespace PholioVisualisation.DataConstruction
 {
     public class BenchmarkDataProvider
     {
-        private IGroupDataReader groupDataReader;
+        private IGroupDataReader _groupDataReader;
 
         public BenchmarkDataProvider(IGroupDataReader groupDataReader)
         {
-            this.groupDataReader = groupDataReader;
+            this._groupDataReader = groupDataReader;
         }
 
         public CoreDataSet GetBenchmarkData(Grouping grouping, TimePeriod timePeriod,
@@ -24,7 +24,9 @@ namespace PholioVisualisation.DataConstruction
                 benchmarkData = averageCalculator.Average;
                 if (benchmarkData != null)
                 {
-                   benchmarkData.AreaCode = parentArea.Code;
+                    SetAreaCode(parentArea, benchmarkData);
+                    benchmarkData.AgeId = grouping.AgeId;
+                    benchmarkData.SexId = grouping.SexId;
                 }
             }
 
@@ -36,18 +38,37 @@ namespace PholioVisualisation.DataConstruction
             return benchmarkData;
         }
 
+        private void SetAreaCode(IArea area, CoreDataSet data)
+        {
+            ICategoryArea categoryArea = area as ICategoryArea;
+            if (categoryArea != null)
+            {
+                // Category area
+                data.AreaCode = categoryArea.ParentAreaCode;
+                data.CategoryTypeId = categoryArea.CategoryTypeId;
+                data.CategoryId = categoryArea.CategoryId;
+            }
+            else
+            {
+                // Standard area
+                data.AreaCode = area.Code;
+                data.CategoryTypeId = CategoryTypeIds.Undefined;
+                data.CategoryId = CategoryIds.Undefined;
+            }
+        }
+
         private CoreDataSet GetDataFromDatabase(Grouping grouping, TimePeriod timePeriod, IArea parentArea)
         {
             CoreDataSet benchmarkData;
 
-            var categoryArea = parentArea as CategoryArea;
+            var categoryArea = parentArea as ICategoryArea;
             if (categoryArea != null)
             {
-                benchmarkData = groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, categoryArea);
+                benchmarkData = _groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, categoryArea);
             }
             else
             {
-                IList<CoreDataSet> data = groupDataReader.GetCoreData(grouping, timePeriod, parentArea.Code);
+                IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, timePeriod, parentArea.Code);
                 CheckOnlyOneCoreDataSetFound(grouping, parentArea, data);
                 benchmarkData = data.FirstOrDefault();
             }

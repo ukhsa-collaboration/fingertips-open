@@ -22,9 +22,9 @@ function updatePage() {
     getIndicatorMetadata(groupIdsString);
     getAreaAddress(model.areaCode);
 
-    getPracticeData(groupIdsString + ',' + SupportingGroupId, areaCode, PRACTICE);
+    getPracticeData(groupIdsString + ',' + SupportingGroupId, areaCode, AreaTypeIds.Practice);
     getCCGData(groupIdsString, model.parentCode, [NATIONAL_CODE], model.areaTypeId);
-    getEnglandPrimaryData(groupIdsString, NATIONAL_CODE, PRACTICE);
+    getEnglandPrimaryData(groupIdsString, NATIONAL_CODE, AreaTypeIds.Practice);
 
     getAllAreas(model);
 
@@ -63,9 +63,6 @@ function displayPage() {
     $('.practice_is_in').html('This practice is in:');
     $('.practice_in_area').html(practiceArea.Name);
 
-    //ToDo: Reintroduce decile comparator in place of category - As of 31/10/2014
-    //    $('.practice_is_category').html('The practice category is: <br/>' + (isDefined(loaded.practiceCategories[areaCode]) ? loaded.practiceCategories[areaCode].Name : 'Not defined'));
-
     $('#area-header').html(getSimpleAreaTypeName() + '<br>value');
     $('#outcomes-header').html(getSimpleAreaTypeName());
     $('#comparison-header').html('Compared to the other practices in the ' + getSimpleAreaTypeName());
@@ -103,7 +100,7 @@ function setRowData(dataList, areaCodeToRowHash, rows, property, valueFormatFunc
 
 function displayValuesAtTopOfPage() {
 
-    var supportingData = loaded.areaData.getData(SupportingGroupId, MT.model.areaCode, PRACTICE);
+    var supportingData = loaded.areaData.getData(SupportingGroupId, MT.model.areaCode, AreaTypeIds.Practice);
     var dataCount = supportingData.length;
     var noDataMessage = NO_DATA;
 
@@ -154,9 +151,9 @@ function initTableRows() {
 
     for (var j in groupIds) {
         var groupId = groupIds[j];
-        var dataList = areaData.getData(groupId, model.areaCode, PRACTICE),
+        var dataList = areaData.getData(groupId, model.areaCode, AreaTypeIds.Practice),
             parentDataList = areaData.getData(groupId, parentCode, model.areaTypeId),
-            nationalDataList = areaData.getData(groupId, NATIONAL_CODE, PRACTICE);
+            nationalDataList = areaData.getData(groupId, NATIONAL_CODE, AreaTypeIds.Practice);
 
         for (var i in nationalDataList) {
             var data = dataList[i];
@@ -164,20 +161,26 @@ function initTableRows() {
             var iid = nationalData.IID;
             var metadata = indicatorMetadataHash[iid];
 
+            // Practice data
             var practiceDataIndex = data.Data.length - 1;
-            var parentDataIndex = parentDataList[i].Data.length - 1;
-
-            var coreData = data.Data[practiceDataIndex];
-            var parentData = parentDataList[i].Data[parentDataIndex];
-            var gradeFunction = getGradeFunction(nationalData.MethodId);
-
-            var parentAreaFormattedValue;
+            var practiceData = data.Data[practiceDataIndex];
             var practiceFormattedValue;
 
-            // Only include rows where area has data
-            if (coreData) {
+            // Parent data
+            if (parentDataList[i]) {
+                var parentDataIndex = parentDataList[i].Data.length - 1;
+                var parentData = parentDataList[i].Data[parentDataIndex];
+            } else {
+                parentDataIndex = parentData = null;
+            }
+            var parentAreaFormattedValue;
 
-                var isValidPracticeData = new CoreDataSetInfo(coreData).isValue();
+            var gradeFunction = getGradeFunction(nationalData.ComparatorMethodId);
+
+            // Only include rows where area has data
+            if (practiceData) {
+
+                var isValidPracticeData = new CoreDataSetInfo(practiceData).isValue();
                 var significance = data.Sig[parentCode][practiceDataIndex];
 
                 if (iid === IndicatorIds.Deprivation) {
@@ -191,13 +194,15 @@ function initTableRows() {
 
                     // CCG deprivation
                     var parentSignificance = parentDataList[deprivationRootIndex].Sig[NATIONAL_CODE];
+
+                    // Assume always have parent data for deprivation
                     parentAreaFormattedValue = getDeprivationLabel(
                         deprivationDefinitions[parentSignificance[parentDataIndex]]);
 
                     var nationalValF = 'N/A';
                 } else {
                     practiceFormattedValue = isValidPracticeData
-                        ? coreData.ValF
+                        ? practiceData.ValF
                         : 'No Data';
                     parentAreaFormattedValue = parentData !== null
                         ? parentData.ValF
@@ -241,7 +246,7 @@ function updatePopulation(rank) {
 
 function selectArea(code) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         MT.model.areaCode = code;
 
         initPage();
@@ -264,41 +269,42 @@ function getCCGData(groupId, areaCode, comparators, areaTypeId) {
 
 function getEnglandPrimaryData(groupId, areaCode, areaTypeId) {
 
-    var parameters = [
-        'gid=', groupId,
-        '&are=', areaCode,
-        '&ati=', areaTypeId,
-        '&tim=yes',
-        '&latest_data_only=yes'
-    ];
+    var parameters = new ParameterBuilder(
+        ).add('group_ids', groupId
+        ).add('area_type_id', areaTypeId
+        ).add('area_codes', areaCode
+        ).add('include_time_periods', 'yes'
+        ).add('latest_data_only', 'yes');
 
-    getData(function (obj) {
-        for (var groupId in obj) {
-            for (areaCode in obj[groupId]) {
-                loaded.areaData.addData(groupId, areaCode, areaTypeId, obj[groupId][areaCode]);
+    ajaxGet('api/latest_data/all_indicators_in_multiple_profile_groups_for_multiple_areas', parameters.build(),
+        function (obj) {
+            for (var groupId in obj) {
+                for (areaCode in obj[groupId]) {
+                    loaded.areaData.addData(groupId, areaCode, areaTypeId, obj[groupId][areaCode]);
+                }
             }
-        }
-        ajaxMonitor.callCompleted();
-    }, 'ad', parameters.join(''));
+            ajaxMonitor.callCompleted();
+        });
 };
 
 function getAreaData(groupId, areaCode, comparators, areaTypeId) {
-    var parameters = [
-        'gid=', groupId,
-        '&are=', areaCode,
-        '&ati=', areaTypeId,
-        '&com=', comparators.join(','),
-        '&latest_data_only=yes'
-    ];
 
-    getData(function (obj) {
-        for (var groupId in obj) {
-            for (areaCode in obj[groupId]) {
-                loaded.areaData.addData(groupId, areaCode, areaTypeId, obj[groupId][areaCode]);
+    var parameters = new ParameterBuilder(
+    ).add('group_ids', groupId
+    ).add('area_type_id', areaTypeId
+    ).add('area_codes', areaCode
+    ).add('latest_data_only', 'yes'
+    ).add('comparator_area_codes', comparators.join(','));
+
+    ajaxGet('api/latest_data/all_indicators_in_multiple_profile_groups_for_multiple_areas', parameters.build(),
+        function (obj) {
+            for (var groupId in obj) {
+                for (areaCode in obj[groupId]) {
+                    loaded.areaData.addData(groupId, areaCode, areaTypeId, obj[groupId][areaCode]);
+                }
             }
-        }
-        ajaxMonitor.callCompleted();
-    }, 'ad', parameters.join(''));
+            ajaxMonitor.callCompleted();
+        });
 }
 
 function getAreaDataCallback(obj) {
@@ -327,7 +333,7 @@ function AreaDataCollection() {
 
 MT.nav.rankings = function () {
     setUrl('/topic/' + profileUrlKey + '/comparisons#par/' + MT.model.parentCode +
-        '/ati/' + PRACTICE + '/pat/' + MT.model.parentAreaType);
+        '/ati/' + AreaTypeIds.Practice + '/pat/' + MT.model.parentAreaType);
 }
 
 function goToPracticeProfiles() {

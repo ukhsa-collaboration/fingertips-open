@@ -11,7 +11,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     public class FingertipsBaseUnitTest : BaseUnitTest
     {
         [TestInitialize]
-        public override void CalledOnceAtStartOfTests()
+        public override void TestInitialize()
         {
             SetSkin(SkinNames.Core);
         }

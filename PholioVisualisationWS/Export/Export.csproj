@@ -35,6 +35,14 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="SpreadsheetGear, Version=6.0.3.222, Culture=neutral, PublicKeyToken=39c186f5904944ec, processorArchitecture=MSIL">
       <HintPath>..\lib\SpreadsheetGear.dll</HintPath>
     </Reference>
@@ -59,11 +67,18 @@
   <ItemGroup>
     <Compile Include="AddressStringifier.cs" />
     <Compile Include="BaseExcelFileInfo.cs" />
+    <Compile Include="CategoryAreaDataWriter.cs" />
     <Compile Include="ColumnHeader.cs" />
+    <Compile Include="ColumnIndexes.cs" />
+    <Compile Include="CoreDataCollector.cs" />
+    <Compile Include="CoverSheet.cs" />
     <Compile Include="ExcelFileBuilder.cs" />
     <Compile Include="ExcelFileWriter.cs" />
     <Compile Include="ExportDIRegistry.cs" />
     <Compile Include="GroupRootUniqueKey.cs" />
+    <Compile Include="ParentDataWriter.cs" />
+    <Compile Include="CategoryIdAndAreaCode.cs" />
+    <Compile Include="RowLabels.cs" />
     <Compile Include="SearchResultsFileInfo.cs" />
     <Compile Include="SheetNamer.cs" />
     <Compile Include="PracticeProfileDataBuilder.cs" />
@@ -74,9 +89,15 @@
     <Compile Include="ProfileFileInfo.cs" />
     <Compile Include="ProfileDataWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubnationalAreaDataWriter.cs" />
+    <Compile Include="TrendMarkerWriter.cs" />
     <Compile Include="WorksheetInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Analysis\Analysis.csproj">
+      <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
+      <Name>Analysis</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>
       <Name>ExceptionLogger</Name>

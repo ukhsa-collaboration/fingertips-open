@@ -4,7 +4,7 @@ namespace PholioVisualisation.PholioObjects
     public class AreaTypeIds
     {
         public const int Undefined = 0;
-        public const int LocalAuthority = 1;
+        public const int District = 1;
         public const int Pct = 2;
         public const int Lsoa = 4;
         public const int Sha = 5;
@@ -17,6 +17,7 @@ namespace PholioVisualisation.PholioObjects
         public const int Shape = 18;
         public const int Ccg = 19;
         public const int MentalHealthTrust = 20;
+        public const int AmbulanceTrust = 41;
         public const int PheCentreObsolete = 43;
         public const int Subregion = 46;
         public const int PheCentreFrom2013 = 48;
@@ -37,11 +38,12 @@ namespace PholioVisualisation.PholioObjects
 
     public class CategoryIds
     {
-        public const int Undefined = -1;        
+        public const int Undefined = -1;
 
         // Deprivation
-        public const int MostDeprived = 1;
-        public const int LeastDeprived = 5;
+        public const int MostDeprivedDecile = 1;
+        public const int MostDeprivedQuintile = 1;
+        public const int LeastDeprivedQuintile = 5;
 
         // Ethnicity (7 groups)
         public const int EthnicityWhite = 1;
@@ -55,14 +57,18 @@ namespace PholioVisualisation.PholioObjects
     {
         public const int Undefined = -1;
         public const int DeprivationDecileGp2010 = 1;
-        public const int DeprivationDecileCountyAndUnitaryAuthority = 2;
-        public const int DeprivationDecileDistrictAndUnitaryAuthority = 3;
-        public const int EthnicGroups5 = 33;
+        public const int DeprivationDecileCountyAndUA2010 = 2;
+        public const int DeprivationDecileDistrictAndUA2010 = 3;
+        public const int EthnicGroups7 = 4;
         public const int LimitsForHealthProfilesLifeExpectancyChart = 5;
-        public const int LsoaDeprivationQuintilesInEngland = 6;
-        public const int LsoaDeprivationDecilesWithinArea = 9;
-        public const int LsoaDeprivationQuintilesWithinArea = 10;
+        public const int LsoaDeprivationQuintilesInEngland2010 = 6;
+        public const int LsoaDeprivationDecilesWithinArea2010 = 9;
+        public const int LsoaDeprivationQuintilesWithinArea2010 = 10;
+        public const int EthnicGroups5 = 33;
         public const int DeprivationDecileGp2015 = 38;
+        public const int DeprivationDecileCountyAndUA2015 = 39;
+        public const int DeprivationDecileDistrictAndUA2015 = 40;
+        public const int LsoaDeprivationQuintilesInEngland2015 = 41;
     }
 
     public class SexIds
@@ -116,7 +122,9 @@ namespace PholioVisualisation.PholioObjects
         public const int Weeks6To8 = 170;
         public const int Plus17 = 187;
         public const int Plus15 = 188;
+        public const int From5To15 = 193;
         public const int From10To11 = 201;
+        public const int From16To64 = 204;
         public const int Over60 = 214;
         public const int From18To75 = 234;
         public const int From90To95 = 281;
@@ -140,7 +148,9 @@ namespace PholioVisualisation.PholioObjects
         public const int AgedOver85Years = 642;
         public const int LifeExpectancyMsoaBasedEstimate = 650;
         public const int EstimatedPrevalenceOfCHD = 720;
+        public const int PercentageLivingInEachDeprivationQuintile = 734;
         public const int AdultSmokingPrevalence = 750;
+        public const int YoungPeopleInTreatmentNotRetainedForMoreThan12Weeks = 909;
         public const int VulnerablePeopleAchievingIndependentLiving = 1116;
         public const int Population = 1170;
         public const int IncidenceOfMalignantMelanoma = 1763;
@@ -149,7 +159,8 @@ namespace PholioVisualisation.PholioObjects
         public const int EthnicityEstimates = 1679;
         public const int DeprivationBottom20Percent = 1730;
         public const int HealthInequalitiesEmergencyHospitalAdmissionsByEthnicGroup = 2538;
-        public const int ChildrenInPoverty = 10101;
+        public const int ChildrenInLowIncomeFamilies = 10101;
+        public const int PupilAbsence = 10301;
         public const int KilledAndSeriouslyInjuredOnRoads = 11001;
         public const int ViolentCrime = 11202;
         public const int StatutoryHomelessness = 11501;
@@ -174,6 +185,7 @@ namespace PholioVisualisation.PholioObjects
         public const int SyphilisDiagnosis = 90742;
         public const int ObeseAdults = 90743;
         public const int HIVLateDiagnosis = 90791;
+        public const int IncidenceOfMalignantMelanoma2 = 90834;
         public const int PercentageOfPeoplePerDeprivationQuintile = 90851;
         public const int XAxisOfHealthProfilesChartAtBottomOfPage2 = 90852;
         public const int Under18AlcoholSpecificStays = 90856;
@@ -182,9 +194,25 @@ namespace PholioVisualisation.PholioObjects
         public const int NumberInTreatmentAtSpecialistDrugMisuseServices = 91181;
         public const int SexuallyTransmittedInfection = 91306;
         public const int AlcoholAdmissionsToHospital = 91414;
-        public const int GcseAchievement = 91466;
+        public const int GcseAchievement = 92199;
         public const int AdultDrugMisuse = 91467;
         public const int DeprivationScoreIMD2015 = 91872;
+        public const int AgedUnder18 = 92309;
+        public const int StatutoryHomelessness2 = 92314;
+        public const int SurgicalSiteInfectionHipProsthesis = 92368;
+        public const int SurgicalSiteInfectionKneeProsthesis = 92420;
+        public const int AdultDrugMisuse2 = 92432;
+        public const int AdultSmokingPrevalence2 = 92443;
+    }
+
+    public class ConfidenceIntervalMethodIds
+    {
+        public const int Byars = 2;
+    }
+
+    public class UnitIds
+    {
+        public const int Days = 7;
     }
 
     public class PolarityIds
@@ -192,7 +220,7 @@ namespace PholioVisualisation.PholioObjects
         public const int NotApplicable = -1;
         public const int RagLowIsGood = 0;
         public const int RagHighIsGood = 1;
-        public const int UseBlues = 99;
+        public const int BlueOrangeBlue = 99;
     }
 
     public class YearTypeIds
@@ -300,6 +328,7 @@ namespace PholioVisualisation.PholioObjects
         public const int Search = 1;
         public const int HealthInequalities = 1000008;
         public const int Phof_WiderDeterminantsOfHealth = 1000041;
+        public const int Phof_HealthcarePrematureMortality = 1000044;
         public const int Phof_HealthProtection = 1000043;
         public const int SexualAndReproductiveHealth = 8000057;
 
@@ -311,18 +340,19 @@ namespace PholioVisualisation.PholioObjects
         public const int PracticeProfiles_SupportingIndicators = 1200006;
         public const int PracticeProfiles_Diabetes = 2000002;
         public const int PracticeProfiles_CvdHeartFailure = 3000009;
-        
+
         public const int SubstanceMisuse_Over18Misuse = 1000031;
         public const int LongerLives = 1000001;
 
         public const int Diabetes_TreatmentTargets = 1938132700;
-        public const int Diabetes_CareProcesses = 1938132728; 
+        public const int Diabetes_CareProcesses = 1938132728;
         public const int Diabetes_PrevalenceAndRisk = 1938132727;
-        public const int DiabetesSupportingIndicators_ValuesAtTopOfPage= 1938132706;
+        public const int DiabetesSupportingIndicators_ValuesAtTopOfPage = 1938132706;
 
         public const int Hypertension_Detection = 1938132758;
         public const int Hypertension_RiskAndPrevention = 1938132757;
         public const int HealthProfiles_OurCommunities = 3007000;
+        public const int HealthProfiles_AllSpineChartIndicators = 1938132701;
     }
 
     public class ProfileIds
@@ -347,7 +377,11 @@ namespace PholioVisualisation.PholioObjects
         public const int HyperTension = 67;
         public const int LocalAlcoholProfilesForEngland = 87;
         public const int CancerServices = 92;
+        public const int WhatAboutYouth = 94;
         public const int PhysicalActivity = 99;
+        public const int Amr = 101;
+        public const int ChildHealthProfiles = 105;
+
     }
 
     public class ComparatorIds
@@ -414,7 +448,12 @@ namespace PholioVisualisation.PholioObjects
         public const int Cumbria = 273454;
     }
 
-    
+    public class ChimatWayResourceIds
+    {
+        public const int NotFound = -1;
+        public const int Cumbria = 279208;
+    }
+
     public enum TrendMarker
     {
         CannotBeCalculated = 0, // i.e. not enough data points

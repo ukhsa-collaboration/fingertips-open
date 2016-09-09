@@ -23,22 +23,34 @@ namespace PholioVisualisation.Services
             }
         }
 
-        private ParentAreasParameters parameters;
+        private ParentAreasParameters _parameters;
         private IAreasReader reader = ReaderFactory.GetAreasReader();
 
         public JsonBuilderParentAreas(HttpContextBase context)
             : base(context)
         {
-            parameters = new ParentAreasParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new ParentAreasParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderParentAreas(ParentAreasParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var areaTypeIds = parameters.AreaTypeIds;
+            var childAreaToParentsMap = GetChildAreaToParentsMap();
+            return JsonConvert.SerializeObject(childAreaToParentsMap);
+        }
+
+        public AreaToParentsMap GetChildAreaToParentsMap()
+        {
+            var areaTypeIds = _parameters.AreaTypeIds;
 
             // First level parents
-            string areaCode = parameters.ChildAreaCode;
+            string areaCode = _parameters.ChildAreaCode;
             AreaToParentsMap childAreaToParentsMap = new AreaToParentsMap(areaCode, reader.GetAreaFromCode(areaCode).AreaTypeId);
             childAreaToParentsMap.Parents = GetParentAreas(areaCode, areaTypeIds);
 
@@ -48,7 +60,7 @@ namespace PholioVisualisation.Services
                 area.Parents = GetParentAreas(area.Code, areaTypeIds);
             }
 
-            return JsonConvert.SerializeObject(childAreaToParentsMap);
+            return childAreaToParentsMap;
         }
 
         private IEnumerable<AreaToParentsMap> GetParentAreas(string areaCode, IList<int> areaTypeIds)

@@ -25,7 +25,7 @@ function getPractices() {
         .add('northing', northing)
         .add('area_type_id', MT.model.areaTypeId);
 
-    ajaxGet('data/nearby_areas', parameters.build(), getGpPracticesNearbyCallback);
+    ajaxGet('api/area_search_by_proximity', parameters.build(), getGpPracticesNearbyCallback);
 }
 
 function renderTable() {

@@ -36,14 +36,9 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.Population); }
         }
 
-        public GroupRoot Deprivation
+        public GroupRoot ChildrenInLowIncomeFamilies
         {
-            get { return GetGroupRoot(IndicatorIds.DeprivationBottom20Percent); }
-        }
-
-        public GroupRoot ChildHealth
-        {
-            get { return GetGroupRoot(IndicatorIds.ChildrenInPoverty); }
+            get { return GetGroupRoot(IndicatorIds.ChildrenInLowIncomeFamilies); }
         }
 
         public GroupRoot XAxisOfHealthProfilesChartAtBottomOfPage2Male
@@ -133,7 +128,7 @@ namespace PholioVisualisation.PdfData
 
         public GroupRoot AdultSmokingPrevalence
         {
-            get { return GetGroupRoot(IndicatorIds.AdultSmokingPrevalence); }
+            get { return GetGroupRoot(IndicatorIds.AdultSmokingPrevalence2); }
         }
 
         public GroupRoot AdultPhysicalActivity
@@ -163,7 +158,7 @@ namespace PholioVisualisation.PdfData
 
         public GroupRoot AdultStatutoryHomelessness
         {
-            get { return GetGroupRoot(IndicatorIds.StatutoryHomelessness); }
+            get { return GetGroupRoot(IndicatorIds.StatutoryHomelessness2); }
         }
 
         public GroupRoot AdultViolentCrime
@@ -178,12 +173,12 @@ namespace PholioVisualisation.PdfData
 
         public GroupRoot AdultIncidenceOfMalignantMelanoma
         {
-            get { return GetGroupRoot(IndicatorIds.IncidenceOfMalignantMelanoma); }
+            get { return GetGroupRoot(IndicatorIds.IncidenceOfMalignantMelanoma2); }
         }
 
         public GroupRoot AdultDrugMisuse
         {
-            get { return GetGroupRoot(IndicatorIds.AdultDrugMisuse); }
+            get { return GetGroupRoot(IndicatorIds.AdultDrugMisuse2); }
         }
 
         public GroupRoot AdultExcessWinterDeaths
@@ -209,6 +204,11 @@ namespace PholioVisualisation.PdfData
         public GroupRoot PercentageOfPeoplePerDeprivationQuintile
         {
             get { return GetGroupRoot(IndicatorIds.PercentageOfPeoplePerDeprivationQuintile); }
+        }
+
+        public GroupRoot DeprivationScoreIMD2015
+        {
+            get { return GetGroupRoot(IndicatorIds.DeprivationScoreIMD2015); }
         }
 
         public GroupRoot OverallPrematureDeaths

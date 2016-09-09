@@ -1,8 +1,5 @@
-﻿using System;
+﻿using PholioVisualisation.Analysis;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using PholioVisualisation.Analysis;
 
 namespace PholioVisualisation.ServiceActions
 {

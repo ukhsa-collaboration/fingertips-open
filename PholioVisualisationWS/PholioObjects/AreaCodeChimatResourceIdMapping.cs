@@ -11,4 +11,10 @@ namespace PholioVisualisation.PholioObjects
         public string AreaCode { get; set; }
         public int ChimatResourceId { get; set; }
     }
+
+    public class AreaCodeChimatWayResourceIdMapping
+    {
+        public string AreaCode { get; set; }
+        public int ChimatWayResourceId { get; set; }
+    }
 }

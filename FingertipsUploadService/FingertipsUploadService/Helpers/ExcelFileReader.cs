@@ -124,8 +124,8 @@ namespace FingertipsUploadService.Helpers
         private DataTable GetDataTableFromWorksheet(string worksheetName, bool isFirstRowHeader, string newDataTableName)
         {
             DataTable dataTable;
-            OleDbConnection connection;
-            OleDbDataAdapter adapter;
+            OleDbConnection connection = null;
+            OleDbDataAdapter adapter = null;
             try
             {
                 connection = GetConnection(isFirstRowHeader);
@@ -141,6 +141,7 @@ namespace FingertipsUploadService.Helpers
 
             adapter.Dispose();
             connection.Dispose();
+            connection.Close();
 
             return dataTable;
         }

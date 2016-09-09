@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Profiles.DomainObjects
@@ -22,12 +21,21 @@ namespace Profiles.DomainObjects
         public int DefaultFingertipsTabId { get; set; }
         public int SkinId { get; set; }
         public bool HasOwnFrontPage { get; set; }
-        public int? LeadProfileForCollectionId { get; set; }
+
+        public string ProfileCollectionIdsString { get; set; }
+        public List<int> ProfileCollectionIds
+        {
+            get
+            {
+                return new IntListStringParser(ProfileCollectionIdsString).IntList;
+            }
+        }
+
         public string ExtraJavaScriptFilesString { get; set; }
         public string ExtraCssFilesString { get; set; }
         public bool ShowDataQuality { get; set; }
         public bool IsNational { get; set; }
-        public bool HasTrendMarkers { get; set; }
+        public bool HasRecentTrends { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
         public string AccessControlGroup { get; set; }
         public LongerLivesProfileDetails LongerLivesProfileDetails { get; set; }
@@ -49,6 +57,5 @@ namespace Profiles.DomainObjects
         }
 
         public SpineChartMinMaxLabel SpineChartMinMaxLabel { get; set; }
-
     }
 }

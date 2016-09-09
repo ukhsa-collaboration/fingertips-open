@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="FingertipsUrl.cs" />
     <Compile Include="ProfileCollectionBuilder.cs" />
+    <Compile Include="ProfileCollectionListBuilder.cs" />
     <Compile Include="ProfileDetailsBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

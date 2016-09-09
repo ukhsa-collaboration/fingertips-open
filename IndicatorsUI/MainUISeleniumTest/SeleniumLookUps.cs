@@ -29,7 +29,8 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string AreaSearchLink = "area-search-link";
         public const string ProfilePerIndicator = "indicator-profile-origin-link";
         public const string ListOfIndicators = "search-indicator-list";
-
+        public const string InequalitiesTrends = "inequalities-trends";
+        public const string InequalitiesLatestValues = "inequalities-values";
         // Tabs
         public const string TabDownload = "page-download";
     }

@@ -30,7 +30,7 @@ namespace Profiles.DomainObjects
 
         public IEnumerable<ProfileCollectionItem> ProfileCollectionItems { get; set; }
 
-        public IList<ProfileCollectionItem> ItemsSortedByName()
+        public IList<ProfileCollectionItem> ProfileCollectionItemsSortedByName()
         {
             if (ProfileCollectionItems == null)
             {
@@ -40,6 +40,14 @@ namespace Profiles.DomainObjects
             return ProfileCollectionItems
                 .OrderBy(x => x.ProfileDetails.Title)
                 .ToList();
+        }
+
+        public void AssignParentToCollectionItems()
+        {
+            foreach (var item in ProfileCollectionItems)
+            {
+                item.ParentCollection = this;
+            }
         }
     }
 }

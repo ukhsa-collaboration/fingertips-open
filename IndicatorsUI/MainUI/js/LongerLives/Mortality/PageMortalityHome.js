@@ -308,7 +308,7 @@ function initMapOptions() {
 
     $('.filters li').click(function () {
 
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
 
             lock();
             setSelectedDiseaseFilter($(this).attr('id'));

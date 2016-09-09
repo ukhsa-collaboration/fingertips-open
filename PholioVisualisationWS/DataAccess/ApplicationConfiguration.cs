@@ -51,7 +51,7 @@ namespace PholioVisualisation.DataAccess
         {
             get { return ConfigurationManager.AppSettings["CoreWsUrlForLogging"]; }
         }
-      
+
         public static string ApplicationName
         {
             get { return ConfigurationManager.AppSettings["ApplicationName"]; }

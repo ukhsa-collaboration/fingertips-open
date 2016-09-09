@@ -117,7 +117,7 @@ namespace PholioVisualisation.DataConstruction
         private static bool IsParentArea(IArea area)
         {
             return area.IsCountry ||
-                area.IsCountyAndUnitaryAuthorityDeprivationDecile ||
+                area.IsCountyAndUADeprivationDecile ||
                 area.AreaTypeId == AreaTypeIds.OnsClusterGroup2001;
         }
 
@@ -219,13 +219,13 @@ namespace PholioVisualisation.DataConstruction
             {
                 decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
                     AreaTypeIds.DistrictAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority);
+                    CategoryTypeIds.DeprivationDecileDistrictAndUA2010);
             }
             else if (childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority)
             {
                 decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
                     AreaTypeIds.CountyAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
+                    CategoryTypeIds.DeprivationDecileCountyAndUA2010);
             }
 
             return decileArea;

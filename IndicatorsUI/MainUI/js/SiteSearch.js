@@ -22,32 +22,35 @@ function getGroupingData() {
 
             showSpinner();
 
-            ajaxGet('GetGroupDataAtDataPointBySearch.ashx',
-                getGroupDataParameters() + getRestrictByProfileParameter(),
-                function (json) { getGroupingDataCallback(json); },
-                handleAjaxFailure
-            );
+            var parameters = new ParameterBuilder();
+            addGroupDataParameters(parameters);
+            addProfileOrIndicatorsParameters(parameters);
+            addRestrictToProfilesIdsParameter(parameters);
+
+            ajaxGet('api/latest_data/specific_indicators_for_child_areas', parameters.build(),
+                getGroupingDataCallback, handleAjaxFailure);
         }
     }
 };
 
 function getTrendData() {
 
-    var code = FT.model.parentCode;
+    var parentCode = FT.model.parentCode;
 
-    if (areaTrendsState.isTrendDataLoaded(code)) {
-        getTrendDataCallback(areaTrendsState.getTrendData(code));
+    if (areaTrendsState.isTrendDataLoaded(parentCode)) {
+        getTrendDataCallback(areaTrendsState.getTrendData(parentCode));
     } else {
 
         showSpinner();
 
-        var parameters =
-            'ati=' + FT.model.areaTypeId +
-            '&par=' + code +
-            getRestrictByProfileParameter() +
-            getProfileOrIndicatorsParameters();
+        var parameters = new ParameterBuilder(
+            ).add('area_type_id', FT.model.areaTypeId
+            ).add('parent_area_code', parentCode);
 
-        ajaxGet('GetTrendDataBySearch.ashx', parameters, getTrendDataCallback);
+        addRestrictToProfilesIdsParameter(parameters);
+        addProfileOrIndicatorsParameters(parameters);
+
+        ajaxGet('api/trend_data/specific_indicators_for_child_areas', parameters.build(), getTrendDataCallback);
     }
 };
 
@@ -58,33 +61,22 @@ function addSearchLink(h, text, areaTypeId, cssClass) {
         areaTypeId, ');">', text, '</td>');
 };
 
-/**
-* Gets the argument for retrieving the appropriate indicator metadata. 
-* In this context it is for all the indicators that has been returned from a search query.
-* @class getIndicatorMetadataArgument
-*/
-function getIndicatorMetadataArgument() {
-
-    return '&iids=' + indicatorIdList.getAllIds() +
-        getRestrictByProfileParameter();
-}
-
 function getSearchResults() {
-    ajaxGet('Search.ashx',
-        's=in&nocache=1&txt=' + searchText + getRestrictByProfileParameter(),
-        function (json) { getSearchResultsCallback(json); },
-        handleAjaxFailure
-    );
+
+    var parameters = new ParameterBuilder().add('search_text', searchText);
+
+    addRestrictToProfilesIdsParameter(parameters);
+
+    ajaxGet('api/indicator_search',
+        parameters.build(),
+        function (areaTypeToIndicatorIdsMap) {
+            indicatorIdList = new IndicatorIdList(areaTypeToIndicatorIdsMap);
+            ajaxMonitor.callCompleted();
+        }, handleAjaxFailure);
 
     logEvent('Search', 'IndicatorSearch', searchText);
 }
 
-function getSearchResultsCallback(areaTypeToIndicatorIdsMap) {
-
-    indicatorIdList = new IndicatorIdList(areaTypeToIndicatorIdsMap);
-
-    ajaxMonitor.callCompleted();
-}
 
 function initData() {
     initSearch();
@@ -107,7 +99,8 @@ function SearchResultSummary(indicatorIdList) {
     $('<br><div id="' + messageId + '" class="standardWidth">&nbsp;</div>').insertBefore('#main');
     var $label = $('#' + messageId);
     var indicatorProfileOriginLink = 'indicator-profile-origin-link';
-    $('<br><div id="' + indicatorProfileOriginLink + '" class="standardWidth" onclick="showIndicatorProfileOrigin()"><a> Show me the profiles these indicators are from</a></div>').insertAfter('#' + messageId);
+    $('<br><div id="' + indicatorProfileOriginLink + '" class="standardWidth" onclick="showIndicatorProfileOrigin()"><a> Show me the profiles these indicators are from</a></div>'
+        ).insertAfter('#' + messageId);
 
     this.display = function (selectedAreaTypeId) {
 
@@ -150,7 +143,23 @@ function initSearch() {
     else {
         searchResultsLoaded();
     }
+}
 
+/**
+* AJAX call to fetch the area types for a profile.
+* @class getAreaTypes
+*/
+function getAreaTypes() {
+    var parameters = new ParameterBuilder().add('profile_ids',
+        getProfileIds(FT.model.areaTypeId));
+
+    ajaxGet('api/area_types',
+        parameters.build(),
+        function (areaTypes) {
+            FT.menus.areaType = new AreaTypeMenu(FT.model,
+                new AreaTypes(areaTypes, loaded.areaTypes));
+            ajaxMonitor.callCompleted();
+        });
 }
 
 function displaySearchFindsNothing() {
@@ -161,16 +170,16 @@ function displaySearchFindsNothing() {
 }
 
 function searchResultsLoaded() {
+    var model = FT.model;
+    model.areAnyIndicators = indicatorIdList.any();
 
-    areAnyIndicators = indicatorIdList.any();
-
-    if (areAnyIndicators) {
+    if (model.areAnyIndicators) {
 
         // If parentCode defined then use URL hash parameters
-        var useModelForAreaTypeId = !!FT.model.parentCode;
+        var useModelForAreaTypeId = !!model.parentCode;
 
         var areaTypeId = useModelForAreaTypeId ?
-            FT.model.areaTypeId :
+            model.areaTypeId :
             indicatorIdList.areaTypeIdWithMostIndicators();
 
         new SearchResultSummary(indicatorIdList).display(areaTypeId);
@@ -190,6 +199,17 @@ function getIndicatorIdArgument() {
     return indicatorIdList.anyForAreaType(areaTypeId) ?
         '&iids=' + indicatorIdList.getIds(areaTypeId) :
         indicatorIds = [];
+}
+
+function addIndicatorIdParameter(parameters) {
+
+    var areaTypeId = FT.model.areaTypeId;
+
+    if (indicatorIdList.anyForAreaType(areaTypeId)) {
+        parameters.add('indicator_ids', indicatorIdList.getIds(areaTypeId).join(','));
+    } else {
+        indicatorIds = [];
+    }
 }
 
 function IndicatorIdList(areaTypeToIndicatorIdsMap) {
@@ -257,7 +277,7 @@ function highlightSearchSummaryAreaType(areaTypeId) {
 
 function showIndicatorProfileOrigin() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         var model = FT.model;
         var indicatorIds = indicatorIdList.getIds(model.areaTypeId);
@@ -266,7 +286,7 @@ function showIndicatorProfileOrigin() {
         ).add('indicator_ids', indicatorIds
         ).add('area_type_id', model.areaTypeId);
 
-        ajaxGet('data/profiles_containing_indicators', parameters.build(),
+        ajaxGet('api/profiles_containing_indicators', parameters.build(),
             function (data) {
                 searchState.profilesPerIndicator = data;
 
@@ -315,7 +335,7 @@ function displayProfilesForIndicatorPopUp() {
 * Get the ID of the indicator selected in the origin profiles pop up.
 * @class indicatorSearch.getSelectedOriginIndicatorId
 */
-indicatorSearch.getSelectedOriginIndicatorId = function() {
+indicatorSearch.getSelectedOriginIndicatorId = function () {
     var groupRootIndex = $('#search-indicator-list').val();
     return groupRoots[groupRootIndex].IID;
 }

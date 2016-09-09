@@ -341,7 +341,7 @@ function getDeprivationPopUpHtml(areaDetails, areaPopulation) {
 
 function viewSimilar() {
    
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -398,7 +398,7 @@ function viewSimilarPart2() {
 
 function viewNational() {
   
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         var model = MT.model;
 
@@ -476,7 +476,7 @@ function setCalloutBoxPixelOffset() {
 // Called when the triangle underneath the pop up
 function pointerClicked() {
     // Reposition pointer over the selected area polygon
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         var selectedAreaCode = mapState.selectedPolygon.areaCode;
         MT.model.areaCode = selectedAreaCode;
 
@@ -671,7 +671,7 @@ function initPolygons(map) {
 
             googleMaps.event.addListener(polygon, 'mouseover', function (event) {
 
-                if (!isTouch && !ajaxLock) {
+                if (!isTouch && !FT.ajaxLock) {
 
                     mapOffset = jqMap.offset();
 
@@ -701,7 +701,7 @@ function initPolygons(map) {
             });
 
             googleMaps.event.addListener(polygon, 'mousemove', function (event) {
-                if (!isTouch && !ajaxLock) {
+                if (!isTouch && !FT.ajaxLock) {
                     positionHoverPopup(event, mapOffset);
                 }
             });
@@ -714,7 +714,7 @@ function initPolygons(map) {
             googleMaps.event.addListener(polygon, 'click', function() {
                 tooltipManager.hide();
 
-                if (!ajaxLock) {
+                if (!FT.ajaxLock) {
 
                     mapState.isPopup = true;
 

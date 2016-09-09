@@ -10,56 +10,50 @@ namespace PholioVisualisation.Export
 {
     public class ProfileDataBuilder : ExcelFileBuilder
     {
-        protected IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-        protected PholioLabelReader labelReader = new PholioLabelReader();
-        protected PholioReader pholioReader = ReaderFactory.GetPholioReader();
-        protected IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        protected SheetNamer sheetNamer = new SheetNamer();
-        protected IArea nationalArea;
-        protected IArea _parentArea;
-        protected List<IndicatorMetadata> indicatorMetadatas = new List<IndicatorMetadata>();
-        protected ComparatorMap comparatorMap;
-        protected Profile profile;
-        protected readonly List<int> restrictSearchProfileIds = new List<int>();
-        protected IList<int> indicatorIds;
-        protected ParentDisplay parentDisplay;
-
-        private ProfileDataWriter profileDataWriter;
-        private IList<ParentArea> parentAreas;
-        private IAreaType subnationalAreaType;
-        private IList<ValueNote> _valueNotes;
-
-        private IList<string> groupRootKeys = new List<string>();
-
-        private Dictionary<string, Area> areaCodeToParentMap;
-
-        private string childAreaLabel, subnationalAreaLabel;
         public const string NationalLabel = "England";
 
+        private IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
+        private PholioLabelReader _labelReader = new PholioLabelReader();
+        private PholioReader _pholioReader = ReaderFactory.GetPholioReader();
+        private IAreasReader _areasReader = ReaderFactory.GetAreasReader();
+        private SheetNamer _sheetNamer = new SheetNamer();
+        private IArea _nationalArea;
+        private IArea _parentArea;
+        private List<IndicatorMetadata> _indicatorMetadatas = new List<IndicatorMetadata>();
+        private ComparatorMap _comparatorMap;
+        private Profile _profile;
+        private readonly List<int> _restrictSearchProfileIds = new List<int>();
+        private IList<int> _indicatorIds;
+        private ProfileDataWriter _profileDataWriter;
+        private IList<ParentArea> _parentAreas;
+        private IAreaType _subnationalAreaType;
+        private IList<ValueNote> _valueNotes;
+        private IList<string> _groupRootKeys = new List<string>();
+        private Dictionary<string, Area> _areaCodeToParentMap;
+        private string _childAreaTypeSheetName, _subnationalAreaTypeSheetName;
+
         public ProfileDataBuilder(ComparatorMap comparatorMap, Profile profile, List<int> restrictSearchProfileIds,
-            ParentDisplay parentDisplay, IList<ParentArea> parentAreas, IAreaType subnationalAreaType)
+            IList<ParentArea> parentAreas, IAreaType subnationalAreaType)
         {
-            this.comparatorMap = comparatorMap;
-            this.profile = profile;
-            this.restrictSearchProfileIds = restrictSearchProfileIds;
-            this.parentDisplay = parentDisplay;
-            this.parentAreas = parentAreas;
+            this._comparatorMap = comparatorMap;
+            this._profile = profile;
+            this._restrictSearchProfileIds = restrictSearchProfileIds;
+            this._parentAreas = parentAreas;
 
-            profileDataWriter = new ProfileDataWriter(profile);
+            _profileDataWriter = new ProfileDataWriter(profile);
 
-            profileDataWriter.AddOrganisationDetails(profile.Id);
+            _profileDataWriter.AddOrganisationDetails(profile.Id);
 
-            nationalArea = comparatorMap.GetNationalComparator().Area;
+            _nationalArea = comparatorMap.GetNationalComparator().Area;
 
-            this.subnationalAreaType = subnationalAreaType;
+            this._subnationalAreaType = subnationalAreaType;
         }
 
         public ProfileDataBuilder(ComparatorMap comparatorMap, Profile profile, List<int> restrictSearchProfileIds,
-            ParentDisplay parentDisplay,
             IList<int> indicatorIds, IList<ParentArea> parentAreas, IAreaType subnationalAreaType)
-            : this(comparatorMap, profile, restrictSearchProfileIds, parentDisplay, parentAreas, subnationalAreaType)
+            : this(comparatorMap, profile, restrictSearchProfileIds, parentAreas, subnationalAreaType)
         {
-            this.indicatorIds = indicatorIds;
+            this._indicatorIds = indicatorIds;
         }
 
         protected ProfileDataBuilder()
@@ -68,7 +62,7 @@ namespace PholioVisualisation.Export
 
         public override IWorkbook BuildWorkbook()
         {
-            if (indicatorIds != null)
+            if (_indicatorIds != null)
             {
                 CreateFileByIndicatorIds();
             }
@@ -77,29 +71,29 @@ namespace PholioVisualisation.Export
                 CreateFileByProfile();
             }
 
-            profileDataWriter.FinaliseBeforeWrite();
-            return profileDataWriter.Workbook;
+            _profileDataWriter.FinaliseBeforeWrite();
+            return _profileDataWriter.Workbook;
         }
 
         private void CreateFileByIndicatorIds()
         {
-            foreach (var parentArea in parentAreas)
+            foreach (var parentArea in _parentAreas)
             {
                 InitParentArea(parentArea);
 
                 GroupData data = new GroupDataBuilderByIndicatorIds
                 {
-                    IndicatorIds = indicatorIds,
-                    ProfileId = profile.Id,
-                    RestrictSearchProfileIds = restrictSearchProfileIds,
-                    ComparatorMap = comparatorMap,
+                    IndicatorIds = _indicatorIds,
+                    ProfileId = _profile.Id,
+                    RestrictSearchProfileIds = _restrictSearchProfileIds,
+                    ComparatorMap = _comparatorMap,
                     ParentAreaCode = parentArea.AreaCode,
                     AreaTypeId = parentArea.ChildAreaTypeId
                 }.Build();
 
                 if (data.IsDataOk)
                 {
-                    data.GroupRoots = new GroupRootFilter(data.GroupRoots).RemoveRootsWithoutChildAreaData();
+                    data.GroupRoots = new GroupRootFilter(_groupDataReader).RemoveRootsWithoutChildAreaData(data.GroupRoots);
                 }
 
                 WriteCoreData(data, parentArea);
@@ -110,27 +104,25 @@ namespace PholioVisualisation.Export
 
         private void CreateFileByProfile()
         {
-            foreach (ParentArea parentArea in parentAreas)
+            foreach (ParentArea parentArea in _parentAreas)
             {
                 InitParentArea(parentArea);
 
-                ComparatorMap limitedMap = comparatorMap.LimitByParentArea(parentArea);
-
                 //Get deciles for all relevant areas
-                var categoryAreaType = subnationalAreaType as CategoryAreaType;
-                if (categoryAreaType!=null)
+                var categoryAreaType = _subnationalAreaType as CategoryAreaType;
+                if (categoryAreaType != null)
                 {
                     BuildCategoryAreaMap(categoryAreaType, parentArea);
                 }
 
-                foreach (int groupId in profile.GroupIds)
+                foreach (int groupId in _profile.GroupIds)
                 {
                     GroupData data = new GroupDataBuilderByGroupings
                     {
-                        ProfileId = profile.Id,
+                        ProfileId = _profile.Id,
                         GroupId = groupId,
                         ChildAreaTypeId = parentArea.ChildAreaTypeId,
-                        ComparatorMap = limitedMap,
+                        ComparatorMap = _comparatorMap,
                         AssignData = false
                     }.Build();
                     WriteCoreData(data, parentArea);
@@ -142,16 +134,16 @@ namespace PholioVisualisation.Export
 
         private void BuildCategoryAreaMap(CategoryAreaType categoryAreaType, ParentArea parentArea)
         {
-            var categories = areasReader.GetCategories(categoryAreaType.CategoryTypeId);
+            var categories = _areasReader.GetCategories(categoryAreaType.CategoryTypeId);
             var subnationalCategoryIdToCategoryAreaMap = categories
                 .ToDictionary<Category, int, IArea>(
-                    category => category.CategoryId,
+                    category => category.Id,
                     CategoryArea.New
                 );
 
             foreach (
                 var categorisedArea in
-                    areasReader.GetCategorisedAreasForAllCategories(AreaTypeIds.Country, parentArea.ChildAreaTypeId,
+                    _areasReader.GetCategorisedAreasForAllCategories(AreaTypeIds.Country, parentArea.ChildAreaTypeId,
                         categoryAreaType.CategoryTypeId))
             {
                 var area = new Area
@@ -160,35 +152,32 @@ namespace PholioVisualisation.Export
                     Name = subnationalCategoryIdToCategoryAreaMap[categorisedArea.CategoryId].Name
                 };
 
-                areaCodeToParentMap.Add(categorisedArea.AreaCode, area);
+                _areaCodeToParentMap.Add(categorisedArea.AreaCode, area);
             }
         }
 
         private void InitParentArea(ParentArea parentArea)
         {
-            Comparator comparator = comparatorMap.GetRegionalComparatorByRegion(parentArea);
+            Comparator comparator = _comparatorMap.GetRegionalComparatorByRegion(parentArea);
 
             // Add child area worksheet
-            var areaType = areasReader.GetAreaType(parentArea.ChildAreaTypeId);
-            childAreaLabel = sheetNamer.GetSheetName(areaType.ShortName);
-            profileDataWriter.AddSheet(childAreaLabel);
+            var areaType = _areasReader.GetAreaType(parentArea.ChildAreaTypeId);
+            _childAreaTypeSheetName = _sheetNamer.GetSheetName(areaType.ShortName);
+            _profileDataWriter.AddSheet(_childAreaTypeSheetName);
             _parentArea = comparator.Area;
 
             // Add parent area(s) worksheet
-            if (subnationalAreaType.Id != AreaTypeIds.Country)
+            if (_subnationalAreaType.Id != AreaTypeIds.Country)
             {
-                subnationalAreaLabel = sheetNamer.GetSheetName(subnationalAreaType.ShortName);
-                profileDataWriter.AddSheet(subnationalAreaLabel);
+                _subnationalAreaTypeSheetName = _sheetNamer.GetSheetName(_subnationalAreaType.ShortName);
+                _profileDataWriter.AddSheet(_subnationalAreaTypeSheetName);
             }
 
-            if (profile.IsNational)
-            {
-                // Add England Worksheet
-                profileDataWriter.AddSheet(NationalLabel);
-            }
+            // Add England Worksheet
+            _profileDataWriter.AddSheet(NationalLabel);
 
             //Get all possible parent areas for the child area type
-            areaCodeToParentMap = areasReader.GetParentAreasFromChildAreaId(subnationalAreaType.Id);
+            _areaCodeToParentMap = _areasReader.GetParentAreasFromChildAreaId(_subnationalAreaType.Id);
         }
 
         /// <summary>
@@ -197,211 +186,153 @@ namespace PholioVisualisation.Export
         /// </summary>
         private void WriteIndicatorMetadata()
         {
-            profileDataWriter.AddIndicatorMetadata(
-                indicatorMetadatas
+            _profileDataWriter.AddIndicatorMetadata(
+                _indicatorMetadatas
                     .Distinct()
                     .ToList()
                 );
         }
 
-        public IList<ValueNote> ValueNotes
+        private IList<ValueNote> ValueNotes
         {
-            get { return _valueNotes ?? (_valueNotes = pholioReader.GetValueNotes()); }
+            get { return _valueNotes ?? (_valueNotes = _pholioReader.GetAllValueNotes()); }
         }
 
         private void WriteCoreData(GroupData data, ParentArea parentArea)
         {
             if (data.IsDataOk)
             {
+                var valueNoteLookUp = ValueNotes.ToDictionary(x => x.Id, x => x.Text);
+
                 // Child areas
                 var childAreaCodes = data.Areas.Select(x => x.Code).ToArray();
                 var childAreaCodeToAreaMap = data.Areas.ToDictionary(area => area.Code);
 
-                // Subnational areas
-                var categoryAreaType = subnationalAreaType as CategoryAreaType;
-                Dictionary<string, IArea> subnationalAreaCodeToAreaMap = null;
-                Dictionary<int, IArea> subnationalCategoryIdToCategoryAreaMap = null;
-                IList<string> subnationalAreaCodes = null;
-                if (categoryAreaType != null)
-                {
-                    var categories = areasReader.GetCategories(categoryAreaType.CategoryTypeId);
-                    subnationalCategoryIdToCategoryAreaMap = categories
-                        .ToDictionary<Category, int, IArea>(
-                        category => category.CategoryId,
-                        category => CategoryArea.New(category)
-                        );
-                }
-                else
-                {
-                    // set subnationalAreaCodeToAreaMap
-                    var areas = areasReader.GetAreasByAreaTypeId(subnationalAreaType.Id);
-                    subnationalAreaCodes = areas.Select(x => x.Code).ToList();
-                    subnationalAreaCodeToAreaMap = areas
-                        .ToDictionary<Area, string, IArea>(
-                        area => area.Code,
-                        area => area
-                        );
-                }
+                // Worksheets
+                WorksheetInfo childAreaWorksheet = _profileDataWriter.GetWorksheetInfo(_childAreaTypeSheetName);
+                WorksheetInfo subnationalWorksheet = _profileDataWriter.GetWorksheetInfo(_subnationalAreaTypeSheetName);
+                WorksheetInfo nationalWorksheet = _profileDataWriter.GetWorksheetInfo(NationalLabel);
 
-                var valueNotes = ValueNotes;
+                // Subnational areas
+                ParentDataWriter parentDataWriter = ParentDataWriterFactory.New(_areasReader, _groupDataReader,
+                    subnationalWorksheet, _profileDataWriter, _subnationalAreaType);
+                var parentAreaDataProvider = new CoreDataSetProviderFactory().New(_parentArea);
+
+                // No subnational sheet if direct parent area is country
+                var isSubnationalSheet = subnationalWorksheet != null;
+
+                var areMultipleSubnationalAreasRequired = AreMultipleSubnationalAreasRequired();
 
                 foreach (var groupRoot in data.GroupRoots)
                 {
                     // Check this data has not already been writen
                     var key = new GroupRootUniqueKey(groupRoot).Key + parentArea.AreaCode;
-                    if (groupRootKeys.Contains(key))
+                    if (_groupRootKeys.Contains(key))
                     {
                         // This added has already been written
                         continue;
                     }
-                    groupRootKeys.Add(key);
+                    _groupRootKeys.Add(key);
 
-                    var metadata = data.GetIndicatorMetadataById(groupRoot.IndicatorId);
+                    var indicatorMetadata = data.GetIndicatorMetadataById(groupRoot.IndicatorId);
 
                     // Adding here means order in metadata sheet is same as in data sheet
-                    AddMetadata(metadata);
+                    AddMetadata(indicatorMetadata);
 
-                    var timePeriodFormatter = new TimePeriodTextFormatter(metadata);
+                    var timePeriodFormatter = new TimePeriodTextFormatter(indicatorMetadata);
+                    var coreDataCollector = new CoreDataCollector();
 
                     var grouping = groupRoot.Grouping.FirstOrDefault();
                     if (grouping != null)
                     {
-                        var sex = labelReader.LookUpSexLabel(grouping.SexId);
-                        var age = labelReader.LookUpAgeLabel(grouping.AgeId);
+                        var sex = _labelReader.LookUpSexLabel(grouping.SexId);
+                        var age = _labelReader.LookUpAgeLabel(grouping.AgeId);
 
-                        var iterator = grouping.GetTimePeriodIterator(metadata.YearType);
-                        foreach (TimePeriod timePeriod in iterator.TimePeriods)
+                        var timePeriods = grouping.GetTimePeriodIterator(indicatorMetadata.YearType).TimePeriods;
+
+                        // Write core data
+                        foreach (TimePeriod timePeriod in timePeriods)
                         {
                             string timeString = timePeriodFormatter.Format(timePeriod);
 
-                            // Write child area data
-                            var coreData = groupDataReader.GetCoreData(grouping, timePeriod, childAreaCodes);
+                            var rowLabels = new RowLabels
+                            {
+                                Age = age,
+                                Sex = sex,
+                                TimePeriod = timeString,
+                                IndicatorName = indicatorMetadata.Descriptive[IndicatorMetadataTextColumnNames.Name],
+                                ValueNoteLookUp = valueNoteLookUp
+                            };
 
-                            profileDataWriter.AddData(childAreaLabel, timeString, coreData, childAreaCodeToAreaMap, sex,
-                                metadata.Descriptive, age, valueNotes, areaCodeToParentMap);
+                            // Write child area data
+                            var coreDataList = _groupDataReader.GetCoreData(grouping, timePeriod, childAreaCodes);
+                            _profileDataWriter.AddData(childAreaWorksheet, rowLabels, coreDataList, childAreaCodeToAreaMap, _areaCodeToParentMap);
 
                             // Subnational data
-                            if (subnationalAreaLabel != null)
+                            if (isSubnationalSheet)
                             {
-                                if (AreMultipleSubnationalAreasRequired())
+                                if (areMultipleSubnationalAreasRequired)
                                 {
-                                    // Write data for all areas of subnational type
-                                    if (categoryAreaType != null)
-                                    {
-                                        var subnationalData = groupDataReader
-                                            .GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                                                grouping, timePeriod, categoryAreaType.CategoryTypeId, AreaCodes.England);
-
-                                        profileDataWriter.AddCategorisedData(subnationalAreaLabel, timeString,
-                                            subnationalData,
-                                            subnationalCategoryIdToCategoryAreaMap, sex, metadata.Descriptive, age,
-                                            valueNotes);
-                                    }
-                                    else
-                                    {
-                                        var subnationalcoreData = groupDataReader.GetCoreData(grouping, timePeriod,
-                                            subnationalAreaCodes.ToArray());
-                                        if (subnationalcoreData.Count == 0)
-                                        {
-                                            AddCalculatedAverageValue(subnationalAreaCodeToAreaMap, grouping, timePeriod, metadata, timeString, sex, age, valueNotes);
-                                        }
-                                        else
-                                        {
-                                            profileDataWriter.AddData(subnationalAreaLabel, timeString, subnationalcoreData,
-                                                subnationalAreaCodeToAreaMap, sex, metadata.Descriptive, age, valueNotes, areaCodeToParentMap);
-                                        }
-                                    }
+                                    // Multiple parent areas
+                                    var dataList = parentDataWriter.AddMultipleAreaData(rowLabels, grouping, timePeriod,
+                                        indicatorMetadata, _areaCodeToParentMap);
+                                    coreDataCollector.AddDataList(dataList);
                                 }
                                 else
                                 {
-                                    if (categoryAreaType != null && (categoryAreaType.CategoryTypeId != CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority && categoryAreaType.CategoryTypeId != CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority))
-                                    {
-                                        var subnationalcoreData = groupDataReader.GetCoreData(grouping, timePeriod, subnationalAreaCodes.ToArray());
-                                        if (subnationalcoreData.Count == 0)
-                                        {
-                                            AddCalculatedAverageValue(subnationalAreaCodeToAreaMap, grouping, timePeriod, metadata, timeString, sex, age, valueNotes);
-                                        }
-                                        else
-                                        {
-                                            // Write data for one subnational area
-                                            AddSingleAreaData(grouping, timePeriod, subnationalAreaLabel, metadata, timeString,
-                                                sex, age, _parentArea, valueNotes);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // Write data for one subnational area
-                                        AddSingleAreaData(grouping, timePeriod, subnationalAreaLabel, metadata, timeString,
-                                            sex, age, _parentArea, valueNotes);
-                                    }
+                                    // One parent area
+                                    var coreData = parentAreaDataProvider.GetData(grouping, timePeriod, indicatorMetadata);
+                                    _profileDataWriter.AddData(subnationalWorksheet, rowLabels, coreData, _parentArea);
+                                    coreDataCollector.AddData(coreData);
                                 }
                             }
 
                             // Write national data
-                            if (profile.IsNational && IsEnglandDataRequired())
+                            var nationalData = new CoreDataSetProviderFactory().New(_nationalArea).GetData(grouping, timePeriod, indicatorMetadata);
+                            _profileDataWriter.AddData(nationalWorksheet, rowLabels, nationalData, _nationalArea);
+                        }
+
+                        // Write trend data
+                        var trendMarkerWriter = TrendMarkerWriterFactory.New(_profileDataWriter, groupRoot.PolarityId, timePeriods, _profile.HasTrendMarkers);
+
+                        // Child area trend markers
+                        trendMarkerWriter.WriteChildTrendMarkers(childAreaWorksheet, groupRoot.RecentTrends, childAreaCodes);
+
+                        // Subnational trend markers
+                        if (isSubnationalSheet)
+                        {
+                            if (areMultipleSubnationalAreasRequired)
                             {
-                                AddSingleAreaData(grouping, timePeriod, NationalLabel, metadata, timeString,
-                                    sex, age, nationalArea, valueNotes);
+                                trendMarkerWriter.WriteMultipleSubnationalTrendMarkers(subnationalWorksheet, grouping,
+                                    indicatorMetadata, coreDataCollector, parentDataWriter.CategoryIdAndAreaCodes);
+                            }
+                            else
+                            {
+                                trendMarkerWriter.WriteSingleSubnationalTrendMarker(subnationalWorksheet, grouping,
+                                    indicatorMetadata, coreDataCollector);
                             }
                         }
+
+                        // National trend markers
+                        trendMarkerWriter.WriteNationalTrendMarkers(nationalWorksheet, groupRoot.RecentTrends,
+                            _nationalArea.Code);
                     }
                 }
             }
         }
 
-        private void AddCalculatedAverageValue(Dictionary<string, IArea> subnationalAreaCodeToAreaMap, Grouping grouping, TimePeriod timePeriod,
-            IndicatorMetadata metadata, string timeString, string sex, string age, IList<ValueNote> valueNotes)
-        {
-            foreach (var subnationalArea in subnationalAreaCodeToAreaMap)
-            {
-                var regionalAreas = ReadChildAreas(subnationalArea.Value.Code, grouping.AreaTypeId);
-                var regionalValues = groupDataReader.GetCoreData(grouping, timePeriod,
-                    regionalAreas.Select(x => x.Code).ToArray());
-
-                var averageCalculator = AverageCalculatorFactory.New(regionalValues, metadata);
-                if (averageCalculator.Average != null)
-                {
-                    profileDataWriter.AddData(subnationalAreaLabel, timeString, averageCalculator.Average, subnationalArea.Value,
-                        sex, metadata.Descriptive, age, valueNotes);
-                }
-            }
-        }
-
-        private IList<IArea> ReadChildAreas(string parentAreaCode, int childAreaTypeId)
-        {
-            IList<IArea> childAreas = new ChildAreaListBuilder(areasReader, parentAreaCode, childAreaTypeId).ChildAreas;
-            return childAreas;
-        }
-
         private void AddMetadata(IndicatorMetadata metadata)
         {
-            if (indicatorMetadatas.Select(x => x.IndicatorId).Contains(metadata.IndicatorId) == false)
+            if (_indicatorMetadatas.Select(x => x.IndicatorId).Contains(metadata.IndicatorId) == false)
             {
-                indicatorMetadatas.Add(metadata);
+                _indicatorMetadatas.Add(metadata);
             }
         }
 
         private bool AreMultipleSubnationalAreasRequired()
         {
-            return _parentArea.Code == nationalArea.Code;
+            return _parentArea.Code == _nationalArea.Code;
         }
 
-        private bool IsEnglandDataRequired()
-        {
-            return parentDisplay != ParentDisplay.RegionalOnly;
-        }
-
-        private void AddSingleAreaData(Grouping grouping, TimePeriod timePeriod, string worksheetLabel,
-            IndicatorMetadata metadata, string timeString, string sex, string age, IArea area,
-            IList<ValueNote> valueNotes)
-        {
-            var coreData = new CoreDataSetProviderFactory().New(area).GetData(grouping, timePeriod, metadata);
-
-            if (coreData != null)
-            {
-                profileDataWriter.AddData(worksheetLabel, timeString, coreData, area, sex,
-                    metadata.Descriptive, age, valueNotes);
-            }
-        }
     }
 }

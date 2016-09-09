@@ -79,7 +79,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestDeprivationDecileReturnsValuesButNotRanks()
         {
             var areasReader = ReaderFactory.GetAreasReader();
-            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 7);
+            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 7);
 
             AreaRankBuilder rankBuilder = new AreaRankBuilder
             {

@@ -1,25 +1,14 @@
 ﻿
 describe('SexAndAge', function () {
 
-    var femaleId = 2;
-
-    it('getSexLabel as expected', function () {
-
-        expect(new SexAndAge().getSexLabel(1)).toBe('Male');
-        expect(new SexAndAge().getSexLabel(femaleId)).toBe('Female');
-        expect(new SexAndAge().getSexLabel(4)).toBe('Persons');
-    });
-
-    it('default sex label is Persons', function () {
-
-        expect(new SexAndAge().getSexLabel()).toBe('Persons');
-    });
+    var sex = { Name: 'Female' };
+    var age = { Name: '60+' };
 
     it('label as expected for only sex', function () {
 
         var groupRoot = {
             StateSex: true,
-            SexId: femaleId
+            Sex: sex
         };
 
         expect(new SexAndAge().getLabel(groupRoot)).toBe(' (Female)');
@@ -29,8 +18,8 @@ describe('SexAndAge', function () {
 
         var groupRoot = {
             StateSex: false,
-            AgeLabel: null,
-            SexId: femaleId
+            StateAge: false,
+            Sex: sex
         };
 
         expect(new SexAndAge().getLabel(groupRoot)).toBe('');
@@ -39,7 +28,8 @@ describe('SexAndAge', function () {
     it('label as expected for only age', function () {
 
         var groupRoot = {
-            AgeLabel: '60+'
+            StateAge: true,
+            Age:age
         };
 
         expect(new SexAndAge().getLabel(groupRoot)).toBe(' (60+)');
@@ -48,9 +38,10 @@ describe('SexAndAge', function () {
     it('label for both age and sex', function () {
 
         var groupRoot = {
-            AgeLabel: '60+',
+            StateAge: true,
+            Age:age,
             StateSex: true,
-            SexId: femaleId
+            Sex: sex
         };
 
         expect(new SexAndAge().getLabel(groupRoot)).toBe(' (Female, 60+)');

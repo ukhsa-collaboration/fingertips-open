@@ -144,6 +144,23 @@ namespace FingertipsUploadService.ProfileData.Repositories
             return result;
         }
 
+        public IList<CoreDataSetDuplicateResponse> GetDuplicateCoreDataSetForAnIndicator(CoreDataSet data)
+        {
+            return CurrentSession.GetNamedQuery("Find_Duplciate_Rows_In_CoreDataSet_SP")
+                .SetInt32("indicator_id", data.IndicatorId)
+                .SetInt32("year", data.Year)
+                .SetInt32("year_range", data.YearRange)
+                .SetInt32("quarter", data.Quarter)
+                .SetInt32("month", data.Month)
+                .SetInt32("age_id", data.AgeId)
+                .SetInt32("sex_id", data.SexId)
+                .SetString("area_code", data.AreaCode)
+                .SetInt32("category_type_id", data.CategoryTypeId)
+                .SetInt32("category_id", data.CategoryId)
+                .SetResultTransformer(Transformers.AliasToBean<CoreDataSetDuplicateResponse>())
+                .List<CoreDataSetDuplicateResponse>();
+        }
+
         private string GetSqlFromFilters(Dictionary<string, int> filters)
         {
             if (filters == null) return string.Empty;

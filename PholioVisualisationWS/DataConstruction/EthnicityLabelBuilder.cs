@@ -91,7 +91,7 @@ namespace PholioVisualisation.DataConstruction
 
             sb.Append(Percentage(data.Value));
 
-            var category = categories.First(x => x.CategoryId == data.CategoryId);
+            var category = categories.First(x => x.Id == data.CategoryId);
             sb.Append(category.ShortName.ToLower());
         }
 

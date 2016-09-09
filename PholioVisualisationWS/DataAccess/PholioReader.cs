@@ -66,10 +66,55 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<TargetConfig>();
         }
 
-        public virtual IList<ValueNote> GetValueNotes()
+        public virtual IList<ValueNote> GetAllValueNotes()
         {
             return CurrentSession.CreateCriteria<ValueNote>()
                 .List<ValueNote>();
+        }
+
+        public virtual IList<YearType> GetAllYearTypes()
+        {
+            return CurrentSession.CreateCriteria<YearType>()
+                .List<YearType>();
+        }
+
+        public virtual YearType GetYearType(int id)
+        {
+            return CurrentSession.CreateCriteria<YearType>()
+                .Add(Restrictions.Eq("Id", id))
+                .UniqueResult<YearType>();
+        }
+
+        public virtual IList<Unit> GetAllUnits()
+        {
+            return CurrentSession.CreateCriteria<Unit>()
+                .List<Unit>();
+        }
+
+        public virtual IList<Polarity> GetAllPolarities()
+        {
+            return CurrentSession.CreateCriteria<Polarity>()
+                .List<Polarity>();
+        }
+
+        public virtual IList<ValueType> GetAllValueTypes()
+        {
+            return CurrentSession.CreateCriteria<ValueType>()
+                .List<ValueType>();
+        }
+
+        public virtual IList<ComparatorMethod> GetAllComparatorMethods()
+        {
+            return CurrentSession.CreateCriteria<ComparatorMethod>()
+                .Add(Restrictions.Eq("IsCurrent", true))
+                .List<ComparatorMethod>();
+        }
+
+        public virtual ComparatorMethod GetComparatorMethod(int id)
+        {
+            return CurrentSession.CreateCriteria<ComparatorMethod>()
+                .Add(Restrictions.Eq("Id", id))
+                .UniqueResult<ComparatorMethod>();
         }
 
         public virtual Age GetAgeById(int ageId)
@@ -103,6 +148,19 @@ namespace PholioVisualisation.DataAccess
             return CurrentSession.CreateCriteria<Sex>()
                 .AddOrder(Order.Asc("Sequence"))
                 .List<Sex>();
+        }
+
+        public ConfidenceIntervalMethod GetConfidenceIntervalMethod(int id)
+        {
+            return CurrentSession.CreateCriteria<ConfidenceIntervalMethod>()
+                .Add(Restrictions.Eq("Id", id))
+                .UniqueResult<ConfidenceIntervalMethod>();
+        }
+
+        public IList<ConfidenceIntervalMethod> GetAllConfidenceIntervalMethods()
+        {
+            return CurrentSession.CreateCriteria<ConfidenceIntervalMethod>()
+                .List<ConfidenceIntervalMethod>();
         }
 
         public virtual IList<KeyMessageOverride> GetKeyMessageOverrides(int profileId, string areaCode)

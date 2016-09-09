@@ -44,7 +44,6 @@ namespace PholioVisualisation.PdfData
                     averageCalculator, benchmarkArea);
                 formatter.Format(benchmarkData);
                 dataProcessor.Truncate(benchmarkData);
-                ModifyDataForSpecificProfile(benchmarkData);
                 dataList.Add(benchmarkArea.Code, benchmarkData);
             }
         }
@@ -73,10 +72,6 @@ namespace PholioVisualisation.PdfData
         {
             timeFormatter.Format(grouping, metadata);
             IndicatorData.Period = grouping.TimePeriodText;
-        }
-
-        protected virtual void ModifyDataForSpecificProfile(CoreDataSet data)
-        {
         }
     }
 }

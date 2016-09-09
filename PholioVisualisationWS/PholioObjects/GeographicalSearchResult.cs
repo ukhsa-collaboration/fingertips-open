@@ -43,5 +43,14 @@ namespace PholioVisualisation.PholioObjects
         {
             return Northing > 0;
         }
+
+        /// <summary>
+        /// Are Easting and Northing both valid?
+        /// </summary>
+        public bool AreCoordinatesValid()
+        {
+            return Easting != 0 &&
+                Northing != 0;
+        }
     }
 }

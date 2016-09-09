@@ -24,7 +24,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestChildAreas_WhenParentIsCategoryArea()
         {
-            var areaCode = CategoryArea.CreateAreaCode(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority,
+            var areaCode = CategoryArea.CreateAreaCode(CategoryTypeIds.DeprivationDecileCountyAndUA2010,
                 1);
 
             var areas = new ChildAreaListBuilder(ReaderFactory.GetAreasReader(),

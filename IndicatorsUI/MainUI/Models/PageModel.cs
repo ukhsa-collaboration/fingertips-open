@@ -59,7 +59,7 @@ namespace Profiles.MainUI.Models
         }
 
         public bool IsOfficialStatistics { get; set; }
-        public bool HasTrendMarkers { get; set; }
+        public bool HasRecentTrends { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
         public int RagColourId { get; set; }
         public SpineChartMinMaxLabelBuilder.MinMaxLabel SpineChartMinMaxLabel { get; set; }
@@ -83,7 +83,7 @@ namespace Profiles.MainUI.Models
 
         public int ProfileId { get; set; }
 
-        public IList<ProfileCollection> ProfileCollection { get; set; }
+        public IList<ProfileCollection> ProfileCollections { get; set; }
         public ProfileCollection NationalProfileCollection { get; set; }
 
         /// <summary>

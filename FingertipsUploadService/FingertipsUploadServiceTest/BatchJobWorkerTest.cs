@@ -19,6 +19,7 @@ namespace FingertipsUploadServiceTest
         {
             _jobGuid = Guid.NewGuid();
             AutoMapperConfig.RegisterMappings();
+            JobRepository.DeleteAllJob();
         }
 
         [TestCleanup]
@@ -61,8 +62,7 @@ namespace FingertipsUploadServiceTest
             var fileReader = new ExcelFileReader(job.Filename);
             worker.ProcessJob(job, validator, processor, fileReader);
 
-            Assert.AreEqual(UploadJobStatus.ConfirmationAwaited, job.Status);
-
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
             // Cleanup
             CoreDataRepository.DeleteCoreData(_jobGuid);
         }
@@ -75,12 +75,6 @@ namespace FingertipsUploadServiceTest
             job.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
             job = JobRepository.SaveJob(job);
 
-            // Duplicate job
-            var duplicateJob = GetJob(UploadJobType.Batch, _jobGuid);
-            duplicateJob.Guid = Guid.NewGuid();
-            duplicateJob.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
-            duplicateJob = JobRepository.SaveJob(duplicateJob);
-
             // Process new job without any duplication
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
@@ -88,11 +82,25 @@ namespace FingertipsUploadServiceTest
             var excelFileReader = new ExcelFileReader(job.Filename);
             worker.ProcessJob(job, validator, processor, excelFileReader);
 
+            // Duplicate job
+            var duplicateJob = GetJob(UploadJobType.Batch, _jobGuid);
+            duplicateJob.Guid = Guid.NewGuid();
+            duplicateJob.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
+            duplicateJob = JobRepository.SaveJob(duplicateJob);
+
             // Process job with duplication
             excelFileReader = new ExcelFileReader(duplicateJob.Filename);
             worker.ProcessJob(duplicateJob, validator, processor, excelFileReader);
 
             Assert.AreEqual(UploadJobStatus.ConfirmationAwaited, duplicateJob.Status);
+
+            // Give confirmation to override 
+            duplicateJob.Status = UploadJobStatus.ConfirmationGiven;
+            JobRepository.UpdateJob(duplicateJob);
+
+            excelFileReader = new ExcelFileReader(duplicateJob.Filename);
+            worker.ProcessJob(duplicateJob, validator, processor, excelFileReader);
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, duplicateJob.Status);
 
             // Cleanup
             CoreDataRepository.DeleteCoreData(job.Guid);
@@ -101,6 +109,26 @@ namespace FingertipsUploadServiceTest
             JobRepository.DeleteJob(duplicateJob.Guid);
             ErrorRepository.DeleteLog(duplicateJob.Guid);
         }
+
+
+        [TestMethod]
+        public void EndToEnd_4_ProcessBatchJobWithDuplicateRowInFileWithComplexGrouping()
+        {
+            var job = GetJob(UploadJobType.Batch, _jobGuid);
+            job.Filename = GetTestFilePath("batch-indicator-upload-duplicate-rows_complex_grouping.xlsx");
+            job = JobRepository.SaveJob(job);
+
+            var worker = GetWorker();
+            var validator = new WorksheetNameValidator();
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
+            var fileReader = new ExcelFileReader(job.Filename);
+            worker.ProcessJob(job, validator, processor, fileReader);
+
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
+            // Cleanup
+            CoreDataRepository.DeleteCoreData(_jobGuid);
+        }
+
 
         [TestMethod]
         public void ProcessBatchJobWithWrongWorksheet()

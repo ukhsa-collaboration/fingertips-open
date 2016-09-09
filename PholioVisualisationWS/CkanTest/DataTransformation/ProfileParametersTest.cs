@@ -37,7 +37,7 @@ namespace PholioVisualisation.CkanTest.DataTransformation
             // Assert: area type ids are split and distinct
             var areaTypeIds = parameters.AreaTypeIds;
             Assert.AreEqual(3, areaTypeIds.Count);
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.LocalAuthority));
+            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.District));
             Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.UnitaryAuthority));
             Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.County));
         }

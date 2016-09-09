@@ -1,32 +1,29 @@
 ﻿
+using System.Collections.Generic;
 using System.Web;
 using Newtonsoft.Json;
+using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.SearchQuerying;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonpBuilderAreaLookup : JsonBuilderBase
+    public class JsonpBuilderAreaLookup
     {
         private readonly AreaLookupParameters _parameters;
 
-        public JsonpBuilderAreaLookup(HttpContextBase context)
-            : base(context)
+        public JsonpBuilderAreaLookup(AreaLookupParameters parameters)
         {
-            _parameters = new AreaLookupParameters(context.Request.Params);
-            Parameters = _parameters;
+            _parameters = parameters;
         }
 
-        public override string GetJson()
+        public List<GeographicalSearchResult> GetGeographicalSearchResults()
         {
-            var placePostcodes = new GeographicalSearch
+            return new GeographicalSearch
             {
-                AreEastingAndNorthingRetrieved = _parameters.AreEastingAndNorthingRequired,
-                ExcludeCcGs = _parameters.ExcludeCcGs
-            }.SearchPlacePostcodes(_parameters.SearchText, _parameters.PolygonAreaTypeId);
-
-            var json = JsonConvert.SerializeObject(placePostcodes);
-            return _parameters.Callback + "(" + json + ")";
+                AreEastingAndNorthingRetrieved = _parameters.AreEastingAndNorthingRequired
+            }.SearchPlacePostcodes(_parameters.SearchText, _parameters.PolygonAreaTypeId,
+                _parameters.ParentAreaTypesToIncludeInResults);
         }
     }
 }

@@ -18,5 +18,7 @@
     <property name="JobType" column="jobtype"/>
     <property name="Filename" column="filename"/>
     <property name="ProgressStage" column="progressstage"/>
+    <property name="TotalRowsCommitted" column="totalrowscommitted"/>
+
   </class>
 </hibernate-mapping>

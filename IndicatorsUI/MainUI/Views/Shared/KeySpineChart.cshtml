@@ -2,7 +2,7 @@
 <div class="keyContainer" id="key-spine-chart" style="display: none;">
     <table id="spineTable" class="keyTable @(Model.DisplayBothKeyColorings ? "" : "key-one-triplet")" cellspacing="0">
         <tr>
-            <td class="keyText"></td>
+            <td class="keyText keyLabel"></td>
             @if (Model.DisplayRagKey)
             {
                 <td class="keySpacer"></td>
@@ -20,19 +20,16 @@
                 <td class="keySpacer"></td>
                 <td class="keySpine">
                     <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_darkblue_mini.png"
-                         alt="" />
+                         alt=""/>
                     Lower
                     <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt=""/>
                     Similar
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt="" />
+                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt=""/>
                     Higher
                 </td>
             }
             <td class="keySpacer"></td>
-        </tr>
 
-        <tr>
-            <td></td>
             @*Show quintile legend*@
             <td class="keySpacer"></td>
             <td id="quintile-key" class='keySpine quintileKey' colspan="5">
@@ -44,53 +41,14 @@
                 <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile5_mini.png" alt=""/>&nbsp;
                 High
             </td>
-        </tr>
-            
-        <tr>
-            <td></td>
+
             @if (Model.DisplayBothKeyColorings)
             {
-                <td class="keySpacer"></td>
-                <td class='keySpine' style="padding-top:6px;">
+                <td class='keySpine'>
                     <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt=""/>
                     Not Compared
                 </td>
             }
         </tr>
     </table>
-
-    @if (Model.HasTrendMarkers)
-    {
-        <div class="trendLegends" id="trend-marker-legend-spine" >
-            <table class="keyTable" cellspacing="0">
-                <tr>
-                    <td ><img src="~/images/trends/up_red.png" /></td>
-                    <td class="legendText">Increasing and worse</td>
-            
-                    <td ><img src="~/images/trends/up_green.png" /></td>
-                    <td class="legendText">Increasing and better</td>
-                    
-                    <td><img src="~/images/trends/up_blue.png" /></td>
-                    <td class="legendText">Increasing</td>
-
-                    <td><img src="~/images/trends/no_calc.png" /></td>
-                    <td class="legendText">Could not be calculated</td>
-                </tr>
-                <tr>
-                    <td ><img src="~/images/trends/down_red.png" /></td>
-                    <td class="legendText">Decreasing and worse</td>
-
-                    <td ><img src="~/images/trends/down_green.png" /></td>
-                    <td class="legendText">Decreasing and better</td>
-                    
-                    <td><img src="~/images/trends/down_blue.png" /></td>
-                    <td class="legendText">Decreasing</td>
-
-                    <td ><img src="~/images/trends/no_change.png" /></td>
-                    <td class="legendText">No signficant change</td>
-                </tr>
-            </table>
-        </div>
-    }
-
 </div>

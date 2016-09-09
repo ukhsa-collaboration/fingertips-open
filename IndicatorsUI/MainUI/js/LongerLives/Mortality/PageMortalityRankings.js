@@ -182,7 +182,7 @@ function getSecondaryData() {
 
 function populateAreaTypes(model) {
 
-    if (model.areaTypeId !== PRACTICE) {
+    if (model.areaTypeId !== AreaTypeIds.Practice) {
 
         var templateName = 'areaFilter';
 
@@ -207,7 +207,7 @@ function populateCauseList() {
 
 function selectIndicator(rootIndex, name) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         setActiveOption('mortality_list', rootIndex - 1);
@@ -342,7 +342,7 @@ function setValueTypeHeading() {
 */
 function selectSupportingData(optionIndex) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var showDeprivation = optionIndex === 1;
@@ -497,7 +497,7 @@ function assignRank(rowsToDisplay) {
 }
 
 function selectSimilarAreas(areaCode) {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         
 
@@ -540,7 +540,7 @@ function getDecileLookUp() {
 }
 
 function showAllAreas() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         comparatorId = NATIONAL_COMPARATOR_ID;

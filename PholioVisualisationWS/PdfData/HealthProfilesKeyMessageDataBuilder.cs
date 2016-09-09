@@ -18,17 +18,21 @@ namespace PholioVisualisation.PdfData
         private PholioReader pholioReader = ReaderFactory.GetPholioReader();
         private HealthProfilesGroupRootSelector groupRootSelector;
         private IndicatorMetadataCollection indicatorMetadataCollection;
+        private IArea _area;
+        private IndicatorComparerFactory _indicatorComparerFactory;
 
-        public HealthProfilesKeyMessageDataBuilder(Area area, CoreDataSetProvider coreDataSetProvider,
+        public HealthProfilesKeyMessageDataBuilder(IArea area, CoreDataSetProvider coreDataSetProvider,
             CoreDataSetProvider benchmarkDataProvider, IndicatorMetadataCollection indicatorMetadataCollection,
             HealthProfilesGroupRootSelector groupRootSelector)
         {
-            keyMessageData.AreaCode = area.Code;
-            keyMessageData.AreaName = area.Name;
+            _area = area;
+            keyMessageData.Area = area;
             this.coreDataSetProvider = coreDataSetProvider;
             this.benchmarkDataProvider = benchmarkDataProvider;
             this.groupRootSelector = groupRootSelector;
             this.indicatorMetadataCollection = indicatorMetadataCollection;
+
+            _indicatorComparerFactory = new IndicatorComparerFactory {PholioReader = pholioReader};
         }
 
         public KeyMessageData BuildData()
@@ -41,7 +45,7 @@ namespace PholioVisualisation.PdfData
         {
             // Key Message 1
             AssignSpineChartSig();
-            AssignDeprivationSig();
+            AssignDeprivationData();
             AssignChildrenInPoverty();
             AssignLifeExpectancyAtBirth();
 
@@ -57,7 +61,6 @@ namespace PholioVisualisation.PdfData
             AssignSmokingAtTimeOfDeliverySig();
 
             // Key Message 4
-            AssignObesityAdult();
             AssignAdultAlcoholAdmissions();
             AssignAdultSelfHarmAdmissions();
             AssignAdultSmokingRelatedDeaths();
@@ -85,8 +88,7 @@ namespace PholioVisualisation.PdfData
             CoreDataSet coreDataSet = coreDataSetProvider.GetData(grouping, TimePeriod.GetDataPoint(grouping), metadata);
             CoreDataSet benchmarkData = benchmarkDataProvider.GetData(grouping, TimePeriod.GetDataPoint(grouping),
                 metadata);
-            significance = new IndicatorComparerFactory { PholioReader = pholioReader }.New(grouping)
-                .Compare(coreDataSet, benchmarkData, metadata);
+            significance = _indicatorComparerFactory.New(grouping).Compare(coreDataSet, benchmarkData, metadata);
 
             return coreDataSet;
         }
@@ -113,22 +115,29 @@ namespace PholioVisualisation.PdfData
 
         #region 1.2
 
-        internal void AssignDeprivationSig()
+        /// <summary>
+        /// Assign significance 
+        /// </summary>
+        internal void AssignDeprivationData()
         {
-            Grouping grouping = groupRootSelector.Deprivation.FirstGrouping;
-            IndicatorMetadata metadata = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
-            coreDataSetProvider.GetData(grouping, TimePeriod.GetDataPoint(grouping), metadata);
+            // Define parameters
+            Grouping grouping = groupRootSelector.DeprivationScoreIMD2015.FirstGrouping;
+            var timePeriod = TimePeriod.GetDataPoint(grouping);
 
-            keyMessageData.DeprivationSig = GetSignificance(grouping);
+            // Get data
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            CoreDataSet coreDataSet = groupDataReader.GetCoreData(grouping, timePeriod, _area.Code)
+                .FirstOrDefault();
+            keyMessageData.Deprivation = coreDataSet;
         }
 
         internal void AssignChildrenInPoverty()
         {
-            Grouping grouping = groupRootSelector.ChildHealth.FirstGrouping;
+            Grouping grouping = groupRootSelector.ChildrenInLowIncomeFamilies.FirstGrouping;
             IndicatorMetadata metadata = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
             CoreDataSet coreDataSet = coreDataSetProvider.GetData(grouping, TimePeriod.GetDataPoint(grouping), metadata);
 
-            keyMessageData.ChildrenInPoverty = coreDataSet;
+            keyMessageData.ChildrenInLowIncomeFamilies = coreDataSet;
         }
 
         #endregion
@@ -173,7 +182,7 @@ namespace PholioVisualisation.PdfData
             {
                 keyMessageData.IsMaleSlopeIndexOfInequalitySignificant =
                     IsSlopeIndexOfInequalityForLifeExpectancySignificant(data);
-                keyMessageData.MaleSlopeIndexOfInequalityForLifeExpectancy = 
+                keyMessageData.MaleSlopeIndexOfInequalityForLifeExpectancy =
                     NumericFormatter.Format1DP(data.Value);
             }
 
@@ -280,35 +289,6 @@ namespace PholioVisualisation.PdfData
         #endregion
 
         #region Key Message 4
-
-        #region 4.1
-
-        private void AssignObesityAdult()
-        {
-            Grouping grouping = groupRootSelector.ObesityAdult.FirstGrouping;
-            Significance significance;
-            CoreDataSet coreDataSet = GetCoreDataSet(grouping, out significance);
-            keyMessageData.ObesityAdultsSignificance = significance;
-
-            var yearTypeId = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId).YearTypeId;
-            keyMessageData.ObesityAdultsYear = TimePeriodFormatter
-                .GetTimePeriodString(TimePeriod.GetDataPoint(grouping), yearTypeId).Replace(" - ","-");
-
-            if (coreDataSet != null)
-            {
-                if (coreDataSet.IsValueValid)
-                {
-                    keyMessageData.ObesityAdultsPercentage = NumericFormatter.Format1DP(coreDataSet.Value);
-                }
-
-                if (coreDataSet.IsCountValid)
-                {
-                    keyMessageData.ObesityAdultsCount = NumberCommariser.Commarise0DP(coreDataSet.CountPerYear);
-                }
-            }
-        }
-
-        #endregion
 
         #region 4.2
 

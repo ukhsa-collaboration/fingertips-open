@@ -7,54 +7,60 @@
     ViewBag.Title = "FPM - Edit Profile Collection";
 }
 
-<div class="standardWidth">
+<div class="standardWidth container">
     @using (Html.BeginForm("UpdateProfileCollection", "Profile", FormMethod.Post, new { id = "UpdateProfileCollection" }))
     {
-        <h2 class="subheading">Edit profile collection</h2>
-        
-        <div class="delete-indicators">
+        <div class="row">
+            <h2 class="subheading">Edit profile collection</h2>
+        </div>
+
+        <div class="row">
             <label class="content-item-detail-label">Collection Name:</label>
             @Html.TextBoxFor(model => model.CollectionName, new { @class = "unselected-domain" })
             <span class="field-validation-valid" data-valmsg-for="CollectionName" data-valmsg-replace="true"></span>
         </div>
-       
-        <div class="delete-indicators">
+
+        <div class="row">
             <label class="content-item-detail-label">Collection Title:</label>
             @Html.TextBoxFor(model => model.CollectionSkinTitle, new { @class = "unselected-domain" })
             <span class="field-validation-valid" data-valmsg-for="CollectionSkinTitle" data-valmsg-replace="true"></span>
         </div>
-       
+
         @Html.HiddenFor(x => x.Id)
         @Html.HiddenFor(x => x.ReturnUrl)
-        @Html.Hidden("assignedProfiles", new {id = "assignedProfiles", name = "assignedProfiles"})
+        @Html.Hidden("assignedProfiles", new { id = "assignedProfiles", name = "assignedProfiles" })
 
-        <table class="grid sortable">
-            <thead>
-                <tr>
-                    <th>Profile</th>
-                    <th>Select</th>
-                    <th>Display Domains?</th>
-                </tr>
-            </thead>
-            @foreach (var profile in Model.ProfileCollectionItems)
+        <div class="row">
+            <input class="col-md-2 btn btn-success" id="update_profile_collection" type="button" value="Update" />
+            <input class="col-md-2 btn btn-warning" id="cancel_profile" type="button" onclick="location.href='@Model.ReturnUrl    '" value="Cancel" />
+        </div>
+
+        <div class="row">
+            <table class="grid sortable">
+                <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Select</th>
+                        <th>Display Domains?</th>
+                    </tr>
+                </thead>
+                @foreach (var profile in Model.ProfileCollectionItems)
             {
-                <tr>
-                    <td class="left">
-                        @profile.profileDetails.Name
-                    </td>
-                    <td class="center">@Html.CheckBox(profile.ProfileId + "_assigned", profile.Selected, new { @class = "selectable-check-box", @value = profile.ProfileId })
-                    </td>
-                    <td class="center">@Html.CheckBox(profile.ProfileId + "_display_domains", profile.DisplayDomains, new {id = profile.ProfileId + "_display_domains",  @class = "display-domains-check-box", @value = profile.DisplayDomains })
-                    </td>
-                </tr>
-            }
-        </table>
-        
-        <p>
-            <input class="medium-button" id="update_profile_collection" type="button" value="Update" />
-        </p>
-        <p>
-            <input class="medium-button" id="cancel_profile" type="button" onclick="location.href='@Model.ReturnUrl    '" value="Cancel" />
-        </p>
+                    <tr>
+                        <td class="left">
+                            @profile.profileDetails.Name
+                        </td>
+                        <td class="center">
+                            @Html.CheckBox(profile.ProfileId + "_assigned", profile.Selected,
+                            new { @class = "selectable-check-box", @value = profile.ProfileId })
+                        </td>
+                        <td class="center">
+                            @Html.CheckBox(profile.ProfileId + "_display_domains", profile.DisplayDomains,
+                            new { id = profile.ProfileId + "_display_domains", @class = "display-domains-check-box", @value = profile.DisplayDomains })
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
     }
 </div>

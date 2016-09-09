@@ -100,35 +100,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseChart.cs" />
-    <Compile Include="HttpHandlers\Search.cs" />
     <Compile Include="JsonBuilderAreaMapping.cs" />
     <Compile Include="JsonBuilderParentAreaGroups.cs" />
-    <Compile Include="HttpHandlers\AreaLookup.cs" />
     <Compile Include="JsonBuilderAreaCategories.cs" />
     <Compile Include="JsonBuilderGroupRoots.cs" />
     <Compile Include="DataDownloadBespoke.cs" />
     <Compile Include="ExportHelper.cs" />
     <Compile Include="HttpHandlers\GetDataDownload.cs" />
-    <Compile Include="HttpHandlers\GetLabelSeries.cs" />
     <Compile Include="HttpHandlers\GetData.cs" />
     <Compile Include="HttpHandlers\GetTrendDataBySearch.cs" />
     <Compile Include="JsonBuilderAreaAddress.cs" />
     <Compile Include="JsonBuilderAreaData.cs" />
     <Compile Include="JsonBuilderAreaValues.cs" />
-    <Compile Include="JsonBuilderGroupedIndicatorNames.cs" />
-    <Compile Include="JsonBuilderHelpText.cs" />
     <Compile Include="JsonBuilderIndicatorMetadata.cs" />
-    <Compile Include="JsonBuilderGetLabel.cs" />
-    <Compile Include="HttpHandlers\GetLabel.cs" />
     <Compile Include="HttpHandlers\GetGroupDataAtDataPointBySearch.cs" />
-    <Compile Include="HttpHandlers\GetGroupDataAtTimePoint.cs" />
-    <Compile Include="JsonBuilderGetLabelSeries.cs" />
     <Compile Include="JsonBuilderIndicatorStats.cs" />
     <Compile Include="JsonBuilderParentAreas.cs" />
     <Compile Include="JsonBuilderSearchIndicators.cs" />
     <Compile Include="HttpHandlers\GetChart.cs" />
     <Compile Include="HttpHandlers\GetGroupDataAtDataPoint.cs" />
-    <Compile Include="JsonBuilderGroupData.cs" />
     <Compile Include="HttpHandlers\GetTrendData.cs" />
     <Compile Include="JsonBuilderGroupingTree.cs" />
     <Compile Include="JsonpBuilderAreaLookup.cs" />
@@ -137,7 +127,6 @@
     <Compile Include="JsonBuilderBase.cs" />
     <Compile Include="JsonBuilderGroupDataAtDataPoint.cs" />
     <Compile Include="JsonBuilderGroupDataAtDataPointBySearch.cs" />
-    <Compile Include="JsonBuilderGroupDataAtTimePoint.cs" />
     <Compile Include="JsonBuilderTrendData.cs" />
     <Compile Include="JsonBuilderTrendDataBySearch.cs" />
   </ItemGroup>

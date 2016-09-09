@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestGetGroupDataProcessed_ForCategoryArea()
         {
-            var areaCode = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 1).Code;
+            var areaCode = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1).Code;
 
             var groupData = new GroupDataAtDataPointRepository().GetGroupDataProcessed(areaCode,
                 AreaTypeIds.CountyAndUnitaryAuthority, ProfileIds.Phof,GroupIds.Phof_WiderDeterminantsOfHealth);

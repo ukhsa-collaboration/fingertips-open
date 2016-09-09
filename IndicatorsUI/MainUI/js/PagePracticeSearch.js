@@ -1,3 +1,5 @@
+'use strict';
+
 function goToPracticeSearchPage() {
 
     lock();
@@ -13,7 +15,7 @@ function goToPracticeSearchPage() {
 
 function selectPractice(code) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -65,11 +67,14 @@ function getParentAreas(code) {
         getParentAreasCallback(parents[code]);
     }
     else {
-        ajaxGet('GetData.ashx',
-            's=pa&ati=2,19&are=' + code,
-            function (json) { getParentAreasCallback(json); },
-            handleAjaxFailure
-        );
+        // Get parent areas
+        var parameters = new ParameterBuilder(
+        ).add('child_area_code', code
+        ).add('parent_area_type_ids', AreaTypeIds.CCG);
+
+        ajaxGet('api/area/parent_areas', parameters.build(),
+            function (json) { getParentAreasCallback(json); }
+            );
     }
 }
 
@@ -160,7 +165,7 @@ function displayPracticeResultsTable(rows) {
 
 function areaSearchResultSelected(noMatches, searchResult) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -178,7 +183,7 @@ function areaSearchResultSelected(noMatches, searchResult) {
 
 function showAllPracticesInCCG() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -200,7 +205,7 @@ function getPractices(searchResult) {
         .add('northing', searchResult.Northing)
         .add('area_type_id', AreaTypeIds.Practice);
 
-    ajaxGet('data/nearby_areas', parameters.build(), getGpPracticesNearbyCallback);
+    ajaxGet('api/area_search_by_proximity', parameters.build(), getGpPracticesNearbyCallback);
 }
 
 function getCCGPractices() {
@@ -208,7 +213,7 @@ function getCCGPractices() {
         .add('parent_area_code', PP.model.parentCode)
         .add('area_type_id', AreaTypeIds.Practice);
 
-    ajaxGet('data/areas_with_addresses', parameters.build(), getGpPracticesNearbyCallback);
+    ajaxGet('api/area_addresses/by_parent_area_code', parameters.build(), getGpPracticesNearbyCallback);
 }
 
 function getGpPracticesNearbyCallback(obj) {
@@ -323,7 +328,7 @@ function displayMarkersOnMap() {
         gm.event.addListener(marker, 'click', (function (marker, i) {
             return function () {
 
-                if (!ajaxLock) {
+                if (!FT.ajaxLock) {
 
                     var areaCode = marker.get('marker_id');
 
@@ -356,7 +361,7 @@ function displayMarkersOnMap() {
     fitMapToPracticeResults(map, bounds);
 }
 
-practiceSearchState = {
+var practiceSearchState = {
     displayedArea: null,
     selectedArea: null,
     practicesOnMap: [],
@@ -364,8 +369,6 @@ practiceSearchState = {
 };
 
 loaded.nearbyPractices = [];
-
-NO_DATA = 'n/a';
 
 templates.add('rows',
     '{{#rows}}\

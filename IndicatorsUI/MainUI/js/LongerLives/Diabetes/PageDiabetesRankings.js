@@ -24,6 +24,7 @@ function updatePage() {
     getAreaTypes();
     getEnglandPrimaryData(model);
     getEnglandSupportingData(model);
+
     ajaxMonitor.monitor(getSecondaryData);
 }
 
@@ -49,25 +50,24 @@ function getSupportingDataValues(prevAndRiskRootIndex) {
     var root = supportingGroupRoots[prevAndRiskRootIndex];
     var groupId = selectedSupportingGroupId;
 
-    var parameters = new ParameterBuilder();
-    parameters.add('par', MT.model.parentCode);
-    parameters.add('gid', groupId);
-    parameters.add('ati', MT.model.areaTypeId);
-    parameters.add('off', 0);
-    parameters.add('iid', root.IID);
-    parameters.add('age', root.AgeId);
-    parameters.add('sex', root.SexId);
-    parameters.add('pid', MT.model.profileId);
+    var parameters = new ParameterBuilder(
+    ).add('group_id', groupId
+    ).add('area_type_id', MT.model.areaTypeId
+    ).add('parent_area_code', MT.model.parentCode
+    ).add('comparator_id', -1
+    ).add('indicator_id', root.IID
+    ).add('sex_id', root.Sex.Id
+    ).add('age_id', root.Age.Id);
 
-    getData(function (obj) {
-
-        loaded.supportingDataValues[MT.model.areaTypeId] = obj;
-
-        ajaxMonitor.callCompleted();
-    }, 'av', parameters.build());
+    ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(),
+        function (obj) {
+            loaded.supportingDataValues[MT.model.areaTypeId] = obj;
+            ajaxMonitor.callCompleted();
+        });
 };
 
 function getSecondaryData() {
+
     changeNumberOrder();   // Reorder table_options pretext
 
     var model = MT.model;
@@ -86,7 +86,6 @@ function getSecondaryData() {
     loaded.practiceValues.fetchDataByAjax(groupRoots[ROOT_INDEXES.POPULATION]);
     getPracticeList();
     getSupportingDataValues(selectedSupportingGroupRootIndex);
-
     getValueNotes();
 
     ajaxMonitor.monitor(displayPage);
@@ -99,15 +98,10 @@ function getSecondaryData() {
 }
 
 function getComparisonValues(model) {
-    switch (model.areaTypeId) {
-        case AreaTypeIds.CountyUA:
-            getDecileData(model);
-            break;
-        case PRACTICE:
-            break;
-        case AreaTypeIds.CCG:
-            getDecileData(model);
-            break;
+    if (model.areaTypeId === AreaTypeIds.Practice) {
+        ajaxMonitor.callCompleted();
+    } else {
+        getDecileData(model);
     }
 }
 
@@ -140,7 +134,7 @@ function resetRankingsState() {
 }
 
 function displayRankingLegend() {
-    var template = MT.model.areaTypeId === PRACTICE
+    var template = MT.model.areaTypeId === AreaTypeIds.Practice
     ? 'bobLegend'
     : 'ragLegend';
     $('#data_legend').html(templates.render(template));
@@ -218,14 +212,14 @@ function displayTable(rows) {
     var root = groupRoots[selectedRootIndex];
     sortByPolarity(rows, root.PolarityId);
     sortDisplayedRows(rows);
-    
-    var column1Val="", 
-        column2Val="", 
-        column1Unit="", 
-        column2Unit="",
+
+    var column1Val = "",
+        column2Val = "",
+        column1Unit = "",
+        column2Unit = "",
         showEnglandVal = false;
 
-    if((MT.model.areaTypeId === AreaTypeIds.CCG) || (MT.model.areaTypeId === AreaTypeIds.CountyUA)) {
+    if ((MT.model.areaTypeId === AreaTypeIds.CCG) || (MT.model.areaTypeId === AreaTypeIds.CountyUA)) {
         var model = {};
         model.areaCode = MT.model.parentCode;
         model.areaTypeId = MT.model.areaTypeId;
@@ -234,7 +228,7 @@ function displayTable(rows) {
 
         var primaryMetadataHash = loaded.indicatorMetadata[model.groupId];
         var supportingMetadataHash = loaded.indicatorMetadata[selectedSupportingGroupId];
-        
+
 
         // get primary grouping data
         var primaryGroupData = loaded.groupDataAtDataPoint.getData(model);
@@ -246,22 +240,22 @@ function displayTable(rows) {
         var supportingIndicatorMetadata = supportingMetadataHash[selectedSupportingIndicatorId];
         model.groupId = selectedSupportingGroupId;
         var supportingGroupData = loaded.groupDataAtDataPoint.getData(model);
-        column1Val = supportingIndicatorMetadata.IID === IndicatorIds.Deprivation ?'N/A' : supportingGroupData[selectedSupportingGroupRootIndex].ValF;
+        column1Val = supportingIndicatorMetadata.IID === IndicatorIds.Deprivation ? 'N/A' : supportingGroupData[selectedSupportingGroupRootIndex].ValF;
         column1Unit = new UnitFormat(supportingIndicatorMetadata, column1Val).getLabel();
-        
+
         showEnglandVal = true;
     }
 
     // Render data
     $('#diabetes-rankings-table tbody').html(
-        templates.render('rows', { rows:rows, englandValCol1:column1Val, englandValCol2:column2Val, col1Unit:column1Unit, col2Unit:column2Unit, showEnglandVal:showEnglandVal })
+        templates.render('rows', { rows: rows, englandValCol1: column1Val, englandValCol2: column2Val, col1Unit: column1Unit, col2Unit: column2Unit, showEnglandVal: showEnglandVal })
     );
 }
 
 function setBreadcrumb() {
     var links = ['<li><a href="javascript:MT.nav.home();">Home</a></li>'];
 
-    if (MT.model.areaTypeId === PRACTICE) {
+    if (MT.model.areaTypeId === AreaTypeIds.Practice) {
         links.push('<li id="national-comparisons"><a href="javascript:switchAreas(' +
             MT.model.parentAreaType + ')">National comparisons</a></li>',
             '<li id="practice-comparisons" class="last"><a>Practice comparisons</a></li>');
@@ -286,7 +280,7 @@ function getDefaultIndicator() {
 function populateAreaTypes(model) {
     var $filter = $('#area-filter');
 
-    if (model.areaTypeId !== PRACTICE) {
+    if (model.areaTypeId !== AreaTypeIds.Practice) {
         if (_.size(loaded.areaTypes) < 2) {
 
             $filter.hide();
@@ -307,7 +301,7 @@ function populateAreaTypes(model) {
 
 function switchAreas(parentAreaTypeId) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var model = MT.model;
@@ -328,7 +322,7 @@ function createExportLinks() {
     var exportLink = '<a href="' + FT.url.corews + serviceUrl;
 
     // National data download link
-    if (model.areaTypeId !== PRACTICE/*TODO FIN-300 temporarily exclude practices*/) {
+    if (model.areaTypeId !== AreaTypeIds.Practice/*TODO FIN-300 temporarily exclude practices*/) {
         $('#download_data_for_england').html(exportLink + '&pat=15&par=' + NATIONAL_CODE +
             '" class="external_link" target="_blank">Download ' + profileTitle + ' data for England</a>');
     } else {
@@ -337,7 +331,7 @@ function createExportLinks() {
     }
 
     // Download practice data within parent area
-    if (model.areaTypeId === PRACTICE) {
+    if (model.areaTypeId === AreaTypeIds.Practice) {
         $('#download_data_for_ccg').html(exportLink + '&pat=' + model.parentAreaType + '&par=' + model.parentCode +
             '" class="external_link" target="_blank">Download ' + profileTitle + ' data for '
             + loaded.addresses[MT.model.parentCode].Name + '</a>');
@@ -361,10 +355,15 @@ function getIndexOfGroupRootThatContainsIndicator(indicatorId, groupRoots) {
 }
 
 function getPracticeList() {
-    ajaxGet('data/areas',
-        'parent_area_code=' + MT.model.parentCode +
-        '&area_type_id=' + MT.model.areaTypeId +
-        '&profile_id=' + MT.model.profileId,
+
+    var model = MT.model;
+
+    var parameters = new ParameterBuilder(
+        ).add('profile_id', model.profileId
+        ).add('parent_area_code', model.parentCode
+        ).add('area_type_id', model.areaTypeId);
+
+    ajaxGet('api/areas/by_parent_area_code', parameters.build(),
         getPracticeListCallback);
 };
 
@@ -425,7 +424,7 @@ function getSupportingIndicators(groupId) {
 function populateSupportingIndicatorList() {
     var html = templates.render('prevandriskcauses',
         { causes: getSupportingIndicators(selectedSupportingGroupId) });
-   
+
     $('#diabetes_prev_and_risk_list-' + selectedSupportingGroupId).html(html);
     setDefaultPrevAndRiskIndicator();
 }
@@ -439,7 +438,7 @@ function selectDomain(groupId) {
 
     var model = MT.model;
 
-    if (!ajaxLock && groupId !== model.groupId) {
+    if (!FT.ajaxLock && groupId !== model.groupId) {
         lock();
 
         model.groupId = groupId;
@@ -456,7 +455,7 @@ function selectDomain(groupId) {
 
 function selectSupportingDomain(groupId) {
 
-    if (!ajaxLock && selectedSupportingGroupId !== groupId) {
+    if (!FT.ajaxLock && selectedSupportingGroupId !== groupId) {
         lock();
 
         selectedSupportingGroupId = groupId;
@@ -495,14 +494,18 @@ function repopulateSupportingIndicatorList() {
     selectSupportingIndicator(0);
 }
 
+// Reload group roots each time to ensure clicking on a grouping reloads the relevant indicators
 function getSupportingGroupRoots(model) {
-    //Reload group roots each time to ensure clicking on a grouping reloads the relevant indicators
-    getData(function (obj) {
-        supportingGroupRoots = obj;
-        ajaxMonitor.callCompleted();
-    }, 'gr',
-        'gid=' + selectedSupportingGroupId +
-        '&ati=' + model.areaTypeId);
+
+    var parameters = new ParameterBuilder(
+        ).add('group_id', selectedSupportingGroupId
+        ).add('area_type_id', model.areaTypeId);
+
+    ajaxGet('api/profile_group_roots', parameters.build(),
+        function (obj) {
+            supportingGroupRoots = obj;
+            ajaxMonitor.callCompleted();
+        });
 }
 
 function getEnglandPrimaryData(model) {
@@ -526,7 +529,7 @@ function getEnglandSupportingData(model) {
 
 function selectPrimaryIndicator(rootIndex) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var model = MT.model;
@@ -555,7 +558,7 @@ function setSelectedPrimaryIndicator() {
 }
 
 function selectSupportingIndicator(rootIndex) {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var indicatorId = supportingGroupRoots[rootIndex].IID;
@@ -582,11 +585,11 @@ function selectPractice(code) {
 
     var model = MT.model;
     if (hasPracticeData) {
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             lock();
             model.parentCode = model.parentCode;
             model.areaCode = code;
-            model.areaTypeId == PRACTICE ? MT.nav.practiceDetails(model) : MT.nav.rankings();
+            model.areaTypeId === AreaTypeIds.Practice ? MT.nav.practiceDetails(model) : MT.nav.rankings();
             scrollToTop();
         }
     } else {
@@ -597,7 +600,7 @@ function selectPractice(code) {
 
 function showAllAreas() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         rankingsState.compareSimilar = false;
@@ -690,7 +693,7 @@ function displayInfoBox2(rank) {
     if (MT.model.profileId === ProfileIds.DrugsAndAlcohol) {
         var count = new CommaNumber(rank.AreaRank.Count).rounded();
         var template = '<h2>Estimated number of opiate and/or crack cocaine users in England</h2><p><span>{{count}}</span> {{period}}</p>';
-        
+
     } else {
 
         count = isDefined(rank.AreaRank)
@@ -805,7 +808,7 @@ function getSupportingGrade(grade) {
 
     // Work out if this is showing Quintile (Purple) or RAG for the middle column
     var supportingGroupRoot = supportingGroupRoots[selectedSupportingGroupRootIndex];
-    var comparatorMethodId = supportingGroupRoot.Grouping[0].MethodId;
+    var comparatorMethodId = supportingGroupRoot.ComparatorMethodId;
 
     if (useQuintiles(comparatorMethodId)) {
         var supportingSignificanceImage = '<img src="' + FT.url.img +
@@ -888,7 +891,7 @@ function setComparisonValues(rows) {
                     similarRows.push(row);
                 }
                 break;
-            case PRACTICE:
+            case AreaTypeIds.Practice:
                 if (isDefined(loaded.practiceCategories[row.Code])) {
                     if (loaded.practiceCategories[row.Code].Code === rankingsState.comparisonValues.Code) {
                         similarRows.push(row);
@@ -991,8 +994,8 @@ function sortByPolarity(rowsToDisplay, polarity) {
 }
 
 function selectSimilarAreas(areaCode) {
-   
-    if (!ajaxLock) {
+
+    if (!FT.ajaxLock) {
         lock();
 
         switch (MT.model.areaTypeId) {
@@ -1007,7 +1010,7 @@ function selectSimilarAreas(areaCode) {
                 rankingsState.comparisonValues.selectedAreaCode = areaCode;
                 rankingsState.compareSimilar = true;
                 break;
-            case PRACTICE:
+            case AreaTypeIds.Practice:
                 $('#comparison_category').html('(' + loaded.practiceCategories[areaCode].Name.trim() + ')');
                 $('#comparing_area_type').html('to similar practices');
                 $('#comparison_type').html('Similar Practices');
@@ -1050,7 +1053,7 @@ function changeNumberOrder() {
     var titleOrder = 1;
     var riskOrder = 2;
 
-    if (MT.model.areaTypeId !== PRACTICE && _.size(loaded.areaTypes) > 1) {
+    if (MT.model.areaTypeId !== AreaTypeIds.Practice && _.size(loaded.areaTypes) > 1) {
         titleOrder++;
         riskOrder++;
     }
@@ -1165,7 +1168,7 @@ function ColumnHeader(metadata) {
 function getDeprivationColumnHeader() {
 
     var model = MT.model;
-    var parentAreaType = model.areaTypeId === PRACTICE
+    var parentAreaType = model.areaTypeId === AreaTypeIds.Practice
     ? model.parentAreaType
         : AreaTypeIds.Country;
 

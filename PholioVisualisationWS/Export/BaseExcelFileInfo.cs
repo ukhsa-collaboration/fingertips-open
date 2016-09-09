@@ -9,6 +9,9 @@ namespace PholioVisualisation.Export
 {
     public abstract class BaseExcelFileInfo
     {
+        /// <summary>
+        /// Is virtual to allow mocking for testing
+        /// </summary>
         public virtual string FilePath { get; protected set; }
 
         public bool DoesFileExist

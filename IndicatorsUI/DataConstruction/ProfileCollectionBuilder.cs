@@ -8,7 +8,12 @@ using Profiles.DomainObjects;
 
 namespace Profiles.DataConstruction
 {
-    public class ProfileCollectionBuilder
+    public interface IProfileCollectionBuilder
+    {
+        ProfileCollection GetCollection(int profileCollectionId);
+    }
+
+    public class ProfileCollectionBuilder : IProfileCollectionBuilder
     {
         private ProfileReader profileReader;
         private AppConfig config;

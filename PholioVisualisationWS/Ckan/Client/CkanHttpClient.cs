@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
@@ -28,6 +29,12 @@ namespace Ckan.Client
         {
             this.repository = repository;
             this.apiKey = apiKey;
+
+            /* Workaround for error message "Authentication failed because remote party has closed the transport stream"
+            See: http://stackoverflow.com/questions/30664566/authentication-failed-because-remote-party-has-closed-the-transport-stream
+            */
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | 
+                SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
         }
 
         public string GetAction(string actionName, Dictionary<string, string> parameters)

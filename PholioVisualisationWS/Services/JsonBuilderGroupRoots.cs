@@ -5,28 +5,39 @@ using System.Web;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
     public class JsonBuilderGroupRoots : JsonBuilderBase
     {
-        private GroupRootsParameters parameters;
+        private GroupRootsParameters _parameters;
 
         public JsonBuilderGroupRoots(HttpContextBase context)
             : base(context)
         {
-            parameters = new GroupRootsParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new GroupRootsParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderGroupRoots(GroupRootsParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(
-                parameters.GroupId, parameters.AreaTypeId);
-            var groupRoots = new GroupRootBuilder().BuildGroupRoots(groupings);
+            var groupRoots = GetGroupRoots();
             return JsonConvert.SerializeObject(groupRoots);
         }
 
+        public IList<GroupRoot> GetGroupRoots()
+        {
+            var groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(
+                _parameters.GroupId, _parameters.AreaTypeId);
+            return new GroupRootBuilder().BuildGroupRoots(groupings);
+        }
     }
 }

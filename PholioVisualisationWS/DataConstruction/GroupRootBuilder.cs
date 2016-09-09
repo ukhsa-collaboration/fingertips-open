@@ -70,11 +70,7 @@ namespace PholioVisualisation.DataConstruction
             AssignGroupings(newGroupings);
             AssignPropertiesFromGrouping(newGroupings.First());
             root.StateSex = stateSex;
-
-            if (stateAge)
-            {
-                root.AgeLabel = pholioReader.GetAgeById(newGroupings.First().AgeId).Name;
-            }
+            root.StateAge = stateAge;
         }
 
         private void AssignPropertiesFromGrouping(Grouping grouping)
@@ -83,6 +79,9 @@ namespace PholioVisualisation.DataConstruction
             root.SexId = grouping.SexId;
             root.AgeId = grouping.AgeId;
             root.ComparatorMethodId = grouping.ComparatorMethodId;
+            root.YearRange = grouping.YearRange;
+            root.Sex = grouping.Sex;
+            root.Age = grouping.Age;
         }
 
         private void AssignGroupings(IEnumerable<Grouping> groupings)

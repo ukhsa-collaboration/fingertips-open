@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using PholioVisualisation.DataAccess;
@@ -15,19 +16,8 @@ namespace PholioVisualisation.SearchIndexing
 
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
-        /// <summary>
-        /// IMPORTANT: To add an area type you must also change the AddParentAreaCodes method below.
-        /// </summary>
-        private readonly List<int> parentAreaTypeIds = new List<int>
-            {
-                AreaTypeIds.GoRegion,
-                AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaTypeIds.Ccg,
-                AreaTypeIds.DistrictAndUnitaryAuthority,
-                AreaTypeIds.Subregion,
-                AreaTypeIds.PheCentresFrom2013To2015,
-                AreaTypeIds.PheCentresFrom2015
-            };
+        private List<int> parentAreaTypeIds;
+        private Dictionary<int, int> parentAreaTypeIdHash;
 
         private Dictionary<string, string> parentAreaCodeToName = new Dictionary<string, string>();
 
@@ -41,6 +31,7 @@ namespace PholioVisualisation.SearchIndexing
             IndexWriter writer = GetWriterThatIncludesStopWords(DirectoryPlacePlacecodes);
             writer.DeleteAll();
 
+            InitSearchableAreaTypes();
             InitAreaLookUps();
 
             IndexPlaceNames(writer);
@@ -50,6 +41,17 @@ namespace PholioVisualisation.SearchIndexing
             writer.Optimize();
             writer.Commit();
             writer.Close();
+        }
+
+        private void InitSearchableAreaTypes()
+        {
+            parentAreaTypeIds = areasReader
+                 .GetAllAreaTypes()
+                 .Where(x => x.IsSearchable)
+                 .Select(x => x.Id)
+                 .ToList();
+
+            parentAreaTypeIdHash = parentAreaTypeIds.ToDictionary(x => x, x => x);
         }
 
         private void InitAreaLookUps()
@@ -163,26 +165,44 @@ namespace PholioVisualisation.SearchIndexing
 
         private void AddParentAreaCodes(PostcodeParentAreas parentAreas, Document doc)
         {
-            var areaCode = parentAreas.AreaCode6;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.GoRegion);
+            AddParentAreaMapping(doc, AreaTypeIds.GoRegion, parentAreas.AreaCode6);
+            AddParentAreaMapping(doc, AreaTypeIds.CountyAndUnitaryAuthority, parentAreas.AreaCode102);
+            AddParentAreaMapping(doc, AreaTypeIds.DistrictAndUnitaryAuthority, parentAreas.AreaCode101);
+            AddParentAreaMapping(doc, AreaTypeIds.Ccg, parentAreas.AreaCode19);
+            AddParentAreaMapping(doc, AreaTypeIds.Subregion, parentAreas.AreaCode46);
+            AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2013To2015, parentAreas.AreaCode103);
+            AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2015, parentAreas.AreaCode104);
+        }
 
-            areaCode = parentAreas.AreaCode102;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.CountyAndUnitaryAuthority);
+        private void AddParentAreaMapping(Document doc, int areaTypeId, string areaCode)
+        {
+            if (parentAreaTypeIdHash.ContainsKey(areaTypeId))
+            {
+                try
+                {
+                    AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, areaTypeId);
+                }
+                catch (KeyNotFoundException)
+                {
+                    ThrowInvalidParentCode(areaCode, areaTypeId);
+                }
+            }
+        }
 
-            areaCode = parentAreas.AreaCode101;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.DistrictAndUnitaryAuthority);
+        private static void ThrowInvalidParentCode(string areaCode, int areaTypeId)
+        {
+            StringBuilder sb = new StringBuilder()
+                .AppendLine("Invalid parent area code: " + areaCode)
+                .AppendLine("For area type: " + areaTypeId)
+                .AppendLine()
+                .AppendLine("Maybe invalid ParentLevelGeographyCode:")
+                .AppendLine(
+                    "SELECT DISTINCT ParentLevelGeographyCode FROM L_AreaMapping WHERE ParentLevelGeographyCode NOT IN(SELECT areacode FROM l_areas)")
+                .AppendLine()
+                .AppendLine("Or maybe invalid code in GIS_Postcodes");
+            
 
-            areaCode = parentAreas.AreaCode19;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.Ccg);
-
-            areaCode = parentAreas.AreaCode46;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.Subregion);
-
-            areaCode = parentAreas.AreaCode103;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.PheCentresFrom2013To2015);
-
-            areaCode = parentAreas.AreaCode104;
-            AddParentArea(areaCode, parentAreaCodeToName[areaCode], doc, AreaTypeIds.PheCentresFrom2015);
+            throw new FingertipsException(sb.ToString());
         }
 
         private void AddCounty(string county, Document doc)

@@ -1,13 +1,11 @@
+'use strict';
+
 /**
 * Download namespace
 * @module download
 */
 
-/**
-* Entry point to displaying download page
-* @class goToDownloadPage
-*/
-download = {};
+var download = {};
 
 /**
 * Entry point to displaying download page
@@ -38,7 +36,7 @@ function getArePdfsAvailable() {
         ).add('profile_id', model.profileId
         ).add('area_type_id', model.areaTypeId);
 
-        ajaxGet('data/are_pdfs',
+        ajaxGet('api/are_pdfs',
             parameters.build(),
             function (obj) {
                 loaded.arePdfs[key] = obj;
@@ -105,14 +103,23 @@ function displayDownload() {
     }
 
     var areaName = areaHash[FT.model.areaCode].Name;
-    var pdfHtml = areAnyPdfsForProfile ?
+
+    // Time periods
+    var timePeriods = FT.staticReportTimePeriods;
+    if (timePeriods.length > 0) {
+        download.timePeriod = timePeriods[0];
+    }
+
+    var pdfHtml = FT.config.areAnyPdfsForProfile ?
         templates.render('pdf', {
             noPdfsMessage: noPdfsMessage,
             images: imgUrl,
             fileName: new PdfFileNamer(profileId).name,
             areaName: areaName,
             areaCode: model.areaCode,
-            profileId: model.profileId
+            profileId: model.profileId,
+            showTimePeriodsMenu: timePeriods.length > 1,
+            timePeriods: timePeriods
         }) :
         '';
 
@@ -132,6 +139,11 @@ function displayDownload() {
     showAndHidePageElements();
 
     unlock();
+
+    // Bind time period menu
+    $('#report-time-period').change(function (e) {
+        download.timePeriod = $(this).find('option:selected').text();
+    });
 }
 
 /**
@@ -151,8 +163,8 @@ function exportPdf(areaCode) {
 * Download a child health PDF from the Chimat site.
 * @class downloadChildHealthPdf
 */
-function downloadChildHealthPdf(areaCode) {
-    ajaxGet('data/chimat_resource_id', 'area_code=' + areaCode,
+function downloadChildHealthPdf(areaCode,profileId) {
+    ajaxGet('api/area/chimat_resource_id', 'area_code=' + areaCode + '&profile_id=' + profileId,
         function (resourceId) {
             window.open('http://www.chimat.org.uk/resource/view.aspx?RID=' + resourceId, '_blank');
         });
@@ -168,8 +180,8 @@ function downloadCachedPdf(areaCode) {
     var url;
 
     // Child Health profiles are hosted on Chimat site
-    if (profileId === ProfileIds.ChildHealth) {
-        downloadChildHealthPdf(areaCode);
+    if (profileId === ProfileIds.ChildHealth || profileId === ProfileIds.ChiMatWAY) {
+        downloadChildHealthPdf(areaCode,profileId);
         return;
     }
 
@@ -177,20 +189,22 @@ function downloadCachedPdf(areaCode) {
         // Static reports
         url = FT.url.corews + 'static-reports?profile_key=' + profileUrlKey + '&file_name=' + areaCode + '.pdf';
 
+        // Time period
         if (download.timePeriod) {
             // Add time period parameter to url
             url = url + '&time_period=' + download.timePeriod;
-
-            // Reset time period
-            download.timePeriod = null;
         }
     }
     else if (profileId === ProfileIds.Liver) {
         // Liver profiles
         url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
+    } else if (profileId === ProfileIds.HealthProfiles) {
+        // Health profiles
+        url = FT.url.pdf + profileUrlKey /*global set elsewhere*/ + '/' + download.timePeriod + '/' + areaCode + '.pdf';
     } else {
         url = getPdfUrl(areaCode);
     }
+
     window.open(url.toLowerCase(), '_blank');
 }
 
@@ -215,7 +229,11 @@ pages.add(PAGE_MODES.DOWNLOAD, {
 templates.add('pdf',
     '<div><img src="{{images}}download/{{fileName}}"{{#isAvailable}} class="pdf" onclick="exportPdf(\'{{areaCode}}\', {{profileId}})"{{/isAvailable}}/></div>\
 <div id="pdf-download-text" class="text"><h2>Area profile</h2>\
-{{^noPdfsMessage}}<p>Download a detailed profile of the data for</p><a class="pdf" href="javascript:exportPdf(\'{{areaCode}}\', {{profileId}})">{{areaName}}</a>{{/noPdfsMessage}}\
+{{^noPdfsMessage}}\
+<p>Download a detailed report of the data for</p>\
+{{#showTimePeriodsMenu}}<p>Report year <select id="report-time-period">{{#timePeriods}}<option>{{.}}</option>{{/timePeriods}}</select></p>{{/showTimePeriodsMenu}}\
+<a class="pdf" href="javascript:exportPdf(\'{{areaCode}}\', {{profileId}})">{{areaName}}</a>\
+{{/noPdfsMessage}}\
 {{#noPdfsMessage}}<p>PDF profiles are not currently available for {{{noPdfsMessage}}}</p>{{/noPdfsMessage}}</div>');
 
 templates.add('excel',

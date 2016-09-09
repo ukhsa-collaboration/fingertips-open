@@ -11,25 +11,34 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public int AreaTypeId { get; set; }
 
-        [JsonProperty]
+        [JsonIgnore]
         public int SexId { get; set; }
 
         [JsonProperty]
         public bool StateSex { get; set; }
 
         [JsonProperty]
-        public string AgeLabel { get; set; }
+        public Sex Sex { get; set; }
+
+        [JsonProperty]
+        public Age Age { get; set; }
+
+        [JsonProperty]
+        public bool StateAge { get; set; }
+
+        [JsonIgnore]
+        public int AgeId { get; set; }
+
+        [JsonProperty]
+        public int YearRange { get; set; }
 
         [JsonProperty]
         public int PolarityId { get; set; }
 
         [JsonProperty]
-        public int AgeId { get; set; }
-
-        [JsonProperty]
         public int ComparatorMethodId { get; set; }
 
-        [JsonProperty]
-        public Dictionary<string, TrendMarker> TrendMarkers { get; set; }
+        [JsonProperty(PropertyName = "RecentTrends")]
+        public Dictionary<string, TrendMarkerResult> RecentTrends { get; set; }
     }
 }

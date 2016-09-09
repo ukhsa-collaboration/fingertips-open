@@ -4,6 +4,7 @@
 @{
     var profileKey = ViewBag.ProfileUrlKey;
     var pageType = Model.PageType;
+    var isPageRootProfileCollection = ViewBag.IsPageRootProfileCollection ?? false;
 }
 
 <ul id="breadcrumbs">
@@ -12,54 +13,55 @@
     <li class="site-link"><a href="/">Home</a></li>
 
     @* Profile group introduction *@
-    @if (pageType == PageType.ProfileCollectionFrontPage ||
-        pageType == PageType.FrontPageOfProfileInCollection ||
-        pageType == PageType.DataPageOfProfileInCollection)
+    @if (isPageRootProfileCollection)
     {
         <li class="breadcrumb-separator">></li>
         <li class="site-link">
-            <a href="/profile-group/@ViewBag.LeadProfileUrlKey">@Model.ProfileCollection[0].CollectionName</a>
+            <a href="/profile-group/@ViewBag.LeadProfileUrlKey">@Model.ProfileCollections[0].CollectionName</a>
         </li>
     }
 
     @* Introduction *@
-    @if (pageType == PageType.FrontPageOfStandaloneProfileWithFrontPage ||
-         pageType == PageType.DataPageOfStandaloneProfileWithFrontPage ||
+    @if (pageType == PageType.FrontPageOfProfileWithFrontPage ||
+         pageType == PageType.DataPageOfProfileWithFrontPage ||
         pageType == PageType.SupportingInformation ||
-        pageType == PageType.AreaSearchResults)
+        pageType == PageType.AreaSearchResultsOfProfileWithFrontPage)
     {
         <li class="breadcrumb-separator">></li>
-        <li class="site-link"><a href="/profile/@profileKey">Introduction</a></li>
-    }
-    else if (pageType == PageType.FrontPageOfProfileInCollection ||
-            pageType == PageType.DataPageOfProfileInCollection)
-    {
-        @* Introduction of profile in profile group *@
-        <li class="breadcrumb-separator">></li>
-        <li class="site-link">
-            <a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey">Introduction</a>
-        </li>
+
+        if (isPageRootProfileCollection)
+        {
+            <li class="site-link">
+                <a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey">Introduction</a>
+            </li>
+        }
+        else
+        {
+            <li class="site-link"><a href="/profile/@profileKey">Introduction</a></li>
+        }
     }
 
     @* Data page *@
-    @if (pageType == PageType.DataPageOfStandaloneProfileWithFrontPage)
+    @if (pageType == PageType.DataPageOfProfileWithFrontPage)
     {
         <li class="breadcrumb-separator">></li>
-        <li class="site-link"><a href="/profile/@profileKey/data">Data</a></li>
+        if (isPageRootProfileCollection)
+        {
+            <li class="site-link"><a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey/data">Data</a></li>
+        }
+        else
+        {
+            <li class="site-link"><a href="/profile/@profileKey/data">Data</a></li>
+        }
     }
     else if (pageType == PageType.DataPageOfProfileWithoutFrontPage)
     {
         <li class="breadcrumb-separator">></li>
         <li class="site-link"><a href="/@profileKey">Data</a></li>
     }
-    else if (pageType == PageType.DataPageOfProfileInCollection)
-    {
-        <li class="breadcrumb-separator">></li>
-        <li class="site-link"><a href="/profile-group/@ViewBag.LeadProfileUrlKey/profile/@profileKey/data">Data</a></li>
-    }
 
     @* Area search results *@
-    @if (pageType == PageType.AreaSearchResults)
+    @if (pageType == PageType.AreaSearchResultsOfProfileWithFrontPage)
     {
         <li class="breadcrumb-separator">></li>
         <li class="site-link">

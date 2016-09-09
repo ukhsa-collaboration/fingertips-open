@@ -212,7 +212,9 @@
     <Compile Include="ViewModels\Upload\UploadSummaryViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AngularApps\upload\app.js" />
+    <Content Include="AngularApps\upload\upload-app.js" />
+    <Content Include="AngularApps\upload\view\upload-index.html" />
+    <Content Include="AngularApps\upload\view\upload-progress.html" />
     <Content Include="css\bootstrap-theme.css" />
     <Content Include="css\bootstrap-theme.min.css" />
     <Content Include="css\bootstrap.css" />
@@ -228,9 +230,9 @@
     <Content Include="css\TableSorter.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
-    <Content Include="images\ajax-loader.gif" />
     <Content Include="images\BatchUpload.png" />
     <Content Include="images\Info.png" />
+    <Content Include="images\ajax-loader.gif" />
     <Content Include="images\navigate-next.png" />
     <Content Include="images\navigate-previous.png" />
     <Content Include="images\reorder.png" />
@@ -240,6 +242,7 @@
     <Content Include="js\es5-sham.min.js" />
     <Content Include="js\es5-shim.min.js" />
     <Content Include="js\jquery-1.12.1.js" />
+    <Content Include="js\jquery.form.js" />
     <Content Include="js\PageCoreData.js" />
     <Content Include="js\document-manager.js" />
     <Content Include="js\lookup-tables.js" />

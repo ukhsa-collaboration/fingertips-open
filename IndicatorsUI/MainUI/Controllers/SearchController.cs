@@ -43,7 +43,7 @@ namespace Profiles.MainUI.Controllers
             //Check to see if there's a profileCollection added for the current skin. Restrict the search to just the profiles of this ProfileCollection if there is.
             GetProfileCollection();
             var searchableProfiles =
-                PageModel.ProfileCollection.SelectMany(x => x.ProfileCollectionItems)
+                PageModel.ProfileCollections.SelectMany(x => x.ProfileCollectionItems)
                     .Select(c => c.ProfileId)
                     .ToArray();
 
@@ -76,7 +76,7 @@ namespace Profiles.MainUI.Controllers
                 {
                     pci.ProfileDetails = new ProfileDetailsBuilder(pci.ProfileId).Build();
                 }
-                PageModel.ProfileCollection.Add(profileCollection);
+                PageModel.ProfileCollections.Add(profileCollection);
             }
         }
 

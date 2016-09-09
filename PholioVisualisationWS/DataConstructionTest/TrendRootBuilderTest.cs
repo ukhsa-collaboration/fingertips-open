@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -89,10 +88,11 @@ namespace PholioVisualisation.DataConstructionTest
                 AreaTypeIds.CountyAndUnitaryAuthority, ProfileIds.Phof,
                data.IndicatorMetadata, false);
 
+            var trendRoot = trendRoots.FirstOrDefault();
             Assert.IsTrue(trendRoots.Any() 
-                && trendRoots.FirstOrDefault() != null
-                && trendRoots.FirstOrDefault().TrendMarkers != null
-                && trendRoots.FirstOrDefault().TrendMarkers.Count > 0
+                && trendRoot != null
+                && trendRoot.RecentTrends != null
+                && trendRoot.RecentTrends.Count > 0
                 );
         }
 

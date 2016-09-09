@@ -12,88 +12,125 @@ namespace PholioVisualisation.DataConstructionTest
     [TestClass]
     public class BenchmarkDataProviderTest
     {
+        private Mock<GroupDataReader> _groupDataReader;
+        private Mock<AverageCalculator> _averageCalculator;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _groupDataReader = new Mock<GroupDataReader>(MockBehavior.Strict);
+            _averageCalculator = new Mock<AverageCalculator>();
+        }
+
         [TestMethod]
         public void TestGetBenchmarkData_DataReadFromDatabaseIsReturned()
         {
-            var mockReader = new Mock<GroupDataReader>(MockBehavior.Strict);
-
-            mockReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
+            // Data is read from database
+            _groupDataReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
                 .Returns(new List<CoreDataSet> { new CoreDataSet { Value = 1 } });
 
-            var provider = new BenchmarkDataProvider(mockReader.Object);
+            // Act
+            var data = DataProvider().GetBenchmarkData(new Grouping(), new TimePeriod(),
+                _averageCalculator.Object, new Area());
 
-            var data = provider.GetBenchmarkData(new Grouping(), new TimePeriod(),
-                new Mock<AverageCalculator>().Object, new Area());
-
+            // Assert
             Assert.IsTrue(data.IsValueValid);
-
-            mockReader.Verify();
+            _groupDataReader.Verify();
         }
 
         [TestMethod]
         public void TestGetBenchmarkData_WhenNoDataInDatabaseAndNoAverageThenNullCoreDataSetIsReturned()
         {
-            var mockReader = new Mock<GroupDataReader>(MockBehavior.Strict);
-            mockReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
+            // Data is not found in database
+            _groupDataReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
                 .Returns(new List<CoreDataSet>());
 
-            var averageCalculator = new Mock<AverageCalculator>();
-            averageCalculator.SetupGet(x => x.Average)
+            // Average cannot be calculated
+            _averageCalculator.SetupGet(x => x.Average)
                 .Returns(default(CoreDataSet)/*i.e. null*/);
 
-            var data = new BenchmarkDataProvider(mockReader.Object)
-                .GetBenchmarkData(new Grouping(), new TimePeriod(), averageCalculator.Object, new Area());
+            // Act
+            var data = DataProvider()
+                .GetBenchmarkData(new Grouping(), new TimePeriod(), _averageCalculator.Object, new Area());
 
+            // Assert
             Assert.IsFalse(data.IsValueValid);
-
-            mockReader.Verify();
+            _groupDataReader.Verify();
         }
 
         [TestMethod]
         public void TestGetBenchmarkData_WhenNoDataInDatabaseAverageIsReturned()
         {
-            var mockReader = new Mock<GroupDataReader>(MockBehavior.Strict);
-            mockReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
+            // No data found in database
+            _groupDataReader.Setup(x => x.GetCoreData(It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), It.IsAny<string>()))
                 .Returns(new List<CoreDataSet>());
 
-            var averageCalculator = new Mock<AverageCalculator>();
-            averageCalculator.SetupGet(x => x.Average)
+            // Average is calculated
+            _averageCalculator.SetupGet(x => x.Average)
                 .Returns(new CoreDataSet { Value = 1 });
 
-            var data = new BenchmarkDataProvider(mockReader.Object)
-                .GetBenchmarkData(new Grouping(), new TimePeriod(), averageCalculator.Object, new Area());
+            // Act
+            var data = DataProvider()
+                .GetBenchmarkData(new Grouping(), new TimePeriod(), _averageCalculator.Object, new Area());
 
+            // Assert
             Assert.IsTrue(data.IsValueValid);
-
-            mockReader.Verify();
+            _groupDataReader.Verify();
         }
 
         [TestMethod]
-        public void TestGetBenchmarkData_WhenAreaIsCategoryArea()
+        public void TestGetBenchmarkData_WhenAreaIsCategoryAreaAndDataIsRetrievedFromDatabase()
         {
-            var mockReader = new Mock<GroupDataReader>(MockBehavior.Strict);
-
-            mockReader.Setup(x => x.GetCoreDataForCategoryArea(It.IsAny<Grouping>(),
-                    It.IsAny<TimePeriod>(), It.IsAny<CategoryArea>()))
+            // Category area found in database
+            _groupDataReader.Setup(x => x.GetCoreDataForCategoryArea(It.IsAny<Grouping>(),
+                    It.IsAny<TimePeriod>(), It.IsAny<ICategoryArea>()))
                 .Returns(new CoreDataSet { Value = 1 });
 
-            var provider = new BenchmarkDataProvider(mockReader.Object);
-
-            var parentArea = new Mock<CategoryArea>(MockBehavior.Strict);
+            // Area setup
+            var parentArea = new Mock<ICategoryArea>(MockBehavior.Strict);
             parentArea.Setup(x => x.Code).Returns("code");
 
-            var data = provider.GetBenchmarkData(new Grouping(), new TimePeriod(),
-                new Mock<AverageCalculator>().Object, parentArea.Object);
+            // Act
+            var data = DataProvider().GetBenchmarkData(new Grouping(), new TimePeriod(),
+                _averageCalculator.Object, parentArea.Object);
 
+            // Assert
             Assert.IsTrue(data.IsValueValid);
-            Assert.IsNotNull("code", data.AreaCode, "AreaCode has not been set");
+            _groupDataReader.Verify();
+        }
 
-            mockReader.Verify();
+        [TestMethod]
+        public void TestGetBenchmarkData_WhenAreaIsCategoryAreaAndDataIsCalculated()
+        {
+            // No data in database
+            _groupDataReader.Setup(x => x.GetCoreDataForCategoryArea(It.IsAny<Grouping>(),
+                    It.IsAny<TimePeriod>(), It.IsAny<ICategoryArea>()))
+                .Returns((CoreDataSet)null);
+
+            // Average is calculated
+            _averageCalculator.SetupGet(x => x.Average)
+                .Returns(new CoreDataSet { Value = 1 });
+
+            // Category area properties are copied to data
+            var parentArea = new Mock<ICategoryArea>(MockBehavior.Strict);
+            parentArea.Setup(x => x.ParentAreaCode).Returns("parent-code");
+            parentArea.Setup(x => x.Code).Returns("code");
+            parentArea.Setup(x => x.CategoryId).Returns(1);
+            parentArea.Setup(x => x.CategoryTypeId).Returns(2);
+
+            // Act
+            var data = DataProvider().GetBenchmarkData(new Grouping(), new TimePeriod(),
+                _averageCalculator.Object, parentArea.Object);
+
+            // Assert
+            Assert.IsTrue(data.IsValueValid);
+            Assert.AreEqual("parent-code", data.AreaCode, "AreaCode has not been set");
+            _groupDataReader.Verify();
         }
 
         public BenchmarkDataProvider DataProvider()
         {
-            return new BenchmarkDataProvider(ReaderFactory.GetGroupDataReader());
+            return new BenchmarkDataProvider(_groupDataReader.Object);
         }
     }
 }

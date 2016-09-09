@@ -13,7 +13,6 @@ namespace PholioVisualisation.RequestParameters
         public int DataPointOffset { get; set; }
         public string ParentAreaCode { get; set; }
         public int ChildAreaTypeId { get; set; }
-        public IndicatorStatsType IndicatorStatsType { get; set; }
 
         public List<int> RestrictResultsToProfileIdList { get; set; }
 
@@ -25,20 +24,6 @@ namespace PholioVisualisation.RequestParameters
             ParentAreaCode = ParseString(ParameterNames.ParentAreaCode);
             ChildAreaTypeId = ParseInt(ParameterNames.AreaTypeId);
             RestrictResultsToProfileIdList = ParseIntList(ParameterNames.RestrictToProfileId, Convert.ToChar(","));
-            SetIndicatorStatsType();
-        }
-
-        private void SetIndicatorStatsType()
-        {
-            var statsType = ParseString(ParameterNames.Type);
-            if (statsType != null && statsType == "cl")
-            {
-                IndicatorStatsType = IndicatorStatsType.ControlLimits;
-            }
-            else
-            {
-                IndicatorStatsType = IndicatorStatsType.Percentiles25And75;
-            }
         }
 
         public override bool AreValid

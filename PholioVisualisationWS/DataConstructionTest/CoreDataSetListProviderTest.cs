@@ -50,7 +50,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestWhenAreaIsCategoryArea()
         {
-            CategoryArea area = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority,1);
+            CategoryArea area = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010,1);
 
             var reader = Reader();
             reader.Setup(x => x.GetCoreDataListForChildrenOfCategoryArea(

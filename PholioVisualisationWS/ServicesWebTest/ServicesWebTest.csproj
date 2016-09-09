@@ -81,8 +81,13 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Common\ServiceHelperTest.cs" />
+    <Compile Include="Controllers\AreasControllerTest.cs" />
     <Compile Include="Controllers\DataControllerTest.cs" />
+    <Compile Include="Controllers\IndicatorMetadataControllerTest.cs" />
+    <Compile Include="Controllers\NonPublicServicesControllerTest.cs" />
+    <Compile Include="Controllers\ProfilesControllerTest.cs" />
     <Compile Include="Controllers\StaticReportsControllerTest.cs" />
+    <Compile Include="Helpers\UrlHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +108,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

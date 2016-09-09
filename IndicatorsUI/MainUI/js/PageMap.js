@@ -1,3 +1,10 @@
+/**
+* Map namespace
+* @module map
+*/
+
+map = {};
+
 // jQuery.XDomainRequest.js
 // Author: Jason Moon - @JSONMOON
 // IE8+
@@ -134,10 +141,8 @@ function displayMap() {
 
     initMap();
 
-    if (
-        mapState.initiated
-            &&
-            mapState.areaTypeDisplayed != FT.model.areaTypeId) {
+    if (mapState.initiated&&
+            mapState.areaTypeDisplayed !== FT.model.areaTypeId) {
         NEPHOMaps.LoadLayer($('#areaTypes').val());
     }
     else if (mapState.initiated) {
@@ -150,6 +155,8 @@ function displayMap() {
 
         addNearestNeighboursToMaps();
     }
+
+    mapState.tabSpecificOptions.setHtml({});
 
     showAndHidePageElements();
 
@@ -170,12 +177,16 @@ function getAreaValues(root, model) {
         mapState.areaValues = areaValues[key];
         ajaxMonitor.callCompleted();
     } else {
-        var parameters = 'par=' + getCurrentComparator().Code +
-            '&gid=' + model.groupId + '&off=0&iid=' + root.IID +
-            '&sex=' + root.SexId + '&age=' + root.AgeId +
-            '&ati=' + model.areaTypeId + '&com=' + comparatorId +
-            getRestrictByProfileParameter();
-        getData(getAreaValuesCallback, 'av', parameters);
+        // If in search mode then use the groupId of the selected indicator from the search results
+        var parameters = new ParameterBuilder(
+            ).add('group_id', (isInSearchMode() ? root.Grouping[0].GroupId : FT.model.groupId)
+            ).add('area_type_id', model.areaTypeId
+            ).add('parent_area_code', getCurrentComparator().Code
+            ).add('comparator_id', comparatorId
+            ).add('indicator_id', root.IID
+            ).add('sex_id', root.Sex.Id
+            ).add('age_id', root.Age.Id);
+        ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), getAreaValuesCallback);
     }
 }
 
@@ -195,7 +206,7 @@ function getAreaValuesCallback(obj) {
     // First, count number of areas which have a value.
     var numAreas = 0;
     $.each(areaOrder, function (i, v) {
-        if (v.ValF != "-") {
+        if (v.ValF !== "-") {
             numAreas++;
         }
     });
@@ -203,7 +214,7 @@ function getAreaValuesCallback(obj) {
     // Second, set orderFrac for each.
     var j = 0;
     $.each(areaOrder, function (i, v) {
-        if (v.ValF == "-") {
+        if (v.ValF === "-") {
             hash[v.AreaCode].order = -1;
             hash[v.AreaCode].orderFrac = -1;
         }
@@ -215,7 +226,6 @@ function getAreaValuesCallback(obj) {
             j++;
         }
     });
-
 
     mapState.areaValues = hash;
 
@@ -243,12 +253,17 @@ function initMap() {
 
     $('.keyValueNote').hide();
 
-    var exportMap = '<span class="export-chart-box" style="margin-left: 11px;"><a class="export-link" href="javascript:exportMap()">Export map as image</a></span>';
     var exportChart = '<span class="export-chart-box" style="margin-left: 11px;"><a class="export-link" href="javascript:exportMapChart()">Export chart as image</a></span>';
 
-    var html = "<div id='maps_map'></div><div id='maps_resize_width'></div><div id='maps_info'><div id='map_colour_box'>Map colour: <select id='map_colour'><option value='benchmark'>Comparison to benchmark</option><option value='quartile'>Quartiles</option><option value='quintile'>Quintiles</option><option value='continuous'>Continuous</option></select></div><div id='maps_table'>Please wait...</div></div>" + exportMap + exportChart + "<div id='maps_chart'></div>";
+    var html = "<div id='maps_map'></div><div id='maps_resize_width'></div><div id='maps_info'><div id='map_colour_box'>Map colour&nbsp;<select id='map_colour'><option value='benchmark'>Comparison to benchmark</option><option value='quartile'>Quartiles</option><option value='quintile'>Quintiles</option><option value='continuous'>Continuous</option></select></div><div id='maps_table'>Please wait...</div></div>" + exportChart + "<div id='maps_chart'></div>";
     pages.getContainerJq().html(html);
 
+    mapState.tabSpecificOptions = new TabSpecificOptions({
+        exportImage: {
+            label: 'Export map as image',
+            clickHandler: exportMap
+        }
+    });
 
     setTimeout(function () {
         mapState.initiated = true;
@@ -376,20 +391,6 @@ function addNearestNeighboursToMaps() {
         NEPHOMaps.updateMap();
     }
 }
-
-
-//This call enables visualisation pages to be included dynamically
-pages.add(PAGE_MODES.MAP, {
-    id: 'map',
-    title: 'Map',
-    goto: goToMapPage,
-    gotoName: 'goToMapPage',
-    needsContainer: true,
-    jqIds: ['indicatorMenuDiv', '.geo-menu', 'benchmark-box', 'map-key-part2', 'value-note-legend', 'nearest-neighbour-link'],
-    jqIdsNotInitiallyShown: ['keyAdHoc', 'keyTartanRug', 'trend-marker-legend-tartan'],
-    showHide: hideAndShowMapMenus
-});
-
 
 function NEPHOMaps() {
 
@@ -525,7 +526,8 @@ function NEPHOMaps() {
         NEPHOMaps.AreaLayer = L.esri.featureLayer(serviceUrl + geoLayerId,
                 {
                     simplifyFactor: .25,//0.75,
-                    attribution: "Contains Ordnance Survey data &copy; Crown copyright and database right 2015.",
+                    attribution: "Contains Ordnance Survey data &copy; Crown copyright and database right " +
+                        (new Date).getFullYear() + ".",
                     style: function (feature) {
                         var selected = (jQuery.inArray(feature.properties.ONSCD, NEPHOMaps.SelectedFeatures) > -1),
                                         fillColour = getColour(feature.properties.ONSCD),
@@ -749,19 +751,30 @@ function NEPHOMaps() {
                     }
                 }
 
+                var formattedCell = "";
+                var formattedValue = valueDisplayer.byNumberString(values.ValF);
+                var dataInfo = new CoreDataSetInfo(values);
+
+                if (dataInfo.isNote()) {
+                    if (dataInfo.isValue()) {
+                        formattedCell = "<td class='hasNote' data-NoteId='" + values.NoteId + "'>" + formattedValue + "*</td>";
+                    } else {
+                        formattedCell = "<td class='hasNote value-note-symbol' data-NoteId='" + values.NoteId + "'>*</td>";
+                    }
+                } else {
+                    formattedCell = "<td>" + formattedValue + "</td>";
+                }
+
                 html += "<tr id='tr-" + values.AreaCode + "' "
-                    + (_.isUndefined(values.NoteId) ? "" : " class='hasNote'")
+                    + (dataInfo.isNote() ? " class='hasNote'" : "")
                     + "><td style='border-left-color: " + colour + "'>"
                           + area.Name + "</td>" + nearestNeighbourRank() +
                     "<td>"
-                    + (values.Count === -1 ? "-" : new CommaNumber(values.Count).rounded()) + "</td>"
-                          + (_.isUndefined(values.NoteId)
-                            ? "<td>" + valueDisplayer.byNumberString(values.ValF) + "</td>"
-                            : "<td class='hasNote' data-NoteId='" + values.NoteId + "'>*</td>"
-                            )
-                          + "<td>" + valueDisplayer.byNumberString(values.LoCIF) + "</td>"
-                          + "<td>" + valueDisplayer.byNumberString(values.UpCIF) + "</td>"
-                          + "</tr>";
+                    + (dataInfo.isCount() ? new CommaNumber(values.Count).rounded() : "-") + "</td>"
+                    + formattedCell
+                    + "<td>" + valueDisplayer.byNumberString(values.LoCIF) + "</td>"
+                    + "<td>" + valueDisplayer.byNumberString(values.UpCIF) + "</td>"
+                    + "</tr>";
             }
 
         });
@@ -777,8 +790,9 @@ function NEPHOMaps() {
                     return '';
                 }
             }
-          
-            html = "<table id='map_table'><thead><tr><th>Area</th>" + nearestNeighbourOption() + "<th>Count</th><th>Value</th><th>LCI</th><th>UCI</th></tr><thead><tbody id='map_table_body'>" + html + "</tbody></table>";
+
+            html = "<table id='map_table'><thead><tr><th>Area</th>" + nearestNeighbourOption() +
+                "<th>Count</th><th>Value</th><th>LCI</th><th>UCI</th></tr><thead><tbody id='map_table_body'>" + html + "</tbody></table>";
             $('#maps_table').html(html);
             $("#map_table").tablesorter({
                 sortList: [[0, 0]],
@@ -1050,8 +1064,8 @@ function buildChartTitle() {
     var root = groupRoots[getIndicatorIndex()],
         unit = ui.getMetadataHash()[root.IID].Unit,
         unitLabel = !String.isNullOrEmpty(unit.Label) ? unit.Label + ', ' : '',
-        period = getFirstGrouping(root).Period;        
-        return mapState.metadata.ValueType.Label + ' - ' + unitLabel + period;   
+        period = getFirstGrouping(root).Period;
+    return mapState.metadata.ValueType.Name + ' - ' + unitLabel + period;
 }
 
 function addMapBarChart() {
@@ -1193,8 +1207,7 @@ function addMapBarChart() {
         },
         yAxis: yAxis,
         tooltip: {
-            shared: false
-            ,
+            shared: false,
             formatter: function () {
                 if (this.series.type == "line") {
                     return "<b>" + this.series.name + "</b><br />"
@@ -1224,7 +1237,6 @@ function addMapBarChart() {
                 if (!_.isUndefined(xAxisCategories[this.x].UpCIF)) {
                     s += "<br>UCI: " + new ValueWithUnit(unit).getFullLabel(xAxisCategories[this.x].UpCIF);
                 }
-
 
                 s += "<br>Rank: " + (this.x + 1);
 
@@ -1296,6 +1308,7 @@ function addMapBarChart() {
     });
 }
 
+// Export map bar chart
 function exportMapChart() {
 
     NEPHOMaps.chart.exportChart({ type: 'image/png' }, {
@@ -1322,18 +1335,29 @@ function exportMapChart() {
     });
 }
 
-function exportMap() {
+function exportMap(e) {
+
+    // Prevent page refresh on link click
+    e.preventDefault();
+
     if (isIE8()) {
         browserUpgradeMessage();
-    } else {          
-        $('.leaflet-top').hide(); // hide the map options buttons
+    } else {
+        // hide the map options buttons
+        $('.leaflet-top').hide();
         var title = getTitle();
+
         // Add title div
         $('<div id="map-export-title" style="text-align: center; font-family:Arial;">' + title + '</div>').appendTo('#maps_map');
+
+        // create image
         var mapContainer = $('#maps_map');
         saveElementAsImage(mapContainer, 'Map');
-        $('#map-export-title').remove(); // Remove title div
-        $('.leaflet-top').show(); // restore the map options
+
+        // Remove title div
+        $('#map-export-title').remove();
+        // restore the map options
+        $('.leaflet-top').show();
     }
 }
 
@@ -1366,3 +1390,16 @@ var baseMaps = [
         L: L.esri.basemapLayer('Gray')
     }
 ];
+
+
+pages.add(PAGE_MODES.MAP, {
+    id: 'map',
+    title: 'Map',
+    goto: goToMapPage,
+    gotoName: 'goToMapPage',
+    needsContainer: true,
+    jqIds: ['indicatorMenuDiv', '.geo-menu', 'benchmark-box', 'map-key-part2', 'value-note-legend',
+        'nearest-neighbour-link', 'tab-specific-options'],
+    jqIdsNotInitiallyShown: ['keyAdHoc', 'keyTartanRug'],
+    showHide: hideAndShowMapMenus
+});

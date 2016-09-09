@@ -3,6 +3,31 @@
                    assembly="PholioVisualisation.PholioObjects"
                    namespace="PholioVisualisation.PholioObjects">
 
+  <!-- ComparatorMethod class -->
+  <class name="ComparatorMethod" table="l_comparatormethods">
+
+    <id name="Id" column="comparatormethodid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="comparatormethod"/>
+    <property name="ShortName" column="shortname"/>
+    <property name="Description" column="ComparatorDescription"/>
+    <property name="Reference" column="Reference"/>
+    <property name="IsCurrent" column="IsCurrent"/>
+
+  </class>
+
+
+  <!-- Polarity class -->
+  <class name="Polarity" table="l_polarity">
+
+    <id name="Id" column="polarityid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="polarity"/>
+
+  </class>
+  
   <!-- ParentAreaGroup class -->
   <class name="ParentAreaGroup" table="ws_profileparentareaoptions">
 
@@ -134,6 +159,8 @@
 
     <property name="Name" column="areatypefull"/>
     <property name="ShortName" column="areatype"/>
+    <property name="IsCurrent" column="iscurrent"/>
+    <property name="IsSearchable" column="issearchable"/>
 
   </class>
 
@@ -278,7 +305,7 @@
       <generator class="identity"/>
     </id>
 
-    <property name="Label" column="yeartype"/>
+    <property name="Name" column="yeartype"/>
 
   </class>
   
@@ -289,7 +316,7 @@
       <generator class="identity"/>
     </id>
 
-    <property name="Label" column="valuetype"/>
+    <property name="Name" column="valuetype"/>
 
   </class>
 
@@ -312,6 +339,7 @@
     <many-to-one name="Unit" column="unitid" lazy="false"/>
     <many-to-one name="YearType" column="yeartypeid" lazy="false"/>
     <many-to-one name="ValueType" column="valuetypeid" lazy="false"/>
+    <many-to-one name="ConfidenceIntervalMethod" column="cimethodid" lazy="false"/>
     <many-to-one name="TargetConfig" column="targetid" lazy="false" not-found="ignore"/>
 
   </class>
@@ -364,6 +392,9 @@
     <property name="ComparatorMethodId" column="comparatormethodid"/>
     <property name="ComparatorConfidence" column="comparatorconfidence"/>
     <property name="ComparatorTargetId" column="comparatortargetid"/>
+
+    <many-to-one name="Sex" column="sexid" lazy="false"/>
+    <many-to-one name="Age" column="ageid" lazy="false"/>
 
   </class>
 
@@ -463,7 +494,7 @@
   <class name="Category" table="l_categories">
     <composite-id>
       <key-property name="CategoryTypeId" column="categorytypeid" type="int" />
-      <key-property name="CategoryId" column="categoryid" type="int" />
+      <key-property name="Id" column="categoryid" type="int" />
     </composite-id>
     <property name="Name" column="name"/>
     <property name="ShortName" column="shortname"/>
@@ -477,13 +508,22 @@
     <property name="NhsChoicesId" column="NhsChoicesId"/>
   </class>
 
-  <!-- Chimat reource ID mapping -->
+  <!-- Chimat resource ID mapping -->
   <class name="AreaCodeChimatResourceIdMapping" table="l_areacodechimatresource">
     <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
       <generator class="identity"/>
     </id>
     <property name="ChimatResourceId" column="ChimatResourceId"/>
   </class>
+
+  <!-- Chimat health behaviours (WAY) resource ID mapping -->
+  <class name="AreaCodeChimatWayResourceIdMapping" table="l_areacodechimatresource">
+    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="ChimatWayResourceId" column="ChimatWayResourceId"/>
+  </class>
+  
 
   <!-- ProfilePdf-->
   <class name="ProfilePdf" table="ui_profilepdfs">

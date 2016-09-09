@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F90E6631-DB1A-4CC1-B648-8FD3EBAED8DE}"
 	ProjectSection(SolutionItems) = preProject
@@ -99,6 +99,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DIResolver", "DIResolver\DIResolver.csproj", "{638184FB-B8CA-43BD-A136-6737A417EF5A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FingertipsDataExtractionToolTest", "FingertipsDataExtractionToolTest\FingertipsDataExtractionToolTest.csproj", "{318AC2BF-8B87-4260-8D9D-F55E85E51929}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataHelpers", "DataHelpers\DataHelpers.csproj", "{24500DF1-56B2-425C-BDE4-851561897EC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataHelpersTest", "DataHelpersTest\DataHelpersTest.csproj", "{E925A8BA-2873-4516-AA28-5D352B81E889}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -254,6 +258,14 @@ Global
 		{318AC2BF-8B87-4260-8D9D-F55E85E51929}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{318AC2BF-8B87-4260-8D9D-F55E85E51929}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{318AC2BF-8B87-4260-8D9D-F55E85E51929}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24500DF1-56B2-425C-BDE4-851561897EC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24500DF1-56B2-425C-BDE4-851561897EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24500DF1-56B2-425C-BDE4-851561897EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24500DF1-56B2-425C-BDE4-851561897EC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E925A8BA-2873-4516-AA28-5D352B81E889}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E925A8BA-2873-4516-AA28-5D352B81E889}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E925A8BA-2873-4516-AA28-5D352B81E889}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E925A8BA-2873-4516-AA28-5D352B81E889}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -296,6 +308,8 @@ Global
 		{22019897-902E-4DFA-ABB2-67AD9964E226} = {2722978C-4F20-479E-B31D-C69B9F77CAF3}
 		{638184FB-B8CA-43BD-A136-6737A417EF5A} = {31664D2D-76EA-4046-A40D-D999F44F021F}
 		{318AC2BF-8B87-4260-8D9D-F55E85E51929} = {2722978C-4F20-479E-B31D-C69B9F77CAF3}
+		{24500DF1-56B2-425C-BDE4-851561897EC2} = {C0262A9F-990B-4C78-AE36-0463A8E88705}
+		{E925A8BA-2873-4516-AA28-5D352B81E889} = {C0262A9F-990B-4C78-AE36-0463A8E88705}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = PholioDataVisualisation.vsmdi

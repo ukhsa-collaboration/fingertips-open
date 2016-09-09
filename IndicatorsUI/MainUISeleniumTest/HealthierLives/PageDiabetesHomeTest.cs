@@ -22,12 +22,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             CheckTextOnHomePageReflectsSelectedAreaType(LongerLivesIds.AreaTypeLinkCcgs, "CCG");
         }
 
-        [TestMethod]
-        public void CheckTextOnHomePageReflectsCountyUaAreaType()
-        {
-            CheckTextOnHomePageReflectsSelectedAreaType(LongerLivesIds.AreaTypeLinkCountyUa, "authority");
-        }
-
         private void CheckTextOnHomePageReflectsSelectedAreaType(string areaTypeLinkId,
             string areaTypeString)
         {

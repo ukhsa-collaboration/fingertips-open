@@ -13,14 +13,22 @@ namespace PholioVisualisation.PdfDataTest
     [TestClass]
     public class DomainNationalValuesBuilderTest
     {
-        private IList<DomainNationalValues> domainNationalValuesList;
+        private static IList<DomainNationalValues> domainNationalValuesList;
+
+        [ClassInitialize]
+        public static void ClassInitialize(TestContext testContext)
+        {
+            domainNationalValuesList = new DomainNationalValuesBuilder()
+                .GetDomainDataForProfile(ProfileIds.Phof,
+                AreaTypeIds.CountyAndUnitaryAuthority, new List<string>());
+        }
 
         [TestMethod]
         public void TestAreaValues()
         {
             bool areAnyAreaValuesSet = false;
 
-            var domainNationalValues = Data().First();
+            var domainNationalValues = domainNationalValuesList.First();
             foreach (var groupRootNationalValues in domainNationalValues.IndicatorData)
             {
                 if (groupRootNationalValues.AreaValues.Count > 0)
@@ -39,7 +47,7 @@ namespace PholioVisualisation.PdfDataTest
         [TestMethod]
         public void TestSignificancesAreSet()
         {
-            var domainNationalValues = Data().First();
+            var domainNationalValues = domainNationalValuesList.First();
             foreach (var groupRootNationalValues in domainNationalValues.IndicatorData)
             {
                 var dataList = groupRootNationalValues.AreaValues.Values.ToList();
@@ -59,7 +67,7 @@ namespace PholioVisualisation.PdfDataTest
 
         private void AssertText(string propertyName)
         {
-            foreach (var spineChartTableData in Data())
+            foreach (var spineChartTableData in domainNationalValuesList)
             {
                 foreach (var row in spineChartTableData.IndicatorData)
                 {
@@ -67,19 +75,6 @@ namespace PholioVisualisation.PdfDataTest
                     Assert.IsFalse(string.IsNullOrWhiteSpace(text));
                 }
             }
-        }
-
-        private IList<DomainNationalValues> Data()
-        {
-            // All tests are read only so only need to create once
-            while (domainNationalValuesList == null)
-            {
-                domainNationalValuesList = new DomainNationalValuesBuilder()
-                    .GetDomainDataForProfile(ProfileIds.Phof,
-                    AreaTypeIds.CountyAndUnitaryAuthority, new List<string>());
-            }
-
-            return domainNationalValuesList;
         }
     }
 }

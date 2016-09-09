@@ -47,36 +47,13 @@ namespace IndicatorsUI.FingertipsBridgeWS.CacheTest
         {
             NameValueCollection nameValues = new NameValueCollection();
             nameValues.Add("a", "9");
-            nameValues.Add(CacheKeyBuilder.ParameterJsonp, "8");
             nameValues.Add(CacheKeyBuilder.ParameterAjaxCallId, "7");
             CacheKeyBuilder builder = new CacheKeyBuilder(nameValues, "b");
 
-            Assert.IsFalse(builder.CacheKey.Contains(CacheKeyBuilder.ParameterJsonp));
             Assert.IsFalse(builder.CacheKey.Contains(CacheKeyBuilder.ParameterAjaxCallId));
             Assert.IsFalse(builder.CacheKey.Contains("7"));
             Assert.IsFalse(builder.CacheKey.Contains("8"));
         }
-
-        [TestMethod]
-        public void TestIsJsonP()
-        {
-            // JsonP defined
-            NameValueCollection nameValues = new NameValueCollection();
-            nameValues.Add("a", "9");
-            nameValues.Add(CacheKeyBuilder.ParameterJsonp, "8");
-            nameValues.Add(CacheKeyBuilder.ParameterAjaxCallId, "7");
-            CacheKeyBuilder builder = new CacheKeyBuilder(nameValues, "b");
-            Assert.IsTrue(builder.IsJsonP);
-            Assert.AreEqual("8", builder.JsonPValue);
-
-            // JsonP not defined
-            nameValues = new NameValueCollection();
-            nameValues.Add("a", "9");
-            nameValues.Add(CacheKeyBuilder.ParameterAjaxCallId, "7");
-            builder = new CacheKeyBuilder(nameValues, "b");
-            Assert.IsFalse(builder.IsJsonP);
-        }
-
 
         [TestMethod]
         public void TestNoCache()

@@ -1,4 +1,13 @@
 ﻿@using Profiles.MainUI.Models
 @model PageModel
-<a id="startButton" href="/profile-group/@Model.ProfileCollection.First().UrlKey/profile/@ViewBag.ProfileUrlKey/data"></a>
-
+@if (Model.HasExclusiveSkin == false && Model.IsProfileWithOnlyStaticReports == false)
+{
+    if (Model.DefaultFingertipsTabId == -1)
+    {
+        <a id="startButton" href="/profile-group/@Model.ProfileCollections.First().UrlKey/profile/@ViewBag.ProfileUrlKey/data"></a>
+    }
+    else
+    {
+        <a id="startButton" href="/profile-group/@Model.ProfileCollections.First().UrlKey/profile/@ViewBag.ProfileUrlKey/data#page/@Model.DefaultFingertipsTabId"></a>
+    }
+}

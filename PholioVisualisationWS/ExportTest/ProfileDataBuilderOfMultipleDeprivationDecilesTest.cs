@@ -12,28 +12,12 @@ namespace PholioVisualisation.ExportTest
     [TestClass]
     public class ProfileDataBuilderOfMultipleDeprivationDecilesTest
     {
-        private static IWorkbook workbook;
+        private static IWorkbook _workbook;
 
         [ClassInitialize]
         public static void RunOnceBeforeAllTests(TestContext testContext)
         {
             InitDeprivationDecilesForAllEnglandWorksheets();
-        }
-
-        private static void InitDeprivationDecilesForAllEnglandWorksheets()
-        {
-            var parentArea = new ParentArea(AreaCodes.England, AreaTypeIds.CountyAndUnitaryAuthority);
-            IList<ParentArea> parentAreas = new List<ParentArea>();
-            parentAreas.Add(parentArea);
-
-            var map = new ComparatorMapBuilder(parentAreas).ComparatorMap;
-            var profileId = ProfileIds.Phof;
-            var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
-            var parentAreaTypeId =
-                CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(
-                    CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
-            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId }, ParentDisplay.NationalAndRegional,
-                parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)).BuildWorkbook();;
         }
 
         [TestMethod]
@@ -61,19 +45,38 @@ namespace PholioVisualisation.ExportTest
         [TestMethod]
         public void TestDeprivationDecileCodesAreWrittenForParentAreas()
         {
-            var cells = CountyUAWorksheet().Cells;
+            var cells = DistrictUAWorksheet().Cells;
             Assert.IsNotNull(cells[1, ExcelColumnIndexes.ParentAreaCode].Value);
             Assert.IsNotNull(cells[1, ExcelColumnIndexes.ParentAreaName].Value);
         }
 
-        private static IWorksheet DeprivationDecileWorksheet()
+        private static void InitDeprivationDecilesForAllEnglandWorksheets()
         {
-            return workbook.Worksheets["Deprivation decile (IMD..."];
+            // Parameters
+            var profileId = ProfileIds.Phof;
+            var childAreaType = AreaTypeIds.DistrictAndUnitaryAuthority;
+            var parentArea = new ParentArea(AreaCodes.England, childAreaType);
+            var parentAreaTypeId =
+                CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(
+                    CategoryTypeIds.DeprivationDecileDistrictAndUA2015);
+
+            // Create workbook
+            IList<ParentArea> parentAreas = new List<ParentArea>();
+            parentAreas.Add(parentArea);
+            var map = new ComparatorMapBuilder(parentAreas).ComparatorMap;
+            var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
+            _workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId },
+                parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)).BuildWorkbook(); ;
         }
 
-        private static IWorksheet CountyUAWorksheet()
+        private static IWorksheet DeprivationDecileWorksheet()
         {
-            return workbook.Worksheets["County & UA"];
+            return _workbook.Worksheets["Deprivation decile (IMD..."];
+        }
+
+        private static IWorksheet DistrictUAWorksheet()
+        {
+            return _workbook.Worksheets["District & UA"];
         }
     }
 }

@@ -69,6 +69,11 @@ namespace Fpm.MainUI.Controllers
 
             try
             {
+                if (!Directory.Exists(AppConfig.UploadFolder))
+                {
+                    Directory.CreateDirectory(AppConfig.UploadFolder);
+                }
+
                 file.SaveAs(Path.Combine(AppConfig.UploadFolder, fileName));
                 var uploadJob = new UploadJob
                 {

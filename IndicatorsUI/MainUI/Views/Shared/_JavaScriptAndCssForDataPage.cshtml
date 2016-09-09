@@ -8,7 +8,7 @@
     defaultAreaType = @(ViewBag.DefaultAreaType);
     enumParentDisplay = @ViewBag.EnumParentDisplay;
     ignoredSpineChartAreas = '@Model.IgnoredSpineChartAreas';
-    areAnyIndicators = true;
+    FT.model.areAnyIndicators = true;
     spineHeaders = { min: '@Model.SpineChartMinMaxLabel.Min',
                      max: '@Model.SpineChartMinMaxLabel.Max'
     };
@@ -16,6 +16,7 @@
     FT.version = '@ViewBag.JavaScriptVersion';
     showDataQuality = @(ViewBag.ShowDataQuality);
     isNational = @(ViewBag.IsNational);
+
 //]]</script>
 @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForDataPage"))
 @Html.Partial("_ProfileSpecificCssFiles")

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PholioVisualisation.Export;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
@@ -42,7 +43,7 @@ namespace PholioVisualisation.ExportTest
             var workbook = ProfileDataBuilderOfSingleRegionTest.GetWorkbookForProfile(
                 ProfileIds.SexualHealth);
 
-            var cells = workbook.Worksheets["England"].Cells;
+            var cells = workbook.Worksheets[ProfileDataBuilder.NationalLabel].Cells;
             var lastData = string.Empty;
             var dataList = new List<string>();
             for (int rowIndex = 1; rowIndex < 1000; rowIndex++)

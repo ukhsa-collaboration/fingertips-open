@@ -12,13 +12,13 @@ namespace PholioVisualisation.KeyMessages
             "In {{Year}}, {{AdultObesityPercent}}%{{AdultObesityCount}} of adults are classified as obese{{SignificanceText}}";
 
         private const string Sentence2Template =
-            "The rate of alcohol related harm hospital stays was {{AlcoholAdmissionsToHospital}}{{SignificanceText}} This represents {{AdultAlcoholAdmissionsPerYear}} stays per year.";
+            "The rate of alcohol-related harm hospital stays is {{AlcoholAdmissionsToHospital}}{{SignificanceText}} This represents {{AdultAlcoholAdmissionsPerYear}} stays per year.";
 
         private const string Sentence3Template =
-            "The rate of self-harm hospital stays was {{AdultSelfHarmAdmissions}}{{SignificanceText}} This represents {{AdultSelfHarmAdmissionsPerYear}} stays per year.";
+            "The rate of self-harm hospital stays is {{AdultSelfHarmAdmissions}}{{SignificanceText}} This represents {{AdultSelfHarmAdmissionsPerYear}} stays per year.";
 
         private const string Sentence4Template =
-            "The rate of smoking related deaths was {{AdultSmokingRelatedDeaths}}{{SignificanceText}} This represents {{AdultSmokingRelatedDeathsPerYear}} deaths per year.";
+            "The rate of smoking related deaths is {{AdultSmokingRelatedDeaths}}{{SignificanceText}} This represents {{AdultSmokingRelatedDeathsPerYear}} deaths per year.";
 
         private const string Sentence5Template =
             "Estimated levels of adult {{Options}} are {{BetterOrWorse}} than the England average.";
@@ -33,7 +33,6 @@ namespace PholioVisualisation.KeyMessages
         {
             this.data = data;
             var message = new SentenceJoiner();
-            message.Add(GetSentence1());
             message.Add(GetSentence2());
             message.Add(GetSentence3());
             message.Add(GetSentence4());
@@ -44,23 +43,6 @@ namespace PholioVisualisation.KeyMessages
             message.Add(GetSentence7(Significance.Worse));
             message.Add(GetSentence7(Significance.Better));
             return message.Join();
-        }
-
-        public string GetSentence1()
-        {
-            // if we dont have count don't show.
-            string obesityCount = string.IsNullOrEmpty(data.ObesityAdultsCount)
-                ? string.Empty
-                : " (" + data.ObesityAdultsCount + ")";
-
-            var sentenceData = new Dictionary<string, string>
-            {
-                {"Year", data.ObesityAdultsYear},
-                {"AdultObesityPercent", data.ObesityAdultsPercentage},
-                {"AdultObesityCount", obesityCount},
-                {"SignificanceText", GetSignificanceText(data.ObesityAdultsSignificance)}
-            };
-            return Render.StringToString(Sentence1Template, sentenceData);
         }
 
         public string GetSentence2()
@@ -216,7 +198,7 @@ namespace PholioVisualisation.KeyMessages
             if (data.AdultIncidenceOfMalignantMelanomaSig == sig)
                 qualifiedItems.Add("new cases of malignant melanoma");
             if (data.AdultDrugMisuseSig == sig)
-                qualifiedItems.Add("drug misuse");
+                qualifiedItems.Add("deaths from drug misuse");
             if (data.AdultExcessWinterDeathsSig == sig)
                 qualifiedItems.Add("excess winter deaths");
             if (data.AdultUnder75MortalityRateCvdSig == sig)

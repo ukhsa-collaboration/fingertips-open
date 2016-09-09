@@ -17,7 +17,7 @@ namespace PholioVisualisation.DataConstruction
         /// <summary>
         /// Returns null.
         /// </summary>
-        public IList<string> ToList()
+        public IList<string> GetTimePeriodStrings()
         {
             return null;
         }

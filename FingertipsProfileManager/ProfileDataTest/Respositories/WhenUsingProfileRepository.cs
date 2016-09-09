@@ -324,7 +324,7 @@ namespace Fpm.ProfileDataTest.Respositories
             // Arrange
             var reader = ReaderFactory.GetProfilesReader();
 
-            const int indicatorId = IndicatorIds.IDAOPI;
+            const int indicatorId = IndicatorIds.ChildrenInPoverty;
             const int newOwnerProfileId = ProfileIds.Diabetes;
 
             var currentOwnerProfile = reader.GetIndicatorMetadata(indicatorId).OwnerProfileId;

@@ -5,7 +5,7 @@ sonar.projectName=FPM-JavaScript
 sonar.sourceEncoding=UTF-8
 sonar.sources=.
 sonar.language=js
-sonar.exclusions=**/jquery*,**/*jquery*,**/underscore*,**/bootstrap*,**/tiny_mce/**,**/modernizr*
+sonar.exclusions=**/jquery*,**/*jquery*,**/underscore*,**/bootstrap*,**/tiny_mce/**,**/modernizr*,**/angular*,**/es5*
 
 sonar.fxcop.mode=skip
 sonar.gallio.mode=skip

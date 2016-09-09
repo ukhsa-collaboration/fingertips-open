@@ -1,20 +1,30 @@
-function displayMetadata(indicatorMetadata, root) {
-    
-    var a = getMetadataHtml(indicatorMetadata, root);
+'use strict';
 
-    var e = $('#metadataBox');
-    if (e.length) {
+/**
+* Defined in PageMetadata.js
+* @module metadata
+*/
+
+var metadata = {};
+
+function displayMetadata(indicatorMetadata, root) {
+
+    var metadata = getMetadataHtml(indicatorMetadata, root);
+
+    var html = metadata.html;
+    var $box = $('#metadataBox');
+    if ($box.length) {
         // Practice profiles
-        e.html(a.html);
+        $box.html(html);
     } else {
         // Fingertips
-        pages.getContainerJq().html(a.html);
+        pages.getContainerJq().html(html);
     }
 
-    labelAsync.populate(a.labelArgs);
+    labelAsync.populate(metadata.labelArgs);
 };
 
-metadataState = {
+var metadataState = {
 
     // Stored to facilitate label callback 
     yearTypeId: null,
@@ -31,16 +41,21 @@ metadataState = {
     }
 };
 
-labelAsync = (function () {
+var labelAsync = (function () {
 
-    // Key so that most recent AJAX response can be identified
-    var key = 0;
+    var _getLabel = function (labelArgs, key, cacheKey) {
+        if (labelArgs[key]) {
+            ajaxGet('api/' + key.replace('-', '_') + '?', 'id=' + labelArgs[key],
+                function (obj) {
+                    if (isDefined(obj)) {
+                        loaded[cacheKey][obj.Id] = obj.Name;
+                        $('#' + key + '-label').html(obj.Name);
+                    }
+                });
+        }
+    }
 
     return {
-
-        getCurrentKey: function () {
-            return key;
-        },
 
         getLabel: function (id, loaded, arg, labelArgs) {
 
@@ -58,46 +73,11 @@ labelAsync = (function () {
         },
 
         populate: function (labelArgs) {
-            if (_.size(labelArgs) > 0) {
-                key++;
-
-                var a = ['key=', key];
-                for (var i in labelArgs) {
-                    a.push('&', i, '=', labelArgs[i]);
-                }
-
-                ajaxGet('GetLabel.ashx', a.join(''), getLabelCallback);
-            }
+            _getLabel(labelArgs, 'comparator-method', 'comparatorMethods');
         }
     }
 })();
 
-function getLabelCallback(obj) {
-    if (isDefined(obj) &&
-            parseInt(obj.key, 10) === labelAsync.getCurrentKey()) {
-
-        displayLabel(obj, 'age', 'ages');
-        displayLabel(obj, 'yti', 'yearTypes');
-        displayLabel(obj, 'cm', 'methods');
-
-        var key = 'cim';
-        var ciMethod = obj[key];
-        if (isDefined(ciMethod)) {
-
-            loaded['ciMethods'][ciMethod.Id] = ciMethod;
-
-            $('#' + key + 'Label').html(ciMethod.Name);
-
-            var des = ciMethod.Description;
-            var jq = $('#cimdLabel');
-            if (isDefined(des)) {
-                $(jq).html(des);
-            } else {
-                jq.parent().parent().hide();
-            }
-        }
-    }
-};
 
 function addMetadataRow(rows, textMetadata, property) {
 
@@ -111,10 +91,11 @@ function addMetadataRow(rows, textMetadata, property) {
             if ((columnName === 'DataQuality') && showDataQuality) {
                 // Add data quality flags instead of number
                 var dataQualityCount = parseInt(text);
-                rows.push([property.DisplayName, getIndicatorDataQualityHtml(text) + ' ' + getIndicatorDataQualityTooltipText(dataQualityCount)]);
+                var displayText = getIndicatorDataQualityHtml(text) + ' ' + getIndicatorDataQualityTooltipText(dataQualityCount);
             } else {
-                rows.push([property.DisplayName, text]);
+                displayText = text;
             }
+            rows.push([property.DisplayName, displayText]);
         }
     }
 }
@@ -125,7 +106,7 @@ function getMetadataProperties() {
         ajaxMonitor.callCompleted();
     } else {
 
-        ajaxGet('data/indicator_metadata_text_properties', '',
+        ajaxGet('api/indicator_metadata_text_properties', '',
             function (obj) {
 
                 loaded.indicatorProperties = obj;
@@ -135,17 +116,7 @@ function getMetadataProperties() {
     }
 }
 
-function displayLabel(obj, key, cacheKey) {
-
-    var label = obj[key];
-
-    if (isDefined(label)) {
-        loaded[cacheKey][label.Id] = label.Text;
-        $('#' + key + 'Label').html(label.Text);
-    }
-}
-
-function goToMetadataPage(rootIndex) {        
+function goToMetadataPage(rootIndex) {
     if (!groupRoots.length) {
         // Search results empty
         noDataForAreaType();
@@ -172,27 +143,28 @@ function goToMetadataPage(rootIndex) {
 
 function getMetadataHtml(indicatorMetadata, root) {
 
+    var propertyIndex, text, ageId, sexId, benchmarkingMethodId, benchmarkingSigLevel;
+
     var grouping = isDefined(root) && root.hasOwnProperty('Grouping') ?
         root.Grouping[0] :
         root; // Practice profiles
 
     if (isDefined(grouping)) {
-        var ageId = root.AgeId,
+        ageId = root.Age.Id,
         benchmarkingMethodId = grouping.MethodId,
         benchmarkingSigLevel = grouping.SigLevel,
-        sexId = root.SexId;
+        sexId = root.Sex.Id;
     } else {
         ageId = benchmarkingMethodId = benchmarkingSigLevel = sexId = null;
     }
 
     var labelArgs = {},
-    rows = [],
-    des = indicatorMetadata.Descriptive,
-    text;
+        rows = [],
+        des = indicatorMetadata.Descriptive;
 
     // Initial indicator text properties
     var properties = loaded.indicatorProperties;
-    for (var propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
+    for (propertyIndex = 0; propertyIndex < properties.length; propertyIndex++) {
         var property = properties[propertyIndex];
         if (property.Order > 59) {
             break;
@@ -205,7 +177,7 @@ function getMetadataHtml(indicatorMetadata, root) {
     }
 
     // Value type
-    rows.push(['Value type', indicatorMetadata.ValueType.Label]);
+    rows.push(['Value type', indicatorMetadata.ValueType.Name]);
 
     // Text - Methodology
     addMetadataRow(rows, des, properties[propertyIndex++]);
@@ -220,28 +192,20 @@ function getMetadataHtml(indicatorMetadata, root) {
     addMetadataRow(rows, des, properties[propertyIndex++]);
 
     // Age
-    if (isDefined(ageId)) {
-        text = labelAsync.getLabel(ageId, loaded.ages, 'age', labelArgs);
-        rows.push(['Age', text]);
-    }
+    rows.push(['Age', root.Age.Name]);
 
     // Sex
-    if (isDefined(sexId)) {
-        rows.push(['Sex', new SexAndAge().getSexLabel(sexId)]);
-    }
+    rows.push(['Sex', root.Sex.Name]);
 
     // Year type
-    var yearTypeId = indicatorMetadata.YearTypeId;
-    metadataState.yearTypeId = yearTypeId;
-    text = labelAsync.getLabel(yearTypeId, loaded.yearTypes, 'yti', labelArgs);
-    rows.push(['Year type', text]);
+    rows.push(['Year type', indicatorMetadata.YearType.Name]);
 
-    // Text - Frequency
+    // Frequency
     addMetadataRow(rows, des, properties[propertyIndex++]);
 
     // Benchmarking method
     if (isDefined(benchmarkingMethodId)) {
-        var text = labelAsync.getLabel(benchmarkingMethodId, loaded.methods, 'cm', labelArgs);
+        text = labelAsync.getLabel(benchmarkingMethodId, loaded.comparatorMethods, 'comparator-method', labelArgs);
         rows.push(['Benchmarking method', text]);
     }
 
@@ -254,29 +218,19 @@ function getMetadataHtml(indicatorMetadata, root) {
     }
 
     // Confidence interval method
-    var ciMethodId = indicatorMetadata.CIMethodId;
-    if (isDefined(ciMethodId) && ciMethodId > -1) {
-        var ciMethod = labelAsync.getLabel(ciMethodId, loaded.ciMethods, 'cim', labelArgs);
+    var ciMethod = indicatorMetadata.ConfidenceIntervalMethod;
+    if (ciMethod) {
 
-        var isMethod = ciMethod.hasOwnProperty('Name');
-        rows.push(['Confidence interval method', isMethod ? ciMethod.Name : ciMethod]);
+        rows.push(['Confidence interval method', ciMethod.Name]);
 
-        if (ciMethodId <= 0) {
-            var description = null;
-        }
-        else if (isMethod) {
-            var cimDescription = ciMethod.Description;
-            description = isDefined(cimDescription) ? cimDescription : null;
-        }
-        else {
-            description = getLabelSpan('cimd');
-        }
-
-        if (description !== null) {
-            rows.push(['Confidence interval methodology', description]);
+        // Display CI method description
+        var cimDescription = ciMethod.Description;
+        if (cimDescription) {
+            rows.push(['Confidence interval methodology', cimDescription]);
         }
     }
 
+    // Confidence level
     var confidenceLevel = indicatorMetadata.ConfidenceLevel;
     if (confidenceLevel > -1) {
         rows.push(['Confidence level', confidenceLevel + '%']);
@@ -295,7 +249,7 @@ function getMetadataHtml(indicatorMetadata, root) {
 }
 
 function getLabelSpan(id) {
-    return '<span id="' + id + 'Label"></span>';
+    return '<span id="' + id + '-label"></span>';
 }
 
 templates.add('metadata',
@@ -309,4 +263,3 @@ pages.add(PAGE_MODES.METADATA, {
     needsContainer: true,
     jqIds: ['indicatorMenuDiv', 'areaTypeBox']
 });
-

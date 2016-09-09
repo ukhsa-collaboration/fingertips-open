@@ -1,5 +1,12 @@
+'use strict';
+
 // Base namespace for practice profiles specific code
-PP = {};
+var PP = {
+    data : {}
+};
+
+// Required for reusing Fingertips code
+var download = {};
 
 function documentReady() {
 
@@ -17,7 +24,7 @@ function documentReady() {
     });
 
     // Init area lists
-    loaded.areaLists[PRACTICE] = {};
+    loaded.areaLists[AreaTypeIds.Practice] = {};
     loaded.areaLists[AreaTypeIds.CCG] = {};
 
     addYearHashes(loaded.population);
@@ -47,7 +54,7 @@ function documentReady() {
 
     initYears();
 
-    initAreaSearch('#searchText', FT.model, true);
+    initAreaSearch('#searchText', true);
 };
 
 function handleAjaxFailure(e) {
@@ -56,7 +63,7 @@ function handleAjaxFailure(e) {
 
     // Only reset URL if it contains a hash state string
     if (href.indexOf('#') > 0) {
-        alert("The data could not be loaded. Please try again.")
+        alert("The data could not be loaded. Please try again.");
         PP.model.reset();
     }
 };
@@ -66,13 +73,13 @@ function getPracticeList() {
     var parentCode = PP.model.parentCode;
 
     if (isDefined(parentCode)) {
-        var obj = loaded.areaLists[PRACTICE][parentCode];
+        var obj = loaded.areaLists[AreaTypeIds.Practice][parentCode];
 
         if (isDefined(obj)) {
             getPracticeListCallback(obj);
         } else {
 
-            var areaList = loaded.areaLists[PRACTICE];
+            var areaList = loaded.areaLists[AreaTypeIds.Practice];
             var areas = areaList[parentCode];
             if (isDefined(areas)) {
 
@@ -80,10 +87,11 @@ function getPracticeList() {
 
             } else {
 
-                ajaxGet('data/areas',
-                    'parent_area_code=' + parentCode +
-                        '&area_type_id=' + PRACTICE,
-                    getPracticeListCallback);
+                var parameters = new ParameterBuilder(
+                    ).add('parent_area_code', parentCode
+                    ).add('area_type_id', AreaTypeIds.Practice);
+
+                ajaxGet('api/areas/by_parent_area_code', parameters.build(), getPracticeListCallback);
             }
         }
     }
@@ -97,7 +105,7 @@ function getPracticeList() {
 
 function getPracticeListCallback(obj) {
 
-    loaded.areaLists[PRACTICE][PP.model.parentCode] = obj;
+    loaded.areaLists[AreaTypeIds.Practice][PP.model.parentCode] = obj;
 
     displayPracticeMenu(obj);
 
@@ -117,23 +125,28 @@ function practiceChanged(practiceCode) {
     goToCurrentPage();
 };
 
-function getLabelSeries(arg) {
+function getLabelSeries() {
 
-    if (!isDefined(labels[arg])) {
-        ajaxGet('GetLabelSeries.ashx', 'id=' + arg,
-            getLabelSeriesCallback);
+    if (!isDefined(labels[1])) {
+
+        var parameters = new ParameterBuilder(
+        ).add('category_type_id', CategoryTypeIds.DeprivationDecileGp2015);
+        ajaxGet('api/categories',
+            parameters.build(),
+            function (categories) {
+
+                labels = _.object(_.map(categories,
+                    function (category) {
+                        return [category.Id, category.Name];
+                    }));
+
+                ajaxMonitor.callCompleted();
+            });
+
     } else {
 
         ajaxMonitor.callCompleted();
     }
-};
-
-function getLabelSeriesCallback(obj) {
-    if (isDefined(obj)) {
-        labels[obj.Id] = obj.Labels;
-    }
-
-    ajaxMonitor.callCompleted();
 };
 
 function showBox(id) {
@@ -169,33 +182,29 @@ function goToCurrentPage(arg) {
         case PAGE_MODES.BAR:
             goToBarChartPage(arg);
             break;
-        case PAGE_MODES.CLUSTER:
-            goToClusterPage(arg);
-            break;
         case PAGE_MODES.TRENDS:
             goToTrendsPage(arg);
             break;
     }
 };
 
-PAGE_MODES = {
+var PAGE_MODES = {
     SPINE: 1,
     POPULATION: 2,
     METADATA: 3,
     SCATTER: 4,
     BAR: 5,
     SELECT: 6,
-    CLUSTER: 7,
     TRENDS: 8
 };
 
 function makeValuesNegative(values) {
-    for (i in values) {
+    for (var i in values) {
         values[i] = -Math.abs(values[i]);
     }
 };
 
-colours = {
+var colours = {
     better: '#92d050',
     same: '#ffc000',
     worse: '#c00000',
@@ -213,7 +222,7 @@ function getPracticeParentName() {
 
     var option = $(ID_PARENT_AREA_MENU + " option:selected");
 
-    return option.val() != NULL_OPTION
+    return option.val() !== NULL_OPTION
         ? option.text()
         : getPracticeParentLabel();
 };
@@ -224,7 +233,7 @@ function getPracticeParentLabel() {
 
 function yearClicked(year) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -252,7 +261,7 @@ function setPracticeCode(code) {
     selectCodeInMenu(ID_PRACTICE_MENU, PP.model.practiceCode);
 };
 
-ui = {
+var ui = {
 
     // Array of all the SELECT elements in the dom
     _selects: null,
@@ -315,7 +324,7 @@ ui = {
     },
 
     getPractices: function () {
-        return loaded.areaLists[PRACTICE][PP.model.parentCode];
+        return loaded.areaLists[AreaTypeIds.Practice][PP.model.parentCode];
     },
 
     /* The area object */
@@ -364,18 +373,21 @@ ui = {
 }
 
 function getGroupingTree() {
-    getData(getGroupingTreeCallback, 'sg', 'gid=' + groupIds);
-};
 
-function getGroupingTreeCallback(obj) {
+    var parameters = new ParameterBuilder(
+        ).add('group_ids', groupIds);
 
-    if (isDefined(obj)) {
-        loaded.subgroups = obj;
-        PP.model.groupId = obj[0].Id
-        populateSubgroupMenu(obj, 'subgroupMenu');
-    }
+    ajaxGet('api/group_metadata', parameters.build(),
+        function (obj) {
 
-    ajaxMonitor.callCompleted();
+            if (isDefined(obj)) {
+                loaded.subgroups = obj;
+                PP.model.groupId = obj[0].Id
+                populateSubgroupMenu(obj, 'subgroupMenu');
+            }
+
+            ajaxMonitor.callCompleted();
+        });
 };
 
 function populateSubgroupMenu(items, id) {
@@ -412,12 +424,13 @@ function getIndicatorStats(groupId, year, offset) {
 
         ajaxMonitor.callCompleted();
     } else {
-        getData(getIndicatorStatsCallback, 'is',
-            'gid=' + groupId +
-                '&ati=' + PRACTICE +
-                '&off=' + offset +
-                '&par=' + NATIONAL_CODE
-        );
+
+        var parameters = new ParameterBuilder(
+            ).add('group_id', groupId
+            ).add('child_area_type_id', AreaTypeIds.Practice
+            ).add('data_point_offset', offset
+            ).add('parent_area_code', NATIONAL_CODE);
+        ajaxGet('api/indicator_statistics', parameters.build(), getIndicatorStatsCallback);
     }
 }
 
@@ -453,8 +466,8 @@ function getUnitLabel(metadata) {
 
 function lock() {
 
-    if (!ajaxLock) {
-        ajaxLock = 1;
+    if (!FT.ajaxLock) {
+        FT.ajaxLock = 1;
         PP.menuManager.disableAll();
     }
 };
@@ -529,8 +542,8 @@ function IndicatorFormatter(items) {
 
 function unlock() {
 
-    if (ajaxLock === 1) {
-        ajaxLock = null;
+    if (FT.ajaxLock === 1) {
+        FT.ajaxLock = null;
 
         PP.menuManager.enableAll();
 
@@ -553,7 +566,7 @@ function getPeerGroupCode(number) {
     return null;
 };
 
-BENCHMARKS = {
+var BENCHMARKS = {
     CCG: 0,
     DEPRIVATION: 1,
     PEER_GROUP: 2
@@ -696,7 +709,7 @@ function selectRoot(index) {
 
     /* User clicked link in spine chart */
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         ui.setPreferredGroupRoot(index);
@@ -714,7 +727,7 @@ function selectMenuOption(id, index) {
 
 function getPracticeFromCode(code) {
     var practices = ui.getPractices();
-    for (i in practices) {
+    for (var i in practices) {
         if (practices[i].Code === code) {
             return practices[i];
         }
@@ -783,7 +796,7 @@ function getPracticeAddress() {
             } else {
                 // Practice address not retrieved from server yet
                 practiceTitle.html('');
-                ajaxGet('GetData.ashx', "s=aa&are=" + code, getPracticeAddressCallback)
+                ajaxGet('api/area_address', 'area_code=' + code, getPracticeAddressCallback);
                 return;
             }
         }
@@ -933,8 +946,8 @@ PP.model = {
 
         /* Cannot use root index because order may change in grouping tables, but 
         * information regarding grouping may not yet have been retrieved from server */
-        indicator1 = this._getIndicatorKey(ui.getPreferredGroupRoot(), this.groupId);
-        indicator2 = this._getIndicatorKey(scatterState.getPreferredGroupRoot(), this.groupId2);
+        var indicator1 = this._getIndicatorKey(ui.getPreferredGroupRoot(), this.groupId);
+        var indicator2 = this._getIndicatorKey(scatterState.getPreferredGroupRoot(), this.groupId2);
 
         var parentCode = this._valToString(PP.model.parentCode);
         var practiceCode = this._valToString(PP.model.practiceCode);
@@ -962,7 +975,7 @@ PP.model = {
             var subgroupData = loaded.data[sid];
             if (subgroupData.hasOwnProperty(NATIONAL_CODE)) {
                 var root = subgroupData[NATIONAL_CODE][i];
-                return root.IID + '-' + root.SexId;
+                return root.IID + '-' + root.Sex.Id;
             }
         }
         return '-';
@@ -975,8 +988,8 @@ PP.model = {
             // Translate indicator data into root index
             for (var i in roots) {
                 var root = roots[i];
-                if (root.IID == indicator.IID &&
-                        root.SexId == indicator.SexId) {
+                if (root.IID === indicator.IID &&
+                        root.Sex.Id === indicator.SexId) {
                     found = true;
                     break;
                 }
@@ -988,7 +1001,7 @@ PP.model = {
     },
 
     isPractice: function () {
-        return this.practiceCode !== null
+        return this.practiceCode !== null;
     }
 };
 
@@ -1069,14 +1082,14 @@ function getIndicator2Index(roots) {
 };
 
 function ifNoLock(func) {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         func();
     }
 };
 
 function showExport() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         // Parent
         var isPractice = PP.model.isPractice();
@@ -1140,10 +1153,10 @@ function downloadPdf() {
 
     try {
         // This section can fail for some IE7 users, reason unknown
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             var practiceCode = PP.model.practiceCode;
             if (practiceCode) {
-                var url = FT.url.pdf + '?' + 
+                var url = FT.url.pdf + '?' +
                     'CCG=' + PP.model.parentCode +
                     '&PracCode=' + practiceCode;
 
@@ -1192,13 +1205,13 @@ function getCurrentSubgroup() {
 }
 
 // These are different on IE 7-8 because bar label top offset does not work
-chartColours = {
+var chartColours = {
     label: '#333',
     bar: '#76B3B3',
     pink: '#FF66FC'
 }
 
-CHART_TEXT_STYLE = {
+var CHART_TEXT_STYLE = {
     color: chartColours.label,
     fontWeight: 'normal',
     fontFamily: 'Verdana'
@@ -1213,13 +1226,13 @@ function getParentList() {
         parameters.add('area_type_id', areaTypeId);
         parameters.add('profile_id', ProfileIds.PracticeProfiles);
 
-        ajaxGet('data/areas',
+        ajaxGet('api/areas/by_area_type',
             parameters.build(),
-            function (obj) {
+            function (areas) {
 
-                if (isDefined(obj)) {
-                    loaded.areaLists[areaTypeId] = obj;
-                    populateParentMenu(obj);
+                if (isDefined(areas)) {
+                    loaded.areaLists[areaTypeId] = areas;
+                    populateParentMenu(areas);
                 }
 
                 ajaxMonitor.callCompleted();
@@ -1343,25 +1356,32 @@ function populateParentMenu(areas) {
 }
 
 function getHelpText(key, top, left, width) {
-    if (!ajaxLock) {
-        var help = 'help';
-        if (!loaded.hasOwnProperty(help)) {
-            loaded[help] = {};
+    if (!FT.ajaxLock) {
+
+        // Set content hash
+        if (!loaded.hasOwnProperty('content')) {
+            loaded[content] = {};
         }
-        if (loaded[help].hasOwnProperty(key)) {
-            lightbox.show(loaded[help][key], top, left, width);
+        var content = loaded[content];
+
+        // Show content
+        if (content.hasOwnProperty(key)) {
+            lightbox.show(content[key], top, left, width);
         } else {
             lightbox.show('<div class="ajax-loading"><img src="' + FT.url.img + 'spinner.gif" alt=""/></div>', top, left, width);
-            getData(getHelpTextCallback, 'ht', 'key=' + key);
+
+            ajaxGet('api/content?', 'profile_id=' + ProfileIds.PracticeProfiles + '&key=' + key,
+               function (html) {
+                   lightbox.setHtml(html);
+                   content[key] = html;
+               }, handleAjaxFailure
+           );
+
         }
     }
 }
 
-function getHelpTextCallback(obj) {
-    var txt = obj.Content;
-    lightbox.setHtml(txt);
-    loaded.help[obj.Key] = txt;
-}
+
 
 function showAllJQs(toShow) {
 
@@ -1459,40 +1479,36 @@ loaded.population = {};
 loaded.data = {};
 loaded.valueLimits = {};
 
-MAIN = '#main';
-ID_PARENT_AREA_MENU = '#parentAreaMenu';
-ID_PRACTICE_MENU = '#practiceMenu';
-PRACTICE = 7;
-NULL_OPTION_TEXT = '...';
-NULL_OPTION = '-';
-SEX_MALE = 1;
-SEX_FEMALE = 2;
-SEX_PERSON = 4;
+var MAIN = '#main';
+var ID_PARENT_AREA_MENU = '#parentAreaMenu';
+var ID_PRACTICE_MENU = '#practiceMenu';
+var NULL_OPTION_TEXT = '...';
+var NULL_OPTION = '-';
+var SEX_MALE = 1;
+var SEX_FEMALE = 2;
+var SEX_PERSON = 4;
 
-LABELS_QUINARY = 'qpop';
-LABELS_DEPRIVATION = 'dep';
+var SEARCH_NO_RESULT_TOP_OFFSET = 27;
+var NATIONAL_CODE = 'E92000001';
 
-SEARCH_NO_RESULT_TOP_OFFSET = 27;
-NATIONAL_CODE = 'E92000001';
+var labels = {};
 
-labels = {};
+var changeIndex = 0;
 
-changeIndex = 0;
+var lastDecile = null;
 
-lastDecile = null;
+var CSS_NUMERIC = 'numeric';
+var CSS_CENTER = 'center';
+var CSS_VAL = 'value';
 
-CSS_NUMERIC = 'numeric';
-CSS_CENTER = 'center';
-CSS_VAL = 'value';
+var nationalPopulation = {};
 
-nationalPopulation = {};
-
-currentPracticePopulation = null;
-correctForPolarity = false;
-
-chart = null;
-barChart = null;
-ajaxLock = 1;
+var correctForPolarity = false;
+var stems, spineChartJQs, metadataJQs, scatterJQs, metadataJQs,
+    trendsJQs, barJQs, metadataJQs, allJQs;
+var chart = null;
+var barChart = null;
+FT.ajaxLock = 1;
 
 $(document).ready(documentReady);
 

@@ -29,7 +29,7 @@ namespace Ckan.DataTransformation
             categoryTypeIdToName = categoryTypes.ToDictionary(x => x.Id, x => x.Name);
             categoryTypeIdToCategoryIdToName = GetCategoryTypeIdToCategoryIdToNameLookUp(categoryTypes);
 
-            valueNoteIdToText = pholioReader.GetValueNotes().ToDictionary(x => x.Id, x => x.Text);
+            valueNoteIdToText = pholioReader.GetAllValueNotes().ToDictionary(x => x.Id, x => x.Text);
         }
 
         private void InitAreaCodeToNameLookUp(IAreasReader areasReader, 
@@ -58,7 +58,7 @@ namespace Ckan.DataTransformation
             var categoryTypeIdToCategoryIdToName = new Dictionary<int, Dictionary<int, string>>();
             foreach (var categoryType in categoryTypes)
             {
-                var categoryIdToName = categoryType.Categories.ToDictionary(x => x.CategoryId, x => x.Name);
+                var categoryIdToName = categoryType.Categories.ToDictionary(x => x.Id, x => x.Name);
                 categoryTypeIdToCategoryIdToName.Add(categoryType.Id, categoryIdToName);
             }
             return categoryTypeIdToCategoryIdToName;

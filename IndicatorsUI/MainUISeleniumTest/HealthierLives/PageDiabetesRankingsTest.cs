@@ -44,45 +44,10 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
         }
 
         [TestMethod]
-        public void TestCanChangeAreaTypeOnCcgRankingsPage()
-        {
-            var driver = LoadCcgRankingsPage();
-
-            // Wait for CountyUA link to be rendered
-            new WaitFor(driver).ExpectedElementToBePresent(By.Id(LongerLivesIds.AreaTypeLinkCountyUa));
-
-            // CCG to County & UA
-            SelectCountyUas(driver);
-            List<string> countyUaAreas = GetAreaNamesFromRankingTable(driver);
-            Assert.IsTrue(countyUaAreas.Contains("Isles of Scilly"));
-
-            // County & UA back to CCG
-            SelectCcgs(driver);
-            List<string> ccgAreas = GetAreaNamesFromRankingTable(driver);
-            Assert.IsTrue(ccgAreas.Contains("NHS St Helens CCG"));
-        }
-
-        [TestMethod]
-        public void TestValueNoteIconsExist()
-        {
-            var driver = LoadCcgRankingsPage();
-            SelectCcgs(driver);
-            new WaitFor(driver).AjaxLockToBeUnlocked();
-
-            // Click on an indicator which has a value note
-            driver.FindElement(By.LinkText("People with diabetes meeting treatment targets")).Click();
-            new WaitFor(driver).AjaxLockToBeUnlocked();
-            new WaitFor(driver).ExpectedElementToBeVisible(
-                By.ClassName(Classes.PrimaryValueNoteTooltip));
-
-            // Check value note is displayed
-            var valueNoteTooltip = driver.FindElement(By.ClassName(Classes.PrimaryValueNoteTooltip));
-            Assert.IsTrue(valueNoteTooltip.Displayed);
-        }
-
-        [TestMethod]
         public void TestNavigationFromRankingsPageToPracticeDetailsPage()
         {
+            const string PracticeName = "Parkgate Surgery";
+
             // Go to rankings page
             var driver = LoadCcgRankingsPage();
 
@@ -91,28 +56,11 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             waitFor.PracticeRankingsForWestLancashireCcgToLoad();
 
             // Click on practice name
-            driver.FindElement(By.LinkText("PARKGATE SURGERY")).Click();
+            driver.FindElement(By.LinkText(PracticeName)).Click();
             waitFor.PracticeDetailsToLoad();
 
             // Check practice page has loaded
-            Assert.AreEqual("PARKGATE SURGERY", driver.FindElement(By.ClassName("area_name")).Text);
-        }
-
-        private static void SelectCountyUas(IWebDriver driver)
-        {
-            driver.FindElement(By.XPath(XPaths.AreaTypeLinkCountyUas)).Click();
-            new WaitFor(driver).AjaxLockToBeUnlocked();
-            var tableHeader = driver.FindElement(By.Id(LongerLivesIds.GpCount));
-            new WaitFor(driver).ElementToContainText(tableHeader, "Counties & Unitary Authorities");
-        }
-
-        private static void SelectCcgs(IWebDriver driver)
-        {
-            driver.FindElement(By.XPath(XPaths.AreaTypeLinkCcgs)).Click();
-            new WaitFor(driver).AjaxLockToBeUnlocked();
-            new WaitFor(driver).ExpectedElementToBePresent(By.Id(LongerLivesIds.GpCount));
-            IWebElement tableHeader = driver.FindElement(By.Id(LongerLivesIds.GpCount));
-            new WaitFor(driver).ElementToContainText(tableHeader, "CCGs");
+            Assert.AreEqual(PracticeName, driver.FindElement(By.ClassName("area_name")).Text);
         }
 
         private IWebDriver LoadCcgRankingsPage()
@@ -120,24 +68,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             navigateTo.DiabetesRankings();
             new WaitFor(driver).CcgRankingsToLoad();
             return driver;
-        }
-
-        private List<string> GetAreaNamesFromRankingTable(IWebDriver webDriver)
-        {
-            var areas = new List<string>();
-
-            IWebElement table =
-                (new WebDriverWait(webDriver, TimeSpan.FromSeconds(10)).Until(
-                    ExpectedConditions.ElementExists(By.Id(LongerLivesIds.DiabetesRankingsTable))));
-
-            ReadOnlyCollection<IWebElement> rows = table.FindElements(By.XPath(XPaths.DiabetesRankingsTableTrs));
-
-            foreach (var cells in rows.Select(x => x.FindElements(By.XPath("td"))))
-            {
-                areas.Add(cells.First().Text);
-            }
-
-            return areas;
         }
 
         private string GetRankingAreaHeaderText(IWebDriver webDriver)

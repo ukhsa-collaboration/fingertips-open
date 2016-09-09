@@ -96,7 +96,7 @@ namespace PholioVisualisation.KeyMessages
 
             if (data.BreastfeedingInitiationSig == sig)
             {
-                qualifiedItems.Add("breastfeeding");
+                qualifiedItems.Add("breastfeeding initiation");
             }
 
             if (data.SmokingAtTimeOfDeliverySig == sig)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.ExceptionLogging;
+using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
@@ -10,13 +11,12 @@ namespace PholioVisualisation.Export
 {
     public class ProfileDataWriter : ExcelDataWriter
     {
-        private readonly Profile profile;
-
-        private readonly Dictionary<string, WorksheetInfo> wsDictionary = new Dictionary<string, WorksheetInfo>();
+        private readonly Profile _profile;
+        private readonly Dictionary<string, WorksheetInfo> _wsDictionary = new Dictionary<string, WorksheetInfo>();
 
         public ProfileDataWriter(Profile profile)
         {
-            this.profile = profile;
+            _profile = profile;
 
             // Indicator metadata
             workbook.Worksheets.Add();
@@ -39,18 +39,27 @@ namespace PholioVisualisation.Export
         protected override string GetDataUrl()
         {
             string profileUrl = ApplicationConfiguration.UrlUI;
-            if (profile.IsDefinedProfile)
+            if (_profile.IsDefinedProfile)
             {
-                profileUrl = profileUrl.TrimEnd('/') + "/" + profile.UrlKey;
+                profileUrl = profileUrl.TrimEnd('/') + "/" + _profile.UrlKey;
             }
             return profileUrl;
         }
 
+        public WorksheetInfo GetWorksheetInfo(string sheetName)
+        {
+            if (string.IsNullOrEmpty(sheetName) || _wsDictionary.ContainsKey(sheetName) == false)
+            {
+                return null;
+            }
+            return _wsDictionary[sheetName];
+        }
+
         public void AddSheet(string sheetLabel)
         {
-            var ws = new WorksheetInfo {Worksheet = workbook.Worksheets.Add()};
+            var ws = new WorksheetInfo { Worksheet = workbook.Worksheets.Add() };
             ws.Worksheet.Name = sheetLabel;
-            wsDictionary.Add(sheetLabel, ws);
+            _wsDictionary.Add(sheetLabel, ws);
             AddDataHeader(ws);
         }
 
@@ -74,129 +83,126 @@ namespace PholioVisualisation.Export
             SetColumnAsText(row[rowIndex, column++], "Sex");
             SetColumnAsText(row[rowIndex, column++], "Age");
 
-            SetColumnAsText(row[rowIndex, column], "Note");
+            SetColumnAsText(row[rowIndex, column++], "Note");
+            SetColumnAsText(row[rowIndex, column], "Recent Trend");
 
-            foreach (string range in new[] {"$G:$G", "$H:$I", "$I:$I", "$J:$J", "$K:$K"})
+            foreach (string range in new[] { "$G:$G", "$H:$I", "$I:$I", "$J:$J", "$K:$K" })
             {
                 ws.Worksheet.Cells[range].NumberFormat = "0.00";
             }
 
             row.Font.Bold = true;
 
-            SetColumnWidths(row, new[] {45, 13, 10, 20, 10, 20, 13, 13, 13, 13, 13, 15, 15, 35});
+            SetColumnWidths(row, new[] { 45, 13, 10, 20, 10, 20, 13, 13, 13, 13, 13, 15, 15, 35, 30 });
         }
 
-        public void AddCategorisedData(string sheetLabel, string timePeriod, IList<CoreDataSet> coreData,
-            Dictionary<int, IArea> categoryIdToAreaMap, string sex, IDictionary<string, string> metadata,
-            string age, IList<ValueNote> valueNotes)
+        public void AddCategorisedData(WorksheetInfo ws, RowLabels rowLabels, IList<CoreDataSet> dataList,
+            Dictionary<int, IArea> categoryIdToAreaMap)
         {
-            WorksheetInfo ws = wsDictionary[sheetLabel];
             IRange cells = ws.Worksheet.Cells;
-            foreach (CoreDataSet d in coreData)
+            foreach (CoreDataSet data in dataList)
             {
-                IArea area = categoryIdToAreaMap[d.CategoryId];
-
-                ValueNote valueNote = valueNotes.FirstOrDefault(x => x.Id == d.ValueNoteId);
-
-                AddDataRow(ws, area, d, cells, metadata, timePeriod, sex, age, valueNote, null, null);
+                IArea area = categoryIdToAreaMap[data.CategoryId];
+                AddDataRow(ws, rowLabels, area, data, cells, null, null);
             }
         }
 
-        public void AddData(string sheetLabel, string timePeriod, IList<CoreDataSet> coreData, 
-            Dictionary<string, IArea> areaCodeToAreaMap, string sex, IDictionary<string, string> metadata, string age, IList<ValueNote> valueNotes, Dictionary<string, Area> areaCodeToParentMap)
+        public void AddData(WorksheetInfo ws, RowLabels rowLabels, IList<CoreDataSet> dataList,
+            Dictionary<string, IArea> areaCodeToAreaMap, Dictionary<string, Area> areaCodeToParentMap)
         {
-            WorksheetInfo ws = wsDictionary[sheetLabel];
             IRange cells = ws.Worksheet.Cells;
-            foreach (CoreDataSet d in coreData)
+            foreach (CoreDataSet data in dataList)
             {
-                IArea area = areaCodeToAreaMap[d.AreaCode];
+                IArea area = areaCodeToAreaMap[data.AreaCode];
                 Area parentArea;
 
-                string parentAreaName="",
-                    parentAreaCode="";
+                string parentAreaName = "",
+                    parentAreaCode = "";
 
-                if (areaCodeToParentMap.TryGetValue(d.AreaCode, out parentArea))
+                if (areaCodeToParentMap.TryGetValue(data.AreaCode, out parentArea))
                 {
-                    parentAreaCode = areaCodeToParentMap[d.AreaCode].Code;
-                    parentAreaName = areaCodeToParentMap[d.AreaCode].Name;
+                    parentAreaCode = areaCodeToParentMap[data.AreaCode].Code;
+                    parentAreaName = areaCodeToParentMap[data.AreaCode].Name;
                 }
 
-                ValueNote valueNote = valueNotes.FirstOrDefault(x => x.Id == d.ValueNoteId);
-
-                AddDataRow(ws, area, d, cells, metadata, timePeriod, sex, age, valueNote, parentAreaCode, parentAreaName);
+                AddDataRow(ws, rowLabels, area, data, cells, parentAreaCode, parentAreaName);
             }
         }
 
-        public void AddData(string worksheetLabel, string timePeriod, CoreDataSet coreData, IArea area, string sex,
-            IDictionary<string, string> metadata, string age, IList<ValueNote> valueNotes)
+        public void AddData(WorksheetInfo ws, RowLabels rowLabels, CoreDataSet coreData, IArea area)
         {
-            WorksheetInfo ws = wsDictionary[worksheetLabel];
+            if (coreData != null)
+            {
+                IRange cells = ws.Worksheet.Cells;
+                AddDataRow(ws, rowLabels, area, coreData, cells, null, null);
+            }
+        }
+
+        public void AddTrendMarker(TrendMarkerLabel trendMarkerLabel, int rowOffset, WorksheetInfo ws)
+        {
+            int currentRowIndex = ws.CurrentRow;
+            int column = 0;
             IRange cells = ws.Worksheet.Cells;
-
-            ValueNote valueNote = valueNotes.FirstOrDefault(x => x.Id == coreData.ValueNoteId);
-            AddDataRow(ws, area, coreData, cells, metadata, timePeriod, sex, age, valueNote, null, null);
+            int rowIndex = currentRowIndex - rowOffset;
+            if (rowIndex > 1)
+            {
+                cells[rowIndex, ColumnIndexes.RecentTrend].Value = trendMarkerLabel.Text;
+            }
         }
 
-        private static void AddDataRow(WorksheetInfo ws, IArea area, CoreDataSet coreData, IRange cells, IDictionary<string, string> metadata, string timePeriod, string sex, string age, ValueNote valueNote, string parentAreaCode, string parentAreaName)
+        private static void AddDataRow(WorksheetInfo ws, RowLabels rowLabels, IArea area, CoreDataSet coreData,
+            IRange cells, string parentAreaCode, string parentAreaName)
         {
-
-            string areaCode;
-            string areaName;
-
-            bool isCategory = false;
-            if (CategoryArea.IsCategoryAreaCode(area.Code))
-            {
-                var areaCategory = (CategoryArea)area;
-                areaCode = areaCategory.CategoryId.ToString();
-                areaName = areaCategory.Name;
-                isCategory = true;
-            }
-            else
-            {
-                areaCode = area.Code;
-                areaName = area.Name;
-            }
-
             try
             {
                 int rowIndex = ws.NextRow;
                 int column = 0;
-                
-                cells[rowIndex, column++].Value = metadata[IndicatorMetadataTextColumnNames.Name];
-                cells[rowIndex, column++].Value = timePeriod;
 
+                // Indicator / time period
+                cells[rowIndex, column++].Value = rowLabels.IndicatorName;
+                cells[rowIndex, column++].Value = rowLabels.TimePeriod;
+
+                // Parent area
                 cells[rowIndex, column++].Value = parentAreaCode ?? string.Empty;
                 cells[rowIndex, column++].Value = parentAreaName ?? string.Empty;
 
-                if (isCategory)
+                // Area code
+                var category = area as CategoryArea;
+                if (category != null)
                 {
-                    AddValue(cells[rowIndex, column++], Convert.ToDouble(areaCode) );
+                    AddValue(cells[rowIndex, column++], Convert.ToDouble(category.CategoryId));
                 }
                 else
                 {
-                    cells[rowIndex, column++].Value = areaCode;    
+                    cells[rowIndex, column++].Value = area.Code;
                 }
-                
-                cells[rowIndex, column++].Value = areaName;
 
+                // Area name
+                cells[rowIndex, column++].Value = area.Name;
+
+                // Value / CIs
                 AddValue(cells[rowIndex, column++], coreData.Value);
                 AddValue(cells[rowIndex, column++], coreData.LowerCI);
                 AddValue(cells[rowIndex, column++], coreData.UpperCI);
 
+                // Count
                 if (coreData.IsCountValid)
                 {
                     AddValue(cells[rowIndex, column], coreData.Count.Value);
                 }
                 column++;
 
+                // Denominator
                 AddValue(cells[rowIndex, column++], coreData.Denominator);
 
-                cells[rowIndex, column++].Value = sex;
-                cells[rowIndex, column++].Value = age;
+                // Sex / age
+                cells[rowIndex, column++].Value = rowLabels.Sex;
+                cells[rowIndex, column++].Value = rowLabels.Age;
 
+                // Value note
                 if (coreData.ValueNoteId > 0)
                 {
-                    cells[rowIndex, column].Value = valueNote.Text;
+                    cells[rowIndex, column].Value = rowLabels.ValueNoteLookUp[coreData.ValueNoteId];
                 }
             }
             catch (Exception ex)
@@ -212,7 +218,6 @@ namespace PholioVisualisation.Export
                 cells.Value = val;
             }
         }
-        
 
         public override void FinaliseBeforeWrite()
         {
@@ -221,7 +226,7 @@ namespace PholioVisualisation.Export
 
         private void DeleteEmptyWorksheets()
         {
-            foreach (var worksheetInfo in wsDictionary)
+            foreach (var worksheetInfo in _wsDictionary)
             {
                 if (worksheetInfo.Value.IsWorksheetEmpty)
                 {

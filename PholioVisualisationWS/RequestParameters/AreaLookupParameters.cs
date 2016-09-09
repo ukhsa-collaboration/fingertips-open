@@ -1,24 +1,23 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 
 namespace PholioVisualisation.RequestParameters
 {
-    public class AreaLookupParameters : BaseParameters, IJsonpParameters
+    public class AreaLookupParameters : BaseParameters
     {
         public string SearchText { get; set; }
         public int PolygonAreaTypeId { get; set; }
-        public string Callback { get; set; }
+        public List<int> ParentAreaTypesToIncludeInResults { get; set; }
         public bool AreEastingAndNorthingRequired { get; set; }
-        public bool ExcludeCcGs { get; set; }
 
         public AreaLookupParameters(NameValueCollection parameters)
             : base(parameters)
         {
             SearchText = ParseString(ParameterNames.Text);
             PolygonAreaTypeId = ParseInt(ParameterNames.PolygonAreaTypeId);
-            Callback = ParseString(ParameterNames.JsonpCallback);
             AreEastingAndNorthingRequired = ParseBool(ParameterNames.AreEastingAndNorthingRequired);
-            ExcludeCcGs = ParseBool(ParameterNames.ExcludeCcGs);
+            ParentAreaTypesToIncludeInResults = ParseIntList(ParameterNames.ParentAreaTypesToIncludeInResults, ',');
         }
 
         public override bool AreValid

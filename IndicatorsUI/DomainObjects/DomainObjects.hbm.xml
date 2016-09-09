@@ -23,10 +23,11 @@
     <property name="AreasToIgnoreEverywhere" column="areas_ignored_everywhere"/>
     <property name="SkinId" column="skin_id"/>
     <property name="HasOwnFrontPage" column="has_own_front_page"/>
-    <property name="LeadProfileForCollectionId" column="lead_profile_for_collection_id"/>
+    <property name="ProfileCollectionIdsString" column="lead_profile_for_collection_ids"/>
+    
     <property name="ShowDataQuality" column="show_data_quality"/>
     <property name="IsNational" column="is_national"/>
-    <property name="HasTrendMarkers" column="has_trend_markers"/>
+    <property name="HasRecentTrends" column="has_trend_markers"/>
     <property name="AccessControlGroup" column="access_control_group"/>
     <property name="IsOfficialStatistics" column="is_official_statistics"/>
     <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>

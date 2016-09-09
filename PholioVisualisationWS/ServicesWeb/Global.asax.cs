@@ -1,7 +1,11 @@
 ﻿using PholioVisualisation.ExceptionLogging;
 using System;
+using System.IO;
+using System.Text;
 using System.Web;
 using System.Web.Http;
+using ServicesWeb.Helpers;
+using StackExchange.Profiling;
 
 namespace ServicesWeb
 {
@@ -18,38 +22,23 @@ namespace ServicesWeb
         // Uncomment these two methods to enable Mini Profiler
 
 
-        //protected void Application_BeginRequest()
-        //{
-        //    // need to start one here in order to render out the UI
-        //    MiniProfiler.Start();
-        //}
+        protected void Application_BeginRequest()
+        {
+            // need to start one here in order to render out the UI
+//            MiniProfiler.Start();
+        }
 
-        //protected void Application_EndRequest()
-        //{
-        //    //            // Use step to measure duration of code execution
-        //    //            using (MiniProfiler.Current.Step("GetPageIndex"))
-        //    //            {
-        //    //                // Do something here
-        //    //            }
+        protected void Application_EndRequest()
+        {
+            //            // Use step to measure duration of code execution
+            //            using (MiniProfiler.Current.Step("GetPageIndex"))
+            //            {
+            //                // Do something here
+            //            }
 
-        //    MiniProfiler miniProfiler = MiniProfiler.Current;
-
-        //    MiniProfiler.Stop();
-
-        //    if (miniProfiler != null && miniProfiler.DurationMilliseconds > 50)
-        //    {
-        //        var s = string.Format("{0} {1}\n",
-        //            miniProfiler.DurationMilliseconds,
-        //            miniProfiler.Root);
-        //        try
-        //        {
-        //            File.AppendAllText(@"c:\temp\out.txt", s);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //        }
-        //    }
-        //}
+//            MiniProfiler.Stop();
+//            new MiniProfilerWriter().Write(MiniProfiler.Current);
+        }
 
         protected void Application_Error(object sender, EventArgs e)
         {

@@ -17,7 +17,7 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
         public void TestCanNavigateToPracticeViaAreaSearchForCountiesUAsInDiabetes()
         {
             navigateTo.DiabetesHome();
-            PageDiabetesHomeTest.SelectAreaTypeAndWaitForPageToLoad(driver, LongerLivesIds.AreaTypeLinkCountyUa);
+            PageDiabetesHomeTest.SelectAreaTypeAndWaitForPageToLoad(driver, LongerLivesIds.AreaTypeLinkCcgs);
             CheckCanNavigateToSpecificPractice();
         }
 
@@ -34,7 +34,7 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 
             // Check address
             var address = driver.FindElement(By.Id("area-address")).Text;
-            TestHelper.AssertTextContains(address, "east park", "Practice address was not as expected");
+            TestHelper.AssertTextContains(address, "eastville", "Practice address was not as expected");
         }
     }
 }

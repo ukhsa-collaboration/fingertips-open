@@ -10,7 +10,7 @@ namespace Ckan.Client
 {
     public class CkanApi : ICkanApi
     {
-        private ICkanHttpClient _ckanHttpClient;
+        private readonly ICkanHttpClient _ckanHttpClient;
 
         public CkanApi(ICkanHttpClient _ckanHttpClient)
         {

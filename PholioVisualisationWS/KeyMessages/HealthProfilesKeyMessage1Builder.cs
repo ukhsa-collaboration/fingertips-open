@@ -11,11 +11,10 @@ namespace PholioVisualisation.KeyMessages
     {
 
         private const string Sentence1Template = @"The health of people in {{AreaName}} is {{WorseBetterSimilarVaried}} the England average.";
-        private const string Sentence2Template = @"{{DeprivationisLowerOrHigher}} {{Value}}% ({{CountPerYear}}) children live in poverty.";
+        private const string Sentence2Template = @"{{DeprivationText}} {{Value}}% ({{CountPerYear}}) of children live in low income families.";
         private const string Sentence3Template = @"Life expectancy for {{MenWomen}} {{HigherLower}} the England average.";
 
         internal KeyMessageData data; /* set as internal so can be mocked in unit tests*/
-
 
         public string ProcessKeyMessage(KeyMessageData data)
         {
@@ -57,7 +56,7 @@ namespace PholioVisualisation.KeyMessages
             }
 
             var sentenceData = new Dictionary<string, string> {
-                { "AreaName", data.AreaName }, 
+                { "AreaName", data.Area.Name }, 
                 { "WorseBetterSimilarVaried", worseBetterSimilarVaried }
             };
             return Render.StringToString(Sentence1Template, sentenceData);
@@ -69,37 +68,45 @@ namespace PholioVisualisation.KeyMessages
         /// <returns>sentence2</returns>
         internal string GetSentence2()
         {
-            var childrenInPoverty = data.ChildrenInPoverty;
-            if (childrenInPoverty == null || childrenInPoverty.IsValueValid == false)
+            // Check data is available
+            var childrenInPoverty = data.ChildrenInLowIncomeFamilies;
+            var deprivation = data.Deprivation;
+            if (childrenInPoverty == null || childrenInPoverty.IsValueValid == false ||
+                deprivation == null || deprivation.IsValueValid == false)
             {
                 return string.Empty;
             }
 
-            string isLowerOrHigherText = string.Empty;
+            // Find deprivation level
+            int areaTypeId = data.Area.AreaTypeId;
+            var deprivationLevel = HealthProfilesKeyMessage1DeprivationLevel
+                .GetDeprivationLevel(data.Deprivation.Value, areaTypeId);
 
-            switch (data.DeprivationSig)
+            // Define deprivation text
+            string deprivationText = string.Empty;
+            var areaTypeName = HealthProfilesAreaTypeHelper.GetAreaTypeName(areaTypeId);
+            switch (deprivationLevel)
             {
-                case Significance.Better:
-                    isLowerOrHigherText = "Deprivation is lower than average, however about";
+                case DeprivationLevel.High:
+                    deprivationText = data.Area.Name + 
+                        " is one of the 20% most deprived " + areaTypeName + " in England and about";
                     break;
-                case Significance.Worse:
-                    isLowerOrHigherText = "Deprivation is higher than average and about";
+                case DeprivationLevel.Low:
+                    deprivationText = data.Area.Name +
+                        " is one of the 20% least deprived " + areaTypeName + " in England, however about";
                     break;
-                case Significance.Same:
-                    isLowerOrHigherText = "About";
+                case DeprivationLevel.Mid:
+                    deprivationText = "About";
                     break;
-                case Significance.None:
-                    /*In case we don't have sig data, to avoid breaking
-                    * the process of creating pdfs, just return empty string.*/
-                    return string.Empty;
             }
 
+            // Calculate child poverty values
             var countperYear = childrenInPoverty.CountPerYear;
             var count = NumberCommariser.Commarise0DP(NumberRounder.ToNearest100(countperYear));
-            var val = NumericFormatter.Format1DP(childrenInPoverty.Value);
+            var val = NumericFormatter.FormatZeroDP(childrenInPoverty.Value);
 
             var sentenceData = new Dictionary<string, string> {
-                { "DeprivationisLowerOrHigher", isLowerOrHigherText },
+                { "DeprivationText", deprivationText },
                 { "CountPerYear", count },
                 { "Value", val } 
             };

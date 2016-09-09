@@ -1,44 +1,33 @@
-﻿using System;
+﻿using PholioVisualisation.DataHelpers;
+using PholioVisualisation.PholioObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.Analysis
 {
-    public class TrendResponse
-    {
-        public double? Slope { get; set; }
-        public double? Intercept { get; set; }
-        public TrendMarker Marker { get; set; }
-        public int NumberOfPointsUsedInCalculation { get; set; }
-        public double ChiSquare { get; set; }
-        public bool IsSignificant { get; set; }
-        public string Message { get; set; }
-    }
-
-
     public class TrendRequest
     {
         public int ValueTypeId { get; set; }
-        public double ComparatorConfidence { get; set; }
+        public double UnitValue { get; set; }
         public IEnumerable<CoreDataSet> Data { get; set; }
         public int YearRange { get; set; }
 
         public bool IsValid(ref string validationMessage)
         {
-            var valid = (this.ValueTypeId == ValueTypeIds.Proportion
-                    || this.ValueTypeId == ValueTypeIds.CrudeRate
-                    || this.ValueTypeId == ValueTypeIds.DirectlyStandardisedRate);
+            var valid = ValueTypeId == ValueTypeIds.Proportion
+                    || ValueTypeId == ValueTypeIds.CrudeRate
+                    || ValueTypeId == ValueTypeIds.DirectlyStandardisedRate;
 
             if (!valid)
             {
-                validationMessage = string.Format("Value Type {0} is not relevant for the calculation", this.ValueTypeId);
+                validationMessage = "The recent trend cannot be calculated for this value type";
                 return false;
             }
 
-            if (this.YearRange != 1)
+            if (YearRange != 1)
             {
-                validationMessage = string.Format("Year Range {0} is not relevant for the calculation", this.YearRange);
+                validationMessage = "The recent trend cannot be calculated for this year range";
                 return false;
             }
 
@@ -48,91 +37,169 @@ namespace PholioVisualisation.Analysis
                 return false;
             }
 
-            if (this.Data.Count() < 5)
+            if (this.Data.Count() < TrendMarkerCalculator.MinimumNumberOfPoints)
             {
-                validationMessage = "Not enough data points to do the calculation";
+                validationMessage = "Not enough data points to calculate recent trend";
                 return false;
             }
 
-            if (this.Data.Count(d => d.IsCountValid == false || d.IsDenominatorValid == false) > 0)
+            var Data = GetValidDataList();
+            if (Data.Count < TrendMarkerCalculator.MinimumNumberOfPoints)
             {
-                validationMessage = "One or more data points have invalid values";
+                validationMessage = "Not enough data points with valid values to calculate recent trend";
+                return false;
             }
 
             return true;
         }
+
+        /// <summary>
+        /// Get the data (starting with the most recent) until an invalid data point is reached.
+        /// </summary>
+        private List<CoreDataSet> GetValidDataList()
+        {
+            var orderedData = new CoreDataSetSorter(Data.ToList()).SortByDescendingYear();
+            var validData = new List<CoreDataSet>();
+            foreach (var data in orderedData)
+            {
+                if (IsDataValid(data))
+                {
+                    validData.Add(data);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return validData;
+        }
+
+        /// <summary>
+        /// Only Count and denominator are required for the calculation. Check Value too because 
+        /// a missing value suggests it has been suppressed.
+        /// </summary>
+        private static bool IsDataValid(CoreDataSet data)
+        {
+            return data.IsValueValid && data.IsCountValid && data.IsDenominatorValid;
+        }
+    }
+
+    public class TrendLine
+    {
+        public double SlopeBeta { get; set; }
+        public double InterceptAlpha { get; set; }
     }
 
     public class TrendMarkerCalculator
     {
-        public TrendResponse GetResults(TrendRequest trendRequest)
+        public const int MinimumNumberOfPoints = 5;
+
+        public TrendMarkerResult GetResults(TrendRequest trendRequest)
         {
             return CalculateTrend(trendRequest);
         }
 
-        private TrendResponse CalculateTrend(TrendRequest trendRequest, int pointsUsed = 0)
+        private TrendMarkerResult CalculateTrend(TrendRequest trendRequest, int pointsUsed = 0)
         {
             var message = string.Empty;
             var chiSquare = 0.0;
 
-            if (!IsSignificant(trendRequest, ref pointsUsed, ref chiSquare, ref message))
+            // Is there a significant trend
+            var isSignificant = IsSignificant(trendRequest, ref pointsUsed, ref chiSquare, ref message);
+
+            // Trend line
+            TrendLine trendLine;
+            if (isSignificant)
             {
-                return new TrendResponse()
-                {
-                    Slope = null,
-                    Intercept = null,
-                    NumberOfPointsUsedInCalculation = pointsUsed,
-                    Marker = pointsUsed > 0 ? TrendMarker.NoChange : TrendMarker.CannotBeCalculated,
-                    IsSignificant = false,
-                    ChiSquare = chiSquare,
-                    Message = message
-                };
+                var values = GetMostRecentDataOrderedByIncreasingYear(trendRequest.Data, pointsUsed)
+                    .Select(x => x.Value)
+                    .ToList();
+                trendLine = GetSlopeAndIntercept(values, trendRequest.ValueTypeId, trendRequest.UnitValue);
+            }
+            else
+            {
+                trendLine = new TrendLine();
             }
 
-            var sumOfx = 0.0;
-            var sumOfxLog = 0.0;
-            var sumOft = 0.0;
-            var sumOftSq = 0.0;
-            var sumOfxLogAndt = 0.0;
-
-            var n = pointsUsed;
-
-            foreach (var dataItem in trendRequest.Data.OrderByDescending(t => t.Year).Take(n).Reverse())
+            // Trend marker
+            TrendMarker marker;
+            if (isSignificant)
             {
-                var x = dataItem.Value / 100;
+                marker = trendLine.SlopeBeta > 0 ? TrendMarker.Increasing : TrendMarker.Decreasing;
+            }
+            else
+            {
+                marker = pointsUsed > 0 ? TrendMarker.NoChange : TrendMarker.CannotBeCalculated;
+            }
 
-                var xLog = trendRequest.ValueTypeId == ValueTypeIds.Proportion ?
-                    Math.Log(x / (1 - x), Math.E)
-                    : Math.Log(x, Math.E);
+            // Return results
+            return new TrendMarkerResult()
+            {
+                Slope = trendLine.SlopeBeta,
+                Intercept = trendLine.InterceptAlpha,
+                NumberOfPointsUsedInCalculation = pointsUsed,
+                Marker = marker,
+                IsSignificant = isSignificant,
+                ChiSquare = chiSquare,
+                Message = message
+            };
+        }
 
-                var t = dataItem.Year;
+        public static TrendLine GetSlopeAndIntercept(IList<double> values, int valueTypeId, double unitValue)
+        {
+            double sumOfxLog = 0D;
+            double sumOft = 0D;
+            double sumOftSq = 0D;
+            double sumOfxLogAndt = 0D;
 
-                // do sums
-                sumOfx += x;
+            double n = values.Count;
+            double t = n;
+
+            foreach (var val in values)
+            {
+                // Don't know why 100??
+                double x = (val / 100D);
+
+                x = x / unitValue;
+
+                double xLog;
+                if (valueTypeId == ValueTypeIds.Proportion)
+                {
+                    double xTimeoneminusx = x / (1D - x);
+                    xLog = Math.Log(xTimeoneminusx);
+                }
+                else
+                {
+                    xLog = Math.Log(x); ;
+                }
+
                 sumOfxLog += xLog;
                 sumOft += t;
 
                 sumOftSq += t * t;
                 sumOfxLogAndt += xLog * t;
+
+                t--;
             }
 
-            var slopeBeta = ((n * sumOfxLogAndt) - (sumOfxLog * sumOft)) / (n * sumOftSq - (sumOft * sumOft));
+            // This needs a minus in front to be consistent with Excel sheet results (don't know why?!)
+            double slopeBeta = -((n * sumOfxLogAndt) - (sumOfxLog * sumOft)) / (n * sumOftSq - (sumOft * sumOft));
+            double interceptAlpha = (sumOfxLog - (slopeBeta * sumOft)) / n;
 
-            // not used yet
-            var interceptAlpha = (sumOfx - (slopeBeta * sumOft)) / n;
-
-            return new TrendResponse()
+            return new TrendLine
             {
-                Slope = slopeBeta,
-                Intercept = interceptAlpha,
-                NumberOfPointsUsedInCalculation = pointsUsed,
-                Marker = slopeBeta > 0 ? TrendMarker.Increasing : TrendMarker.Decreasing,
-                IsSignificant = true,
-                ChiSquare = chiSquare
-
+                SlopeBeta = slopeBeta,
+                InterceptAlpha = interceptAlpha
             };
         }
 
+        private IEnumerable<CoreDataSet> GetMostRecentDataOrderedByIncreasingYear(IEnumerable<CoreDataSet> dataList, int numberOfPoints)
+        {
+            return dataList
+                .OrderByDescending(t => t.Year)
+                .Take(numberOfPoints)
+                .Reverse();
+        }
 
         private bool IsSignificant(TrendRequest trendRequest, ref int pointsUsed, ref double chiSquare, ref string message)
         {
@@ -145,47 +212,48 @@ namespace PholioVisualisation.Analysis
                 return false;
             }
 
-            const double chiSquared95 = 3.84145882069412;
-            const double chiSquared98 = 9.54953570608324;
+            // Chi squared confidence 
+            const double chiSquared99Point8 = 9.54953570608324; // inExcel =CHIINV(0.002,1)
+            double chiSquaredConfidence = chiSquared99Point8;
 
-            pointsUsed = 1;
-
-            var sumOfr = 0.0;
-            var sumOfn = 0.0;
-            var sumOfrAndt = 0.0;
-            var sumOfnAndt = 0.0;
-            var sumOfnAndtSq = 0.0;
-
-            var chiSquaredConfidence = trendRequest.ComparatorConfidence <= 95 ? chiSquared95 : chiSquared98;
-
-            foreach (var dataItem in trendRequest.Data.OrderByDescending(t => t.Year).Reverse())
+            var fullDataList = trendRequest.Data.ToList();
+            for (int pointsToUse = MinimumNumberOfPoints; pointsToUse <= fullDataList.Count; pointsToUse++)
             {
+                pointsUsed = pointsToUse;
 
-                var r = dataItem.Count.Value;
-                var n = dataItem.Denominator;
-                var t = dataItem.Year;
+                double sumOfr = 0;
+                double sumOfn = 0;
+                double sumOfrAndt = 0;
+                double sumOfnAndt = 0;
+                double sumOfnAndtSq = 0;
+                double t = pointsUsed;
 
-                sumOfr += r;
-                sumOfn += n;
-                sumOfrAndt += r * t;
-                sumOfnAndt += n * t;
-                sumOfnAndtSq += n * (t * t);
+                var dataList = GetMostRecentDataOrderedByIncreasingYear(fullDataList, pointsToUse);
+                foreach (var coreDataSet in dataList)
+                {
+                    var r = coreDataSet.Count.Value;
+                    var n = coreDataSet.Denominator;
 
-                var sumPart1 = (sumOfn * sumOfrAndt - sumOfr * sumOfnAndt);
+                    sumOfr += r;
+                    sumOfn += n;
+                    sumOfrAndt += r * t;
+                    sumOfnAndt += n * t;
+                    sumOfnAndtSq += n * (t * t);
+
+                    t--;
+                }
+
+                var sumPart1 = ((sumOfn * sumOfrAndt) - (sumOfr * sumOfnAndt));
 
                 chiSquare = (sumOfn * (sumPart1 * sumPart1)) /
-                                (sumOfr * (sumOfn - sumOfr) * (sumOfn * sumOfnAndtSq - (sumOfnAndt * sumOfnAndt)));
+                            (sumOfr * (sumOfn - sumOfr) * (sumOfn * sumOfnAndtSq - (sumOfnAndt * sumOfnAndt)));
 
-                if (pointsUsed > 4 && chiSquare > chiSquaredConfidence)
+                if (chiSquare > chiSquaredConfidence)
                 {
                     return true;
                 }
-
-                pointsUsed++;
-
             }
 
-            pointsUsed--;
             return false;
         }
     }

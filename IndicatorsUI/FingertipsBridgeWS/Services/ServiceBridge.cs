@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.IO;
 using System.Net;
 using System.Web;
 using FingertipsBridgeWS.Cache;
@@ -9,7 +10,6 @@ namespace FingertipsBridgeWS.Services
     public class ServiceBridge
     {
         public const string ContentTypeJson = "application/json";
-        public const string ContentTypeJsonP = "application/javascript";
 
         private JsonWebCache webCache;
         private bool isResponseOk = true;
@@ -75,15 +75,9 @@ namespace FingertipsBridgeWS.Services
 
             Context.Response.StatusCode = (int)statusCode;
 
-            Context.Response.ContentType =
-                keyBuilder.IsJsonP ?
-                    ContentTypeJsonP :
-                    ContentTypeJson;
+            Context.Response.ContentType = ContentTypeJson;
 
-            Context.Response.BinaryWrite(
-                keyBuilder.IsJsonP ?
-                    new JsonpBuilder(json, keyBuilder.JsonPValue).Jsonp :
-                    json);
+            Context.Response.BinaryWrite(json);
 
             Context.Response.Flush();
         }
@@ -133,10 +127,10 @@ namespace FingertipsBridgeWS.Services
             {
                 string url = AppConfiguration.CoreWsUrlForAjaxBridge + Context.Request.RawUrl;
 
-                WebClient wc = new WebClient();
-                wc.Headers.Add("user-agent", AppConfiguration.UserAgent);
-
-                json = wc.DownloadData(url);
+                WebRequest request = WebRequest.Create(url);
+                request.Headers.Add("IndicatorUI-Bridge", AppConfiguration.UserAgent);
+                request.Timeout = 5 * 60 * 1000; // 5 minutes
+                json = GetResponseAsBytes(request);
             }
             catch (Exception ex)
             {
@@ -144,5 +138,20 @@ namespace FingertipsBridgeWS.Services
             }
             return json;
         }
+
+        private static byte[] GetResponseAsBytes(WebRequest request)
+        {
+
+            string text;
+            var response = (HttpWebResponse)request.GetResponse();
+
+            using (var sr = new StreamReader(response.GetResponseStream()))
+            {
+                text = sr.ReadToEnd();
+            }
+
+            return System.Text.Encoding.UTF8.GetBytes(text);
+        }
+
     }
 }

@@ -37,7 +37,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
@@ -75,23 +77,25 @@
     <Compile Include="GetDataDownload_PracticeProfilesTest.cs" />
     <Compile Include="GetData_AreaCategoriesTest.cs" />
     <Compile Include="GetData_AreaDataTest.cs" />
-    <Compile Include="GetData_GroupedIndicatorNamesTest.cs" />
-    <Compile Include="GetData_HelpTextTest.cs" />
     <Compile Include="GetData_IndicatorMetadataTest.cs" />
     <Compile Include="GetData_IndicatorStatsTest.cs" />
     <Compile Include="GetData_ParentAreasTest.cs" />
     <Compile Include="GetData_GetGroupingTreeTest.cs" />
     <Compile Include="GetGroupDataAtDataPointBySearchTest.cs" />
-    <Compile Include="GetLabelSeriesTest.cs" />
-    <Compile Include="GetLabelTest.cs" />
+    <Compile Include="IndicatorMetadataControllerEndPointTest.cs" />
     <Compile Include="JsonBuilderAreaCategoriesTest.cs" />
-    <Compile Include="JsonBuilderGroupDataTest.cs" />
+    <Compile Include="JsonBuilderParentAreaGroupsTest.cs" />
+    <Compile Include="LiveSiteExcelDownloadTest.cs" />
     <Compile Include="LogExceptionTest.cs" />
+    <Compile Include="EntitiesControllerEndPointTest.cs" />
+    <Compile Include="NonPublicServicesControllerEndPointTest.cs" />
     <Compile Include="PdfDataTest.cs" />
+    <Compile Include="ProfilesControllerEndPointTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelper.cs" />
-    <Compile Include="DataTest.cs" />
+    <Compile Include="DataControllerEndPointTest.cs" />
     <Compile Include="PdfGenerationTest.cs" />
+    <Compile Include="AreasControllerEndPointTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Analysis\Analysis.csproj">

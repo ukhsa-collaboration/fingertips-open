@@ -1,35 +1,42 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
 {
     public class GroupRootFilter
     {
-        private List<GroupRoot> rootsToKeep;
+        private IGroupDataReader _groupDataReader;
 
-        public GroupRootFilter(IEnumerable<GroupRoot> groupRoots)
+        public GroupRootFilter(IGroupDataReader groupDataReader)
         {
-            rootsToKeep = groupRoots.ToList();
+            _groupDataReader = groupDataReader;
         }
 
-        public IList<GroupRoot> RemoveRootsWithoutChildAreaData()
+        public IList<GroupRoot> RemoveRootsWithoutChildAreaData(IEnumerable<GroupRoot> groupRoots)
         {
-            List<GroupRoot> rootsToRemove = rootsToKeep.Where(root => root.Data.Count == 0).ToList();
+            var rootsToKeep = new List<GroupRoot>();
 
-            foreach (GroupRoot groupRoot in rootsToRemove)
+            foreach (GroupRoot groupRoot in groupRoots)
             {
-                rootsToKeep.Remove(groupRoot);
+                Debug.WriteLine(_groupDataReader.GetCoreDataCountAtDataPoint(groupRoot.FirstGrouping));
+
+                if (_groupDataReader.GetCoreDataCountAtDataPoint(groupRoot.FirstGrouping) > 0)
+                {
+                    rootsToKeep.Add(groupRoot);
+                }
             }
 
             return rootsToKeep;
         }
 
-        public IList<GroupRoot> KeepRootsWithIndicatorIds(IEnumerable<int> indicatorIds)
+        public IList<GroupRoot> KeepRootsWithIndicatorIds(IEnumerable<GroupRoot> groupRoots, IEnumerable<int> indicatorIds)
         {
-            return rootsToKeep.Where(x => indicatorIds.Contains(x.IndicatorId)).ToList();
+            return groupRoots.Where(x => indicatorIds.Contains(x.IndicatorId)).ToList();
         }
     }
 }

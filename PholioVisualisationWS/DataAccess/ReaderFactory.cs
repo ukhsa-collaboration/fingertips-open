@@ -74,7 +74,7 @@ namespace PholioVisualisation.DataAccess
             return service;
         }
 
-        public static TrendDataReader GetTrendDataReader()
+        public static ITrendDataReader GetTrendDataReader()
         {
             TrendDataReader service = new TrendDataReader(GetSessionFactory());
             service.OpenSession();

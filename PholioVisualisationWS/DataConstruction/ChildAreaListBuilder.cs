@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -22,8 +22,9 @@ namespace PholioVisualisation.DataConstruction
             else if (Area.IsNearestNeighbour(parentAreaCode))
             {
                 // TODO: this should be replaced by CreateAreaListFromNearestNeighbourAreaCode
-                var areaCode = new NearestNeighbourArea(parentAreaCode).AreaCodeOfAreaWithNeighbours;
-                var nearestNeighbours = areasReader.GetNearestNeighbours(areaCode);
+
+                var nearestNeighbourArea = new NearestNeighbourArea(parentAreaCode);
+                var nearestNeighbours = areasReader.GetNearestNeighbours(nearestNeighbourArea.AreaCodeOfAreaWithNeighbours, nearestNeighbourArea.NeighbourTypeId);
                 var nearestNeighboursAreas = nearestNeighbours.Select(x => x.NeighbourAreaCode).ToList();
                 var areas = areasReader.GetAreasFromCodes(nearestNeighboursAreas);
                 ChildAreas = areas.Cast<IArea>().ToList();

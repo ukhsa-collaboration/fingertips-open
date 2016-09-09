@@ -1,5 +1,4 @@
 ﻿using FingertipsUploadService.ProfileData;
-using FingertipsUploadService.ProfileData.Entities.Core;
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Helpers;
 using FingertipsUploadService.ProfileData.Repositories;
@@ -33,10 +32,12 @@ namespace FingertipsUploadService.Upload
 
             if (batchUpload.DataToUpload.Any())
             {
-                //Validate the spreadsheet data to see if there's replication within it.
+                //Validate the spreadsheet data to see if there's duplication within it.
                 batchUpload.DuplicateUploadErrorsExist = ValidateSpreadsheetForDuplicatedRows(batchUpload);
+
                 batchUpload.DuplicateRowInDatabaseErrors =
-                    DoesCoreDataAlreadyExist(batchUpload).DuplicateRowInDatabaseErrors;
+                    new CoreDataSetDuplicateChecker().GetDuplicates(batchUpload.DataToUpload, _coreDataRepository,
+                        UploadJobType.Batch);
             }
 
             GetDistinctIndicators(indicators);
@@ -359,45 +360,6 @@ namespace FingertipsUploadService.Upload
             return false;
         }
 
-        private BatchUpload DoesCoreDataAlreadyExist(BatchUpload batchUpload)
-        {
-            List<int> uniqueIndicatorList = batchUpload.DataToUpload.Select(x => x.IndicatorId).Distinct().ToList();
-            IEnumerable<CoreDataSet> coreDataSetForIndicatorList =
-                _profilesReader.GetCoreDataForIndicatorIds(uniqueIndicatorList);
-
-            int rowIndex = 1;
-            foreach (UploadDataModel row in batchUpload.DataToUpload)
-            {
-                rowIndex++;
-
-                CoreDataSet coreDataRecord = coreDataSetForIndicatorList.FirstOrDefault(
-                    i =>
-                        i.IndicatorId == row.IndicatorId && i.Year == row.Year && i.YearRange == row.YearRange &&
-                        i.Quarter == row.Quarter && i.Month == row.Month && i.AgeId == row.AgeId && i.SexId == row.SexId &&
-                        i.AreaCode == row.AreaCode && i.CategoryTypeId == row.CategoryTypeId &&
-                        i.CategoryId == row.CategoryId);
-
-                if (coreDataRecord != null)
-                {
-                    var duplicateDataError = new DuplicateRowInDatabaseError
-                    {
-                        ErrorMessage = "Data already exists for Indicator Id: " + row.IndicatorId,
-                        RowNumber = rowIndex,
-                        DbValue = coreDataRecord.Value,
-                        ExcelValue = row.Value,
-                        IndicatorId = row.IndicatorId,
-                        AgeId = row.AgeId,
-                        SexId = row.SexId,
-                        AreaCode = row.AreaCode,
-                        Uid = coreDataRecord.Uid
-                    };
-
-                    batchUpload.DuplicateRowInDatabaseErrors.Add(duplicateDataError);
-                    row.DuplicateExists = true;
-                }
-            }
-            return batchUpload;
-        }
 
         private void GetDistinctIndicators(DataTable excelData)
         {

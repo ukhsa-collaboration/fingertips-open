@@ -1,0 +1,69 @@
+﻿<div ng-controller="uploadCtrl"> 
+    <!-- File upload tab -->
+    <div id="upload-menu" class="tab-pane">
+        <div id="upload-container" class="main standardWidth">
+            <div class="upload-simple">
+                <div>
+                    <img src="/images/SimpleUpload.png" onclick="uploadSimple();"/>
+                </div>
+                <div class="text">
+                    <h2 title="What does this do?">Simple Indicator Upload</h2>
+                    <p>
+                        Upload an Excel spreadsheet for one indicator.<br><br>
+                    </p>
+                    <a href="#" class="upload-help upload-simple-help">Find out more about this way to upload data</a>
+                    <a href="{{pageConst.simpleTemplateUrl}}">Download the latest template <small>(last updated {{pageConst.simpleLastUpdated}})</small></a>
+                    <input type="button" class="medium-button" value="Upload Data" onclick="uploadSimple();"/>
+                </div>
+            </div>
+            <div class="upload-batch">
+                <div>
+                    <img src="/images/BatchUpload.png" onclick="uploadBatch();"/>
+                </div>
+                <div class="text">
+                    <h2 title="What does this do?">Batch Indicator Upload</h2>
+                    <p>Upload an Excel spreadsheet or CSV file for a batch of indicators.</p>
+                    <a href="#" class="upload-help upload-batch-help">Find out more about this way to upload data</a>
+                    <a href="{{pageConst.batchTemplateUrl}}">Download the latest template <small>(last updated {{pageConst.batchLastUpdated}})</small></a>
+                    <input type="button" class="medium-button" value="Upload Data" onclick="uploadBatch();"/>
+                </div>
+            </div>
+            <div id="upload-progress" class="modal" aria-hidden="true" data-backdrop="static"
+                 data-keyboard="false">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <div class="col-lg-offset-4">
+                                <h2>Uploading {{uploadPercent}}</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Wrong file type error -->
+        <div class="allowed-filetypes standardWidth" ng-show="!isFileTypeOk">
+            <strong>Wrong file type, only allowed files are csv, xls and xlsx</strong>
+        </div>
+        <!-- Simple file upload -->
+        <div id="upload-simple-browse-control" class="standardWidth hidden upload-browse-control filtering clearfix">
+            <form Id="simpleUploadForm" class="form-inline" method="POST" action="/UploadSimpleFile" enctype="multipart/form-data">
+                <div class="browse-control">
+                    <label for="simple-excel-file">Select simple file to upload:</label>
+                    <input type="file" class="excel-file form-control" id="simple-excel-file" name="excelFile" size="47" custom-on-change="simpleFileSelected"/>
+                    <input type="submit" value="Upload" class="btn btn-primary" ng-show="fileReadyForUpload"/>
+                </div>
+            </form>
+        </div>
+        <!-- Batch file upload -->
+        <div id="upload-batch-browse-control" class="standardWidth hidden upload-browse-control filtering clearfix">
+            <form id="batchUploadForm" class="form-inline" method="POST" action="/UploadBatchUpload" enctype="multipart/form-data">
+                <div class="browse-control">
+                    <label for="batch-excel-file">Select batch file to upload:</label>
+                    <input type="file" class="excel-file form-control" id="batch-excel-file" name="excelFile" size="47" custom-on-change="batchFileSelected"/>
+                    <input type="submit" value="Upload" class="btn btn-primary" ng-show="fileReadyForUpload"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

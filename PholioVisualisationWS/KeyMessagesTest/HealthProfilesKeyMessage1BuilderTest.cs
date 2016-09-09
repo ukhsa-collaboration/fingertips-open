@@ -9,44 +9,6 @@ namespace PholioVisualisation.KeyMessagesTest
     [TestClass]
     public class HealthProfilesKeyMessage1BuilderTest
     {
-
-        #region Setup
-
-        private KeyMessageData Sentence1Data(double green, double red, double amber)
-        {
-            var mockSig = new Mock<SignificanceCounter>();
-            mockSig.SetupProperty(x => x.ProportionGreen, green);
-            mockSig.SetupProperty(x => x.ProportionRed, red);
-            mockSig.SetupProperty(x => x.ProportionAmber, amber);
-
-            return new KeyMessageData
-            {
-                AreaName = "Derby",
-                SpineChartSignificances = mockSig.Object
-            };
-        }
-
-        private KeyMessageData Sentence2Data(Significance deprivationSig)
-        {
-            return new KeyMessageData
-            {
-                ChildrenInPoverty = new CoreDataSet { Value = 23.7777, Count = 10000, YearRange = 3 },
-                DeprivationSig = deprivationSig
-            };
-        }
-
-        private KeyMessageData Sentence3Data(Significance maleLifeExpectancyAtBirth, Significance femaleLifeExpectancyAtBirth)
-        {
-            return new KeyMessageData()
-            {
-                MaleLifeExpectancyAtBirth = maleLifeExpectancyAtBirth,
-                FemaleLifeExpectancyAtBirth = femaleLifeExpectancyAtBirth
-            };
-        }
-
-        #endregion
-
-
         #region Sentence-1 Tests
         [TestMethod]
         public void TestSentence1_If_Statement_Block_1_1()
@@ -192,48 +154,49 @@ namespace PholioVisualisation.KeyMessagesTest
         #region Sentence-2 Tests
 
         [TestMethod]
-        public void TestSentence2Complete()
+        public void TestSentence2_Deprivation_Low()
         {
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = Sentence2Data(Significance.Better)
+                data = Sentence2Data(1)
             };
 
             var sentence2 = builder.GetSentence2();
-            Assert.AreEqual("Deprivation is lower than average, however about 23.8% (3,300) children live in poverty.",
+            Assert.AreEqual("AreaName is one of the 20% least deprived counties/unitary authorities in England, however about 24% (3,300) of children live in low income families.",
                 sentence2);
         }
 
         [TestMethod]
-        public void TestSentence2WorseSig()
+        public void TestSentence2_Deprivation_High()
         {
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = Sentence2Data(Significance.Worse)
+                data = Sentence2Data(30)
             };
 
             var sentence2 = builder.GetSentence2();
-            Assert.AreEqual("Deprivation is higher than average and about 23.8% (3,300) children live in poverty.", sentence2);
+            Assert.AreEqual("AreaName is one of the 20% most deprived counties/unitary authorities in England and about 24% (3,300) of children live in low income families.", 
+                sentence2);
         }
 
         [TestMethod]
-        public void TestSentence2SameSig()
+        public void TestSentence2_Deprivation_Mid()
         {
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = Sentence2Data(Significance.Same)
+                data = Sentence2Data(20)
             };
 
             var sentence2 = builder.GetSentence2();
-            Assert.AreEqual("About 23.8% (3,300) children live in poverty.", sentence2);
+            Assert.AreEqual("About 24% (3,300) of children live in low income families.", sentence2);
         }
 
         [TestMethod]
-        public void TestSentence2NoneSig()
+        public void TestSentence2_Invalid_Data()
         {
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = Sentence2Data(Significance.None)
+                data = Sentence2Data(-1)
             };
 
             var sentence2 = builder.GetSentence2();
@@ -243,13 +206,12 @@ namespace PholioVisualisation.KeyMessagesTest
         [TestMethod]
         public void TestSentence2DataIsNull()
         {
+            var data = Sentence2Data(10);
+            data.ChildrenInLowIncomeFamilies = null;
+
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = new KeyMessageData
-                {
-                    ChildrenInPoverty = null,
-                    DeprivationSig = Significance.Better
-                }
+                data = data
             };
 
             var sentence2 = builder.GetSentence2();
@@ -259,17 +221,25 @@ namespace PholioVisualisation.KeyMessagesTest
         [TestMethod]
         public void TestSentence2DataIsInvalid()
         {
+            var data = Sentence2Data(10);
+            data.ChildrenInLowIncomeFamilies = new CoreDataSet { Value = ValueData.NullValue };
+
             var builder = new HealthProfilesKeyMessage1Builder
             {
-                data = new KeyMessageData
-                {
-                    ChildrenInPoverty = new CoreDataSet { Value = ValueData.NullValue },
-                    DeprivationSig = Significance.Better
-                }
+                data = data
             };
 
             var sentence2 = builder.GetSentence2();
             Assert.AreEqual("", sentence2);
+        }
+
+        private IArea Area()
+        {
+            return new Area
+            {
+                AreaTypeId = AreaTypeIds.County,
+                Name = "AreaName"
+            };
         }
 
         #endregion
@@ -423,5 +393,42 @@ namespace PholioVisualisation.KeyMessagesTest
 
         #endregion
 
+
+        #region Setup
+
+        private KeyMessageData Sentence1Data(double green, double red, double amber)
+        {
+            var mockSig = new Mock<SignificanceCounter>();
+            mockSig.SetupProperty(x => x.ProportionGreen, green);
+            mockSig.SetupProperty(x => x.ProportionRed, red);
+            mockSig.SetupProperty(x => x.ProportionAmber, amber);
+
+            return new KeyMessageData
+            {
+                Area = new Area { Name = "Derby" },
+                SpineChartSignificances = mockSig.Object
+            };
+        }
+
+        private KeyMessageData Sentence2Data(double deprivationValue)
+        {
+            return new KeyMessageData
+            {
+                Area = Area(),
+                ChildrenInLowIncomeFamilies = new CoreDataSet { Value = 23.7777, Count = 10000, YearRange = 3 },
+                Deprivation = new CoreDataSet { Value = deprivationValue }
+            };
+        }
+
+        private KeyMessageData Sentence3Data(Significance maleLifeExpectancyAtBirth, Significance femaleLifeExpectancyAtBirth)
+        {
+            return new KeyMessageData()
+            {
+                MaleLifeExpectancyAtBirth = maleLifeExpectancyAtBirth,
+                FemaleLifeExpectancyAtBirth = femaleLifeExpectancyAtBirth
+            };
+        }
+
+        #endregion
     }
 }

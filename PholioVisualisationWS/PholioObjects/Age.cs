@@ -2,7 +2,7 @@
 
 namespace PholioVisualisation.PholioObjects
 {
-    public class Age
+    public class Age : INamedEntity
     {
         [JsonProperty]
         public int Id { get; set; }

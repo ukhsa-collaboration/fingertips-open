@@ -1,31 +1,50 @@
 ﻿/* ------------------------------------------------------------
-	Introduction area search, Views/AreaSearch
+	Introduction area search
 ------------------------------------------------------------ */
 #area-search td {
-    padding: 10px 0;
+    padding: 3px 0;
 }
 
-    #area-search td:first-child {
-        text-align: right;
-        vertical-align: middle;
-    }
-
-#area-search input, #health-profile-search select {
+#area-search input {
     border: solid 2px #ddd;
-    height: 26px;
+    height: 32px;
     padding: 0;
     padding-left: 5px;
-    width: 290px;
+    width: 350px;
+    font-size: 17px;
 }
 
 #area-search select {
-    width: 299px;
-    height: 28px;
+    font-size: 17px;
+    width: 200px;
+    height: 32px;
 }
+
+#spinner {
+    width: 100%;
+    height: 214px;
+}
+
+#spinnerLabel {
+    top: 75px;
+    left:315px
+}
+
+img.spinner {
+    top: 40px;
+    left: 315px;
+}
+
+
+/* ------------------------------------------------------------
+	Introduction area search results
+------------------------------------------------------------ */
 
 table.area-search-results {
     border-collapse: collapse;
     margin: 0 0 18px 11px;
+    float: left;
+    clear: both;
 }
 
 .area-search-results tr td {
@@ -53,6 +72,8 @@ table.area-search-results {
 #area-results-box h3 {
     margin-top: 25px;
     font-size: 18px;
+    float: left;
+    clear: both;
 }
 
 ul#no-matches-found {
@@ -63,22 +84,6 @@ ul#no-matches-found {
     padding-top: 12px;
 }
 
-/* ------------------------------------------------------------
-	Spinner
------------------------------------------------------------- */
-
-#spinner {
-    width: 100%;
-    height: 149px;
+#spinner-box {
+    padding-top: 100px;
 }
-
-#spinnerLabel {
-    top: 75px;
-    left:315px
-}
-
-img.spinner {
-    top: 40px;
-    left: 315px;
-}
-

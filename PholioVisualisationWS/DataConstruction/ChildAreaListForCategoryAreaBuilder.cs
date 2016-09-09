@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstruction
             var areaCodes = reader
                 .GetCategorisedAreasForOneCategory(AreaTypeIds.Country, childAreaType, parentArea.CategoryTypeId, parentArea.CategoryId)
                 .Select(x => x.AreaCode);
-            var areaListBuilder = new AreaListBuilder(reader);
+            var areaListBuilder = new AreaListProvider(reader);
             areaListBuilder.CreateAreaListFromAreaCodes(areaCodes);
             ChildAreas = areaListBuilder.Areas.OrderBy(x=> x.Name).ToList();
         }

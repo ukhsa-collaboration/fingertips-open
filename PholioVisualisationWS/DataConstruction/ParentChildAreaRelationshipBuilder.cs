@@ -9,27 +9,27 @@ namespace PholioVisualisation.DataConstruction
     public class ParentChildAreaRelationshipBuilder
     {
         private IgnoredAreasFilter ignoredAreasFilter;
-        private AreaListBuilder areaListBuilder;
+        private AreaListProvider _areaListProvider;
 
         public ParentChildAreaRelationshipBuilder(IgnoredAreasFilter ignoredAreasFilter,
-            AreaListBuilder areaListBuilder)
+            AreaListProvider _areaListProvider)
         {
             this.ignoredAreasFilter = ignoredAreasFilter;
-            this.areaListBuilder = areaListBuilder;
+            this._areaListProvider = _areaListProvider;
         }
 
         public ParentAreaWithChildAreas GetParentAreaWithChildAreas(IArea parentArea, 
             int childAreaTypeId, bool retrieveIgnoredAreas)
         {
-            areaListBuilder.CreateChildAreaList(parentArea.Code, childAreaTypeId);
+            _areaListProvider.CreateChildAreaList(parentArea.Code, childAreaTypeId);
 
             if (retrieveIgnoredAreas == false)
             {
-                areaListBuilder.RemoveAreasIgnoredEverywhere(ignoredAreasFilter);
+                _areaListProvider.RemoveAreasIgnoredEverywhere(ignoredAreasFilter);
             }
-            areaListBuilder.SortByOrderOrName();
+            _areaListProvider.SortByOrderOrName();
 
-            return new ParentAreaWithChildAreas(parentArea,  areaListBuilder.Areas, childAreaTypeId);
+            return new ParentAreaWithChildAreas(parentArea,  _areaListProvider.Areas, childAreaTypeId);
         }
     }
 }

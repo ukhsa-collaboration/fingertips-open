@@ -781,11 +781,6 @@ div.page span
     line-height: 0.95em;
 }
 
-.show-ci {
-    padding-left: 30px;
-}
-
-
 /* ------------------------------------------------------------
 	General
 ------------------------------------------------------------ */
@@ -1018,139 +1013,6 @@ div.noData300 {
     text-align: right;
 }
 
-.trendTitle {
-    float: left;
-    font-weight: bold;
-    font-size: 1.3em;
-    text-align: left;
-}
-.trendTitle a {
-    margin-right: 20px;
-}
-
-.trendUnit {
-    padding: 6px 0 0 0;
-    float: right;
-    font-size: 11px;
-}
-
-.trendArea {
-    font-size: 11px;
-    padding-top: 6px;
-}
-
-td.coloured {
-    background: #a8a8cc;
-    color: White;
-}
-
-.light {
-    background: #cfcfe2;
-}
-
-#areaTrendsContainer {
-    width: 100%;
-    float: left;
-    clear: left;
-}
-
-.trendContainer {
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    margin-top: 6px;
-    margin-bottom: 20px;
-    float: left;
-}
-
-.trendChart {
-    width: 400px;
-    height: 300px;
-    float: left;
-}
-
-.trendHeader, .multiTrendHeader {
-    float: left;
-    clear: both;
-}
-
-.multiTrendHeader {
-    padding: 30px 0 0 0;
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    font-weight: bold;
-}
-
-.trendHeader {
-    padding: 20px 0 5px 0;
-    border-bottom: 5px solid #0b0c0c;
-    width: 100%;
-    font-weight: bold;
-}
-
-.trendPeriod {
-    width: 85px;
-}
-
-.trendPeriodWide {
-    width: 120px;
-}
-
-.trendTableBox {
-    float: right;
-    width: 520px;
-}
-
-.trendTableBoxWide {
-    float: right;
-    width: 535px;
-}
-
-.trendSig {
-    width: 40px;
-}
-
-.trendSource {
-    width: 100%;
-    text-align: left;
-    float: right;
-    font-style: italic;
-    font-size: 11px;
-}
-
-#trendHelper {
-    border-style: dotted;
-    border-width: thin;
-    border-color: #aaa;
-    background-color: white;
-    z-index: 5;
-    position: absolute;
-    font-style: italic;
-    padding: 0 3px 0 3px;
-}
-
-a.trendLink, a.trendLink:visited, a.trendLink:active {
-    color: Black;
-    text-decoration: none;
-}
-
-    a.trendLink:hover {
-        color: Black;
-        text-decoration: underline;
-    }
-
-td span.value-note-symbol {
-    width: 100%;
-    text-align: center;
-    display: block;
-    cursor: default;
-}
-
-td span.unit {
-    color: #777;
-}
-
 a.start, a.start:active, a.start:visited {
     display: block;
     font-size: 18px;
@@ -1162,42 +1024,9 @@ a.start, a.start:active, a.start:visited {
     box-shadow: 5px 5px 5px #ccc;
 }
 
-#global-prefooter {
-    float: left;
-    text-align: center;
-    width: 100%;
-    margin-top: 24px;
-}
-
 .data-header {
     font-size: 12px;
 }
-
-/* ------------------------------------------------------------
-	Trends
------------------------------------------------------------- */
-#trends-chart-sorter-az {
-    font-size:14px;
-}
-
-#trends-chart-sorter-az a {
-    margin: 0 3px;
-    text-decoration: none;
-    color: #1f0aa1;
-}
-
-#trends-chart-sorter-az a:hover {
-    text-decoration: underline;
-}
-
-#trendsBox {
-     display:inline-block; overflow:hidden; text-align: left; margin-left:3%;
-}
-
-#trends-chart-sorter-az {
-    margin-left: 180px;
-}
-
 
 /* ------------------------------------------------------------
 	Menus
@@ -1221,6 +1050,7 @@ ul.menu li {
 
 ul.menu .heading {
     padding-top: 2px;
+    padding-right: 3px;
 }
 
 ul.menu select {
@@ -1320,30 +1150,18 @@ ul.right-menu {
 ------------------------------------------------------------ */
 #download-container {
     color: #666;
-    padding: 70px 0 120px 0;
+    padding: 60px 0 120px 0;
 }
 
 #download-container h2 {
     padding: 0;
-    margin-top: 60px;
     color: #555;
-}
-
-#download-container a.pdf {
-    background-image: url('../images/pdf.gif');
-    background-position: 0 3px;
-}
-
-#download-container a.excel {
-    background-image: url('../images/excel.gif');
-    background-position: 0 4px;
 }
 
 #download-container a {
     font-size: 20px;
     color: #39836e;
     margin: 15px 0 0 0;
-    padding-left: 20px;
     background-repeat: no-repeat;
     display: block;
     text-decoration: none;
@@ -1360,13 +1178,12 @@ ul.right-menu {
 }
 
 #download-container div {
-    width: 25%;
     text-align: left;
     float: left;
 }
 
 #download-container div.text {
-    width: 23%;
+    width: 24%;
     padding:0 1%;
 }
 
@@ -1381,12 +1198,17 @@ ul.right-menu {
     cursor: pointer;
 }
 
+#pdf-download-text p {
+    margin-bottom: 20px;
+}
+
+
 #trendDisplayOptions {
+/*    position: absolute; */
     float: left;
     width: auto;
-    margin-bottom: 5px;
-    height: 23px;
-    margin-top: -27px;
+  /*  margin-bottom: 5px;
+    height: 23px; */
     vertical-align: middle;
     text-align: center;
 }
@@ -1402,27 +1224,14 @@ ul.right-menu {
     margin-left: 10px;
 }
 
-
-.optionButton {
- 
-    background: #D7EBE8;
-    margin-right: 2px;
-    color: #666;
-    text-decoration: none;
-    height: 30px;
-    float: left;
-    cursor: pointer;
-    position: relative;
-    font-weight: bold;
-    padding: 6px 10px 10px 10px;
-    line-height: 0.95em;
-    font-size: 14px;
-
+.tartan-export-chart-box {
+    color: #450AA3;
 }
 
-button.buttonSelected, button.optionButton:hover {
-    color: white;
-    background-color: #02ae94;
+.tartan-export-chart-box .export-link {
+    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+    padding: 5px 30px;
+    text-decoration: none;
 }
 
 .tartanTrend {

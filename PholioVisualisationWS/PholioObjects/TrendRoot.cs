@@ -9,11 +9,15 @@ namespace PholioVisualisation.PholioObjects
         {
             IndicatorId = rootToCopy.IndicatorId;
             StateSex = rootToCopy.StateSex;
+            StateAge = rootToCopy.StateAge;
             AreaTypeId = rootToCopy.AreaTypeId;
             SexId = rootToCopy.SexId;
             AgeId = rootToCopy.AgeId;
             PolarityId = rootToCopy.PolarityId;
+            YearRange = rootToCopy.YearRange;
             ComparatorMethodId = rootToCopy.ComparatorMethodId;
+            Age = rootToCopy.Age;
+            Sex = rootToCopy.Sex;
             DataPoints = new Dictionary<string, IList<TrendDataPoint>>();
             ComparatorValueFs = new List<Dictionary<int, string>>();
             ComparatorValue = new List<Dictionary<int, double>>();

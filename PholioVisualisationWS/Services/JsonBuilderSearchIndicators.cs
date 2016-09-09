@@ -12,7 +12,7 @@ namespace PholioVisualisation.Services
 {
     public class JsonBuilderSearchIndicators : JsonBuilderBase
     {
-        private SearchIndicatorsParameters parameters;
+        private SearchIndicatorsParameters _parameters;
 
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
         private IProfileReader profileReader = ReaderFactory.GetProfileReader();
@@ -21,14 +21,26 @@ namespace PholioVisualisation.Services
         public JsonBuilderSearchIndicators(HttpContextBase context)
             : base(context)
         {
-            parameters = new SearchIndicatorsParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new SearchIndicatorsParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderSearchIndicators(SearchIndicatorsParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var indicatorIds = new IndicatorSearch().SearchIndicators(parameters.SearchText);
-            var profileIds = parameters.RestrictResultsToProfileIdList;
+            var areaTypeIdToIndicatorIdsWithData = GetAreaTypeIdToIndicatorIdsWithData();
+            return JsonConvert.SerializeObject(areaTypeIdToIndicatorIdsWithData);
+        }
+
+        public IDictionary<int, List<int>> GetAreaTypeIdToIndicatorIdsWithData()
+        {
+            var indicatorIds = new IndicatorSearch().SearchIndicators(_parameters.SearchText);
+            var profileIds = _parameters.RestrictResultsToProfileIdList;
 
             var areaTypes = new AreaTypeListProvider(new GroupIdProvider(profileReader), areasReader, groupDataReader)
                 .GetChildAreaTypesUsedInProfiles(profileIds);
@@ -57,7 +69,7 @@ namespace PholioVisualisation.Services
                 areaTypeIdToIndicatorIdsWithData.Add(areaTypeId, indicatorIdsWithData);
             }
 
-            return JsonConvert.SerializeObject(areaTypeIdToIndicatorIdsWithData);
+            return areaTypeIdToIndicatorIdsWithData;
         }
     }
 }

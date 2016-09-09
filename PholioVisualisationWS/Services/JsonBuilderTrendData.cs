@@ -12,32 +12,44 @@ namespace PholioVisualisation.Services
 {
     public class JsonBuilderTrendData : JsonBuilderBase
     {
-        private TrendDataParameters parameters;
+        private TrendDataParameters _parameters;
 
         public JsonBuilderTrendData(HttpContextBase context)
             : base(context)
         {
-            parameters = new TrendDataParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new TrendDataParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderTrendData(TrendDataParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var parentArea = new ParentArea(parameters.ParentAreaCode, parameters.AreaTypeId);
-           
-            bool isParentCodeNearestNeighbour = Area.IsNearestNeighbour(parameters.ParentAreaCode);
+            var trendRoots = GetTrendData();
+            return JsonConvert.SerializeObject(trendRoots);
+        }
 
-            var groupData = new GroupDataAtDataPointRepository().GetGroupData(parameters.ParentAreaCode,
-                parameters.AreaTypeId, parameters.ProfileId,parameters.GroupId);
+        public IList<TrendRoot> GetTrendData()
+        {
+            var parentArea = new ParentArea(_parameters.ParentAreaCode, _parameters.AreaTypeId);
+
+            bool isParentCodeNearestNeighbour = Area.IsNearestNeighbour(_parameters.ParentAreaCode);
+
+            var groupData = new GroupDataAtDataPointRepository().GetGroupData(_parameters.ParentAreaCode,
+                _parameters.AreaTypeId, _parameters.ProfileId, _parameters.GroupId);
 
             IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(
                groupData.GroupRoots,
                 new ComparatorMapBuilder(parentArea).ComparatorMap,
-                parameters.AreaTypeId,
-                parameters.ProfileId,
+                _parameters.AreaTypeId,
+                _parameters.ProfileId,
                 groupData.IndicatorMetadata, isParentCodeNearestNeighbour);
 
-            return JsonConvert.SerializeObject(trendRoots);
+            return trendRoots;
         }
     }
 }

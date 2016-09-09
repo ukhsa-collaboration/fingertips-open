@@ -70,14 +70,15 @@
   <ItemGroup>
     <Compile Include="AreasOfAreaTypeActionTest.cs" />
     <Compile Include="AreaTypesActionTest.cs" />
-    <Compile Include="MostRecentDataForAllAgesActionTest.cs" />
-    <Compile Include="MostRecentDataForAllCategoriesActionTest.cs" />
-    <Compile Include="MostRecentDataForAllSexesActionTest.cs" />
+    <Compile Include="PartitionDataForAllAgesBuilderTest.cs" />
+    <Compile Include="PartitionDataForAllCategoriesBuilderTest.cs" />
+    <Compile Include="PartitionDataForAllSexesBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpcForDsrLimitsActionTest.cs" />
     <Compile Include="ParameterCheckTest.cs" />
     <Compile Include="ChildAreasForPdfsActionTest.cs" />
     <Compile Include="NationalValuesForPdfsActionTest.cs" />
+    <Compile Include="TrendMarkersActionTest.cs" />
     <Compile Include="ValueLimitsActionTest.cs" />
   </ItemGroup>
   <ItemGroup>

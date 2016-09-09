@@ -232,7 +232,7 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestGetGroupingByIndicatorId()
         {
-            var indicatorIds = new List<int> { IndicatorIds.IDAOPI };
+            var indicatorIds = new List<int> { IndicatorIds.ChildrenInPoverty };
 
             Assert.IsTrue(Reader().GetGroupingByIndicatorId(indicatorIds).Any());
         }
@@ -427,7 +427,7 @@ namespace Fpm.ProfileDataTest
         public void TestGetOwnerProfilesByIndicatorIds()
         {
             var profile = Reader().GetOwnerProfilesByIndicatorIds(
-                IndicatorIds.IDAOPI);
+                IndicatorIds.ChildrenInPoverty);
             Assert.IsNotNull(profile);
         }
 

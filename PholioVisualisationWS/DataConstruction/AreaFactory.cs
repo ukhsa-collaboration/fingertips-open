@@ -1,5 +1,4 @@
-﻿using System;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -27,7 +26,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 var nearestNeighboursArea = new NearestNeighbourArea(areaCode);
                 nearestNeighboursArea.Neighbours = areasReader.GetNearestNeighbours(
-                    nearestNeighboursArea.AreaCodeOfAreaWithNeighbours);
+                    nearestNeighboursArea.AreaCodeOfAreaWithNeighbours, nearestNeighboursArea.NeighbourTypeId);
                 return nearestNeighboursArea;
             }
 

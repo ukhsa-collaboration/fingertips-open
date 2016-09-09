@@ -70,12 +70,12 @@
     <Compile Include="ComparatorMapBuilderTest.cs" />
     <Compile Include="ContentProviderTest.cs" />
     <Compile Include="CoreDataProcessorTest.cs" />
-    <Compile Include="CoreDataSetSorterTest.cs" />
     <Compile Include="GroupDataRepositoryTest.cs" />
     <Compile Include="GroupRootComparisonManagerTest.cs" />
     <Compile Include="GroupRootSummaryTest.cs" />
     <Compile Include="LimitsBuilderTest.cs" />
     <Compile Include="NearestNeighbourAreaListBuilderTest.cs" />
+    <Compile Include="PartitionTrendDataDictionaryBuilderTest.cs" />
     <Compile Include="PostcodeProviderTest.cs" />
     <Compile Include="ProfileUrlTest.cs" />
     <Compile Include="QuinaryPopulationSorterTest.cs" />
@@ -94,7 +94,7 @@
     <Compile Include="CcgCoreDataSetProviderTest.cs" />
     <Compile Include="ShapeCoreDataSetProviderTest.cs" />
     <Compile Include="IgnoredAreasFilterFactoryTest.cs" />
-    <Compile Include="ParentAreaGroupOrganiserTest.cs" />
+    <Compile Include="AreaTypesWithParentAreaTypesBuilderTest.cs" />
     <Compile Include="AverageCalculatorFactoryTest.cs" />
     <Compile Include="NullAverageCalculatorTest.cs" />
     <Compile Include="GroupingListProviderTest.cs" />
@@ -108,13 +108,13 @@
     <Compile Include="ParentAreasOfChildAreasBuilderTest.cs" />
     <Compile Include="GroupingDataForProfileBuilderTest.cs" />
     <Compile Include="ProfilePerIndicatorBuilderTest.cs" />
+    <Compile Include="TrendMarkersProviderTest.cs" />
     <Compile Include="WeightedAverageCalculatorTest.cs" />
     <Compile Include="AreaTypeListProviderTest.cs" />
     <Compile Include="ValueListBuilderTest.cs" />
     <Compile Include="ValueWithCIsDataProcessorTest.cs" />
     <Compile Include="ValueDataProcessorTest.cs" />
     <Compile Include="DataPointOffsetCalculatorTest.cs" />
-    <Compile Include="AreaLabelsBuilderTest.cs" />
     <Compile Include="EthnicityLabelBuilderTest.cs" />
     <Compile Include="GroupDataBuilderByGroupingsTest.cs" />
     <Compile Include="GroupDataBuilderByIndicatorIdsTest.cs" />

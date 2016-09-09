@@ -29,10 +29,10 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "A4")]
         public string Address4 { get; set; }
 
-        [JsonProperty(PropertyName = "Postcode")]
+        [JsonProperty]
         public string Postcode { get; set; }
 
-        [JsonProperty(PropertyName = "IsCurrent")]
+        [JsonProperty]
         public bool IsCurrent { get; set; }
 
         [JsonIgnore]

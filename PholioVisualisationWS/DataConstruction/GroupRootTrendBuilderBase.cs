@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.Analysis;
+﻿using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -15,6 +14,13 @@ namespace PholioVisualisation.DataConstruction
 
         private IndicatorComparer comparer;
         private TargetComparer targetComparer;
+
+        // Category comparison: Data lists retained to prevent repeated trip to database
+        private Dictionary<TimePeriod, ICategoryComparer> timePeriodToNationalCategoryComparer =
+            new Dictionary<TimePeriod, ICategoryComparer>();
+        private Dictionary<TimePeriod, ICategoryComparer> timePeriodToSubnationalCategoryComparer =
+            new Dictionary<TimePeriod, ICategoryComparer>();
+
         private Dictionary<int, IList<CoreDataSet>> comparatorIdToComparatorTrendData = new Dictionary<int, IList<CoreDataSet>>();
         private IList<CoreDataSet> dataList;
         private IEnumerable<TimePeriod> periods;
@@ -24,6 +30,9 @@ namespace PholioVisualisation.DataConstruction
 
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
+        /// <summary>
+        /// Factory method
+        /// </summary>
         public static GroupRootTrendBuilderBase New(Grouping grouping, IndicatorMetadata indicatorMetadata)
         {
             GroupRootTrendBuilderBase builder = GetAppropriateBuilderType(grouping);
@@ -51,11 +60,12 @@ namespace PholioVisualisation.DataConstruction
         }
 
         public TrendRoot BuildTrendRoot(ComparatorMap comparatorMap, GroupRoot root,
-            TrendDataReader trendReader, IList<string> childAreaCodes)
+            ITrendDataReader trendReader, IList<string> childAreaCodes)
         {
-            TrendRoot trendRoot = new TrendRoot(root);
 
-            CreateComparers();
+            Init();
+
+            TrendRoot trendRoot = new TrendRoot(root);
 
             periods = Grouping.GetTimePeriodIterator(IndicatorMetadata.YearType).TimePeriods;
 
@@ -69,10 +79,9 @@ namespace PholioVisualisation.DataConstruction
                 if (categoryArea != null)
                 {
                     var categoryTypeId = categoryArea.CategoryTypeId;
-
-                    CheckCategoryTypeIsAllowedForTrendData(categoryTypeId);
-
-                    var categoryAreaDataList = trendReader.GetTrendDataForSpecificCategory(Grouping, AreaCodes.England, categoryTypeId, categoryArea.CategoryId);
+                    //TODO: we we don't have data for trends calculate on the fly
+                    var categoryAreaDataList = trendReader.GetTrendDataForSpecificCategory(Grouping,
+                        AreaCodes.England, categoryTypeId, categoryArea.CategoryId);
                     comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, categoryAreaDataList);
                 }
                 else
@@ -104,8 +113,10 @@ namespace PholioVisualisation.DataConstruction
                 IList<TrendDataPoint> trendDataPoints = new List<TrendDataPoint>();
                 foreach (var timePeriod in periods)
                 {
+
                     var dataPoint = GetDataAtSpecificTimePeriod(dataList, timePeriod)
-                        ?? CoreDataSet.GetNullObject(areaCode);
+                                    ?? CoreDataSet.GetNullObject(areaCode);
+
                     var significances = AssignSignificanceToTrendDataPoint(dataPoint, Grouping, timePeriod);
 
                     // Need to assess count before data is truncated
@@ -122,7 +133,7 @@ namespace PholioVisualisation.DataConstruction
                 trendRoot.DataPoints[areaCode] = trendDataPoints;
             }
 
-            trendRoot.TrendMarkers = root.TrendMarkers;
+            trendRoot.RecentTrends = root.RecentTrends;
 
             AssignPeriods(trendRoot);
 
@@ -146,10 +157,7 @@ namespace PholioVisualisation.DataConstruction
         /// </summary>
         private static void CheckCategoryTypeIsAllowedForTrendData(int categoryTypeId)
         {
-            if (categoryTypeId != CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority &&
-                categoryTypeId != CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority &&
-                categoryTypeId != CategoryTypeIds.DeprivationDecileGp2010 &&
-                categoryTypeId != CategoryTypeIds.DeprivationDecileGp2015)
+            if (CategoryType.IsDeprivationDecile(categoryTypeId))
             {
                 throw new FingertipsException("Unexpected Category Type ID for trend data");
             }
@@ -161,11 +169,16 @@ namespace PholioVisualisation.DataConstruction
                 new SpecifiedTimePeriodFormatter { TimePeriod = p }.Format(IndicatorMetadata)).ToList();
         }
 
-        private void CreateComparers()
+        private void Init()
         {
-            comparer = new IndicatorComparerFactory { PholioReader = pholioReader }.New(Grouping);
+            comparer = NewIndicatorComparer();
             targetComparer = TargetComparerFactory.New(IndicatorMetadata.TargetConfig);
             // Note: TargetComparerHelper.AssignExtraDataIfRequired called in GroupDataProcessor
+        }
+
+        private IndicatorComparer NewIndicatorComparer()
+        {
+            return new IndicatorComparerFactory { PholioReader = pholioReader }.New(Grouping);
         }
 
         private void AssignComparatorDataToTrendRoot(TrendRoot trendRoot, Grouping grouping, IList<string> childAreaCodes)
@@ -195,6 +208,7 @@ namespace PholioVisualisation.DataConstruction
         {
             Dictionary<int, Significance> sig = new Dictionary<int, Significance>();
 
+            // Benchmark comparisons
             if (comparer is ICategoryComparer == false)
             {
                 // Compare against benchmarks
@@ -211,34 +225,29 @@ namespace PholioVisualisation.DataConstruction
             // Category comparison
             if (comparer is ICategoryComparer)
             {
-                ICategoryComparer categoryComparer = comparer as ICategoryComparer;
-
-                Area nationalArea = areasReader.GetAreaFromCode(AreaCodes.England);
-                Area regionalArea = areasReader.GetAreaFromCode(data.AreaCode);
-
                 var provider = new CoreDataSetListProvider(groupDataReader);
-                var nationalComparatorValues = provider.GetChildAreaData(grouping, nationalArea, period);
-                var rootComparatorValues = provider.GetChildAreaData(grouping, regionalArea, period);
 
                 // Compare against benchmarks
                 foreach (KeyValuePair<int, IList<CoreDataSet>> keyValuePair in comparatorIdToComparatorTrendData)
                 {
                     var comparatorId = keyValuePair.Key;
+                    ICategoryComparer categoryComparer;
 
-                    List<double> comparatorValues;
                     switch (comparatorId)
                     {
                         case ComparatorIds.England:
-                            dataProcessor.FormatAndTruncateList(nationalComparatorValues);
-                            comparatorValues = new CoreDataSetFilter(nationalComparatorValues).SelectValidValues().ToList();
+
+                            // Get national comparer
+                            categoryComparer = GetCategoryComparerWithValues(timePeriodToNationalCategoryComparer,
+                                    provider, grouping, period, AreaCodes.England);
                             break;
                         default:
-                            dataProcessor.FormatAndTruncateList(rootComparatorValues);
-                            comparatorValues = new CoreDataSetFilter(rootComparatorValues).SelectValidValues().ToList();
+
+                            // Get subnational comparer
+                            categoryComparer = GetCategoryComparerWithValues(timePeriodToSubnationalCategoryComparer,
+                                    provider, grouping, period, data.AreaCode); ;
                             break;
                     }
-
-                    categoryComparer.SetDataForCategories(comparatorValues);
 
                     sig.Add(comparatorId, (Significance)categoryComparer.GetCategory(data));
                 }
@@ -300,6 +309,28 @@ namespace PholioVisualisation.DataConstruction
 
             dataProcessor.FormatAndTruncate(benchmarkData);
             return benchmarkData;
+        }
+
+        private ICategoryComparer GetCategoryComparerWithValues(Dictionary<TimePeriod, ICategoryComparer> periodToComparer,
+            CoreDataSetListProvider provider, Grouping grouping, TimePeriod period, string areaCode)
+        {
+
+            if (periodToComparer.ContainsKey(period) == false)
+            {
+                Area area = areasReader.GetAreaFromCode(areaCode);
+                var childDataList = provider.GetChildAreaData(grouping, area, period);
+                var comparatorValues = new CoreDataSetFilter(childDataList).SelectValidValues().ToList();
+
+                // Get comparer
+                var categoryComparer = (ICategoryComparer)NewIndicatorComparer();
+                categoryComparer.SetDataForCategories(comparatorValues);
+                periodToComparer[period] = categoryComparer;
+
+                // Truncate last
+                dataProcessor.FormatAndTruncateList(childDataList);
+            }
+
+            return periodToComparer[period];
         }
 
         protected abstract CoreDataSet GetDataAtSpecificTimePeriod(IList<CoreDataSet> data, TimePeriod period);

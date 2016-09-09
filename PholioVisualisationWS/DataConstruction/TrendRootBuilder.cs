@@ -15,24 +15,23 @@ namespace PholioVisualisation.DataConstruction
         public IList<TrendRoot> Build(IList<GroupRoot> groupRoots, ComparatorMap comparatorMap,
             int childAreaTypeId, int profileId, IList<IndicatorMetadata> indicatorMetadataList, bool isNearestNeighbour)
         {
-
             _isParentAreaNearestNeighbour = isNearestNeighbour;
 
             List<TrendRoot> trendRoots = new List<TrendRoot>();
-            TrendDataReader trendReader = ReaderFactory.GetTrendDataReader();
+            ITrendDataReader trendReader = ReaderFactory.GetTrendDataReader();
 
             var childAreaCodes = GetChildAreaCodes(comparatorMap, childAreaTypeId, profileId);
 
             if (groupRoots != null)
             {
+                var metadataCollection = new IndicatorMetadataCollection(indicatorMetadataList);
                 foreach (GroupRoot root in groupRoots)
                 {
                     Grouping grouping = root.Grouping.FirstOrDefault();
 
                     if (grouping != null)
                     {
-                        IndicatorMetadata indicatorMetadata = indicatorMetadataList
-                            .First(x => x.IndicatorId == root.IndicatorId);
+                        IndicatorMetadata indicatorMetadata = metadataCollection.GetIndicatorMetadataById(root.IndicatorId);
                         GroupRootTrendBuilderBase builder = GroupRootTrendBuilderBase.New(grouping, indicatorMetadata);
                         TrendRoot trendRoot = builder.BuildTrendRoot(comparatorMap, root, trendReader, childAreaCodes);
                         trendRoots.Add(trendRoot);

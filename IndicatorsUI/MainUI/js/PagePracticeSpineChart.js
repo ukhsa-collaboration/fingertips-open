@@ -1,3 +1,5 @@
+'use strict';
+
 function goToIndicatorsPage() {
     lock();
     
@@ -208,17 +210,19 @@ function getAreaData(groupId, areaCode, includeTimePeriods) {
                 }
             }
             
-            var a = ['gid=', groupId,
-                '&are=', areaCode,
-                '&ati=', PRACTICE,
-                '&com=', comparators.join(',')];
-            
+            var parameters = new ParameterBuilder(
+                ).add('group_ids', groupId
+                ).add('area_type_id', AreaTypeIds.Practice
+                ).add('area_codes', areaCode
+                ).add('comparator_area_codes', comparators.join(','));
+
             if (isDefined(includeTimePeriods) && includeTimePeriods) {
-                a.push('&tim=yes');
+                parameters.add('include_time_periods', 'yes');
             }
-            
-            getData(getAreaDataCallback, 'ad', a.join(''));
-            
+
+            ajaxGet('api/latest_data/all_indicators_in_multiple_profile_groups_for_multiple_areas', parameters.build(), getAreaDataCallback);
+
+
             return;
         }
     }
@@ -228,26 +232,18 @@ function getAreaData(groupId, areaCode, includeTimePeriods) {
 
 function getAreaDataCallback(obj) {
     
-    var key = 'areaData',
-    callData = ui.callbackIds;
-    
-    // Get Subgroup ID the callback data refers to
-    var sid = callData[key];
-    if (!isDefined(sid)) {
-        sid = PP.model.groupId;
-    }
-     
     if (isDefined(obj)) {
         
-        checkHash(loaded.data,sid);
-        
-        for (var areaCode in obj) {
-            loaded.data[sid][areaCode] = obj[areaCode];
+        var groupId = _.keys(obj)[0];
+
+        checkHash(loaded.data,groupId);
+
+        var data = obj[groupId];
+
+        for (var areaCode in data) {
+            loaded.data[groupId][areaCode] = data[areaCode];
         }
     }
-    
-    // Reset call data
-    callData[key] = null;
     
     ajaxMonitor.callCompleted();
 };
@@ -265,7 +261,7 @@ function getBenchmarkData() {
     
     if (model.isPractice()) {
         
-        var population = currentPracticePopulation;
+        var population = PP.data.currentPracticePopulation;
         
         var code = getBenchmarkId() === BENCHMARKS.PEER_GROUP ?
             getPeerGroupCode(population.Shape) :
@@ -278,13 +274,13 @@ function getBenchmarkData() {
                 !data[gid].hasOwnProperty(code)) {
                 
                 ajaxMonitor.setCalls(1);
-                
-                getData(getAreaDataCallback, 'ad', 'gid=' + gid +
-                        '&ati=' + PRACTICE +
-                        '&are=' + code +
-                        '&com=' + NATIONAL_CODE +
-                        '&pyr=' + ajaxMonitor.state.year
-                );
+
+                var parameters = new ParameterBuilder(
+                    ).add('group_ids', gid
+                    ).add('area_type_id', AreaTypeIds.Practice
+                    ).add('area_codes', code
+                    ).add('comparator_area_codes', NATIONAL_CODE);
+                ajaxGet('api/latest_data/all_indicators_in_multiple_profile_groups_for_multiple_areas', parameters.build(), getAreaDataCallback);
                 
                 ajaxMonitor.monitor(callOnFinish);
                 return;
@@ -328,7 +324,7 @@ function setBenchmarkImage() {
     $('#benchmarkImg').attr('src', FT.url.img + getBenchmarkImage());
 };
 
-spineChartState = {
+var spineChartState = {
     
     displayedSubgroupId : null,
     
@@ -446,7 +442,8 @@ function createSpineChartTable(sid, nationalSubgroupData,metadata) {
         } else {
             data = null;
         }
-        showSpine = isDefined(data) && isDefined(stats.Stats);
+
+        var showSpine = isDefined(data) && isDefined(stats.Stats);
         
         h.push('<tr>');
         
@@ -462,7 +459,7 @@ function createSpineChartTable(sid, nationalSubgroupData,metadata) {
         
         // National
         var nationalValF = getValF(data, unit);
-        label = nationalValF;            
+        var label = nationalValF;            
         addTd(h, label, CSS_NUMERIC);
         
         if (showSpine) 
@@ -530,33 +527,32 @@ function addTableSpineChartTooltip(spineChartElementIdStem, formatter) {
 function getAreaInfo(isArea, cellIndex, indicatorMetadata, subgroupData, row, rootIndex, yearOffset, 
     iid,  nationalItem, tableId, isPractice, img) {
     
-    var val = null,  valHtml = NO_DATA;
+    var val = null, valHtml = NO_DATA, count = NO_DATA;
     
     // Update value cell
-    if (isArea) {      
+    if (isArea) {
         var item = subgroupData[rootIndex],
-        dataArray = item.Data,
-        dataIndex = dataArray.length - yearOffset - 1,
-        data = dataArray[dataIndex]; 
-        
+            dataArray = item.Data,
+            dataIndex = dataArray.length - yearOffset - 1,
+            data = dataArray[dataIndex];
+
         var dataInfo = new CoreDataSetInfo(data);
 
         // Practice count
         if (isPractice) {
-            var count = formatCount(dataInfo);
-            row.children(':eq(2)').html(count);
+            count = formatCount(dataInfo);
         }
 
-        if (dataInfo.isValue()) {          
+        if (dataInfo.isValue()) {
             var unit = getUnitLabel(indicatorMetadata),
-            valF =  getValF(data, unit);
-            
+                valF = getValF(data, unit);
+
             val = data.Val;
             valHtml = valF;
-            
+
             if (isPractice && item.Sig) {
                 var significances = item.Sig[NATIONAL_CODE],
-                sig = significances[dataIndex];
+                    sig = significances[dataIndex];
                 if (significances.length) {
                     var sigPreviousYear = significances[dataIndex - 1];
                     if (sig !== sigPreviousYear) {
@@ -564,16 +560,21 @@ function getAreaInfo(isArea, cellIndex, indicatorMetadata, subgroupData, row, ro
                         valHtml = getTrendTriangle(item, iid, dataIndex, val, valF);
                     }
                 }
-                
+
                 // Standardise significant difference
-                sig = sig == 3 ? 1 : sig; 
+                sig = sig === 3 ? 1 : sig;
             } else {
                 sig = 0;
             }
         }
     }
 
-    // Update value cell
+    // Update practice count cell
+    if (isPractice) {
+        row.children(':eq(2)').html(count);
+    }
+
+    // Update practice value cell
     row.children(':eq(' + cellIndex + ')').html(valHtml);
     
     // Update spine chart marker
@@ -617,7 +618,7 @@ function getAreaInfo(isArea, cellIndex, indicatorMetadata, subgroupData, row, ro
     }
 };
 
-changeManager = {
+var changeManager = {
     
     changeValues : [],
     changeIds : [],
@@ -677,7 +678,7 @@ function getBenchmarkCode() {
     
     var id = getBenchmarkId(),
     model = PP.model,
-    population = currentPracticePopulation,
+    population = PP.data.currentPracticePopulation,
     practiceCode = model.practiceCode;
     
     switch(id) {
@@ -785,7 +786,7 @@ function getSpineChartData(year, offset) {
     getIndicatorMetadata(groupId);
     getIndicatorStats(groupId, year, offset);
     
-    getLabelSeries(LABELS_DEPRIVATION);
+    getLabelSeries();
     
     if (getBenchmarkId() == BENCHMARKS.CCG) {
         var callOnFinish = displaySpineCharts;
@@ -844,9 +845,9 @@ function getParentMarkerImage(sig) {
     return 'markers/' + shape + colour + '.png'; 
 }
 
-PPTooltipProvider = function(stems) {
+var PPTooltipProvider = function(stems) {
     
-    map = {};
+    var map = {};
     
     this.add = function (key, formatter) {
         map[key.toString()] = formatter;
@@ -900,7 +901,7 @@ PPTooltipProvider = function(stems) {
                 } else {
                     var bid = getBenchmarkId();
                     if (bid == BENCHMARKS.DEPRIVATION) {
-                        var areaCode = currentPracticePopulation.GpDeprivationDecile;
+                        var areaCode = PP.data.currentPracticePopulation.GpDeprivationDecile;
                         areaName = labels[LABELS_DEPRIVATION][areaCode];
                     } else if (bid == BENCHMARKS.CCG) {
                         areaName = getPracticeParentName();    

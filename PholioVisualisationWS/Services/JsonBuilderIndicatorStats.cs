@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
@@ -14,9 +13,17 @@ using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
+    public class IndicatorStatsResponse
+    {
+        public int IID { get; set; }
+        public IndicatorStatsPercentiles Stats { get; set; }
+        public IndicatorStatsPercentilesFormatted StatsF { get; set; }
+        public bool? HaveRequiredValues { get; set; }
+    }
+
     public class JsonBuilderIndicatorStats : JsonBuilderBase
     {
-        private IndicatorStatsParameters parameters;
+        private IndicatorStatsParameters _parameters;
 
         private IndicatorMetadataRepository indicatorMetadataRepository = IndicatorMetadataRepository.Instance;
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
@@ -38,17 +45,29 @@ namespace PholioVisualisation.Services
         public JsonBuilderIndicatorStats(HttpContextBase context)
             : base(context)
         {
-            parameters = new IndicatorStatsParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new IndicatorStatsParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderIndicatorStats(IndicatorStatsParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            profileIds = parameters.RestrictResultsToProfileIdList;
-            parentArea = AreaFactory.NewArea(areasReader, parameters.ParentAreaCode);
+            var responseObjects = GetIndicatorStats();
+            return JsonConvert.SerializeObject(responseObjects);
+        }
+
+        public Dictionary<int, IndicatorStatsResponse> GetIndicatorStats()
+        {
+            profileIds = _parameters.RestrictResultsToProfileIdList;
+            parentArea = AreaFactory.NewArea(areasReader, _parameters.ParentAreaCode);
 
             var roots = GetRoots();
-            var responseObjects = new Dictionary<int, object>();
+            var responseObjects = new Dictionary<int, IndicatorStatsResponse>();
 
             SetAreaCodesToIgnore();
 
@@ -58,45 +77,36 @@ namespace PholioVisualisation.Services
             }
 
             childAreaCount = new ChildAreaCounter(areasReader)
-                .GetChildAreasCount(parentArea, parameters.ChildAreaTypeId);
+                .GetChildAreasCount(parentArea, _parameters.ChildAreaTypeId);
 
             int rootIndex = 0;
             foreach (var root in roots)
             {
                 Grouping grouping = root.Grouping[0];
                 IndicatorMetadata metadata = indicatorMetadataRepository.GetIndicatorMetadata(grouping);
-                TimePeriod timePeriod = new DataPointOffsetCalculator(grouping, parameters.DataPointOffset, metadata.YearType).TimePeriod;
+                TimePeriod timePeriod = new DataPointOffsetCalculator(grouping, _parameters.DataPointOffset, metadata.YearType).TimePeriod;
 
                 IEnumerable<double> values = GetValuesForStats(grouping, timePeriod);
 
-                object statsAndStatF = null;
+                IndicatorStatsResponse statsAndStatF;
                 if (values != null)
                 {
-                    if (parameters.IndicatorStatsType == IndicatorStatsType.Percentiles25And75)
-                    {
-                        IndicatorStatsPercentiles statsPercentiles = new IndicatorStatsCalculator(values).GetStats();
-                        var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
-                        indicatorStatsProcessor.Truncate(statsPercentiles);
+                    IndicatorStatsPercentiles statsPercentiles = new IndicatorStatsCalculator(values).GetStats();
+                    var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+                    indicatorStatsProcessor.Truncate(statsPercentiles);
 
-                        statsAndStatF = new
-                        {
-                            IID = metadata.IndicatorId,
-                            Stats = statsPercentiles,
-                            StatsF = formatter.FormatStats(statsPercentiles),
-                            HaveRequiredValues = doEnoughAreasHaveValues
-                        };
-                    }
-                    else
+                    statsAndStatF = new IndicatorStatsResponse
                     {
-                        //TODO need to do for both IndicatorStatsTypes
-                        // IndicatorStatsControlLimitsCalculator.New()
-                        //   return appropriate calculator for SPC DSR
-                    }
+                        IID = metadata.IndicatorId,
+                        Stats = statsPercentiles,
+                        StatsF = formatter.FormatStats(statsPercentiles),
+                        HaveRequiredValues = doEnoughAreasHaveValues
+                    };
                 }
                 else
                 {
                     // No stats calculated
-                    statsAndStatF = new
+                    statsAndStatF = new IndicatorStatsResponse
                     {
                         IID = metadata.IndicatorId,
                         HaveRequiredValues = doEnoughAreasHaveValues
@@ -107,12 +117,12 @@ namespace PholioVisualisation.Services
                 rootIndex++;
             }
 
-            return JsonConvert.SerializeObject(responseObjects);
+            return responseObjects;
         }
 
         private void SetAreaCodesToIgnore()
         {
-            var profileId = parameters.ProfileId;
+            var profileId = _parameters.ProfileId;
             areaCodesToIgnore = profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
         }
 
@@ -120,17 +130,18 @@ namespace PholioVisualisation.Services
         {
             IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             IList<Grouping> groupings;
-            if (parameters.UseIndicatorIds)
+            if (_parameters.UseIndicatorIds)
             {
                 groupings = new GroupingListProvider(reader, profileReader).GetGroupings(
                     profileIds,
-                    parameters.IndicatorIds,
-                    parameters.ChildAreaTypeId);
+                    _parameters.IndicatorIds,
+                    _parameters.ChildAreaTypeId);
+
+                var roots = new GroupRootBuilder().BuildGroupRoots(groupings);
+                return new GroupRootFilter(reader).RemoveRootsWithoutChildAreaData(roots);
             }
-            else
-            {
-                groupings = reader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(parameters.GroupId, parameters.ChildAreaTypeId);
-            }
+
+            groupings = reader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(_parameters.GroupId, _parameters.ChildAreaTypeId);
             return new GroupRootBuilder().BuildGroupRoots(groupings);
         }
 
@@ -157,7 +168,9 @@ namespace PholioVisualisation.Services
             int areaTypeId = grouping.AreaTypeId;
             if (areaTypeId != AreaTypeIds.GpPractice)
             {
-                doEnoughAreasHaveValues = IsRequiredNumberOfAreaValues(values);
+                doEnoughAreasHaveValues = IsRequiredNumberOfAreaValues(values) ||
+                    ShouldSpineChartAlwaysBeAvailable(grouping.IndicatorId);
+
                 if (doEnoughAreasHaveValues == false)
                 {
                     values = null;
@@ -173,6 +186,15 @@ namespace PholioVisualisation.Services
             }
 
             return values;
+        }
+
+        /// <summary>
+        /// See FIN-1084: spine chart should be displayed for SSI indicator
+        /// </summary>
+        private bool ShouldSpineChartAlwaysBeAvailable(int indicatorId)
+        {
+            return indicatorId == IndicatorIds.SurgicalSiteInfectionHipProsthesis ||
+                   indicatorId == IndicatorIds.SurgicalSiteInfectionKneeProsthesis;
         }
 
         /// <summary>

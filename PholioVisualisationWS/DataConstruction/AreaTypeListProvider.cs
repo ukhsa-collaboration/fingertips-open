@@ -23,6 +23,7 @@ namespace PholioVisualisation.DataConstruction
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId);
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetCategoryTypeIdsUsedInProfile(int profileId);
+        IList<int> GetCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
     }
 
     public class AreaTypeListProvider : IAreaTypeListProvider
@@ -31,12 +32,17 @@ namespace PholioVisualisation.DataConstruction
         private IAreasReader areasReader;
         private IGroupDataReader groupDataReader;
 
-        public AreaTypeListProvider(IGroupIdProvider groupdIdProvider, 
+        public AreaTypeListProvider(IGroupIdProvider groupdIdProvider,
             IAreasReader areasReader, IGroupDataReader groupDataReader)
         {
             this.groupdIdProvider = groupdIdProvider;
             this.areasReader = areasReader;
             this.groupDataReader = groupDataReader;
+        }
+
+        public IList<AreaType> GetAllAreaTypes()
+        {
+            return areasReader.GetAllAreaTypes();
         }
 
         public List<int> GetAllAreaTypeIdsUsedInProfile(int profileId)
@@ -104,16 +110,27 @@ namespace PholioVisualisation.DataConstruction
 
         public IList<int> GetCategoryTypeIdsUsedInProfile(int profileId)
         {
-            var parentAreaGroups = areasReader.GetParentAreaGroups(profileId);
+            var parentAreaGroups = areasReader.GetParentAreaGroups(profileId)
+                .Where(x => x.CategoryTypeId != null);
 
-            var categoryTypeIds = parentAreaGroups
-                .Where(x => x.CategoryTypeId != null)
+            return SelectDistinctCategoryTypeIds(parentAreaGroups);
+        }
+
+        public IList<int> GetCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId)
+        {
+            var parentAreaGroups = areasReader.GetParentAreaGroups(profileId)
+                .Where(x => x.CategoryTypeId != null && x.ChildAreaTypeId == childAreaTypeId);
+
+            return SelectDistinctCategoryTypeIds(parentAreaGroups);
+        }
+
+        private IList<int> SelectDistinctCategoryTypeIds(IEnumerable<ParentAreaGroup> parentAreaGroups)
+        {
+            return parentAreaGroups
                 .Select(x => x.CategoryTypeId)
                 .Distinct()
                 .Cast<int>()
                 .ToList();
-
-            return categoryTypeIds;
         }
 
         private IList<int> GetAllGroupIdsBelongingToProfiles(IEnumerable<int> profileIds)

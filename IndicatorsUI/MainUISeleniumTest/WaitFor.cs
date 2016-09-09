@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
+using System;
+using System.Threading;
 
 namespace IndicatorsUI.MainUISeleniumTest
 {
@@ -44,7 +44,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             while (checks < maxCheckCount)
             {
                 var isUnlocked = (bool)(driver as IJavaScriptExecutor)
-                    .ExecuteScript("return ajaxLock === null;");
+                    .ExecuteScript("return FT.ajaxLock === null;");
                 if (isUnlocked)
                 {
                     break;
@@ -100,7 +100,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void PracticeRankingsForWestLancashireCcgToLoad()
         {
-            ExpectedElementToBeVisible(By.LinkText("PARKGATE SURGERY"));
+            ExpectedElementToBeVisible(By.LinkText("Parkgate Surgery"));
         }
 
         public void PracticeDetailsToLoad()
@@ -111,6 +111,11 @@ namespace IndicatorsUI.MainUISeleniumTest
             // ImplicitlyWait until the table rows have been created
             ExpectedElementToBeVisible(
                 By.XPath("//*[@id=\"diabetes-rankings-table\"]/tbody/tr[1]/td[1]"));
+        }
+
+        public void FingertipsSpineChartToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("singleAreaTable"));
         }
 
         public void FingertipsTartanRugToLoad()
@@ -146,11 +151,30 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void FingertipsAreaSearchResultsPageToLoad()
         {
             ExpectedElementToBeVisible(By.Id("area-results-box"));
+            PageToFinishLoading();
+
+            // This is necessary but not clear why
+            ThreadWait(0.5);
         }
-        
+
         public void PhofDomainsToLoad()
         {
             ExpectedElementToBeVisible(By.ClassName("phof-domains"));
+        }
+
+        public void PhofTrendOptionButtonToLoad()
+        {
+            ExpectedElementToBeVisible(By.ClassName("tab-options"));
+        }
+
+        public void PhofCompareAreasTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("indicatorDetailsTable"));
+        }
+
+        public void PhofInequalitiesFilters()
+        {
+            ExpectedElementToBeVisible(By.Id("inequalities-trend-filters"));
         }
 
         public void PracticeProfilesSearchTabToLoad()
@@ -189,7 +213,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("trendTable0"));
         }
 
-       public void FingertipsProfileFrontPageToLoad()
+        public void FingertipsProfileFrontPageToLoad()
         {
             ExpectedElementToBeVisible(By.Id("introduction"));
         }
@@ -226,7 +250,8 @@ namespace IndicatorsUI.MainUISeleniumTest
                 .Until(ExpectedConditions.ElementIsVisible(element));
         }
 
-         public void PageToFinishLoading() {
+        public void PageToFinishLoading()
+        {
 
             const double totalSecondsToCheckFor = TimeoutLimitInSeconds;
             double secondsCheckedFor = 0;
@@ -245,7 +270,15 @@ namespace IndicatorsUI.MainUISeleniumTest
             }
 
             Assert.Fail("Document ready state never became complete");
- } 
+        }
+
+        /// <summary>
+        /// Wait for the inequalities trend chart to be loaded
+        /// </summary>
+        public void InequalitiesTrendChart()
+        {
+            ExpectedElementToBeVisible(By.Id("inequalities-trend-chart"));
+        }
 
         /// <summary>
         /// DO NOT USE unless you really have to!!

@@ -70,6 +70,7 @@
     <Compile Include="ProportionFormatterTest.cs" />
     <Compile Include="FixedDecimalPlaceFormatterTest.cs" />
     <Compile Include="NumberCommariserTest.cs" />
+    <Compile Include="TrendMarkerLabelProviderTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

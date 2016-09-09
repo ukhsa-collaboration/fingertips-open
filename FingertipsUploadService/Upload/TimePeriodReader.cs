@@ -35,7 +35,7 @@ namespace FingertipsUploadService.Upload
         {
             string period;
             string pholioWs = AppConfig.GetPholioWs();
-            var serviceUrl = pholioWs + "data/time_period?quarter=" + timePeriod.Quarter +
+            var serviceUrl = pholioWs + "api/time_period?quarter=" + timePeriod.Quarter +
                              "&month=" + timePeriod.Month +
                              "&year=" + timePeriod.Year +
                              "&year_range=" + timePeriod.YearRange +

@@ -1,3 +1,11 @@
+'use strict';
+
+/**
+* Area profile namespace
+* @module areaProfile
+*/
+var areaProfile = {};    
+
 function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
     rootIndex, stats, formatter, regionalData, nationalData, benchmarkData,
     period, metadata, haveRequiredValues) {
@@ -6,23 +14,25 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
         comparisonConfig = new ComparisonConfig(groupRoot, metadata);
 
     // Indicator name
-    html.push('<td id="spine-indicator_', rootIndex, '" class="pLink" onclick="indicatorNameClicked(\'', rootIndex,
-        '\');" onmouseover="highlightRow(this);" onmouseout="unhighlightRow();">',
-        formatter.getIndicatorName(), getIndicatorDataQualityHtml(formatter.getDataQuality()),
-        '<br>', getTargetLegendHtml(comparisonConfig, metadata),
-        '</td>');
-
+    var indicatorText = formatter.getIndicatorName() + getIndicatorDataQualityHtml(formatter.getDataQuality());
+    var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
+    html.push(renderIndicatorCell(rootIndex, indicatorText, targetLegend));
+    
     addTd(html, period, CSS_CENTER);
 
     // Trend
-    if (groupRoot.TrendMarkers) {
+    if (groupRoot.RecentTrends) {
+        
         if (coreDataSet) {
-            var image = getTrendMarkerImage(groupRoot.TrendMarkers[coreDataSet.AreaCode], groupRoot.PolarityId);
+            var recentTrends = groupRoot.RecentTrends[coreDataSet.AreaCode];
+            addRecentTrendTooltip(rowNumber - 1, recentTrends);
+
+            var image = getTrendMarkerImage(recentTrends.Marker, groupRoot.PolarityId);
         } else {
             image = getTrendMarkerImage(TrendMarkerValue.CannotCalculate, 0);
+            addRecentTrendTooltip(rowNumber - 1);
         }
-
-        addTd(html, image, CSS_CENTER);
+        html.push(renderTrendCell(rootIndex, image));
     }
 
     // Count
@@ -81,12 +91,40 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
 
     // Tooltips
     tooltipManager.initElement('spine-indicator_' + rootIndex);
+    
     addTableSpineChartTooltip(rowNumber, formatter);
 
     if (comparisonConfig.useQuintileColouring) {
         toggleQuintileLegend($('#quintile-key'), true);
     }
+    
+    tooltipManager.initElement('spine-trend_' + rootIndex);
 }
+
+function renderIndicatorCell(rootIndex, indicatorText, targetLegend) {
+    templates.add('indicatorCell', '<td id="spine-indicator_{{rootIndex}}" class="pLink" ' +
+        'onclick="indicatorNameClicked(\'{{rootIndex}}\');"  onmouseover="highlightRow(this);" onmouseout="unhighlightRow();" >{{{indicatorText}}}' +
+        '<br>{{{targetLegend}}}</td>');
+
+    var html = templates.render('indicatorCell',
+    {
+        rootIndex: rootIndex,
+        indicatorText: indicatorText,
+        targetLegend: targetLegend
+    });
+    return html;
+}
+
+function renderTrendCell(rootIndex, innerContent) {
+    templates.add('spineTrendCell', '<td id="spine-trend_{{rootIndex}}" class="center">{{{innerContent}}}</td>');
+    var html = templates.render('spineTrendCell',
+    {
+        rootIndex: rootIndex,
+        innerContent: innerContent
+    });
+    return html;
+}
+
 
 function goToAreaProfilePage(areaCode) {
 
@@ -108,11 +146,11 @@ function goToAreaProfilePage(areaCode) {
 
         ajaxMonitor.monitor(displayAreaProfile);
     }
-};
+}
 
 function displayAreaProfile() {
 
-    //NOTE: ajaxLock test cannot go here 
+    //NOTE: FT.ajaxLock test cannot go here 
 
     var provider = new AreaTooltipProvider(stems),
     model = FT.model;
@@ -137,14 +175,14 @@ function displayAreaProfile() {
 
     loadValueNoteToolTips();
 
-};
+}
 
 function initAreaProfile() {
     // Populate container
     var isNationalAndRegional = enumParentDisplay == PARENT_DISPLAY.NATIONAL_AND_REGIONAL &&
        !isParentCountry();
 
-    var trendMarkerFound = isDefined(groupRoots) && isDefined(groupRoots[0]) && isDefined(groupRoots[0].TrendMarkers);
+    var trendMarkerFound = isDefined(groupRoots) && isDefined(groupRoots[0]) && isDefined(groupRoots[0].RecentTrends);
 
     pages.getContainerJq().html(
         templates.render('areaProfile', {
@@ -155,7 +193,8 @@ function initAreaProfile() {
             parentType: FT.menus.parentType.getName(),
             isNotNN: !FT.model.isNearestNeighbours(),
             trendColSpan: trendMarkerFound ? 3 : 2,
-            trendHeaderIfEnabled: trendMarkerFound
+            trendHeaderIfEnabled: trendMarkerFound && FT.config.hasRecentTrends,
+            spineChartImage: spineChartImage
         }));
 
     areaProfileState.isInitialised = true;
@@ -174,7 +213,7 @@ function getSpineChartHtml(rowNumber, groupRoot, coreDataSet, stats, benchmarkDa
     if (!isDefined(stats) ||
         !isDefined(benchmarkData) ||
         !isValidValue(benchmarkData.Val) ||
-        metadata.ValueTypeId === ValueTypeIds.Count) {
+        metadata.ValueType.Id === ValueTypeIds.Count) {
         return NO_SPINE_DATA;
     }
 
@@ -204,38 +243,49 @@ function addTableSpineChartTooltip(rowNumber, formatter) {
 
     // IDs of elements can be known here so can associate those
     // with data in global look up
+
     areaProfileState.tooltipProvider.add(rowNumber, formatter);
     var stemKeys = stems.getKeys();
-    for (var i in stemKeys) {
+
+    for (var i in stemKeys) {        
         tooltipManager.initElement(stemKeys[i] + '_' + rowNumber);
     }
-};
+}
+
+function addRecentTrendTooltip(rowNumber, trendData) {    
+    var trendCellId = 'spine-trend_' + (rowNumber);
+    areaProfileState.trendstooltip.addTooltip(trendCellId, trendData);
+}
+
+
 
 function getIndicatorStats() {
 
     ui.storeScrollTop();
 
     // National spine chart
-    var code = getComparatorById(comparatorId).Code;
-    if (ui.areIndicatorStatsLoaded(code)) {
+    var parentAreaCode = getComparatorById(comparatorId).Code;
+    if (ui.areIndicatorStatsLoaded(parentAreaCode)) {
         ajaxMonitor.callCompleted();
     } else {
 
         showSpinner();
 
-        var parameters = 's=is&gid=' + FT.model.groupId +
-            '&par=' + code +
-            '&ati=' + FT.model.areaTypeId +
-            getProfileOrIndicatorsParameters() +
-            getRestrictByProfileParameter();
+        var parameters = new ParameterBuilder(
+            ).add('group_id', FT.model.groupId
+            ).add('child_area_type_id', FT.model.areaTypeId
+            ).add('parent_area_code', parentAreaCode);
 
-        ajaxGet('GetData.ashx', parameters, getIndicatorStatsCallback);
+        addProfileOrIndicatorsParameters(parameters);
+        addRestrictToProfilesIdsParameter(parameters)
+
+        ajaxGet('api/indicator_statistics', parameters.build(), getIndicatorStatsCallback);
     }
-};
+}
 
 function setAreaProfileHtml(areaCode) {
     // Benchmark
-    var isNationalBenchmark = (comparatorId == NATIONAL_COMPARATOR_ID),
+    var isNationalBenchmark = (comparatorId === NATIONAL_COMPARATOR_ID),
         benchmark = isNationalBenchmark ?
             getNationalComparator() :
             getParentArea(),
@@ -288,18 +338,19 @@ function setAreaProfileHtml(areaCode) {
     }
 
     setAreaHeadings(area, benchmark);
-};
+}
 
 function getIndicatorStatsCallback(obj) {
     ui.setIndicatorStats(getComparatorById(comparatorId).Code, obj);
     ajaxMonitor.callCompleted();
-};
+}
 
-areaProfileState = {
+var areaProfileState = {
     isInitialised: false,
     isAreaIgnored: false,
     ignoreMessage: '',
-    tooltipProvider: null
+    tooltipProvider: null,
+    trendstooltip: new RecentTrendsTooltip()
 }
 
 function setIgnoreMessage(area, benchmark) {
@@ -367,6 +418,10 @@ AreaTooltipProvider.prototype = {
             return getIndicatorNameTooltip(bits[1]/*root index*/, areaHash[FT.model.areaCode]);
         }
 
+        if (firstBit === 'spine-trend') {            
+            return areaProfileState.trendstooltip.getTooltip(id);
+        }
+
         return id !== '' ?
             this.getSpineChartText(id) :
             '';
@@ -406,19 +461,19 @@ AreaTooltipProvider.prototype = {
             // Indicator name
             html.push('</span><span id="tooltipIndicator">',
                 formatter.getIndicatorName(), '</span>');
+            
         }
-
         return html.join('');
     }
 }
 
 
-ID_SINGLE_AREA_TABLE = 'singleAreaTable';
-NO_SPINE_DATA = '<div class="noSpine">-</div>';
-INSUFFICIENT_DATA = '<div class="noSpine">Insufficient number of values for a spine chart</div>';
+var ID_SINGLE_AREA_TABLE = 'singleAreaTable';
+var NO_SPINE_DATA = '<div class="noSpine">-</div>';
+var INSUFFICIENT_DATA = '<div class="noSpine">Insufficient number of values for a spine chart</div>';
 
 templates.add('areaProfile',
-    showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') +
+    '<div style="height:50px;"><div style="width:500px; float:left;padding-top:20px;">' + showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') + '</div><div style="float:right;"> <img src="{{spineChartImage}}"></div></div>' +
     '<table id="' + ID_SINGLE_AREA_TABLE + '" class="borderedTable" style="table-layout: auto;" cellspacing="0" cellpadding="0"><thead>\
 <tr><th id="spineIndicatorHeader" rowspan="2">Indicator</th><th id="spinePeriodHeader" rowspan="2">Period</th><th style="position: relative;" class="numericHeader areaName topRow" colspan="{{trendColSpan}}">-</th>\
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader topRow parent-area-type">{{parentType}}</th>{{/isNotNN}}<th class="numericHeader topRow">England</th>\
@@ -437,7 +492,7 @@ pages.add(PAGE_MODES.AREA_SPINE, {
     gotoName: 'goToAreaProfilePage',
     needsContainer: true,
     jqIds: ['spine-range-key', 'key-spine-chart', 'spineKey', '.geo-menu',
-        'spineRangeKeyContainer', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend-spine'],
+        'spineRangeKeyContainer', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box']
 });
 

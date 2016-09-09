@@ -7,7 +7,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
     public class PhofBaseUnitTest : BaseUnitTest
     {
         [TestInitialize]
-        public override void CalledOnceAtStartOfTests()
+        public override void TestInitialize()
         {
             SetSkin(SkinNames.Phof);
         }

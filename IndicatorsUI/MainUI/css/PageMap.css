@@ -82,6 +82,14 @@
 	color: #999999;
 	padding-right: 10px;
 }
+
+#map_table_body td.value-note-symbol {
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: default;
+}
+
 #map_table_body tr.selected {
 	background-color: aliceblue;
 	font-weight: bold;

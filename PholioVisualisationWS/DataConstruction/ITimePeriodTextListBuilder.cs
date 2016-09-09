@@ -8,6 +8,6 @@ namespace PholioVisualisation.DataConstruction
     {
         void Add(TimePeriod timePeriod);
         void AddRange(IEnumerable<TimePeriod> timePeriods);
-        IList<string> ToList();
+        IList<string> GetTimePeriodStrings();
     }
 }

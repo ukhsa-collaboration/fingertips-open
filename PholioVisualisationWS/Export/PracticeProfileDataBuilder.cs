@@ -130,7 +130,7 @@ namespace PholioVisualisation.Export
         {
             var builder = new TimePeriodTextListBuilder(metadata);
             builder.AddRange(timePeriods);
-            IList<string> periodLabels = builder.ToList();
+            IList<string> periodLabels = builder.GetTimePeriodStrings();
             return periodLabels;
         }
 

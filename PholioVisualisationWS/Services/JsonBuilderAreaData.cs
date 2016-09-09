@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
-using NHibernate.Mapping;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.RequestParameters;
@@ -12,44 +11,60 @@ namespace PholioVisualisation.Services
 {
     public class JsonBuilderAreaData : JsonBuilderBase
     {
-        private AreaDataParameters parameters;
+        private AreaDataParameters _parameters;
 
         public JsonBuilderAreaData(HttpContextBase context)
             : base(context)
         {
-            parameters = new AreaDataParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new AreaDataParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderAreaData(AreaDataParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var areaListBuilder = new AreaListBuilder(ReaderFactory.GetAreasReader());
-            areaListBuilder.CreateAreaListFromAreaCodes(parameters.AreaCodes);
+            // IMPORTANT : must include if (_parameters.GroupIds.Count == 1) section when wrapping this method
+            var groupIdToData = GetAreaData();
+
+            if (_parameters.GroupIds.Count == 1)
+            {
+                // For backwards compatibility do not include group ID in response object
+                var data = groupIdToData.Values.First();
+                return JsonConvert.SerializeObject(data);
+            }
+
+            return JsonConvert.SerializeObject(groupIdToData);
+        }
+
+        public Dictionary<int, Dictionary<string, IList<SimpleAreaData>>> GetAreaData()
+        {
+            var areaListBuilder = new AreaListProvider(ReaderFactory.GetAreasReader());
+            areaListBuilder.CreateAreaListFromAreaCodes(_parameters.AreaCodes);
             var areas = areaListBuilder.Areas;
 
-            Dictionary<int, object> groupIdToData = new Dictionary<int, object>();
+            Dictionary<int, Dictionary<string, IList<SimpleAreaData>>> groupIdToData = 
+                new Dictionary<int, Dictionary<string, IList<SimpleAreaData>>>();
 
-            foreach (var groupId in parameters.GroupIds)
+            foreach (var groupId in _parameters.GroupIds)
             {
-                var data = new AreaDataBuilder
+                Dictionary<string, IList<SimpleAreaData>> data = new AreaDataBuilder
                 {
                     GroupId = groupId,
                     Areas = areas,
-                    AreaTypeId = parameters.AreaTypeId,
-                    ComparatorAreaCodes = parameters.ComparatorAreaCodes,
-                    IncludeTimePeriods = parameters.IncludeTimePeriods,
-                    LatestDataOnly = parameters.LatestDataOnly
+                    AreaTypeId = _parameters.AreaTypeId,
+                    ComparatorAreaCodes = _parameters.ComparatorAreaCodes,
+                    IncludeTimePeriods = _parameters.IncludeTimePeriods,
+                    LatestDataOnly = _parameters.LatestDataOnly
                 }.Build();
                 groupIdToData.Add(groupId, data);
             }
 
-            if (parameters.GroupIds.Count == 1)
-            {
-                // For backwards compatibility do not include group ID in response object
-                return JsonConvert.SerializeObject(groupIdToData.Values.First());
-            }
-
-            return JsonConvert.SerializeObject(groupIdToData);
+            return groupIdToData;
         }
     }
 }

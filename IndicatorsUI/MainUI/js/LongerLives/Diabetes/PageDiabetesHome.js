@@ -43,7 +43,7 @@ function getSecondaryData() {
 
 function selectIndicator(rootIndex, indicatorId) {
     
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var model = MT.model;
@@ -142,7 +142,7 @@ function displayMapLegend(root) {
         new MutuallyExclusiveDisplay({
             a: $(prefix + 'quintiles'),
             b: $(prefix + 'deaths')
-        }).showA(useQuintiles(root.Grouping[0].MethodId));
+        }).showA(useQuintiles(root.ComparatorMethodId));
     }
 }
 
@@ -196,7 +196,7 @@ function getPolygonColourFunction(root) {
                : noComparison;
         };
 
-    if (useQuintiles(root.Grouping[0].MethodId)) {
+    if (useQuintiles(root.ComparatorMethodId)) {
         return function (sig) {
             return getColourFromSignificance(quintileColors, sig);
         };
@@ -312,7 +312,7 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, areaPopulation) {
     var key = getIndicatorKey(root, MT.model, comparatorAreaCode);
     var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
     var valF = areaValues[MT.model.areaCode].ValF;
-    if (metadata.ValueTypeId === 2/*indirectly standardised ratio*/) {
+    if (metadata.ValueType.Id === 2/*indirectly standardised ratio*/) {
         // e.g. Diabetes complications
         var indicatorName = textMetadata.Name;
         var indicatorDescription = '';
@@ -366,7 +366,7 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, areaPopulation) {
         areatypename: getAreaTypeNamePlural(MT.model.areaTypeId),
         areaCode: MT.model.areaCode,
         imageclass: imageClass,
-        filterheader: metadata.ValueTypeId === 2 ? textMetadata.Definition : indicatorName,
+        filterheader: metadata.ValueType.Id === 2 ? textMetadata.Definition : indicatorName,
         rankClass: gradeClass,
         valueNote: valueNoteText,
         topLinkText: topLink.text,

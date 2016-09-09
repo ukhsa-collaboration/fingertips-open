@@ -74,6 +74,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AverageCalculator\Calculator.cs" />
+    <Compile Include="AverageCalculator\GroupingManager.cs" />
+    <Compile Include="AverageCalculator\IndicatorManager.cs" />
+    <Compile Include="CoreDataSetAverageCalculator.cs" />
     <Compile Include="ExcelFileDeleter.cs" />
     <Compile Include="ExcelFileGenerator.cs" />
     <Compile Include="ExcelFileTimer.cs" />

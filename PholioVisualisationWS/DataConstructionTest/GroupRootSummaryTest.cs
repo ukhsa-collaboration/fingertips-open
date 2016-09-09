@@ -17,18 +17,19 @@ namespace PholioVisualisation.DataConstructionTest
 
             var summaries = new List<GroupRootSummary>
             {
-                summary2,summary1
+                summary2, summary1
             };
 
             summaries.Sort();
-            Assert.AreEqual("a",summaries.First().IndicatorName);
+            Assert.AreEqual("a", summaries.First().IndicatorName);
         }
 
         public static GroupRootSummary Summary(string name)
         {
             return new GroupRootSummary
             {
-                IndicatorName = name
+                IndicatorName = name,
+                Sex = new Sex { Id = SexIds.Persons}
             };
         }
     }

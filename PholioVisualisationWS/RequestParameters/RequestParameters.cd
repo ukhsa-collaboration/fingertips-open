@@ -158,13 +158,6 @@
       <FileName>LabelParameters.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="PholioVisualisation.RequestParameters.LabelSeriesParameters">
-    <Position X="8.5" Y="5.75" Width="2" />
-    <TypeIdentifier>
-      <HashCode>IAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
-      <FileName>LabelSeriesParameters.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="PholioVisualisation.RequestParameters.DataDownloadBespokeParameters">
     <Position X="3" Y="3.5" Width="2.5" />
     <TypeIdentifier>

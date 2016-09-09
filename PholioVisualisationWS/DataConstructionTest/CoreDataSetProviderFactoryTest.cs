@@ -11,7 +11,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewCategoryAreaCoreDataSetProvider()
         {
-            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority,1);
+            var categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010,1);
             Assert.IsTrue(new CoreDataSetProviderFactory().New(categoryArea) is CategoryAreaCoreDataSetProvider);
         }
 

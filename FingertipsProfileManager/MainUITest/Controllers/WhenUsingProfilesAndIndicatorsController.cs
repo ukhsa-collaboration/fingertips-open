@@ -76,7 +76,7 @@ namespace Fpm.MainUITest.Controllers
             // Arrange
             _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
 
-            const int indicatorId = IndicatorIds.IDAOPI;
+            const int indicatorId = IndicatorIds.ChildrenInPoverty;
 
             // Act
             var result = (PartialViewResult)_controller.BrowseIndicatorData(indicatorId);

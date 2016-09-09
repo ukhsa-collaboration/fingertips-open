@@ -52,7 +52,7 @@ namespace ConsoleApplication
         private void GetAreaCodes()
         {
             IAreasReader areaReader = ReaderFactory.GetAreasReader();
-            localAuthorityAreas = areaReader.GetAreaCodesForAreaType(AreaTypeIds.LocalAuthority);
+            localAuthorityAreas = areaReader.GetAreaCodesForAreaType(AreaTypeIds.District);
             countyAreas = areaReader
                 .GetAreaCodesForAreaType(AreaTypeIds.County)
                 .Where(x => x != AreaCodes.CountyUa_Bedfordshire)

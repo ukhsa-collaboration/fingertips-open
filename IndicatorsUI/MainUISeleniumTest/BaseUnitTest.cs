@@ -20,7 +20,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         }
 
         [TestInitialize]
-        public virtual void CalledOnceAtStartOfTests()
+        public virtual void TestInitialize()
         {
             SetSkin(SkinNames.Mortality);
         }
@@ -41,9 +41,10 @@ namespace IndicatorsUI.MainUISeleniumTest
         }
 
         [TestCleanup]
-        public void CalledOnceWhenAllTestsHaveFinished()
+        public void TestCleanup()
         {
             SeleniumHelper.DisposeDrivers(drivers);
+            drivers = null;
         }
 
         private IWebDriver FirstDriver

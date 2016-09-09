@@ -11,31 +11,44 @@ namespace PholioVisualisation.DataConstruction
         private IGroupDataReader groupDataReader;
         private GroupIdProvider groupIdProvider;
 
+        /// <summary>
+        /// Parameterless constructor for mocking
+        /// </summary>
+        public SingleGroupingProvider()
+        {
+            
+        }
+
         public SingleGroupingProvider(IGroupDataReader groupDataReader, GroupIdProvider groupIdProvider)
         {
             this.groupDataReader = groupDataReader;
             this.groupIdProvider = groupIdProvider;
         }
 
-        public Grouping GetGrouping(int profileId, int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
         {
             var groupIds = GetGroupIds(groupId, profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
         }
 
-        public Grouping GetGrouping(int profileId, int areaTypeId, int indicatorId, int sexId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId, int indicatorId, int sexId, int ageId)
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
         }
 
-        public Grouping GetGroupingByIndicatorIdAndSexId(int profileId, int areaTypeId, int indicatorId, int sexId)
+        public virtual Grouping GetGroupingByGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
+        {
+            return GetGrouping(new List<int> { groupId}, areaTypeId, indicatorId, sexId, ageId);
+        }
+
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexId(int profileId, int areaTypeId, int indicatorId, int sexId)
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingBySexId(groupIds, areaTypeId, indicatorId, sexId);
         }
 
-        public Grouping GetGroupingByIndicatorIdAndAgeId(int profileId, int areaTypeId, int indicatorId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndAgeId(int profileId, int areaTypeId, int indicatorId, int ageId)
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingByAgeId(groupIds, areaTypeId, indicatorId, ageId);

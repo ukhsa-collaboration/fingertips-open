@@ -32,7 +32,7 @@ namespace PholioVisualisation.ExportTest
             var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
             var parentAreaTypeId = AreaTypeIds.Country;
 
-            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId }, ParentDisplay.NationalAndRegional,
+            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId },
                 parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)
                 ).BuildWorkbook();
         }
@@ -41,7 +41,7 @@ namespace PholioVisualisation.ExportTest
         public void TestOnlyOneSheetContainsNationalData()
         {
             var worksheets = workbook.Worksheets;
-            Assert.IsNotNull(worksheets["England"]);
+            Assert.IsNotNull(worksheets[ProfileDataBuilder.NationalLabel]);
             Assert.IsNull(worksheets["Country"]);
         }
 

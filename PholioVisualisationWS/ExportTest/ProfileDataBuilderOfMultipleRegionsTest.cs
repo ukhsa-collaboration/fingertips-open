@@ -20,23 +20,6 @@ namespace PholioVisualisation.ExportTest
             InitWorksheets();
         }
 
-        private static void InitWorksheets()
-        {
-            var region = ReaderFactory.GetAreasReader().GetAreaFromCode(AreaCodes.England);
-            var parentArea = new ParentArea(region.Code, AreaTypeIds.CountyAndUnitaryAuthority);
-            IList<ParentArea> parentAreas = new List<ParentArea>();
-            parentAreas.Add(parentArea);
-
-            var map = new ComparatorMapBuilder(parentAreas).ComparatorMap;
-            var profileId = ProfileIds.Phof;
-            var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
-            var parentAreaTypeId = AreaTypeIds.GoRegion;
-
-            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId }, ParentDisplay.NationalAndRegional,
-                parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)
-                ).BuildWorkbook();
-        }
-
         [TestMethod]
         public void TestSubnationalSheetExists()
         {
@@ -58,7 +41,25 @@ namespace PholioVisualisation.ExportTest
 
             Assert.IsFalse(string.IsNullOrWhiteSpace(parentAreaCode1));
             Assert.IsFalse(string.IsNullOrWhiteSpace(parentAreaCode2));
-            Assert.AreNotEqual(parentAreaCode1, parentAreaCode2,"Expect region area codes to be different");
+            Assert.AreNotEqual(parentAreaCode1, parentAreaCode2, "Expect region area codes to be different");
+        }
+
+        private static void InitWorksheets()
+        {
+            // Parameters
+            var profileId = ProfileIds.Phof;
+            var childAreaType = AreaTypeIds.GoRegion;
+            var parentArea = new ParentArea(AreaCodes.England, childAreaType);
+            var parentAreaTypeId = AreaTypeIds.Country;
+
+            // Create workbook
+            IList<ParentArea> parentAreas = new List<ParentArea>();
+            parentAreas.Add(parentArea);
+            var map = new ComparatorMapBuilder(parentAreas).ComparatorMap;
+            var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
+            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId },
+                parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)
+                ).BuildWorkbook();
         }
 
         private static IWorksheet RegionWorksheet()

@@ -24,6 +24,22 @@ namespace PholioVisualisation.DataConstruction
             return GetLimitsOfSpecifiedAreas(grouping);
         }
 
+        public Limits GetLimits(IList<CoreDataSet> dataList)
+        {
+            if (dataList == null || dataList.Any() == false)
+            {
+                return null;
+            }
+
+            var values = new CoreDataSetFilter(dataList).SelectValidValues().ToList();
+            if (values.Any() == false)
+            {
+                return null;
+            }
+
+            return GetLimitsFromMinAndMax(values.Min(), values.Max());
+        }
+
         private void AddRegionAndChildAreas(IList<string> childAreaCodes, ComparatorMap comparatorMap)
         {
             Comparator regionalComparator = comparatorMap.GetSubnationalComparator();
@@ -40,10 +56,16 @@ namespace PholioVisualisation.DataConstruction
 
         private Limits GetLimitsOfSpecifiedAreas(Grouping grouping)
         {
-            TrendDataReader trendReader = ReaderFactory.GetTrendDataReader();
+            ITrendDataReader trendReader = ReaderFactory.GetTrendDataReader();
 
             double? min = trendReader.GetMin(grouping, areaCodes);
             double? max = trendReader.GetMax(grouping, areaCodes);
+
+            return GetLimitsFromMinAndMax(min, max);
+        }
+
+        private static Limits GetLimitsFromMinAndMax(double? min, double? max)
+        {
             return (min.HasValue && max.HasValue)
                 ? new MinMaxRounder(min.Value, max.Value).Limits
                 : null;

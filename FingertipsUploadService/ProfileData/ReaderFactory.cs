@@ -65,6 +65,15 @@ namespace FingertipsUploadService.ProfileData
             return service;
         }
 
+        public static void DisposeStatic()
+        {
+            if (staticSessionFactory != null)
+            {
+                staticSessionFactory.Dispose();
+                staticSessionFactory = null;
+            }
+        }
+
         private static ISessionFactory GetSessionFactory()
         {
             if (staticSessionFactory == null)
@@ -76,6 +85,7 @@ namespace FingertipsUploadService.ProfileData
 
             return staticSessionFactory;
         }
+
 
         /// <summary>
         /// Disposes of the resources held by the factory

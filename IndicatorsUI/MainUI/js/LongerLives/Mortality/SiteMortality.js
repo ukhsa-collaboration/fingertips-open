@@ -81,8 +81,11 @@ MT.model = {
 
 function getGroupRoots(model) {
     if (!groupRoots) {
-        getData(getGroupRootsCallback, 'gr',
-            'gid=' + model.groupId + '&ati=' + model.areaTypeId);
+        var parameters = new ParameterBuilder(
+            ).add('group_id', model.groupId
+            ).add('area_type_id', model.areaTypeId);
+        ajaxGet('api/profile_group_roots', parameters.build(), getGroupRootsCallback);
+
     } else {
         // Data already loaded
         ajaxMonitor.callCompleted();
@@ -134,7 +137,7 @@ function getChildAreas(model) {
         ).add('parent_area_code', parentCode
         ).add('area_type_id', areaTypeId);
 
-        ajaxGet('data/areas', parameters.build(), getChildAreasCallback);
+        ajaxGet('api/areas/by_parent_area_code', parameters.build(), getChildAreasCallback);
     }
 }
 
@@ -183,7 +186,7 @@ MT.nav = {
     // Go to the home page
     //
     home: function (model) {
-        
+
         if ($('.home_intro').length) {
             // Already on home page
             return;
@@ -192,11 +195,11 @@ MT.nav = {
         if (!isDefined(model)) {
             model = MT.model;
         }
-        setUrl('/topic/' + profileUrlKey +'/#' + model.toString());
+        setUrl('/topic/' + profileUrlKey + '/#' + model.toString());
     },
 
     gohome: function () {
-            setUrl('/topic/' + profileUrlKey);
+        setUrl('/topic/' + profileUrlKey);
     }
 }
 

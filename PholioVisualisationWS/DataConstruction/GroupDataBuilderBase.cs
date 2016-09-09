@@ -11,7 +11,7 @@ namespace PholioVisualisation.DataConstruction
     public abstract class GroupDataBuilderBase
     {
         protected IAreasReader AreasReader = ReaderFactory.GetAreasReader();
-        private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
+        protected IGroupDataReader GroupDataReader = ReaderFactory.GetGroupDataReader();
 
         public bool AssignAreas = true;
         public bool AssignChildAreaData = true;
@@ -34,7 +34,7 @@ namespace PholioVisualisation.DataConstruction
 
             try
             {
-                ReadGroupings(groupDataReader);
+                ReadGroupings(GroupDataReader);
                 if (Groupings.Count > 0)
                 {
                     if (AssignAreas)
@@ -48,17 +48,16 @@ namespace PholioVisualisation.DataConstruction
 
                     if (AssignData)
                     {
-                        AssignCoreData(groupDataReader);
+                        AssignCoreData();
                     }
 
+                    // Assign trend markers
                     var profileReader = ReaderFactory.GetProfileReader();
                     ProfileConfig profileConfig = profileReader.GetProfileConfig(ProfileId);
-
                     if (profileConfig != null && profileConfig.HasTrendMarkers)
                     {
-                        AssignTrendMarkers();
+                        AssignRecentTrends();
                     }
-
                 }
                 else
                 {
@@ -81,7 +80,7 @@ namespace PholioVisualisation.DataConstruction
             GroupData.GroupRoots = rootBuilder.BuildGroupRoots(Groupings);
         }
 
-        private void AssignCoreData(IGroupDataReader groupDataReader)
+        private void AssignCoreData()
         {
             string[] areaCodes = AssignChildAreaData
                 ? GroupData.Areas.Select(x => x.Code).ToArray()
@@ -94,18 +93,17 @@ namespace PholioVisualisation.DataConstruction
 
                 if (AssignChildAreaData)
                 {
-                    root.Data = groupDataReader.GetCoreData(firstGrouping, timePeriod, areaCodes);
+                    root.Data = GroupDataReader.GetCoreData(firstGrouping, timePeriod, areaCodes);
                 }
 
-                AssignComparatorData(groupDataReader, root, timePeriod);
+                AssignComparatorData(root, timePeriod);
             }
         }
 
-        private void AssignComparatorData(IGroupDataReader groupDataReader, GroupRoot root, TimePeriod timePeriod)
+        private void AssignComparatorData(GroupRoot root, TimePeriod timePeriod)
         {
             IndicatorMetadata indicatorMetaData = GroupData.GetIndicatorMetadataById(root.IndicatorId);
-            var benchmarkDataProvider = new BenchmarkDataProvider(groupDataReader);
-            var averageCalculator = AverageCalculatorFactory.New(root.Data, indicatorMetaData);
+            var benchmarkDataProvider = new BenchmarkDataProvider(GroupDataReader);
 
             // Comparator data
             foreach (Grouping grouping in root.Grouping)
@@ -122,8 +120,24 @@ namespace PholioVisualisation.DataConstruction
                          ? AreaFactory.NewArea(AreasReader, comparator.Area.Code.Substring(5))
                          : comparator.Area;
 
+                    // Only get subnational data, do not want to prefetch England data as usually won't be needed
+                    var dataList = grouping.ComparatorId == ComparatorIds.Subnational
+                        ? root.Data
+                        : null;
+
+                    AverageCalculator averageCalculator = AverageCalculatorFactory.New(dataList, indicatorMetaData);
+
                     data = benchmarkDataProvider.GetBenchmarkData(grouping, timePeriod,
                             averageCalculator, comparatorArea);
+
+                    // Calculate England data if not found in DB (this done after so do not have to read all data when necessary)
+                    if (data.IsValueValid == false && grouping.ComparatorId == ComparatorIds.England)
+                    {
+                        dataList = GroupDataReader.GetCoreDataForAllAreasOfType(grouping, timePeriod);
+                        averageCalculator = AverageCalculatorFactory.New(dataList, indicatorMetaData);
+                        data = benchmarkDataProvider.GetBenchmarkData(grouping, timePeriod,
+                            averageCalculator, comparatorArea);
+                    }
                 }
                 grouping.ComparatorData = data;
             }
@@ -136,53 +150,51 @@ namespace PholioVisualisation.DataConstruction
 
         protected IList<IArea> ReadChildAreas(string parentAreaCode, int childAreaTypeId)
         {
-            IList<IArea> childAreas;
-            if (NearestNeighbourArea.IsNearestNeighbourAreaCode(parentAreaCode))
-            {
-                var nearestNeighbourArea = (NearestNeighbourArea)AreaFactory.NewArea(AreasReader, parentAreaCode);
-                childAreas = new NearestNeighbourAreaListBuilder(AreasReader, nearestNeighbourArea).Areas;
-            }
-            else
-            {
-                childAreas = new ChildAreaListBuilder(AreasReader, parentAreaCode, childAreaTypeId)
-                    .ChildAreas;
-            }
-
-            IgnoredAreasFilter filter = IgnoredAreasFilterFactory.New(ProfileId);
-            return filter.RemoveAreasIgnoredEverywhere(childAreas).ToList();
+            return new FilteredChildAreaListProvider(AreasReader)
+                .ReadChildAreas(parentAreaCode, ProfileId, childAreaTypeId);
         }
 
-
-        private void AssignTrendMarkers()
+        private void AssignRecentTrends()
         {
-            var trendCalculator = new TrendMarkerCalculator();
-            var trendReader = ReaderFactory.GetTrendDataReader();
-
-            foreach (var groupRoot in GroupData.GroupRoots)
+            if (GroupData.Areas != null)
             {
-                    groupRoot.TrendMarkers = new Dictionary<string, TrendMarker>();
+                var trendCalculator = new TrendMarkerCalculator();
+                var trendReader = ReaderFactory.GetTrendDataReader();
+                var trendMarkersProvider = new TrendMarkersProvider(trendReader, trendCalculator);
 
-                    var indicatorMetaData =
-                        GroupData.IndicatorMetadata.FirstOrDefault(i => i.IndicatorId == groupRoot.IndicatorId);
+                var areas = GroupData.Areas.ToList();
+                AddParentAreas(areas);
 
-                    if (indicatorMetaData == null) continue;
+                var metadataCollection = new IndicatorMetadataCollection(GroupData.IndicatorMetadata);
+                foreach (var groupRoot in GroupData.GroupRoots)
+                {
+                    var grouping = groupRoot.Grouping.FirstOrDefault();
 
-                    foreach (var area in GroupData.Areas)
-                    {
-                        var grouping = groupRoot.Grouping.FirstOrDefault();
+                    var indicatorMetaData = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
 
-                        var trendRequest = new TrendRequest()
-                        {
-                            ValueTypeId = indicatorMetaData.ValueTypeId,
-                            ComparatorConfidence = grouping.ComparatorConfidence,
-                            Data = trendReader.GetTrendData(grouping, area.Code),
-                            YearRange = grouping.YearRange,
-                        };
+                    var recentTrends = indicatorMetaData == null
+                        ? new Dictionary<string, TrendMarkerResult>()
+                        : trendMarkersProvider.GetTrendResults(areas, indicatorMetaData, grouping);
 
-                        var trendResponse = trendCalculator.GetResults(trendRequest);
+                    groupRoot.RecentTrends = recentTrends;
+                }
+            }
+        }
 
-                        groupRoot.TrendMarkers.Add(area.Code, trendResponse.Marker);
-                    }
+        private void AddParentAreas(List<IArea> areas)
+        {
+            //Add the national and subnational areas in order to calculate the trends for these.
+            var subnationalArea = ComparatorMap.GetSubnationalComparator().Area;
+            var nationalComparator = ComparatorMap.GetNationalComparator();
+            IArea nationalArea = null;
+            if (nationalComparator != null)
+            {
+                nationalArea = nationalComparator.Area;
+                areas.Add(nationalArea);
+            }
+            if (nationalComparator == null || nationalArea.Code != subnationalArea.Code)
+            {
+                areas.Add(subnationalArea);
             }
         }
     }

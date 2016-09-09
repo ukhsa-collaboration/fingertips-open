@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PholioVisualisation.DataAccess;
@@ -73,7 +74,16 @@ namespace PholioVisualisation.DataConstructionTest
             var categoryTypeIds = AreaTypeListProvider()
                 .GetCategoryTypeIdsUsedInProfile(ProfileIds.Phof);
 
-            Assert.IsTrue(categoryTypeIds.Contains(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority));
+            Assert.IsTrue(categoryTypeIds.Contains(CategoryTypeIds.DeprivationDecileCountyAndUA2010));
+        }
+
+        [TestMethod]
+        public void TestGetCategoryTypeIdsUsedInProfile_When_Child_Has_No_Parent_Options()
+        {
+            var categoryTypeIds = AreaTypeListProvider()
+                .GetCategoryTypeIdsUsedInProfile(ProfileIds.Phof, AreaTypeIds.GoRegion);
+
+            Assert.IsFalse(categoryTypeIds.Any());
         }
 
         private static AreaTypeListProvider AreaTypeListProvider()

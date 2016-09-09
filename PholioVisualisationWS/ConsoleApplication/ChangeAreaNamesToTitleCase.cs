@@ -101,7 +101,7 @@ on t1.areacode = t2.code
         private static IList<Area> GetAreas()
         {
             IAreasReader areasReader = ReaderFactory.GetAreasReader();
-            return areasReader.GetAreasByAreaTypeId(AreaTypeIds.Subregion);
+            return areasReader.GetAreasByAreaTypeId(AreaTypeIds.AmbulanceTrust);
         }
 
         private static string FormatName(string name)
@@ -119,7 +119,9 @@ on t1.areacode = t2.code
                 .Replace("Ccg", "CCG")
                 .Replace("Nhs", "NHS")
                 .Replace("Qpp", "QPP")
-                .Replace("And ", "and ");
+                .Replace("And ", "and ")
+                .Replace("  ", " ")
+                .Replace("   ", " ");
             return name;
         }
 

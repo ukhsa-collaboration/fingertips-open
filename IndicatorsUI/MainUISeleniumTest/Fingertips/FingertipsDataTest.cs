@@ -56,7 +56,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             navigateTo.FingertipsDataForProfile(ProfileUrlKeys.SexualHealth);
             SelectTab("page-scatter");
 
-            CheckExportLinkPresent("export-link");
+            CheckExportLinkPresent();
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             navigateTo.FingertipsDataForProfile(ProfileUrlKeys.SexualHealth);
             SelectTab("page-map");
 
-            CheckExportLinkPresent("export-link");
+            CheckExportLinkPresent();
         }
 
         [TestMethod]
@@ -74,12 +74,37 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             navigateTo.FingertipsDataForProfile(ProfileUrlKeys.SexualHealth);
             SelectTab("page-trends");
 
-            CheckExportLinkPresent("export-link");
+            CheckExportLinkPresent();
         }
 
-        private void CheckExportLinkPresent(string exportLinkId)
+        /// <summary>
+        /// 'undefined' on a page indicates some data has not been found in JavaScript
+        /// </summary>
+        [TestMethod]
+        public void TestNoPageContainsUndefined()
         {
-            By byExportMenuId = By.ClassName(exportLinkId);
+            navigateTo.FingertipsDataForProfile(ProfileUrlKeys.HealthProfiles);
+
+            var tabIds = new [] { "page-map", "page-scatter", "page-trends", "page-indicators",
+                "page-areas", "page-content", "page-metadata", "page-overview"};
+
+            foreach (var tabId in tabIds)
+            {
+                AssertPageDoesNotContainUndefined(tabId);
+            }
+        }
+
+        private void AssertPageDoesNotContainUndefined(string tabId)
+        {
+            SelectTab(tabId);
+            var body = driver.FindElement(By.TagName("body"));
+            var html = body.GetAttribute("innerHTML");
+            Assert.IsFalse(html.Contains("undefined"), "'undefined' found on " + tabId);
+        }
+
+        private void CheckExportLinkPresent()
+        {
+            By byExportMenuId = By.ClassName("export-link");
             waitFor.ExpectedElementToBeVisible(byExportMenuId);
             var exportMenu = driver.FindElement(byExportMenuId);
             waitFor.ElementToContainText(exportMenu, "Export");

@@ -13,36 +13,22 @@
 <div class="standardWidth">
     @Html.Partial("_ProfileCollection", Model.NationalProfileCollection)
 
-    <table id="about-fingertips">
-        <tr>
-            <td>
-                <h2>
-                    About the profiles
-                </h2>
-                <p>
-                    These profiles are a rich source of indicators across a range of health and
-                    wellbeing themes that has been designed to support JSNA and commissioning to
-                    improve health and wellbeing, and reduce inequalities.
-                </p>
-                <p>
-                    These profiles have been developed by Public Health England.
-                </p>
-                <ul>
-                    <li>Browse indicators at different geographical levels</li>
-                    <li>Benchmark against the regional or England average</li>
-                    <li>Export data to use locally</li>
-                </ul>
-            </td>
-            <td style="width: 5%;"></td>
-
-            <td>
-                <h2>
-                    Introduction
-                </h2>
-                <div id="video-box">
-                    <iframe id="ytplayer" type="text/html" width="480" height="292" src="@(ViewBag.Protocol)www.youtube.com/embed/Veku-aqksa4" frameborder="0"></iframe>
-                </div>
-            </td>
-        </tr>
-    </table>
+    <div id="about-fingertips">
+        <h2>
+            About the profiles
+        </h2>
+        <p>
+            These profiles are a rich source of indicators across a range of health and
+            wellbeing themes that has been designed to support JSNA and commissioning to
+            improve health and wellbeing, and reduce inequalities. With these profiles you can:
+        </p>
+        <ul>
+            <li>Browse indicators at different geographical levels</li>
+            <li>Benchmark against the regional or England average</li>
+            <li>Export data to use locally</li>
+        </ul>
+        <p>
+            These profiles have been developed by Public Health England.
+        </p>
+    </div>
 </div>

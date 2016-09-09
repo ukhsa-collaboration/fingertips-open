@@ -67,6 +67,11 @@ namespace IndicatorsUI.MainUISeleniumTest
             GoToUrl("topic/diabetes/practice-details" + hashParameters);
         }
 
+        public void HypertensionPracticeDetails(string hashParameters)
+        {
+            GoToUrl("topic/hypertension/practice-details" + hashParameters);
+        }
+
         public void FingertipsIndicatorSearchResults(string searchText)
         {
             GoToUrl("search/" + searchText);
@@ -80,6 +85,16 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void PhofDataPage()
         {
             FingertipsDataForProfile(ProfileUrlKeys.Phof);
+        }
+
+        public void PhofInequalitiesPage()
+        {
+            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/7");
+        }
+
+        public void PhofCompareAreasPage()
+        {
+            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/3");
         }
 
         public void GoToUrl(string relativeUrl)

@@ -14,5 +14,6 @@ namespace FingertipsUploadService.ProfileData.Entities.Job
         public UploadJobType JobType { get; set; }
         public string Filename { get; set; }
         public ProgressStage ProgressStage { get; set; }
+        public int TotalRowsCommitted { get; set; }
     }
 }

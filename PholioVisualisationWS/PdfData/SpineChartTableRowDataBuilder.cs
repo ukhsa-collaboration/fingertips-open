@@ -109,19 +109,10 @@ namespace PholioVisualisation.PdfData
 
                     // Truncate after significance has been calculated
                     dataProcessor.FormatAndTruncate(data);
-
-                    ModifyDataForSpecificProfile(data);
                 }
                 currentRow.AreaData.Add(areaCode, data);
             }
         }
 
-        protected override void ModifyDataForSpecificProfile(CoreDataSet data)
-        {
-            if (profileId == ProfileIds.HealthProfiles)
-            {
-                data.Count = data.CountPerYear;
-            }
-        }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataAccessTest
 {
@@ -136,6 +136,14 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
+        public void TestGetAllAreaTypes()
+        {
+            IAreasReader reader = ReaderFactory.GetAreasReader();
+            var areaTypes = reader.GetAllAreaTypes();
+            Assert.IsTrue(areaTypes.Count > 0);
+        }
+
+        [TestMethod]
         public void TestGetAreaType()
         {
             var id = AreaTypeIds.Ccg;
@@ -175,7 +183,8 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetChildAreasInRegionByIndicatorIds()
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
-            IList<Area> areas = reader.GetChildAreas(AreaCodes.Sha_EastOfEngland, 2);
+            IList<Area> areas = reader
+                .GetChildAreas(AreaCodes.Sha_EastOfEngland, AreaTypeIds.Pct);
             Assert.IsTrue(areas.Count > 0);
 
             // Luton included
@@ -315,10 +324,10 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCategory()
         {
-            var categoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
+            var categoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             IAreasReader reader = ReaderFactory.GetAreasReader();
             var category = reader.GetCategory(categoryTypeId, 5);
-            Assert.AreEqual(5, category.CategoryId);
+            Assert.AreEqual(5, category.Id);
             Assert.AreEqual(categoryTypeId, category.CategoryTypeId);
         }
 
@@ -326,12 +335,12 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetCategories()
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
-            var categoryIds = reader.GetCategories(CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
+            var categoryIds = reader.GetCategories(CategoryTypeIds.DeprivationDecileCountyAndUA2010);
             Assert.AreEqual(10, categoryIds.Count);
 
             // Check are in ascending order
-            Assert.AreEqual(1, categoryIds.First().CategoryId);
-            Assert.AreEqual(10, categoryIds.Last().CategoryId);
+            Assert.AreEqual(1, categoryIds.First().Id);
+            Assert.AreEqual(10, categoryIds.Last().Id);
         }
 
         [TestMethod]
@@ -349,7 +358,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<CategorisedArea> categories = reader.GetCategorisedAreasForOneCategory(AreaTypeIds.Country,
-                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority,
+                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUA2010,
                 7);
 
             Assert.IsTrue(categories.Count > 0 && categories.Count < 20/*more than one tenth of 150*/);
@@ -360,7 +369,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<CategorisedArea> categories = reader.GetCategorisedAreasForAllCategories(AreaTypeIds.Country,
-                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
+                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUA2010);
 
             // Expect ~150 areas
             Assert.IsTrue(categories.Count > 100 && categories.Count < 200);
@@ -369,15 +378,22 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCategoryType()
         {
-            var id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
+            var id = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             var categoryType = Reader().GetCategoryType(id);
             Assert.AreEqual(id, categoryType.Id);
         }
 
         [TestMethod]
+        public void TestGetAllCategoryTypes()
+        {
+            var categoryTypes = Reader().GetAllCategoryTypes();
+            Assert.IsTrue(categoryTypes.Select(x => x.Id).Contains(CategoryTypeIds.EthnicGroups5));
+        }
+
+        [TestMethod]
         public void TestCategoryTypeAlsoLoadsCategories()
         {
-            var id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority;
+            var id = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             var categoryType = Reader().GetCategoryType(id);
             Assert.IsNotNull(categoryType.Categories);
             Assert.AreEqual(10, categoryType.Categories.Count);
@@ -389,12 +405,12 @@ namespace PholioVisualisation.DataAccessTest
             var categoryTypes = Reader().GetCategoryTypes(new List<int>
             {
                 CategoryTypeIds.EthnicGroups5,
-                CategoryTypeIds.LsoaDeprivationDecilesWithinArea
+                CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010
             });
 
             Assert.AreEqual(2, categoryTypes.Count);
             Assert.AreEqual(1, categoryTypes.Count(x => x.Id == CategoryTypeIds.EthnicGroups5));
-            Assert.AreEqual(1, categoryTypes.Count(x => x.Id == CategoryTypeIds.LsoaDeprivationDecilesWithinArea));
+            Assert.AreEqual(1, categoryTypes.Count(x => x.Id == CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010));
         }
 
         /// <summary>
@@ -429,14 +445,24 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetChimatResourceId()
         {
-            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria);
+            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria,
+                ProfileIds.ChildHealthProfiles);
             Assert.AreEqual(ChimatResourceIds.Cumbria, id);
+        }
+
+        [TestMethod]
+        public void TestGetChimatWayResourceId()
+        {
+            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria,
+                ProfileIds.WhatAboutYouth);
+            Assert.AreEqual(ChimatWayResourceIds.Cumbria, id);
         }
 
         [TestMethod]
         public void TestNearbyPractices()
         {
-            var practices = ReaderFactory.GetAreasReader().GetNearbyAreas("352107", "529262", 7);
+            var practices = ReaderFactory.GetAreasReader()
+                .GetNearbyAreas("352107", "529262", AreaTypeIds.GpPractice);
             Assert.IsTrue(practices.Count > 0);
             var practice = new NearByAreas
             {
@@ -450,7 +476,7 @@ namespace PholioVisualisation.DataAccessTest
                 Northing = 529262.0139
             };
 
-            Assert.IsTrue(practices.Any(x => x.AreaName == practice.AreaName));
+            Assert.IsTrue(practices.Any(x => x.AreaName.ToLower() == practice.AreaName.ToLower()));
             Assert.IsTrue(practices.Any(x => x.AreaCode == practice.AreaCode));
             Assert.IsTrue(practices.Any(x => x.AreaTypeID == practice.AreaTypeID));
             Assert.IsTrue(practices.Any(x => x.Postcode == practice.Postcode));
@@ -461,7 +487,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetNearestNeighbours()
         {
-            var nearestNeighbours = Reader().GetNearestNeighbours(AreaCodes.CountyUa_Cumbria);
+            var nearestNeighbours = Reader().GetNearestNeighbours(AreaCodes.CountyUa_Cumbria, 1);
 
             Assert.IsTrue(nearestNeighbours.Count > 0);
         }

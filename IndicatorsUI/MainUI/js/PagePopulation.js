@@ -1,3 +1,5 @@
+'use strict';
+
 function goToPopulationPage() {
     lock();
     showSpinnerIfNoPopulation();
@@ -14,7 +16,7 @@ function goToPopulationPage() {
     
     var offset = getYearOffset();
     
-    ajaxMonitor.setCalls(10);
+    ajaxMonitor.setCalls(9);
     ajaxMonitor.setState({year:PP.model.year, offset:offset});
     
     getPracticeAndParentLists();
@@ -22,8 +24,7 @@ function goToPopulationPage() {
     getIndicatorMetadata(populationGroupId);
     getMetadataProperties();
     getPracticePopulation(PP.model.year, offset);
-    getLabelSeries(LABELS_QUINARY);
-    getLabelSeries(LABELS_DEPRIVATION);
+    getLabelSeries();
     getPracticeParentPopulation();
     getNationalPopulation();
     
@@ -53,19 +54,19 @@ function displayPopulationInfo() {
     
     var noPopulationLabel = $('#noPractice');
     
-    var p = currentPracticePopulation;
+    var practicePopulation = PP.data.currentPracticePopulation;
     if (state.isAnyPopulation()) {
         
         $('#practiceLabel').html(getPracticeLabel());
         
-        updateEthnicity(p)
-        updateDeprivationTable(p);
-        updateFurtherInfo(p.AdHocValues);
+        updateEthnicity(practicePopulation)
+        updateDeprivationTable(practicePopulation);
+        updateFurtherInfo(practicePopulation.AdHocValues);
         
         noPopulationLabel.hide(); 
     } else {
         
-        var label = p === null ?
+        var label = practicePopulation === null ?
             'Select a practice<br>for further information' :
             'No population data<br>available for current practice';
         noPopulationLabel.html(label);
@@ -106,7 +107,7 @@ function displayPopulation() {
 
 function getAveragedPopulation(areaCode, callBack) {
     
-    ajaxGet('data/quinary_population_data',
+    ajaxGet('api/quinary_population_data',
         'area_code=' + areaCode +
         '&data_point_offset=' + getYearOffset() +
         '&group_id=' + populationGroupId,
@@ -143,17 +144,19 @@ function getPracticeParentPopulationCallback(obj) {
     ajaxMonitor.callCompleted();
 };
 
-function getPracticePopulationCallback(obj) {
-    
-    if (isDefined(obj) && isDefined(obj.Values)) {
+function getPracticePopulationCallback(practicePopulation) {
 
-        currentPracticePopulation = obj;
-        makeValuesNegative(currentPracticePopulation.Values[SEX_MALE]);
+    var ppData = PP.data;
+
+    if (isDefined(practicePopulation) && isDefined(practicePopulation.Values)) {
+
+        ppData.currentPracticePopulation = practicePopulation;
+        makeValuesNegative(practicePopulation.Values[SEX_MALE]);
 
         var year = ajaxMonitor.state.year;
-        loaded.population[year][obj.Code] = obj;
+        loaded.population[year][practicePopulation.Code] = practicePopulation;
     } else {
-        currentPracticePopulation = null;   
+        ppData.currentPracticePopulation = null;   
     }
     
     ajaxMonitor.callCompleted();
@@ -185,11 +188,11 @@ function getPracticePopulation(year, offset) {
         var pop = loaded.population[year][practiceCode];
         if (isDefined(pop)) {
             
-            currentPracticePopulation = pop;
+            PP.data.currentPracticePopulation = pop;
         } else {
             
             // Year not required as offset from Grouping DataPoint used
-            ajaxGet('data/quinary_population_data',
+            ajaxGet('api/quinary_population_data',
                 'area_code=' + practiceCode + 
                 '&data_point_offset=' + offset + 
                 '&group_id=' + populationGroupId,             
@@ -197,13 +200,13 @@ function getPracticePopulation(year, offset) {
             return;
         }
     } else {
-        currentPracticePopulation = null;   
+        PP.data.currentPracticePopulation = null;
     }
     
     ajaxMonitor.callCompleted();   
 };
 
-populationState = {
+var populationState = {
     
     _displayedKey : '',
     lastDecile : '',
@@ -238,23 +241,23 @@ populationState = {
     },
     
     isAnyPopulation : function() {
-        var p = currentPracticePopulation;
+        var p = PP.data.currentPracticePopulation;
         return p && p.hasOwnProperty('ListSize');   
     }
 };
 
-function updateDeprivationTable(p) {
-    var decile = p.GpDeprivationDecile;
+function updateDeprivationTable(practicePopulation) {
+    var decile = practicePopulation.GpDeprivationDecile;
     if (isDefined(decile)) {
-        var d = labels[LABELS_DEPRIVATION][decile];
+        var decileName = labels[decile];
         
         $('#d' + decile).html('<div class="decileSpacer"></div><div class="decile decile' + decile + '" >' +
                 decile + '</div>');
         populationState.lastDecile = decile;
     } else {
-        d = '<i>Data not available for current practice</i>';
+        decileName = '<i>Data not available for current practice</i>';
     }
-    $('#deprivation').html(d);
+    $('#deprivation').html(decileName);
 };
 
 function updateEthnicity(data) {
@@ -301,21 +304,20 @@ function updateFurtherInfo(adhocValues) {
 
 function updateRegisteredPersons(practiceParentName) {
     
-    var rows = [],
-    p,data,populationNumber;
+    var rows = [], populationNumber;
     
     // Practice
     if (populationState.isAnyPopulation()) {
         rows.push({
                 name: ui.getCurrentPractice().Name,
-                val: new PopulationNumber(currentPracticePopulation.ListSize).val()
+                val: new PopulationNumber(PP.data.currentPracticePopulation.ListSize).val()
         });
     } 
     
     // Practice parent
-    p = getSelectedParentPopulation();
-    if (p) {
-        populationNumber = new PopulationNumber(p.ListSize);
+    var parentPopulation = getSelectedParentPopulation();
+    if (parentPopulation) {
+        populationNumber = new PopulationNumber(parentPopulation.ListSize);
         rows.push({
                 name: practiceParentName,
                 val: populationNumber.val(),
@@ -371,8 +373,7 @@ function exportPopulationChart() {
         title: {
             text: '',
             style: CHART_TEXT_STYLE
-        },
-
+        }
     });
 }
 
@@ -386,7 +387,7 @@ function displayPopulationChart() {
     chartTitle = 'Age Distribution ' + PP.model.year;
     
     // Define populations
-    var practicePopulation = new Population(currentPracticePopulation),
+    var practicePopulation = new Population(PP.data.currentPracticePopulation),
     parentPopulation = new Population(getSelectedParentPopulation()),
     nationalPop = new Population(nationalPopulation[PP.model.year]);
     
@@ -418,12 +419,12 @@ function displayPopulationChart() {
                         style:CHART_TEXT_STYLE
                     },
                     xAxis: [{
-                            categories: labels[LABELS_QUINARY],
+                        categories: nationalPop.Labels,
                             reversed: _false
                         }, { // mirror axis on right side
                             opposite: true,
                             reversed: _false,
-                            categories: labels[LABELS_QUINARY],
+                            categories: nationalPop.Labels,
                             linkedTo: 0
                         }
                     ],
@@ -525,6 +526,7 @@ function Population(population) {
     } else {
         male = population.Values[SEX_MALE]; 
         female = population.Values[SEX_FEMALE]; 
+        this.Labels = population.Labels;
     }
     
     this.male = male;
@@ -548,7 +550,8 @@ PopulationNumber.prototype = {
     }
 }
 
-NO_DATA = '<div class="noData">-</div>';
+var NO_DATA = '<div class="noData">-</div>';
+var populationChart;
 
 templates.add('furtherInfo', '{{#rows}}<tr><td class="header info">{{#iid}}<div class="fl infoTooltip" onclick="showMetadata(populationGroupId,{{iid}})"></div>{{/iid}}{{name}}</td><td>{{val}}{{^val}}' +
         NO_DATA + '{{/val}}{{#average}} <span class="averageLabel">(average)</span>{{/average}}</td></tr>{{/rows}}');

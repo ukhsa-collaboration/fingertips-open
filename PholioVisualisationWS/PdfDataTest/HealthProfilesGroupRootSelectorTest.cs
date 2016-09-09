@@ -31,8 +31,8 @@ namespace PholioVisualisation.PdfDataTest
 
             var roots = new List<GroupRoot>
             {
-                new GroupRoot {IndicatorId = IndicatorIds.ChildrenInPoverty, SexId = SexIds.Male},
-                new GroupRoot {IndicatorId = IndicatorIds.ChildrenInPoverty, SexId = SexIds.Female},
+                new GroupRoot {IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies, SexId = SexIds.Male},
+                new GroupRoot {IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies, SexId = SexIds.Female},
                 new GroupRoot {IndicatorId = indicatorId, SexId = SexIds.Male},
                 new GroupRoot {IndicatorId = indicatorId, SexId = SexIds.Female}
             };

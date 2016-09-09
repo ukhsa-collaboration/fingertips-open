@@ -38,26 +38,45 @@ namespace FingertipsUploadService.Helpers
             return sb.ToString();
         }
 
-        public static UploadJobError GetSimplePermissionError(Guid jobGuid, List<string> listOfErrors)
+        public static UploadJobError GetSimplePermissionError(Guid jobGuid, List<string> listOfErrors, bool doesIndicatorsExist)
         {
+            var message = doesIndicatorsExist
+                ? listOfErrors.FirstOrDefault() + " does not have permission"
+                : listOfErrors.FirstOrDefault() + "does not exist";
+
             var error = new UploadJobError
             {
                 JobGuid = jobGuid,
                 ErrorType = UploadJobErrorType.PermissionError,
-                ErrorText = listOfErrors.FirstOrDefault()
+                ErrorText = message
             };
             return error;
         }
 
-        public static UploadJobError GetBatchPermissionError(Guid jobGuid, List<string> listOfErrors)
+        public static UploadJobError GetBatchPermissionError(Guid jobGuid, List<string> listOfErrors, bool doesAllIndicatorsExist)
         {
+            // var doesIndicatorExist = listOfErrors.Contains(X500DistinguishedName
             var error = new UploadJobError
             {
                 JobGuid = jobGuid,
                 ErrorType = UploadJobErrorType.PermissionError,
-                ErrorText =
-                    "To upload data for the following indicator(s) you will need permission to the owner profile",
+                ErrorText = doesAllIndicatorsExist ?
+                    "To upload data for the following indicator(s) you will need permission to the owner profile" :
+                    "Following indicator(s) does not exist",
+
                 ErrorJson = new JavaScriptSerializer().Serialize(listOfErrors)
+            };
+            return error;
+        }
+
+        public static UploadJobError GetConversionError(Guid jobGuid, List<UploadValidationFailure> validationFailures)
+        {
+            var error = new UploadJobError
+            {
+                JobGuid = jobGuid,
+                ErrorType = UploadJobErrorType.ValidationFailureError,
+                ErrorText = "Data type conversion errors occurred in the following spreadsheet rows",
+                ErrorJson = new JavaScriptSerializer().Serialize(validationFailures)
             };
             return error;
         }
@@ -79,12 +98,17 @@ namespace FingertipsUploadService.Helpers
             List<DuplicateRowInDatabaseError> duplicateRows)
         {
             var errorText = GetRowDuplicationInDatabaseError(duplicateRows.Count);
+            const int maxDuplicateRows = 500;
+            var duplicateRowsForError = duplicateRows.Count > maxDuplicateRows
+                ? duplicateRows.Take(30) // we only show 30 duplicate rows in UI, it is pointless to return more than 30 rows.
+                : duplicateRows;
+
             var error = new UploadJobError
             {
                 JobGuid = jobGuid,
                 ErrorType = UploadJobErrorType.DuplicateRowInDatabaseError,
                 ErrorText = errorText,
-                ErrorJson = new JavaScriptSerializer().Serialize(duplicateRows)
+                ErrorJson = new JavaScriptSerializer().Serialize(duplicateRowsForError)
             };
             return error;
         }

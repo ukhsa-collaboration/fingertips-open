@@ -53,7 +53,7 @@ namespace PholioVisualisation.PholioObjectsTest
         public void TestIsCategoryAreaTypeIdTrueForCategoryAreaType()
         {
             var areaTypeId = CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(
-                CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority);
+                CategoryTypeIds.DeprivationDecileCountyAndUA2010);
             Assert.IsTrue(CategoryAreaType.IsCategoryAreaTypeId(areaTypeId));
         }
 

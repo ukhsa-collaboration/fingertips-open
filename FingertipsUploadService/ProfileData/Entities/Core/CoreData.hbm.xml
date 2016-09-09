@@ -170,7 +170,23 @@
      ,:deleteBatchId
    )
    </sql-query>
-  
+
+  <sql-query name="Find_Duplciate_Rows_In_CoreDataSet_SP">
+    <query-param name="indicator_id" type="int"/>
+    <query-param name="year" type="int"/>
+    <query-param name="year_range" type="int"/>
+    <query-param name="quarter" type="int"/>
+    <query-param name="month" type="int"/>
+    <query-param name="age_id" type="int"/>
+    <query-param name="sex_id" type="int"/>
+    <query-param name="area_code" type="string"/>
+    <query-param name="category_type_id" type="int"/>
+    <query-param name="category_id" type="int"/>
+        
+    <return-scalar column="Uid" type="int"/>
+    <return-scalar column="Value" type="double"/>
+    exec [dbo].[usp_fus_check_row_duplicate_in_coredataset] :indicator_id, :year, :year_range, :quarter ,:month ,:age_id ,:sex_id ,:area_code ,:category_type_id ,:category_id
+  </sql-query>
 
 </hibernate-mapping>
 

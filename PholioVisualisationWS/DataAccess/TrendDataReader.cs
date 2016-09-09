@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
 using NHibernate.Criterion;
@@ -6,7 +7,31 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess
 {
-    public class TrendDataReader : BaseReader
+    public interface ITrendDataReader
+    {
+        /// <summary>
+        ///     Get the minimum for Value, LowerCI and UpperCI
+        /// </summary>
+        /// <returns>Minimum value</returns>
+        double? GetMin(Grouping grouping, IEnumerable<string> areaCodes);
+
+        /// <summary>
+        ///     Get the maximum for Value, LowerCI and UpperCI
+        /// </summary>
+        /// <returns>Maximum value</returns>
+        double? GetMax(Grouping grouping, IEnumerable<string> areaCodes);
+
+        /// <summary>
+        /// Gets all core data between the base line and data point time points of a grouping.
+        /// </summary>
+        /// <returns>List of CoreDataSet</returns>
+        IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode);
+
+        IList<CoreDataSet> GetTrendDataForSpecificCategory(Grouping grouping, string areaCode,
+            int categoryTypeId, int categoryId);
+    }
+
+    public class TrendDataReader : BaseReader, ITrendDataReader
     {
         private const string GetLimitQuery =
             "select {0}(d.{1}) from CoreDataSet d where d.IndicatorId = :indicatorId and d.Year between :startYear and :endYear" +
@@ -41,6 +66,43 @@ namespace PholioVisualisation.DataAccess
             return GetLimit(grouping, "max", areaCodes).Max();
         }
 
+        /// <summary>
+        /// Gets all core data between the base line and data point time points of a grouping.
+        /// </summary>
+        /// <returns>List of CoreDataSet</returns>
+        public IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode)
+        {
+            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode, 
+                CategoryTypeIds.Undefined , CategoryIds.Undefined);
+            return RestrictDataToTimePeriodsLimits(grouping, data);
+        }
+
+        /// <summary>
+        /// Gets all core data between the base line and data point time points of a grouping.
+        /// </summary>
+        /// <returns>List of CoreDataSet</returns>
+        public IList<CoreDataSet> GetTrendDataForSpecificCategory(Grouping grouping, string areaCode,
+            int categoryTypeId, int categoryId)
+        {
+            var criteria = CurrentSession.CreateCriteria<CoreDataSet>();
+            criteria.Add(Restrictions.Eq("AreaCode", areaCode));
+            AddGroupingRestrictions(grouping, criteria);
+            AddTimePeriodRestriction(grouping, criteria);
+            criteria.Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
+                .Add(Restrictions.Eq("CategoryId", categoryId));
+
+            AddTimeOrdering(criteria);
+
+            return RestrictDataToTimePeriodsLimits(grouping, criteria.List<CoreDataSet>());
+        }
+
+        private static IList<CoreDataSet> RestrictDataToTimePeriodsLimits(Grouping grouping, IList<CoreDataSet> data)
+        {
+            return new CoreDataTimeFilter(data).Filter(
+                TimePeriod.GetBaseline(grouping),
+                TimePeriod.GetDataPoint(grouping)).ToList();
+        }
+
         private IEnumerable<double?> GetLimit(Grouping grouping, string function, IEnumerable<string> areaCodes)
         {
             var results = new List<double?>();
@@ -65,20 +127,6 @@ namespace PholioVisualisation.DataAccess
             }
 
             return results.Where(x => x.HasValue);
-        }
-
-        public IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode)
-        {
-            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode, 
-                CategoryTypeIds.Undefined , CategoryIds.Undefined);
-            return RestrictDataToTimePeriodsLimits(grouping, data);
-        }
-
-        private static IList<CoreDataSet> RestrictDataToTimePeriodsLimits(Grouping grouping, IList<CoreDataSet> data)
-        {
-            return new CoreDataTimeFilter(data).Filter(
-                TimePeriod.GetBaseline(grouping),
-                TimePeriod.GetDataPoint(grouping)).ToList();
         }
 
         private void AddGroupingParameters(Grouping grouping, IQuery q)
@@ -110,21 +158,6 @@ namespace PholioVisualisation.DataAccess
                 q.SetParameter("quarter", grouping.BaselineQuarter);
             }
             return q;
-        }
-
-        public IList<CoreDataSet> GetTrendDataForSpecificCategory(Grouping grouping, string areaCode,
-            int categoryTypeId, int categoryId)
-        {
-            var criteria = CurrentSession.CreateCriteria<CoreDataSet>();
-            criteria.Add(Restrictions.Eq("AreaCode", areaCode));
-            AddGroupingRestrictions(grouping, criteria);
-            AddTimePeriodRestriction(grouping, criteria);
-            criteria.Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
-                .Add(Restrictions.Eq("CategoryId", categoryId));
-
-            AddTimeOrdering(criteria);
-
-            return RestrictDataToTimePeriodsLimits(grouping, criteria.List<CoreDataSet>());
         }
 
         private static void AddTimeOrdering(ICriteria criteria)

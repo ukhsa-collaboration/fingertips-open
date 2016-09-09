@@ -518,6 +518,11 @@ input[type=checkbox] {
         background: #E5F0FF;
     }
 
+.btn {
+    margin-right: 15px;
+}
+
+
 #upload-cancel {
     color: #003399;
     float: left;
@@ -1934,6 +1939,10 @@ img.spinner {
 .modal-table-height-400 {
     height: 400px;
     overflow: auto;
+}
+
+.modal-large {
+    width: 80%;  
 }
 
 .mce-tinymce {

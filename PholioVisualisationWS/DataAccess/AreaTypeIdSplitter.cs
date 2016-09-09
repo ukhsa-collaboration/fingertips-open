@@ -33,7 +33,7 @@ namespace PholioVisualisation.DataAccess
                         break;
 
                     case AreaTypeIds.DistrictAndUnitaryAuthority:
-                        Ids.Add(AreaTypeIds.LocalAuthority);
+                        Ids.Add(AreaTypeIds.District);
                         Ids.Add(AreaTypeIds.UnitaryAuthority);
                         break;
 

@@ -8,95 +8,6 @@ namespace PholioVisualisation.KeyMessagesTest
     [TestClass]
     public class HealthProfilesKeyMessage4BuilderTest
     {
-        #region Sentence-1 Tests
-
-        [TestMethod]
-        public void TestSentence1_Sig_Better()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    ObesityAdultsYear = "2014",
-                    ObesityAdultsPercentage = "18.0",
-                    ObesityAdultsCount = "27,890",
-                    ObesityAdultsSignificance = Significance.Better,
-                }
-            };
-            var sentence = builder.GetSentence1();
-            Assert.AreEqual("In 2014, 18.0% (27,890) of adults are classified as obese, better than the average for England.", sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence1_Sig_Worse()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    ObesityAdultsYear = "2014",
-                    ObesityAdultsPercentage = "18.0",
-                    ObesityAdultsCount = "27,890",
-                    ObesityAdultsSignificance = Significance.Worse,
-                }
-            };
-            var sentence = builder.GetSentence1();
-            Assert.AreEqual("In 2014, 18.0% (27,890) of adults are classified as obese, worse than the average for England.", sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence1_Sig_None()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    ObesityAdultsYear = "2014",
-                    ObesityAdultsPercentage = "18.0",
-                    ObesityAdultsCount = "27,890",
-                    ObesityAdultsSignificance = Significance.None,
-                }
-            };
-            var sentence = builder.GetSentence1();
-            Assert.AreEqual("In 2014, 18.0% (27,890) of adults are classified as obese.", sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence1_Sig_Same()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    ObesityAdultsYear = "2014",
-                    ObesityAdultsPercentage = "18.0",
-                    ObesityAdultsCount = "27,890",
-                    ObesityAdultsSignificance = Significance.Same,
-                }
-            };
-            var sentence = builder.GetSentence1();
-            Assert.AreEqual("In 2014, 18.0% (27,890) of adults are classified as obese.", sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence1_Wrong_Data()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    ObesityAdultsYear = "2013",
-                    ObesityAdultsPercentage = "19.0",
-                    ObesityAdultsCount = "28,890",
-                    ObesityAdultsSignificance = Significance.Same,
-                }
-            };
-            var sentence = builder.GetSentence1();
-            Assert.AreNotEqual("In 2014, 18.0% (27,890) of adults are classified as obese.", sentence);
-        }
-
-        #endregion
-
         #region Sentence-2 Tests
 
         [TestMethod]
@@ -112,7 +23,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence2();
-            Assert.AreEqual("The rate of alcohol related harm hospital stays was 18*, better than the average for England. This represents 30,456 stays per year.", sentence);
+            Assert.AreEqual("The rate of alcohol-related harm hospital stays is 18*, better than the average for England. This represents 30,456 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -128,7 +39,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence2();
-            Assert.AreEqual("The rate of alcohol related harm hospital stays was 18*, worse than the average for England. This represents 30,456 stays per year.", sentence);
+            Assert.AreEqual("The rate of alcohol-related harm hospital stays is 18*, worse than the average for England. This represents 30,456 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -144,7 +55,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence2();
-            Assert.AreEqual("The rate of alcohol related harm hospital stays was 18*. This represents 30,456 stays per year.", sentence);
+            Assert.AreEqual("The rate of alcohol-related harm hospital stays is 18*. This represents 30,456 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -160,7 +71,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence2();
-            Assert.AreEqual("The rate of alcohol related harm hospital stays was 18*. This represents 30,456 stays per year.", sentence);
+            Assert.AreEqual("The rate of alcohol-related harm hospital stays is 18*. This represents 30,456 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -176,7 +87,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence2();
-            Assert.AreNotEqual("The rate of alcohol related harm hospital stays was 18*. This represents 30,456 stays per year.", sentence);
+            Assert.AreNotEqual("The rate of alcohol related harm hospital stays is 18*. This represents 30,456 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -205,7 +116,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreEqual("The rate of self-harm hospital stays was 30.0*, better than the average for England. This represents 44,567 stays per year.", sentence);
+            Assert.AreEqual("The rate of self-harm hospital stays is 30.0*, better than the average for England. This represents 44,567 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -221,7 +132,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreEqual("The rate of self-harm hospital stays was 30.0*, worse than the average for England. This represents 44,567 stays per year.", sentence);
+            Assert.AreEqual("The rate of self-harm hospital stays is 30.0*, worse than the average for England. This represents 44,567 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -237,7 +148,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreEqual("The rate of self-harm hospital stays was 30.0*. This represents 44,567 stays per year.", sentence);
+            Assert.AreEqual("The rate of self-harm hospital stays is 30.0*. This represents 44,567 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -253,7 +164,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreEqual("The rate of self-harm hospital stays was 30.0*. This represents 44,567 stays per year.", sentence);
+            Assert.AreEqual("The rate of self-harm hospital stays is 30.0*. This represents 44,567 stays per year.", sentence);
         }
 
         [TestMethod]
@@ -269,7 +180,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreNotEqual("The rate of self-harm hospital stays was 30.0*. This represents 44,567 stays per year.", sentence);
+            Assert.AreNotEqual("The rate of self-harm hospital stays is 30.0*. This represents 44,567 stays per year.", sentence);
         }
 
         #endregion
@@ -290,7 +201,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence4();
             Assert.AreEqual(
-                "The rate of smoking related deaths was 50*, better than the average for England. This represents 19,000 deaths per year.",
+                "The rate of smoking related deaths is 50*, better than the average for England. This represents 19,000 deaths per year.",
                 sentence);
         }
 
@@ -308,7 +219,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence4();
             Assert.AreEqual(
-                "The rate of smoking related deaths was 50*, worse than the average for England. This represents 19,000 deaths per year.",
+                "The rate of smoking related deaths is 50*, worse than the average for England. This represents 19,000 deaths per year.",
                 sentence);
         }
 
@@ -326,7 +237,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence4();
             Assert.AreEqual(
-                "The rate of smoking related deaths was 50*. This represents 19,000 deaths per year.",
+                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
                 sentence);
         }
 
@@ -344,7 +255,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence4();
             Assert.AreEqual(
-                "The rate of smoking related deaths was 50*. This represents 19,000 deaths per year.",
+                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
                 sentence);
         }
 
@@ -362,7 +273,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence4();
             Assert.AreNotEqual(
-                "The rate of smoking related deaths was 50*. This represents 19,000 deaths per year.",
+                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
                 sentence);
         }
 
@@ -1111,7 +1022,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Better);
             Assert.AreEqual(
-                "Rates of drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
+                "Rates of deaths from drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
                 sentence);
         }
 
@@ -1134,7 +1045,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Better);
             Assert.AreEqual(
-                "Rates of drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
+                "Rates of deaths from drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
                 sentence);
         }
 

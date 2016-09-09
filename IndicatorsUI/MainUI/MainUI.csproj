@@ -139,6 +139,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\SwaggerBridgeController.cs" />
+    <Compile Include="Helpers\AjaxUrl.cs" />
     <Compile Include="Helpers\ContentProvider.cs" />
     <Compile Include="Helpers\SpineChartMinMaxLabelBuilder.cs" />
     <Compile Include="Controllers\AreaSearchController.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Helpers\RowAssigner.cs" />
     <Compile Include="Helpers\ExceptionLogger.cs" />
     <Compile Include="Helpers\SupportingPage.cs" />
+    <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Helpers\UserDetails.cs" />
     <Compile Include="Helpers\VerticalText.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -202,6 +205,7 @@
     <Compile Include="Skins\SkinNames.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitignore" />
     <Content Include="css\AreaSearch\area-search.css" />
     <Content Include="css\common.css" />
     <Content Include="css\core-contentpages.css" />
@@ -371,22 +375,13 @@
     <Content Include="js\AreaSearch\area-search.js" />
     <Content Include="js\common.js" />
     <Content Include="js\EnvironmentTest.js" />
-    <Content Include="js\esri-leaflet.js" />
-    <Content Include="js\Floatahead\jquery.floatThead-slim.min.js" />
-    <Content Include="js\Highcharts\exporting.js" />
-    <Content Include="js\Highcharts\highcharts-more.js" />
-    <Content Include="js\Highcharts\highcharts.js" />
-    <Content Include="js\Html2Canvas\html2canvas.js" />
-    <Content Include="js\Html2Canvas\html2canvas.min.js" />
-    <Content Include="js\Html2Canvas\html2canvas.svg.js" />
-    <Content Include="js\Html2Canvas\html2canvas.svg.min.js" />
-    <Content Include="js\js.cookie.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaDetails.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaSearchResults.js" />
     <Content Include="js\LongerLives\Diabetes\CallOutBox.js" />
     <Content Include="js\LongerLives\Diabetes\CallOutBoxHealthCheck.js" />
     <Content Include="js\LongerLives\PageBaseLongerLivesRankings.js" />
     <Content Include="js\LongerLives\PageBaseLongerLivesHome.js" />
+    <Content Include="js\PageEngland.js" />
     <Content Include="js\PageScatterPlot.js" />
     <Content Include="js\PageTwitterFeed.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesPracticeDetails.js" />
@@ -395,11 +390,6 @@
     <Content Include="js\LongerLives\Diabetes\SiteDiabetes.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesHome.js" />
     <Content Include="js\fingertips.js" />
-    <Content Include="js\hogan.min.js" />
-    <Content Include="js\infobox-1.1.12.min.js" />
-    <Content Include="js\jquery-1.10.2.min.js" />
-    <Content Include="js\leaflet.js" />
-    <Content Include="js\modernizr-2.6.2.min.js" />
     <Content Include="js\mortality-jquery-ui-1.10.3.custom.min.js" />
     <Content Include="js\PageAreaProfile.js" />
     <Content Include="js\PageAreaTrends.js" />
@@ -422,19 +412,20 @@
     <Content Include="js\PageScatter.js" />
     <Content Include="js\PageTartanRug.js" />
     <Content Include="js\practice-profiles-ie8.js" />
+    <Content Include="js\TooltipRecentTrends.js" />
     <Content Include="js\SiteKeyIndicators.js" />
     <Content Include="js\LongerLives\Mortality\SiteMortality.js" />
     <Content Include="js\SitePracticeProfiles.js" />
     <Content Include="js\SiteSearch.js" />
     <Content Include="js\SiteSubstance.js" />
     <Content Include="js\spineChart.js" />
-    <Content Include="js\tablesorter.min.js" />
     <Content Include="js\TestPage.js" />
     <Content Include="js\tooltip.js" />
-    <Content Include="js\underscore-min.js" />
     <Content Include="Views\Search\Data.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\AreaMenu.cshtml" />
+    <Content Include="bower.json" />
+    <Content Include=".bowerrc" />
     <None Include="Controllers\Controllers.cd" />
     <Content Include="Views\LongerLives\Mortality\_MortalityLayoutPage.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityHome.cshtml" />
@@ -474,7 +465,6 @@
     <Content Include="Views\PracticeProfiles\SiteFooter.cshtml" />
     <Content Include="Views\PracticeProfiles\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\PracticeProfiles\Data.cshtml" />
-    <Content Include="js\jquery-1.10.2.min.map" />
     <Content Include="Views\PracticeProfiles\_IE8.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\SiteFooter.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\Data.cshtml" />
@@ -605,6 +595,8 @@
     <Content Include="Views\Shared\_UpdateDelayedMessage.cshtml" />
     <Content Include="Views\Shared\_KeyValueNote.cshtml" />
     <Content Include="Views\Shared\_JsUrls.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\SupportingInformation.cshtml" />
+    <Content Include="Views\Shared\_KeyRecentTrends.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
@@ -634,6 +626,7 @@
   <ItemGroup>
     <Folder Include="css\chosen\" />
     <Folder Include="images\chosen\" />
+    <Folder Include="js\vendor\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

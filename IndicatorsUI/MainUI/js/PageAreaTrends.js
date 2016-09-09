@@ -1,7 +1,15 @@
-function goToAreaTrendsPage() {
+'use strict';
 
+/**
+* Area trends namespace
+* @module areaTrends
+*/
+var areaTrends = {};
+
+
+function goToAreaTrendsPage() {
     var model = FT.model;
-    sortedAreasForTrends = sortedAreas;
+    sortedAreasForTrends = FT.data.sortedAreas;
 
     $('#goBack').bind('click', function () {
         areaTrendsState.neighbourAreaCode = null;
@@ -22,7 +30,7 @@ function goToAreaTrendsPage() {
     }
 }
 
-SPARKLINE_SORTS = {
+var SPARKLINE_SORTS = {
     AREA: 0,
     DIFF: 1,
     AVERAGE: 2,
@@ -32,8 +40,8 @@ SPARKLINE_SORTS = {
 function getTrendData() {
     var model = FT.model;
 
-    var parentCode = model.isNearestNeighbours() && viewModeState !== VIEW_MODES.MULTI_AREA 
-        ? model.nearestNeighbour 
+    var parentCode = model.isNearestNeighbours() && viewModeState !== VIEW_MODES.MULTI_AREA
+        ? model.nearestNeighbour
         : model.parentCode;
 
     if (areaTrendsState.isTrendDataLoaded(parentCode)) {
@@ -41,24 +49,25 @@ function getTrendData() {
     } else {
         showSpinner();
 
-        var parameters = 'gid=' + model.groupId +
-            '&ati=' + model.areaTypeId +
-            '&par=' + parentCode +
-            getProfileOrIndicatorsParameters();
+        var parameters = new ParameterBuilder(
+            ).add('group_id', model.groupId
+            ).add('area_type_id', model.areaTypeId
+            ).add('parent_area_code', parentCode);
 
-        ajaxGet('GetTrendData.ashx', parameters, getTrendDataCallback);
+        addProfileOrIndicatorsParameters(parameters);
+
+        ajaxGet('api/trend_data/all_indicators_in_profile_group_for_child_areas', parameters.build(), getTrendDataCallback);
     }
 }
 
-function getTrendDataCallback(obj) {
+function getTrendDataCallback(trendRoots) {
 
-    if (isDefined(obj)) {
-        currentTrendRoots = obj;
+    if (isDefined(trendRoots)) {
+        currentTrendRoots = trendRoots;
 
         areaTrendsState.setTrendData(FT.model.parentCode,
             currentTrendRoots);
 
-        filterTrendRoots();
     } else {
         currentTrendRoots = null;
     }
@@ -66,7 +75,7 @@ function getTrendDataCallback(obj) {
     setPageMode(PAGE_MODES.AREA_TRENDS);
 
     if (!areaTrendsState.isInitialised) {
-        initAreaSwitch();
+        initTabSpecificOptions();
         areaTrendsState.isInitialised = true;
     }
 
@@ -87,20 +96,20 @@ function getTrendDataCallback(obj) {
     loadValueNoteToolTips();
 }
 
-function initAreaSwitch() {
+function initTabSpecificOptions() {
 
-    var topOptionFunc = function () {
+    var singleAreaClickHandler = function () {
         viewModeState = VIEW_MODES.AREA;
         viewClicked(VIEW_MODES.AREA);
     };
 
-    var bottomOptionFunc = function () {
+    var multiAreaClickHandler = function () {
         viewModeState = VIEW_MODES.MULTI_AREA;
         viewClicked(VIEW_MODES.MULTI_AREA);
     };
 
-    areaTrendsState.areaSwitch = new AreaSwitch({
-        eventHanders: [topOptionFunc, bottomOptionFunc],
+    areaTrendsState.tabSpecificOptions = new TabSpecificOptions({
+        eventHandlers: [singleAreaClickHandler, multiAreaClickHandler],
         eventName: 'ChartCountChanged'
     });
 }
@@ -108,22 +117,24 @@ function initAreaSwitch() {
 function displayChartOptions() {
     var model = FT.model;
     var state = areaTrendsState;
-    var areaSwitch = state.areaSwitch;
+    var tabSpecificOptions = state.tabSpecificOptions;
     var areaCode = getSingleTrendsAreaCode();
     var area = areaHash[areaCode];
 
-    areaSwitch.setHtml({
+    // Display area options
+    var label2 = model.isNearestNeighbours()
+        ? 'All nearest neighbours for ' + area.Short
+        : 'All in ' + getParentArea().Name;
+    var labels = [getAreaNameToDisplay(area), label2];
+    tabSpecificOptions.setHtml({
         label: 'Trends for',
-        topOptionText: getAreaNameToDisplay(area),
-        bottomOptionText: model.isNearestNeighbours()
-            ? 'All nearest neighbours for ' + area.Short
-            : 'All in ' + getParentArea().Name
+        optionLabels: labels
     });
 
-    if (areaSwitch.getOption() === VIEW_MODES.MULTI_AREA) {
-        var atozSorter = '<div id="sorting-options" style="text-align:center">Sort charts by: ' +
-            '<a id="spark0" href="javascript:sortSparklineClicked(SPARKLINE_SORTS.AREA);" class="" title="Sort alphabetically by area name">A-Z</a> ' +
-            '<a id="spark1" href="javascript:sortSparklineClicked(SPARKLINE_SORTS.AVERAGE);" class="" title="Sort by the most recent value">Value</a></div>';
+    if (tabSpecificOptions.getOption() === VIEW_MODES.MULTI_AREA) {
+        var atozSorter = '<div id="sorting-options" style="text-align:center"><span style="float:left;">Sort charts by: </span>' +
+            '<button id="spark0" onclick="javascript:sortSparklineClicked(SPARKLINE_SORTS.AREA);" class="optionButton" title="Sort alphabetically by area name">A-Z</button> ' +
+            '<button id="spark1" onclick="javascript:sortSparklineClicked(SPARKLINE_SORTS.AVERAGE);" class="optionButton" title="Sort by the most recent value">Value</button></div>';
 
         var templateName = 'atozChartSorter';
         templates.add(templateName, atozSorter);
@@ -133,7 +144,7 @@ function displayChartOptions() {
 
         // add rank sorting option after template is randered
         if (model.isNearestNeighbours()) {
-            $('#spark1').after('<a id="spark2" href="javascript:sortSparklineClicked(SPARKLINE_SORTS.RANK);" class="" title="Sort by rank">Rank</a>');
+            $('#spark1').after('<button id="spark2" onclick="javascript:sortSparklineClicked(SPARKLINE_SORTS.RANK);" class="optionButton" title="Sort by rank">Rank</button>');
         } else {
             $('#spark2').remove();
         }
@@ -205,7 +216,7 @@ function displayTrendRootTables() {
     indexesDisplayed = [],
         areaCode, i, root, comparatorName, index;
 
-    var viewMode = areaTrendsState.areaSwitch.getOption();
+    var viewMode = areaTrendsState.tabSpecificOptions.getOption();
 
     if (currentTrendRoots !== null) {
         displayChartOptions();
@@ -227,7 +238,7 @@ function displayTrendRootTables() {
             index = indexesDisplayed[i];
             root = displayedTrendRoots[index];
 
-            chart = new Highcharts.Chart(
+            new Highcharts.Chart(
                 getLargeTrendChartOptions('trendChart' + index, root, areaCode, comparatorName)
             );
         }
@@ -245,8 +256,8 @@ function displayTrendRootTables() {
                 comparatorVals.push(vals[i][comparatorId]);
             }
 
-            var metadata = ui.getMetadataHash()[root.IID],
-                comparisonConfig = new ComparisonConfig(root, metadata);
+            var metadata = ui.getMetadataHash()[root.IID];
+            var comparisonConfig = new ComparisonConfig(root, metadata);
 
             for (i in sortedAreasForTrends) {
                 areaCode = sortedAreasForTrends[i].Code;
@@ -327,7 +338,7 @@ function getLargeTrendChartOptions(id, root, areaCode, comparatorName) {
         dataList = [];
     }
 
-    var showBenchmarkData = metadata.ValueTypeId !== ValueTypeIds.Count;
+    var showBenchmarkData = metadata.ValueType.Id !== ValueTypeIds.Count;
 
     for (var j in dataList) {
 
@@ -516,7 +527,7 @@ function toggleCIBars(groupRootIndex) {
 function showErrorBar(groupRootIndex) {
     toggleCIBars(groupRootIndex);
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         displayTrendRootTables();
@@ -525,19 +536,14 @@ function showErrorBar(groupRootIndex) {
 }
 
 function showExportMenu() {
-    return areaTrendsState.areaSwitch.getOption() === VIEW_MODES.AREA ? true : false;
+    return areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA ? true : false;
 }
 
 function getMinYAxis(limits) {
-    if (limits.min < 0) {
-        return limits.Min;
-    } else {
-        if (startZeroYAxis) {
-            return 0;
-        }
-    }
-
-    return limits.Min;
+    var min = limits.Min;
+    return FT.config.startZeroYAxis && min >= 0
+        ? 0
+        : min;
 }
 
 function getTrendMarkerRadius(dataList) {
@@ -675,7 +681,7 @@ function getLabelCount(label) {
 }
 
 function hasWidePeriodLabel(metadata) {
-    var id = metadata.YearTypeId;
+    var id = metadata.YearType.Id;
     // Is rolling year or cumulative quarters
     return (id >= 4 && id <= 7);
 }
@@ -688,8 +694,8 @@ function chartTooltip() {
     rootIndex = $(series.chart.container).parent().attr('id').match(/\d+/);
 
     // Determine value column index,
-    isComparator = dataPoint.isBenchmark;
-    columnIndex = isComparator ?
+    var isComparator = dataPoint.isBenchmark;
+    var columnIndex = isComparator ?
         getComparatorCellIndex() :
         trendTableColumnIndexes.value;
 
@@ -722,7 +728,7 @@ function getTrendRootsToDisplay() {
 }
 
 function getSingleTrendsAreaCode() {
-    var neighbourAreaCode  = areaTrendsState.neighbourAreaCode;
+    var neighbourAreaCode = areaTrendsState.neighbourAreaCode;
     if (FT.model.isNearestNeighbours() && neighbourAreaCode) {
         return neighbourAreaCode;
     }
@@ -734,7 +740,7 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
     var html = [];
     var areaCode = getSingleTrendsAreaCode();
     var areaName = getAreaNameToDisplay(areaHash[areaCode]);
-   
+
     displayedTrendRoots = getTrendRootsToDisplay();
 
     var indicatorMetadataHash = ui.getMetadataHash();
@@ -759,12 +765,13 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
                 '" class="show-ci" href="javascript:showErrorBar(' + i + ')">' + showCIText + '</a></div>';
 
             h.push('<div class="trendContainer">' + exportTypes + '<div id="trendChart', i, '" class="trendChart"></div>');
-
+           
             // Trend table contents
-            if (root.TrendMarkers)
-            {
-                h.push('<div class="trendMarker">Recent trend:' + 
-                    getTrendMarkerImage(root.TrendMarkers[areaCode], root.PolarityId) + 
+            if (root.RecentTrends) {
+                var recentTrend = FT.config.hasRecentTrends
+                    ? 'Recent trend:' + getTrendMarkerImage(root.RecentTrends[areaCode].Marker, root.PolarityId)
+                    : '';
+                h.push('<div class="trend-marker" onmouseover="showRecentTrendTooltip(this,true);"  onmouseout="showRecentTrendTooltip(this,false);"">'+  recentTrend +
                     '</div>');
             }
 
@@ -798,9 +805,7 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
 
                 if (isDefined(areaData)) {
                     var data = areaData[j];
-
-                    comparatorValues = root.ComparatorValueFs[j];
-
+                    var comparatorValues = root.ComparatorValueFs[j];
                     addTrendRow(h, data, comparatorValues, period, comparisonConfig);
                 }
                 areAnyRows = true;
@@ -826,9 +831,22 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
     return html;
 }
 
+function showRecentTrendTooltip(e,showOrHide) {
+    
+    if (showOrHide) {
+        var trendTooltip = new RecentTrendsTooltip(),
+            recentTrends = groupRoots[getIndicatorIndex()].RecentTrends,
+            trend = recentTrends[getSingleTrendsAreaCode()],
+            tooltip= trendTooltip.getTooltipByData(trend);
+            displayTrendTooltip(e, tooltip);
+    } else {
+          $('#trendHelper').hide();
+    }    
+}
+
 function toggleViewMode(areaCode) {
 
-    if (areaTrendsState.areaSwitch.getOption() === VIEW_MODES.AREA) {
+    if (areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA) {
         changeViewMode(VIEW_MODES.MULTI_AREA);
     } else {
         changeViewMode(VIEW_MODES.AREA);
@@ -870,14 +888,14 @@ function getMultiAreaTrendsHtml() {
             'goToMetadataPage(' + i + ')'));
 
         // Benchmark target key
-        comparisonConfig = new ComparisonConfig(root, metadata);
+        var comparisonConfig = new ComparisonConfig(root, metadata);
         var useTarget = comparisonConfig.useTarget;
         if (useTarget) {
             h.push('<div class="target-box"><span class="target-label">Benchmarking against goal: </span>',
                 getTargetLegendHtml(comparisonConfig, metadata), '</div>');
         }
 
-        for (x in sortedAreasForTrends) {
+        for (var x in sortedAreasForTrends) {
             var area = sortedAreasForTrends[x];
             var areaCode = area.Code;
             var areaTypeId = area.AreaTypeId;
@@ -887,7 +905,7 @@ function getMultiAreaTrendsHtml() {
             if (isDefined(dataList)) {
                 for (var d in dataList) {
                     if (isValidValue(dataList[d].D)) {
-   
+
                         // Set area name as chart title
                         if (areaTypeId === AreaTypeIds.Practice) {
                             var chartTitle = areaCode + ' - ' + area.Short;
@@ -1034,8 +1052,6 @@ function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonCon
             },
             tooltip: {
                 formatter: function () {
-                    var series = this.series;
-                    rootIndex = $(series.chart.container).parent().attr('id').match(/\d+/);
                     var indicatorId = root.IID,
                         unit = ui.getMetadataHash()[indicatorId].Unit,
                         value = new ValueWithUnit(unit).getFullLabel(this.point.ValF);
@@ -1061,7 +1077,7 @@ function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonCon
                 enabled: false
             }
         });
-    } catch (e) {}
+    } catch (e) { }
 }
 
 /* Determines which elements are visible and enabled for pages that 
@@ -1071,7 +1087,7 @@ function hideAndShowSparklineMenus() {
     var indicatorSelectAllTd = $('#indicatorSelectAllTd'),
         sortSelectionBox = $('#sortSelectionBox');
 
-    if (areaTrendsState.areaSwitch.getOption() === VIEW_MODES.AREA) {
+    if (areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA) {
         // One area displayed in detail
         indicatorSelectAllTd.show();
         sortSelectionBox.hide();
@@ -1084,22 +1100,22 @@ function hideAndShowSparklineMenus() {
 }
 
 function changeViewMode(mode) {
-    var areaSwitch = areaTrendsState.areaSwitch;
-    if (areaSwitch.getOption() !== mode) {
-        areaSwitch.setOption(mode);
+    var tabSpecificOptions = areaTrendsState.tabSpecificOptions;
+    if (tabSpecificOptions.getOption() !== mode) {
+        tabSpecificOptions.setOption(mode);
         hideAndShowSparklineMenus();
         configureIndicatorMenu();
     }
 }
 
 function getSparkBoxClass() {
-    return areaTrendsState.areaSwitch.getOption() === VIEW_MODES.AREA
+    return areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA
         ? 'sparklineArea'
         : 'sparklineIndicator';
 }
 
 function sortSparklineClicked(mode) {
-    if (areaTrendsState.areaSwitch.getOption() === VIEW_MODES.MULTI_AREA) {
+    if (areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.MULTI_AREA) {
         areaTrendsState.sparklineSort = mode;
         sortSparklines();
         displayTrends();
@@ -1117,7 +1133,7 @@ function sortSparklines() {
         _.each(areaHash, function (value, key) { areaCodesByNearestNeighboursRank.push(key); });
 
         for (var i = 0; i < _.size(areaCodesByNearestNeighboursRank) ; i++) {
-            sortedAreasList.push(_.findWhere(sortedAreas, { Code: areaCodesByNearestNeighboursRank[i] }));
+            sortedAreasList.push(_.findWhere(FT.data.sortedAreas, { Code: areaCodesByNearestNeighboursRank[i] }));
         }
 
         sortedAreasForTrends = sortedAreasList;
@@ -1128,9 +1144,9 @@ function sortSparklines() {
     }
 }
 
-areaTrendsState = (function () {
+var areaTrendsState = new (function () {
 
-    this.row;
+    this.row = null;
     this.isInitialised = false;
     this.sparklineSort = SPARKLINE_SORTS.BY_AREA;
 
@@ -1142,7 +1158,7 @@ areaTrendsState = (function () {
     *  encapsulated here rather than attached to loaded object */
     var data = {};
 
-    getTrendKey = function (areaCode) {
+    var getTrendKey = function (areaCode) {
         return getKey(FT.model.groupId, FT.model.areaTypeId, areaCode, FT.model.nearestNeighbour);
     };
 
@@ -1167,7 +1183,7 @@ areaTrendsState = (function () {
 
 function hideAndShowTrendKeys() {
     var $elements = $('#sort-many-charts,#spine-range-key');
-    if (areaTrendsState.areaSwitch.getOption() == VIEW_MODES.AREA) {
+    if (areaTrendsState.tabSpecificOptions.getOption() == VIEW_MODES.AREA) {
         $elements.hide();
     } else {
         $elements.show();
@@ -1232,7 +1248,7 @@ function TrendData() {
 
 }
 
-trendTableColumnIndexes = {
+var trendTableColumnIndexes = {
     value: 3,
     lowerCI: 4,
     upperCI: 5
@@ -1292,10 +1308,14 @@ function TrendTableRow() {
     };
 }
 
-NO_TREND_DATA = '<div class="noData300">No trend data available</div>';
-currentTrendRoots = null;
-viewModeState = 0;
+
+
+
+var NO_TREND_DATA = '<div class="noData300">No trend data available</div>';
+var currentTrendRoots = null;
+var viewModeState = 0;
 var sortedAreasForTrends = [];
+var displayedTrendRoots;
 
 pages.add(PAGE_MODES.AREA_TRENDS, {
     id: 'trends',
@@ -1306,7 +1326,7 @@ pages.add(PAGE_MODES.AREA_TRENDS, {
     jqIds: [
         'indicatorSelectAllTd', 'indicatorMenuDiv',
         'sparkLineViews', '.geo-menu', 'trends-chart-sorter-az', 'show-all-indicators-box',
-        'areaSwitch', 'key-spine-chart', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend-spine'],
+        'tab-specific-options', 'key-spine-chart', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-spine-chart'],
     showHide: hideAndShowSparklineMenus
 });

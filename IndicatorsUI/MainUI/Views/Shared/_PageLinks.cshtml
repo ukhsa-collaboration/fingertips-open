@@ -22,10 +22,6 @@
             <a href="/documents/UserGuide.pdf" target="_blank"
                title="The user guide provides a detailed explanation on how to interpret and understand the data presented">User Guide</a>
         </li>
-        <li class="site-link">
-            <a href="http://www.youtube.com/user/erphotraining?ob=0" target="_blank"
-               title="Learn more by watching the online tutorials at our YouTube video channel">Video Tutorials</a>
-        </li>
     }
     else
     {
@@ -39,8 +35,19 @@
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
         }
+        else if (profileId == ProfileIds.HealthProfiles)
+        {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+        }
     }
 
     @*Contact us*@
-    <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", profileUrlKey).Link)</li>
+    @if (profileId == ProfileIds.HealthProfiles)
+    {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.ContactUs, profileId).Link)</li>
+    }
+    else
+    {
+        <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", profileUrlKey).Link)</li>
+    }
 </ul>

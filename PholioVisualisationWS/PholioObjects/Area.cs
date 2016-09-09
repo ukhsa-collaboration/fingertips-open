@@ -112,7 +112,7 @@ namespace PholioVisualisation.PholioObjects
         /// Whether or not the area is a county or UA deprivation decile
         /// </summary>
         [JsonIgnore]
-        public bool IsCountyAndUnitaryAuthorityDeprivationDecile
+        public bool IsCountyAndUADeprivationDecile
         {
             get { return false; }
         }
@@ -127,7 +127,7 @@ namespace PholioVisualisation.PholioObjects
                 return false;
             }
 
-            return areaCode.ToLower().StartsWith("nn-1");
+            return areaCode.ToLower().StartsWith("nn-");
         }
     }
 }

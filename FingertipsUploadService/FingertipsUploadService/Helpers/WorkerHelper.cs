@@ -33,7 +33,7 @@ namespace FingertipsUploadService.Helpers
             }
 
             job.TotalRows = rowCount;
-            repository.SaveJob(job);
+            repository.UpdateJob(job);
 
 
         }

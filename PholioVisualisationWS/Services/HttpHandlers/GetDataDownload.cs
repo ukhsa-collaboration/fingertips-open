@@ -50,7 +50,7 @@ namespace PholioVisualisation.Services.HttpHandlers
                 if (parameters.UseIndicatorIds)
                 {
                     fileInfo = new SearchResultsFileInfo();
-                    workbook = new ProfileDataBuilder(comparatorMap, profile, profileIds, parameters.ParentsToDisplay,
+                    workbook = new ProfileDataBuilder(comparatorMap, profile, profileIds, 
                         parameters.IndicatorIds, parentAreas, subnationalAreaType).BuildWorkbook();
                 }
                 else
@@ -63,7 +63,7 @@ namespace PholioVisualisation.Services.HttpHandlers
                     }
                     else
                     {
-                        workbook = new ProfileDataBuilder(comparatorMap, profile, profileIds, parameters.ParentsToDisplay,
+                        workbook = new ProfileDataBuilder(comparatorMap, profile, profileIds,
                              parentAreas, subnationalAreaType).BuildWorkbook();
                     }
                 }

@@ -52,7 +52,7 @@ function getSimpleAreaTypeNamePlural(areaTypeId) {
         return 'CCG';
     }
 
-    return areaTypeId === PRACTICE
+    return areaTypeId === AreaTypeIds.Practice
         ? 'practices'
         : 'areas';
 }
@@ -63,7 +63,7 @@ function getSimpleAreaTypeNameSingular(areaTypeId) {
         return 'CCG';
     }
 
-    return areaTypeId === PRACTICE
+    return areaTypeId === AreaTypeIds.Practice
         ? 'practice'
         : 'area';
 }
@@ -124,7 +124,7 @@ function getAllAreas(model) {
         parameters.add('profile_id', model.profileId);
         parameters.add('retrieve_ignored_areas', 'yes');
 
-        ajaxGet('data/areas',
+        ajaxGet('api/areas/by_area_type',
             parameters.build(), function (obj) {
 
                 // Flatten hash
@@ -142,13 +142,21 @@ function getAllAreas(model) {
     }
 }
 
+/**
+* AJAX call to fetch the area types for a profile.
+* @class getAreaTypes
+*/
 function getAreaTypes() {
-    getAreaTypesCall(MT.model.profileId);
-}
 
-function getAreaTypesCallback(obj) {
-    loaded.areaTypes = obj;
-    ajaxMonitor.callCompleted();
+    var parameters = new ParameterBuilder().add('profile_ids',
+        getProfileIds(MT.model.profileId));
+
+    ajaxGet('api/area_types',
+        parameters.build(),
+        function (areaTypes) {
+            loaded.areaTypes = areaTypes;
+            ajaxMonitor.callCompleted();
+        });
 }
 
 function AreaFilterModelBuilder(areaTypes, selectedAreaTypeId) {
@@ -197,25 +205,19 @@ function getIndicatorMetadata(groupId, getDefinition, getSystemContent) {
         // Data already loaded
         ajaxMonitor.callCompleted();
     } else {
-        getData(function getIndicatorMetadataCallback(obj) {
-            loaded.indicatorMetadata[groupId] = obj;
-            ajaxMonitor.callCompleted();
-        }, 'im',
-            'def=' + getDefinition + '&gid=' + groupId + '&include_system_content=' + getSystemContent);
+
+        var parameters = new ParameterBuilder(
+            ).add('include_system_content', getSystemContent
+            ).add('group_ids', groupId
+            ).add('include_definition', getDefinition);
+
+        ajaxGet('api/indicator_metadata/by_group_id', parameters.build(),
+            function (obj) {
+                loaded.indicatorMetadata[groupId] = obj;
+                ajaxMonitor.callCompleted();
+            });
     }
 };
-
-function getProfileOrIndicatorsParameters() {
-    var p = '';
-    var pid = MT.model.profileId;
-    if (isDefined(pid)) {
-        p += '&pid=' + pid;
-    }
-
-    p += getIndicatorIdArgument();
-
-    return p;
-}
 
 function getIndicatorIdArgument() {
     return '';
@@ -297,7 +299,6 @@ function highlightSelectedTab() {
 * area code -> decile number
 */
 function getDecileData(model) {
-
     if (!loaded.categories[AreaTypeIds.DeprivationDecile]) {
         switch (model.areaTypeId) {
             case AreaTypeIds.CountyUA:
@@ -316,9 +317,14 @@ function getDecileData(model) {
         var parameters = new ParameterBuilder(
             ).add('profile_id', model.profileId
             ).add('category_type_id', categoryTypeId
-            ).add('ati', model.areaTypeId);
+            ).add('child_area_type_id', model.areaTypeId);
 
-        getData(getDecileDataCallback, 'ac', parameters.build());
+        ajaxGet('api/area_categories', parameters.build(),
+            function (obj) {
+                loaded.categories[AreaTypeIds.DeprivationDecile] = obj;
+                ajaxMonitor.callCompleted();
+            });
+
     } else {
         ajaxMonitor.callCompleted();
     }
@@ -381,13 +387,6 @@ function getChildAreasCallback(obj) {
     ajaxMonitor.callCompleted();
 }
 
-function getDecileDataCallback(obj) {
-
-    loaded.categories[AreaTypeIds.DeprivationDecile] = obj;
-
-    ajaxMonitor.callCompleted();
-}
-
 function displayAreaRangeElements(isNational) {
 
     new MutuallyExclusiveDisplay({
@@ -403,7 +402,7 @@ function getSimilarAreaCode() {
 function isSimilarAreas() {
     var model = MT.model;
     return model.parentCode !== NATIONAL_CODE &&
-        model.areaTypeId !== PRACTICE;
+        model.areaTypeId !== AreaTypeIds.Practice;
 }
 
 function getUrlParameterString() {
@@ -431,7 +430,7 @@ function getParentPeriod(parentCode, areaCode, index) {
 }
 
 function lock() {
-    ajaxLock = 1;
+    FT.ajaxLock = 1;
 }
 
 function showLoadingSpinner() {
@@ -464,14 +463,19 @@ function bindOverlayMenuEvents() {
     );
 }
 
-function ajaxAreaSearch(text, successFunction) {
+function ajaxAreaSearch(text, successFunction, excludeParentAreasFromSearchResults) {
 
     var model = MT.model;
     var areaTypeId = model.areaTypeId === AreaTypeIds.Practice
         ? model.parentAreaType
         : model.areaTypeId;
 
-    getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, false);
+    var parentAreas = [];
+    if (!excludeParentAreasFromSearchResults) {
+        parentAreas.push(areaTypeId);
+    }
+
+    getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, parentAreas);
 }
 
 function replacePercentageWithArialFont(text) {
@@ -544,7 +548,7 @@ function AreaDetailsDataManager() {
             ).add('area_code', modelCopy.areaCode
             ).add('child_area_type_id', modelCopy.areaTypeId);
 
-            ajaxGet('data/area_details',
+            ajaxGet('api/area_details',
                 parameters.build(),
                 function (obj) {
                     setData(modelCopy, obj);
@@ -573,7 +577,7 @@ function AreaValuesDataManager() {
     _this.data = data;
 
     var getDataKey = function (modelForKey, root) {
-        return getKey(modelForKey.parentCode, root.IID, root.SexId, root.AgeId);
+        return getKey(modelForKey.parentCode, root.IID, root.Sex.Id, root.Age.Id);
     }
 
     var setData = function (modelForKey, root, newData) {
@@ -611,22 +615,19 @@ function AreaValuesDataManager() {
 
         if (!getDataFromModel(modelCopy, root)) {
 
-            var parameters = new ParameterBuilder();
-            parameters.add('par', modelCopy.parentCode);
-            parameters.add('gid', modelCopy.groupId);
-            parameters.add('ati', modelCopy.areaTypeId);
-            parameters.add('pid', modelCopy.profileId);
-            parameters.add('off', 0);
-            parameters.add('iid', root.IID);
-            parameters.add('age', root.AgeId);
-            parameters.add('sex', root.SexId);
+            var parameters = new ParameterBuilder(
+                ).add('group_id', modelCopy.groupId
+                ).add('area_type_id', modelCopy.areaTypeId
+                ).add('parent_area_code', modelCopy.parentCode
+                ).add('comparator_id', -1
+                ).add('indicator_id', root.IID
+                ).add('sex_id', root.Sex.Id
+                ).add('age_id', root.Age.Id);
 
-            getData(
-                function (obj) {
-                    setData(modelCopy, root, obj);
-                    ajaxMonitor.callCompleted();
-                },
-                'av', parameters.build());
+            ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), function (obj) {
+                setData(modelCopy, root, obj);
+                ajaxMonitor.callCompleted();
+            });
 
         } else {
             // Do not need to load data
@@ -637,32 +638,32 @@ function AreaValuesDataManager() {
 
 function getOnsClusterCode(model) {
     var parameters = new ParameterBuilder();
-    parameters.add('pid', model.profileId);
-    parameters.add('ati', model.areaTypeId);
-    parameters.add('tem', model.profileId);
-    parameters.add('pat', AreaTypeIds.OnsClusterGroup);
+    parameters.add('profile_id', model.profileId);
+    parameters.add('child_area_type_id', model.areaTypeId);
+    parameters.add('parent_area_type_id', AreaTypeIds.OnsClusterGroup);
 
-    getData(getOnsClusterCodeCallback, 'am', parameters.build());
-    
+    // Get parent areas
+    ajaxGet('api/parent_to_child_areas', parameters.build(), getOnsClusterCodeCallback);
 }
 
 function getOnsClusterCodeCallback(obj) {
-   
+
     var model = MT.model;
     var onsGroupCode;
     for (var onsCode in obj) {
         _.each(obj[onsCode], function (area) {
-            if (area == model.areaCode) {
+            if (area === model.areaCode) {
                 onsGroupCode = onsCode;
             }
         });
     };
-    
+
     onsClusterCode = onsGroupCode;
     ajaxMonitor.callCompleted();
 }
 
-quintileColors = ['#DED3EC', '#BEA7DA', '#9E7CC8', '#7E50B6', '#5E25A4'];
+quintileColors = ['#DED3EC', '#BEA7DA', '#9E7CC8', '#7E50B6', '#5E25A4'];
+
 $(document).ready(function () {
 
     // Do not proceed if test page
@@ -680,27 +681,28 @@ $(document).ready(function () {
     highlightSelectedTopic();
     highlightSelectedTab();
 
-    var excludeCCGs = false;
-    initAreaSearch('#search_text', MT.model, excludeCCGs);
+    initAreaSearch('#search_text', false);
     initSite();
 
     // Page specific initialisation
     if (typeof initPage !== 'undefined') {
         initPage();
     }
-});function unlock() {
-    ajaxLock = null;
-}
-PRACTICE = 7;
-GET_METADATA_DEFINITION = 'yes';
-GET_METADATA_SYSTEM_CONTENT = 'yes';
+});
+
+function unlock() {
+    FT.ajaxLock = null;
+}
+
+GET_METADATA_DEFINITION = GET_METADATA_SYSTEM_CONTENT = 'yes';
 SEARCH_NO_RESULT_TOP_OFFSET = 38;
 
 SPINNER_STATE = false;
 
 loaded.areaDetails = new AreaDetailsDataManager();
 loaded.categories = {};
-loaded.areaLists = {};
+loaded.areaLists = {};
+
 /**
 * Call out box for map.
 * @class CallOutBox

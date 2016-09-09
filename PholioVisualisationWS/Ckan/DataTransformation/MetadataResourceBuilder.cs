@@ -60,8 +60,8 @@ namespace Ckan.DataTransformation
 
             // Add other properties
             csvWriter.AddLine("Unit", indicatorMetadata.Unit.Label);
-            csvWriter.AddLine("Value type", indicatorMetadata.ValueType.Label);
-            csvWriter.AddLine("Year type", indicatorMetadata.YearType.Label);
+            csvWriter.AddLine("Value type", indicatorMetadata.ValueType.Name);
+            csvWriter.AddLine("Year type", indicatorMetadata.YearType.Name);
 
             var bytes = csvWriter.WriteAsBytes();
             return bytes;

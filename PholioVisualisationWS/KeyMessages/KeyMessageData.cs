@@ -6,8 +6,7 @@ namespace PholioVisualisation.KeyMessages
 {
     public class KeyMessageData
     {
-        public string AreaCode { get; set; }
-        public string AreaName { get; set; }        
+        public IArea Area { get; set; }        
         
         /**
          * Key message 1
@@ -17,8 +16,8 @@ namespace PholioVisualisation.KeyMessages
         public SignificanceCounter SpineChartSignificances { get; set; }
 
         // 1.2
-        public Significance DeprivationSig { get; set; }
-        public CoreDataSet ChildrenInPoverty { get; set; }
+        public CoreDataSet Deprivation { get; set; }
+        public CoreDataSet ChildrenInLowIncomeFamilies { get; set; }
         // 1.3
         public Significance MaleLifeExpectancyAtBirth { get; set; }
         public Significance FemaleLifeExpectancyAtBirth { get; set; }

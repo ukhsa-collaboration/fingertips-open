@@ -6,23 +6,27 @@ namespace PholioVisualisation.PholioObjects
     public class GroupRootSummary : IComparable<GroupRootSummary>
     {
         public string IndicatorName { get; set; }
+
         [JsonProperty(PropertyName = "IID")]
-        public int  IndicatorId { get; set; }
-        public int SexId { get; set; }
-        public int AgeId { get; set; }
+        public int IndicatorId { get; set; }
+
+        public Sex Sex { get; set; }
+        public Age Age { get; set; }
         public int GroupId { get; set; }
         public bool StateSex { get; set; }
+        public bool StateAge { get; set; }
+
         [JsonProperty(PropertyName = "Unit")]
         public Unit IndicatorUnit { get; set; }
 
         public int CompareTo(GroupRootSummary other)
         {
-          var compare= String.Compare(IndicatorName, other.IndicatorName,
-                 StringComparison.Ordinal);
+            var compare = String.Compare(IndicatorName, other.IndicatorName,
+                   StringComparison.Ordinal);
 
-            if (compare == 0) 
+            if (compare == 0)
             {
-                compare = GetSequenceId(this.SexId).CompareTo(GetSequenceId(other.SexId));
+                compare = GetSequenceId(this.Sex.Id).CompareTo(GetSequenceId(other.Sex.Id));
             }
             return compare;
         }

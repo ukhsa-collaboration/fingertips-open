@@ -83,6 +83,10 @@
       <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataHelpers.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataHelpers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>
       <Name>PholioObjects</Name>

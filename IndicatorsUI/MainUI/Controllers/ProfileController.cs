@@ -31,7 +31,7 @@ namespace Profiles.MainUI.Controllers
                 ProfileCollectionProvider.GetSkinProfileCollections(PageModel.Skin.Id);
             foreach (SkinProfileCollection skinProfileCollection in skinProfileCollections)
             {
-                PageModel.ProfileCollection.Add(
+                PageModel.ProfileCollections.Add(
                     ProfileCollectionBuilder.GetCollection(skinProfileCollection.ProfileCollectionId));
             }
 

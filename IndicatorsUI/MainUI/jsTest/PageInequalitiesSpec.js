@@ -19,7 +19,7 @@ describe('inequalities.CategoryDataManager', function () {
 
     it('setData', function () {
         var dataManager = new inequalities.CategoryDataManager();
-        var groupRoot = { IID: 1, SexId: 2, AgeId: 3 };
+        var groupRoot = { IID: 1, Sex: { Id: 2 }, Age: { Id: 3 } };
         var areaTypeId = 4;
 
         dataManager.setData(groupRoot, 'a', areaTypeId, 5);

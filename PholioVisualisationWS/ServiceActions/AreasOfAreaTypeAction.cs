@@ -9,24 +9,24 @@ namespace PholioVisualisation.ServiceActions
     public class AreasOfAreaTypeAction
     {
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        private AreaListBuilder areaListBuilder;
+        private AreaListProvider _areaListProvider;
 
         public IList<IArea> GetResponse(int areaTypeId, int profileId,
             int templateProfileId, bool retrieveIgnoredAreas)
         {
-            areaListBuilder = new AreaListBuilder(areasReader);
-            areaListBuilder.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
+            _areaListProvider = new AreaListProvider(areasReader);
+            _areaListProvider.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
 
             // Remove ignored areas
             if (retrieveIgnoredAreas == false)
             {
                 var nonSearchProfileId = ActionHelper.GetNonSearchProfileId(profileId, templateProfileId);
                 var ignoredAreasFilter = IgnoredAreasFilterFactory.New(nonSearchProfileId);
-                areaListBuilder.RemoveAreasIgnoredEverywhere(ignoredAreasFilter);
+                _areaListProvider.RemoveAreasIgnoredEverywhere(ignoredAreasFilter);
             }
 
-            areaListBuilder.SortByOrderOrName();
-            return areaListBuilder.Areas;
+            _areaListProvider.SortByOrderOrName();
+            return _areaListProvider.Areas;
         }
     }
 }

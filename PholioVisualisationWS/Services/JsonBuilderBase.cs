@@ -16,6 +16,10 @@ namespace PholioVisualisation.Services
 
         public string ServiceName { get; set; }
 
+        protected JsonBuilderBase()
+        {
+        }
+
         protected JsonBuilderBase(HttpContextBase context)
         {
             Context = context;

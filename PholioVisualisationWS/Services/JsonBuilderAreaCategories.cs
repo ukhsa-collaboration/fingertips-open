@@ -16,21 +16,33 @@ namespace PholioVisualisation.Services
     /// </summary>
     public class JsonBuilderAreaCategories : JsonBuilderBase
     {
-        private AreaCategoriesParameters parameters;
+        private AreaCategoriesParameters _parameters;
 
         public JsonBuilderAreaCategories(HttpContextBase context)
             : base(context)
         {
-            parameters = new AreaCategoriesParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new AreaCategoriesParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderAreaCategories(AreaCategoriesParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
+            var filteredMap = GetAreaCodeToCategoryIdMap();
+            return JsonConvert.SerializeObject(filteredMap);
+        }
+
+        public Dictionary<string, int> GetAreaCodeToCategoryIdMap()
+        {
             Dictionary<string, int> areaCodeToCategoryIdMap = new AreaCodeToCategoryIdMapBuilder
             {
-                ChildAreaTypeId = parameters.ChildAreaTypeId,
-                CategoryTypeId = parameters.CategoryTypeId
+                ChildAreaTypeId = _parameters.ChildAreaTypeId,
+                CategoryTypeId = _parameters.CategoryTypeId
             }.Build();
 
             /* TODO #159
@@ -38,14 +50,14 @@ namespace PholioVisualisation.Services
              *  values from PHOLIO and calculate quintiles */
 
             var areaCodes = ReaderFactory.GetProfileReader()
-                .GetAreaCodesToIgnore(parameters.ProfileId)
+                .GetAreaCodesToIgnore(_parameters.ProfileId)
                 .AreaCodesIgnoredEverywhere;
 
             var filteredMap = areaCodeToCategoryIdMap
                 .Where(x => areaCodes.Contains(x.Key) == false)
                 .ToDictionary(x => x.Key, x => x.Value);
 
-            return JsonConvert.SerializeObject(filteredMap);
+            return filteredMap;
         }
     }
 }

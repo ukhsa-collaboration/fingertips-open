@@ -160,7 +160,7 @@ lightbox = (function() {
             
             show : function(html, top, left, width) {
                 
-                if (!ajaxLock) {
+                if (!FT.ajaxLock) {
                     
                     init();
                     

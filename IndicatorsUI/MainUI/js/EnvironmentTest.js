@@ -47,4 +47,6 @@ function getPdfUrl(areaCode) {
         '&groupId=6&output=browser';
 }
 
-download.excelExportText = "Excel files for all England data are now pre-calculated every night so any data that has been uploaded or changed today will not be included.";
+download.excelExportText =
+        "Excel files for all England data are now pre-calculated every night so any data that has been uploaded or changed today will not be included.";
+

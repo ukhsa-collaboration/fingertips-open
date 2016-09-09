@@ -8,6 +8,7 @@
         ConfirmationGiven = 301,
         ConfirmationRefused = 302,
         FailedValidation = 400,
+        UnexpectedError = 500,
         SuccessfulUpload = 1000
     }
 

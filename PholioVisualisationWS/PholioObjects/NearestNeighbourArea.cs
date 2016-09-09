@@ -71,36 +71,43 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public virtual string Name { get; set; }
 
+        [JsonProperty]
         public int AreaTypeId
         {
             get { throw new NotImplementedException();}
         }
 
+        [JsonIgnore]
         public bool IsCcg
         {
             get { return false; }
         }
 
+        [JsonIgnore]
         public bool IsGpDeprivationDecile
         {
             get { return false; }
         }
 
+        [JsonIgnore]
         public bool IsShape
         {
             get { return false; }
         }
 
+        [JsonIgnore]
         public bool IsCountry
         {
             get { return false; }
         }
 
-        public bool IsCountyAndUnitaryAuthorityDeprivationDecile
+        [JsonIgnore]
+        public bool IsCountyAndUADeprivationDecile
         {
             get { return false; }
         }
 
+        [JsonIgnore]
         public bool IsGpPractice
         {
             get { return false; }

@@ -78,7 +78,7 @@ namespace PholioVisualisation.PdfDataTest
             {
                 isPolaritySet = spineChartTableData.IndicatorData
                     .Any(x => 
-                        x.PolarityId == PolarityIds.UseBlues ||
+                        x.PolarityId == PolarityIds.BlueOrangeBlue ||
                         x.PolarityId == PolarityIds.RagLowIsGood ||
                         x.PolarityId == PolarityIds.RagHighIsGood);
             }
@@ -118,19 +118,6 @@ namespace PholioVisualisation.PdfDataTest
         public void TestGetResponse_PeriodIsSet()
         {
             AssertText("Period");
-        }
-
-        /// <summary>
-        /// If this test fails then you should add a definition for the 
-        /// indicator number field for the indicator in FPM.
-        /// </summary>
-        [TestMethod]
-        public void TestGetResponse_IndicatorNumberSetForPhof()
-        {
-            AssertText("IndicatorNumber", 
-                IndicatorIds.DeprivationScoreIMD2010, /*in PHOF but does not need number*/
-                IndicatorIds.DeprivationScoreIMD2015 /*in PHOF but does not need number*/
-                );
         }
 
         [TestMethod]
@@ -406,7 +393,7 @@ namespace PholioVisualisation.PdfDataTest
                 profileId, AreaTypeIds.CountyAndUnitaryAuthority, areaCodes, benchmarkAreaCodes);
 
             var groupIds = ReaderFactory.GetProfileReader().GetProfile(profileId).GroupIds;
-            var groupingMetadataList = ReaderFactory.GetGroupDataReader().GetGroupMetadata(groupIds);
+            var groupingMetadataList = ReaderFactory.GetGroupDataReader().GetGroupMetadataList(groupIds);
 
             for (var i = 0; i < spineChartTableDataList.Count; i++)
             {

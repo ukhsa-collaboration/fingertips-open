@@ -41,7 +41,7 @@ namespace FingertipsUploadService.ProfileDataTest
         public void TestGetOwnerProfilesByIndicatorIds()
         {
             var profile = Reader().GetOwnerProfilesByIndicatorIds(
-                IndicatorIds.IDAOPI);
+                IndicatorIds.ChildrenInPoverty);
             Assert.IsNotNull(profile);
         }
 

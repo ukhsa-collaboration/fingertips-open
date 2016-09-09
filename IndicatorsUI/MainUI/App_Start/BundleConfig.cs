@@ -1,9 +1,6 @@
-﻿using System;
+﻿using Profiles.DataAccess;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Optimization;
-using Profiles.DataAccess;
 
 namespace Profiles.MainUI
 {
@@ -19,6 +16,7 @@ namespace Profiles.MainUI
 
             // Add scripts
             AddScripts(bundles, jsPath, "js-fingertips", GetJsFingertips());
+            AddScripts(bundles, jsPath, "js-fingertips-js-file", GetJsFingertipsJsFile());
             AddScripts(bundles, jsPath, "js-longer-lives", GetJsLongerLives());
             AddScripts(bundles, jsPath, "js-practice-profiles", GetJsPracticeProfiles());
             AddScripts(bundles, jsPath, "js-fingertips-maps", GetJsFingertipsMaps());
@@ -27,14 +25,14 @@ namespace Profiles.MainUI
             // Add styles
             AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
             AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
-            AddStyles(bundles, cssPath, "css-area-search", new []{ "AreaSearch/area-search.css"});
+            AddStyles(bundles, cssPath, "css-area-search", new[] { "AreaSearch/area-search.css" });
         }
 
         private static string[] GetJsPracticeProfiles()
         {
             var jsFiles = new[]
             {
-                "chosen.jquery.min.js",
+                "vendor/chosen/chosen.jquery.js",
                 "PageMetadata.js", "PagePopulation.js", "PagePracticeSpineChart.js",
                 "PageScatter.js", "PagePracticeBarChart.js", "PagePracticeTrends.js",
                 "PagePracticeSearch.js", "PageCluster.js", "SitePracticeProfiles.js"
@@ -65,12 +63,12 @@ namespace Profiles.MainUI
         {
             var jsFiles = new[]
             {
-                "jquery-1.10.2.min.js",
+                "vendor/jquery-legacy/jquery.min.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
-                "modernizr-2.6.2.min.js",
+                "vendor/modernizr/modernizr.js",
                 "longer-lives-min.js",
-                "underscore-min.js",
-                "hogan.min.js",
+                "vendor/underscore/underscore-min.js",
+                "vendor/hogan.js/hogan.min.js",
                 "common.js",
                 "fingertips.js",
                 "LongerLives/SiteBaseLongerLives.js"
@@ -107,19 +105,30 @@ namespace Profiles.MainUI
         {
             var jsFiles = new[]
             {
-                "jquery-1.10.2.min.js",
-                "chosen.jquery.min.js",
+                "vendor/jquery-legacy/jquery.min.js",
+                "vendor/chosen/chosen.jquery.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
-                "Highcharts/highcharts.js",
-                "Highcharts/highcharts-more.js",
-                "Highcharts/exporting.js",
-                "underscore-min.js",
-                "hogan.min.js",
+                "vendor/highcharts/highcharts.js",
+                "vendor/highcharts/highcharts-more.js",
+                "vendor/highcharts/exporting.js",
+                "vendor/underscore/underscore-min.js",
+                "vendor/hogan.js/hogan.min.js",
                 "common.js",
                 "tooltip.js",
+                "TooltipRecentTrends.js",
                 "spineChart.js",
-                "Floatahead/jquery.floatThead-slim.min.js",
-                "js.cookie.js"
+                "vendor/jquery.floatThead/jquery.floatThead.min.js",
+                "vendor/js-cookie/js.cookie.js"
+            };
+            return jsFiles;
+        }
+
+
+        private static string[] GetJsFingertipsJsFile()
+        {
+            var jsFiles = new[]
+            {
+                "fingertips.js"
             };
             return jsFiles;
         }
@@ -129,9 +138,8 @@ namespace Profiles.MainUI
             // new version of esri-leaflet.js can be downloaded from http://esri.github.io/esri-leaflet/download
             var jsFiles = new[]
             {
-                "leaflet.js",
-                "tablesorter.min.js",
-                "esri-leaflet.js",
+                "vendor/leaflet/leaflet.js",
+                "vendor/esri-leaflet-v1.0.0-rc.2/esri-leaflet.js",
                 "PageMap.js"
             };
             return jsFiles;

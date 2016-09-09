@@ -1,4 +1,6 @@
-﻿/**
+﻿'use strict';
+
+/**
 * Scatter namespace
 * @module scatter
 */
@@ -9,7 +11,6 @@ var scatterplot = {};
 * @class goToScatterPlotPage
 */
 function goToScatterPlotPage() {
-
     if (!groupRoots.length) {
         // Search results empty
         noDataForAreaType();
@@ -42,23 +43,23 @@ scatterplot.getDataForSelectedArea = function () {
     var model = FT.model,
         groupRoot = getGroupRoot();
 
-        ajaxMonitor.setCalls(2);
+    ajaxMonitor.setCalls(2);
 
-        scatterplot.getGroupingDataForProfile(model);
+    scatterplot.getGroupingDataForProfile(model);
 
-        scatterplotState.tempIndicatorKey = scatterplotState.indicatorKey1 = getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
+    scatterplotState.tempIndicatorKey = scatterplotState.indicatorKey1 = getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
 
-        var areaValueModel = {
-            groupId: model.groupId,
-            indicatorId: groupRoot.IID,
-            sexId: groupRoot.SexId,
-            ageId: groupRoot.AgeId,
-            areaTypeId: model.areaTypeId,
-            key: scatterplotState.tempIndicatorKey
-        };
-        scatterplot.getAreaValues(areaValueModel);
+    var areaValueModel = {
+        groupId: model.groupId,
+        indicatorId: groupRoot.IID,
+        sexId: groupRoot.Sex.Id,
+        ageId: groupRoot.Age.Id,
+        areaTypeId: model.areaTypeId,
+        key: scatterplotState.tempIndicatorKey
+    };
+    scatterplot.getAreaValues(areaValueModel);
 
-        ajaxMonitor.monitor(scatterplot.getSecondaryData);
+    ajaxMonitor.monitor(scatterplot.getSecondaryData);
 };
 
 /**
@@ -76,9 +77,9 @@ scatterplot.getSecondaryData = function () {
     for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
         var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
         var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
-        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].SexId;
+        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
         $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
-        if (key==currentlySelectedYIndicator) {
+        if (key == currentlySelectedYIndicator) {
             selectedSupportingIndicatorIndex = i;
         }
     }
@@ -96,8 +97,8 @@ scatterplot.getSecondaryData = function () {
     var areaValueModel = {
         groupId: groupRoot.GroupId,
         indicatorId: groupRoot.IID,
-        sexId: groupRoot.SexId,
-        ageId: groupRoot.AgeId,
+        sexId: groupRoot.Sex.Id,
+        ageId: groupRoot.Age.Id,
         areaTypeId: model.areaTypeId,
         key: scatterplotState.tempIndicatorKey
     };
@@ -144,7 +145,7 @@ scatterplot.reloadSupportingIndicators = function () {
         var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
         var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
         var IID = loaded.groupingDataForProfile[i].IID;
-        var sexId = loaded.groupingDataForProfile[i].SexId;
+        var sexId = loaded.groupingDataForProfile[i].Sex.Id;
         $supportingIndicators.append('<option key="' + IID + '-' + sexId + '" value="' + i + '">' + indicatorName + '</option>');
     }
 
@@ -164,7 +165,7 @@ scatterplot.ViewManager = function ($container) {
         $supportingIndicators,
         chart;
 
-    this.areaSwitch = null;
+    this.tabSpecificOptions = null;
 
     this.init = function () {
         if (!isInitialised) {
@@ -180,9 +181,9 @@ scatterplot.ViewManager = function ($container) {
 
             $header = $('<div id="scatterplot-header" class="clearfix"></div>');
             $chartBox = $('<div id="scatter-plot-chart-box-wrapper">' + exportTypes + '<div id="scatter-plot-chart-box" class="clearfix"><div id="scatter-plot-chart"></div></div>' + $filters + '</div>');
-            $supportingIndicators = $('<div id="supportingIndicatorsWrapper"><div class="supportingIndicators">Indicator on Y axis: </div><div class="supportingIndicatorsMenu"><select id="supportingIndicators"  onchange="scatterplot.getSelectedSupportingIndicator(this);"></select></div></div>');
+            $supportingIndicators = $('<div id="supportingIndicatorsWrapper"><div class="supportingIndicators">Indicator on Y axis&nbsp;</div><div class="supportingIndicatorsMenu"><select id="supportingIndicators"  onchange="scatterplot.getSelectedSupportingIndicator(this);"></select></div></div>');
             $container.prepend($header, $supportingIndicators, $chartBox);
-            this.initAreaSwitch();
+            this.initTabSpecificOptions();
             isInitialised = true;
         }
     };
@@ -216,21 +217,24 @@ scatterplot.ViewManager = function ($container) {
 
     /**
     * Initialises the area switch 
-    * @method initAreaSwitch
+    * @method initTabSpecificOptions
     */
-    this.initAreaSwitch = function () {
-        var func = scatterplot.getDataForSelectedArea;
-        this.areaSwitch = new AreaSwitch({
-            eventHanders: [func, func],
+    this.initTabSpecificOptions = function () {
+        var clickHandler = scatterplot.getDataForSelectedArea;
+        this.tabSpecificOptions = new TabSpecificOptions({
+            eventHandlers: [clickHandler, clickHandler],
             eventName: 'ScatterplotAreaSelected'
         });
     };
 
-    this.updateAreaSwitchOptions = function () {
-        this.areaSwitch.setHtml({
+    /**
+    * Updates the area switch 
+    * @method updateTabSpecificOptionsOptions
+    */
+    this.updateTabSpecificOptionsOptions = function () {
+        this.tabSpecificOptions.setHtml({
             label: 'Scatter plot for',
-            topOptionText: 'England',
-            bottomOptionText: areaHash[FT.model.areaCode].Name
+            optionLabels: ['England', areaHash[FT.model.areaCode].Name]
         });
     };
 
@@ -260,13 +264,19 @@ scatterplot.ViewManager = function ($container) {
             xAxis: {
                 title: {
                     enabled: true,
-                    text: scatterplot.xAxisTitle() + ' / ' + units.x
-                },
+                    text: scatterplot.formatTitle(scatterplot.xAxisTitle(), units.x),                      
+                    style: {
+                        width: 400
+                    }
+                }
             },
             yAxis: {
                 title: {
-                    text: scatterplot.yAxisTitle() + ' / ' + units.y,
-                    margin: 40,
+                text: scatterplot.formatTitle( scatterplot.yAxisTitle(), units.y),                   
+                margin: scatterplot.calculateMargin(scatterplot.yAxisTitle()),
+                style: {
+                    width: 300
+                }
                 }
             },
             legend: {
@@ -307,7 +317,7 @@ scatterplot.ViewManager = function ($container) {
                 },
                 series: {
                     events: {
-                        legendItemClick: function() {
+                        legendItemClick: function () {
                             return false;
                         }
                     }
@@ -321,7 +331,7 @@ scatterplot.ViewManager = function ($container) {
                 },
                 buttonOptions: {
                     x: -270,
-                    y: -10,
+                    y: -10
                 }
             },
             exporting: {
@@ -332,8 +342,25 @@ scatterplot.ViewManager = function ($container) {
 };
 
 
+scatterplot.formatTitle = function(indicatorName, unit) {
+    if (unit !== '') {        
+        return indicatorName + ' / ' + unit;
+    } else {
+        return indicatorName;
+    }
+};
+
+scatterplot.calculateMargin = function (indicatorName) {    
+    var charCount = indicatorName.length;
+    var newMargin = 30;
+    if (charCount > 60) {
+        newMargin = (charCount / 60) * 30;
+    }    
+    return newMargin;
+}
+
 scatterplot.isNationalSelected = function () {
-    return scatterplot.viewManager.areaSwitch.getOption() === inequalities.AreaOptions.NATIONAL;
+    return scatterplot.viewManager.tabSpecificOptions.getOption() === inequalities.AreaOptions.NATIONAL;
 };
 
 scatterplot.getSelectedAreaName = function () {
@@ -349,7 +376,7 @@ scatterplot.getGroupingDataForProfile = function (model) {
     ).add('profile_id', model.profileId
     ).add('area_type_id', model.areaTypeId);
 
-    ajaxGet('data/grouproot_summaries',
+    ajaxGet('api/grouproot_summaries',
         parameters.build(),
         function (obj) {
             loaded.groupingDataForProfile = obj;
@@ -368,12 +395,16 @@ scatterplot.getAreaValues = function (model) {
     if (areaValues.hasOwnProperty(model.key)) {
         ajaxMonitor.callCompleted();
     } else {
-        var parameters = 'par=' + getCurrentComparator().Code +
-            '&gid=' + model.groupId + '&off=0&iid=' + model.indicatorId +
-            '&sex=' + model.sexId + '&age=' + model.ageId +
-            '&ati=' + model.areaTypeId + '&com=' + comparatorId +
-            getRestrictByProfileParameter();
-        getData(scatterplot.getAreaValuesCallback, 'av', parameters);
+        var parameters = new ParameterBuilder(
+            ).add('group_id', model.groupId
+            ).add('area_type_id', model.areaTypeId
+            ).add('parent_area_code', getCurrentComparator().Code
+            ).add('comparator_id', comparatorId
+            ).add('indicator_id', model.indicatorId
+            ).add('sex_id', model.sexId
+            ).add('age_id', model.ageId);
+
+        ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), scatterplot.getAreaValuesCallback);
     }
 };
 
@@ -529,22 +560,21 @@ scatterplot.transformDataForIndicator = function () {
         var rSquaredValue = Math.round(linearRegressionData.r2 * 100) / 100;
         var rSquareThreshold = .15;
         var legendBaseText = rSquareEquation + '<br>R\xB2 = ' + Math.round(linearRegressionData.r2 * 100) / 100;
-        
 
-            scatterplot.dataSeries.push({
-                data: rSquaredValue > rSquareThreshold ? linearRegressionData.coordinates: null,
-                color: rSquaredValue > rSquareThreshold ? '#ED1F52' : '#ffffff',
-                dashStyle: 'solid',
-                type: 'line',
-                animation: false,
-                name: rSquaredValue > rSquareThreshold ? legendBaseText : 'Trend line not drawn when R\xB2<br>is below 0.15 (R\xB2 = ' + rSquaredValue + ')',
-                lineWidth: 2,
-                marker: {
-                    enabled: false
-                },
-                enableMouseTracking: false
-            });
-//        }
+
+        scatterplot.dataSeries.push({
+            data: rSquaredValue > rSquareThreshold ? linearRegressionData.coordinates : null,
+            color: rSquaredValue > rSquareThreshold ? '#ED1F52' : '#ffffff',
+            dashStyle: 'solid',
+            type: 'line',
+            animation: false,
+            name: rSquaredValue > rSquareThreshold ? legendBaseText : 'Trend line not drawn when R\xB2<br>is below 0.15 (R\xB2 = ' + rSquaredValue + ')',
+            lineWidth: 2,
+            marker: {
+                enabled: false
+            },
+            enableMouseTracking: false
+        });
     }
 };
 
@@ -572,7 +602,7 @@ scatterplot.getSelectedSupportingIndicator = function () {
 */
 scatterplot.xAxisTitle = function () {
     var xTitle = $('#indicatorMenu :selected').text();
-    return xTitle.wordWrap(75, '<br>');
+    return xTitle;
 };
 
 /**
@@ -581,7 +611,7 @@ scatterplot.xAxisTitle = function () {
 */
 scatterplot.yAxisTitle = function () {
     var yTitle = $('#supportingIndicators :selected').text();
-    return yTitle.wordWrap(60, '<br>');
+    return yTitle; //.wordWrap(60, '<br>');
 };
 
 scatterplot.makeAreaNamesAndCodes = function () {
@@ -652,7 +682,8 @@ function linearRegression(y, x) {
 
     var slope = (n * sum_xy - sum_x * sum_y) / (n * sum_xx - sum_x * sum_x);
     var intercept = (sum_y - slope * sum_x) / n;
-    var r2 = Math.pow((n * sum_xy - sum_x * sum_y) / Math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y)), 2);
+    var r2 = Math.pow((n * sum_xy - sum_x * sum_y) /
+        Math.sqrt((n * sum_xx - sum_x * sum_x) * (n * sum_yy - sum_y * sum_y)), 2);
 
 
     var points = [];
@@ -675,12 +706,13 @@ function linearRegression(y, x) {
     return lr;
 }
 
+
 scatterplot.AreaOptions = {
     NATIONAL: 0,
     LOCAL: 1
 };
 
-scatterplotState = {
+var scatterplotState = {
     tempIndicatorKey: null,
     indicatorKey1: null,
     indicatorKey2: null,

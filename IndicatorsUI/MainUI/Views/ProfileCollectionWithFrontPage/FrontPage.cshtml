@@ -15,7 +15,7 @@
     <div class="w100 fl">
         @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
 
-        @foreach (var profileCollection in Model.ProfileCollection)
+        @foreach (var profileCollection in Model.ProfileCollections)
         {
             @Html.Partial("_ProfileCollection", profileCollection)
         }

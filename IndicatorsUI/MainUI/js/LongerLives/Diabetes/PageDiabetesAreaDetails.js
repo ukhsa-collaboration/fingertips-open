@@ -103,12 +103,12 @@ function displayPage() {
         
         if (rank.AreaRank) {
             causeClass = getCauseClass(significancesForHealthChecks[i],
-                rank.AreaRank.Val, root.Grouping[0].MethodId);
+                rank.AreaRank.Val, root.ComparatorMethodId);
         } else {
             causeClass = 'none';
         }
 
-        var causeBar = getCauseBars(area, causeInfo, rank, overallMax, causeClass, metadataHash[root.IID], root.Grouping[0].MethodId);
+        var causeBar = getCauseBars(area, causeInfo, rank, overallMax, causeClass, metadataHash[root.IID], root.ComparatorMethodId);
         html.push(causeBar);
     }
 
@@ -406,7 +406,7 @@ function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData)
 }
 
 function showSimilarAreas() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         if (MT.model.areaTypeId == AreaTypeIds.CountyUA) {
             MT.model.parentCode = loaded.areaDetails.getData(getGroupId()).Decile.Code;
@@ -420,7 +420,7 @@ function showSimilarAreas() {
 }
 
 function showAllAreas() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         MT.model.parentCode = NATIONAL_CODE;
         initPage();
@@ -478,7 +478,7 @@ function populateSimilarAreasList() {
 
 function selectArea(code) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         MT.model.areaCode = code;
 
         initPage();

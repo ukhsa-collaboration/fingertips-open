@@ -1,17 +1,16 @@
-﻿using System;
+﻿using NHibernate;
+using NHibernate.Criterion;
+using PholioVisualisation.PholioObjects;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using NHibernate;
-using NHibernate.Criterion;
-using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess
 {
     public interface IGroupDataReader
     {
         IList<int> GetIndicatorIdsByGroupIdAndAreaTypeId(int groupId, int areaTypeId);
-        IList<GroupingMetadata> GetGroupMetadata(IList<int> groupIds);
+        IList<GroupingMetadata> GetGroupMetadataList(IList<int> groupIds);
         IList<int> GetGroupingIds(int profileId);
         Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId);
         IList<Grouping> GetGroupings(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId);
@@ -21,7 +20,7 @@ namespace PholioVisualisation.DataAccess
         IList<Grouping> GetGroupingsByGroupIdAndAreaTypeId(int groupId, int areaTypeId);
         IList<Grouping> GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(int groupId, int areaTypeId);
         IList<Grouping> GetGroupingsByIndicatorIds(IList<int> indicatorIds, IList<int> groupingIds);
-
+        IList<Grouping> GetGroupingsByIndicatorId(int indicatorId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(IList<int> groupIds,
             IList<int> indicatorIds, int areaTypeId);
 
@@ -49,7 +48,7 @@ namespace PholioVisualisation.DataAccess
         /// Selects data without discriminating by ageId. To only be used when multiple age bands are
         /// required together, e.g. for population pyramids.
         /// </summary>
-        IList<CoreDataSet> GetCoreDataForAllAges(int indicatorId, TimePeriod period, 
+        IList<CoreDataSet> GetCoreDataForAllAges(int indicatorId, TimePeriod period,
             string areaCode, int sexId);
 
         IList<CoreDataSet> GetCoreDataForAllSexes(int indicatorId, TimePeriod period,
@@ -59,10 +58,13 @@ namespace PholioVisualisation.DataAccess
         IList<CoreDataSet> GetCoreData(Grouping grouping, TimePeriod period, params string[] areaCodes);
 
         CoreDataSet GetCoreDataForCategoryArea(Grouping grouping,
-            TimePeriod timePeriod, CategoryArea categoryArea);
+            TimePeriod timePeriod, ICategoryArea categoryArea);
 
         IList<CoreDataSet> GetCoreDataForCategoryTypeId(Grouping grouping,
             TimePeriod timePeriod, int categoryTypeId);
+
+        CoreDataSet GetCoreDataForCategory(Grouping grouping,
+            TimePeriod timePeriod, string areaCode, int categoryTypeId, int categoryId);
 
         IList<CoreDataSet> GetAllCategoryDataWithinParentArea(string parentAreaCode,
             int indicatorId, int sexId, int ageId, TimePeriod timePeriod);
@@ -84,8 +86,6 @@ namespace PholioVisualisation.DataAccess
         IList<double> GetOrderedCoreDataValidValuesForAllAreasOfType(Grouping grouping, TimePeriod period,
             IEnumerable<string> ignoredAreaCodes);
 
-        ConfidenceIntervalMethod GetConfidenceIntervalMethod(int id);
-
         IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
@@ -102,6 +102,9 @@ namespace PholioVisualisation.DataAccess
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
         IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties();
+
+        IList<int> GetAllIndicators();
+
     }
 
     public class GroupDataReader : BaseReader, IGroupDataReader
@@ -175,8 +178,14 @@ namespace PholioVisualisation.DataAccess
             return (from g in groupings select g.IndicatorId).Distinct().ToList();
         }
 
-        public virtual IList<GroupingMetadata> GetGroupMetadata(IList<int> groupIds)
+        public virtual IList<GroupingMetadata> GetGroupMetadataList(IList<int> groupIds)
         {
+            // Guard clause to avoid case where query will fail to execute
+            if (groupIds.Any() == false)
+            {
+                return new List<GroupingMetadata>();
+            }
+
             IQuery q = CurrentSession.CreateQuery("from GroupingMetadata g where g.Id in (:groupId) order by g.Sequence");
             q.SetParameterList(ParameterGroupId, groupIds.ToList());
             return q.List<GroupingMetadata>();
@@ -187,6 +196,13 @@ namespace PholioVisualisation.DataAccess
             IQuery q = CurrentSession.CreateQuery("select  g.id from GroupingMetadata g where g.ProfileId = :profileId");
             q.SetParameter("profileId", profileId);
             return q.List<int>();
+        }
+
+        public IList<Grouping> GetGroupingsByIndicatorId(int indicatorId)
+        {
+            IQuery q = CurrentSession.CreateQuery("select g from Grouping g where g.IndicatorId = :indicatorId");
+            q.SetParameter(ParameterIndicatorId, indicatorId);
+            return q.List<Grouping>();
         }
 
         public Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId)
@@ -310,6 +326,12 @@ namespace PholioVisualisation.DataAccess
 
         public virtual IList<int> GetDistinctGroupingAreaTypeIds(IList<int> groupIds)
         {
+            // Guard clause to avoid case where query will fail to execute
+            if (groupIds.Any() == false)
+            {
+                return new List<int>();
+            }
+
             IQuery q = CurrentSession.CreateQuery("select distinct g.AreaTypeId from Grouping g where g.GroupId in (:groupId)");
             q.SetParameterList(ParameterGroupId, groupIds.ToList());
             return q.List<int>();
@@ -358,7 +380,7 @@ namespace PholioVisualisation.DataAccess
         /// Selects data without discriminating by ageId. To only be used when multiple age bands are
         /// required together, e.g. for population pyramids.
         /// </summary>
-        public virtual IList<CoreDataSet> GetCoreDataForAllAges(int indicatorId, TimePeriod period, 
+        public virtual IList<CoreDataSet> GetCoreDataForAllAges(int indicatorId, TimePeriod period,
             string areaCode, int sexId)
         {
             var criteria = CurrentSession.CreateCriteria<CoreDataSet>()
@@ -366,7 +388,7 @@ namespace PholioVisualisation.DataAccess
                 .Add(Restrictions.Eq("SexId", sexId))
                 .Add(Restrictions.Eq("AreaCode", areaCode))
                 .Add(Restrictions.Eq("CategoryTypeId", CategoryTypeIds.Undefined));
-      
+
             AddTimePeriodRestrictions(period, criteria);
 
             return criteria.List<CoreDataSet>();
@@ -442,7 +464,7 @@ namespace PholioVisualisation.DataAccess
         }
 
         public virtual CoreDataSet GetCoreDataForCategoryArea(Grouping grouping,
-            TimePeriod timePeriod, CategoryArea categoryArea)
+            TimePeriod timePeriod, ICategoryArea categoryArea)
         {
             return CurrentSession.CreateCriteria<CoreDataSet>()
                 .Add(Restrictions.Eq("IndicatorId", grouping.IndicatorId))
@@ -473,6 +495,23 @@ namespace PholioVisualisation.DataAccess
                 .AddOrder(new Order("AreaCode", true))
                 .AddOrder(new Order("CategoryId", true))
                 .List<CoreDataSet>();
+        }
+
+        public CoreDataSet GetCoreDataForCategory(Grouping grouping, TimePeriod timePeriod, 
+            string areaCode, int categoryTypeId, int categoryId)
+        {
+            return CurrentSession.CreateCriteria<CoreDataSet>()
+                .Add(Restrictions.Eq("IndicatorId", grouping.IndicatorId))
+                .Add(Restrictions.Eq("Year", timePeriod.Year))
+                .Add(Restrictions.Eq("YearRange", timePeriod.YearRange))
+                .Add(Restrictions.Eq("Quarter", timePeriod.Quarter))
+                .Add(Restrictions.Eq("Month", timePeriod.Month))
+                .Add(Restrictions.Eq("SexId", grouping.SexId))
+                .Add(Restrictions.Eq("AgeId", grouping.AgeId))
+                .Add(Restrictions.Eq("AreaCode", areaCode))
+                .Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
+                .Add(Restrictions.Eq("CategoryId", categoryId))
+                .UniqueResult<CoreDataSet>();
         }
 
         public IList<CoreDataSet> GetAllCategoryDataWithinParentArea(string parentAreaCode,
@@ -670,11 +709,10 @@ namespace PholioVisualisation.DataAccess
             q.SetParameter("month", period.Month);
         }
 
-        public ConfidenceIntervalMethod GetConfidenceIntervalMethod(int id)
+        public IList<int> GetAllIndicators()
         {
-            IQuery q = CurrentSession.CreateQuery("from ConfidenceIntervalMethod d where d.Id = :id");
-            q.SetParameter("id", id);
-            return q.UniqueResult<ConfidenceIntervalMethod>();
+            var q = CurrentSession.CreateSQLQuery("select distinct(IndicatorID) from Grouping");
+            return q.List<int>();
         }
 
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,

@@ -1,12 +1,15 @@
 ﻿@using Profiles.MainUI.Models
 @model PageModel
 @Html.Partial("_JsUrls")
-<script type="text/javascript">//<![CDATA[
-profileUrlKey = '@ViewBag.ProfileUrlKey';
-FT.model.profileId = @Model.ProfileId;
-useJsonp = @JsHelper.GetJsBool(ViewBag.UseJsonp);
-areAnyPdfsForProfile = @JsHelper.GetJsBool(Model.AreAnyPdfsForProfile);
-startZeroYAxis = @JsHelper.GetJsBool(Model.StartZeroYAxis);
-indicatorIds = @Html.Raw(ViewData.ContainsKey("indicatorIds") ? ("'" + ViewData["indicatorIds"] + "'") : "null");
-FT.features = @ViewBag.FeatureSwitch;
-//]]</script>
+<script type="text/javascript">
+//<![CDATA[
+    profileUrlKey = '@ViewBag.ProfileUrlKey';
+    FT.model.profileId = @Model.ProfileId;
+    indicatorIds = @Html.Raw(ViewData.ContainsKey("indicatorIds") ? ("'" + ViewData["indicatorIds"] + "'") : "null");
+    FT.features = @ViewBag.FeatureSwitch;
+    FT.config.hasRecentTrends =  @JsHelper.GetJsBool(@Model.HasRecentTrends);
+    FT.config.profileCollectionUrlKey = '@ViewBag.LeadProfileUrlKey';
+    FT.config.startZeroYAxis = @JsHelper.GetJsBool(Model.StartZeroYAxis);
+    FT.config.areAnyPdfsForProfile = @JsHelper.GetJsBool(Model.AreAnyPdfsForProfile);
+    FT.staticReportTimePeriods = '@ViewBag.StaticReportsTimePeriods'.split(',');
+    //]]</script>

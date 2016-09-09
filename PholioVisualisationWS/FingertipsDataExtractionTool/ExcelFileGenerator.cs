@@ -47,13 +47,22 @@ namespace FingertipsDataExtractionTool
                     foreach (var childAreaTypeId in childAreaTypeIds)
                     {
                         var parentAreaTypeIds = _areaTypeListProvider
-                            .GetParentAreaTypeIdsUsedInProfile(profile.ProfileId, childAreaTypeId);
+                            .GetParentAreaTypeIdsUsedInProfile(profile.ProfileId, childAreaTypeId)
+                            .ToList();
+
+                        var categoryAreaTypeIds = _areaTypeListProvider.GetCategoryTypeIdsUsedInProfile(
+                            profile.ProfileId, childAreaTypeId)
+                            .Select(CategoryAreaType.GetAreaTypeIdFromCategoryTypeId);
+
+                        // Combine parent area type IDs with category area type IDs
+                        parentAreaTypeIds.AddRange(categoryAreaTypeIds);
 
                         foreach (var parentAreaTypeId in parentAreaTypeIds)
                         {
                             _logger.Info("Creating Excel file with " +
                                 GetProfileDetailsText(profile.ProfileId,
                                 parentAreaTypeId, childAreaTypeId));
+
                             var watch = new ExcelFileTimer(_logger);
 
                             CreateExcelFilesForCoreProfiles(profile.ProfileId, childAreaTypeId,
@@ -78,15 +87,15 @@ namespace FingertipsDataExtractionTool
         {
             try
             {
-                var profileIds = new List<int>();
-
                 var profile = _profileReader.GetProfile(profileId);
                 var parentAreas = new List<ParentArea> { new ParentArea(AreaCodes.England, areaTypeId) };
                 var subnationalAreaType = AreaTypeFactory.New(_areasReader, subnationalAreaTypeId);
 
                 var comparatorMap = new ComparatorMapBuilder(parentAreas).ComparatorMap;
 
-                IWorkbook workbook = new ProfileDataBuilder(comparatorMap, profile, profileIds, 0,
+                var dummyListOfprofileIds = new List<int>();
+
+                IWorkbook workbook = new ProfileDataBuilder(comparatorMap, profile, dummyListOfprofileIds,
                         parentAreas, subnationalAreaType).BuildWorkbook();
 
                 if (workbook != null)

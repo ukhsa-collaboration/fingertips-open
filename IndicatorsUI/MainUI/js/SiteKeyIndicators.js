@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * SiteKeyIndicators.js
 * @module SiteKeyIndicators
@@ -10,9 +12,9 @@ function IndicatorFormatter(groupRoot, metadata, coreDataSet, indicatorStatsF) {
 
     // Private variables
     var dataInfo = new CoreDataSetInfo(coreDataSet),
-        unit = !!metadata ? metadata.Unit : null,
-        valueAndUnit = new ValueWithUnit(unit),
-        isInverted = correctForPolarity && groupRoot.PolarityId === 0;
+		unit = !!metadata ? metadata.Unit : null,
+		valueAndUnit = new ValueWithUnit(unit),
+		isInverted = correctForPolarity && groupRoot.PolarityId === 0;
 
     this.getIndicatorName = function () {
         return metadata.Descriptive.Name + new SexAndAge().getLabel(groupRoot);
@@ -52,26 +54,26 @@ function IndicatorFormatter(groupRoot, metadata, coreDataSet, indicatorStatsF) {
 
     this.getMin = function () {
         return this.getVal(this.stats,
-            (isInverted ? 'Max' : 'Min')
-        );
+			(isInverted ? 'Max' : 'Min')
+		);
     };
 
     this.getMax = function () {
         return this.getVal(this.stats,
-            (isInverted ? 'Min' : 'Max')
-        );
+			(isInverted ? 'Min' : 'Max')
+		);
     };
 
     this.get25 = function () {
         return this.getVal(this.stats,
-            (isInverted ? 'P75' : 'P25')
-        );
+			(isInverted ? 'P75' : 'P25')
+		);
     };
 
     this.get75 = function () {
         return this.getVal(this.stats,
-            (isInverted ? 'P25' : 'P75')
-        );
+			(isInverted ? 'P25' : 'P75')
+		);
     };
 
     this.getDataQuality = function () {
@@ -102,28 +104,30 @@ function addTd(html, text, cssClass, tooltip, noteId) {
 
 function getGroupingData() {
 
-    sid = getGroupAndCurrentAreaTypeKey();
+    var key = getGroupAndCurrentAreaTypeKey();
+    var model = FT.model;
 
-    if (!isDefined(sid) || sid.length == 0) {
+    if (!isDefined(key) || key.length === 0) {
         // No data available
         getGroupingDataCallback(null);
     } else {
 
-        var code = FT.model.parentCode;
-        if (ui.isDataLoaded(sid, code)) {
+        var parentAreaCode = model.parentCode;
+        if (ui.isDataLoaded(key, parentAreaCode)) {
             // Data already loaded
-            getGroupingDataCallback(ui.getData(sid, code));
+            getGroupingDataCallback(ui.getData(key, parentAreaCode));
         } else {
             // Data not yet loaded
             lock();
 
             showSpinner();
 
-            var parameters = getGroupDataParameters();
+            var parameters = new ParameterBuilder().add('group_id', model.groupId);
+            addGroupDataParameters(parameters);
+            addProfileOrIndicatorsParameters(parameters);
 
-            ajaxGet('GetGroupDataAtDataPoint.ashx', parameters,
-                getGroupingDataCallback, handleAjaxFailure
-            );
+            ajaxGet('api/latest_data/all_indicators_in_profile_group_for_child_areas', parameters.build(),
+                getGroupingDataCallback, handleAjaxFailure);
         }
     }
 }
@@ -136,7 +140,6 @@ function getGroupingDataCallback(obj) {
 
         try {
             groupRoots = obj;
-            filterRoots();
         } catch (e) {
             handleAjaxFailure(e);
             return;
@@ -163,13 +166,13 @@ function getDataFromAreaCode(data, areaCode) {
 function showAndHidePageElements() {
 
     var main = $(MAIN),
-        menus = FT.menus;
+		menus = FT.menus;
 
     main.hide();
 
     pages.displayElements();
     configureIndicatorMenu();
-        
+
     menus.parentType.setVisibility();
     menus.areaType.setVisibility();
     menus.parent.setVisibility();
@@ -177,7 +180,6 @@ function showAndHidePageElements() {
 
     // Specific UI updates to do everytime
     showMessageIfIndicatorNotAvailableForNewAreaType();
-    showEastMidlandsMessage();
     updateNearestNeighbourElements();
     updatePreferredState();
 
@@ -194,8 +196,8 @@ function showMessageIfIndicatorNotAvailableForNewAreaType() {
             var left = ($(window).width() - popupWidth) / 2;
             var top = 200;
             var html = '<br><br>' + '<div id="indicator-not-in-area" ><b>' + metadata.Descriptive.Name +
-                '</b> is not available for ' + FT.menus.areaType.getName() + '<br></div>' + '<br>' +
-                '<input type="button" id="indicator-not-in-area-ok" value="OK" onclick="lightbox.hide();" ><br><br>';
+				'</b> is not available for ' + FT.menus.areaType.getName() + '<br></div>' + '<br>' +
+				'<input type="button" id="indicator-not-in-area-ok" value="OK" onclick="lightbox.hide();" ><br><br>';
             lightbox.show(html, top, left, popupWidth);
         }
 
@@ -254,28 +256,44 @@ function PreferredAreas(serialisedState, model) {
 
     var preferredAreas = new HashSerialiser().deserialise(serialisedState);
 
-    var getCode = function() {
+    var getCode = function () {
         return preferredAreas[model.areaTypeId];
     }
 
-    var containsAreaTypeId = function() {
+    var containsAreaTypeId = function () {
         return !!getCode();
     }
 
+    /**
+    * Whether or not the preferred area code needs updating
+    * @method doesAreaCodeNeedUpdating
+    */
     this.doesAreaCodeNeedUpdating = function () {
         return !containsAreaTypeId() || getCode() !== model.areaCode;
     }
 
-    this.updateAreaCode = function() {
-            preferredAreas[model.areaTypeId] = model.areaCode;
+    /**
+    * Updates the preferred area code for the current area type ID
+    * @method updateAreaCode
+    */
+    this.updateAreaCode = function () {
+        preferredAreas[model.areaTypeId] = model.areaCode;
     };
 
-    this.getAreaCode = function() {
+    /**
+    * Gets the preferred area code for the current area type ID
+    * @method getAreaCode
+    */
+    this.getAreaCode = function () {
         return containsAreaTypeId()
-            ? getCode()
-            : null;
+			? getCode()
+			: null;
     };
 
+    /**
+    * Serialises this class to a string
+    * @method serialise
+    */
     this.serialise = function () {
         return new HashSerialiser().serialise(preferredAreas);
     }
@@ -309,8 +327,8 @@ function PreferredAreaTypeId(serialisedState, model) {
 
     _this.getAreaTypeId = function () {
         return _this.containsProfileId()
-            ? parseInt(_getAreaTypeId())
-            : null;
+			? parseInt(_getAreaTypeId())
+			: null;
     };
 
     _this.serialise = function () {
@@ -319,7 +337,7 @@ function PreferredAreaTypeId(serialisedState, model) {
 }
 
 /**
-* Update the preferred areas cookie if required
+* Update the preferred areas and preferred area types cookies if required.
 * @class updatePreferredState
 */
 function updatePreferredState() {
@@ -339,6 +357,187 @@ function updatePreferredState() {
     }
 }
 
+/**
+* Wrapper around the html2canvas, takes the element as save it as an image
+* @class saveElementAsImage
+*/
+function saveElementAsImage(element, outputFilename) {
+    html2canvas(element, {
+        onrendered: function (canvas) {
+            var img = canvas.toDataURL('image/png');
+            img = img.replace(/^data:image\/(png|jpg);base64,/, "");
+            // save the captured image to hidden field and submit the form.
+            $('#captured-image').val(img);
+            $('#tab-name').val(outputFilename);
+            $('#image-capture-form').submit();
+        }
+    }, {
+        allowTaint: false, // allowTaint is required for maps
+        logging: true,
+        useCORS: true
+    });
+}
+
+/**
+* Whether or not search results are displayed
+* @class isInSearchMode
+*/
+function isInSearchMode() {
+    return FT.model.profileId === ProfileIds.SearchResults;
+}
+
+/**
+* Returns group root for selected indicator
+* @class getGroupRoot
+*/
+function getGroupRoot() {
+    return groupRoots[getIndicatorIndex()];
+}
+
+/**
+* Button options at top of tab pages.
+* @class TabSpecificOptions
+* @constructor
+* @param options eventHandlers, eventName, 
+* exportImage.label, exportImage.clickHandler, infoIcon.label, infoIcon.clickHandler
+*/
+function TabSpecificOptions(options) {
+
+    var selectedClass = 'button-selected';
+    var selectedOption = 0;
+    var templateName = 'tabOptions';
+    var $tabSpecificOptions = $('#tab-specific-options');
+
+    var template = '{{#label}}<div>' +
+        '<span>{{label}} </span>' +
+        '{{#options}}<button id="tab-option-{{index}}" class="{{cssClass}}">{{text}}</button>{{/options}}' +
+        '</div>{{/label}}' +
+        '{{#isExport}}<div class="export-chart-box"><a href="">{{exportLabel}}</a></div>{{/isExport}}';
+
+    /**
+    * Show or hide the options. 
+    * @method show
+    * @param {Boolean} isVisible whether the buttons should be visible or not
+    */
+    this.show = function (isVisible) {
+        if (isVisible) {
+            $tabSpecificOptions.show();
+        } else {
+            $tabSpecificOptions.hide();
+        }
+    }
+
+    /**
+    * Sets the option that is selected.
+    * @method setOption
+    * @param {Integer} index index of option to select
+    */
+    this.setOption = function (index) {
+        selectedOption = index;
+    };
+
+    /**
+	* Gets the option that is selected.
+	* @method getOption
+    * @return {Integer} index of selected option
+	*/
+    this.getOption = function () {
+        return parseInt(selectedOption);
+    };
+
+    /**
+	* Clears the options HTML
+	* @method clearHtml
+	*/
+    this.clearHtml = function () {
+        $tabSpecificOptions.html('');
+    }
+
+    /**
+	* Displays the options
+	* @method setHtml
+    * @param model label, optionLabels
+	*/
+    this.setHtml = function (model) {
+
+        templates.add(templateName, template);
+
+        var viewModel = {};
+
+        // Export
+        var isExport = isDefined(options.exportImage);
+        viewModel.exportLabel = isExport ? options.exportImage.label : '';
+        viewModel.isExport = isExport;
+
+        // Buttons
+        if (model.label) {
+
+            viewModel.label = model.label;
+
+            // Define options
+            var i = 0;
+            var optionConfigs = _.map(model.optionLabels,
+                function (label) {
+                    return { text: label, index: i++ }
+                });
+            viewModel.options = optionConfigs;
+
+            // Selected option is highlighted
+            viewModel.options[selectedOption].cssClass = selectedClass;
+        }
+
+        // Render HTML
+        var html = templates.render(templateName, viewModel);
+        $tabSpecificOptions.html(html);
+
+        this._bind(model);
+
+        // Bind export
+        if (isExport) {
+            $tabSpecificOptions.find('a').bind('click', options.exportImage.clickHandler);
+        }
+    };
+
+    /**
+	* Binds click event for each option
+	* @method _bind
+    * @param model
+	*/
+    this._bind = function (model) {
+
+        if (options.eventHandlers) {
+            var indexAttr = 'index';
+            var eventHandlers = options.eventHandlers;
+
+            for (var i in eventHandlers) {
+
+                var $option = $('#tab-option-' + i);
+                $option.attr(indexAttr, i);
+
+                $option.bind('click',
+                    function (e) {
+
+                        $option = $(this);
+                        var index = $option.attr(indexAttr);;
+
+                        if (selectedOption != index) {
+                            selectedOption = index;
+
+                            // Highlight selected option
+                            $tabSpecificOptions.find('button').removeClass(selectedClass);
+                            $option.addClass(selectedClass);
+
+                            // Event handler must be called after selected class is displayed
+                            eventHandlers[selectedOption]($option);
+
+                            logEvent(getCurrentPageTitle(), options.eventName, model.optionLabels[selectedOption]);
+                        }
+                    });
+            }
+        }
+    };
+};
+
 function addTdLink(h, clickFunction, argument, text, tooltip) {
 
     h.push('<td');
@@ -347,13 +546,13 @@ function addTdLink(h, clickFunction, argument, text, tooltip) {
     }
 
     h.push(' class="pLink" onclick="', clickFunction, '(\'', argument,
-        '\');" onmouseover="highlightRow(this);" onmouseout="unhighlightRow();">',
-        text, '</td>');
+		'\');" onmouseover="highlightRow(this);" onmouseout="unhighlightRow();">',
+		text, '</td>');
 }
 
 function highlightRow(td, isBgChanged) {
 
-    var cells = highlightedRowCells = $(td).parent().children();
+    var cells = FT.data.highlightedRowCells = $(td).parent().children();
 
     var border = colours.border;
 
@@ -373,7 +572,7 @@ function highlightRow(td, isBgChanged) {
 }
 
 function unhighlightRow(isBgReset) {
-    var cells = highlightedRowCells;
+    var cells = FT.data.highlightedRowCells;
 
     if (cells) {
         var c = '#eee';
@@ -405,7 +604,10 @@ function setPageMode(newMode) {
 }
 
 function getCurrentPageTitle() {
-    return pages.getCurrentPage().title;
+    var page = pages.getCurrentPage();
+    return isDefined(page)
+        ? page.title
+        : 'Unknown';
 }
 
 function restoreLastViewedAreaTypeId(model) {
@@ -444,9 +646,9 @@ function documentReady() {
 
         if (isNational) {
             $('#area-search-link-box').show();
-            initAreaSearch('#area-search-text', model, true);
+            initAreaSearch('#area-search-text', true);
         }
-        
+
         getValueNotesCall();
         // Log initial state
         logEvent('DomainSelected', getCurrentDomainName(), 'LandedOn');
@@ -463,7 +665,7 @@ function handleAjaxFailure(e) {
 function refreshCurrentPage() {
     lock();
     // Get data from server
-    ajaxMonitor.setCalls(2);    
+    ajaxMonitor.setCalls(2);
     getGroupingData();
     getIndicatorMetadata(FT.model.groupId, GET_METADATA_SYSTEM_CONTENT);
     ajaxMonitor.monitor(refreshCurrentPage2);
@@ -471,7 +673,7 @@ function refreshCurrentPage() {
 
 function executeWithLock(code) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         code();
     }
@@ -483,36 +685,11 @@ function clearSpineTables() {
     $('#spineBody').html('');
 }
 
-function getAreaTypes() {
-    
-    if (areAnyIndicators) {
-        // Check if areaTypes already loaded
-        if (_.isUndefined(loaded.areaTypes[FT.model.areaTypeId])) {
-            showSpinner();
-            getAreaTypesCall(FT.model.profileId);
-        } else {
-            ajaxMonitor.callCompleted();
-        }
-    } else {
-        getAreaTypesCallback(null);
-    }
-}
-
-function getAreaTypesCallback(areaTypesArray) {
-
-    if (areaTypesArray) {
-        FT.menus.areaType = new AreaTypeMenu(FT.model,
-            new AreaTypes(areaTypesArray, loaded.areaTypes));
-    }
-
-    ajaxMonitor.callCompleted();
-}
-
 function AreaAndDataSorter(order, data, areas, areaCodeToAreaHash) {
-   
+
     var coreDataSetList = new CoreDataSetList(data);
-    
-    var sortAreasByDataOrder = function() {
+
+    var sortAreasByDataOrder = function () {
         // Sort areas
         var areasSorted = [];
         for (var i in data) {
@@ -520,13 +697,13 @@ function AreaAndDataSorter(order, data, areas, areaCodeToAreaHash) {
         }
 
         // Add missing areas
-        if (areasSorted.length == 0) {
+        if (areasSorted.length === 0) {
             // No data to sort
             areasSorted = areas;
-        } else if (areasSorted.length != _.size(areaCodeToAreaHash)) {
+        } else if (areasSorted.length !== _.size(areaCodeToAreaHash)) {
             for (var code in areaCodeToAreaHash) {
                 var area = areaCodeToAreaHash[code];
-                if ($.inArray(area, areasSorted) == -1) {
+                if ($.inArray(area, areasSorted) === -1) {
                     areasSorted.push(area);
                 }
             }
@@ -535,13 +712,13 @@ function AreaAndDataSorter(order, data, areas, areaCodeToAreaHash) {
         return areasSorted;
     };
 
-    var reverseDataIfNecessary = function() {
+    var reverseDataIfNecessary = function () {
         if (order > 0) {
             data.reverse();
         }
     };
 
-    this.byValue = function () {        
+    this.byValue = function () {
         coreDataSetList.sortByValue();
         reverseDataIfNecessary();
         return sortAreasByDataOrder();
@@ -615,29 +792,33 @@ function invertSortOrder(order) {
 }
 
 /**
-* Sort SortedAreas by rank
-* @class sortedAreasByRank
+* Sort FT.data.sortedAreas by rank
+* @class sortAreasByRank
 */
-function sortSortedAreasByRank() {
-    var sortedByRank = sortedAreas.slice(0);
+function sortAreasByRank() {
+    var sortedByRank = FT.data.sortedAreas.slice(0);
     sortedByRank.sort(function (a, b) {
         return a.Rank - b.Rank;
     });
-    return sortedByRank; 
+    return sortedByRank;
 }
 
 function isComparatorValueValid(comparatorGrouping) {
 
     return isDefined(comparatorGrouping) &&
-        isDefined(comparatorGrouping.ComparatorData) &&
-        comparatorGrouping.ComparatorData.Val != -1;
+		isDefined(comparatorGrouping.ComparatorData) &&
+		comparatorGrouping.ComparatorData.Val !== -1;
 }
 
 function getCurrentComparator() {
     return getComparatorById(comparatorId);
 }
 
-colours = {
+/**
+* List of colour constants
+* @class colours
+*/
+var colours = {
     chart: '#a8a8cc',
     better: '#92d050',
     same: '#ffc000',
@@ -661,8 +842,8 @@ colours = {
 function getComparatorFromAreaCode(areaCode) {
 
     return areaCode === NATIONAL_CODE ?
-        getNationalComparator() :
-        getParentArea();
+		getNationalComparator() :
+		getParentArea();
 }
 
 function getComparatorById(id) {
@@ -696,17 +877,17 @@ function ComparisonConfig(groupRoot, indicatorMetadata) {
     var _this = this;
 
     var useTarget = indicatorMetadata.Target &&
-        isCheckboxChecked('#target-benchmark');
+		isCheckboxChecked('#target-benchmark');
 
     _this.useTarget = useTarget;
-    _this.useQuintileColouring = groupRoot.ComparatorMethodId == PolarityIds.Quintiles;
+    _this.useQuintileColouring = groupRoot.ComparatorMethodId === PolarityIds.Quintiles;
 
     if (_this.useQuintileColouring) {
         _this.showQuintileLegend = true;
     }
 
     if (useTarget) {
-        if (indicatorMetadata.Target.PolarityId == PolarityIds.BlueOrangeBlue) {
+        if (indicatorMetadata.Target.PolarityId === PolarityIds.BlueOrangeBlue) {
             _this.useBlueOrangeBlue = true;
             _this.useRagColours = false;
         } else {
@@ -725,30 +906,38 @@ function ComparisonConfig(groupRoot, indicatorMetadata) {
 
     // Which comparator to use
     _this.comparatorId = useTarget
-        ? TARGET_COMPARATOR_ID
-        : comparatorId;
+		? TARGET_COMPARATOR_ID
+		: comparatorId;
 }
 
-function getGroupDataParameters() {
+/**
+* Adds 'area_type_id' and 'parent_area_code' to AJAX parameters builder
+* @class addGroupDataParameters
+*/
+function addGroupDataParameters(parameters) {
     var model = FT.model;
-    
-    return 'gid=' + model.groupId +
-            '&ati=' + model.areaTypeId +
-            '&par=' + getParentCode() +
-            getProfileOrIndicatorsParameters();
+
+    parameters.add('area_type_id', model.areaTypeId
+        ).add('parent_area_code', getParentCode());
 }
 
+/**
+* Gets the current parent area code
+* @class getParentCode
+*/
 function getParentCode() {
-    var model = FT.model;        
+    var model = FT.model;
     return !model.isNearestNeighbours() ? model.parentCode : model.nearestNeighbour;
 }
 
 function doSearch() {
-    var model = FT.model;
-
-    var searchText = new SearchText($('#searchBox').val());
+    var searchText = new SearchTextValidator($('#searchBox').val());
     if (searchText.isOk) {
-        setUrl(FT.url.search + encodeURIComponent(searchText.text) + '#pat/' + model.parentAreaType + '/ati/' + model.areaTypeId + '/par/' + model.parentCode);
+        if (isDefined(FT.model.parentTypeId) && isDefined(FT.model.areaTypeId)) {
+            setUrl(FT.url.search + encodeURIComponent(searchText.text) + '#pat/' + FT.model.parentTypeId + '/ati/' + FT.model.areaTypeId + '/par/' + FT.model.parentCode);
+        } else {
+            setUrl(FT.url.search + encodeURIComponent(searchText.text));
+        }
     }
 }
 
@@ -775,30 +964,29 @@ function searchBlur(e) {
     }
 }
 
-function getProfileOrIndicatorsParameters() {
-    var p = '';
-    var pid = FT.model.profileId;
-    if (isDefined(pid)) {
-        p += '&pid=' + pid;
+function addProfileOrIndicatorsParameters(parameters) {
+
+    // Profile ID
+    var profileId = FT.model.profileId;
+    if (isDefined(profileId)) {
+        parameters.add('profile_id', profileId);
     }
 
-    p += getIndicatorIdArgument();
-
-    return p;
+    addIndicatorIdParameter(parameters);
 }
 
 function populateIndicatorMenu() {
 
     var selectElement = $('#indicatorMenu')[0],
-        options = selectElement.options;
+		options = selectElement.options;
     options.length = 0;
     var metadataHash = ui.getMetadataHash();
 
     for (var i in groupRoots) {
         var root = groupRoots[i],
-            indicator = metadataHash[root.IID];
+			indicator = metadataHash[root.IID];
         options[i] = new Option(indicator.Descriptive.Name +
-            new SexAndAge().getLabel(root), i);
+			new SexAndAge().getLabel(root), i);
     }
 
     // Select preferred group root if user has already viewed this domain
@@ -811,7 +999,7 @@ function populateIndicatorMenu() {
         for (i in groupRoots) {
             root = groupRoots[i];
             if (preferredRoot.IID === root.IID &&
-                preferredRoot.SexId === root.SexId) {
+				preferredRoot.Sex.Id === root.Sex.Id) {
                 index = i;
                 break;
             }
@@ -840,10 +1028,10 @@ function getIndicatorIndex() {
     var model = FT.model;
     if (model.iid !== null) {
         var indicatorIndex = 0, matchingIndex;
-        _.each(groupRoots, function (data) {
-            if (data.IID === model.iid && 
-	    data.SexId === model.sexId && 
-	    data.AgeId === model.ageId) {
+        _.each(groupRoots, function (root) {
+            if (root.IID === model.iid &&
+		root.Sex.Id === model.sexId &&
+		root.Age.Id === model.ageId) {
                 matchingIndex = indicatorIndex;
             }
             indicatorIndex++;
@@ -862,12 +1050,12 @@ function getIndicatorIndex() {
 
 function getDataValues(data, attribute) {
     var a = [],
-        i,
-        val;
+		i,
+		val;
     for (i in data) {
         val = data[i] === null
-            ? 0
-            : parseFloat(data[i][attribute]);
+			? 0
+			: parseFloat(data[i][attribute]);
         a.push(val);
     }
     return a;
@@ -876,16 +1064,16 @@ function getDataValues(data, attribute) {
 function getTrendHeader(metadata, root, areaName, clickHandler) {
 
     var unit = metadata.Unit.Label,
-        unitLabel = unit !== '' ?
-            ' - ' + unit :
-            '';
+		unitLabel = unit !== '' ?
+			' - ' + unit :
+			'';
 
     return ['<div class="trendHeader"><div class="trendTitle"><a class="trendLink" title="More about this indicator" href="javascript:',
-        clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>',
-        getIndicatorDataQualityHtml(metadata.Descriptive.DataQuality), 
-        '<span class="trendArea">', areaName, '</span>', '</div>',
-        '<div class="trendUnit">',metadata.ValueType.Label, unitLabel, '</div>',
-        '</div>'].join('');
+		clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>',
+		getIndicatorDataQualityHtml(metadata.Descriptive.DataQuality),
+		'<span class="trendArea">', areaName, '</span>', '</div>',
+		'<div class="trendUnit">', metadata.ValueType.Name, unitLabel, '</div>',
+		'</div>'].join('');
 }
 
 function getSource(metadata) {
@@ -893,12 +1081,13 @@ function getSource(metadata) {
     var source = metadata.Descriptive.DataSource;
 
     return isDefined(source) && !String.isNullOrEmpty(source) ?
-        '<div class="trendSource">Source: ' + source + '</div>' :
-        '';
+		'<div class="trendSource">Source: ' + source + '</div>' :
+		'';
 }
 
 function indicatorChanged(rootIndex) {
-    FT.menus.area.setAdditionalParameters(groupRoots[rootIndex].IID, groupRoots[rootIndex].AgeId, groupRoots[rootIndex].SexId);
+   
+    FT.menus.area.setAdditionalParameters(groupRoots[rootIndex].IID, groupRoots[rootIndex].Age.Id, groupRoots[rootIndex].Sex.Id);
     ftHistory.setHistory();
 
     // Enables a specific indicator to be preferentially chosen when the menu is repopulated
@@ -912,7 +1101,7 @@ function indicatorChanged(rootIndex) {
     }
 
     logEvent('IndicatorSelectedInMenu',
-        ui.getMetadataHash()[root.IID].Descriptive.Name);
+		ui.getMetadataHash()[root.IID].Descriptive.Name);
 }
 
 function showAllIndicatorsChanged(checked) {
@@ -958,7 +1147,7 @@ function getSignificanceImg(sig, useRag, useQuintileColouring) {
     if (useQuintileColouring) {
         switch (true) {
             case (sig > 0 && sig < 6):
-            return 'quintile' + sig + '.png';
+                return 'quintile' + sig + '.png';
         }
     } else {
         if (useRag) {
@@ -985,20 +1174,6 @@ function getSignificanceImg(sig, useRag, useQuintileColouring) {
     }
 
     return null;
-}
-
-function getSubgroupsByAreaType() {
-
-    ajaxGet('GetData.ashx', 's=sa&gid=' + groupIds.join(','),
-        getSubgroupsByAreaTypeCallback, handleAjaxFailure
-    );
-
-}
-
-function getSubgroupsByAreaTypeCallback(obj) {
-
-    setViewableGroups(obj);
-    ajaxMonitor.callCompleted();
 }
 
 function getGroupAndCurrentAreaTypeKey() {
@@ -1031,7 +1206,7 @@ function refreshCurrentPage2() {
         if (FT.model.isNearestNeighbours()) {
             toggleNearestNeighboursControls(false);
         }
-        pages.goToCurrent();        
+        pages.goToCurrent();
     } else {
         noDataForAreaType();
         unlock();
@@ -1047,15 +1222,15 @@ function initPageElements() {
     // Init menus
     var menus = FT.menus;
     menus.parent = new ParentMenu('#regionMenu', model, loaded.areaLists);
-    menus.parentType = new ParentTypeMenu('#parentAreaTypesMenu', model);    
+    menus.parentType = new ParentTypeMenu('#parentAreaTypesMenu', model);
     menus.area = new AreaMenu('#areaMenu', model);
     menus.benchmark = new BenchmarkMenu('#comparator', model);
-    
+
     // Key heading
     var benchmark = enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY ?
-        'England' :
-        'benchmark';
-    $('.keyText').html('Compared with ' + benchmark + ':');
+		'England' :
+		'benchmark';
+    $('.keyText').html('Compared with ' + benchmark);
 
     // Selected domain
     $('#domain' + model.groupId).addClass('selectedDomain');
@@ -1068,9 +1243,8 @@ function initPageElements() {
     tooltipManager.init();
 }
 
-function initAreaData() {        
-    ajaxMonitor.setCalls(3);
-    getAreaTypes();    
+function initAreaData() {
+    ajaxMonitor.setCalls(2);
     getParentAreaGroups(); // parent area types
     getAllAreas(FT.model.areaTypeId); // need all for map
     ajaxMonitor.monitor(initAreaData2);
@@ -1111,18 +1285,18 @@ ValueNoteTooltipProvider.prototype = {
 
         //TODO template this
         return !valueNoteId ?
-            '' :
-            '<span id="tooltipData"></span>' + this.getHtmlFromNoteId(valueNoteId);
+			'' :
+			'<span id="tooltipData"></span>' + this.getHtmlFromNoteId(valueNoteId);
     },
 
     getHtmlFromNoteId: function (id) {
 
         return !id ?
-            '' :
-            [
-                '<span class="tooltipValueNote">', VALUE_NOTE,
-                loaded.valueNotes[id].Text, '</span>'
-            ].join('');
+			'' :
+			[
+				'<span class="tooltipValueNote">', VALUE_NOTE,
+				loaded.valueNotes[id].Text, '</span>'
+			].join('');
     }
 };
 
@@ -1131,7 +1305,7 @@ function initData() {
     stems = new SpineChartStems(spineHeaders);
 }
 
-PARENT_DISPLAY = {
+var PARENT_DISPLAY = {
     NATIONAL_AND_REGIONAL: 0,
     REGIONAL_ONLY: 1,
     NATIONAL_ONLY: 2
@@ -1176,7 +1350,7 @@ function getMarkerImageFromSignificance(significance, useRag, suffix, useQuintil
 
 function getAllAreas(areaTypeId) {
 
-    if (areAnyIndicators && !loaded.areaLists[areaTypeId]) {
+    if (FT.model.areAnyIndicators && !loaded.areaLists[areaTypeId]) {
         showSpinner();
 
         var parameters = new ParameterBuilder();
@@ -1184,23 +1358,23 @@ function getAllAreas(areaTypeId) {
         parameters.add('profile_id', FT.model.profileId);
         parameters.add('template_profile_id', templateProfileId);
 
-        ajaxGet('data/areas',
-            parameters.build(),
-            function (areas) {
+        ajaxGet('api/areas/by_area_type',
+			parameters.build(),
+			function (areas) {
 
-                if (isDefined(areas)) {
-                    loaded.areaLists[areaTypeId] = areas;
-                    // If missing for one area then will be missing for all, e.g. practices
-                    if (!areas[0].Short) {
-                        for (var i in areas) {
-                            // Ensure Short name is set, may need to trim this if too long
-                            areas[i].Short = areas[i].Name;
-                        }
-                    }
-                }
+			    if (isDefined(areas)) {
+			        loaded.areaLists[areaTypeId] = areas;
+			        // If missing for one area then will be missing for all, e.g. practices
+			        if (!areas[0].Short) {
+			            for (var i in areas) {
+			                // Ensure Short name is set, may need to trim this if too long
+			                areas[i].Short = areas[i].Name;
+			            }
+			        }
+			    }
 
-                ajaxMonitor.callCompleted();
-            });
+			    ajaxMonitor.callCompleted();
+			});
     } else {
         ajaxMonitor.callCompleted();
     }
@@ -1209,7 +1383,7 @@ function getAllAreas(areaTypeId) {
 
 function getChildAreas() {
     var codes = new AreaMappings(FT.model).getChildAreaCodes();
-    return new AreaCollection(loaded.areaLists[FT.model.areaTypeId]).findAll(codes);    
+    return new AreaCollection(loaded.areaLists[FT.model.areaTypeId]).findAll(codes);
 }
 
 function getParentArea() {
@@ -1225,28 +1399,13 @@ function GetParentAndChildAreas() {
     });
 }
 
-/* Special message that is displayed when East Midlands is selected for 
- the MESHA profiles */
-function showEastMidlandsMessage() {
-
-    var e = $('#global-prefooter');
-    if (e) {
-        var parent = FT.model.parentCode;
-        if (parent === 'EMREG' || parent === 'EMSHA') {
-            e.show();
-        } else {
-            e.hide();
-        }
-    }
-}
-
 function enableMenus() {
     $('select').prop('disabled', null);
 }
 
 function lock() {
-    if (!ajaxLock) {
-        ajaxLock = 1;
+    if (!FT.ajaxLock) {
+        FT.ajaxLock = 1;
 
         // Disable menus
         var disabled = 'disabled';
@@ -1255,8 +1414,8 @@ function lock() {
 }
 
 function unlock() {
-    if (ajaxLock) {
-        ajaxLock = null;
+    if (FT.ajaxLock) {
+        FT.ajaxLock = null;
         enableMenus();
     }
 }
@@ -1270,25 +1429,26 @@ function getAreaHash(areas) {
 };
 
 function setAreas() {
-    // Global
-    sortedAreas = getChildAreas();
+
+    var sortedAreas = FT.data.sortedAreas = getChildAreas();
+
     var isNearestNeighbours = FT.model.isNearestNeighbours();
 
     if (isNearestNeighbours) {
-        
+
         // add selected neighbour areacode to zeroth index 
         var areaList = loaded.areaLists[FT.model.areaTypeId];
         var area = new AreaCollection(areaList).find(FT.model.areaCode);
         sortedAreas.splice(0, 0, area);
 
         // add nearest neighbour rank property
-        for (var x in sortedAreas) {            
+        for (var x in sortedAreas) {
             sortedAreas[x].Rank = x;
         }
     }
 
     areaHash = getAreaHash(sortedAreas);
-    
+
     if (!isNearestNeighbours) {
         FT.menus.area.setAreas(sortedAreas);
     }
@@ -1306,10 +1466,10 @@ function getChildAreasForRegion(parentCode, areaTypeId) {
 //
 // areas : an array of Area objects
 //
-function AreaCollection(areas) {    
-    this.containsAreaCode = function (code) {    
+function AreaCollection(areas) {
+    this.containsAreaCode = function (code) {
         return code !== null &&
-            _.any(areas, function (area) { return area.Code === code; });
+			_.any(areas, function (area) { return area.Code === code; });
     };
 
     this.find = function (code) {
@@ -1322,7 +1482,7 @@ function AreaCollection(areas) {
         _.each(areas, function (area) { codeToArea[area.Code] = area; });
         var selectedAreas = [];
         _.each(codes, function (code) { selectedAreas.push(codeToArea[code]); });
-       
+
         return selectedAreas;
     };
 }
@@ -1342,7 +1502,7 @@ function CoreDataSetList(list) {
         return _.pluck(validCoreData, property);
     };
 
-    this.areAnyValidTrendValues = function() {
+    this.areAnyValidTrendValues = function () {
         return this.getValidValues('V').length > 0;
     };
 
@@ -1350,8 +1510,8 @@ function CoreDataSetList(list) {
         list.sort(sortData);
     };
 
-    this.sortByCount = function() {
-        list.sort(function(a, b) {
+    this.sortByCount = function () {
+        list.sort(function (a, b) {
             return a.Count - b.Count;
         });
     };
@@ -1363,8 +1523,8 @@ function isParentCountry() {
 
 function isSubnationalColumn() {
     return enumParentDisplay !== PARENT_DISPLAY.NATIONAL_ONLY &&
-        !isParentCountry() &&
-        !FT.model.isNearestNeighbours();
+		!isParentCountry() &&
+		!FT.model.isNearestNeighbours();
 }
 
 function BarScale(dataList) {
@@ -1377,18 +1537,18 @@ function BarScale(dataList) {
     // Find limits 
 
     var mapper = new CoreDataSetList(dataList),
-        values = mapper.getValidValues('Val'),
-        lowerCIs = mapper.getValidValues('LoCI'),
-        upperCIs = mapper.getValidValues('UpCI'),
-        mmVal = new MinMaxFinder(values),
-        mmLo = new MinMaxFinder(lowerCIs),
-        mmUp = new MinMaxFinder(upperCIs);
+		values = mapper.getValidValues('Val'),
+		lowerCIs = mapper.getValidValues('LoCI'),
+		upperCIs = mapper.getValidValues('UpCI'),
+		mmVal = new MinMaxFinder(values),
+		mmLo = new MinMaxFinder(lowerCIs),
+		mmUp = new MinMaxFinder(upperCIs);
 
     // Max
     var max = !mmUp.isValid || mmVal.max > mmUp.max ?
-        mmVal.max :
-        mmUp.max;
-    
+		mmVal.max :
+		mmUp.max;
+
     // Adjust max
     if (max < 0) {
         // Start bars from zero
@@ -1400,8 +1560,8 @@ function BarScale(dataList) {
 
     // Min
     var min = !mmLo.isValid || mmVal.min < mmLo.min ?
-        mmVal.min :
-        mmLo.min;
+		mmVal.min :
+		mmLo.min;
     if (min > 0) {
         min = 0;
     }
@@ -1411,8 +1571,8 @@ function BarScale(dataList) {
     _this.pixelsPerUnit = (_this.width) / _this.range;
 
     _this.negativePixels = min < 0 ?
-        Math.floor(-min * _this.pixelsPerUnit) :
-        0;
+		Math.floor(-min * _this.pixelsPerUnit) :
+		0;
 }
 
 function MinMaxFinder(arrayOfNumbers) {
@@ -1427,7 +1587,7 @@ MinMaxFinder.prototype = {
         if (areValues) {
 
             this.min = _.min(arrayOfNumbers),
-                this.max = _.max(arrayOfNumbers);
+				this.max = _.max(arrayOfNumbers);
         }
         this.isValid = areValues;
     }
@@ -1451,8 +1611,8 @@ function setTargetLegendHtml(comparisonConfig, metadata) {
     if (comparisonConfig.useTarget) {
         var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
         $('#keyAdHoc').html(
-                '<div><table class="keyTable"><tr><td class="keyText">Benchmarked against goal:</td><td class="keySpacer"></td><td>' +
-                targetLegend + '</td></tr></table></div>').show();
+				'<div><table class="keyTable"><tr><td class="keyText">Benchmarked against goal:</td><td class="keySpacer"></td><td>' +
+				targetLegend + '</td></tr></table></div>').show();
     }
 }
 
@@ -1464,18 +1624,18 @@ function getTargetLegendHtml(comparisonConfig, metadata) {
     if (comparisonConfig.useTarget) {
 
         var targetConfig = metadata.Target,
-            bespokeKey = targetConfig.BespokeKey,
-            start = '<span class="target ',
-            end = '</span>';
+			bespokeKey = targetConfig.BespokeKey,
+			start = '<span class="target ',
+			end = '</span>';
         var worseOrBetter = targetConfig.PolarityId == PolarityIds.BlueOrangeBlue
-            ? ['bobLower', 'bobHigher']
-            : ['worse', 'better'];
+			? ['bobLower', 'bobHigher']
+			: ['worse', 'better'];
 
         if (bespokeKey) {
             // Bespoke comparison
             if (bespokeKey === 'last-year-england') {
                 return start + worseOrBetter[0] + '">&lt;previous year\'s England value' + end +
-                    start + worseOrBetter[1] + '">&ge;previous year\'s England value' + end;
+					start + worseOrBetter[1] + '">&ge;previous year\'s England value' + end;
             }
 
             if (bespokeKey === 'nth-percentile-range') {
@@ -1485,16 +1645,16 @@ function getTargetLegendHtml(comparisonConfig, metadata) {
 
                 // Red, amber green
                 if (targetConfig.PolarityId === 0) {    // Lower is green
-                    
+
                     return start + worseOrBetter[0] + '">&gt;' + upperTargetPercentile + 'th-percentile of UTLAs' + end +
-                        start + 'same' + '">&le;' + upperTargetPercentile + 'th to ' + '&gt;' + lowerTargetPercentile + 'th' + end +
-                        start + worseOrBetter[1] + '">&le;' + lowerTargetPercentile + 'th' + end;
-                } 
-                
+						start + 'same' + '">&le;' + upperTargetPercentile + 'th to ' + '&gt;' + lowerTargetPercentile + 'th' + end +
+						start + worseOrBetter[1] + '">&le;' + lowerTargetPercentile + 'th' + end;
+                }
+
                 if (targetConfig.PolarityId === 1) {    // Upper is green
                     return start + worseOrBetter[0] + '">&lt;' + lowerTargetPercentile + 'th-percentile of UTLAs' + end +
-                    start + 'same' + '">&ge;' + lowerTargetPercentile + 'th to ' + '&lt;' + upperTargetPercentile + 'th' + end +
-                    start + worseOrBetter[1] + '">&ge;' + upperTargetPercentile + 'th' + end;
+					start + 'same' + '">&ge;' + lowerTargetPercentile + 'th to ' + '&lt;' + upperTargetPercentile + 'th' + end +
+					start + worseOrBetter[1] + '">&ge;' + upperTargetPercentile + 'th' + end;
                 }
             }
 
@@ -1502,9 +1662,9 @@ function getTargetLegendHtml(comparisonConfig, metadata) {
         }
 
         var lowerLimit = new CommaNumber(targetConfig.LowerLimit).unrounded(),
-        upperLimit = targetConfig.UpperLimit,
-        suffix = new ValueSuffix(metadata.Unit).getShortLabel(),
-        html;
+		upperLimit = targetConfig.UpperLimit,
+		suffix = new ValueSuffix(metadata.Unit).getShortLabel(),
+		html;
 
         // Switch colouring if low is good
         if (targetConfig.PolarityId === 0) {
@@ -1553,8 +1713,8 @@ TrendDataInfo.prototype = {
     isValue: function () {
         var data = this.data;
         return data ?
-            data.V !== '-' :
-            false;
+			data.V !== '-' :
+			false;
     },
 
     isCount: function () {
@@ -1586,35 +1746,48 @@ ValueDisplayer.prototype = {
         if (dataInfo.isValue()) {
 
             return this._getNumber(dataInfo.getValF(), options) +
-            (isValueNote ? this.symbol : '');
+			(isValueNote ? this.symbol : '');
         }
 
         return isValueNote ?
-            '<span class="value-note-symbol">' + this.symbol + '</span>' :
-            NO_DATA;
+			'<span class="value-note-symbol">' + this.symbol + '</span>' :
+			NO_DATA;
     },
 
     byNumberString: function (number, options) {
         return !number || number === '-' || number === -1 ?
             NO_DATA :
-            this._getNumber(number, options);
+			this._getNumber(number, options);
     }
 };
 
 function getParentAreaGroups() {
     if (_.size(loaded.parentAreaGroups) === 0) {
-        var builder = new ParameterBuilder().add('pid', FT.model.profileId);
-        getData(getParentAreaGroupsCallback, 'pg', builder.build());
+
+        var parameters = new ParameterBuilder(
+        ).add('profile_id', FT.model.profileId);
+
+        ajaxGet('api/area_types/parent_area_types', parameters.build(),
+            function (areaTypes) {
+
+                // Area types menu
+                FT.menus.areaType = new AreaTypeMenu(FT.model,
+                    new AreaTypes(areaTypes, loaded.areaTypes));
+
+                // Map of child area type ID to parent area type
+                var areaTypeMap = _.object(_.map(areaTypes,
+                    function (areaType) {
+                        return [areaType.Id, areaType.ParentAreaTypes];
+                    }));
+                loaded.parentAreaGroups = areaTypeMap;
+                new ParentTypes(FT.model).setDefault();
+
+                ajaxMonitor.callCompleted();
+            });
+
     } else {
         ajaxMonitor.callCompleted();
     }
-}
-
-function getParentAreaGroupsCallback(obj) {
-
-    loaded.parentAreaGroups = obj;
-    new ParentTypes(FT.model).setDefault();
-    ajaxMonitor.callCompleted();
 }
 
 function initAreaData2() {
@@ -1634,15 +1807,15 @@ function initAreaData2() {
 
 function getAreaMappings(model) {
 
-    if (areAnyIndicators && !new AreaMappings(model).areDefined()) {
-        var builder = new ParameterBuilder();
-        builder.add('pid', model.profileId);
-        builder.add('ati', model.areaTypeId);
-        builder.add('tem', templateProfileId);
-        builder.add('pat', model.parentTypeId);
-        builder.add('nn', model.nearestNeighbour);
+    if (model.areAnyIndicators && !new AreaMappings(model).areDefined()) {
+        var parameters = new ParameterBuilder();
+        parameters.add('profile_id', model.profileId);
+        parameters.add('child_area_type_id', model.areaTypeId);
+        parameters.add('parent_area_type_id', model.parentTypeId);
+        parameters.add('nearest_neighbour_code', model.nearestNeighbour);
 
-        getData(getAreaMappingsCallback, 'am', builder.build());
+        // Get parent areas
+        ajaxGet('api/parent_to_child_areas', parameters.build(), getAreaMappingsCallback);
     } else {
         ajaxMonitor.callCompleted();
     }
@@ -1656,16 +1829,16 @@ function getAreaMappingsCallback(obj) {
 
 function ParentTypeMenu(jquerySelector, model) {
     var _this = this,
-        $menu = $(jquerySelector),
-        selected = 'selected',
-        $box = $('#parentTypeBox'),
-        selectedOption = function () {
-            return $menu.find('option:' + selected);
-        };
+		$menu = $(jquerySelector),
+		selected = 'selected',
+		$box = $('#parentTypeBox'),
+		selectedOption = function () {
+		    return $menu.find('option:' + selected);
+		};
 
     $menu.change(function () {
         // Lock test required so change is only fired by the user selecting a different option
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             lock();
             model.parentTypeId = _this.getId();
             model.parentCode = null;
@@ -1675,7 +1848,7 @@ function ParentTypeMenu(jquerySelector, model) {
             logEvent('ParentAreaTypeSelected', _this.getName());
         }
     }
-    );
+	);
 
     _this.setOptions = function () {
 
@@ -1683,17 +1856,17 @@ function ParentTypeMenu(jquerySelector, model) {
         if ($menu.length) {
 
             var parentTypes = new ParentTypes(model).getTypes(),
-                options = $menu[0].options;
+				options = $menu[0].options;
 
             options.length = 0;
 
             var parentTypeId = model.parentTypeId,
-                optionIndex = 0;
+				optionIndex = 0;
 
             for (var i in parentTypes) {
                 var areaType = parentTypes[i],
-                    id = areaType.Id,
-                    option = new Option(areaType.Short, id);
+					id = areaType.Id,
+					option = new Option(areaType.Short, id);
                 options[optionIndex++] = option;
 
                 // Select option
@@ -1730,7 +1903,7 @@ function ParentTypeMenu(jquerySelector, model) {
 function AreaMappings(model) {
 
     var key = getKey(model.parentTypeId, model.areaTypeId, model.nearestNeighbour),
-        loadedMappings = loaded.areaMappings;
+		loadedMappings = loaded.areaMappings;
 
     this.set = function (mappings) {
         loadedMappings[key] = mappings;
@@ -1742,8 +1915,8 @@ function AreaMappings(model) {
 
     this.getChildAreaCodes = function () {
         return model.isNearestNeighbours() ?
-            loadedMappings[key][model.areaCode] :
-            loadedMappings[key][model.parentCode];
+			loadedMappings[key][model.areaCode] :
+			loadedMappings[key][model.parentCode];
     };
 
     this.getParentAreaCode = function (childCode) {
@@ -1764,12 +1937,12 @@ function AreaMappings(model) {
 
 function ParentMenu(jquerySelector, model, loadedAreas) {
     var _this = this,
-        $menu = $(jquerySelector),
-        $box = $('#region-menu-box');
+		$menu = $(jquerySelector),
+		$box = $('#region-menu-box');
 
     $menu.change(function () {
         // Lock test required so change is only fired by the user selecting a different option
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             lock();
             model.parentCode = $menu.val();
             setAreas();
@@ -1799,15 +1972,15 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
 
         // Populate parent menu
         var parents = loadedAreas[parentTypeId],
-            j = 0,
-            options = $menu[0].options;
+			j = 0,
+			options = $menu[0].options;
 
         options.length = 0;
 
         // Name type
         var nameType = parentTypeId === AreaTypeIds.CountyUA
-            ? 'Name'
-            :'Short';
+			? 'Name'
+			: 'Short';
 
         // Populate menu options
         for (var i in parents) {
@@ -1825,10 +1998,10 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
         try {
             // Log fails in tests
             logEvent('ParentAreaSelected', getParentArea().Name, 'MenuPopulated');
-        } catch (e) {}
+        } catch (e) { }
     };
 
-    _this.setVisibility = function() {
+    _this.setVisibility = function () {
         var hide = _this.count() === 1 && model.parentTypeId === AreaTypeIds.Country;
         $box.filter(':visible').toggle(!hide);
     }
@@ -1869,11 +2042,11 @@ function ParentTypes(model) {
 
 function AreaMenu(jquerySelector, model) {
     var _this = this,
-        $menu = $(jquerySelector),
-        $box = $('#areaMenuBox');
+		$menu = $(jquerySelector),
+		$box = $('#areaMenuBox');
 
     $menu.change(function () {
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             lock();
             model.areaCode = _this.getCode();
             ftHistory.setHistory();
@@ -1888,7 +2061,7 @@ function AreaMenu(jquerySelector, model) {
 
     _this.setCode = function (code) {
         if (code) {
-            $menu.val(code);            
+            $menu.val(code);
             model.areaCode = code;
         }
     };
@@ -1913,13 +2086,13 @@ function AreaMenu(jquerySelector, model) {
     };
 
     _this.setAreas = function (areas) {
-        populateAreaMenu(areas, $menu);        
+        populateAreaMenu(areas, $menu);
         var areaCode = model.areaCode;
         _this.setCode(
-            new AreaCollection(areas).containsAreaCode(areaCode) ?
+			new AreaCollection(areas).containsAreaCode(areaCode) ?
             areaCode :
-            this.getCode()
-        );
+			this.getCode()
+		);
     };
 }
 
@@ -1928,8 +2101,8 @@ function BenchmarkMenu(jquerySelector, model) {
     var $menu = $(jquerySelector);
     var options = $menu[0].options;
     var $subnationalOption = $(options[1]);
- 
-    this.setComparatorId = function(id) {
+
+    this.setComparatorId = function (id) {
         comparatorId = id;
         $menu.val(id);
     }
@@ -1939,11 +2112,11 @@ function BenchmarkMenu(jquerySelector, model) {
     }
 
     this.setSubnationalOptionVisibility = function () {
-        if(model.parentTypeId === AreaTypeIds.Country ||
-            model.isNearestNeighbours() ||
-            enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY) {
+        if (model.parentTypeId === AreaTypeIds.Country ||
+			model.isNearestNeighbours() ||
+			enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY) {
             $subnationalOption.hide();
-        } 
+        }
         else {
             $subnationalOption.show();
         }
@@ -1953,37 +2126,37 @@ function BenchmarkMenu(jquerySelector, model) {
 function AreaTypeMenu(model, areaTypes) {
 
     var _this = this,
-        id = 'areaTypes',
-        selected = 'selected',
-        $box = $('#areaTypeBox'),
-        visibility = 'visibility',
-        getAreaTypeOptions = function () {
+		id = 'areaTypes',
+		selected = 'selected',
+		$box = $('#areaTypeBox'),
+		visibility = 'visibility',
+		getAreaTypeOptions = function () {
 
-            var areaTypesArray = areaTypes.getAreaTypes();
+		    var areaTypesArray = areaTypes.getAreaTypes();
 
-            _.each(areaTypesArray, function (a) {
-                if (a.Id === model.areaTypeId) {
-                    a.selected = selected;
-                }
-            });
+		    _.each(areaTypesArray, function (a) {
+		        if (a.Id === model.areaTypeId) {
+		            a.selected = selected;
+		        }
+		    });
 
-            templates.add('areaTypes',
-                '{{#types}}<option value="{{Id}}" {{selected}} title="{{Name}}">{{Short}}</option>{{/types}}');
+		    templates.add('areaTypes',
+				'{{#types}}<option value="{{Id}}" {{selected}} title="{{Name}}">{{Short}}</option>{{/types}}');
 
-            return templates.render('areaTypes', { types: areaTypesArray });
-        };
+		    return templates.render('areaTypes', { types: areaTypesArray });
+		};
     $box.html(
-        '<li><select id="' + id + '">' + getAreaTypeOptions() +
-        '</select></li><li class="heading">Area type:</li>');
+		'<li><select id="' + id + '">' + getAreaTypeOptions() +
+		'</select></li><li class="heading">Area type</li>');
 
     var $menu = $('#' + id),
-        selectedOption = function () {
-            return $menu.find('option:' + selected);
-        };
+		selectedOption = function () {
+		    return $menu.find('option:' + selected);
+		};
 
     $menu.change(function () {
 
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
 
             // So that we know when to show the user a message saying the current
             // indicator isn't available for the new area type
@@ -2031,11 +2204,11 @@ function AreaTypeMenu(model, areaTypes) {
 function initAreaElements() {
     var model = FT.model;
     var areaMappings = new AreaMappings(model);
-  
+
     if (!model.isNearestNeighbours()) {
         // Preferred area only if its not NN
         if (!model.areaCode /*no area code in hash*/ ||
-            areaMappings.getParentAreaCode(model.areaCode) === null /* area code from another area type that doesn't contain the child area */) {
+			areaMappings.getParentAreaCode(model.areaCode) === null /* area code from another area type that doesn't contain the child area */) {
             model.areaCode = FT.preferredAreas.getAreaCode();
         }
     }
@@ -2058,7 +2231,7 @@ function initAreaElements() {
 
 function benchmarkChanged() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
 
         lock();
 
@@ -2067,14 +2240,14 @@ function benchmarkChanged() {
         pages.goToCurrent();
 
         logEvent('BenchmarkSelected', comparatorId === NATIONAL_COMPARATOR_ID
-            ? 'National'
-            : 'Subnational');
+			? 'National'
+			: 'Subnational');
     }
 }
 
 function domainClicked(groupId) {
     var model = FT.model;
-    if (model.groupId !== groupId && !ajaxLock) {
+    if (model.groupId !== groupId && !FT.ajaxLock) {
 
         lock();
         model.groupId = groupId;
@@ -2099,34 +2272,34 @@ function indicatorNameClicked(id) {
     goToIndicatorDetailsPage(id);
 }
 
-VIEW_MODES = {
+var VIEW_MODES = {
     AREA: 0,
     MULTI_AREA: 1
 };
 
 function getIndicatorNameTooltip(rootIndex, area) {
     var root = groupRoots[rootIndex],
-        metadata = ui.getMetadataHash()[root.IID],
-        comparisonConfig = new ComparisonConfig(root, metadata),
-        useTarget = comparisonConfig.useTarget,
-        targetLabel = (area
-                ? 'The value for ' + area.Name + ' is'
-                : 'These area values are') +
-            ' benchmarked against the goal</span>';
+		metadata = ui.getMetadataHash()[root.IID],
+		comparisonConfig = new ComparisonConfig(root, metadata),
+		useTarget = comparisonConfig.useTarget,
+		targetLabel = (area
+				? 'The value for ' + area.Name + ' is'
+				: 'These area values are') +
+			' benchmarked against the goal</span>';
 
     return [
-        (useTarget ? '<span id="tooltip-target">' + targetLabel + '</span>' : ''),
-        '<span id="tooltipIndicator"', (!useTarget ? 'style="margin-top:0;"' : ''), '>',
-        metadata.Descriptive.NameLong, '</span>'
+		(useTarget ? '<span id="tooltip-target">' + targetLabel + '</span>' : ''),
+		'<span id="tooltipIndicator"', (!useTarget ? 'style="margin-top:0;"' : ''), '>',
+		metadata.Descriptive.NameLong, '</span>'
     ].join('');
 }
 
 // Stores data loaded by AJAX
-ui = (function () {
+var ui = (function () {
 
     // Stores loaded group data
     var data = {},
-        stats = {};
+		stats = {};
 
     // Window position (prevents vertical scrollbar being reset to top)
     var scrollTop = null;
@@ -2153,8 +2326,8 @@ ui = (function () {
         getIndicatorStats: function (parentAreaCode) {
             var key = this._getStatsKey(parentAreaCode);
             return stats[key] ?
-                stats[key] :
-                null;
+				stats[key] :
+				null;
         },
 
         setIndicatorStats: function (parentAreaCode, newData) {
@@ -2169,8 +2342,8 @@ ui = (function () {
         getData: function (sid, areaCode) {
             var key = getKey(sid, areaCode);
             return isDefined(data[key]) ?
-                data[key] :
-                null;
+				data[key] :
+				null;
         },
 
         setData: function (sid, areaCode, newData) {
@@ -2193,32 +2366,25 @@ function addLoadedData(obj) {
     ui.setData(getGroupAndCurrentAreaTypeKey(), FT.model.parentCode, obj);
 }
 
-function filterTrendRoots() {
-    // Placeholder overriden by Inequality profile
-}
-
-function filterRoots() {
-    // Placeholder overriden by Inequality profile
-}
-
 function exportExcel(parentCode) {
 
     var model = FT.model;
 
     setUrl(FT.url.corews + 'GetDataDownload.ashx?pid=' + model.profileId +
-        '&ati=' + model.areaTypeId +
-        getIndicatorIdArgument() + getRestrictByProfileParameter() +
-        '&tem=' + templateProfileId +
-        '&par=' + parentCode +
-        '&pds=' + enumParentDisplay +
-        '&pat=' + model.parentTypeId
-    );
+		'&ati=' + model.areaTypeId +
+		getIndicatorIdArgument() + getRestrictByProfileParameter() +
+		'&tem=' + templateProfileId +
+		'&par=' + parentCode +
+		'&pds=' + enumParentDisplay +
+		'&pat=' + model.parentTypeId
+	);
 
     logEvent('Download', 'Excel', parentCode);
 }
 
+
 function advanceIndicatorMenuClicked(step) {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         var i = incArrayIndex(groupRoots, getIndicatorIndex(), step);
         setIndicatorIndex(i);
@@ -2229,12 +2395,13 @@ function advanceIndicatorMenuClicked(step) {
 }
 
 function advanceAreaMenuClicked(step) {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var areaCode = FT.model.areaCode,
-            i = 0;
+			i = 0;
 
+        var sortedAreas = FT.data.sortedAreas;
         for (i in sortedAreas) {
             if (sortedAreas[i].Code === areaCode) {
                 break;
@@ -2257,35 +2424,33 @@ function advanceAreaMenuClicked(step) {
 }
 
 function searchOptionClicked() {
-    var $searchOption = $('#area-search-link');
-    var $searchText = $('#area-search-text');
-    var $areaMenu = $('#areaMenu');
-    var $areaNextOrBack = $('.area-next-back');
-    var searchLabel = 'Search for an area';
-    var returnToMenuLabel = 'Return to area menu';
-    var currentText = $searchOption.text();
 
-    if (currentText === searchLabel) {
-        $searchOption.text(returnToMenuLabel);
-        $areaNextOrBack.hide();
-        $areaMenu.hide();
-        $searchText.show().focus();
+    if (!FT.ajaxLock) {
 
-    } else if (currentText === returnToMenuLabel) {
-        $searchOption.text(searchLabel);
-        $areaNextOrBack.show();
-        $areaMenu.show();
-        $searchText.hide().val('');
+        // Elements
+        var $searchOption = $('#area-search-link');
+        var $searchText = $('#area-search-text');
+        var $areaMenu = $('#areaMenu');
+        var $areaNextOrBack = $('.area-next-back');
+
+        // Text labels
+        var searchLabel = 'Search for an area';
+        var returnToMenuLabel = 'Return to area menu';
+        var currentText = $searchOption.text();
+
+        if (currentText === searchLabel) {
+            $searchOption.text(returnToMenuLabel);
+            $areaNextOrBack.hide();
+            $areaMenu.hide();
+            $searchText.show().focus();
+
+        } else if (currentText === returnToMenuLabel) {
+            $searchOption.text(searchLabel);
+            $areaNextOrBack.show();
+            $areaMenu.show();
+            $searchText.hide().val('');
+        }
     }
-}
-
-function canAreaTypeBeSearched(areaTypeId) {
-    return _.contains([
-        AreaTypeIds.Region,
-        AreaTypeIds.CCG, AreaTypeIds.DistrictUA,
-        AreaTypeIds.Subregion, AreaTypeIds.CountyUA,
-        AreaTypeIds.PheCentres2013, AreaTypeIds.PheCentres2015
-    ], areaTypeId);
 }
 
 function setAreaSearchOptions(areaTypeId) {
@@ -2293,7 +2458,7 @@ function setAreaSearchOptions(areaTypeId) {
     var $searchOption = $('#area-search-link');
     var $span = $('#area-search-link-box span');
 
-    if (canAreaTypeBeSearched(areaTypeId)) {
+    if (loaded.areaTypes[areaTypeId].IsSearchable) {
         // Area search is only available for the above area types
         $searchOption.show();
         $span.hide();
@@ -2315,18 +2480,22 @@ function incArrayIndex(array, index, step) {
     return i;
 }
 
+// Dummy for search equivalent
 function getIndicatorIdArgument() {
     return '';
 }
 
+// Dummy for search equivalent
+function addIndicatorIdParameter() { }
+
 /* Determines whether or not the indicator menu is enabled */
 function configureIndicatorMenu() {
 
-    var menuDisabled = areaTrendsState.areaSwitch &&
-        areaTrendsState.areaSwitch.getOption() === VIEW_MODES.AREA && 
-        pages.isTrue('showAllAvailable') ?
-        showAllIndicators() :
-        '';
+    var menuDisabled = areaTrendsState.tabSpecificOptions &&
+		areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA &&
+		pages.isTrue('showAllAvailable') ?
+		showAllIndicators() :
+		'';
 
     $('#indicatorMenu').prop('disabled', menuDisabled);
 }
@@ -2401,25 +2570,42 @@ function updateDomains() {
     $('#domain' + FT.model.groupId).addClass(cls);
 }
 
-function SearchText(textEnteredByUser) {
+/**
+* Event handler for when a user selects an option from area search results
+* @class SearchTextValidator
+*/
+function SearchTextValidator(textEnteredByUser) {
     this.isOk = textEnteredByUser !== 'Indicator keywords';
     if (this.isOk) {
         this.text = textEnteredByUser.replace(
-            /*valid word separators*//[-]/g, ' ').replace(
-            /*valid word combiners*//[+&]/g, ' and ').replace(
-            /*nonalphanumerics*//[^A-Za-z0-9 ]/g, '');
+			/*valid word separators*//[-]/g, ' ').replace(
+			/*valid word combiners*//[+&]/g, ' and ').replace(
+			/*nonalphanumerics*//[^A-Za-z0-9 ]/g, '');
     }
 }
 
-function ajaxAreaSearch(text, successFunction) {
-    getAreaSearchResults(text, successFunction, FT.model.areaTypeId, true);
+function ajaxAreaSearch(text, successFunction, excludeParentAreasFromSearchResults, extraParentAreaTypeIds) {
+    var areaTypeId = FT.model.areaTypeId;
+
+    var parentAreas = [];
+    if (!excludeParentAreasFromSearchResults) {
+        parentAreas.push(FT.model.areaTypeId);
+    }
+    for (var i in extraParentAreaTypeIds) {
+        parentAreas.push(extraParentAreaTypeIds[i]);
+    }
+
+    getAreaSearchResults(text, successFunction, areaTypeId, true, parentAreas);
 }
 
-// Selected address
+/**
+* Event handler for when a user selects an option from area search results
+* @class areaSearchResultSelected
+*/
 function areaSearchResultSelected(noMatches, searchResult) {
     if (!noMatches.is(':visible')) {
         $('#area-search-text').val('');
-        if (!ajaxLock) {
+        if (!FT.ajaxLock) {
             lock();
 
             var model = FT.model;
@@ -2441,138 +2627,65 @@ function areaSearchResultSelected(noMatches, searchResult) {
     }
 }
 
-
 /**
-* Returns group root for selected indicator
-* @method getGroupRoot
+* Returns as HTML a link to export a chart as an image 
+* @class showExportChartLink
 */
-function getGroupRoot() {
-    return groupRoots[getIndicatorIndex()];
+function showExportChartLink(chartVariable) {
+    return '<div class="export-chart-box"><a class="export-link" href="javascript:exportChartAsImage(' + chartVariable
+        + ')">Export chart as image</a></div>';
 }
 
 /**
-* Creates area switch control
-* @class AreaSwitch
+* Returns as HTML a link to export a table as an image 
+* @class showExportTableLink
 */
-function AreaSwitch(options) {
+function showExportTableLink(containerId, fileNamePrefix, legends) {
+    return '<div class="export-chart-box"><a class="export-link" href="javascript:exportTableAsImage(' +
+        '\'' + containerId + '\'' +
+        ',' +
+        '\'' + fileNamePrefix + '\'' +
+        ',\'' + legends + '\'' +
+        ')">Export table as image</a></div>';
+}
 
-    var selectedClass = 'selected';
-    var selectedOption = 0;
-    var templateName = 'areaSwitch';
-    var $areaSwitch = $('#areaSwitch');
+/**
+* Exports a table as an image. 
+* @class exportTableAsImage
+*/
+function exportTableAsImage(containerId, fileNamePrefix, legends) {
 
-    /**
-    * Sets the option that is selected.
-    * @method setOption
-    */
-    this.setOption = function(option) {
-        selectedOption = option;
-    };
-
-    /**
-    * Gets the option that is selected.
-    * @method getOption
-    */
-    this.getOption = function() {
-        return selectedOption;
-    };
-
-    /**
-    * Returns compiled html for area switch
-    * @method getHtml
-    */
-    this.clearHtml = function () {
-        $areaSwitch.html('');
-    }
-
-    /**
-    * Returns compiled html for area switch
-    * @method getHtml
-    */
-    this.setHtml = function (model) {
-
-        templates.add(templateName, template);
-
-        // model for switchTmpl
-        var displayOptions = {
-            label: model.label,
-            topOptionText: model.topOptionText,
-            bottomOptionText: model.bottomOptionText,
-            class0: '',
-            class1: ''
-        };
-
-        // Option to display as selected
-        displayOptions['class' + selectedOption] = selectedClass;
-
-        var html = templates.render(templateName, displayOptions);
-        $areaSwitch.html(html);
-
-        this.bind(model);
-    };
-
-    /**
-    * Bind on click event for topOption and bottomOption
-    * @method bind
-    */
-    this.bind = function (model) {
-        var $topOption = $('#topOption');
-        var $bottomOption = $('#bottomOption');
-
-        $topOption.bind('click', function (e) {
-            e.preventDefault();
-
-            selectedOption = 0;
-            $bottomOption.removeClass(selectedClass);
-            $topOption.addClass(selectedClass);
-
-            options.eventHanders[0]();
-
-            logEvent(getCurrentPageTitle(), options.eventName, model.topOptionText);
-        });
-
-        $bottomOption.bind('click', function (e) {
-            e.preventDefault();
-
-            selectedOption = 1;
-            $topOption.removeClass(selectedClass);
-            $bottomOption.toggleClass(selectedClass);
-
-            options.eventHanders[1]();
-
-            logEvent(getCurrentPageTitle(), options.eventName, model.bottomOptionText);
-        });
-    };
-
-    var template = '<table><tr>' +
-    '<td style="text-align:right;">{{label}}: </td>' +
-    '<td>' +
-    '<a id="topOption" href="#" class={{class0}} >{{topOptionText}}</a>' +
-    '<br>' +
-    '<a id="bottomOption" href="#" class={{class1}}>{{bottomOptionText}}</a>' +
-    '</td></tr></table>';
-};
-
-function setNearestNeighbourLinkText() {
-    var areaTypeId = FT.model.areaTypeId;
-    var profileId = FT.model.profileId;
-
-    if (profileId !== ProfileIds.ChildHealth &&
-        (areaTypeId === AreaTypeIds.CountyUA || areaTypeId === AreaTypeIds.DistrictUA)
-        ) {
-        var areaName = areaHash.hasOwnProperty(FT.model.areaCode)
-        ? areaHash[FT.model.areaCode].Name
-            : '?????';
-        var text = 'CIPFA nearest neighbours to ' + areaName;
+    if (isIE8()) {
+        browserUpgradeMessage();
     } else {
-        text = '';
-    }
+        containerId = '#' + containerId;
+        $(containerId + ' .export-chart-box').hide();
+        $(containerId + ' .columnSort').hide();
+        $(containerId).css('font-family', 'Arial');
+        $(containerId).css('background', 'white');
+        var container = $(containerId);
 
-    $('#nearest-neighbour-link').text(text);
+        if (legends && legends.length > 0) {
+            var legendContainer = $("<div id='legends'></div>");
+
+            $.each(legends.split(','), function (index, legendId) {
+                var legend = $(legendId).clone().attr('id', 'legendId').after('#id');
+                legendContainer.append(legend);
+            });
+            $('#legends').css('font-family', 'Arial');
+            container.prepend(legendContainer);
+        }
+
+        saveElementAsImage(container, fileNamePrefix);
+
+        if (legends) $('#legends').remove();
+        $(containerId + ' .export-chart-box').show();
+        $(containerId + ' .columnSort').show();
+    }
 }
 
 function findNearestNeighbours() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         $('#nearestNeighbours-wrapper').css('visibility', 'hidden');
@@ -2580,7 +2693,7 @@ function findNearestNeighbours() {
         FT.model.nearestNeighbour = getNearestNeighbourCode();
         // We set the comparatorId to National as its only selectable option
         comparatorId = NATIONAL_COMPARATOR_ID;
-        ftHistory.setHistory();              
+        ftHistory.setHistory();
         initAreaData();
 
         logEvent('NearestNeighbours', 'NearestNeighbourModeSelected');
@@ -2588,24 +2701,53 @@ function findNearestNeighbours() {
 }
 
 function showAndHideNearestNeighboursMenu() {
-    var goBackInnerHtml = '';
-    var selectedNearestNeighboursInnerHtml = '';
+
+    var linksHtml = '';
+    var $neighbourHeader = $('#nearest-neighbour-header');
 
     if (FT.model.isNearestNeighbours()) {
-        goBackInnerHtml = '<a onclick="backToMenu()" class="a-link">Exit nearest neighbours</a><a href="/documents/Nearest_Neighbour_Methodology.docx" class="a-link">More information</a>';
-        selectedNearestNeighboursInnerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
-            areaHash[FT.model.areaCode].Name + '</h2> <span>and its CIPFA nearest neighbours</span><div id="nearest-neighbour-extra-text">To send feedback, or to provide suggestions regarding this new feature please contact  <a href="mailto:ProfileFeedback@phe.gov.uk" class="a-link">ProfileFeedback@phe.gov.uk</a></div></span>';
+
+        var config = getNearestNeighboursConfig();
+
+        // Display neighbours explanation
+        var headerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
+            areaHash[FT.model.areaCode].Name + ' ' + nnSelectedText + '</h2></span>';
+        $neighbourHeader.html(headerHtml).show();
+
+        // Back text
+        var viewModel = {};
+        viewModel.text = config.altText
+            ? config.altText
+            : 'nearest neighbours';
+
+        // More information link
+        viewModel.isLink = config.hasOwnProperty('link');
+        if (viewModel.isLink) {
+            viewModel.link = config.link;
+        }
+
+        // Render links
+        var templateName = 'neighbours';
+        templates.add(templateName, '<a onclick="backToMenu()" class="a-link">Exit {{text}}</a>' +
+            '{{#isLink}}<a href="{{{link}}}" class="a-link" target="_blank">More information</a>{{/isLink}}');
+        linksHtml = templates.render(templateName, viewModel);
     } else {
+        // Show neighbour link
         $('#nearestNeighbours-wrapper').css('visibility', 'visible');
+
+        $neighbourHeader.hide();
     }
 
-    $('#goBack').html(goBackInnerHtml);
-    $('#selected-nearest-neighbour').html(selectedNearestNeighboursInnerHtml);
+    $('#goBack').html(linksHtml);
 }
 
+/**
+* Exits nearest neighbours mode. 
+* @class backToMenu
+*/
 function backToMenu() {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         var model = FT.model;
@@ -2617,12 +2759,12 @@ function backToMenu() {
     }
 }
 
-function toggleNearestNeighboursControls(state) {    
+function toggleNearestNeighboursControls(state) {
     var $areaMenuBox = $('#areaMenuBox'),
-        $regionMenuBox = $('#region-menu-box'),
-        $areaTypeBox = $('#areaTypeBox'),
-        $parentTypeBox = $('#parentTypeBox'),
-        $nearestNeighboursLink = $('#nearest-neighbour-link');
+		$regionMenuBox = $('#region-menu-box'),
+		$areaTypeBox = $('#areaTypeBox'),
+		$parentTypeBox = $('#parentTypeBox'),
+		$nearestNeighboursLink = $('#nearest-neighbour-link');
 
     if (state) {
         pages.displayElements();
@@ -2636,9 +2778,91 @@ function toggleNearestNeighboursControls(state) {
     }
 }
 
-function getNearestNeighbourCode() {    
-    return  'nn-1-' + FT.model.areaCode;
+function setNearestNeighbourLinkText() {
+    var model = FT.model;
+
+    if (doesAreaTypeHaveNearestNeighbours()) {
+        var config = getNearestNeighboursConfig();
+        var area = areaHash[model.areaCode];
+
+        var name = FT.model.areaTypeId === AreaTypeIds.CCG
+            ? area.Short
+            : area.Name;
+        nnLinkText = config.linkText + ' ' + name;
+        nnSelectedText = ' ' + config.selectText;
+    } else {
+        nnLinkText = '';
+        nnSelectedText = '';
+    }
+
+    $('#nearest-neighbour-link').text(nnLinkText);
 }
+
+/**
+* Whether nearest neighbours are available for the current area type
+* @class doesAreaTypeHaveNearestNeighbours
+*/
+function doesAreaTypeHaveNearestNeighbours() {
+    var areaTypeId = FT.model.areaTypeId;
+    return areaTypeId === AreaTypeIds.CountyUA ||
+        areaTypeId === AreaTypeIds.DistrictUA ||
+        areaTypeId === AreaTypeIds.CCG;
+}
+
+/**
+* Gets the nearest neighbour area code for the current area. 
+* @class getNearestNeighbourCode
+*/
+function getNearestNeighbourCode() {
+
+    var nnCode = '';
+    if (doesAreaTypeHaveNearestNeighbours()) {
+        var config = getNearestNeighboursConfig();
+        nnCode = 'nn-' + config.typeId + '-' + FT.model.areaCode;
+    }
+
+    return nnCode;
+}
+
+function getNearestNeighboursConfig() {
+
+    switch (FT.model.areaTypeId) {
+        case AreaTypeIds.CCG:
+            var config = NN_Hash.Ccg;
+            break;
+        default:
+            config = FT.model.profileId === ProfileIds.ChildHealth
+                ? NN_Hash.ChildHealth
+                : NN_Hash.Cipfa;
+    }
+    return config;
+}
+
+/**
+* Content displayed for the nearest neighbours. 
+* @class NN_Hash
+*/
+var NN_Hash = {
+    Cipfa: {
+        linkText: 'CIPFA nearest neighbours to',
+        selectText: 'and its CIPFA nearest neighbours',
+        link: '/documents/Nearest_Neighbour_Methodology.docx',
+        typeId: 1
+    },
+    Ccg: {
+        linkText: '10 most similar CCGs to',
+        selectText: 'and other most similar CCGs',
+        link: '/documents/cfv-16-similar-10-explr-tool.xlsm',
+        typeId: 2
+    },
+    ChildHealth: {
+        linkText: 'Statistical neighbours of',
+        selectText: 'and its CSSNBT statistical neighbours',
+        link: 'https://www.gov.uk/government/publications/local-authority-interactive-tool-lait',
+        altText: 'statistical neighbours',
+        typeId: 3
+    }
+};
 
 FT.model.isNearestNeighbours = function () {
     var model = FT.model;
@@ -2649,52 +2873,101 @@ FT.model.isNearestNeighbours = function () {
             return false;
         default:
             return true;
-    }    
+    }
 }
 
-/**
- * Wrapper around the html2canvas, takes the element as save it as an image
- * @method saveElementAsImage
- */
-function saveElementAsImage(element, outputFilename) {
-    html2canvas(element, {
-        onrendered: function (canvas) {
-            var img = canvas.toDataURL('image/png');
-            img = img.replace(/^data:image\/(png|jpg);base64,/, "");
-            // save the captured image to hidden field and submit the form.
-            $('#captured-image').val(img);
-            $('#tab-name').val(outputFilename);
-            $('#image-capture-form').submit();
+var barChart = {
+    getBarHtml: function (data, comparisonConfig) {
+
+        // No bar or CIs if everything is zero
+        var info = new CoreDataSetInfo(data);
+        if (info.areValueAndCIsZero()) {
+            return '';
         }
-    }, {
-        allowTaint: false, // allowTaint is required for maps
-        logging: true,
-        useCORS: true,
-    });
-}
+
+        var barScale = barChartState.barScale,
+        imgUrl = FT.url.img;
+
+        var img = getSignificanceImg(data.Sig[comparisonConfig.comparatorId],
+            comparisonConfig.useRagColours, comparisonConfig.useQuintileColouring);
+        if (!img) { img = 'lightGrey.png'; }
+
+        var width = parseInt(barScale.pixelsPerUnit * data.Val, 10);
+        width = Math.abs(width);
+
+        var left = data.Val < 0 ?
+            barScale.negativePixels - width :
+            barScale.negativePixels;
+
+        var h = ['<div class="barBox"><img class="bar" style="width:', width,
+            'px;left:', left,
+            'px" src="', imgUrl, img, '"/>'];
+
+        if (data.UpCIF) {
+
+            // Add the error bars
+            var lower = getErrorBarPixelStart(data.LoCI, barScale),
+            upper = getErrorBarPixelStart(data.UpCI, barScale),
+            pixelSpan = upper - lower - 2;
+
+            var start = '<img class="error',
+            end = 'px;"/>',
+            src = ' src="' + imgUrl + 'black.png" style="left:';
+
+            h.push(start, '"', src, lower, end);
+            if (pixelSpan > 0) {
+                h.push(start, 'Mid"', src, (lower + 1), 'px;width:', pixelSpan, end);
+            }
+            h.push(start, '"', src, (upper - 1), end);
+        }
+        h.push('</div>');
+        return h.join('');
+    },
+    selectBenchmarkClicked: function (comparatorId) {
+        if (!FT.ajaxLock) {
+            FT.menus.benchmark.setComparatorId(comparatorId);
+            benchmarkChanged();
+            logEvent('BarChart', 'ComparatorChangedByClickOnBar');
+        }
+    },
+    setIndicatorTableHeaderHtml: function (root, rootIndex) {
+        var grouping = getFirstGrouping(root);
+
+        var period = isDefined(grouping)
+            ? grouping.Period
+            : '';
+
+        var html = getTrendHeader(barChartState.metadata, root, period,
+            'goToMetadataPage(' + rootIndex + ')');
+        $('#indicatorDetailsHeader').html(html);
+    }
+};
+
+var nnLinkText = '';
+var nnSelectedText = '';
 
 // UI
-CSS_CENTER = 'center';
-CSS_NUMERIC = 'numeric';
-EMPTY_TD_CONTENTS = '&nbsp;'; // Necessary for empty bordered TDs in IE
-NO_DATA = '<div class="noData">-</div>';
-VALUE_NOTE = '*';
-MAIN = '#main';
-allJQs = [];
-nextUniqueId = 0;
-GET_METADATA_SYSTEM_CONTENT = 'yes';
-SEARCH_NO_RESULT_TOP_OFFSET = 21;
+var CSS_CENTER = 'center';
+var CSS_NUMERIC = 'numeric';
+var EMPTY_TD_CONTENTS = '&nbsp;'; // Necessary for empty bordered TDs in IE
+var NO_DATA = '<div class="noData">-</div>';
+var VALUE_NOTE = '*';
+var MAIN = '#main';
+var allJQs = [];
+var nextUniqueId = 0;
+var GET_METADATA_SYSTEM_CONTENT = 'yes';
+var SEARCH_NO_RESULT_TOP_OFFSET = 21;
+var stems;
 
 // UI State
-cells = null;
-metadataBeforeAreaTypeChange = null;
-sortedAreas = null;
-groupRoots = null;
-comparatorId = null;
-areaHash = null;
-preferredGroupRoots = {};
+var cells = null;
+var metadataBeforeAreaTypeChange = null;
+FT.data.sortedAreas = null;
+var groupRoots = null;
+var comparatorId = null;
+var areaHash = null;
+var preferredGroupRoots = {};
+var correctForPolarity = true;
+var chart;
 
 $(document).ready(documentReady);
-
-correctForPolarity = true;
-areaState = {};

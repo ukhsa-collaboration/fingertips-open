@@ -20,5 +20,6 @@ namespace Fpm.ProfileData.Entities.Job
         public string Filename { get; set; }
         public string OriginalFile { get { return Path.GetFileName(Filename); } }
         public ProgressStage ProgressStage { get; set; }
+        public int TotalRowsCommitted { get; set; }
     }
 }

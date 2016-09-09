@@ -6,6 +6,7 @@ namespace FingertipsUploadService.ProfileData.Entities.JobError
         PermissionError = 40001,
         WorkSheetValidationError = 40002,
         DuplicateRowInSpreadsheetError = 40003,
-        DuplicateRowInDatabaseError = 40004
+        DuplicateRowInDatabaseError = 40004,
+        ValidationFailureError = 40005
     }
 }

@@ -49,6 +49,40 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.IsTrue(limitsWithComparators.Max > limitsWithoutComparators.Max * 10);
         }
 
+        [TestMethod]
+        public void When_Data_List_Of_Invalid_Values_Then_Null_Returned()
+        {
+            var limits = new LimitsBuilder().GetLimits(GetCoreDataList(-1));
+            Assert.IsNull(limits);
+        }
+
+        [TestMethod]
+        public void When_Data_List_Then_Limits_Returned()
+        {
+            var limits = new LimitsBuilder().GetLimits(GetCoreDataList(1,2));
+            Assert.AreEqual(1, limits.Min);
+            Assert.AreEqual(2, limits.Max);
+        }
+
+        [TestMethod]
+        public void When_Empty_Data_List_Then_Null_Returned()
+        {
+            var limits = new LimitsBuilder().GetLimits(new List<CoreDataSet>());
+            Assert.IsNull(limits);
+        }
+
+        [TestMethod]
+        public void When_Null_Data_List_Then_Null_Returned()
+        {
+            var limits = new LimitsBuilder().GetLimits(new List<CoreDataSet>());
+            Assert.IsNull(limits);
+        }
+
+        private IList<CoreDataSet> GetCoreDataList(params double[] values)
+        {
+            return values.Select(x => new CoreDataSet {Value = x}).ToList();
+        }
+
         private Limits GetLimits(Grouping grouping,  bool excludeComparators)
         {
             var areaCodes = new List<string>

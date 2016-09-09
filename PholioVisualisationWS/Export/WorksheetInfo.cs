@@ -21,6 +21,14 @@ namespace PholioVisualisation.Export
         }
 
         /// <summary>
+        /// Returns the current row index.
+        /// </summary>
+        public int CurrentRow
+        {
+            get { return row; }
+        }
+
+        /// <summary>
         /// A worksheet is considered empty if NextRow has only been called 0 or 1 times.
         /// </summary>
         public bool IsWorksheetEmpty

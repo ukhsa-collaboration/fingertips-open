@@ -1,3 +1,5 @@
+'use strict';
+
 function goToBarChartPage() {
     lock();
 
@@ -148,13 +150,17 @@ function getAreaValues() {
             var roots = ui.getData(NATIONAL_CODE),
                     root = roots[index];
 
-            getData(getAreaValuesCallback, 'av', ['par=', NATIONAL_CODE,
-                '&gid=', PP.model.groupId,
-                '&ati=', PRACTICE,
-                '&off=', getYearOffset(),
-                '&iid=', root.IID,
-                '&age=', root.AgeId,
-                '&sex=', root.SexId].join(''));
+            var parameters = new ParameterBuilder(
+                ).add('group_id', PP.model.groupId
+                ).add('area_type_id', AreaTypeIds.Practice
+                ).add('parent_area_code', NATIONAL_CODE
+                ).add('comparator_id', -1
+                ).add('data_point_offset', getYearOffset()
+                ).add('indicator_id', root.IID
+                ).add('sex_id', root.Sex.Id
+                ).add('age_id', root.Age.Id);
+            
+            ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), getAreaValuesCallback);
 
             ajaxMonitor.monitor(displayBarChart);
             return;
@@ -163,7 +169,6 @@ function getAreaValues() {
 
     displayBarChart();
 }
-;
 
 function getAreaValuesCallback(obj) {
 
@@ -173,7 +178,7 @@ function getAreaValuesCallback(obj) {
 }
 ;
 
-barChartState = {
+var barChartState = {
     //TODO - move sort code into own class
 
     isInitialised: false,
@@ -297,8 +302,6 @@ function showOrHideBarChart(isChartDisplayed, noDataMessage) {
 
     }
 }
-;
-
 
 function createBarChart(dataAllPractices, dataPractice, practiceLabels, rootIndex) {
 
@@ -398,7 +401,7 @@ function createBarChart(dataAllPractices, dataPractice, practiceLabels, rootInde
     var title = indicatorName + new SexAndAge().getLabel(nationalRoot);
 
     try {
-        chart = new Highcharts.Chart({
+        barChart = new Highcharts.Chart({
             chart: {
                 renderTo: 'barChart',
                 animation: false,
@@ -637,6 +640,12 @@ function sortByCode(a, b) {
         return 1;
     return 0;
 }
+
+function showExportChartLink() {
+    return '<div class="export-chart-box"><a class="export-link" href="javascript:exportChartAsImage(barChart)">Export chart as image</a></div>';
+}
+
+var barChart;
 
 var practiceProfilesLegend = '<div class="legends" style="position: relative; top: 10px;">\
     <table id="barChartKeyTable">\

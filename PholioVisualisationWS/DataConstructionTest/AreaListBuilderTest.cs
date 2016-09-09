@@ -1,13 +1,10 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Moq.Protected;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstructionTest
 {
@@ -28,9 +25,9 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var categoryAreaType = CategoryAreaType.New(new CategoryType
             {
-                Id = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority
+                Id = CategoryTypeIds.DeprivationDecileCountyAndUA2010
             });
-            var builder = new AreaListBuilder(ReaderFactory.GetAreasReader());
+            var builder = new AreaListProvider(ReaderFactory.GetAreasReader());
             builder.CreateAreaListFromAreaTypeId(profileId, categoryAreaType.Id);
             var areaList = builder.Areas;
             Assert.IsTrue(areaList.Any());
@@ -50,14 +47,14 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void CreateAreaListFromAreaTypeIdReturnsParentAreas()
         {
-            IList<string> codes = new List<string> {"a", "b"};
+            IList<string> codes = new List<string> { "a", "b" };
             var areas = AreaList();
 
             var mockAreasReader = new Mock<AreasReader>();
             ParentAreaCodesAreFound(codes, mockAreasReader);
             AreasGotFromCodes(codes, areas, mockAreasReader);
 
-            var builder = new AreaListBuilder(mockAreasReader.Object);
+            var builder = new AreaListProvider(mockAreasReader.Object);
             builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
             var areaList = builder.Areas;
             Assert.AreEqual(3, areaList.Count);
@@ -69,7 +66,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areas = AreaList();
             var builder = CreateAreaListFromAreaTypeId(areas);
 
-            var ignoredAreasFilter = new IgnoredAreasFilter(new List<string> {"a"});
+            var ignoredAreasFilter = new IgnoredAreasFilter(new List<string> { "a" });
             builder.RemoveAreasIgnoredEverywhere(ignoredAreasFilter);
 
             var filteredAreas = builder.Areas;
@@ -114,14 +111,14 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestGetAreaListFromAreaCodesReturnEmptyListForIfAreaCodes()
         {
-            var codes = new string[] {};
+            var codes = new string[] { };
 
             var mock = new Mock<AreasReader>();
             mock.Setup(x => x
                 .GetAreasFromCodes(codes))
                 .Returns(new List<Area>());
 
-            var builder = new AreaListBuilder(mock.Object);
+            var builder = new AreaListProvider(mock.Object);
 
             builder.CreateAreaListFromAreaCodes(codes);
             Assert.AreEqual(0, builder.Areas.Count);
@@ -132,13 +129,13 @@ namespace PholioVisualisation.DataConstructionTest
         {
             const string code = "a";
 
-            var codes = new[] {code};
+            var codes = new[] { code };
 
             var mock = new Mock<AreasReader>();
             mock.Setup(x => x
                 .GetAreaFromCode(code))
-                .Returns(new Area {Code = code});
-            var builder = new AreaListBuilder(mock.Object);
+                .Returns(new Area { Code = code });
+            var builder = new AreaListProvider(mock.Object);
 
             builder.CreateAreaListFromAreaCodes(codes);
             var areas = builder.Areas;
@@ -150,32 +147,32 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestCreateAreaListFromNearestNeighbourAreaCode()
         {
             const string code = AreaCodes.NearestNeighbours_Derby;
-            var nn = new NearestNeighbourArea(code);            
-            IAreasReader areasReader = ReaderFactory.GetAreasReader();            
+            var nn = new NearestNeighbourArea(code);
+            IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
-            var builder = new AreaListBuilder(areasReader);
+            var builder = new AreaListProvider(areasReader);
             builder.CreateAreaListFromNearestNeighbourAreaCode(
-                ProfileIds.ChildrenAndYoungPeoplesBenchmarkingTool,code);
+                ProfileIds.ChildrenAndYoungPeoplesBenchmarkingTool, code);
 
             // Check areas
             var areas = builder.Areas;
             Assert.IsNotNull(areas);
 
             // Check order of Nearest Neighbours
-            var sortedNearestNeighboursByRank = areasReader.GetNearestNeighbours(nn.Code);
-            for (var i=0; i < sortedNearestNeighboursByRank.Count; i++)
+            var sortedNearestNeighboursByRank = areasReader.GetNearestNeighbours(nn.Code, 1);
+            for (var i = 0; i < sortedNearestNeighboursByRank.Count; i++)
             {
-                Assert.AreEqual(sortedNearestNeighboursByRank[i].NeighbourAreaCode, areas[i].Code );
-            }           
+                Assert.AreEqual(sortedNearestNeighboursByRank[i].NeighbourAreaCode, areas[i].Code);
+            }
         }
 
-        private AreaListBuilder CreateAreaListFromAreaTypeId(List<Area> areas)
+        private AreaListProvider CreateAreaListFromAreaTypeId(List<Area> areas)
         {
             var mockAreasReader = new Mock<AreasReader>();
             GetAreasByAreaTypeIdReturnsAreas(areas, mockAreasReader);
             NoParentAreaCodes(mockAreasReader);
 
-            var builder = new AreaListBuilder(mockAreasReader.Object);
+            var builder = new AreaListProvider(mockAreasReader.Object);
             builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
             return builder;
         }
@@ -193,7 +190,7 @@ namespace PholioVisualisation.DataConstructionTest
 
         public Area Area(string nameAndCode)
         {
-            return new Area {Name = nameAndCode, Code = nameAndCode};
+            return new Area { Name = nameAndCode, Code = nameAndCode };
         }
 
         public void AssertName(string name, IArea area)
@@ -233,126 +230,126 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var nearestNeighbours = new List<AreaCodeNeighbourMapping>()
             {
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11233,
-		            NeighbourAreaCode = "E08000026",
-		            NeighbourTypeId = 1,
-		            Position = 1
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11234,
-		            NeighbourAreaCode = "E08000001",
-		            NeighbourTypeId = 1,
-		            Position = 2
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11235,
-		            NeighbourAreaCode = "E08000027",
-		            NeighbourTypeId = 1,
-		            Position = 3
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11236,
-		            NeighbourAreaCode = "E08000030",
-		            NeighbourTypeId = 1,
-		            Position = 4
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11237,
-		            NeighbourAreaCode = "E06000035",
-		            NeighbourTypeId = 1,
-		            Position = 5
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11238,
-		            NeighbourAreaCode = "E08000005",
-		            NeighbourTypeId = 1,
-		            Position = 6
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11239,
-		            NeighbourAreaCode = "E06000005",
-		            NeighbourTypeId = 1,
-		            Position = 7
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11240,
-		            NeighbourAreaCode = "E06000004",
-		            NeighbourTypeId = 1,
-		            Position = 8
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11241,
-		            NeighbourAreaCode = "E08000004",
-		            NeighbourTypeId = 1,
-		            Position = 9
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11242,
-		            NeighbourAreaCode = "E08000034",
-		            NeighbourTypeId = 1,
-		            Position = 10
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11243,
-		            NeighbourAreaCode = "E08000033",
-		            NeighbourTypeId = 1,
-		            Position = 11
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11244,
-		            NeighbourAreaCode = "E08000018",
-		            NeighbourTypeId = 1,
-		            Position = 12
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11245,
-		            NeighbourAreaCode = "E08000031",
-		            NeighbourTypeId = 1,
-		            Position = 13
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11246,
-		            NeighbourAreaCode = "E08000002",
-		            NeighbourTypeId = 1,
-		            Position = 14
-	            },
-	            new AreaCodeNeighbourMapping
-	            {
-		            AreaCode = "E06000015",
-		            Id = 11247,
-		            NeighbourAreaCode = "E06000020",
-		            NeighbourTypeId = 1,
-		            Position = 15
-	            }
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11233,
+                    NeighbourAreaCode = "E08000026",
+                    NeighbourTypeId = 1,
+                    Position = 1
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11234,
+                    NeighbourAreaCode = "E08000001",
+                    NeighbourTypeId = 1,
+                    Position = 2
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11235,
+                    NeighbourAreaCode = "E08000027",
+                    NeighbourTypeId = 1,
+                    Position = 3
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11236,
+                    NeighbourAreaCode = "E08000030",
+                    NeighbourTypeId = 1,
+                    Position = 4
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11237,
+                    NeighbourAreaCode = "E06000035",
+                    NeighbourTypeId = 1,
+                    Position = 5
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11238,
+                    NeighbourAreaCode = "E08000005",
+                    NeighbourTypeId = 1,
+                    Position = 6
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11239,
+                    NeighbourAreaCode = "E06000005",
+                    NeighbourTypeId = 1,
+                    Position = 7
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11240,
+                    NeighbourAreaCode = "E06000004",
+                    NeighbourTypeId = 1,
+                    Position = 8
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11241,
+                    NeighbourAreaCode = "E08000004",
+                    NeighbourTypeId = 1,
+                    Position = 9
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11242,
+                    NeighbourAreaCode = "E08000034",
+                    NeighbourTypeId = 1,
+                    Position = 10
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11243,
+                    NeighbourAreaCode = "E08000033",
+                    NeighbourTypeId = 1,
+                    Position = 11
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11244,
+                    NeighbourAreaCode = "E08000018",
+                    NeighbourTypeId = 1,
+                    Position = 12
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11245,
+                    NeighbourAreaCode = "E08000031",
+                    NeighbourTypeId = 1,
+                    Position = 13
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11246,
+                    NeighbourAreaCode = "E08000002",
+                    NeighbourTypeId = 1,
+                    Position = 14
+                },
+                new AreaCodeNeighbourMapping
+                {
+                    AreaCode = "E06000015",
+                    Id = 11247,
+                    NeighbourAreaCode = "E06000020",
+                    NeighbourTypeId = 1,
+                    Position = 15
+                }
             };
             return nearestNeighbours;
         }

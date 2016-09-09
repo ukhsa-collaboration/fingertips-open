@@ -101,7 +101,7 @@ namespace PholioVisualisation.DataConstructionTest
             }.Build();
 
             Assert.IsTrue(data.GroupRoots.Count > 0
-                && data.GroupRoots.FirstOrDefault().TrendMarkers.Count > 0
+                && data.GroupRoots.FirstOrDefault().RecentTrends.Count > 0
                 );
         }
 

@@ -7,6 +7,7 @@ using Moq;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
 
 
 namespace FingertipsUploadServiceTest
@@ -15,19 +16,29 @@ namespace FingertipsUploadServiceTest
     public class SimpleJobWorkerTest : WorkerTestBase
     {
         private Guid _jobGuid;
+        private Guid _secondJobGuid;
+        private bool hasSecondJobGuid;
 
         [TestInitialize]
         public void RunBeforeEachTest()
         {
             _jobGuid = Guid.NewGuid();
             AutoMapperConfig.RegisterMappings();
+            JobRepository.DeleteAllJob();
         }
 
         [TestCleanup]
         public void RunAfterEachTest()
         {
-            // JobRepository.DeleteJob(_jobGuid);
+            JobRepository.DeleteJob(_jobGuid);
             ErrorRepository.DeleteLog(_jobGuid);
+            CoreDataRepository.DeleteCoreData(_jobGuid);
+            if (hasSecondJobGuid)
+            {
+                JobRepository.DeleteJob(_secondJobGuid);
+                ErrorRepository.DeleteLog(_secondJobGuid);
+                CoreDataRepository.DeleteCoreData(_secondJobGuid);
+            }
         }
 
         [TestMethod]
@@ -61,30 +72,45 @@ namespace FingertipsUploadServiceTest
             var excelFileReader = new ExcelFileReader(job.Filename);
             worker.ProcessJob(job, validator, processor, excelFileReader);
 
-            Assert.AreEqual(UploadJobStatus.ConfirmationAwaited, job.Status);
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
+
             // Clean up
-            CoreDataRepository.DeleteCoreData(_jobGuid);
+            CoreDataRepository.DeleteCoreData(job.Guid);
+
         }
 
         [TestMethod]
         public void EndToEnd_3_ProcessJobWithDuplicateRowInPholio()
         {
+            hasSecondJobGuid = true;
+
             // First job
             var job = GetJob(UploadJobType.Simple, _jobGuid);
             job.Filename = GetTestFilePath("upload-simple-duplicate-row-in-pholio.xlsx");
             job = JobRepository.SaveJob(job);
 
-            var duplicateJob = GetJob(UploadJobType.Simple, _jobGuid);
-            duplicateJob.Guid = Guid.NewGuid();
-            duplicateJob.Filename = GetTestFilePath("upload-simple-duplicate-row-in-pholio.xlsx");
-            duplicateJob = JobRepository.SaveJob(duplicateJob);
 
-            // process new job without any duplication
+            // Process new job without any duplication
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
             var processor = new SimpleWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
             var excelFileReader = new ExcelFileReader(job.Filename);
             worker.ProcessJob(job, validator, processor, excelFileReader);
+
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
+
+
+
+
+            // Second job           
+            _secondJobGuid = Guid.NewGuid();
+            var duplicateJob = GetJob(UploadJobType.Simple, _secondJobGuid);
+
+            duplicateJob.Filename = GetTestFilePath("upload-simple-duplicate-row-in-pholio.xlsx");
+            duplicateJob = JobRepository.SaveJob(duplicateJob);
+
+            // Wait for excel read connection to be disposed
+            Thread.Sleep(1000);
 
             // Process job with duplication
             excelFileReader = new ExcelFileReader(duplicateJob.Filename);
@@ -92,12 +118,16 @@ namespace FingertipsUploadServiceTest
 
             Assert.AreEqual(UploadJobStatus.ConfirmationAwaited, duplicateJob.Status);
 
-            // Clean up
-            CoreDataRepository.DeleteCoreData(job.Guid);
-            CoreDataRepository.DeleteCoreData(duplicateJob.Guid);
+            // Wait for excel read connection to be disposed
+            Thread.Sleep(1000);
 
-            JobRepository.DeleteJob(duplicateJob.Guid);
-            ErrorRepository.DeleteLog(duplicateJob.Guid);
+            duplicateJob.Status = UploadJobStatus.ConfirmationGiven;
+
+            JobRepository.UpdateJob(duplicateJob);
+
+            worker.ProcessJob(duplicateJob, validator, processor, excelFileReader);
+            Assert.AreEqual(UploadJobStatus.SuccessfulUpload, duplicateJob.Status);
+
         }
 
         [TestMethod]

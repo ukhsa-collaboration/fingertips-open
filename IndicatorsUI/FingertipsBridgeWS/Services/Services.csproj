@@ -25,6 +25,7 @@
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -66,18 +67,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GetData.cs" />
-    <Compile Include="GetGroupAreas.cs" />
     <Compile Include="GetGroupDataAtDataPoint.cs" />
     <Compile Include="GetGroupDataAtDataPointBySearch.cs" />
-    <Compile Include="GetGroupDataAtTimePoint.cs" />
-    <Compile Include="GetLabel.cs" />
-    <Compile Include="GetLabelSeries.cs" />
     <Compile Include="GetTrendData.cs" />
     <Compile Include="GetTrendDataBySearch.cs" />
-    <Compile Include="JsonpBuilder.cs" />
-    <Compile Include="PostHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Search.cs" />
     <Compile Include="ServiceBridge.cs" />
   </ItemGroup>
   <ItemGroup>

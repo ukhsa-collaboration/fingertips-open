@@ -14,7 +14,7 @@ namespace PholioVisualisation.DataConstructionTest
             var builder = new AreaCodeToCategoryIdMapBuilder
             {
                 ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
-                CategoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority
+                CategoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2010
             };
 
             Dictionary<string, int> map = builder.Build();
@@ -27,7 +27,7 @@ namespace PholioVisualisation.DataConstructionTest
             var builder = new AreaCodeToCategoryIdMapBuilder
             {
                 ChildAreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority,
-                CategoryTypeId = CategoryTypeIds.DeprivationDecileDistrictAndUnitaryAuthority
+                CategoryTypeId = CategoryTypeIds.DeprivationDecileDistrictAndUA2010
             };
 
             Dictionary<string, int> map = builder.Build();

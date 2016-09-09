@@ -4,13 +4,11 @@
     {
         Undefined = -1,
         SiteFrontPage = 1,
-        DataPageOfProfileWithoutFrontPage = 2,
-        FrontPageOfStandaloneProfileWithFrontPage = 3,
-        DataPageOfStandaloneProfileWithFrontPage = 4,
-        ProfileCollectionFrontPage = 5,
-        FrontPageOfProfileInCollection = 6,
-        DataPageOfProfileInCollection = 7,
         SupportingInformation = 8,
-        AreaSearchResults = 9
+        DataPageOfProfileWithoutFrontPage = 2,
+        FrontPageOfProfileWithFrontPage = 3,
+        DataPageOfProfileWithFrontPage = 4,
+        AreaSearchResultsOfProfileWithFrontPage = 9,
+        ProfileCollectionFrontPage = 5,
     }
 }

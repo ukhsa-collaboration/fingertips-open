@@ -30,7 +30,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestBuild()
         {
-            var areaListBuilder = new Mock<AreaListBuilder>(MockBehavior.Strict);
+            var areaListBuilder = new Mock<AreaListProvider>(MockBehavior.Strict);
             areaListBuilder.Setup(x => x.CreateChildAreaList(parentAreaCode, childAreaId));
             areaListBuilder.Setup(x => x.SortByOrderOrName());
             areaListBuilder.SetupGet(x => x.Areas)
@@ -52,7 +52,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestBuild_IgnoredAreasMayBeRemoved()
         {
-            var areaListBuilder = new Mock<AreaListBuilder>();
+            var areaListBuilder = new Mock<AreaListProvider>();
             areaListBuilder.SetupGet(x => x.Areas)
                 .Returns(filteredAreas);
 

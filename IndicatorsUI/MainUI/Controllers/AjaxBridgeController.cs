@@ -11,40 +11,41 @@ namespace Profiles.MainUI.Controllers
 {
     public class AjaxBridgeController : Controller
     {
-        private JsonCache jsonCache = new JsonCache();
+        private readonly JsonCache _jsonCache = new JsonCache();
 
-        private DateTime startTime = DateTime.Now;
+        private readonly DateTime _startTime = DateTime.Now;
 
-        public JsonResult Data(string serviceAction)
+        [HttpGet]
+        public JsonResult Data(string serviceAction1, string serviceAction2 = "")
         {
             var request = HttpContext.Request;
-            string serviceParameters = request.Url.Query.TrimStart('?')/* e.g. "?pid=15" */;
+            var ajaxUrl = new AjaxUrl(request);
+            var serviceParameters = ajaxUrl.ServiceParameters;
 
-            byte[] json = jsonCache.GetJson(serviceAction, serviceParameters);
-
-            if (JsonUnit.IsJsonOk(json) == false)
+            byte[] json;
+            if (serviceParameters.Contains("no_cache=true"))
             {
-                WebClient wc = new WebClient();
-                var url = GetUrl(request);
-                json = wc.DownloadData(url);
+                json = GetJsonFromWebServices(ajaxUrl.WebServicesUrl);
+            }
+            else
+            {
+                var serviceKey = serviceAction1 + serviceAction2;
+                json = _jsonCache.GetJson(serviceKey, serviceParameters);
 
-                if (JsonUnit.IsJsonOk(json))
+                if (JsonUnit.IsJsonOk(json) == false)
                 {
-                    CacheJson(json, serviceAction, serviceParameters, request);
+                    json = GetJsonFromWebServices(ajaxUrl.WebServicesUrl);
+
+                    if (JsonUnit.IsJsonOk(json))
+                    {
+                        CacheJson(json, serviceKey, serviceParameters, request);
+                    }
                 }
             }
 
             SetPublicCacheIfLive();
 
             return new AjaxBridgeJsonResult(json);
-        }
-
-        private void SetPublicCacheIfLive()
-        {
-            if (AppConfig.Instance.IsEnvironmentLive)
-            {
-                CachePolicyHelper.CacheForOneMonth(HttpContext.Response.Cache);
-            }
         }
 
         [HttpPost]
@@ -56,15 +57,25 @@ namespace Profiles.MainUI.Controllers
                     ExceptionLogger.LogClientSideException(Request.Params["errorMessage"]);
                     break;
                 case "export":
-                    ExceptionLogger.LogExport(Request.Params["areaCode"], Request.Params["profileId"], Request.Params["downloadType"]);
+                    ExceptionLogger.LogExport(Request.Params["areaCode"], 
+                        Request.Params["profileId"], Request.Params["downloadType"]);
                     break;
             }
         }
 
-        private string GetUrl(HttpRequestBase request)
+        private byte[] GetJsonFromWebServices(string url)
         {
-            var coreWsUrl = AppConfig.Instance.CoreWsUrlForAjaxBridge;
-            return coreWsUrl.TrimEnd('/') + request.RawUrl/* e.g. "/data/areatypes?pid=15" */;
+            WebClient wc = new WebClient();
+            byte[] json = wc.DownloadData(url);
+            return json;
+        }
+
+        private void SetPublicCacheIfLive()
+        {
+            if (AppConfig.Instance.IsEnvironmentLive)
+            {
+                CachePolicyHelper.CacheForOneMonth(HttpContext.Response.Cache);
+            }
         }
 
         private void CacheJson(byte[] json, string serviceAction, string serviceParameters, HttpRequestBase request)
@@ -72,11 +83,11 @@ namespace Profiles.MainUI.Controllers
             string absoluteUri = request.Url.AbsoluteUri;
 
             JsonUnit unit = new JsonUnit(serviceAction, serviceParameters, json, absoluteUri,
-                                             (DateTime.Now - startTime).TotalMilliseconds);
+                                             (DateTime.Now - _startTime).TotalMilliseconds);
 
             try
             {
-                jsonCache.AddJson(unit);
+                _jsonCache.AddJson(unit);
             }
             catch (Exception ex)
             {

@@ -64,6 +64,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="HealthProfilesKeyMessage1DeprivationLevelTest.cs" />
     <Compile Include="HealthProfilesKeyMessage2BuilderTest.cs" />
     <Compile Include="HealthProfilesKeyMessage3BuilderTest.cs" />
     <Compile Include="HealthProfilesKeyMessage4BuilderTest.cs" />

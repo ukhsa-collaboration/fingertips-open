@@ -120,7 +120,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_DeprivationDecile()
         {
             var areaCode = CategoryArea.CreateAreaCode(
-                CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority, 5);
+                CategoryTypeIds.DeprivationDecileCountyAndUA2010, 5);
             var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             CheckBenchmarkDetails(areaDetails);

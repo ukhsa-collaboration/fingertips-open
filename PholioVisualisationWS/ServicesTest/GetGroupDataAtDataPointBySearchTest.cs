@@ -14,10 +14,18 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestSearchFindsResultsForAllAreaTypesWhereDataIsAvailable()
         {
-            foreach (var areaTypeId in new [] { AreaTypeIds.DistrictAndUnitaryAuthority, AreaTypeIds.CountyAndUnitaryAuthority })
+            foreach (var areaTypeId in new[] { AreaTypeIds.DistrictAndUnitaryAuthority, AreaTypeIds.CountyAndUnitaryAuthority })
             {
-                byte[] data = new WebClient().DownloadData(TestHelper.BaseUrl +
-                    string.Format("GetGroupDataAtDataPointBySearch.ashx?gid=1&ati={0}&par=EMREG&pid=13&iids=767", (int)areaTypeId));
+                var url = TestHelper.BaseUrl + string.Format("GetGroupDataAtDataPointBySearch.ashx?" +
+                    "gid=" + GroupIds.Search +
+                    "&ati={0}" +
+                    "&par=" + AreaCodes.Gor_EastMidlands +
+                    "&pid=" + ProfileIds.Search +
+                    "&res=" + ProfileIds.Phof +
+                    "&iids=" + IndicatorIds.ChildrenInLowIncomeFamilies, (int)areaTypeId);
+
+                byte[] data = new WebClient().DownloadData(url);
+
                 TestHelper.IsData(data);
                 string s = Encoding.Default.GetString(data);
                 Assert.IsFalse(s.Contains("groupRoots:[]"));

@@ -53,11 +53,11 @@
     <Reference Include="System.Configuration">
       <HintPath>..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriver, Version=2.42.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="WebDriver, Version=2.53.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdPartyLibraries\selenium\net40\WebDriver.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriver.Support, Version=2.42.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="WebDriver.Support, Version=2.53.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\3rdPartyLibraries\selenium\net40\WebDriver.Support.dll</HintPath>
     </Reference>
@@ -74,7 +74,9 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
@@ -92,15 +94,18 @@
     <Compile Include="HealthierLives\PageDiabetesHomeTest.cs" />
     <Compile Include="HealthierLives\PageDiabetesRankingsTest.cs" />
     <Compile Include="HealthierLives\PageDiabetesPracticeDetailsTest.cs" />
+    <Compile Include="HealthierLives\PageHypertensionPracticeDetailsTest.cs" />
     <Compile Include="HealthierLives\PageMortalityAreaDetailsTest.cs" />
     <Compile Include="HealthierLives\PageMortalityHealthInterventionsTest.cs" />
     <Compile Include="HealthierLives\PageMortalityRankingsTest.cs" />
     <Compile Include="LongerLivesHelper.cs" />
     <Compile Include="NavigateTo.cs" />
+    <Compile Include="PHOF\PhofCompareAreasTest.cs" />
     <Compile Include="PHOF\PhofContentPageTest.cs" />
     <Compile Include="PHOF\PhofDataTest.cs" />
     <Compile Include="PHOF\PhofBaseUnitTest.cs" />
     <Compile Include="PHOF\PhofIndicatorSearchTest.cs" />
+    <Compile Include="PHOF\PhofInequalityTrendTest.cs" />
     <Compile Include="PHOF\PhofNearestNeighboursTest.cs" />
     <Compile Include="TestHelper.cs" />
     <Compile Include="SeleniumLookUps.cs" />
@@ -153,7 +158,7 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "C:\fingertips\3rdPartyLibraries\selenium\chromedriver.exe" "$(TargetDir)" /i /d /y</PreBuildEvent>
+    <PreBuildEvent>xcopy "C:\fingertips\3rdPartyLibraries\selenium\geckodriver.exe" "$(TargetDir)" /i /d /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

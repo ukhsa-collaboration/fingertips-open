@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
 using PholioVisualisation.Analysis;
@@ -11,7 +12,7 @@ namespace PholioVisualisation.Services
 {
     public class JsonBuilderAreaValues : JsonBuilderBase
     {
-        private AreaValuesParameters parameters;
+        private AreaValuesParameters _parameters;
 
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         private IProfileReader profileReader = ReaderFactory.GetProfileReader();
@@ -19,57 +20,65 @@ namespace PholioVisualisation.Services
         public JsonBuilderAreaValues(HttpContextBase context)
             : base(context)
         {
-            parameters = new AreaValuesParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new AreaValuesParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderAreaValues(AreaValuesParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            var profileId = GetProfileId();
+            var values = GetValues();
+            return JsonConvert.SerializeObject(values);
+        }
 
+        public IList<CoreDataSet> GetValues()
+        {
+            var profileId = GetProfileId();
             var grouping = GetGrouping(profileId);
-            object values = null;
 
             var indicatorComparerFactory = new IndicatorComparerFactory
-                {
-                    PholioReader = ReaderFactory.GetPholioReader()
-                };
+            {
+                PholioReader = ReaderFactory.GetPholioReader()
+            };
 
             ChildAreaValuesBuilder builder = new ChildAreaValuesBuilder(indicatorComparerFactory, groupDataReader,
                 ReaderFactory.GetAreasReader(), profileReader)
-                {
-                    AreaTypeId = parameters.AreaTypeId,
-                    ParentAreaCode = parameters.ParentAreaCode,
-                    DataPointOffset = parameters.DataPointOffset,
-                    ComparatorId = parameters.ComparatorId,
-                    RestrictToProfileId = GetProfileId()
-                };
+            {
+                AreaTypeId = _parameters.AreaTypeId,
+                ParentAreaCode = _parameters.ParentAreaCode,
+                DataPointOffset = _parameters.DataPointOffset,
+                ComparatorId = _parameters.ComparatorId,
+                RestrictToProfileId = GetProfileId()
+            };
 
-            values = builder.Build(grouping);
-
-            return JsonConvert.SerializeObject(values);
+            return builder.Build(grouping);
         }
 
         private int GetProfileId()
         {
-            return parameters.RestrictToProfileId != -1
-                ? parameters.RestrictToProfileId
-                : parameters.ProfileId;
+            return _parameters.RestrictToProfileId != -1
+                ? _parameters.RestrictToProfileId
+                : _parameters.ProfileId;
         }
 
         private Grouping GetGrouping(int profileId)
         {
-            if (parameters.GroupIds.Count > 1)
+            if (_parameters.GroupIds.Count > 1)
             {
                 throw new FingertipsException("Only one group ID at a time allowed");
             }
 
-            var groupId = parameters.GroupIds.First();
+            var groupId = _parameters.GroupIds.First();
 
             GroupIdProvider groupIdProvider = new GroupIdProvider(profileReader);
             var grouping = new SingleGroupingProvider(groupDataReader, groupIdProvider)
-                .GetGrouping(profileId, groupId, parameters.AreaTypeId, 
-                    parameters.IndicatorId, parameters.SexId, parameters.AgeId);
+                .GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(profileId, groupId, _parameters.AreaTypeId, 
+                    _parameters.IndicatorId, _parameters.SexId, _parameters.AgeId);
             return grouping;
         }
     }

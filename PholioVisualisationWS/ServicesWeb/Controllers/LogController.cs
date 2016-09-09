@@ -12,6 +12,10 @@ namespace ServicesWeb.Controllers
 {
     public class LogController : BaseController
     {
+        /// <summary>
+        /// Logs an exception that can be viewed in FPM
+        /// </summary>
+        /// <param name="exception">Serialised exception taken from the request body</param>
         [HttpPost]
         [Route("log/exception")]
         public void Exception([FromBody]string exception)

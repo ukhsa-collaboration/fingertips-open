@@ -1,27 +1,41 @@
 ﻿
+using System.Collections.Generic;
 using System.Web;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
     public class JsonBuilderGroupingTree : JsonBuilderBase
     {
-        private GroupingTreeParameters parameters;
+        private GroupingTreeParameters _parameters;
 
         public JsonBuilderGroupingTree(HttpContextBase context)
             : base(context)
         {
-            parameters = new GroupingTreeParameters(context.Request.Params);
-            Parameters = parameters;
+            _parameters = new GroupingTreeParameters(context.Request.Params);
+            Parameters = _parameters;
+        }
+
+        public JsonBuilderGroupingTree(GroupingTreeParameters parameters)
+        {
+            _parameters = parameters;
+            Parameters = _parameters;
         }
 
         public override string GetJson()
         {
-            return JsonConvert.SerializeObject(
-                new GroupMetadataBuilder(ReaderFactory.GetGroupDataReader()) { GroupIds = parameters.GroupIds }.Build());
+            var groupingMetadatas = GetGroupingMetadatas();
+            return JsonConvert.SerializeObject(groupingMetadatas);
+        }
+
+        public IList<GroupingMetadata> GetGroupingMetadatas()
+        {
+            return new GroupMetadataBuilder(ReaderFactory.GetGroupDataReader()) { GroupIds = _parameters.GroupIds }
+                .Build();
         }
     }
 }

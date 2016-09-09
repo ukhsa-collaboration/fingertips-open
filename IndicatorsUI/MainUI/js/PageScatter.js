@@ -1,3 +1,5 @@
+'use strict';
+
 function goToScatterPage() {
     lock();
     
@@ -47,16 +49,16 @@ function displayScatterChart() {
     
     src.push("&gid1=", model.groupId, 
         "&iid1=", root.IID, 
-        "&sex1=", root.SexId,
-        '&age1=', root.AgeId);
+        "&sex1=", root.Sex.Id,
+        '&age1=', root.Age.Id);
     
     var index2 = $('#indicator2Menu').val();
     var sid2 = model.groupId2;
     var root2 = loaded.data[sid2][NATIONAL_CODE][index2];
     src.push("&gid2=", sid2,
         "&iid2=", root2.IID,
-        "&sex2=", root2.SexId,
-        '&age2=', root2.AgeId);
+        "&sex2=", root2.Sex.Id,
+        '&age2=', root2.Age.Id);
     
     // TODO only change src if necessary
     setScatterSrc(src.join(''));
@@ -111,7 +113,7 @@ function evaluateIndicator2Menu() {
     jq.val(i);
 };
 
-scatterState = {
+var scatterState = {
     
     /* If second indicator menu required by another page then move preferred group root 
     information to ui object */

@@ -65,6 +65,7 @@
     <Compile Include="BatchUpload.cs" />
     <Compile Include="BatchWorksheetDataProcessor.cs" />
     <Compile Include="CategoryValuesValidator.cs" />
+    <Compile Include="CoreDataSetDuplicateChecker.cs" />
     <Compile Include="DataUploadValidation.cs" />
     <Compile Include="DuplicateRowInSpreadsheetError.cs" />
     <Compile Include="IBatchWorksheetDataProcessor.cs" />

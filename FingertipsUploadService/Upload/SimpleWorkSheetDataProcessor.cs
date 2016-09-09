@@ -1,5 +1,4 @@
 ﻿using FingertipsUploadService.ProfileData;
-using FingertipsUploadService.ProfileData.Entities.Core;
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Helpers;
 using FingertipsUploadService.ProfileData.Repositories;
@@ -33,7 +32,9 @@ namespace FingertipsUploadService.Upload
             {
                 //Validate the spreadsheet data to see if there's replication within it.
                 simpleUpload.DuplicateUploadErrorsExist = ValidateSpreadsheetForDuplicatedRows(simpleUpload);
-                simpleUpload.DuplicateRowInDatabaseErrors = DoesCoreDataAlreadyExist(simpleUpload).DuplicateRowInDatabaseErrors;
+                simpleUpload.DuplicateRowInDatabaseErrors =
+                    new CoreDataSetDuplicateChecker().GetDuplicates(simpleUpload.DataToUpload, _coreDataRepository,
+                        UploadJobType.Simple);
             }
             simpleUpload.UploadPeriod = new TimePeriodTranslater().Translate(simpleUpload);
         }
@@ -48,6 +49,8 @@ namespace FingertipsUploadService.Upload
             // TODO: find out why were are calling it again here as its caled in Validate()
             ValidateIndicatorDetails(indicatorDetails, simpleUpload, allowedData);
 
+            var dataToUpload = new List<UploadDataModel>();
+
             for (int i = 0; i < pholioData.Rows.Count; i++)
             {
                 DataRow row = pholioData.Rows[i];
@@ -61,9 +64,12 @@ namespace FingertipsUploadService.Upload
 
                 rowCount++;
 
-                UploadDataModel upload = rowParser.GetUploadDataModelWithUnparsedValuesSetToDefaults(simpleUpload);
+                var upload = rowParser.GetUploadDataModelWithUnparsedValuesSetToDefaults(simpleUpload);
                 _coreDataRepository.InsertCoreData(upload.ToCoreDataSet(), job.Guid);
+                dataToUpload.Add(upload);
             }
+
+            simpleUpload.DataToUpload = dataToUpload;
 
             int uploadId = _loggingRepository.InsertUploadAudit(job.Guid, job.Username,
                 rowCount, job.Filename, WorksheetNames.SimplePholio);
@@ -76,46 +82,6 @@ namespace FingertipsUploadService.Upload
             return simpleUpload;
         }
 
-
-        //TODO: rewrite with DataTable
-        public SimpleUpload UploadSimpleDataAndArchiveDuplicates(string excelFileName, string shortFilename,
-            string selectedWorksheet, Guid uploadBatchId, string userName)
-        {
-            var simpleUpload = new SimpleUpload
-            {
-                FileName = excelFileName,
-                DataToUpload = new List<UploadDataModel>(),
-                DuplicateRowInDatabaseErrors = new List<DuplicateRowInDatabaseError>(),
-                DuplicateRowInSpreadsheetErrors = new List<DuplicateRowInSpreadsheetError>(),
-                ExcelDataSheets = new List<UploadExcelSheet>(),
-                UploadValidationFailures = new List<UploadValidationFailure>(),
-                SelectedWorksheet = selectedWorksheet,
-                UploadBatchId = uploadBatchId
-            };
-            //TODO: validate with datatable
-            //            Validate(simpleUpload);
-
-            if (simpleUpload.DuplicateRowInDatabaseErrors.Count > 0)
-            {
-                //Insert the duplicates to the CoreDataset Archive table and delete the coredataset rows in question
-                _coreDataRepository.InsertCoreDataArchive(simpleUpload.DuplicateRowInDatabaseErrors, uploadBatchId);
-
-                int uploadId = _loggingRepository.InsertUploadAudit(uploadBatchId, userName,
-                    simpleUpload.DataToUpload.Count, excelFileName, selectedWorksheet);
-
-                //Insert the new rows into the CoreDataset table
-                foreach (UploadDataModel uploadDataModel in simpleUpload.DataToUpload)
-                {
-                    _coreDataRepository.InsertCoreData(uploadDataModel.ToCoreDataSet(), uploadBatchId);
-                }
-
-                simpleUpload.ShortFileName = shortFilename;
-                simpleUpload.TotalDataRows = simpleUpload.DataToUpload.Count;
-                simpleUpload.UploadBatchId = uploadBatchId;
-                simpleUpload.Id = uploadId;
-            }
-            return simpleUpload;
-        }
 
         // Validate indicator details
         private void ValidateIndicatorDetails(DataTable dataTable, SimpleUpload simpleUpload, AllowedData allowedData)
@@ -232,7 +198,8 @@ namespace FingertipsUploadService.Upload
             }
         }
 
-        private List<UploadValidationFailure> ValidateUploadedRow(DataRow uploadedRow, int rowNumber, List<string> allAreaCodes)
+        private List<UploadValidationFailure> ValidateUploadedRow(DataRow uploadedRow, int rowNumber,
+            List<string> allAreaCodes)
         {
             var duv = new DataUploadValidation();
             Exception dataConversionException;
@@ -300,7 +267,19 @@ namespace FingertipsUploadService.Upload
                 uploadErrors.Add(new UploadValidationFailure(rowNumber, UploadColumnNames.ValueNoteId,
                     "Invalid Value Note Id", dataConversionException.Message));
             }
-
+            else
+            {
+                var allowedData = new AllowedData(_profilesReader);
+                var columnName = UploadColumnNames.ValueNoteId;
+                //Ensure this is a value note id in the DB
+                uploadValidationFailure = duv.ValidateValueNoteId((int)uploadedRow.Field<double>(columnName), rowNumber,
+                    allowedData.ValueNoteIds);
+                if (uploadValidationFailure != null)
+                {
+                    //There was an error so log it
+                    uploadErrors.Add(uploadValidationFailure);
+                }
+            }
             return uploadErrors;
         }
 
@@ -330,45 +309,6 @@ namespace FingertipsUploadService.Upload
             }
 
             return false;
-        }
-
-        private SimpleUpload DoesCoreDataAlreadyExist(SimpleUpload simpleUpload)
-        {
-            List<int> uniqueIndicatorList = simpleUpload.DataToUpload.Select(x => x.IndicatorId).Distinct().ToList();
-            IEnumerable<CoreDataSet> coreDataSetForIndicatorList =
-                _profilesReader.GetCoreDataForIndicatorIds(uniqueIndicatorList);
-
-            int rowIndex = 1;
-            foreach (UploadDataModel row in simpleUpload.DataToUpload)
-            {
-                rowIndex++;
-
-                CoreDataSet coreDataRecord = coreDataSetForIndicatorList.FirstOrDefault(
-                    i =>
-                        i.IndicatorId == row.IndicatorId && i.Year == row.Year && i.YearRange == row.YearRange &&
-                        i.Quarter == row.Quarter && i.Month == row.Month && i.AgeId == row.AgeId && i.SexId == row.SexId &&
-                        i.AreaCode == row.AreaCode && i.CategoryId == -1 && i.CategoryTypeId == -1);
-
-                if (coreDataRecord != null)
-                {
-                    var duplicateDataError = new DuplicateRowInDatabaseError
-                    {
-                        ErrorMessage = "Data already exists for Indicator Id: " + row.IndicatorId,
-                        RowNumber = rowIndex,
-                        DbValue = coreDataRecord.Value,
-                        ExcelValue = row.Value,
-                        IndicatorId = row.IndicatorId,
-                        AgeId = row.AgeId,
-                        SexId = row.SexId,
-                        AreaCode = row.AreaCode,
-                        Uid = coreDataRecord.Uid
-                    };
-
-                    simpleUpload.DuplicateRowInDatabaseErrors.Add(duplicateDataError);
-                    row.DuplicateExists = true;
-                }
-            }
-            return simpleUpload;
         }
 
         private void ValidateSpreadsheetRows(DataTable excelData, SimpleUpload simpleUpload, AllowedData allowedData)

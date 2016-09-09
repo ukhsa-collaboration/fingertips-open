@@ -17,7 +17,7 @@ else if (details.HasOwnFrontPage)
 {
     <a class="title" href="@(fingertipsUrl)/profile/@details.ProfileUrlKey">@details.Title</a>
 }
-else if (details.LeadProfileForCollectionId.HasValue)
+else if (details.ProfileCollectionIds.Any())
 {
     // When displayed on front page of site
     <a class="title" href="@(fingertipsUrl)/profile-group/@details.ProfileUrlKey">@details.Title</a>

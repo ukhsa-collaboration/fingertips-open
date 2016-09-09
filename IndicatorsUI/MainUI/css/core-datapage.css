@@ -47,34 +47,6 @@
     color: white;
 }
 
- /* ------------------------------------------------------------
-	Area switch extra options
------------------------------------------------------------- */
- .area-switch-options {
-    margin-top: 10px;
-    float: right;
-}
-
-.area-switch-options table {
-    float: right;
-}
-
-.area-switch-options a{
-    padding: 1px 2px;
-    text-decoration: none;
-    color: #1f0aa1;
-    text-align: left;
-}
-
-.area-switch-options a.selected,
-.area-switch-options a.selected:hover
- {
-    background-color: #006666;
-    color: white;
-    text-decoration: none;
-    cursor:default;
-}
-
 /* ------------------------------------------------------------
 	Tartan rug
 ------------------------------------------------------------ */
@@ -220,6 +192,12 @@ th.rugPeriod, td.rugPeriod
     visibility: hidden;
 }
 
+
+.floatThead-table, .floatThead-table th.rugPeriod:last-of-type, .floatThead-table th.sortHeader:last-of-type, .floatThead-table th.rugPeriod:nth-last-child(2) {
+    border: none;
+}
+
+
 /* ------------------------------------------------------------
 	Other tabs
 ------------------------------------------------------------ */
@@ -327,25 +305,13 @@ div.keySpineText {
     padding-top: 3px;
 }
 
-.keyText {
+.keyLabel {
     font-style: italic;
     text-align: right;
 }
 .keyContainer {
     float: left;
     margin: 10px 0 0 0;
-}
-
-#spineRangeKeyContainer {
-    position: relative;
-    top: 10px;
-    right: 0;
-}
-
-#spine-range-key {
-    position: absolute;
-    top: 0;
-    right: 0;
 }
 
 #keyAdHoc, #key-spine-chart, #key-bar-chart {
@@ -387,7 +353,6 @@ td.keyBoxRight div
 .keyTable
 {
     float: left;
-    margin-left: 30px;
 }
 
 #map-key-part2 div {
@@ -408,15 +373,14 @@ td.keyBoxRight div
 }
 
 #value-note-legend {
-    margin: 9px 0 0 30px;
-    float:left;
-    clear:left;
+    float: right;
     font-size: 11px;
     color: #777;
+    text-align: right;
+    margin-top:8px;
 }
 
 #spineTable, #barTable {
-    margin-left: 30px;
     float: left;
 }
 
@@ -424,8 +388,149 @@ td.keyBoxRight div
      padding-top: 6px;
 }
 
-#trend-marker-legend-tartan table, #trend-marker-legend-barchart table {
-    margin-top: 10px;
+/* ------------------------------------------------------------
+	Trends
+------------------------------------------------------------ */
+.trendTitle {
+    float: left;
+    font-weight: bold;
+    font-size: 1.3em;
+    text-align: left;
+}
+.trendTitle a {
+    margin-right: 20px;
+}
+
+.trendUnit {
+    padding: 6px 0 0 0;
+    float: right;
+    font-size: 11px;
+}
+
+.trendArea {
+    font-size: 11px;
+    padding-top: 6px;
+}
+
+td.coloured {
+    background: #a8a8cc;
+    color: White;
+}
+
+.light {
+    background: #cfcfe2;
+}
+
+#areaTrendsContainer {
+    width: 100%;
+    float: left;
+    clear: left;
+}
+
+.trendContainer {
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 6px;
+    margin-bottom: 20px;
+    float: left;
+}
+
+.trendChart {
+    width: 400px;
+    height: 300px;
+    float: left;
+}
+
+.trendHeader, .multiTrendHeader {
+    float: left;
+    clear: both;
+}
+
+.multiTrendHeader {
+    padding: 30px 0 0 0;
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
+    font-weight: bold;
+}
+
+.trendHeader {
+    padding: 20px 0 5px 0;
+    border-bottom: 5px solid #0b0c0c;
+    width: 100%;
+    font-weight: bold;
+}
+
+.trendPeriod {
+    width: 85px;
+}
+
+.trendPeriodWide {
+    width: 120px;
+}
+
+.trendTableBox {
+    float: right;
+    width: 520px;
+}
+
+.trendTableBoxWide {
+    float: right;
+    width: 535px;
+}
+
+.trendSig {
+    width: 40px;
+}
+
+.trendSource {
+    width: 100%;
+    text-align: left;
+    float: right;
+    font-style: italic;
+    font-size: 11px;
+    overflow-wrap: break-word
+}
+
+#trendHelper {
+    border-style: dotted;
+    border-width: thin;
+    border-color: #aaa;
+    background-color: white;
+    z-index: 5;
+    position: absolute;
+    font-style: italic;
+    padding: 0 3px 0 3px;
+}
+
+a.trendLink, a.trendLink:visited, a.trendLink:active {
+    color: Black;
+    text-decoration: none;
+}
+
+    a.trendLink:hover {
+        color: Black;
+        text-decoration: underline;
+    }
+
+td span.value-note-symbol {
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: default;
+}
+
+td span.unit {
+    color: #777;
+}
+
+#trendsBox {
+     display:inline-block; overflow:hidden; text-align: left; margin-left:3%;
+}
+
+#trend-sort-multi-charts {
+    float: left;
 }
 
 /* ------------------------------------------------------------
@@ -473,12 +578,6 @@ td.keyBoxRight div
     padding-bottom:10px;
 }
 
-#sort-many-charts {
-    float: right;
-    clear: right;
-    margin-top: 15px;
-}
-
 /* ------------------------------------------------------------
     Inequalities
 ------------------------------------------------------------ */
@@ -487,13 +586,13 @@ td.keyBoxRight div
     width: 75%;
     margin-bottom: 50px;
 }
-#inequalities-chart-box p {
+#inequalities-chart-box p.no-data {
     text-align: center;
     padding: 150px 0 150px 34%; /* no data */
 }
 #inequalities-partition-menu {
-    margin-top: 20px;
-    margin-right: 5%;
+    margin-top: -6px;
+    margin-right: 10px;
     width: 20%;
     float: right;
 }
@@ -509,19 +608,72 @@ td.keyBoxRight div
     padding: 5px;
 }
 #inequalities-partition-menu a.selected {
-    background-color: #006666;
+    background-color: #02ae94;
+    font-weight: bold;
     color: white;
     text-decoration: none;
     cursor: default;
 }
 
+#inequalities-trend-switch {
+    padding-right: 60px;   
+}
+
+#inequalities-trend-filters {
+    float: right;
+    width: 220px;
+}
+
+#inequalities-trend-filters > div:first-child{
+    font-size: 17px;
+    line-height: 1.3em;
+}
+
+#inequalities-trend-filters hr {
+    height: 1px;
+    width: 96%;
+    display: block;
+    background-color: lightgray;
+    padding-left: 30px;
+    border: 0;
+}
+
+.trend-options-filter {
+    line-height: 1.5em;
+    padding-left: 16px;
+}
+
+.trend-option {
+    line-height: 1.5em;
+}
+
+.trend-option input{
+    vertical-align: middle;
+}
+
+.trend-option a{
+    padding-left: 4px;
+}
+
+#inequalities-trend-filters .england-option{
+    border-top: 1px solid green;
+    border-bottom: 1px solid green;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    
+}
+
+#inequalities-trend-chart {
+    float: left;
+    width: 400px;   
+}
+
 /* ------------------------------------------------------------
-	Content tabs
+	Scatter tab
 ------------------------------------------------------------ */
 #scatter-container {
     margin-top: 10px;
 }
-
 
 /* ------------------------------------------------------------
 	Content tabs
@@ -578,7 +730,7 @@ td.keyBoxRight div
     margin-right: 50px;
 }
 
-#selected-nearest-neighbour a {
+#nearest-neighbour-header a {
     text-decoration: none;
 }
 
@@ -601,22 +753,126 @@ td.keyBoxRight div
 .nearest-neighbour-selected-area h2{
     display: inline-block;
 }
-.nearest-neighbour-selected-area span {
-    font-size: 19.5px;
-    font-weight: bold;
+
+/*----------------------------------------
+    Chart & table export
+------------------------------------------*/
+.export-chart-box {
+    height: 16px;
+	margin-bottom: 8px;
+    margin-top:5px;
+    color: #450AA3;
 }
 
-#nearest-neighbour-extra-text {
-    font-size: 14px;
-    margin-top: 10px;
+.export-chart-box select {
+    width: 80px;
+}
+
+.white-background {
+    background-color: #ffffff;
+}
+
+.tab-options div.export-chart-box {
+    padding-top: 6px;
+    float:left;
+}
+
+.export-chart-box .export-link, .tab-options .export-chart-box a {
+    text-decoration: none;
+    color: #1F0AA1;
+    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+    padding: 5px 27px;
+}
+
+.export-chart-box a.show-ci {
+    text-decoration: none;
+    color: #1F0AA1;    
 }
 
 /* ------------------------------------------------------------
-	Trend legend
+	Trend marker legend
 ------------------------------------------------------------ */
-.trendLegends .legendText {
-    padding-right: 10px;
+#trend-marker-legend table {
+    margin-top: 15px;
 }
-.trendLegends img {
+
+#trend-marker-legend img {
+    padding-left: 15px;
     padding-right: 2px;
+}
+
+.trend-info {
+    margin-left: 0;
+    padding-left: 0!important;
+    cursor: pointer;
+}
+
+.trendContainer .trend-marker {
+    float:left;
+    color:#333;
+    font-weight:bold;
+    margin-left: 60px;
+    margin-bottom: 5px;
+}
+
+.trendContainer .trend-marker img {
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/*----------------------------------------
+    Lightbox
+------------------------------------------*/
+
+#infoBox h2 {
+    padding: 3px 0 12px 9px;
+}
+
+/*----------------------------------------
+    Profiles per indicators
+------------------------------------------*/
+
+#profiles-for-indicators {
+    padding: 5px;
+    padding-bottom: 10px;
+}
+
+#profiles-for-indicators h2 {
+    margin-bottom: 20px;
+}
+
+#profiles-for-indicators table {
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+#profiles-for-indicators .label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+#indicator-list-lbl {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#indicator-list {
+    width: 800px;
+}
+
+#profiles-for-selected-indicator {
+    padding-bottom: 10px;
+}
+
+#profiles-for-selected-indicator ul {
+    list-style-type: none;
+}
+
+#profiles-for-selected-indicator ul li {
+    padding: 3px 0;
+}
+
+#profiles-for-selected-indicator a {
+    color: #1f0aa1;
+    text-decoration: none;
 }

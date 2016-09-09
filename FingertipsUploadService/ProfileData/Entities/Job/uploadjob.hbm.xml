@@ -4,7 +4,7 @@
                    namespace="FingertipsUploadService.ProfileData.Entities.Job">
   
   <!--Job class -->
-  <class name="UploadJob" table="uploadjob">
+  <class name="UploadJob" table="uploadjob" lazy="false">
     
     <id name="Id" column="id" type="int" unsaved-value="-1">
       <generator class="identity" />
@@ -18,5 +18,7 @@
     <property name="JobType" column="jobtype"/>
     <property name="Filename" column="filename"/>
     <property name="ProgressStage" column="progressstage"/>
+    <property name="TotalRowsCommitted" column="totalrowscommitted"/>
+
   </class>
 </hibernate-mapping>

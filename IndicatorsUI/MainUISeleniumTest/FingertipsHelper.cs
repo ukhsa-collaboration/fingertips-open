@@ -56,7 +56,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             return selectArea;
         }
 
-        public static void SearchForAnArea(IWebDriver driver, string text)
+        public static void SearchForAnAreaAndSelectFirstResult(IWebDriver driver, string text)
         {
             var id = By.Id(FingertipsIds.AreaSearchText);
             var searchText = driver.FindElement(id);
@@ -86,6 +86,18 @@ namespace IndicatorsUI.MainUISeleniumTest
             nextIndicatorButton.Click();
             WaitFor.ThreadWait(0.1);
             waitFor.AjaxLockToBeUnlocked();
+        }
+
+        public static void SelectInequalityTrends(IWebDriver driver)
+        {
+            var trendsButton = driver.FindElement(By.Id(FingertipsIds.InequalitiesTrends));
+            trendsButton.Click();
+        }
+
+        public static void SelectLatestInequalityValues(IWebDriver driver)
+        {
+            var trendsButton = driver.FindElement(By.Id(FingertipsIds.InequalitiesLatestValues));
+            trendsButton.Click();
         }
     }
 }

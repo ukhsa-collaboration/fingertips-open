@@ -10,7 +10,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Tobacco
     public class TobaccoBaseUnitTest : BaseUnitTest
     {
         [TestInitialize]
-        public override void CalledOnceAtStartOfTests()
+        public override void TestInitialize()
         {
             SetSkin(SkinNames.Tobacco);
         }

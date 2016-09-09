@@ -36,6 +36,30 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             Assert.IsTrue(notStartedJobs.Count() == 1);
         }
 
+
+        [TestMethod]
+        public void TestGetNotStartedUploadJobsAfterConfirmationGiven()
+        {
+
+            var newJob = CreateJob(_guid);
+            _uploadJobRepository.SaveJob(newJob);
+
+            var notStartedJobs = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
+            Assert.IsTrue(notStartedJobs.Count() == 1);
+
+            var jobFromDB = notStartedJobs.First();
+            jobFromDB.Status = UploadJobStatus.ConfirmationGiven;
+
+
+            _uploadJobRepository.UpdateJob(jobFromDB);
+
+            var jobsAfterStatusChange = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
+
+            Assert.IsTrue(jobsAfterStatusChange.Count() == 1);
+
+        }
+
+
         [TestMethod]
         public void TestGetNotStartedOrConfirmationGivenUploadJobs()
         {

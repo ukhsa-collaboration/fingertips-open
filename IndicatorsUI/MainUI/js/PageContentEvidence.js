@@ -1,4 +1,6 @@
-﻿function goToContentPage() {
+﻿'use strict';
+
+function goToContentPage() {
     lock();
     setPageMode(PAGE_MODES.CONTENT);
     showAndHidePageElements();

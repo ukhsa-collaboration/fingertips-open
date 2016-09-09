@@ -1,4 +1,5 @@
 ﻿using FingertipsUploadService.ProfileData;
+using FingertipsUploadService.ProfileData.Entities.Core;
 using FingertipsUploadService.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -14,7 +15,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
         private LoggingRepository _loggingRepository;
         private static Guid batchId;
 
-        private const int indicatorId = IndicatorIds.IDAOPI;
+        private const int indicatorId = IndicatorIds.HipFractures;
 
         [TestInitialize]
         public void Init()
@@ -102,6 +103,26 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             Console.WriteLine("Total records " + dataSetRowsCount);
 
             Assert.IsTrue(dataSetRowsCount <= 500 && rowsFound >= dataSetRowsCount);
+        }
+
+        [TestMethod]
+        public void TestGetDuplicateCoreDataSetForAnIndicator()
+        {
+            var coreDataSet = new CoreDataSet
+            {
+                IndicatorId = 337,
+                Year = 2010,
+                YearRange = 1,
+                Quarter = -1,
+                Month = -1,
+                AgeId = 4,
+                SexId = 1,
+                AreaCode = "5P3",
+                CategoryTypeId = -1,
+                CategoryId = -1
+            };
+            var result = _coreDataRepository.GetDuplicateCoreDataSetForAnIndicator(coreDataSet);
+            Assert.IsNotNull(result);
         }
 
     }

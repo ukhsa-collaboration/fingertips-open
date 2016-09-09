@@ -12,7 +12,7 @@ namespace PholioVisualisation.PdfData
     {
         private readonly string areaCode;
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        private readonly TrendDataReader trendDataReader = ReaderFactory.GetTrendDataReader();
+        private readonly ITrendDataReader trendDataReader = ReaderFactory.GetTrendDataReader();
         private readonly IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
 
         private readonly HealthProfilesContent content = new HealthProfilesContent();
@@ -43,13 +43,16 @@ namespace PholioVisualisation.PdfData
                 HealthProfilesContent = content
             };
 
-            // Init data
+            // Init areas
             Area area = areasReader.GetAreaFromCode(areaCode);
             coreDataSetProvider = new CoreDataSetProviderFactory().New(area);
             Area benchmarkArea = areasReader.GetAreaFromCode(benchmarkAreaCode);
             benchmarkDataProvider = new CoreDataSetProviderFactory().New(benchmarkArea);
-            InitSupportingGroupData();
-            InitMainGroupData();
+
+            // Init data
+            var areaTypeId = HealthProfilesAreaTypeHelper.GetCompositeAreaTypeId(area);
+            InitSupportingGroupData(areaTypeId);
+            InitMainGroupData(areaTypeId);
 
             // Page 1
             AssignPopulation();
@@ -89,52 +92,45 @@ namespace PholioVisualisation.PdfData
 
             content.KeyMessages = new List<string>
             {
-                staticMessageProvider.GetMessage(1) ?? 
+                staticMessageProvider.GetMessage(1) ??
                     new HealthProfilesKeyMessage1Builder().ProcessKeyMessage(data),
-                staticMessageProvider.GetMessage(2) ?? 
+                staticMessageProvider.GetMessage(2) ??
                     new HealthProfilesKeyMessage2Builder().ProcessKeyMessage(data),
-                staticMessageProvider.GetMessage(3) ?? 
+                staticMessageProvider.GetMessage(3) ??
                     new HealthProfilesKeyMessage3Builder().ProcessKeyMessage(data),
-                staticMessageProvider.GetMessage(4) ?? 
+                staticMessageProvider.GetMessage(4) ??
                     new HealthProfilesKeyMessage4Builder().ProcessKeyMessage(data),
                 message5
             };
         }
 
-        private void InitSupportingGroupData()
+        private void InitSupportingGroupData(int areaTypeId)
         {
             // Supporting data
-            int profileId = ProfileIds.HealthProfilesSupportingIndicators;
+            const int profileId = ProfileIds.HealthProfilesSupportingIndicators;
             int supportingGroupId = new GroupIdProvider(profileReader).GetGroupIds(profileId)[0];
             GroupData groupData = new GroupDataAtDataPointRepository
             {
                 AssignChildAreaData = false,
                 AssignAreas = false
-            }.GetGroupData(benchmarkAreaCode,
-                AreaTypeIds.CountyAndUnitaryAuthority, profileId, supportingGroupId);
+            }.GetGroupData(benchmarkAreaCode,areaTypeId, profileId, supportingGroupId);
             groupRootSelector.SupportingGroupRoots = groupData.GroupRoots;
             indicatorMetadataCollection.AddIndicatorMetadata(groupData.IndicatorMetadata);
         }
 
-        private void InitMainGroupData()
+        private void InitMainGroupData(int areaTypeId)
         {
-            int profileId = ProfileIds.HealthProfiles;
-            IList<int> groupIds = new GroupIdProvider(profileReader).GetGroupIds(profileId);
-            var groupRoots = new List<GroupRoot>();
-            foreach (int groupId in groupIds)
+            const int profileId = ProfileIds.HealthProfiles;
+
+            GroupData groupDataForSpineChart = new GroupDataAtDataPointRepository
             {
-                GroupData groupDataForSpineChart = new GroupDataAtDataPointRepository
-                {
-                    AssignChildAreaData = false,
-                    AssignAreas = false
-                }.GetGroupData(benchmarkAreaCode,
-                    AreaTypeIds.CountyAndUnitaryAuthority, profileId, groupId);
+                AssignChildAreaData = false,
+                AssignAreas = false
+            }.GetGroupData(benchmarkAreaCode, areaTypeId, profileId, GroupIds.HealthProfiles_AllSpineChartIndicators);
 
-                groupRoots.AddRange(groupDataForSpineChart.GroupRoots);
+            indicatorMetadataCollection.AddIndicatorMetadata(groupDataForSpineChart.IndicatorMetadata);
 
-                indicatorMetadataCollection.AddIndicatorMetadata(groupDataForSpineChart.IndicatorMetadata);
-            }
-            groupRootSelector.MainGroupRoots = groupRoots;
+            groupRootSelector.MainGroupRoots = groupDataForSpineChart.GroupRoots;
         }
 
         public void AssignLifeExpectancy()
@@ -145,7 +141,7 @@ namespace PholioVisualisation.PdfData
             IndicatorMetadata metadata =
                 indicatorMetadataCollection.GetIndicatorMetadataById(maleGrouping.IndicatorId);
 
-            var formatter = NumericFormatterFactory.NewWithLimits(metadata, (Limits) null);
+            var formatter = NumericFormatterFactory.NewWithLimits(metadata, (Limits)null);
 
             // Female
             CoreDataSet coreDataSet = coreDataSetProvider.GetData(femaleGrouping,
@@ -197,7 +193,7 @@ namespace PholioVisualisation.PdfData
 
         private IList<XyPoint> GetXYPointsForLsoaDeprivationDeciles(GroupRoot xRoot, GroupRoot yRoot)
         {
-            const int categoryTypeId = CategoryTypeIds.LsoaDeprivationDecilesWithinArea;
+            const int categoryTypeId = CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010;
             var xData = GetLsoaDeprivationDecilesWithinArea(xRoot, categoryTypeId);
             var yData = GetLsoaDeprivationDecilesWithinArea(yRoot, categoryTypeId);
 
@@ -221,7 +217,7 @@ namespace PholioVisualisation.PdfData
         private void AssignLsoaQuintiles()
         {
             data.LsoaQuintiles = groupDataReader.GetCategoriesWithinParentArea(
-                CategoryTypeIds.LsoaDeprivationQuintilesInEngland, areaCode, AreaTypeIds.Lsoa);
+                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, areaCode, AreaTypeIds.Lsoa);
         }
 
         private void AssignPopulation()
@@ -249,11 +245,11 @@ namespace PholioVisualisation.PdfData
         }
 
         private IList<CoreDataSet> GetDeprivationQuintiles(Grouping grouping,
-            TimePeriod timePeriod, string _areaCode)
+            TimePeriod timePeriod, string areaCode)
         {
             var dataList = groupDataReader
                 .GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                    grouping, timePeriod, CategoryTypeIds.LsoaDeprivationQuintilesInEngland, _areaCode);
+                    grouping, timePeriod, CategoryTypeIds.LsoaDeprivationQuintilesInEngland2015, areaCode);
 
             coreDataProcessor.TruncateList(dataList);
 
@@ -292,9 +288,9 @@ namespace PholioVisualisation.PdfData
                 GetLocalAndEnglandChartData(groupRoot));
 
             chartData.LocalLeastDeprived = GetDeprivationQuintileValues(grouping,
-                CategoryIds.LeastDeprived);
+                CategoryIds.LeastDeprivedQuintile);
             chartData.LocalMostDeprived = GetDeprivationQuintileValues(grouping,
-                CategoryIds.MostDeprived);
+                CategoryIds.MostDeprivedQuintile);
 
             return chartData;
         }
@@ -302,7 +298,7 @@ namespace PholioVisualisation.PdfData
         private List<double> GetDeprivationQuintileValues(Grouping grouping, int categoryId)
         {
             var coreDataList = trendDataReader.GetTrendDataForSpecificCategory(grouping,
-                areaCode, CategoryTypeIds.LsoaDeprivationQuintilesWithinArea, categoryId);
+                areaCode, CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2010, categoryId);
 
             coreDataProcessor.TruncateList(coreDataList);
 
@@ -356,6 +352,7 @@ namespace PholioVisualisation.PdfData
 
         private void AssignHealthInequalitiesEthnicity()
         {
+            const int categoryTypeId = CategoryTypeIds.EthnicGroups7;
             Grouping grouping = groupRootSelector.HealthInequalitiesEthnicity.FirstGrouping;
             IndicatorMetadata metadata = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
             TimePeriod timePeriod = TimePeriod.GetDataPoint(grouping);
@@ -363,14 +360,14 @@ namespace PholioVisualisation.PdfData
 
             IList<CoreDataSet> coreDataSetsLocal = groupDataReader
                 .GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                    grouping, timePeriod, CategoryTypeIds.EthnicGroups5, areaCode);
+                    grouping, timePeriod, categoryTypeId, areaCode);
 
             data.EmergencyAdmissionsLocalByEthnicity = AddEthnicityLabelToCoreDataSet(coreDataSetsLocal,
                 formatter);
 
             IList<CoreDataSet> coreDataSetsEngland = groupDataReader.
                 GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                    grouping, timePeriod, CategoryTypeIds.EthnicGroups5, benchmarkAreaCode);
+                    grouping, timePeriod, categoryTypeId, benchmarkAreaCode);
 
             data.EmergencyAdmissionsEnglandByEthnicity = AddEthnicityLabelToCoreDataSet(coreDataSetsEngland,
                 formatter);

@@ -3,7 +3,16 @@ using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
-    public class CategoryArea : IArea
+    public interface ICategoryArea : IArea
+    {
+        void SetNames(Category category);
+        int CategoryTypeId { get; }
+        int CategoryId { get; }
+        string ParentAreaCode { get; }
+        int ParentAreaTypeId { get; }
+    }
+
+    public class CategoryArea : ICategoryArea
     {
         /// <summary>
         /// For Mocking
@@ -32,7 +41,7 @@ namespace PholioVisualisation.PholioObjects
 
         public static CategoryArea New(Category category)
         {
-            var categoryArea = New(category.CategoryTypeId, category.CategoryId);
+            var categoryArea = New(category.CategoryTypeId, category.Id);
             categoryArea.Name = category.Name;
             categoryArea.ShortName = category.ShortName;
             return categoryArea;
@@ -95,15 +104,6 @@ namespace PholioVisualisation.PholioObjects
         }
 
         /// <summary>
-        /// Whether or not the area is a deprivation decile.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsGpDeprivationDecile
-        {
-            get { return CategoryTypeId == CategoryTypeIds.DeprivationDecileGp2015 || CategoryTypeId == CategoryTypeIds.DeprivationDecileGp2010; }
-        }
-
-        /// <summary>
         /// Whether or not the area is a practice shape.
         /// </summary>
         [JsonIgnore]
@@ -118,13 +118,39 @@ namespace PholioVisualisation.PholioObjects
             get { return false; }
         }
 
+        /// <summary>
+        /// Whether or not the area is a deprivation decile.
+        /// </summary>
         [JsonIgnore]
-        public bool IsCountyAndUnitaryAuthorityDeprivationDecile
+        public bool IsGpDeprivationDecile
         {
-            get { return CategoryTypeId == CategoryTypeIds.DeprivationDecileCountyAndUnitaryAuthority; }
+            get
+            {
+                return CategoryType.IsGpDeprivationDecile(CategoryTypeId);
+            }
         }
 
-        public bool IsGpPractice {
+        [JsonIgnore]
+        public bool IsCountyAndUADeprivationDecile
+        {
+            get
+            {
+                return CategoryType.IsCountyAndUADeprivationDecile(CategoryTypeId);
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsDistrictAndUADeprivationDecile
+        {
+            get
+            {
+                return CategoryType.IsDistrictAndUADeprivationDecile(CategoryTypeId);
+            }
+        }
+
+        [JsonIgnore]
+        public bool IsGpPractice
+        {
             get { return false; }
         }
 

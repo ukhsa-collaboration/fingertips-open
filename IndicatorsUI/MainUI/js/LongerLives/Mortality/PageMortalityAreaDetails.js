@@ -376,7 +376,7 @@ function getBars(rankInfo, overallMax, area, isOverall) {
 }
 
 function showSimilarAreas() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
 
         MT.model.parentCode = MT.model.areaTypeId === AreaTypeIds.CountyUA
@@ -390,7 +390,7 @@ function showSimilarAreas() {
 }
 
 function showAllAreas() {
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         lock();
         MT.model.parentCode = NATIONAL_CODE;
         initPage();
@@ -447,7 +447,7 @@ function populateSimilarAreasList() {
 
 function selectArea(code) {
 
-    if (!ajaxLock) {
+    if (!FT.ajaxLock) {
         MT.model.areaCode = code;
 
         initPage();

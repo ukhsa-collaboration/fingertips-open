@@ -14,6 +14,8 @@ namespace Fpm.MainUI.Controllers
 {
     public class DocumentsController : Controller
     {
+        public const int MaxFileSizeInBytes = 50000000/*50MB*/;
+
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
 
@@ -56,16 +58,16 @@ namespace Fpm.MainUI.Controllers
                 {
                     profileId = Convert.ToInt32(selectedProfileId);
                 }
-                var maxFileSizeInBytes = 10000000/*10MB*/;
+
                 HttpPostedFileBase file = Request.Files["fileToBeUploaded"];
                 if (file != null)
                 {
                     byte[] uploadedFile = new byte[file.InputStream.Length];
                     file.InputStream.Read(uploadedFile, 0, uploadedFile.Length);
 
-                    if (uploadedFile.Length > maxFileSizeInBytes)
+                    if (uploadedFile.Length > MaxFileSizeInBytes)
                     {
-                        throw new FpmException("Max file upload size is 10 MB");
+                        throw new FpmException("Max file upload size is 50 MB");
                     }
 
                     var fileName = Path.GetFileName(file.FileName);

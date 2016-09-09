@@ -17,33 +17,45 @@ namespace Profiles.MainUI.Controllers
 
         public const string ViewNameFrontPage = "FrontPage";
         public const string ViewNameData = "Data";
+        public const string ViewNameSupportingInformation = "SupportingInformation";
 
-        private ProfileDetails details;
+        private ProfileDetails profileDetails;
 
         public ActionResult FrontPage(string urlKey)
         {
             ViewBag.ShowUpdateDelayedMessage = appConfig.ShowUpdateDelayedMessage;
 
             return GetPage(ViewNameFrontPage, DefaultViewFolder, urlKey,
-                PageType.FrontPageOfStandaloneProfileWithFrontPage);
+                PageType.FrontPageOfProfileWithFrontPage);
         }
 
         public ActionResult Data(string urlKey)
         {
             return GetPage(ViewNameData, DefaultViewFolder, urlKey,
-                PageType.DataPageOfStandaloneProfileWithFrontPage);
+                PageType.DataPageOfProfileWithFrontPage);
+        }
+
+        public ActionResult SupportingPage(string urlKey, string contentKey)
+        {
+            var result = GetPage(ViewNameSupportingInformation, DefaultViewFolder, urlKey,
+                PageType.SupportingInformation);
+
+            ViewBag.SupportingInformationContentItem = 
+                ContentProvider.GetContentItem(contentKey, profileDetails.Id);
+
+            return result;
         }
 
         public ActionResult PracticeProfilesFrontPage(string urlKey)
         {
             return GetPage(ViewNameFrontPage, PracticeProfilesViewFolder, urlKey,
-                PageType.FrontPageOfStandaloneProfileWithFrontPage);
+                PageType.FrontPageOfProfileWithFrontPage);
         }
 
         public ActionResult PracticeProfilesData(string urlKey)
         {
             return GetPage(ViewNameData, PracticeProfilesViewFolder, urlKey,
-                PageType.DataPageOfStandaloneProfileWithFrontPage);
+                PageType.DataPageOfProfileWithFrontPage);
         }
 
         [CheckUserCanAccessSkin]
@@ -52,23 +64,23 @@ namespace Profiles.MainUI.Controllers
         {
             InitPageModel();
       
-            details = new ProfileDetailsBuilder(urlKey).Build();
+            profileDetails = new ProfileDetailsBuilder(urlKey).Build();
 
-            if (details == null)
+            if (profileDetails == null)
             {
 
                 ErrorController.InvokeHttp404(HttpContext);
                 return new EmptyResult();
             }
 
-            if (AccessControlHelper.ShouldDenyAccess(details))
+            if (AccessControlHelper.ShouldDenyAccess(profileDetails))
             {
                 return AccessControlHelper.GetAccessNotAllowedActionResult();
             }
 
-            PageModel.PageTitle = details.Title;
+            PageModel.PageTitle = profileDetails.Title;
 
-            ConfigureWithProfile(details);
+            ConfigureWithProfile(profileDetails);
 
             if (PageModel.HasExclusiveSkin == false)
             {

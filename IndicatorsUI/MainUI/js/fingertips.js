@@ -1,3 +1,5 @@
+'use strict';
+
 /**
 * fingertips.js
 * Code that is shared between Longer Lives and Fingertips.
@@ -5,19 +7,19 @@
 * @module fingertips
 */
 
-FT = { menus: {} };
+var FT = { menus: {}, data: {} };
 
 /**
 * Global hash containing data that has been fetched by AJAX.
 * @class loaded
 * @static
 */
-loaded = {
+var loaded = {
     areaLists: {},
     areaTypes: {},
     indicatorMetadata: {},
     yearTypes: {},
-    methods: {},
+    comparatorMethods: {},
     ciMethods: {},
     ages: {},
     areaValues: {},
@@ -26,14 +28,15 @@ loaded = {
     parentAreas: {},
     boundaries: {}, // Boundary coordinates for maps: Key -> areaTypeId, Value -> [] of area coordinates
     valueNotes: {},
-    groupDataAtDataPoint: {}
+    groupDataAtDataPoint: {},
+    trendMarkers: {}
 };
 
 /**
 * Enum of the tabs that are available in Fingertips.
 * @class PAGE_MODES
 */
-PAGE_MODES = {
+var PAGE_MODES = {
     TARTAN: 0,
     AREA_SPINE: 1,
     INDICATOR_DETAILS: 3,
@@ -43,7 +46,8 @@ PAGE_MODES = {
     CONTENT: 7,
     MAP: 8,
     DOWNLOAD: 9,
-    SCATTER_PLOT: 10
+    SCATTER_PLOT: 10,
+    ENGLAND: 11
 };
 
 /**
@@ -114,7 +118,7 @@ function populateAreaMenu(areas, $menu, firstOption) {
             } else {
                 options[j++] = new Option(area.Name, area.Code);
             }
-            
+
         }
     }
 };
@@ -288,7 +292,7 @@ function getShortAreaNameToDisplay(area) {
 * @class pages
 * @static
 */
-pages = (function () {
+var pages = (function () {
 
     // Global (for now)
     mode = null;
@@ -505,20 +509,32 @@ pages = (function () {
 function getIndicatorMetadata(groupId, getSystemContent) {
 
     // Establish whether metadata is already loaded
-    var metadata = loaded.indicatorMetadata;
-    if (isDefined(metadata[groupId])) {
+    var loadedMetadata = loaded.indicatorMetadata;
+    if (isDefined(loadedMetadata[groupId])) {
         ajaxMonitor.callCompleted();
     } else {
         if (!isDefined(getSystemContent)) {
             getSystemContent = 'no';
         }
 
-        getData(function (obj) {
-            loaded.indicatorMetadata[groupId] = obj;
-            ajaxMonitor.callCompleted();
-        }, 'im',
-        'def=yes' + '&include_system_content=' + getSystemContent +
-                getIndicatorMetadataArgument(groupId));
+        var parameters = new ParameterBuilder(
+            ).add('include_system_content', getSystemContent
+            ).add('include_definition', 'yes');
+
+        if (FT.model.profileId === ProfileIds.SearchResults) {
+            var method = 'by_indicator_id';
+            parameters.add('indicator_ids', indicatorIdList.getAllIds());
+            addRestrictToProfilesIdsParameter(parameters);
+        } else {
+            method = 'by_group_id';
+            parameters.add('group_ids', groupId);
+        }
+
+        ajaxGet('api/indicator_metadata/' + method, parameters.build(),
+            function (metadata) {
+                loadedMetadata[groupId] = metadata;
+                ajaxMonitor.callCompleted();
+            });
     }
 };
 
@@ -536,15 +552,6 @@ function getData(callback, service, args) {
 };
 
 /**
-* Gets the argument for retrieving the appropriate indicator metadata. 
-* In this context it is for all the indicators in a domain.
-* @class getIndicatorMetadataArgument
-*/
-function getIndicatorMetadataArgument(groupId) {
-    return '&gid=' + groupId;
-}
-
-/**
 * Gets an element ID from the argument of a JQuery event.
 * @class getElementIdFromJQueryEvent
 */
@@ -558,6 +565,15 @@ function getElementIdFromJQueryEvent(e) {
         targetId = target.id;
     }
     return targetId;
+}
+
+/**
+* Defines the immutable configuration settings for the Fingertips data page.
+* @class FT.config
+* @static
+*/
+FT.config = {
+
 }
 
 /**
@@ -695,10 +711,10 @@ FT.model = {
 
 function getAreaValues(root, model, code) {
 
-    var parentCode = !!code ?
-        code :
-        getCurrentComparator().Code,
-    key = getIndicatorKey(root, model, parentCode);
+    var parentCode = !!code
+        ? code
+        : getCurrentComparator().Code;
+    var key = getIndicatorKey(root, model, parentCode);
 
     ajaxMonitor.state.indicatorKey = key;
 
@@ -707,16 +723,16 @@ function getAreaValues(root, model, code) {
         // Data already loaded
         getAreaValuesCallback(areaValues[key]);
     } else {
-        var parameters = 'par=' + parentCode +
-            '&gid=' + model.groupId +
-            '&off=0&iid=' + root.IID +
-            '&sex=' + root.SexId +
-            '&age=' + root.AgeId +
-            '&ati=' + model.areaTypeId +
-            '&com=' + comparatorId +
-            getRestrictByProfileParameter();
 
-        getData(getAreaValuesCallback, 'av', parameters);
+        var parameters = new ParameterBuilder(
+            ).add('group_id', model.groupId
+            ).add('area_type_id', model.areaTypeId
+            ).add('parent_area_code', parentCode
+            ).add('comparator_id', comparatorId
+            ).add('indicator_id', root.IID
+            ).add('sex_id', root.Sex.Id
+            ).add('age_id', root.Age.Id);
+        ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), getAreaValuesCallback);
     }
 }
 
@@ -724,8 +740,8 @@ function getIndicatorKey(root, model, comparatorCode) {
     return getKey(
         model.groupId,
         root.IID,
-        root.SexId,
-        root.AgeId,
+        root.Sex.Id,
+        root.Age.Id,
         model.areaTypeId,
         comparatorCode
     );
@@ -750,19 +766,7 @@ function getAreaCodeToCoreDataHash(dataList) {
 * @class getValueNotesCall
 */
 function getValueNotesCall() {
-    ajaxGet('data/value_notes', '', getValueNotesCallback);
-}
-
-/**
-* AJAX call to fetch the area types for a profile.
-* @class getAreaTypesCall
-*/
-function getAreaTypesCall(profileId) {
-    var parameters = new ParameterBuilder().add('profile_ids', getProfileIds(profileId));
-
-    ajaxGet('data/area_types',
-        parameters.build(),
-        getAreaTypesCallback);
+    ajaxGet('api/value_notes', '', getValueNotesCallback);
 }
 
 /**
@@ -796,36 +800,36 @@ function getRestrictByProfileParameter() {
         '';
 }
 
+/**Add an AJAX parameter of all the relevant profile ids.
+* @class addRestrictToProfilesIdsParameter
+*/
+function addRestrictToProfilesIdsParameter(parameters) {
+    parameters.add('restrict_to_profile_ids', getProfileIds().join(','));
+}
+
 function SexAndAge() { }
 
 SexAndAge.prototype = {
 
-    getSexLabel: function (sexId) {
-        return sexId === 1 ?
-            'Male' : sexId === 2 ?
-            'Female' :
-            'Persons';
-    },
-
     getLabel: function (groupRoot) {
 
         var label = [];
-        if (groupRoot.StateSex || groupRoot.AgeLabel) {
+        if (groupRoot.StateSex || groupRoot.StateAge) {
 
-            var areBothLabelsRequired = groupRoot.StateSex && groupRoot.AgeLabel;
+            var areBothLabelsRequired = groupRoot.StateSex && groupRoot.StateAge;
 
             label.push(' (');
 
             if (groupRoot.StateSex) {
-                label.push(this.getSexLabel(groupRoot.SexId));
+                label.push(groupRoot.Sex.Name);
             }
 
             if (areBothLabelsRequired) {
                 label.push(', ');
             }
 
-            if (groupRoot.AgeLabel) {
-                label.push(groupRoot.AgeLabel);
+            if (groupRoot.StateAge) {
+                label.push(groupRoot.Age.Name);
             }
 
             label.push(')');
@@ -1159,7 +1163,7 @@ function getColourFromSignificance(significance, useRag, colours, useQuintileCol
     return colours.none;
 }
 
-function initAreaSearch(jquerySelector, model, excludeCCGs) {
+function initAreaSearch(jquerySelector, excludeParentAreasFromSearchResults, extraParentAreaTypeIds) {
 
     var $searchBox = $(jquerySelector),
         $noMatches = $('#no-matches-found'),
@@ -1188,7 +1192,7 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
     });
 
     // No results match
-    var showSearchNotFound = function() {
+    var showSearchNotFound = function () {
         var position = $searchBox.position();
         $noMatches.width($searchBox.width()).css(
             {
@@ -1211,7 +1215,8 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
                         showSearchNotFound();
                     }
                 },
-                excludeCCGs
+                excludeParentAreasFromSearchResults,
+                extraParentAreaTypeIds
             );
         },
         delay: 0,
@@ -1236,29 +1241,32 @@ function initAreaSearch(jquerySelector, model, excludeCCGs) {
 * AJAX call to fetch results of an area search
 * @class ajaxAreaSearch
 */
-function ajaxAreaSearch(text, successFunction, excludeCcgs) {
-    getAreaSearchResults(text, successFunction, AreaTypeIds.CCG, true, excludeCcgs);
+function ajaxAreaSearch(text, successFunction, excludeParentAreasFromSearchResults) {
+
+    var areaTypeId = AreaTypeIds.CCG; // Why CCG??
+
+    var parentAreas = [];
+    if (!excludeParentAreasFromSearchResults) {
+        parentAreas.push(areaTypeId);
+    }
+
+    getAreaSearchResults(text, successFunction, areaTypeId, true, parentAreas);
 }
 
 /**
 * AJAX call to fetch results of an area search
 * @class getAreaSearchResults
 */
-function getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, excludeCcgs) {
+function getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRetreiveCoordinates, parentAreasToIncludeInResults) {
 
-    $.ajax({
-        type: 'GET',
-        url: FT.url.corews + 'AreaLookup.ashx?s=aa&text=' + text +
-            '&polygon_area_type_id=' + areaTypeId +
-            '&include_coordinates=' + shouldSearchRetreiveCoordinates +
-            '&exclude_ccgs=' + excludeCcgs,
-        data: {},
-        cache: false,
-        contentType: 'application/json',
-        dataType: 'jsonp',
-        success: successFunction,
-        error: function () { }
-    });
+    var parameters = new ParameterBuilder();
+    parameters.add('search_text', text);
+    parameters.add('no_cache', true);
+    parameters.add('polygon_area_type_id', areaTypeId);
+    parameters.add('include_coordinates', shouldSearchRetreiveCoordinates);
+    parameters.add('parent_areas_to_include_in_results', parentAreasToIncludeInResults.join(','));
+
+    ajaxGet('api/area_search_by_text', parameters.build(), successFunction);
 }
 
 /**
@@ -1352,7 +1360,7 @@ function getGoogleMap() {
 * Predefined configuration objects for HighCharts
 * @class HC
 */
-HC = {
+var HC = {
     credits: { enabled: false },
     noLineMarker: { enabled: false, symbol: 'x' }
 }
@@ -1444,8 +1452,9 @@ CoreDataSetInfo.prototype = {
         if (!this.areCIs()) return false;
 
         var rep = function (valF) {
-
-            return parseInt(valF.replace('.', '').replace('-', ''));
+            return isDefined(valF)
+                ? parseInt(valF.replace('.', '').replace('-', ''))
+                : -1;
         }
 
         var data = this.data;
@@ -1475,23 +1484,20 @@ function getTrendMarkerImage(trendMarker, polarity) {
 
     var lowIsGood = PolarityIds.RAGLowIsGood;
     var highIsGood = PolarityIds.RAGHighIsGood;
-    var blueOrangeBlue = PolarityIds.BlueOrangeBlue;
 
     var imageName;
     switch (trendMarker) {
         case TrendMarkerValue.Up:
             imageName = 'up_' +
-                (polarity === blueOrangeBlue ? 'blue' :
-                polarity === lowIsGood ? 'red' :
+                (polarity === lowIsGood ? 'red' :
                 polarity === highIsGood ? 'green' :
-                'grey');
+                'blue');
             break;
         case TrendMarkerValue.Down:
             imageName = 'down_' +
-                (polarity === blueOrangeBlue ? 'blue' :
-                polarity === lowIsGood ? 'green' :
+                (polarity === lowIsGood ? 'green' :
                 polarity === highIsGood ? 'red' :
-                'grey');
+                'blue');
             break;
         case TrendMarkerValue.NoChange:
             imageName = 'no_change';
@@ -1503,27 +1509,33 @@ function getTrendMarkerImage(trendMarker, polarity) {
     return "<img src='/images/trends/" + imageName + ".png" + "'/>";
 }
 
+function exportChartAsImage(chart) {
+    if (chart) {
+        chart.exportChart({ type: 'image/png' }, {});
+    }
+};
 
 // Constants
-REGIONAL_COMPARATOR_ID = 1;
-NATIONAL_COMPARATOR_ID = 4;
-TARGET_COMPARATOR_ID = 2;
-NOT_APPLICABLE = 'n/a';
-NATIONAL_CODE = 'E92000001';
-SEARCH_NO_RESULT_TOP_OFFSET = 0;
-SEARCH_NO_RESULT_LEFT_OFFSET = 0;
+var REGIONAL_COMPARATOR_ID = 1;
+var NATIONAL_COMPARATOR_ID = 4;
+var TARGET_COMPARATOR_ID = 2;
+var NOT_APPLICABLE = 'n/a';
+var NATIONAL_CODE = 'E92000001';
+var SEARCH_NO_RESULT_TOP_OFFSET = 0;
+var SEARCH_NO_RESULT_LEFT_OFFSET = 0;
 
 /**
 * Enum of PHOLIO area type IDs.
 * @class AreaTypeIds
 */
-AreaTypeIds = {
-    District: 2,
+var AreaTypeIds = {
+    District: 1,
     Region: 6,
     Practice: 7,
     County: 9,
+    AcuteTrust: 14,
     Country: 15,
-    UnitaryAuthority : 16,
+    UnitaryAuthority: 16,
     GpShape: 18,
     CCG: 19,
     DeprivationDecile: 23,
@@ -1532,33 +1544,38 @@ AreaTypeIds = {
     CountyUA: 102,
     PheCentres2013: 103,
     PheCentres2015: 104,
-    OnsClusterGroup: 110
+    OnsClusterGroup: 110,
+    AcuteTrusts: 118
 };
 
 /**
 * Enum of PHOLIO category type IDs.
 * @class CategoryTypeIds
 */
-CategoryTypeIds = {
+var CategoryTypeIds = {
     CountyUA: 2,
     DistrictUA: 3,
     HealthProfilesSSILimit: 5,
-    CCG: 11
+    CCG: 11,
+    DeprivationDecileGp2015: 38
 };
 
 /**
 * Enum of PHOLIO value type IDs.
 * @class ValueTypeIds
 */
-ValueTypeIds = {
-    Count: 7
+var ValueTypeIds = {
+    IndirectlyStandardisedRate: 4,
+    Ratio: 6,
+    Count: 7,
+    LifeExpectancy: 11
 };
 
 /**
 * Enum of PHOLIO polarity IDs.
 * @class PolarityIds
 */
-PolarityIds = {
+var PolarityIds = {
     RAGLowIsGood: 0,
     RAGHighIsGood: 1,
     Quintiles: 15,
@@ -1569,17 +1586,28 @@ PolarityIds = {
 * Enum of PHOLIO sex IDs.
 * @class SexIds
 */
-SexIds = {
+var SexIds = {
+    Male: 1,
+    Female: 2,
     Person: 4
 };
+
+/**
+* Enum of PHOLIO age IDs.
+* @class AgeIds
+*/
+var AgeIds = {
+    AllAges: 1
+};
+
 
 /**
 * Enum of PHOLIO profile IDs.
 * @class ProfileIds
 */
-ProfileIds = {
+var ProfileIds = {
     SearchResults: 13,
-    PracticeProfiles: 20, 
+    PracticeProfiles: 20,
     Mortality: 22,
     HealthProfiles: 26,
     CommunityMentalHealth: 50,
@@ -1589,10 +1617,12 @@ ProfileIds = {
     Cancer: 71,
     DrugsAndAlcohol: 75,
     HealthChecks: 77,
-    ChildHealth: 105
+    ChildHealth: 105,
+    ChiMatWAY: 94,
+    Phof: 19
 };
 
-TrendMarkerValue = {
+var TrendMarkerValue = {
     Up: 1,
     Down: 2,
     NoChange: 3,
@@ -1600,5 +1630,6 @@ TrendMarkerValue = {
 };
 
 // Application state
-isSpinnerDisplayed = true;
-ajaxLock = null;
+var isSpinnerDisplayed = true;
+FT.ajaxLock = null;
+var mode = null;

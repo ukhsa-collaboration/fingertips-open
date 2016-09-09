@@ -1,16 +1,15 @@
-﻿@using Profiles.MainUI.Models
-@model Profiles.MainUI.Models.PageModel
+﻿@model Profiles.MainUI.Models.PageModel
 <div class="keyContainer" id="keyTartanRug" style="display: none;">
     <table class="keyTable" cellspacing="0">
         <tr>
-            <td class="keyText"></td>
+            <td class="keyText keyLabel"></td>
             @if (Model.DisplayRagKey)
             {
                 <td class="keySpacer"></td>
                 <td class='better key'>
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)better.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Better
                         </div>
@@ -19,7 +18,7 @@
                 <td class='same key'>
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)same.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Similar
                         </div>
@@ -28,7 +27,7 @@
                 <td class='worse key'>
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)red.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Worse
                         </div>
@@ -41,7 +40,7 @@
                 <td class='bobLower key'>
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)bobLower.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Lower
                         </div>
@@ -50,7 +49,7 @@
                 <td class='same key'>
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)same.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Similar
                         </div>
@@ -59,15 +58,13 @@
                 <td class="bobHigher key">
                     <div class="tartanBox keyBox">
                         <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)bobHigher.png"
-                             alt="" />
+                             alt=""/>
                         <div class="tartanText">
                             Higher
                         </div>
                     </div>
                 </td>
-            }
-            @*Show quintile legend*@
-    <td class='grade-quintile-1 key quintileKey'>
+            }@*Show quintile legend*@<td class='grade-quintile-1 key quintileKey'>
             <td class="keySpacer "></td>
             <td class='grade-quintile-1 key quintileKey'>
                 <div class="tartanBox keyBox">
@@ -102,12 +99,12 @@
                 </div>
             </td>
             <td class="keySpacer"></td>
-            <td id="tartan-key-part" class="none key keyBoxRight" style="display:none;">
+            <td id="tartan-key-part" class="none key keyBoxRight" style="display: none;">
                 <div class="tartanBox keyBox">
                     Not compared
                 </div>
             </td>
-            <td id="map-key-part2" class="none key keyBoxRight" style="display:none;">
+            <td id="map-key-part2" class="none key keyBoxRight" style="display: none;">
                 <div class="tartanBox keyBox">
                     Not compared
                 </div>
@@ -115,36 +112,3 @@
         </tr>
     </table>
 </div>
-
-@if (Model.HasTrendMarkers)
-{
-    <div class="trendLegends" id="trend-marker-legend-tartan" style="display:none;">
-        <table class="keyTable" cellspacing="0">
-            <tr>
-                <td><img src="~/images/trends/no_calc.png" /></td>
-                <td class="legendText">Could not be calculated</td>
-
-                <td><img src="~/images/trends/up_red.png" /></td>
-                <td class="legendText">Increasing and worse</td>
-
-                <td><img src="~/images/trends/up_green.png" /></td>
-                <td class="legendText">Increasing and better</td>
-
-                <td><img src="~/images/trends/down_red.png" /></td>
-                <td class="legendText">Decreasing and worse</td>
-
-                <td><img src="~/images/trends/down_green.png" /></td>
-                <td class="legendText">Decreasing and better</td>
-
-                <td><img src="~/images/trends/no_change.png" /></td>
-                <td class="legendText">No signficant change</td>
-
-                <td><img src="~/images/trends/up_blue.png" /></td>
-                <td class="legendText">Increasing</td>
-
-                <td><img src="~/images/trends/down_blue.png" /></td>
-                <td class="legendText">Decreasing</td>
-            </tr>
-        </table>
-    </div>
-}

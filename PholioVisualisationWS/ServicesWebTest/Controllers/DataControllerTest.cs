@@ -12,32 +12,22 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
     public class DataControllerTest
     {
         [TestMethod]
+        public void TestAreaValues()
+        {
+            var values = new DataController().GetAreaValues(GroupIds.Phof_HealthcarePrematureMortality, 
+                AreaTypeIds.CountyAndUnitaryAuthority, AreaCodes.England, ComparatorIds.England, 
+                IndicatorIds.ExcessWinterDeaths, SexIds.Persons, AgeIds.AllAges, ProfileIds.Phof
+                );
+
+            // Assert: All values in England
+            Assert.IsTrue(values.Count > 100);
+        }
+
+        [TestMethod]
         public void TestGetTimePeriod()
         {
             var timePeriod = new DataController().GetTimePeriod(2001,-1,-1,1,YearTypeIds.Calendar);
             Assert.AreEqual("2001", timePeriod);
-        }
-
-        [TestMethod]
-        public void TestGetNhsChoicesAreaId()
-        {
-            var nhsChoicesId = new DataController().GetNhsChoicesAreaId(AreaCodes.Gp_Burnham);
-            Assert.AreEqual("43611", nhsChoicesId);
-        }
-
-        [TestMethod]
-        public void TestGetChimatResourceId()
-        {
-            var id = new DataController().GetChimatResourceId(AreaCodes.CountyUa_Cumbria);
-            Assert.AreEqual(ChimatResourceIds.Cumbria, id);
-        }
-
-        [TestMethod]
-        public void TestGetIndicatorMetadataTextProperties()
-        {
-            var properties = new DataController().GetIndicatorMetadataTextProperties();
-            Assert.IsTrue(properties.Select(x => x.ColumnName)
-                .Contains(IndicatorMetadataTextColumnNames.DataSource));
         }
 
         [TestMethod]
@@ -49,57 +39,6 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
                 GroupIds.PracticeProfiles_SupportingIndicators, 0);
 
             Assert.AreEqual(data["Code"], areaCode);
-        }
-
-
-        [TestMethod]
-        public void TestGetChildAreas_Area_Ignored_For_Profile()
-        {
-            var areas = new DataController().GetChildAreas(AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaCodes.Gor_SouthWest,
-                ProfileIds.LongerLives);
-
-            Assert.IsFalse(areas.Select(x => x.Code).Contains(AreaCodes.CountyUa_IslesOfScilly),
-                "Isles of Scilly should have been ignored");
-        }
-
-        [TestMethod]
-        public void TestGetChildAreas_Area_Not_Ignored_When_Profile_Not_Specified()
-        {
-            var areas = new DataController().GetChildAreas(AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaCodes.Gor_SouthWest);
-
-            Assert.IsTrue(areas.Select(x => x.Code).Contains(AreaCodes.CountyUa_IslesOfScilly));
-        }
-
-        [TestMethod]
-        public void TestGetChildAreas_Area_Not_Ignored_For_Profile_That_Requires_It()
-        {
-            var areas = new DataController().GetChildAreas(AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaCodes.Gor_SouthWest, ProfileIds.Phof);
-
-            Assert.IsTrue(areas.Select(x => x.Code).Contains(AreaCodes.CountyUa_IslesOfScilly));
-        }
-
-        [TestMethod]
-        public void TestGetAreasOfAreaType_WhenAreaCodesListSubmitted()
-        {
-            var codes = new List<string> { AreaCodes.CountyUa_Cumbria , AreaCodes.CountyUa_Leicestershire};
-
-            var areas = new DataController().GetAreasOfAreaType(
-                area_codes: string.Join(",", codes));
-
-            // Assert
-            Assert.AreEqual(2, areas.Count);
-            Assert.IsNotNull(areas.FirstOrDefault(x => x.Code == AreaCodes.CountyUa_Cumbria));
-        }
-
-        [TestMethod]
-        public void TestGetProfilesPerIndicator()
-        {
-            var response = new DataController().GetProfilesPerIndicator(
-                IndicatorIds.DeprivationScoreIMD2010.ToString(), AreaTypeIds.CountyAndUnitaryAuthority);
-            Assert.IsTrue(response.Count > 0);
         }
     }
 }

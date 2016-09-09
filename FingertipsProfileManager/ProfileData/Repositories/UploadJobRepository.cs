@@ -27,7 +27,9 @@ namespace Fpm.ProfileData.Repositories
                 transaction = CurrentSession.BeginTransaction();
 
                 CurrentSession.Save(job);
-
+                // Remove job from cache
+                CurrentSession.Flush();
+                CurrentSession.Refresh(job);
                 transaction.Commit();
             }
             catch (Exception exception)
@@ -48,7 +50,7 @@ namespace Fpm.ProfileData.Repositories
         public IEnumerable<UploadJob> GetNotStartedOrConfirmationGivenUploadJobs()
         {
             // Must clear the session otherwise old object will be returned.
-            CurrentSession.Clear();
+            //CurrentSession.Clear();
 
             return CurrentSession
                 .CreateCriteria<UploadJob>()
@@ -86,6 +88,9 @@ namespace Fpm.ProfileData.Repositories
 
                 CurrentSession.Update(job);
                 CurrentSession.Flush();
+                // Remove object from cache
+                CurrentSession.Flush();
+                CurrentSession.Refresh(job);
 
                 transaction.Commit();
                 isOk = true;
@@ -95,6 +100,11 @@ namespace Fpm.ProfileData.Repositories
                 HandleException(exception);
             }
             return isOk;
+        }
+
+        public void DeleteAllJobs()
+        {
+            CurrentSession.CreateSQLQuery("delete from UploadJob").ExecuteUpdate();
         }
 
     }

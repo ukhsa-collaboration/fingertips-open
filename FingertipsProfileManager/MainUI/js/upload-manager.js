@@ -1,12 +1,12 @@
 ﻿
 $(document).ready(function() {
     $('#select-simple-spreadsheet').click(function () {
-        $("form#validateSimpleSpreadsheetForm").submit();
+        $("form#simpleUploadForm").submit();
         $('#spinner').show();
     });
 
     $('#select-batch-spreadsheet').click(function () {
-        $("form#validateBatchSpreadsheetForm").submit();
+        $("form#batchUploadForm").submit();
         $('#spinner').show();
     });
 

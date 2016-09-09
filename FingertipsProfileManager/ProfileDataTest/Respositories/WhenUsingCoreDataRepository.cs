@@ -15,7 +15,7 @@ namespace Fpm.ProfileDataTest.Respositories
         private LoggingRepository _loggingRepository;
         private static Guid batchId;
 
-        private const int indicatorId = IndicatorIds.IDAOPI;
+        private const int indicatorId = IndicatorIds.ChildrenInPoverty;
 
         [TestInitialize]
         public void Init()

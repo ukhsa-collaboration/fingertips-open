@@ -43,13 +43,41 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
-        public void TestGetValueNotes()
+        public void TestGetAllValueNotes()
         {
-            var notes = Reader().GetValueNotes();
+            var notes = Reader().GetAllValueNotes();
             Assert.IsTrue(notes.Count > 0);
 
             var note = notes.First(x => x.Id == 200);
             Assert.AreEqual("Value estimated", note.Text);
+        }
+
+        [TestMethod]
+        public void TestGetAllYearTypes()
+        {
+            var yearTypes = Reader().GetAllYearTypes();
+            Assert.IsTrue(yearTypes.Select(x =>x.Id).Contains(YearTypeIds.Financial));
+        }
+
+        [TestMethod]
+        public void TestGetAllUnits()
+        {
+            var units = Reader().GetAllUnits();
+            Assert.IsTrue(units.Select(x => x.Id).Contains(UnitIds.Days));
+        }
+
+        [TestMethod]
+        public void TestGetAllPolarities()
+        {
+            var polarities = Reader().GetAllPolarities();
+            Assert.IsTrue(polarities.Select(x => x.Id).Contains(PolarityIds.BlueOrangeBlue));
+        }
+
+        [TestMethod]
+        public void TestGetAllValueTypes()
+        {
+            var valueTypes = Reader().GetAllValueTypes();
+            Assert.IsTrue(valueTypes.Select(x => x.Id).Contains(ValueTypeIds.Count));
         }
 
         [TestMethod]
@@ -103,7 +131,29 @@ namespace PholioVisualisation.DataAccessTest
         {
             var ages = Reader().GetAllAges();
             Assert.IsTrue(ages.Count > 3);
-        } 
+        }
+
+        [TestMethod]
+        public void TestGetConfidenceIntervalMethod()
+        {
+            ConfidenceIntervalMethod method = Reader().GetConfidenceIntervalMethod(1);
+            Assert.IsNotNull(method);
+            Assert.IsTrue(method.Name.Contains("Wilson"));
+        }
+
+        [TestMethod]
+        public void TestAllGetConfidenceIntervalMethods()
+        {
+            var methods = Reader().GetAllConfidenceIntervalMethods();
+            Assert.IsTrue(methods.Select(x => x.Id).Contains(ConfidenceIntervalMethodIds.Byars));
+        }
+
+        [TestMethod]
+        public void TestAllGetAllComparatorMethods()
+        {
+            var methods = Reader().GetAllComparatorMethods();
+            Assert.IsTrue(methods.Select(x => x.Id).Contains(ComparatorMethodId.Quintiles));
+        }
 
         [TestMethod]
         public void TestKeyMessageOverride()

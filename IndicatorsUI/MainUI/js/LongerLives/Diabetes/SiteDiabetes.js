@@ -118,15 +118,17 @@ function setSearchText(areaTypeId) {
 
 function getGroupRoots(model) {
     //Reload group roots each time to ensure clicking on a grouping reloads the relevant indicators
-    getData(getGroupRootsCallback, 'gr',
-        'gid=' + model.groupId +
-        '&ati=' + model.areaTypeId);
+    var parameters = new ParameterBuilder(
+        ).add('group_id', model.groupId
+        ).add('area_type_id', model.areaTypeId);
+    ajaxGet('api/profile_group_roots', parameters.build(), getGroupRootsCallback);
 }
 
 function getSpecificGroupRoots(groupId, areaTypeId) {
-    getData(getGroupRootsCallback, 'gr',
-        'gid=' + groupId +
-        '&ati=' + areaTypeId);
+    var parameters = new ParameterBuilder(
+        ).add('group_id', groupId
+        ).add('area_type_id', areaTypeId);
+    ajaxGet('api/profile_group_roots', parameters.build(), getGroupRootsCallback);
 }
 
 function getGroupRootsCallback(obj) {
@@ -136,11 +138,11 @@ function getGroupRootsCallback(obj) {
 
 function switchAreas(areaTypeId) {
     var model = MT.model;
-        setUrl('/topic/' + profileUrlKey +
-            '#par/' + model.parentCode +
-            '/ati/' + areaTypeId +
-            '/gid/' + model.groupId +
-            '/pat/' + areaTypeId);
+    setUrl('/topic/' + profileUrlKey +
+        '#par/' + model.parentCode +
+        '/ati/' + areaTypeId +
+        '/gid/' + model.groupId +
+        '/pat/' + areaTypeId);
     // we only reload the page if we have a topic
     // otherwise we just set the url with clicked areatype
     var currentUrl = window.location.href;
@@ -171,18 +173,18 @@ ROOT_INDEXES = {
 };
 
 function populateCauseList() {
-    
+
     var groupId = MT.model.groupId;
     var metadataHash = loaded.indicatorMetadata[groupId];
     var indicators = [];
     var selectedIndicatorId = groupRoots[selectedRootIndex].IID;
-    
+
     if (!isDefined(MT.model.indicatorId)) {
         MT.model.indicatorId = selectedIndicatorId;
     }
 
     for (var i = 0; i < groupRoots.length; i++) {
-        
+
         var indicatorId = groupRoots[i].IID;
         var isIndicatorSelected = indicatorId === selectedIndicatorId;
         var metadata = metadataHash[indicatorId];
@@ -205,7 +207,7 @@ function populateCauseList() {
     var html = templates.render('causes', { causes: indicators });
     $('#diabetes_list-' + groupId).html(html);
     $('#domain-' + groupId).addClass('active');
-    
+
     unlock();
 }
 
@@ -273,7 +275,7 @@ function GroupDataAtDataPointOfSpecificAreasDataManager() {
                 .add('profile_id', modelCopy.profileId)
                 .add('group_id', modelCopy.groupId);
 
-            ajaxGet('data/group_data_at_data_point_of_specific_areas',
+            ajaxGet('api/latest_data/all_indicators_in_profile_group_for_single_area',
                 parameters.build(),
                 function (obj) {
                     setData(modelCopy, obj);
@@ -314,8 +316,7 @@ function getValueNoteText(valueNoteId) {
 function getAreaAddress(areaCode) {
 
     // Get practice address details
-    ajaxGet('GetData.ashx', 's=aa&are=' + areaCode,
-        getAreaAddressCallback);
+    ajaxGet('api/area_address', 'area_code=' + areaCode, getAreaAddressCallback);
 }
 
 function getAreaAddressCallback(obj) {
@@ -342,24 +343,28 @@ function getChildAreas(model) {
         ajaxMonitor.callCompleted();
     } else {
         // Get child areas
-        ajaxGet('data/areas', 'parent_area_code=' + parentCode +
-                '&area_type_id=' + areaTypeId,
+        var parameters = new ParameterBuilder(
+            ).add('profile_id', model.profileId
+            ).add('parent_area_code', model.parentCode
+            ).add('area_type_id', model.areaTypeId);
+
+        ajaxGet('api/areas/by_parent_area_code', parameters.build(),
             getChildAreasCallback);
     }
 }
 
 function getNhsId() {
     var areaCode = MT.model.areaCode;
-    ajaxGet('data/nhs_choices_area_id', 'area_code=' + areaCode,
+    ajaxGet('api/area/nhs_choices_area_id', 'area_code=' + areaCode,
         function (obj) {
-        loaded.nhsId = obj;
-        ajaxMonitor.callCompleted();
-    });
+            loaded.nhsId = obj;
+            ajaxMonitor.callCompleted();
+        });
 }
 
 function getConditionWord() {
 
-    switch(MT.model.profileId) {
+    switch (MT.model.profileId) {
         case ProfileIds.Diabetes:
             return 'diabetes';
         case ProfileIds.Hypertension:
@@ -375,7 +380,7 @@ function getContentText(contentKey) {
       ).add('profile_id', model.profileId
       ).add('key', contentKey);
 
-    ajaxGet('data/content',
+    ajaxGet('api/content',
         parameters.build(),
         function (obj) {
             loaded.contentText = obj;
@@ -398,7 +403,7 @@ MT.nav = {
             model.parentCode = model.areaCode;
         }
         model.areaCode = null;
-        model.areaTypeId = PRACTICE;
+        model.areaTypeId = AreaTypeIds.Practice;
 
         //Force in the selected indicator Id
         if (groupRoots.length) {
@@ -462,7 +467,7 @@ MT.nav = {
     // Go to home via bread crumbs
     // 
     gohome: function () {
-    setUrl('/topic/' + profileUrlKey);
+        setUrl('/topic/' + profileUrlKey);
     }
 }
 
@@ -479,7 +484,7 @@ function getDecileCode(decile) {
 }
 
 function getGradeFunctionFromGroupRoot(groupRoot) {
-    return getGradeFunction(groupRoot.Grouping[0].MethodId);
+    return getGradeFunction(groupRoot.ComparatorMethodId);
 }
 
 function getGradeFunction(comparatorMethodId) {
@@ -546,7 +551,7 @@ function UnitFormat(metadata, value) {
         return '';
     };
 
-    this.getLabel = function() {
+    this.getLabel = function () {
         return isPercentage
             ? percentageLabel
             : '';
@@ -575,17 +580,17 @@ function areaSearchResultSelected(noMatches, searchResult) {
 
         // Reset search box
         $('#search_text').val('').blur();
-            var model = MT.model;
-            
+        var model = MT.model;
+
         var polygonAreaCode = searchResult.PolygonAreaCode;
-            
+
         if (hasPracticeData) {
             if (searchResult.Easting) {
                 // Go to search results page
                 setUrl('/topic/' + profileUrlKey + '/area-search-results?' +
                     getSearchResultParameters(searchResult) +
-                    '#par/' + polygonAreaCode + 
-                    '/pat/' + model.parentAreaType + 
+                    '#par/' + polygonAreaCode +
+                    '/pat/' + model.parentAreaType +
                     '/ati/' + AreaTypeIds.Practice);
             } else {
                 // Parent polygon areas do not have easting/northing
@@ -597,7 +602,7 @@ function areaSearchResultSelected(noMatches, searchResult) {
             MT.nav.areaDetails(model);
             // if user is on the areaDetails page and perform search we need 
             // to reload the page.
-            if (ajaxLock) {
+            if (FT.ajaxLock) {
                 location.reload();
             }
         }
@@ -613,15 +618,8 @@ function getSearchResultParameters(searchResult) {
 }
 
 function isComparisonAvailable(model) {
-    switch (model.areaTypeId) {
-        case AreaTypeIds.CountyUA:
-            return true;
-        case PRACTICE:
-            return false;
-        case AreaTypeIds.CCG:
-            return true;
-    }
-    return true;
+
+    return model.areaTypeId !== AreaTypeIds.Practice;
 }
 
 function getDeprivationLabel(label, parentAreaType) {
@@ -629,7 +627,7 @@ function getDeprivationLabel(label, parentAreaType) {
     var areaTypeLabel = parentAreaType === AreaTypeIds.CountyUA ? 'County/UA'
         : parentAreaType === AreaTypeIds.CCG ? 'CCG'
         : 'England';
-       
+
     return label + ' within ' + areaTypeLabel;
 }
 
@@ -654,7 +652,7 @@ loaded.contentText = '';
 loaded.groupDataAtDataPoint = new GroupDataAtDataPointOfSpecificAreasDataManager(MT.model);
 
 IndicatorIds = {
-    Deprivation : 338
+    Deprivation: 338
 };
 
 groupRoots = null;
@@ -664,16 +662,16 @@ comparatorId = NATIONAL_COMPARATOR_ID;
 shouldSearchRetreiveCoordinates = true;
 
 GroupIds = {
-    HealthChecks : {
+    HealthChecks: {
         HealthCheck: 1938132782,
-        DiseaseAndDeath : 1938132785
+        DiseaseAndDeath: 1938132785
     },
-    Diabetes : {
+    Diabetes: {
         Complications: 1938132699,
         PrevalenceAndRisk: 1938132727
     },
     DrugsAndAlcohol: {
-        PrevalenceAndRisks :1938132771,
+        PrevalenceAndRisks: 1938132771,
         TreatmentAndRecovery: 1938132772
     },
     Cancer: {

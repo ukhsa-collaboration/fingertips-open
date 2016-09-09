@@ -19,7 +19,7 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var categoryArea = CategoryArea.New(new Category
             {
-                CategoryId = 3,
+                Id = 3,
                 CategoryTypeId = 2,
                 ShortName = "short",
                 Name = "name"

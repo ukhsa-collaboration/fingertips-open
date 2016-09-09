@@ -5,6 +5,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Firefox;
 
 namespace Fpm.MainUISeleniumTest
 {
@@ -15,7 +16,8 @@ namespace Fpm.MainUISeleniumTest
 
         public BaseUnitTest()
         {
-            _driver = new ChromeDriver(ConfigurationManager.AppSettings["ChromeDriver"]);
+            _driver = new FirefoxDriver();
+            //new ChromeDriver(ConfigurationManager.AppSettings["ChromeDriver"]);
         }
 
         [TestInitialize]

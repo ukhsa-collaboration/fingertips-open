@@ -7,11 +7,11 @@ using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
-    public class ValueType
+    public class ValueType : INamedEntity
     {
         [JsonProperty]
         public int Id { get; set; }
         [JsonProperty]
-        public string Label { get; set; }
+        public string Name { get; set; }
     }
 }

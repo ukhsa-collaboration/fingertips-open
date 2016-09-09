@@ -28,7 +28,7 @@ namespace PholioVisualisation.DataAccessTest
                 new[] { AreaTypeIds.DistrictAndUnitaryAuthority });
 
             Assert.AreEqual(2, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.LocalAuthority));
+            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.District));
             Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.UnitaryAuthority));
         }
 
