@@ -26,7 +26,7 @@ namespace PholioVisualisation.DataConstruction
         private IEnumerable<TimePeriod> periods;
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         private PholioReader pholioReader = ReaderFactory.GetPholioReader();
-        private CoreDataProcessor dataProcessor;
+        private CoreDataProcessor _coreDataProcessor;
 
         private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
@@ -66,15 +66,16 @@ namespace PholioVisualisation.DataConstruction
             Init();
 
             TrendRoot trendRoot = new TrendRoot(root);
-
             periods = Grouping.GetTimePeriodIterator(IndicatorMetadata.YearType).TimePeriods;
 
             var formatter = NumericFormatterFactory.New(IndicatorMetadata, groupDataReader);
-            dataProcessor = new CoreDataProcessor(formatter);
+            _coreDataProcessor = new CoreDataProcessor(formatter);
 
             // Get comparator trend data
-            foreach (var comparator in comparatorMap.Comparators)
+            foreach (var grouping in root.Grouping)
             {
+                var comparator = comparatorMap.GetComparatorById(grouping.ComparatorId);
+
                 CategoryArea categoryArea = comparator.Area as CategoryArea;
                 if (categoryArea != null)
                 {
@@ -114,16 +115,18 @@ namespace PholioVisualisation.DataConstruction
                 foreach (var timePeriod in periods)
                 {
 
-                    var dataPoint = GetDataAtSpecificTimePeriod(dataList, timePeriod)
+                    var coreDataSet = GetDataAtSpecificTimePeriod(dataList, timePeriod)
                                     ?? CoreDataSet.GetNullObject(areaCode);
 
-                    var significances = AssignSignificanceToTrendDataPoint(dataPoint, Grouping, timePeriod);
+                    var significances = AssignSignificanceToTrendDataPoint(coreDataSet, Grouping, timePeriod);
 
                     // Need to assess count before data is truncated
-                    var isCountValid = dataPoint.IsCountValid;
+                    var isCountValid = coreDataSet.IsCountValid;
 
-                    dataProcessor.FormatAndTruncate(dataPoint);
-                    var trendDataPoint = new TrendDataPoint(dataPoint)
+                    _coreDataProcessor.FormatAndTruncate(coreDataSet);
+                    _coreDataProcessor.RemoveRedundantValueNote(coreDataSet);
+
+                    var trendDataPoint = new TrendDataPoint(coreDataSet)
                     {
                         Significance = significances,
                         IsCountValid = isCountValid
@@ -152,17 +155,6 @@ namespace PholioVisualisation.DataConstruction
             return trendRoot;
         }
 
-        /// <summary>
-        /// Currently deprivation deciles are the only category areas expected to provide trend data
-        /// </summary>
-        private static void CheckCategoryTypeIsAllowedForTrendData(int categoryTypeId)
-        {
-            if (CategoryType.IsDeprivationDecile(categoryTypeId))
-            {
-                throw new FingertipsException("Unexpected Category Type ID for trend data");
-            }
-        }
-
         private void AssignPeriods(TrendRoot trendRoot)
         {
             trendRoot.Periods = periods.Select(p =>
@@ -187,9 +179,11 @@ namespace PholioVisualisation.DataConstruction
             {
                 Dictionary<int, string> comparatorToValueFs = new Dictionary<int, string>();
                 Dictionary<int, double> comparatorToValue = new Dictionary<int, double>();
+                Dictionary<int, CoreDataSet> comparatorToCoreData = new Dictionary<int, CoreDataSet>();
 
                 trendRoot.ComparatorValueFs.Add(comparatorToValueFs);
                 trendRoot.ComparatorValue.Add(comparatorToValue);
+                trendRoot.ComparatorData.Add(comparatorToCoreData);
 
                 foreach (KeyValuePair<int, IList<CoreDataSet>> keyValuePair in comparatorIdToComparatorTrendData)
                 {
@@ -197,6 +191,10 @@ namespace PholioVisualisation.DataConstruction
                     var comparatorDataList = keyValuePair.Value;
 
                     var data = GetFormattedValueData(period, comparatorDataList, grouping, childAreaCodes);
+                    _coreDataProcessor.RemoveRedundantValueNote(data);
+                    comparatorToCoreData.Add(comparatorId, data);
+
+                    // These two redundant now have data object
                     comparatorToValueFs.Add(comparatorId, data.ValueFormatted);
                     comparatorToValue.Add(comparatorId, data.Value);
                 }
@@ -307,7 +305,7 @@ namespace PholioVisualisation.DataConstruction
             }
 
 
-            dataProcessor.FormatAndTruncate(benchmarkData);
+            _coreDataProcessor.FormatAndTruncate(benchmarkData);
             return benchmarkData;
         }
 
@@ -327,7 +325,7 @@ namespace PholioVisualisation.DataConstruction
                 periodToComparer[period] = categoryComparer;
 
                 // Truncate last
-                dataProcessor.FormatAndTruncateList(childDataList);
+                _coreDataProcessor.FormatAndTruncateList(childDataList);
             }
 
             return periodToComparer[period];

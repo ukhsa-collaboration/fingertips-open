@@ -24,11 +24,12 @@ namespace IndicatorsUI.DataConstructionTest
             Assert.IsNotNull(details.Title);
             Assert.AreEqual(ProfileUrlKeys.SevereMentalIllness, details.ProfileUrlKey);
 
+            // Assert: domains are as expected
             Assert.AreEqual(6, details.Domains.Count);
             Assert.AreEqual(GroupIds.SevereMentalIllness_RiskFactors, 
-                details.Domains[0].GroupId);
+                details.Domains[1].GroupId);
             Assert.AreEqual(GroupIds.SevereMentalIllness_Finance, 
-                details.Domains[4].GroupId);
+                details.Domains[5].GroupId);
         }
 
         [TestMethod]

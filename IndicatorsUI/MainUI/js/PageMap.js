@@ -214,15 +214,19 @@ function getAreaValuesCallback(obj) {
     // Second, set orderFrac for each.
     var j = 0;
     $.each(areaOrder, function (i, v) {
+        var data = hash[v.AreaCode];
         if (v.ValF === "-") {
-            hash[v.AreaCode].order = -1;
-            hash[v.AreaCode].orderFrac = -1;
+            data.order = -1;
+            data.orderFrac = -1;
         }
         else {
-            hash[v.AreaCode].order = numAreas - j;
-            hash[v.AreaCode].orderFrac = 1 - j / numAreas;
-            hash[v.AreaCode].quartile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 4));
-            hash[v.AreaCode].quintile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 5));
+            data.order = numAreas - j;
+
+            // Continuous scale
+            data.orderFrac = 1 - j / numAreas;
+
+            data.quartile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 4));
+            data.quintile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 5));
             j++;
         }
     });
@@ -522,7 +526,7 @@ function NEPHOMaps() {
         NEPHOMaps.oldId = 0;
         NEPHOMaps.initAreaCodeToSigHash();
         NEPHOMaps.initGetColour();
-        var serviceUrl = 'https://services1.arcgis.com/0IrmI40n5ZYxTUrV/ArcGIS/rest/services/ONS_Boundaries_02/FeatureServer/';
+        var serviceUrl = 'https://services1.arcgis.com/0IrmI40n5ZYxTUrV/ArcGIS/rest/services/ONS_Boundaries/FeatureServer/';
         NEPHOMaps.AreaLayer = L.esri.featureLayer(serviceUrl + geoLayerId,
                 {
                     simplifyFactor: .25,//0.75,
@@ -621,7 +625,7 @@ function NEPHOMaps() {
 
     this.initGetColour = function () {
         // Get a function that will give you a colour from a significance value
-        NEPHOMaps.getColour = NEPHOMaps.getSigColourFunction(mapState.root.PolarityId);
+        NEPHOMaps.getColour = NEPHOMaps.getSigColourFunction(mapState.root);
     }
 
     this.updateMap = function () {
@@ -647,30 +651,30 @@ function NEPHOMaps() {
                 $('#keyTartanRug').hide();
                 $('#keyAdHoc').show();
                 html += "<table class='keyTable customKeyTable' cellspacing='2'><tbody><tr><td class='keyText'>Quartiles:</td>"
-                      + "<td style='background-color: #E8C7D1;'>Q1 (lowest)</td>"
-                      + "<td style='background-color: #B74D6D;' class='whiteText'>Q2</td>"
-                      + "<td style='background-color: #98002E;' class='whiteText'>Q3</td>"
-                      + "<td style='background-color: #700023;' class='whiteText'>Q4 (highest)</td>"
+                      + "<td style='background-color: #E8C7D1;'>Low</td>"
+                      + "<td style='background-color: #B74D6D;' class='whiteText'>&nbsp;</td>"
+                      + "<td style='background-color: #98002E;' class='whiteText'>&nbsp;</td>"
+                      + "<td style='background-color: #700023;' class='whiteText'>High</td>"
                       + "</tr></tbody></table>";
                 break;
             case "quintile":
                 $('#keyTartanRug').hide();
                 $('#keyAdHoc').show();
                 html += "<table class='keyTable customKeyTable' cellspacing='2'><tbody><tr><td class='keyText'>Quintiles:</td>"
-                      + "<td style='background-color: #DED3EC;'>Q1 (Low)</td>"
-                      + "<td style='background-color: #BEA7DA;'>Q2</td>"
-                      + "<td style='background-color: #9E7CC8;' class='whiteText'>Q3</td>"
-                      + "<td style='background-color: #7E50B6;' class='whiteText'>Q4</td>"
-                      + "<td style='background-color: #5E25A4;' class='whiteText'>Q5 (High)</td>"
+                      + "<td style='background-color: #DED3EC;'>Low</td>"
+                      + "<td style='background-color: #BEA7DA;'>&nbsp;</td>"
+                      + "<td style='background-color: #9E7CC8;' class='whiteText'>&nbsp;</td>"
+                      + "<td style='background-color: #7E50B6;' class='whiteText'>&nbsp;</td>"
+                      + "<td style='background-color: #5E25A4;' class='whiteText'>High</td>"
                       + "</tr></tbody></table>";
                 $('#map-key-part1').html(html);
                 break;
             case "continuous":
                 $('#keyTartanRug').hide();
                 $('#keyAdHoc').show();
-                html += "<table class='keyTable customKeyTable' cellspacing='2'><tbody><tr><td class='keyText'>Continuous:</td>"
+                html += "<table class='keyTable customKeyTable' cellspacing='0'><tbody><tr><td class='keyText'>Continuous:</td>"
                       + "<td style='background-color: #FFE97F;'>Lowest</td>"
-                      + "<td class='continual_range whiteText'>Mid</td>"
+                      + "<td class='continual_range whiteText'>&nbsp;</td>"
                       + "<td style='background-color: #151C55;' class='whiteText'>Highest</td>"
                       + "</tr></tbody></table>";
                 break;
@@ -684,11 +688,25 @@ function NEPHOMaps() {
         $('#keyAdHoc').html(html).show();
     }
 
-    this.getSigColourFunction = function (polarityId) {
+    this.getSigColourFunction = function (groupRoot) {
+
+        var polarityId = groupRoot.PolarityId;
 
         var c = colours/*global definition of common colours*/;
         same = c.same,
         noComparison = c.noComparison;
+
+        // Quintiles
+        if (mapState.comparisonConfig.useQuintileColouring ||
+            groupRoot.ComparatorMethodId === ComparatorMethodIds.Quintiles) {
+            return function (sig) {
+                if (sig > 0 && sig < 6) {
+                    var quintile = 'quintile' + sig;
+                    return colours[quintile];
+                }
+                return noComparison;
+            }
+        }
 
         // No colour comparison should be made
         if (polarityId === -1) {
@@ -710,14 +728,6 @@ function NEPHOMaps() {
 
         // RAG
         return function (sig) {
-            if (mapState.comparisonConfig.useQuintileColouring) {
-                switch (true) {
-                    case (sig > 0 && sig < 6):
-                        var quintile = 'quintile' + sig;
-                        return colours[quintile];
-                }
-            }
-
             return sig === 1 ? c.worse :
                 sig === 2 ? same :
                 sig === 3 ? c.better :

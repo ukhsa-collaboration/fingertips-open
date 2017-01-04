@@ -15,7 +15,7 @@
     templateProfileId = @Model.TemplateProfileId;
     FT.version = '@ViewBag.JavaScriptVersion';
     showDataQuality = @(ViewBag.ShowDataQuality);
-    isNational = @(ViewBag.IsNational);
+    isNational = @JsHelper.GetJsBool(ViewBag.IsNational);
 
 //]]</script>
 @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForDataPage"))

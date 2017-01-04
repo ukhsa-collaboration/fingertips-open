@@ -1,5 +1,5 @@
 function initPage() {
-
+    console.log('cc');
     lock();
     updateModelFromHash();
 
@@ -64,7 +64,10 @@ function displayPage() {
         // National rank and judgement
         var nationalVal = areaDetails.Benchmarks[nationalAreaCode][overallIndex].Val;
         var getGrade = getGradeFunction(nationalVal);
+
+
         var grade = getGrade(significances[overallIndex], areaRank.Val);
+       
         var rank = areaRank.Rank;
         var nationalVerdict = getVerdictAndRank(grade, rank, ranks, overallIndex);
         var nationalVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
@@ -89,7 +92,11 @@ function displayPage() {
             //Judgements and ranks
             var decileVal = areaDetails.Benchmarks[decileCode][overallIndex].Val;
             getGrade = getGradeFunction(decileVal, true);
+            console.log(significances[overallIndex]);
+
             grade = getGrade(significances[overallIndex], areaRank.Val);
+            console.log(grade);
+
             similarVerdict = getVerdictAndRank(grade, decileRank, decileRanks, overallIndex);
             similarVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
         } else {
@@ -103,6 +110,7 @@ function displayPage() {
             var onsValue = areaDetails.Benchmarks[onsClusterCode][overallIndex].Val;
             getGrade = getGradeFunction(onsValue, true);
             grade = getGrade(significances[overallIndex], areaRank.Val);
+            console.log(grade);
             similarVerdict = getVerdictAndRank(grade, onsRank, onsRanks, overallIndex);
             similarVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
         }
@@ -122,7 +130,6 @@ function displayPage() {
             areaDetails.Benchmarks[parentCode][overallIndex].Val);
 
         applySigClass(causeClass);
-
         // Render Header
         var pageHeaderModel = {
             areaName: areaName,
@@ -238,6 +245,7 @@ function toggleDataHeaders(dataExists, areaName) {
 }
 
 function groupColour(imgUrl, grade) {
+    console.log(grade);
     // Group colour   
     $('#similar_colour').html(
         '<img src="' + imgUrl + 'Mortality/grade-' +
@@ -490,7 +498,13 @@ function removeAllGradeClasses(jq) {
 function showLocalAuthorityWebsiteLink(url) {
     var model = MT.model;
     if (model.areaTypeId != AreaTypeIds.DistrictUA) {
-        $('.related_links').append('<li><a id="la_link" class="external_link" target="_blank" href="' + url + '">Visit the local authority website</a></li>');
+        var $laLink = $('#la_link').html();
+        if(_.isUndefined($laLink)){
+            $('.related_links')
+                .append('<li><a id="la_link" class="external_link" target="_blank" href="' +
+                    url +
+                    '">Visit the local authority website</a></li>');
+        }
     }
 }
 

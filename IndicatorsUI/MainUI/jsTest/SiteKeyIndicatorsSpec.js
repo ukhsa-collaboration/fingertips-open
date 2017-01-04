@@ -408,7 +408,7 @@ describe('SearchTextValidator', function () {
     });
 });
 
-describe('PreferredAreaTypeId', function() {
+describe('PreferredAreaTypeId', function () {
 
     it('containsProfileId', function () {
         var model = { profileId: 1 };
@@ -439,13 +439,13 @@ describe('PreferredAreaTypeId', function() {
 describe('PreferredAreas', function () {
 
     it('get area null if no state', function () {
-        var model = {areaTypeId : 1};
+        var model = { areaTypeId: 1 };
         expect(new PreferredAreas(null, model).getAreaCode()).toEqual(null);
         expect(new PreferredAreas('', model).getAreaCode()).toEqual(null);
     });
 
     it('updateAreaCode', function () {
-        var model = { areaTypeId: 1, areaCode : 'b' };
+        var model = { areaTypeId: 1, areaCode: 'b' };
         var preferredAreas = new PreferredAreas(null, model);
         expect(preferredAreas.getAreaCode()).toEqual(null);
         preferredAreas.updateAreaCode();
@@ -480,12 +480,12 @@ describe('PreferredAreas', function () {
 });
 
 
-describe('HashSerialiser', function() {
+describe('HashSerialiser', function () {
 
     var hashString = 'a:1,b:2';
     var hash = { a: 1, b: 2 };
 
-    it('serialise', function() {
+    it('serialise', function () {
         expect(new HashSerialiser().serialise(hash)).toEqual(hashString);
     });
 
@@ -518,7 +518,7 @@ describe('getTargetLegendHtml', function () {
     var expectedLowerRed = '<span class="target worse">&lt;10';
     var expectedHigherGreen = '<span class="target better">&ge;50';
 
-    var expectedHigherRed  = '<span class="target worse">&gt;50';
+    var expectedHigherRed = '<span class="target worse">&gt;50';
     var expectedLowerGreen = '<span class="target better">&le;10';
 
 
@@ -608,8 +608,8 @@ describe('isSubnationalColumn', function () {
         FT = {
             model: {
                 parentTypeId: AreaTypeIds.CountyUA,
-                isNearestNeighbours : function() { return false; }
-            } 
+                isNearestNeighbours: function () { return false; }
+            }
         };
     }
 
@@ -626,7 +626,7 @@ describe('isSubnationalColumn', function () {
 
     it('no if nearest neighbours', function () {
         init();
-        FT.model.isNearestNeighbours = function() { return true; };
+        FT.model.isNearestNeighbours = function () { return true; };
         expect(isSubnationalColumn()).toBe(false);
     });
 
@@ -644,3 +644,84 @@ describe('isSubnationalColumn', function () {
         expect(isSubnationalColumn()).toBe(false);
     });
 });
+
+describe('AreaAndDataSorter',
+    function () {
+
+        var areas, areaHash, data;
+
+        // Initialise test data
+        var init = function() {
+            areas = [{ Code: 'a' }, { Code: 'b' }, { Code: 'c' }];
+            areaHash = _.object(_.map(areas,
+                function(area) {
+                    return [area.Code, area];
+                }));
+            data = [
+                { Val: 3, Count: 33, AreaCode: 'c' },
+                { Val: 1, Count: 11, AreaCode: 'a' },
+                { Val: 2, Count: 22, AreaCode: 'b' }
+            ];
+        }
+
+        it('sort areas by value', function () {
+            init();
+            var sorter = new AreaAndDataSorter(0, data, areas, areaHash);
+            var sortedAreas = sorter.byValue();
+
+            // Assert
+            expect(sortedAreas.length).toBe(3);
+            expect(sortedAreas[0].Code).toBe('a');
+            expect(sortedAreas[2].Code).toBe('c');
+        });
+
+        it('sort areas by value where no matching data', function () {
+            init();
+            areas.push({ Val: 4, Count: 44, AreaCode: 'e' });
+            var sorter = new AreaAndDataSorter(0, data, areas, areaHash);
+            var sortedAreas = sorter.byValue();
+
+            // Assert
+            expect(sortedAreas.length).toBe(3);
+            expect(sortedAreas[0].Code).toBe('a');
+            expect(sortedAreas[2].Code).toBe('c');
+        });
+
+        it('sort areas by value where no matching area', function () {
+            init();
+            data.push({ Code: 'd' });
+            var sorter = new AreaAndDataSorter(0, data, areas, areaHash);
+            var sortedAreas = sorter.byValue();
+
+            // Assert
+            expect(sortedAreas.length).toBe(3);
+            expect(sortedAreas[0].Code).toBe('a');
+            expect(sortedAreas[2].Code).toBe('c');
+        });
+
+        it('sort areas by count', function () {
+            init();
+            var sorter = new AreaAndDataSorter(0, data, areas, areaHash);
+            var sortedAreas = sorter.byCount();
+
+            // Assert
+            expect(sortedAreas.length).toBe(3);
+            expect(sortedAreas[0].Code).toBe('a');
+            expect(sortedAreas[2].Code).toBe('c');
+        });
+
+        it('sort areas by value when no data', function () {
+            init();
+            var sorter = new AreaAndDataSorter(0, [], [], {});
+            var sortedAreas = sorter.byValue();
+            expect(sortedAreas.length).toBe(0);
+        });
+
+        it('sort areas by count when no data', function () {
+            init();
+            var sorter = new AreaAndDataSorter(0, [], [], {});
+            var sortedAreas = sorter.byCount();
+            expect(sortedAreas.length).toBe(0);
+        });
+
+    });

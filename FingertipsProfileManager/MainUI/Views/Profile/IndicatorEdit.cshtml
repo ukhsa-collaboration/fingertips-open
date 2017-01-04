@@ -243,10 +243,18 @@
             </div>
             <div>
                 <label class="associated-detail-label">
-                    Target
+                    Goal
                 </label>
                 @Html.DropDownListFor(x => x.IndicatorMetadata.TargetId, CommonUtilities.GetListOfTargets(),
-                    new { @Name = "TargetId", @Id = "TargetId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+                    new {@Name = "TargetId", @Id = "TargetId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+            </div>
+            <div>
+                <label class="associated-detail-label">
+                    <small>Spine chart displayed even if < 75% of values are valid</small>
+                </label>
+                @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowSpineChart, 
+                    new { @Name = "ShouldAlwaysShowSpineChart", @Id = "ShouldAlwaysShowSpineChart" })
+                @Html.Hidden("AlwaysShowSpineChart")
             </div>
         </div>
         <div id="tabs-3">

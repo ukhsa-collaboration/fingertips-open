@@ -1,7 +1,10 @@
 ﻿@using Profiles.DomainObjects
-<p id="high-to-low-legend">
+@model Profiles.MainUI.Models.PageModel
+@if (Model.ProfileId != ProfileIds.SuicidePrevention)
+{
+    <p id="high-to-low-legend">
         <span id="comparison-header"></span>
-    <span class="grade">
+        <span class="grade">
         low
         <img class="quintile-1" src="@(ViewBag.ImagesUrl)Mortality/grade-quintile-1.png" />
         <img src="@(ViewBag.ImagesUrl)Mortality/grade-quintile-2.png" />
@@ -9,9 +12,8 @@
         <img src="@(ViewBag.ImagesUrl)Mortality/grade-quintile-4.png" />
         <img src="@(ViewBag.ImagesUrl)Mortality/grade-quintile-5.png" />high
     </span>     
-    <span class="grade">       
+        <span class="grade">       
         <img src="@(ViewBag.ImagesUrl)Mortality/no-data.png" alt="" />data unavailable
     </span>
-
-</p>
-
+    </p>
+}

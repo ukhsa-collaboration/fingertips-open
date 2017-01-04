@@ -1,11 +1,11 @@
 ﻿using FingertipsUploadService;
-using FingertipsUploadService.Helpers;
+using FingertipsUploadService.FpmFileReader;
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NLog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 
 namespace FingertipsUploadServiceTest
 {
@@ -13,6 +13,7 @@ namespace FingertipsUploadServiceTest
     public class BatchJobWorkerTest : WorkerTestBase
     {
         private Guid _jobGuid;
+        private Logger _logger = null;
 
         [TestInitialize]
         public void RunBeforeEachTest()
@@ -30,16 +31,35 @@ namespace FingertipsUploadServiceTest
         }
 
         [TestMethod]
-        public void EndToEnd_1_ProcessBatchJobWithNewData()
+        public void EndToEnd_1_ProcessBatchJobWithNewDataExcelFile()
+        {
+            ProcessBatchJobWithNewData("batch-indicator-upload-new-data.xlsx");
+        }
+
+        [TestMethod]
+        public void EndToEnd_1_ProcessBatchJobWithNewDataWithCsvFile()
+        {
+            ProcessBatchJobWithNewData("batch-indicator-upload-new-data.csv");
+        }
+
+
+        [TestMethod]
+        public void EndToEnd_1_ProcessBatchJobWithNewDataWithExcelFileWithNull()
+        {
+            ProcessBatchJobWithNewData("batch-indicator-upload-new-data-null-value.xlsx");
+        }
+
+
+        private void ProcessBatchJobWithNewData(string filename)
         {
             var job = GetJob(UploadJobType.Batch, _jobGuid);
-            job.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
+            job.Filename = GetTestFilePath(filename);
             job = JobRepository.SaveJob(job);
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
-            var fileReader = new ExcelFileReader(job.Filename);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
+            var fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
             worker.ProcessJob(job, validator, processor, fileReader);
 
             Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
@@ -48,18 +68,28 @@ namespace FingertipsUploadServiceTest
             CoreDataRepository.DeleteCoreData(_jobGuid);
         }
 
-
         [TestMethod]
         public void EndToEnd_2_ProcessBatchJobWithDuplicateRowInFile()
         {
+            ProcessBatchJobWithDuplicateRowInFile("batch-indicator-upload-duplicate-rows.xlsx");
+        }
+
+        [TestMethod]
+        public void EndToEnd_2_ProcessBatchJobWithDuplicateRowInFileWithCsvFile()
+        {
+            ProcessBatchJobWithDuplicateRowInFile("batch-indicator-upload-duplicate-rows.csv");
+        }
+
+        public void ProcessBatchJobWithDuplicateRowInFile(string filename)
+        {
             var job = GetJob(UploadJobType.Batch, _jobGuid);
-            job.Filename = GetTestFilePath("batch-indicator-upload-duplicate-rows.xlsx");
+            job.Filename = GetTestFilePath(filename);
             job = JobRepository.SaveJob(job);
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
-            var fileReader = new ExcelFileReader(job.Filename);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
+            var fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
             worker.ProcessJob(job, validator, processor, fileReader);
 
             Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
@@ -70,27 +100,38 @@ namespace FingertipsUploadServiceTest
         [TestMethod]
         public void EndToEnd_3_ProcessBatchJobWithDuplicateRowInPholio()
         {
+            ProcessBatchJobWithDuplicateRowInPholioWithCsvFile("batch-indicator-upload-new-data.xlsx");
+        }
+
+        [TestMethod]
+        public void EndToEnd_3_ProcessBatchJobWithDuplicateRowInPholioWithCsvFile()
+        {
+            ProcessBatchJobWithDuplicateRowInPholioWithCsvFile("batch-indicator-upload-new-data.csv");
+        }
+
+        private void ProcessBatchJobWithDuplicateRowInPholioWithCsvFile(string filename)
+        {
             // First job
             var job = GetJob(UploadJobType.Batch, _jobGuid);
-            job.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
+            job.Filename = GetTestFilePath(filename);
             job = JobRepository.SaveJob(job);
 
             // Process new job without any duplication
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
-            var excelFileReader = new ExcelFileReader(job.Filename);
-            worker.ProcessJob(job, validator, processor, excelFileReader);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
+            var fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
+            worker.ProcessJob(job, validator, processor, fileReader);
 
             // Duplicate job
             var duplicateJob = GetJob(UploadJobType.Batch, _jobGuid);
             duplicateJob.Guid = Guid.NewGuid();
-            duplicateJob.Filename = GetTestFilePath("batch-indicator-upload-new-data.xlsx");
+            duplicateJob.Filename = GetTestFilePath(filename);
             duplicateJob = JobRepository.SaveJob(duplicateJob);
 
             // Process job with duplication
-            excelFileReader = new ExcelFileReader(duplicateJob.Filename);
-            worker.ProcessJob(duplicateJob, validator, processor, excelFileReader);
+            fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
+            worker.ProcessJob(duplicateJob, validator, processor, fileReader);
 
             Assert.AreEqual(UploadJobStatus.ConfirmationAwaited, duplicateJob.Status);
 
@@ -98,8 +139,8 @@ namespace FingertipsUploadServiceTest
             duplicateJob.Status = UploadJobStatus.ConfirmationGiven;
             JobRepository.UpdateJob(duplicateJob);
 
-            excelFileReader = new ExcelFileReader(duplicateJob.Filename);
-            worker.ProcessJob(duplicateJob, validator, processor, excelFileReader);
+            fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
+            worker.ProcessJob(duplicateJob, validator, processor, fileReader);
             Assert.AreEqual(UploadJobStatus.SuccessfulUpload, duplicateJob.Status);
 
             // Cleanup
@@ -110,25 +151,36 @@ namespace FingertipsUploadServiceTest
             ErrorRepository.DeleteLog(duplicateJob.Guid);
         }
 
-
         [TestMethod]
         public void EndToEnd_4_ProcessBatchJobWithDuplicateRowInFileWithComplexGrouping()
         {
+            ProcessBatchJobWithDuplicateRowInFileWithComplexGrouping(
+                "batch-indicator-upload-duplicate-rows_complex_grouping.xlsx");
+        }
+
+        [TestMethod]
+        public void EndToEnd_4_ProcessBatchJobWithDuplicateRowInFileWithComplexGroupingWithCsvFile()
+        {
+            ProcessBatchJobWithDuplicateRowInFileWithComplexGrouping(
+                "batch-indicator-upload-duplicate-rows_complex_grouping.csv");
+        }
+
+        private void ProcessBatchJobWithDuplicateRowInFileWithComplexGrouping(string filename)
+        {
             var job = GetJob(UploadJobType.Batch, _jobGuid);
-            job.Filename = GetTestFilePath("batch-indicator-upload-duplicate-rows_complex_grouping.xlsx");
+            job.Filename = GetTestFilePath(filename);
             job = JobRepository.SaveJob(job);
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
-            var fileReader = new ExcelFileReader(job.Filename);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
+            var fileReader = new FileReaderFactory().Get(job.Filename, job.JobType);
             worker.ProcessJob(job, validator, processor, fileReader);
 
             Assert.AreEqual(UploadJobStatus.SuccessfulUpload, job.Status);
             // Cleanup
             CoreDataRepository.DeleteCoreData(_jobGuid);
         }
-
 
         [TestMethod]
         public void ProcessBatchJobWithWrongWorksheet()
@@ -138,10 +190,10 @@ namespace FingertipsUploadServiceTest
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
 
             var wrongWorksheets = new List<string> { "Fus", "FPM" };
-            var fileReader = new Moq.Mock<IExcelFileReader>();
+            var fileReader = new Moq.Mock<IUploadFileReader>();
             fileReader.Setup(f => f.GetWorksheets()).Returns(wrongWorksheets);
 
             worker.ProcessJob(job, validator, processor, fileReader.Object);
@@ -159,14 +211,14 @@ namespace FingertipsUploadServiceTest
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
 
             var correctWorksheet = new List<string> { WorksheetNames.BatchPholio };
 
-            var batchDataTable = GetEmptyDataTable();
+            var batchDataTable = new UploadDataSchema().CreateEmptyTable();
             batchDataTable.Rows.Add(91491, 2030, 1, -1, -1, 44, 1, "E92000001", -1, 35.3, 34.9, 35.7, 56704, -1, 0, -1, -1);
 
-            var fileReader = new Moq.Mock<IExcelFileReader>();
+            var fileReader = new Moq.Mock<IUploadFileReader>();
             fileReader.Setup(f => f.GetWorksheets()).Returns(correctWorksheet);
             fileReader.Setup(f => f.GetBatchData()).Returns(batchDataTable);
 
@@ -177,7 +229,6 @@ namespace FingertipsUploadServiceTest
             CoreDataRepository.DeleteCoreData(job.Guid);
         }
 
-
         [TestMethod]
         public void ProcessBatchJobWithDuplicateRows()
         {
@@ -186,14 +237,14 @@ namespace FingertipsUploadServiceTest
 
             var worker = GetWorker();
             var validator = new WorksheetNameValidator();
-            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
+            var processor = new BatchWorksheetDataProcessor(CoreDataRepository, LoggingRepository, _logger);
 
             var correctWorksheet = new List<string> { WorksheetNames.BatchPholio };
             // Add new Data
-            var batchDataTable = GetEmptyDataTable();
+            var batchDataTable = new UploadDataSchema().CreateEmptyTable();
             batchDataTable.Rows.Add(91491, 2030, 1, -1, -1, 44, 1, "E92000001", -1, 35.3, 34.9, 35.7, 56704, -1, 0, -1, -1);
 
-            var fileReader = new Moq.Mock<IExcelFileReader>();
+            var fileReader = new Moq.Mock<IUploadFileReader>();
             fileReader.Setup(f => f.GetWorksheets()).Returns(correctWorksheet);
             fileReader.Setup(f => f.GetBatchData()).Returns(batchDataTable);
 
@@ -208,30 +259,6 @@ namespace FingertipsUploadServiceTest
             CoreDataRepository.DeleteCoreData(job.Guid);
         }
 
-
-        public DataTable GetEmptyDataTable()
-        {
-            var table = new DataTable();
-            table.Columns.Add("IndicatorID", typeof(double));
-            table.Columns.Add("Year", typeof(double));
-            table.Columns.Add("YearRange", typeof(double));
-            table.Columns.Add("Quarter", typeof(double));
-            table.Columns.Add("Month", typeof(double));
-            table.Columns.Add("AgeID", typeof(double));
-            table.Columns.Add("SexID", typeof(double));
-            table.Columns.Add("AreaCode", typeof(string));
-            table.Columns.Add("Count", typeof(double));
-            table.Columns.Add("Value", typeof(double));
-            table.Columns.Add("LowerCI", typeof(double));
-            table.Columns.Add("UpperCI", typeof(double));
-            table.Columns.Add("Denominator", typeof(double));
-            table.Columns.Add("Denominator_2", typeof(double));
-            table.Columns.Add("ValueNoteId", typeof(double));
-            table.Columns.Add("CategoryTypeId", typeof(double));
-            table.Columns.Add("CategoryId", typeof(double));
-
-            return table;
-        }
 
         private BatchJobWorker GetWorker()
         {

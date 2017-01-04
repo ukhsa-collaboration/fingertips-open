@@ -27,6 +27,18 @@ namespace Fpm.MainUISeleniumTest
                 By.Id("Confirm"));
         }
 
+        public void ProfilesPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("IndicatorManagementForm"));
+        }
+
+        public void EditProfilePageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("main"));
+        }
+
         /// <summary>
         /// Wait for an element to be present on the page.
         /// </summary>

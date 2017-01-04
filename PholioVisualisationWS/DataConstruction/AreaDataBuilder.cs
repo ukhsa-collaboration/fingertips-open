@@ -28,7 +28,7 @@ namespace PholioVisualisation.DataConstruction
 
         public Dictionary<string, IList<SimpleAreaData>> Build()
         {
-            IndicatorMetadataRepository indicatorMetadataRepository = IndicatorMetadataRepository.Instance;
+            IndicatorMetadataProvider indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
             IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(GroupId, AreaTypeId);
             GroupRootBuilder rootBuilder = new GroupRootBuilder();
             IList<GroupRoot> roots = rootBuilder.BuildGroupRoots(groupings);
@@ -55,7 +55,7 @@ namespace PholioVisualisation.DataConstruction
                     Grouping grouping = root.FirstGrouping;
 
                     IndicatorComparer comparer = indicatorComparerFactory.New(grouping);
-                    IndicatorMetadata metadata = indicatorMetadataRepository.GetIndicatorMetadata(grouping.IndicatorId);
+                    IndicatorMetadata metadata = indicatorMetadataProvider.GetIndicatorMetadata(grouping.IndicatorId);
 
                     var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
                     var dataProcessor = new ValueWithCIsDataProcessor(formatter);

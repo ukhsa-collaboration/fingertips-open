@@ -23,6 +23,8 @@ namespace PholioVisualisation.DataAccess
         {
             Ids = new List<int>();
 
+            // IMPORTANT - when composite area types are added here then they 
+            // must also be added to the same class in FPM
             foreach (var areaTypeId in areaTypeIds)
             {
                 switch (areaTypeId)

@@ -18,7 +18,10 @@ namespace Fpm.MainUI.Controllers
         private readonly IFpmUploadRepository _fpmUploadRepository = new UploadJobRepository();
         private CoreDataRepository _coreDataRepository;
         private LoggingRepository _loggingRepository;
-        // Upload Index
+
+        /// <summary>
+        ///  Upload Index
+        /// </summary>
         public ActionResult Index()
         {
             const string simpleTemplateRelativePath = "/upload-templates/simple-indicator-upload-template.xlsx";
@@ -29,78 +32,40 @@ namespace Fpm.MainUI.Controllers
                 SimpleTemplateUrl = simpleTemplateRelativePath,
                 BatchTemplateUrl = batchTemplateRelativePath,
                 SimpleLastUpdated = AppConfig.LastUpdatedDateSimpleTemplate,
-                BatchLastUpdated = AppConfig.LastUpdatedDateBatchTemplate
+                BatchLastUpdated = AppConfig.LastUpdatedDateBatchTemplate,
+                User = UserDetails.CurrentUser()
             };
 
             return View(viewModel);
         }
 
-        // Upload simple file
+        /// <summary>
+        /// Upload simple file
+        /// </summary>
         [HttpPost]
         public ActionResult UploadSimpleFile(HttpPostedFileBase indicatorDataFile)
         {
-            var response = SaveFile(indicatorDataFile, UploadJobType.Simple);
+            var response = SaveFile(UploadJobType.Simple);
             return Content(response ? "ok" : "fail");
         }
 
-        // Upload batch file
+        /// <summary>
+        /// Upload batch file
+        /// </summary>
         [HttpPost]
         [Route("UploadBatchUpload")]
         public ActionResult UploadBatchUpload(HttpPostedFileBase indicatorDataFile)
         {
-            var response = SaveFile(indicatorDataFile, UploadJobType.Batch);
+            var response = SaveFile(UploadJobType.Batch);
             return Content(response ? "ok" : "fail");
         }
 
-        // Helper to save files and create job in database
-        public bool SaveFile(HttpPostedFileBase indicatorDataFile, UploadJobType jobType)
-        {
-            bool response;
-
-            if (Request.Files == null)
-            {
-                return false;
-            }
-
-            var guid = Guid.NewGuid();
-            var file = Request.Files[0];
-            var actualFileName = file.FileName;
-            var fileName = guid + Path.GetExtension(file.FileName);
-
-            try
-            {
-                if (!Directory.Exists(AppConfig.UploadFolder))
-                {
-                    Directory.CreateDirectory(AppConfig.UploadFolder);
-                }
-
-                file.SaveAs(Path.Combine(AppConfig.UploadFolder, fileName));
-                var uploadJob = new UploadJob
-                {
-                    DateCreated = DateTime.Now,
-                    Guid = guid,
-                    Filename = actualFileName,
-                    JobType = jobType,
-                    Status = UploadJobStatus.NotStart,
-                    UserId = UserDetails.CurrentUser().Id
-                };
-
-                _fpmUploadRepository.CreateJob(uploadJob);
-                response = true;
-            }
-            catch (Exception ex)
-            {
-                response = false;
-            }
-
-            return response;
-        }
-
-        // Returns list of jobs for current user
+        /// <summary>
+        /// Returns list of jobs for current user
+        /// </summary>
         [HttpGet]
-        public ActionResult CurrentUserJobProgress()
+        public ActionResult CurrentUserJobProgress(int userId)
         {
-            var userId = UserDetails.CurrentUser().Id;
             var jobs = _fpmUploadRepository.GetJobsForCurrentUser(userId);
 
             var response = new UploadProgressViewModel
@@ -114,7 +79,9 @@ namespace Fpm.MainUI.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
-        // Returns job summary, i.e. number of processed rows or error
+        /// <summary>
+        /// Returns job summary, i.e. number of processed rows or error
+        /// </summary>
         [HttpGet]
         public ActionResult JobSummary(string guid)
         {
@@ -135,7 +102,9 @@ namespace Fpm.MainUI.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
-        // Change the job starts from ConfirmationAwaited to ConfirmationGiven
+        /// <summary>
+        /// Change the job starts from ConfirmationAwaited to ConfirmationGiven
+        /// </summary>
         [HttpGet]
         public ActionResult ChangeStatus(string guid, int actionCode)
         {
@@ -155,7 +124,9 @@ namespace Fpm.MainUI.Controllers
             return Json(response, JsonRequestBehavior.AllowGet);
         }
 
-        // Returns xls or csv file
+        /// <summary>
+        /// Returns xls or csv file
+        /// </summary>
         [HttpGet]
         public ActionResult Download(string guid)
         {
@@ -187,6 +158,56 @@ namespace Fpm.MainUI.Controllers
             catch (Exception ex)
             {
                 return Redirect("/NotFound");
+            }
+        }
+
+        private bool SaveFile(UploadJobType jobType)
+        {
+            bool wasFileSaved;
+
+            if (Request.Files == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                EnsureUploadDirectoryExists();
+
+                // Save file
+                var guid = Guid.NewGuid();
+                var file = Request.Files[0];
+                var actualFileName = file.FileName;
+                var fileName = guid + Path.GetExtension(file.FileName);
+                file.SaveAs(Path.Combine(AppConfig.UploadFolder, fileName));
+
+                var uploadJob = new UploadJob
+                {
+                    DateCreated = DateTime.Now,
+                    Guid = guid,
+                    Filename = actualFileName,
+                    JobType = jobType,
+                    Status = UploadJobStatus.NotStart,
+                    UserId = UserDetails.CurrentUser().Id
+                };
+
+                _fpmUploadRepository.CreateJob(uploadJob);
+
+                wasFileSaved = true;
+            }
+            catch (Exception ex)
+            {
+                wasFileSaved = false;
+            }
+
+            return wasFileSaved;
+        }
+
+        private static void EnsureUploadDirectoryExists()
+        {
+            if (!Directory.Exists(AppConfig.UploadFolder))
+            {
+                Directory.CreateDirectory(AppConfig.UploadFolder);
             }
         }
 

@@ -13,11 +13,21 @@ namespace Fpm.MainUISeleniumTest
     public class BaseUnitTest
     {
         private IWebDriver _driver;
+        public WaitFor waitFor;
+        public NavigateTo navigateTo;
 
         public BaseUnitTest()
         {
-            _driver = new FirefoxDriver();
-            //new ChromeDriver(ConfigurationManager.AppSettings["ChromeDriver"]);
+           InitDriverObjects();
+        }
+
+        protected void InitDriverObjects()
+        {
+            const string driverDirectory = @"C:\fingertips\3rdPartyLibraries\selenium";
+            _driver = new ChromeDriver(driverDirectory);
+
+            waitFor = new WaitFor(_driver);
+            navigateTo = new NavigateTo(_driver);
         }
 
         [TestInitialize]

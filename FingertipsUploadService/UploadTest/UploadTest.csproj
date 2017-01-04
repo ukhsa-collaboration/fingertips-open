@@ -48,6 +48,10 @@
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -81,6 +85,10 @@
     <ProjectReference Include="..\DIResolver\DIResolver.csproj">
       <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
       <Name>DIResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FingertipsUploadService\FingertipsUploadService.csproj">
+      <Project>{7B7A48E8-3CC7-4BD1-A2D6-77A8F4CFF381}</Project>
+      <Name>FingertipsUploadService</Name>
     </ProjectReference>
     <ProjectReference Include="..\ProfileData\ProfileData.csproj">
       <Project>{db5ce84b-be14-44bb-a83e-506ffdf58094}</Project>

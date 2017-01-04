@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 /**
 * Inequalities namespace
@@ -24,7 +24,7 @@ function goToInequalitiesPage() {
     }
 }
 
-inequalities.selectValuesOrTrends = function () {
+inequalities.selectValuesOrTrends = function() {
     lock();
     var ns = inequalities;
     if (ns.state.isViewModeValues) {
@@ -32,13 +32,13 @@ inequalities.selectValuesOrTrends = function () {
     } else {
         ns.selectTrends();
     }
-}
+};
 
 /**
 * Initialises the inequalities page. Only the first call has an effect
 * @class init
 */
-inequalities.init = function () {
+inequalities.init = function() {
     var ns = inequalities;
 
     if (!ns.viewManager) {
@@ -57,7 +57,7 @@ inequalities.init = function () {
 * Get all data for selected area by AJAX
 * @class getDataForValues
 */
-inequalities.getDataForValues = function () {
+inequalities.getDataForValues = function() {
 
     var model = FT.model;
     var groupRoot = getGroupRoot();
@@ -76,7 +76,7 @@ inequalities.getDataForValues = function () {
 * Gets category data by AJAX
 * @class getDataForAllCategories
 */
-inequalities.getDataForAllCategories = function (model, groupRoot) {
+inequalities.getDataForAllCategories = function(model, groupRoot) {
 
     var ns = inequalities;
     var dataManager = ns.categoryDataManager;
@@ -91,10 +91,12 @@ inequalities.getDataForAllCategories = function (model, groupRoot) {
         // Load data
         var parameters = inequalities.getCategoryAjaxParameters(model, groupRoot, areaCode);
 
-        ajaxGet('api/partition_data/by_category',
+        ajaxGet("api/partition_data/by_category",
             parameters.build(),
-            function (obj) {
-                dataManager.setData(groupRoot, areaCode, model.areaTypeId,
+            function(obj) {
+                dataManager.setData(groupRoot,
+                    areaCode,
+                    model.areaTypeId,
                     new ns.CategoryDataAnalyser(obj));
                 ajaxMonitor.callCompleted();
             });
@@ -105,21 +107,31 @@ inequalities.getDataForAllCategories = function (model, groupRoot) {
 * Returns the AJAX parameters for getting the category data
 * @class getCategoryAjaxParameters
 */
-inequalities.getCategoryAjaxParameters = function (model, groupRoot, areaCode) {
+inequalities.getCategoryAjaxParameters = function(model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add('profile_id', model.profileId
-        ).add('area_code', areaCode
-        ).add('indicator_id', groupRoot.IID
-        ).add('area_type_id', model.areaTypeId
-        ).add('sex_id', groupRoot.Sex.Id
-        ).add('age_id', groupRoot.Age.Id);
-}
+        ).add("profile_id",
+            model.profileId
+        )
+        .add("area_code",
+            areaCode
+        )
+        .add("indicator_id",
+            groupRoot.IID
+        )
+        .add("area_type_id",
+            model.areaTypeId
+        )
+        .add("sex_id",
+            groupRoot.Sex.Id
+        )
+        .add("age_id", groupRoot.Age.Id);
+};
 
 /**
 * Gets the most recent data partitioned by sex by AJAX
 * @class getDataForAllSexes
 */
-inequalities.getDataForAllSexes = function (model, groupRoot) {
+inequalities.getDataForAllSexes = function(model, groupRoot) {
 
     var ns = inequalities;
     var dataManager = ns.sexDataManager;
@@ -134,10 +146,12 @@ inequalities.getDataForAllSexes = function (model, groupRoot) {
         // Load data
         var parameters = ns.getSexAjaxParameters(model, groupRoot, areaCode);
 
-        ajaxGet('api/partition_data/by_sex',
+        ajaxGet("api/partition_data/by_sex",
             parameters.build(),
-            function (obj) {
-                dataManager.setData(groupRoot, areaCode, model.areaTypeId,
+            function(obj) {
+                dataManager.setData(groupRoot,
+                    areaCode,
+                    model.areaTypeId,
                     new ns.SexDataAnalyser(obj));
                 ajaxMonitor.callCompleted();
             });
@@ -148,20 +162,28 @@ inequalities.getDataForAllSexes = function (model, groupRoot) {
 * Returns the AJAX parameters for getting the sex data
 * @class getSexAjaxParameters
 */
-inequalities.getSexAjaxParameters = function (model, groupRoot, areaCode) {
+inequalities.getSexAjaxParameters = function(model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add('profile_id', model.profileId
-        ).add('area_code', areaCode
-        ).add('indicator_id', groupRoot.IID
-        ).add('area_type_id', model.areaTypeId
-        ).add('age_id', groupRoot.Age.Id);
-}
+        ).add("profile_id",
+            model.profileId
+        )
+        .add("area_code",
+            areaCode
+        )
+        .add("indicator_id",
+            groupRoot.IID
+        )
+        .add("area_type_id",
+            model.areaTypeId
+        )
+        .add("age_id", groupRoot.Age.Id);
+};
 
 /**
 * Gets the most recent data partitioned by age by AJAX
 * @class getDataForAllAges
 */
-inequalities.getDataForAllAges = function (model, groupRoot) {
+inequalities.getDataForAllAges = function(model, groupRoot) {
 
     var ns = inequalities;
     var dataManager = ns.ageDataManager;
@@ -176,10 +198,12 @@ inequalities.getDataForAllAges = function (model, groupRoot) {
         // Load data
         var parameters = ns.getAgeAjaxParameters(model, groupRoot, areaCode);
 
-        ajaxGet('api/partition_data/by_age',
+        ajaxGet("api/partition_data/by_age",
             parameters.build(),
-            function (obj) {
-                dataManager.setData(groupRoot, areaCode, model.areaTypeId,
+            function(obj) {
+                dataManager.setData(groupRoot,
+                    areaCode,
+                    model.areaTypeId,
                     new ns.AgeDataAnalyser(obj));
                 ajaxMonitor.callCompleted();
             });
@@ -190,20 +214,28 @@ inequalities.getDataForAllAges = function (model, groupRoot) {
 * Returns the AJAX parameters for getting the age data
 * @class getAgeAjaxParameters
 */
-inequalities.getAgeAjaxParameters = function (model, groupRoot, areaCode) {
+inequalities.getAgeAjaxParameters = function(model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add('profile_id', model.profileId
-        ).add('area_code', areaCode
-        ).add('indicator_id', groupRoot.IID
-        ).add('area_type_id', model.areaTypeId
-        ).add('sex_id', groupRoot.Sex.Id);
-}
+        ).add("profile_id",
+            model.profileId
+        )
+        .add("area_code",
+            areaCode
+        )
+        .add("indicator_id",
+            groupRoot.IID
+        )
+        .add("area_type_id",
+            model.areaTypeId
+        )
+        .add("sex_id", groupRoot.Sex.Id);
+};
 
 /**
 * Displays the inequalities page
 * @class determinePartitionToDisplay
 */
-inequalities.determinePartitionToDisplay = function () {
+inequalities.determinePartitionToDisplay = function() {
 
     var ns = inequalities;
     var state = ns.state;
@@ -220,7 +252,7 @@ inequalities.determinePartitionToDisplay = function () {
     var isAgeData = ageDataAnalyser.isAnyData;
     var isSexData = sexDataAnalyser.isAnyData;
 
-    // Define default category in case needed 
+    // Define default category in case needed
     var defaultCategoryTypeId = null;
     if (isCategoryData) {
         defaultCategoryTypeId = categoryDataAnalyser.categoryTypes[0].Id;
@@ -234,32 +266,32 @@ inequalities.determinePartitionToDisplay = function () {
         if (isDefined(preferredPartition)) {
             // Use last thing the user looked at
             switch (preferredPartition) {
-                case 'bySex':
-                    if (isSexData) {
-                        ns.selectSex();
-                    } else {
-                        state.preferredPartition = null;
-                        ns.selectCategoryType(defaultCategoryTypeId);
-                    }
-                    break;
-                case 'byAge':
-                    if (isAgeData) {
-                        ns.selectAge();
-                    } else {
-                        state.preferredPartition = null;
-                        ns.selectCategoryType(defaultCategoryTypeId);
-                    }
-                    break;
-                default:
-                    if (isSexData && !isCategoryData) {
-                        ns.selectSex();
-                    } else if (isAgeData && !isCategoryData) {
-                        ns.selectAge();
-                    } else {
-                        var categoryTypeId = ns.getCategoryTypeIdToDisplay();
-                        ns.selectCategoryType(categoryTypeId);
-                    }
-                    break;
+            case ns.PartitionsTypes.BySex:
+                if (isSexData) {
+                    ns.selectSex();
+                } else {
+                    state.preferredPartition = null;
+                    ns.selectCategoryType(defaultCategoryTypeId);
+                }
+                break;
+            case ns.PartitionsTypes.ByAge:
+                if (isAgeData) {
+                    ns.selectAge();
+                } else {
+                    state.preferredPartition = null;
+                    ns.selectCategoryType(defaultCategoryTypeId);
+                }
+                break;
+            default:
+                if (isSexData && !isCategoryData) {
+                    ns.selectSex();
+                } else if (isAgeData && !isCategoryData) {
+                    ns.selectAge();
+                } else {
+                    var categoryTypeId = ns.getCategoryTypeIdToDisplay();
+                    ns.selectCategoryType(categoryTypeId);
+                }
+                break;
             }
         } else {
             // Nothing has been looked at yet
@@ -278,14 +310,15 @@ inequalities.determinePartitionToDisplay = function () {
     // Display values
     if (state.isViewModeValues || !isAnyData) {
         ns.displayValues();
+    } else {
+        // change the header
+        inequalities.updateTrendHeader();
+        inequalities.displayOptions();
+        inequalities.toggleDisplayOptionCss(ns.state.isViewModeValues);
     }
 };
 
-/**
-* Displays the most recent values trend chart
-* @class displayValues
-*/
-inequalities.displayValues = function () {
+inequalities.updateTrendHeader = function() {
     var ns = inequalities;
     var viewManager = ns.viewManager;
     viewManager.updateTabSpecificOptionsOptions();
@@ -294,32 +327,42 @@ inequalities.displayValues = function () {
     var groupRoot = getGroupRoot();
     var metadata = ui.getMetadataHash()[groupRoot.IID];
     var period = getFirstGrouping(groupRoot).Period;
-    var areaLabel = ns.getSelectedAreaName() + ', ' + period + '';
-
+    var areaLabel = ns.getSelectedAreaName() + ", " + period + "";
     // Header
-    var html = getTrendHeader(metadata, groupRoot, areaLabel, 'goToMetadataPage(' + indicatorIndex + ')');
+    var html = getTrendHeader(metadata, groupRoot, areaLabel, "goToMetadataPage(" + indicatorIndex + ")");
     viewManager.setHeaderHtml(html);
+};
 
+
+/**
+* Displays the most recent values trend chart
+* @class displayValues
+*/
+inequalities.displayValues = function() {
+    var ns = inequalities;
+    var viewManager = ns.viewManager;
+    viewManager.updateTabSpecificOptionsOptions();
+
+    var groupRoot = getGroupRoot();
+    var metadata = ui.getMetadataHash()[groupRoot.IID];
+
+    ns.updateTrendHeader();
     var comparisonConfig = new ComparisonConfig(groupRoot, metadata);
     setTargetLegendHtml(comparisonConfig, metadata);
-
     showAndHidePageElements();
-
     showBarChartLegend(comparisonConfig.useTarget);
-
-    $('#benchmark-box').hide();
-
+    $("#benchmark-box").hide();
     ns.displayOptions();
     ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
 
     unlock();
-}
+};
 
 /**
 * Gets the category type ID that should be displayed
 * @class getCategoryTypeIdToDisplay
 */
-inequalities.getCategoryTypeIdToDisplay = function () {
+inequalities.getCategoryTypeIdToDisplay = function() {
     var ns = inequalities;
 
     var areaCode = ns.getSelectedAreaCode();
@@ -341,34 +384,36 @@ inequalities.getCategoryTypeIdToDisplay = function () {
         return defaultCategoryTypeId;
     }
     return null;
-}
+};
 
 /**
 * Create html template for latest values / trends buttons
 * @class displayOptions
 */
-inequalities.displayOptions = function () {
+inequalities.displayOptions = function() {
 
-    templates.add('inequalitiesTrendSwitch',
+    templates.add("inequalitiesTrendSwitch",
         '<div id="inequalities-trend-switch" class="tab-options clearfix">' +
-        '<span>Display</span>' +
+        '<span id="area-options-inequalities">' +
+        "<span>Display</span>" +
         '<button id="inequalities-values" onclick="inequalities.selectValues();">Latest values</button>' +
         '{{#showTrends}}<button id="inequalities-trends" onclick="inequalities.selectTrends();">Trends</button>{{/showTrends}}' +
-        '</div>');
+        "</span>" +
+        "</div>");
 
-    var html = templates.render('inequalitiesTrendSwitch',
+    var html = templates.render("inequalitiesTrendSwitch",
     {
-        showTrends: isFeatureEnabled('inequalityTrends')
+        showTrends: isFeatureEnabled("inequalityTrends")
     });
 
-    $('#tab-specific-options').prepend(html);
+    $("#tab-specific-options").prepend(html);
 };
 
 /**
 * Render and show latest values
 * @class selectValues
 */
-inequalities.selectValues = function () {
+inequalities.selectValues = function() {
     var ns = inequalities;
     var state = ns.state;
 
@@ -382,7 +427,7 @@ inequalities.selectValues = function () {
 * Render and show trends
 * @class selectTrends
 */
-inequalities.selectTrends = function () {
+inequalities.selectTrends = function() {
     var ns = inequalities;
     var state = ns.state;
 
@@ -402,66 +447,67 @@ inequalities.getTrendsByAge = function (groupRoot) {
     var areaCode = ns.getSelectedAreaCode();
 
     var parameters = ns.getAgeAjaxParameters(model, groupRoot, areaCode);
-
-    ajaxGet('api/partition_trend_data/by_age', parameters.build(), ns.displayTrends);
-}
+    ns.state.preferredPartition = ns.PartitionsTypes.ByAge;
+    ajaxGet("api/partition_trend_data/by_age", parameters.build(), ns.displayTrends);
+};
 
 /**
 * AJAX call get trends by sex
 * @class getTrendsBySex
 */
-inequalities.getTrendsBySex = function (groupRoot) {
-
+inequalities.getTrendsBySex = function(groupRoot) {
     var model = FT.model;
     var ns = inequalities;
     var areaCode = ns.getSelectedAreaCode();
 
     var parameters = ns.getSexAjaxParameters(model, groupRoot, areaCode);
-
-    ajaxGet('api/partition_trend_data/by_sex', parameters.build(), ns.displayTrends);
-}
+    ns.state.preferredPartition = ns.PartitionsTypes.BySex;
+    ajaxGet("api/partition_trend_data/by_sex", parameters.build(), ns.displayTrends);
+};
 
 /**
 * AJAX call get trends by category
 * @class getTrendsByCategory
 */
-inequalities.getTrendsByCategory = function (groupRoot, categoryTypeId) {
-
+inequalities.getTrendsByCategory = function(groupRoot, categoryTypeId) {
     var model = FT.model;
     var ns = inequalities;
     var areaCode = ns.getSelectedAreaCode();
-
     var parameters = ns.getCategoryAjaxParameters(model, groupRoot, areaCode);
-    parameters.add('category_type_id', categoryTypeId);
-    ajaxGet('api/partition_trend_data/by_category', parameters.build(), ns.displayTrends);
-}
+    parameters.add("category_type_id", categoryTypeId);
+    ns.state.preferredPartition = categoryTypeId;
+        ajaxGet("api/partition_trend_data/by_category", parameters.build(), ns.displayTrends);
+};
 
 /**
 * Render trend chart template
 * @class renderTrendOptions
 */
-inequalities.renderTrendOptions = function (labels, hasAverage, average) {
-    templates.add('inequalitiesTrendOptions', '<div id="inequalities-trend-filters">' +
-        '<p>Display on chart:</p>' +
+inequalities.renderTrendOptions = function(labels, hasAverage, average) {
+    templates.add("inequalitiesTrendOptions",
+        '<div id="inequalities-trend-filters">' +
+        "<p>Display on chart:</p>" +
         '<div class="trend-options-filter"><a href="javascript:inequalities.hideOrShowAllTrends(true)">Show all</a></div>' +
         '<div class="trend-options-filter"><a href="javascript:inequalities.hideOrShowAllTrends(false)">Clear chart</a></div>' +
         '<div class="trend-options-filter"><hr></div>' +
-        '{{#hasAverage}}' +
+        "{{#hasAverage}}" +
         '<div class="trend-option"><input type="checkbox" id="chk-{{average.Id}}"  class="trend-option-checkbox" checked onclick="inequalities.toggleTrend({{average.Id}})" />' +
         '<a href="javascript:inequalities.toggleTrend({{average.Id}})">{{average.Name}}</a>' +
-        '</div>' +
+        "</div>" +
         '<div class="trend-options-filter"><hr></div>' +
-        '{{/hasAverage}}' +
-        '{{#trendFilters}}' +
+        "{{/hasAverage}}" +
+        "{{#trendFilters}}" +
         '<div class="trend-option">' +
         '<input id="chk-{{Id}}" class="trend-option-checkbox" type="checkbox" checked  onclick="inequalities.toggleTrend({{Id}})" />' +
         '<a href="javascript:inequalities.toggleTrend({{Id}})">{{Name}}</a>' +
-        '</div>' +
-        '{{/trendFilters}}' +
-        '</div>');
+        "</div>" +
+        "{{/trendFilters}}" +
+        "</div>");
 
-    return templates.render('inequalitiesTrendOptions', {
-        trendFilters: labels, average: average,
+    return templates.render("inequalitiesTrendOptions",
+    {
+        trendFilters: labels,
+        average: average,
         hasAverage: hasAverage
     });
 };
@@ -470,158 +516,184 @@ inequalities.renderTrendOptions = function (labels, hasAverage, average) {
 * Callback for rendering trends 
 * @class displayTrends
 */
-inequalities.displayTrends = function (data) {
-
+inequalities.displayTrends = function(data) {
     var ns = inequalities;
     var state = ns.state;
     state.trendData = data;
-
     var chartOptions, hasAverage;
     var average = {};
 
     switch (state.preferredPartition) {
-        case "bySex":
-            // Check if person exists            
-            var person = _.findWhere(data.Labels, { Id: SexIds.Person });
-            // If Person exists don't show in sub-list
-            if (!_.isUndefined(person)) {
-                chartOptions = _.without(data.Labels, person);
-                average = person;
-                hasAverage = true;
-            } else {
-                hasAverage = false;
-                chartOptions = data.Labels;
-            }
-            break;
-        case "byAge":
-            // Check if AllAges exists
-            var allAges = _.findWhere(data.Labels, { Id: AgeIds.AllAges });
-            if (!_.isUndefined(allAges)) {
-                chartOptions = _.without(data.Labels, allAges);
-                average = allAges;
-                hasAverage = true;
-            } else {
-                hasAverage = false;
-                chartOptions = data.Labels;
-            }
-            break;
+        case  ns.PartitionsTypes.BySex:
+        // Check if person exists
+        var person = _.findWhere(data.Labels, { Id: SexIds.Person });
+        // If Person exists don't show in sub-list
+        if (!_.isUndefined(person)) {
+            chartOptions = _.without(data.Labels, person);
+            average = person;
+            hasAverage = true;
+        } else {
+            hasAverage = false;
+            chartOptions = data.Labels;
+        }
+        break;
+        case ns.PartitionsTypes.ByAge:
+        // Check if AllAges exists
+        var allAges = _.findWhere(data.Labels, { Id: AgeIds.AllAges });
+        if (!_.isUndefined(allAges)) {
+            chartOptions = _.without(data.Labels, allAges);
+            average = allAges;
+            hasAverage = true;
+        } else {
+            hasAverage = false;
+            chartOptions = data.Labels;
+        }
+        break;
         default:
-            var englandAvr = _.findWhere(data.Lables, { AreaCode: NATIONAL_CODE });
-            if (!_.isUndefined(englandAvr)) {
-                chartOptions = _.without(data.Labels, NATIONAL_CODE);
-                average = englandAvr;
-                hasAverage = true;
-            } else {
-                hasAverage = false;
-                chartOptions = data.Labels;
-            }
-            break;
+        if (_.size(data.AreaAverage) > 0) {
+            hasAverage = true;
+            // Selected area id will always be zero
+            average = {
+                Id: 0,
+                Name: inequalities.getSelectedAreaName()
+            };
+            chartOptions = data.Labels;
+        } else {            
+            hasAverage = false;
+            chartOptions = data.Labels;
+        }
+        break;
     }
 
     var html = '<div id="inequalities-trend-chart"></div>' +
         ns.renderTrendOptions(chartOptions, hasAverage, average);
 
-    var $trendBox = $('#inequalities-trend-box');
+    var $trendBox = $("#inequalities-trend-box");
     $trendBox.html(html);
-    ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
-    ns.createTrendChart(data);
-    ns.viewManager.restoreTrendSeriesVisibility();
 
-    showAndHidePageElements();
+    ns.toggleDisplayOptionCss(ns.state.isViewModeValues); //TODO: this seems worng
 
-    $('#benchmark-box').hide();
+    if (data.Limits !== null) {
+        ns.createTrendChart(data);
 
-    $trendBox.show();
+        ns.viewManager.restoreTrendSeriesVisibility();
+
+        showAndHidePageElements();
+
+        $("#benchmark-box").hide();
+
+        $trendBox.show();
+    }
 
     unlock();
-}
+};
 
 /**
 * Extract and format data for trend chart 
 * @class getTrendSeriesData
 */
-inequalities.getTrendSeriesData = function (data) {
+inequalities.getTrendSeriesData = function(data) {
     var seriesData = [];
-
     var areErrorBars = inequalities.state.showErrorBars;
 
     _.each(data.TrendData,
-        function (dataList, entityId) {
-
+        function(dataList, entityId) {
             var points = [];
             var cis = [];
 
-            _.each(dataList, function (data) {
-                var dataInfo = new CoreDataSetInfo(data);
+            _.each(dataList,
+                function(data) {
+                    var dataInfo = new CoreDataSetInfo(data);
 
-                // Add point
-                var point = dataInfo.isValue()
-                    ? { y: data.Val, ValF: data.ValF }
-                    : null;
-                points.push(point);
-
-                // Add CI
-                if (areErrorBars) {
-                    var ci = dataInfo.areCIs()
-                        ? [data.LoCI, data.UpCI]
+                    // Add point
+                    var point = dataInfo.isValue()
+                        ? { y: data.Val, ValF: data.ValF }
                         : null;
-                    cis.push(ci);
-                }
-            });
+                    points.push(point);
 
-            var label = _.find(data.Labels, function (labels) {
-                // Comparison should be == not ===
-                return entityId == labels.Id;
-            });
+                    // Add CI
+                    if (areErrorBars) {
+                        var ci = dataInfo.areCIs()
+                            ? [data.LoCI, data.UpCI]
+                            : null;
+                        cis.push(ci);
+                    }
+                });
+
+            var label = _.find(data.Labels,
+                function(labels) {
+                    // Comparison should be == not ===
+                    return entityId == labels.Id;
+                });
 
             seriesData.push({ data: points, name: label.Name });
             seriesData.push(inequalities.getErrorBarSeries(cis));
         });
 
     return seriesData;
-}
+};
+inequalities.AreaTrendSeriesData = function(data) {
 
-inequalities.getErrorBarSeries = function (data) {
+    var points = [];
+
+    var areaData = new CoreDataSetInfo(data.AreaAverage);
+    // if we have data process else reutrn null
+    _.each(areaData.data,
+        function(data) {
+            var point = { y: data.Val, ValF: data.ValF };
+            points.push(point);
+        });
+    var seriesData = {
+        data: points,
+        name: inequalities.getSelectedAreaName(),
+        marker: { symbol: "triangle" },
+        color: "black"
+    };
+
+    return seriesData;
+};
+inequalities.getErrorBarSeries = function(data) {
     return {
-        name: 'Errorbars',
-        type: 'errorbar',
+        name: "Errorbars",
+        type: "errorbar",
         animation: false,
         data: data
     };
-}
+};
 
 /**
 * Gets the HighCharts error bar series data for the bar chart
 * @class getBarChartCIs
 */
-inequalities.getBarChartCIs = function (dataList) {
+inequalities.getBarChartCIs = function(dataList) {
 
     var points = [];
 
-    _.each(dataList, function (data) {
-        var point = new CoreDataSetInfo(data).areCIs()
-            ? [data.LoCI, data.UpCI]
-            : null;
-        points.push(point);
-    });
+    _.each(dataList,
+        function(data) {
+            var point = new CoreDataSetInfo(data).areCIs()
+                ? [data.LoCI, data.UpCI]
+                : null;
+            points.push(point);
+        });
 
     return points;
-}
+};
 
 /**
 * Check or uncheck filters
 * @class checkOrUncheckAllOptions
 */
-inequalities.checkOrUncheckAllOptions = function (isChecked) {
-    var shouldBeChecked = isChecked ? 'checked' : '';
-    $('.trend-option-checkbox').prop('checked', shouldBeChecked);
-}
+inequalities.checkOrUncheckAllOptions = function(isChecked) {
+    var shouldBeChecked = isChecked ? "checked" : "";
+    $(".trend-option-checkbox").prop("checked", shouldBeChecked);
+};
 
 /**
 * Shows or hides all trend lines.
 * @class hideOrShowAllTrends
 */
-inequalities.hideOrShowAllTrends = function (show) {
+inequalities.hideOrShowAllTrends = function(show) {
 
     var ns = inequalities;
     var series = ns.trendChart.series;
@@ -631,16 +703,27 @@ inequalities.hideOrShowAllTrends = function (show) {
         show ? series[i].show() : series[i].hide();
     }
     ns.checkOrUncheckAllOptions(show);
-}
+};
 
 /**
 * Toggle a trend series on the chart
 * @class toggleTrend
 */
 inequalities.toggleTrend = function (id) {
-    var selectedSeries = getSeriesByEntityId(id);
+
+    var selectedPartition = inequalities.state.preferredPartition;
+    var selectedSeries = null;
+    if (id === 0 &&
+        selectedPartition !== inequalities.PartitionsTypes.BySex &&
+        selectedPartition !== inequalities.PartitionsTypes.ByAge) {
+        var area = inequalities.getSelectedAreaName();
+        selectedSeries = getSeriesByName(area);
+    } else {
+        selectedSeries = getSeriesByEntityId(id);
+    }
+
     setSeriesVisibility(selectedSeries, id, !selectedSeries.visible);
-}
+};
 
 /**
 * Sets whether a series is visible on the chart and updates the check status of the relevant checkbox
@@ -648,13 +731,13 @@ inequalities.toggleTrend = function (id) {
 */
 function setSeriesVisibility(series, id, isVisible) {
     // Update check box
-    var $checkBox = $('#chk-' + id);
-    var checked = 'checked';
+    var $checkBox = $("#chk-" + id);
+    var checked = "checked";
     if (isVisible) {
         $checkBox.prop(checked, checked);
         series.show();
     } else {
-        $checkBox.prop(checked, '');
+        $checkBox.prop(checked, "");
         series.hide();
     }
 }
@@ -668,10 +751,9 @@ function getSeriesByEntityId(id) {
 
     var labels = ns.state.trendData.Labels;
     var selectedLabel = _.find(labels,
-        function (label) {
+        function(label) {
             return id == label.Id; // Must be == not ===
         });
-
     // Find the series
     return getSeriesByName(selectedLabel.Name);
 }
@@ -680,18 +762,18 @@ function getSeriesByEntityId(id) {
 * Gets a series by its name
 * @class getSeriesByName
 */
-function getSeriesByName(name) {
-    return _.find(inequalities.trendChart.series, function (s) {
-        return name === s.name;
-    });
+function getSeriesByName(name) {    
+    return _.find(inequalities.trendChart.series,
+        function(s) {
+            return name === s.name;
+        });
 }
 
 /**
 * Render high chart for trend
 * @class createTrendChart
 */
-inequalities.createTrendChart = function (data) {
-
+inequalities.createTrendChart = function(data) {
     var ns = inequalities;
     var groupRoot = getGroupRoot();
 
@@ -703,6 +785,14 @@ inequalities.createTrendChart = function (data) {
         heightPerLegend = 18;
     var unit = metadata.Unit;
 
+
+    var avg = inequalities.AreaTrendSeriesData(data);
+    // Only show area average if we have data
+    if (_.size(avg.data) > 0) {
+        //        seriesData.push(avg);
+        seriesData.splice(0, 0, avg);
+    }
+
     // Adjust chart height to allow for different legend sizes
     var noOfPartitions = _.size(seriesData);
     if (noOfPartitions > 0) {
@@ -712,15 +802,15 @@ inequalities.createTrendChart = function (data) {
     try {
         ns.trendChart = new Highcharts.Chart({
             chart: {
-                renderTo: 'inequalities-trend-chart',
-                defaultSeriesType: 'line',
-                zoomType: 'xy',
+                renderTo: "inequalities-trend-chart",
+                defaultSeriesType: "line",
+                zoomType: "xy",
                 width: 480,
                 height: chartHeight,
                 animation: false
             },
             title: {
-                text: ''
+                text: ""
             },
             xAxis: {
                 title: {
@@ -740,7 +830,7 @@ inequalities.createTrendChart = function (data) {
             },
             legend: {
                 enabled: true,
-                layout: 'vertical',
+                layout: "vertical",
                 borderWidth: 0
             },
             plotOptions: {
@@ -750,28 +840,28 @@ inequalities.createTrendChart = function (data) {
                     animation: false,
                     marker: {
                         radius: 3,
-                        symbol: 'circle',
+                        symbol: "circle",
                         lineWidth: 1,
-                        lineColor: '#000000'
+                        lineColor: "#000000"
                     },
                     events: {
-                        mouseOut: function () {
+                        mouseOut: function() {
                         }
                     }
                 },
                 series: {
                     events: {
-                        legendItemClick: function () {
+                        legendItemClick: function() {
                             return false;
                         }
                     }
                 }
             },
             tooltip: {
-                formatter: function () {
+                formatter: function() {
                     if (isDefined(this.point.ValF)) {
                         var value = new ValueWithUnit(unit).getFullLabel(this.point.ValF);
-                        return '<b>' + value + '</b><br/><i>' + this.series.name + '</i><br/>' + this.point.category;
+                        return "<b>" + value + "</b><br/><i>" + this.series.name + "</i><br/>" + this.point.category;
                     }
                 }
             },
@@ -791,10 +881,10 @@ inequalities.createTrendChart = function (data) {
     }
 };
 
-inequalities.toggleDisplayOptionCss = function (isValueSelected) {
-    var cssClass = 'button-selected';
-    var $values = $('#inequalities-values');
-    var $trends = $('#inequalities-trends');
+inequalities.toggleDisplayOptionCss = function(isValueSelected) {
+    var cssClass = "button-selected";
+    var $values = $("#inequalities-values");
+    var $trends = $("#inequalities-trends");
     if (isValueSelected) {
         $trends.removeClass(cssClass);
         $values.addClass(cssClass);
@@ -808,7 +898,7 @@ inequalities.toggleDisplayOptionCss = function (isValueSelected) {
 * Wrapper for response object from the recent data for all categories service
 * @class CategoryDataAnalyser
 */
-inequalities.CategoryDataAnalyser = function (data) {
+inequalities.CategoryDataAnalyser = function(data) {
 
     var categoryData = data.Data,
         categoryTypes = data.CategoryTypes,
@@ -817,12 +907,12 @@ inequalities.CategoryDataAnalyser = function (data) {
         i;
 
     // Filter out invalid values
-    categoryData = _.filter(categoryData, function (d) { return d.Val !== -1; });
+    categoryData = _.filter(categoryData, function(d) { return d.Val !== -1; });
 
     for (i in categoryTypes) {
         var categoryType = categoryTypes[i];
         var dataOfType = _.filter(categoryData,
-            function (d) { return d.CategoryTypeId === categoryType.Id; });
+            function(d) { return d.CategoryTypeId === categoryType.Id; });
 
         if (categoryType.Id !== CategoryTypeIds.HealthProfilesSSILimit && dataOfType.length) {
             categoryTypeIdToData[categoryType.Id] = dataOfType;
@@ -846,7 +936,7 @@ inequalities.CategoryDataAnalyser = function (data) {
     * Gets array of data with the specified category type ID
     * @method getDataByCategoryTypeId
     */
-    this.getDataByCategoryTypeId = function (categoryTypeId) {
+    this.getDataByCategoryTypeId = function(categoryTypeId) {
         return categoryTypeIdToData[categoryTypeId];
     };
 
@@ -854,50 +944,50 @@ inequalities.CategoryDataAnalyser = function (data) {
     * Get a category type by its ID
     * @method getCategoryTypeById
     */
-    this.getCategoryTypeById = function (categoryTypeId) {
+    this.getCategoryTypeById = function(categoryTypeId) {
         return _.filter(categoryTypesWithData,
-            function (type) { return type.Id === categoryTypeId; })[0];
+            function(type) { return type.Id === categoryTypeId; })[0];
     };
 
     /**
     * Whether a category type is available by its ID
     * @method isCategoryTypeById
     */
-    this.isCategoryTypeById = function (categoryTypeId) {
+    this.isCategoryTypeById = function(categoryTypeId) {
         return _.some(categoryTypesWithData,
-            function (type) { return type.Id === categoryTypeId; });
+            function(type) { return type.Id === categoryTypeId; });
     };
 
     /**
-	* Get the labels for each category of the specified category type ID
-	* @method getCategoryLabels
-	*/
-    this.getCategoryLabels = function (categoryTypeId) {
+    * Get the labels for each category of the specified category type ID
+    * @method getCategoryLabels
+    */
+    this.getCategoryLabels = function(categoryTypeId) {
         var categories = this.getCategoryTypeById(categoryTypeId).Categories;
-        return _.pluck(categories, 'Name');
+        return _.pluck(categories, "Name");
     };
-}
+};
 
 /**
 * Changes the style of the appropriate link to appear selected
 * @class setCategoryTypeOptionSelected
 */
-inequalities.setCategoryTypeOptionSelected = function (categoryTypeId) {
+inequalities.setCategoryTypeOptionSelected = function(categoryTypeId) {
     inequalities.unselectedPartitionOptions();
-    $('#partition-category-type-' + categoryTypeId).addClass('selected');
-}
+    $("#partition-category-type-" + categoryTypeId).addClass("selected");
+};
 
 /**
 * Build data for categories
 * @class CategoryDataBuilder
 */
-inequalities.CategoryDataBuilder = function (categoryDataAnalyser, categoryTypeId, average, useRagColours) {
+inequalities.CategoryDataBuilder = function(categoryDataAnalyser, categoryTypeId, average, useRagColours) {
 
     categoryTypeId = !!categoryTypeId ? categoryTypeId : categoryDataAnalyser.categoryTypes[0].Id;
 
     var categoryType = categoryDataAnalyser.getCategoryTypeById(categoryTypeId),
         dataList = categoryDataAnalyser.getDataByCategoryTypeId(categoryTypeId),
-        categoryIdToData = _.indexBy(dataList, 'CategoryId'),
+        categoryIdToData = _.indexBy(dataList, "CategoryId"),
         categories = categoryType.Categories;
 
     // Define average
@@ -935,22 +1025,22 @@ inequalities.CategoryDataBuilder = function (categoryDataAnalyser, categoryTypeI
     * Get category data
     * @method getData
     */
-    this.getData = function () {
+    this.getData = function() {
         var builderData = {};
         builderData.labels = categoryDataAnalyser.getCategoryLabels(categoryTypeId);
         builderData.dataSeries = dataSeries;
         builderData.averageDataSeries = averageSeries;
         builderData.showAverageLine = true;
-        builderData.averageLegend = inequalities.getSelectedAreaName() + ' average';
+        builderData.averageLegend = inequalities.getSelectedAreaName() + " average";
         return builderData;
     };
-}
+};
 
 /**
 * Wrapper for response object from the recent data for all sexes service
 * @class SexDataAnalyser
 */
-inequalities.SexDataAnalyser = function (data) {
+inequalities.SexDataAnalyser = function(data) {
 
     var sexData = data.Data,
         sexes = data.Sexes;
@@ -972,13 +1062,13 @@ inequalities.SexDataAnalyser = function (data) {
     * @property sexes
     */
     this.sexes = sexes;
-}
+};
 
 /**
 * Build data for Sex
 * @class SexDataBuilder
 */
-inequalities.SexDataBuilder = function (sexDataAnalyser) {
+inequalities.SexDataBuilder = function(sexDataAnalyser) {
     var sexData = sexDataAnalyser.sexData,
         sexes = sexDataAnalyser.sexes,
         dataSeries = [],
@@ -1025,14 +1115,14 @@ inequalities.SexDataBuilder = function (sexDataAnalyser) {
     * Get sex data
     * @method getData
     */
-    this.getData = function () {
+    this.getData = function() {
 
         var builderData = {};
-        builderData.labels = _.pluck(sexes, 'Name');
+        builderData.labels = _.pluck(sexes, "Name");
         builderData.dataSeries = dataSeries;
         builderData.averageDataSeries = averageSeries;
         builderData.showAverageLine = personExist;
-        builderData.averageLegend = inequalities.getSelectedAreaName() + ' persons';
+        builderData.averageLegend = inequalities.getSelectedAreaName() + " persons";
         return builderData;
     };
 };
@@ -1041,7 +1131,7 @@ inequalities.SexDataBuilder = function (sexDataAnalyser) {
 * Wrapper for response object from the recent data for all ages service
 * @class AgeDataAnalyser
 */
-inequalities.AgeDataAnalyser = function (data) {
+inequalities.AgeDataAnalyser = function(data) {
 
     var ageData = data.Data,
         ages = data.Ages;
@@ -1063,14 +1153,14 @@ inequalities.AgeDataAnalyser = function (data) {
     * @property ages
     */
     this.ages = ages;
-}
+};
 
 
 /**
 * Build data for Ages
 * @class AgeDataBuilder
 */
-inequalities.AgeDataBuilder = function (ageDataAnalyser) {
+inequalities.AgeDataBuilder = function(ageDataAnalyser) {
     var average = {},
         ageData = ageDataAnalyser.ageData,
         dataSeries = [],
@@ -1110,22 +1200,22 @@ inequalities.AgeDataBuilder = function (ageDataAnalyser) {
     * Get age data
     * @method getData
     */
-    this.getData = function () {
+    this.getData = function() {
         var builderData = {};
-        builderData.labels = _.pluck(ageDataAnalyser.ages, 'Name');
+        builderData.labels = _.pluck(ageDataAnalyser.ages, "Name");
         builderData.dataSeries = dataSeries;
         builderData.averageDataSeries = averageSeries;
         builderData.showAverageLine = true;
-        builderData.averageLegend = inequalities.getSelectedAreaName() + ' ' + avgLabel;
+        builderData.averageLegend = inequalities.getSelectedAreaName() + " " + avgLabel;
         return builderData;
     };
-}
+};
 
 /**
 * Get age average series data
 * @class getAgeAverageData
 */
-inequalities.getIndicatorAgeRange = function (ageData, average) {
+inequalities.getIndicatorAgeRange = function(ageData, average) {
     var ageDataCopy = _.clone(ageData),
         groupRoot = getGroupRoot();
 
@@ -1136,13 +1226,13 @@ inequalities.getIndicatorAgeRange = function (ageData, average) {
         }
     }
     return average;
-}
+};
 
 /**
 * Gets the age labels
 * @class getAgeLabels
 */
-inequalities.getAgeLabels = function (ageDataAnalyser, indicatorAgeId) {
+inequalities.getAgeLabels = function(ageDataAnalyser, indicatorAgeId) {
     var ages = ageDataAnalyser.ages;
     for (var i in ages) {
         // remove the object which match the indicator Age Range
@@ -1158,13 +1248,13 @@ inequalities.getAgeLabels = function (ageDataAnalyser, indicatorAgeId) {
 * Event handler for partition menu option
 * @class selectAge
 */
-inequalities.selectAge = function () {
+inequalities.selectAge = function() {
 
     var ns = inequalities;
     var state = ns.state;
 
     ns.unselectedPartitionOptions();
-    $('#byAge').addClass('selected');
+    $("#byAge").addClass("selected");
 
     var groupRoot = getGroupRoot();
 
@@ -1173,26 +1263,26 @@ inequalities.selectAge = function () {
     } else {
 
         var metadata = ui.getMetadataHash()[groupRoot.IID],
-        areaCode = ns.getSelectedAreaCode(),
-        ageDataAnalyser = ns.ageDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
-        data = new ns.AgeDataBuilder(ageDataAnalyser).getData();
+            areaCode = ns.getSelectedAreaCode(),
+            ageDataAnalyser = ns.ageDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
+            data = new ns.AgeDataBuilder(ageDataAnalyser).getData();
 
-        ns.viewManager.createBarChart(data, metadata);
+            ns.viewManager.createBarChart(data, metadata);
     }
-    state.preferredPartition = "byAge";
+    state.preferredPartition = ns.PartitionsTypes.ByAge;
 };
 
 /**
 * Event handler for partition menu option
 * @class selectSex
 */
-inequalities.selectSex = function () {
+inequalities.selectSex = function() {
 
     var ns = inequalities;
     var state = ns.state;
 
     ns.unselectedPartitionOptions();
-    $('#bySex').addClass('selected');
+    $("#bySex").addClass("selected");
 
     var groupRoot = getGroupRoot();
 
@@ -1201,35 +1291,33 @@ inequalities.selectSex = function () {
     } else {
 
         var metadata = ui.getMetadataHash()[groupRoot.IID],
-         areaCode = ns.getSelectedAreaCode(),
-         sexDataAnalyser = ns.sexDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
-         data = new ns.SexDataBuilder(sexDataAnalyser).getData();
-
+            areaCode = ns.getSelectedAreaCode(),
+            sexDataAnalyser = ns.sexDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
+            data = new ns.SexDataBuilder(sexDataAnalyser).getData();
         ns.viewManager.createBarChart(data, metadata);
     }
-    state.preferredPartition = 'bySex';
+    state.preferredPartition = ns.PartitionsTypes.BySex;
 };
 
 /**
 * Stores and provides the category data retrieved by AJAX.
 * @class CategoryDataManager
 */
-inequalities.CategoryDataManager = function () {
+inequalities.CategoryDataManager = function() {
 
     this._data = {};
 
-    this._getDataKey = function (groupRoot, areaCode, areaTypeId) {
+    this._getDataKey = function(groupRoot, areaCode, areaTypeId) {
         return getKey(groupRoot.IID, groupRoot.Sex.Id, groupRoot.Age.Id, areaTypeId, areaCode);
-    }
-}
-
+    };
+};
 inequalities.CategoryDataManager.prototype = {
 
     /**
-	* Gets complex data object that was retrieved by AJAX
-	* @method getData
-	*/
-    getData: function (groupRoot, areaCode, areaTypeId) {
+    * Gets complex data object that was retrieved by AJAX
+    * @method getData
+    */
+    getData: function(groupRoot, areaCode, areaTypeId) {
         var key = this._getDataKey(groupRoot, areaCode, areaTypeId);
         return this._data[key];
     },
@@ -1238,26 +1326,25 @@ inequalities.CategoryDataManager.prototype = {
     * Adds data object that was retrieved by AJAX to the manager
     * @method setData
     */
-    setData: function (groupRoot, areaCode, areaTypeId, categoryData) {
+    setData: function(groupRoot, areaCode, areaTypeId, categoryData) {
         var key = this._getDataKey(groupRoot, areaCode, areaTypeId);
         this._data[key] = categoryData;
     }
-}
-
+};
 inequalities.dataManagerPrototype = inequalities.CategoryDataManager.prototype;
 
 /**
 * Stores and provides the category data retrieved by AJAX.
 * @class CategoryDataManager
 */
-inequalities.SexDataManager = function () {
+inequalities.SexDataManager = function() {
 
     this._data = {};
 
-    this._getDataKey = function (groupRoot, areaCode, areaTypeId) {
+    this._getDataKey = function(groupRoot, areaCode, areaTypeId) {
         return getKey(groupRoot.IID, groupRoot.Age.Id, areaCode, areaTypeId);
-    }
-}
+    };
+};
 
 /**
 * Gets the data
@@ -1275,14 +1362,14 @@ inequalities.SexDataManager.prototype.setData = inequalities.dataManagerPrototyp
 * Stores and provides the category data retrieved by AJAX.
 * @class CategoryDataManager
 */
-inequalities.AgeDataManager = function () {
+inequalities.AgeDataManager = function() {
 
     this._data = {};
 
-    this._getDataKey = function (groupRoot, areaCode, areaTypeId) {
+    this._getDataKey = function(groupRoot, areaCode, areaTypeId) {
         return getKey(groupRoot.IID, groupRoot.Sex.Id, areaCode, areaTypeId);
     };
-}
+};
 
 
 /**
@@ -1302,9 +1389,9 @@ inequalities.AgeDataManager.prototype.setData = inequalities.dataManagerPrototyp
 * Determines how much offset should be used for the bar labels.
 * @class BarLabelOffsetCalculator
 */
-inequalities.BarLabelOffsetCalculator = function (dataList) {
+inequalities.BarLabelOffsetCalculator = function(dataList) {
 
-    var maxData = _.max(dataList, function (d) { return d.Val; });
+    var maxData = _.max(dataList, function(d) { return d.Val; });
 
     // e.g. 22.2
     var offset = 29;
@@ -1316,7 +1403,7 @@ inequalities.BarLabelOffsetCalculator = function (dataList) {
             offset = 36;
         }
         if (len === 3) {
-            if (valF.indexOf('.') > -1) {
+            if (valF.indexOf(".") > -1) {
                 offset = 22;
             } else {
                 offset = 25;
@@ -1335,7 +1422,7 @@ inequalities.BarLabelOffsetCalculator = function (dataList) {
 * Determines how much offset should be used for the bar labels.
 * @class BarThicknessCalculator
 */
-inequalities.BarThicknessCalculator = function (numberOfBars) {
+inequalities.BarThicknessCalculator = function(numberOfBars) {
 
     if (numberOfBars < 4) {
         // e.g. Sex
@@ -1354,12 +1441,12 @@ inequalities.BarThicknessCalculator = function (numberOfBars) {
 * Provides HTML for the inequalities bar chart tooltip
 * @class BarChartTooltip
 */
-inequalities.BarChartTooltip = function (unit, averageLabel, categoryLabels) {
+inequalities.BarChartTooltip = function(unit, averageLabel, categoryLabels) {
     /**
     * Gets the tooltip HTML
     * @method getHtml
     */
-    this.getHtml = function (obj) {
+    this.getHtml = function(obj) {
 
         var isAverageSeries = obj.series.index === 1,
             point = obj.point;
@@ -1368,26 +1455,31 @@ inequalities.BarChartTooltip = function (unit, averageLabel, categoryLabels) {
             ? averageLabel
             : categoryLabels[point.index]; // use these non-truncated labels
 
-        return '<b>' +
-            new ValueWithUnit(unit).getFullLabel(point.ValF) + '<b><br><i>' +
-            category + '</i>';
-    }
+        return "<b>" +
+            new ValueWithUnit(unit).getFullLabel(point.ValF) +
+            "<b><br><i>" +
+            category +
+            "</i>";
+    };
 };
 
 /**
 * Manages the views on the inequalities page
 * @class ViewManager
 */
-inequalities.ViewManager = function ($container) {
+inequalities.ViewManager = function($container) {
 
     var isInitialised = false,
-        $chartBox, $header, $partitionMenu, chart;
+        $chartBox,
+        $header,
+        $partitionMenu,
+        chart;
     var seriesVisible = null;
     var optionsChecked = null;
-    var checked = 'checked';
+    var checked = "checked";
 
 
-    templates.add('inequalitiesMenu',
+    templates.add("inequalitiesMenu",
         '<p>Partition data by:</p>{{#types}}<a id="partition-category-type-{{Id}}" categoryTypeId="{{Id}}" {{#isSelected}}class="selected" {{/isSelected}}href="javascript:inequalities.selectCategoryType({{Id}})">{{Name}}</a>{{/types}}' +
         '{{#hasAgeData}}<a id="byAge" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectAge()">Age</a>{{/hasAgeData}}' +
         '{{#hasSexData}}<a id="bySex" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectSex()">Sex</a>{{/hasSexData}}');
@@ -1399,10 +1491,10 @@ inequalities.ViewManager = function ($container) {
     this.tabSpecificOptions = null;
 
     /**
-	* Initialises the view manager
-	* @method init
-	*/
-    this.init = function () {
+    * Initialises the view manager
+    * @method init
+    */
+    this.init = function() {
         if (!isInitialised) {
 
             $chartBox = $('<div id="inequalities-chart-box" class="clearfix"></div>');
@@ -1415,20 +1507,21 @@ inequalities.ViewManager = function ($container) {
     };
 
     /**
-	* Sets the HTML to display above the chart
-	* @method setHeaderHtml
-	*/
-    this.setHeaderHtml = function (html) {
+    * Sets the HTML to display above the chart
+    * @method setHeaderHtml
+    */
+    this.setHeaderHtml = function(html) {
         $header.html(html);
     };
 
     /**
-	* Displays the menu of category types available for the selected indicator
-	* @method displayMenu
-	*/
-    this.displayMenu = function (categoryDataAnalyser, ageDataAnalyser, sexDataAnalyser) {
+    * Displays the menu of category types available for the selected indicator
+    * @method displayMenu
+    */
+    this.displayMenu = function(categoryDataAnalyser, ageDataAnalyser, sexDataAnalyser) {
 
-        $partitionMenu.html(templates.render('inequalitiesMenu', {
+        $partitionMenu.html(templates.render("inequalitiesMenu",
+        {
             types: categoryDataAnalyser.categoryTypes,
             hasAgeData: ageDataAnalyser.isAnyData,
             hasSexData: sexDataAnalyser.isAnyData
@@ -1437,16 +1530,17 @@ inequalities.ViewManager = function ($container) {
         var exportTypes =
             '<div class="export-chart-box"><a class="export-link" href="javascript:inequalities.exportSelectedChart()">Export chart as image</a>';
 
-        if (isFeatureEnabled('inequalityErrorBars')) {
-            var showHide = inequalities.state.showErrorBars ? 'Hide' : 'Show';
-            var errorBars = '<a id="inequalities-toggle-cis">' + showHide + ' confidence intervals</a></div>';
+        if (isFeatureEnabled("inequalityErrorBars")) {
+            var showHide = inequalities.state.showErrorBars ? "Hide" : "Show";
+            var errorBars = '<a id="inequalities-toggle-cis">' + showHide + " confidence intervals</a></div>";
         } else {
-            errorBars = '';
+            errorBars = "";
         }
 
         $chartBox.html('<div id="inequalities-chart"></div><div id="inequalities-trend-box"></div>');
-        $('#export-link-inequalities').remove();
-        $($header).after('<div id="export-link-inequalities" style="margin-top:10px;">' + exportTypes + errorBars + '</div>');
+        $("#export-link-inequalities").remove();
+        $($header)
+            .after('<div id="export-link-inequalities" style="margin-top:10px;">' + exportTypes + errorBars + "</div>");
 
         this.bindToggleConfidenceIntervals();
     };
@@ -1455,54 +1549,54 @@ inequalities.ViewManager = function ($container) {
     * Binds the toggle CI event to the event handler
     * @method bindToggleConfidenceIntervals
     */
-    this.bindToggleConfidenceIntervals = function () {
+    this.bindToggleConfidenceIntervals = function() {
         var ns = inequalities;
         var state = ns.state;
 
-        $('#inequalities-toggle-cis').click(function (e) {
-            e.preventDefault();
-            state.showErrorBars = !state.showErrorBars;
+        $("#inequalities-toggle-cis")
+            .click(function(e) {
+                e.preventDefault();
+                state.showErrorBars = !state.showErrorBars;
 
-            if (inequalities.trendChart) {
+                if (inequalities.trendChart) {
 
-                // Visibility of series
-                seriesVisible = {};
-                var serieses = inequalities.trendChart.series;
-                for (var i in serieses) {
-                    var series = serieses[i];
-                    if (series.name !== 'Errorbars') {
-                        seriesVisible[series.name] = series.visible;
+                    // Visibility of series
+                    seriesVisible = {};
+                    var serieses = inequalities.trendChart.series;
+                    for (var i in serieses) {
+                        var series = serieses[i];
+                        if (series.name !== "Errorbars") {
+                            seriesVisible[series.name] = series.visible;
+                        }
                     }
+
+                    // Checked state for trend options
+                    var options = $(".trend-option input");
+                    optionsChecked = _.map(options,
+                        function(option) {
+                            return $(option).prop(checked);
+                        });
                 }
 
-                // Checked state for trend options
-                var options = $('.trend-option input');
-                optionsChecked = _.map(options,
-                    function (option) {
-                        return $(option).prop(checked);
-                    });
-            }
-
-            ns.determinePartitionToDisplay();
-        });
-    }
-
+                ns.determinePartitionToDisplay();
+            });
+    };
     this.restoreTrendSeriesVisibility = function() {
         if (seriesVisible) {
             for (var name in seriesVisible) {
                 var series = getSeriesByName(name);
-                setSeriesVisibility(series, 'id', seriesVisible[name]);
+                setSeriesVisibility(series, "id", seriesVisible[name]);
             }
             seriesVisible = null;
 
-            var options = $('.trend-option input');
+            var options = $(".trend-option input");
             for (var i in options) {
                 var $option = $(options[i]);
                 var current = $option.prop(checked);
                 if (isDefined(current)) {
                     var target = optionsChecked[i];
                     if (current !== target) {
-                        var newChecked = target ? checked : '';
+                        var newChecked = target ? checked : "";
                         $option.prop(checked, newChecked);
                     }
                 } else {
@@ -1511,15 +1605,15 @@ inequalities.ViewManager = function ($container) {
             }
             optionsChecked = null;
         }
-    }
+    };
 
     /**
     * Exports the current chart as an image
     * @method exportChart
     */
-    this.exportChart = function () {
+    this.exportChart = function() {
 
-        var selectedPartitionName = $('#inequalities-partition-menu a.selected')[0];
+        var selectedPartitionName = $("#inequalities-partition-menu a.selected")[0];
         if (!selectedPartitionName) {
             // No chart displayed
             return;
@@ -1530,22 +1624,30 @@ inequalities.ViewManager = function ($container) {
         var indicatorName = ui.getMetadataHash()[root.IID].Descriptive.Name + new SexAndAge().getLabel(root);
         var partition = $.parseHTML(selectedPartitionName.innerHTML)[0].data;
 
-        chart.exportChart({ type: 'image/png' }, {
+        chart.exportChart({ type: "image/png" },
+        {
             chart: {
                 spacingTop: 70,
                 events: {
-                    load: function () {
-                        this.renderer.text('<b>' + indicatorName + ' - ' +
-                            inequalities.getSelectedAreaName() + ', ' + period +
-                            ' - Data partitioned by ' + partition + '</b>',
-                            350, 15)
+                    load: function() {
+                        this.renderer.text("<b>" +
+                                indicatorName +
+                                " - " +
+                                inequalities.getSelectedAreaName() +
+                                ", " +
+                                period +
+                                " - Data partitioned by " +
+                                partition +
+                                "</b>",
+                                350,
+                                15)
                             .attr({
-                                align: 'center'
+                                align: "center"
                             })
                             .css({
-                                color: '#333',
-                                fontSize: '10px',
-                                width: '650px'
+                                color: "#333",
+                                fontSize: "10px",
+                                width: "650px"
                             })
                             .add();
                     }
@@ -1556,12 +1658,12 @@ inequalities.ViewManager = function ($container) {
     };
 
     /**
-	* Hides the chart and category type menu and tells the user there is no data
-	* @method displayNoData
-	*/
-    this.displayNoData = function () {
+    * Hides the chart and category type menu and tells the user there is no data
+    * @method displayNoData
+    */
+    this.displayNoData = function() {
         $chartBox.html('<p class="no-data">Inequality data is not available<br>for this indicator</p>');
-        $partitionMenu.html('');
+        $partitionMenu.html("");
         this.tabSpecificOptions.clearHtml();
     };
 
@@ -1569,18 +1671,18 @@ inequalities.ViewManager = function ($container) {
     * Initialises the area switch 
     * @method initTabSpecificOptions
     */
-    this.initTabSpecificOptions = function () {
+    this.initTabSpecificOptions = function() {
         var clickHandler = inequalities.selectValuesOrTrends;
         this.tabSpecificOptions = new TabSpecificOptions({
             eventHandlers: [clickHandler, clickHandler],
-            eventName: 'InequalityAreaSelected'
+            eventName: "InequalityAreaSelected"
         });
     };
 
-    this.updateTabSpecificOptionsOptions = function () {
+    this.updateTabSpecificOptionsOptions = function() {
         this.tabSpecificOptions.setHtml({
-            label: 'Inequalities for',
-            optionLabels: ['England', areaHash[FT.model.areaCode].Name]
+            label: "Inequalities for",
+            optionLabels: ["England", areaHash[FT.model.areaCode].Name]
         });
     };
 
@@ -1588,30 +1690,30 @@ inequalities.ViewManager = function ($container) {
     * Creates the bar chart
     * @method createBarChart
     */
-    this.createBarChart = function (data, metadata) {
+    this.createBarChart = function(data, metadata) {
 
-        var itemStyle = { color: '#333333', fontWeight: 'normal', textShadow: '0' };
+        var itemStyle = { color: "#333333", fontWeight: "normal", textShadow: "0" };
         var unitLabel = metadata.Unit.Label;
         var tooltip = new inequalities.BarChartTooltip(metadata.Unit, data.averageLegend, data.labels);
 
         if (data.showAverageLine) {
             var seriesData = [
                 {
-                    name: 'data',
+                    name: "data",
                     data: data.dataSeries,
                     showInLegend: false
                 },
                 {
                     name: data.averageLegend,
                     data: data.averageDataSeries,
-                    type: 'line',
+                    type: "line",
                     showInLegend: true
                 }
             ];
         } else {
             seriesData = [
                 {
-                    name: 'data',
+                    name: "data",
                     data: data.dataSeries,
                     showInLegend: false
                 }
@@ -1629,20 +1731,22 @@ inequalities.ViewManager = function ($container) {
         var barWidth = new inequalities.BarThicknessCalculator(
             data.labels.length).thickness;
 
-        var shortCategoryLabels = _.map(data.labels, function (label) {
-            return trimName(label, 30);
-        });
+        var shortCategoryLabels = _.map(data.labels,
+            function(label) {
+                return trimName(label, 30);
+            });
 
         chart = new Highcharts.Chart({
             chart: {
-                renderTo: 'inequalities-chart',
+                renderTo: "inequalities-chart",
                 animation: false,
-                defaultSeriesType: 'bar',
+                defaultSeriesType: "bar",
                 width: 700,
+                zoomType: "xy",
                 marginRight: 20 // margin necessary for all labels to be displayed
             },
             title: {
-                text: ''
+                text: ""
             },
             xAxis: {
                 categories: shortCategoryLabels,
@@ -1663,36 +1767,34 @@ inequalities.ViewManager = function ($container) {
                 series: {
                     animation: false,
                     events: {
-                        legendItemClick: function () {
+                        legendItemClick: function() {
                             return false;
                         }
                     }
                 },
                 bar: {
-                    borderWidth: 0,
+                    borderColor: "#333",
                     pointPadding: 0,
                     pointWidth: barWidth,
-                    stacking: 'normal',
+                    stacking: "normal",
                     shadow: false,
                     dataLabels: {
                         allowOverlap: true,
                         enabled: true,
                         style: itemStyle,
-                        align: 'right',
+                        align: "right",
                         y: 1, // Ignored IE 6-8
-                        x: new inequalities.BarLabelOffsetCalculator(data.dataSeries).offset,
-                        formatter: function () {
-                            return this.y === 0 || errorBars ?
-                                '' :
-                                new CommaNumber(this.point.ValF).unrounded();
+                        x: new inequalities.BarLabelOffsetCalculator(data.dataSeries).offset + 1,
+                        formatter: function() {
+                            return this.y === 0 || errorBars ? "" : new CommaNumber(this.point.ValF).unrounded();
                         }
                     }
                 },
                 line: {
                     // The symbol is a non-valid option here to work round a bug
                     // in highcharts where only half of the markers appear on hover
-                            borderWidth: 0,
-        pointPadding: 0,
+                    borderWidth: 0,
+                    pointPadding: 0,
                     marker: HC.noLineMarker,
                     states: {
                         hover: {
@@ -1704,11 +1806,11 @@ inequalities.ViewManager = function ($container) {
             legend: {
                 enabled: true,
                 borderWidth: 0,
-                layout: 'vertical',
+                layout: "vertical",
                 itemStyle: itemStyle
             },
             tooltip: {
-                formatter: function () {
+                formatter: function() {
                     return tooltip.getHtml(this);
                 }
             },
@@ -1725,7 +1827,7 @@ inequalities.ViewManager = function ($container) {
 * Gets the average data object for the selected area
 * @class getAverage
 */
-inequalities.getAverage = function (groupRoot) {
+inequalities.getAverage = function(groupRoot) {
     var average, i, areaCode;
 
     if (inequalities.isNationalSelected()) {
@@ -1742,14 +1844,13 @@ inequalities.getAverage = function (groupRoot) {
         }
     }
     return average;
-}
+};
 
 /**
 * Event handler for partition menu option
 * @class selectCategoryType
 */
-inequalities.selectCategoryType = function (categoryTypeId) {
-
+inequalities.selectCategoryType = function(categoryTypeId) {
     var ns = inequalities;
     var state = ns.state;
 
@@ -1789,7 +1890,8 @@ inequalities.selectCategoryType = function (categoryTypeId) {
         // Get data to display
         var average = ns.getAverage(groupRoot);
         var data = new ns.CategoryDataBuilder(categoryDataAnalyser,
-            preferredPartition, average,
+            preferredPartition,
+            average,
             useRagColours()).getData();
 
         // Display bar chart
@@ -1802,7 +1904,7 @@ inequalities.selectCategoryType = function (categoryTypeId) {
 * Whether the national area (instead of local) is currently selected
 * @class isNationalSelected
 */
-inequalities.isNationalSelected = function () {
+inequalities.isNationalSelected = function() {
     return inequalities.viewManager.tabSpecificOptions.getOption() === inequalities.AreaOptions.NATIONAL;
 };
 
@@ -1810,9 +1912,9 @@ inequalities.isNationalSelected = function () {
 * Gets the name of the currently selected area 
 * @class getSelectedAreaName
 */
-inequalities.getSelectedAreaName = function () {
+inequalities.getSelectedAreaName = function() {
     return inequalities.isNationalSelected()
-        ? 'England'
+        ? "England"
         : areaHash[FT.model.areaCode].Name;
 };
 
@@ -1820,7 +1922,7 @@ inequalities.getSelectedAreaName = function () {
 * Gets the currently selected area code
 * @class getSelectedAreaCode
 */
-inequalities.getSelectedAreaCode = function () {
+inequalities.getSelectedAreaCode = function() {
     return inequalities.isNationalSelected()
         ? NATIONAL_CODE
         : FT.model.areaCode;
@@ -1830,15 +1932,15 @@ inequalities.getSelectedAreaCode = function () {
 * Exports the displayed chart
 * @class exportSelectedChart
 */
-inequalities.unselectedPartitionOptions = function () {
-    $('#inequalities-partition-menu').find('*').removeAttr('class');
+inequalities.unselectedPartitionOptions = function() {
+    $("#inequalities-partition-menu").find("*").removeAttr("class");
 };
 
 /**
 * Exports the displayed chart
 * @class exportSelectedChart
 */
-inequalities.exportSelectedChart = function () {
+inequalities.exportSelectedChart = function() {
     inequalities.state.isViewModeValues ? inequalities.viewManager.exportChart() : inequalities.exportTrendChart();
 };
 
@@ -1846,15 +1948,15 @@ inequalities.exportSelectedChart = function () {
 * Gets the link element of the selected partition
 * @class getSelectedPartition
 */
-inequalities.getSelectedPartition = function () {
-    return $('#inequalities-partition-menu a.selected');
-}
+inequalities.getSelectedPartition = function() {
+    return $("#inequalities-partition-menu a.selected");
+};
 
 /**
 * Export trend chart to an image
 * @class inequalities.exportTrendChart
 */
-inequalities.exportTrendChart = function () {
+inequalities.exportTrendChart = function() {
 
     var ns = inequalities;
 
@@ -1863,29 +1965,36 @@ inequalities.exportTrendChart = function () {
     var $option = ns.getSelectedPartition();
     var partition = $.parseHTML($option[0].innerHTML)[0].data;
 
-    ns.trendChart.exportChart({ type: 'image/png' }, {
+    ns.trendChart.exportChart({ type: "image/png" },
+    {
         chart: {
             spacingTop: 70,
             events: {
-                load: function () {
-                    this.renderer.text('<b>' + indicatorName + ' - ' +
-                        ns.getSelectedAreaName() + ', ' +
-                        ' - Data partitioned by ' + partition + '</b>',
-                        350, 15)
+                load: function() {
+                    this.renderer.text("<b>" +
+                            indicatorName +
+                            " - " +
+                            ns.getSelectedAreaName() +
+                            ", " +
+                            " - Data partitioned by " +
+                            partition +
+                            "</b>",
+                            350,
+                            15)
                         .attr({
-                            align: 'center'
+                            align: "center"
                         })
                         .css({
-                            color: '#333',
-                            fontSize: '7px',
-                            width: '450px'
+                            color: "#333",
+                            fontSize: "7px",
+                            width: "450px"
                         })
                         .add();
                 }
             }
         }
     });
-}
+};
 
 /**
 * Whether or not to use RAG colours
@@ -1897,10 +2006,16 @@ function useRagColours() {
     return new ComparisonConfig(groupRoot, metadata).useRagColours;
 }
 
+
 inequalities.AreaOptions = {
     NATIONAL: 0,
     LOCAL: 1
 };
+
+inequalities.PartitionsTypes = {
+    BySex: "bySex",
+    ByAge: "byAge"
+}
 
 inequalities.state = {
     isViewModeTrends: false,
@@ -1910,13 +2025,14 @@ inequalities.state = {
     showErrorBars: false
 };
 
-pages.add(PAGE_MODES.CONTENT, {
-    id: 'content',
-    title: 'Inequalities',
-    icon: 'inequalities',
+pages.add(PAGE_MODES.CONTENT,
+{
+    id: "content",
+    title: "Inequalities",
+    icon: "inequalities",
     'goto': goToInequalitiesPage,
-    gotoName: 'goToInequalitiesPage',
+    gotoName: "goToInequalitiesPage",
     needsContainer: false,
-    jqIds: ['content', '.geo-menu', 'indicatorMenuDiv', 'tab-specific-options', 'nearest-neighbour-link'],
-    jqIdsNotInitiallyShown: ['keyAdHoc', 'key-bar-chart', 'inequalities-trend-box']
+    jqIds: ["content", ".geo-menu", "indicatorMenuDiv", "tab-specific-options", "nearest-neighbour-link"],
+    jqIdsNotInitiallyShown: ["keyAdHoc", "key-bar-chart", "inequalities-trend-box"]
 });

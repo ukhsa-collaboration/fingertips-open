@@ -113,26 +113,26 @@ namespace PholioVisualisation.DataAccessTest
             IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var groupings = new List<Grouping>
             {
-                new Grouping {IndicatorId = 112},
-                new Grouping {IndicatorId = 107},
-                new Grouping {IndicatorId = 108}
+                new Grouping {IndicatorId = IndicatorIds.ExcessWinterDeaths},
+                new Grouping {IndicatorId = IndicatorIds.DeathsFromLungCancer},
+                new Grouping {IndicatorId = IndicatorIds.OverallPrematureDeaths}
             };
             IList<IndicatorMetadata> metadataList = reader.GetIndicatorMetadata(groupings,
                 reader.GetIndicatorMetadataTextProperties());
 
-            Assert.AreEqual(107,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name]
-                    .Contains("all cause mortality")).IndicatorId
+            Assert.AreEqual(IndicatorIds.ExcessWinterDeaths,
+                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                    .Contains("winter deaths")).IndicatorId
                 );
 
-            Assert.AreEqual(108,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name]
-                    .Contains("Overall premature deaths")).IndicatorId
+            Assert.AreEqual(IndicatorIds.OverallPrematureDeaths,
+                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                    .Contains("overall premature deaths")).IndicatorId
                 );
 
-            Assert.AreEqual(112,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name]
-                    .Contains("Life expectancy")).IndicatorId
+            Assert.AreEqual(IndicatorIds.DeathsFromLungCancer,
+                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                    .Contains("lung cancer")).IndicatorId
                 );
         }
 

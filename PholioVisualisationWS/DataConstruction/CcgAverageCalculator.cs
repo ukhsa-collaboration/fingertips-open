@@ -12,13 +12,14 @@ namespace PholioVisualisation.DataConstruction
         {
             Unit unit = indicatorMetadata.Unit;
 
-            if (indicatorMetadata.ValueTypeId == ValueTypeId.Ratio)
+            if (AverageCalculatorFactory.IsWeightedAverageValid(indicatorMetadata.ValueTypeId) == false)
             {
                 return;
             }
 
             if (dataList.Any(x => x.IsCountValid && x.IsDenominatorValid))
             {
+                // Weighted average
                 var validData = new CoreDataSetFilter(dataList).SelectWhereCountAndDenominatorAreValid().ToList();
 
                 if (RuleAreEnoughPracticeValuesByPopulation.Validates(validData, ccgPopulation))
@@ -29,6 +30,7 @@ namespace PholioVisualisation.DataConstruction
             }
             else if (dataList.Any(x => x.IsValueValid))
             {
+                // Population weighted average
                 var practiceCodeToPopulationMap = ccgPopulation.PracticeCodeToPopulation;
 
                 // Keep only data where population is available

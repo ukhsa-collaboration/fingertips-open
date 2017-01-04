@@ -26,7 +26,7 @@ namespace PholioVisualisation.DataAccessTest
             CheckDictionary(hash);
         }
 
-        private void CheckDictionary(Dictionary<ParentArea, IList<Area>> hash)
+        private void CheckDictionary(Dictionary<ParentArea, IList<IArea>> hash)
         {
             // Subnational key present
             Assert.IsTrue(hash.Keys.Any(x => x.AreaCode == ParentAreaCode));

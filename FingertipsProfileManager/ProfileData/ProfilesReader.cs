@@ -50,7 +50,7 @@ namespace Fpm.ProfileData
             q.SetParameter("urlKey", urlKey);
             return q.UniqueResult<ProfileDetails>();
         }
-        
+
         public ProfileDetails GetProfileDetailsByProfileId(int profileId)
         {
             return CurrentSession.CreateCriteria<ProfileDetails>()
@@ -59,7 +59,7 @@ namespace Fpm.ProfileData
         }
 
         public ProfileDetails GetOwnerProfilesByIndicatorIds(int indicatorId)
-        {           
+        {
             IQuery q = CurrentSession.CreateQuery(
                  "select p from ProfileDetails p, IndicatorMetadata i where p.Id = i.OwnerProfileId and i.IndicatorId = :indicatorId");
             q.SetParameter("indicatorId", indicatorId);
@@ -238,7 +238,7 @@ namespace Fpm.ProfileData
             }
             return indicatorTextList;
         }
-       
+
         public IndicatorMetadata GetIndicatorMetadata(int indicatorId)
         {
             IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
@@ -247,12 +247,12 @@ namespace Fpm.ProfileData
             return metadata;
         }
 
-        public Dictionary<int,int> GetIndicatorIdsByProfileIds(List<int> profileIds)
+        public Dictionary<int, int> GetIndicatorIdsByProfileIds(List<int> profileIds)
         {
             var result = CurrentSession.CreateCriteria<IndicatorMetadata>()
                 .Add(Restrictions.In("OwnerProfileId", profileIds))
                 .List<IndicatorMetadata>()
-                .ToDictionary(x => x.IndicatorId, x => x.OwnerProfileId);       
+                .ToDictionary(x => x.IndicatorId, x => x.OwnerProfileId);
             return result;
         }
 
@@ -326,7 +326,7 @@ namespace Fpm.ProfileData
                 .Add(Restrictions.Eq("Id", targetId))
                 .UniqueResult<TargetConfig>();
         }
-        
+
         public virtual IList<Category> GetCategoriesByCategoryTypeId(int categoryTypeId)
         {
             return CurrentSession.CreateCriteria<Category>()
@@ -413,7 +413,7 @@ namespace Fpm.ProfileData
                 .AddOrder(Order.Asc("ShortName"))
                 .List<AreaType>();
         }
-        
+
         public IEnumerable<IndicatorAudit> GetIndicatorAudit(List<int> indicatorIds)
         {
             IQuery q = CurrentSession.CreateQuery("from IndicatorAudit ia where ia.IndicatorId in (:indicatorIds) order by ia.Timestamp desc");
@@ -474,9 +474,9 @@ namespace Fpm.ProfileData
                     periods.Add(new TimePeriod
                     {
                         YearRange = groupingPlusNames.YearRange,
-                        Year = (int) row[0],
-                        Quarter = (int) row[1],
-                        Month = (int) row[2]
+                        Year = (int)row[0],
+                        Quarter = (int)row[1],
+                        Month = (int)row[2]
                     });
                 }
             }
@@ -531,7 +531,7 @@ namespace Fpm.ProfileData
             return user;
         }
 
-       public IList<UserGroupPermissions> GetUserGroupPermissionsByUserAndProfile(int userId, int profileId)
+        public IList<UserGroupPermissions> GetUserGroupPermissionsByUserAndProfile(int userId, int profileId)
         {
             IQuery q = CurrentSession.CreateQuery("from UserGroupPermissions ugp where ugp.ProfileId = :profileid and ugp.UserId = :userid");
             q.SetParameter("profileid", profileId);
@@ -544,7 +544,7 @@ namespace Fpm.ProfileData
             CurrentSession.Clear();
         }
 
-      public IList<ProfileCollectionItem> GetProfileCollectionItems(int profilecollectionid)
+        public IList<ProfileCollectionItem> GetProfileCollectionItems(int profilecollectionid)
         {
             IQuery q = CurrentSession.CreateQuery("from ProfileCollectionItem pci where pci.ProfileCollectionId = :profilecollectionid");
             q.SetParameter("profilecollectionid", profilecollectionid);
@@ -606,10 +606,10 @@ namespace Fpm.ProfileData
         {
             Document documentTypeCast = null; // used for transforming object[] to DocumentType via Transform
             var doc = CurrentSession.QueryOver<Document>()
-            .Where(d=> d.Id == id)
+            .Where(d => d.Id == id)
             .Select(
                     Projections.Property<Document>(d => d.Id).WithAlias(() => documentTypeCast.Id),
-                    Projections.Property<Document>(d => d.ProfileId).WithAlias(() => documentTypeCast.ProfileId),                    
+                    Projections.Property<Document>(d => d.ProfileId).WithAlias(() => documentTypeCast.ProfileId),
                     Projections.Property<Document>(d => d.FileName).WithAlias(() => documentTypeCast.FileName),
                     Projections.Property<Document>(d => d.FileData).WithAlias(() => documentTypeCast.FileData),
                     Projections.Property<Document>(d => d.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn),

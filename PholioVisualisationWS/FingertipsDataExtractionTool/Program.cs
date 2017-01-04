@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
 using DIResolver;
+using FingertipsDataExtractionTool.AverageCalculator;
 using NLog;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.ExceptionLogging;
 
 namespace FingertipsDataExtractionTool
@@ -17,21 +19,31 @@ namespace FingertipsDataExtractionTool
         private IExcelFileDeleter _excelFileDeleter;
         private IExcelFileGenerator _excelFileGenerator;
         private IPracticeProfilesExcelFileGenerator _practiceProfilesExcelFileGenerator;
+        private IBulkCoreDataSetAverageCalculator _bulkCoreDataSetAverageCalculator;
 
         public Program(ILogger logger, IExcelFileDeleter excelFileDeleter,
-            IExcelFileGenerator excelFileGenerator, IPracticeProfilesExcelFileGenerator practiceProfilesExcelFileGenerator)
+            IExcelFileGenerator excelFileGenerator, IPracticeProfilesExcelFileGenerator practiceProfilesExcelFileGenerator,
+            IBulkCoreDataSetAverageCalculator bulkCoreDataSetAverageCalculator)
         {
             _logger = logger;
             _excelFileDeleter = excelFileDeleter;
             _excelFileGenerator = excelFileGenerator;
             _practiceProfilesExcelFileGenerator = practiceProfilesExcelFileGenerator;
+            _bulkCoreDataSetAverageCalculator = bulkCoreDataSetAverageCalculator;
         }
 
         static void Main(string[] args)
         {
-            IoC.Register();
-            var program = IoC.Container.GetInstance<IProgram>();
-            program.Go(args);
+            try
+            {
+                IoC.Register();
+                var program = IoC.Container.GetInstance<IProgram>();
+                program.Go(args);
+            }
+            catch (Exception ex)
+            {
+                ExceptionLog.LogException(ex, null);
+            }
         }
 
         public void Go(string[] args)
@@ -43,11 +55,11 @@ namespace FingertipsDataExtractionTool
 
         public void Run(string[] args)
         {
-            var option = args.Any()
+            var firstOption = args.Any()
                 ? args[0]
                 : Console.ReadKey().KeyChar.ToString();
 
-            switch (option)
+            switch (firstOption)
             {
                 case "1":
                 case "excel":
@@ -63,8 +75,6 @@ namespace FingertipsDataExtractionTool
             }
         }
 
-
-
         public void Init()
         {
             Console.Title = "Fingertips Data Extraction Tool";
@@ -72,7 +82,8 @@ namespace FingertipsDataExtractionTool
 
         private void Menu(string[] args)
         {
-            if (args.Any()) return;
+            if (args == null || args.Any()) return;
+
             _logger.Info("---FDET STARTED---");
             Console.Clear();
             Console.WriteLine("Please select from the following options");
@@ -100,8 +111,10 @@ namespace FingertipsDataExtractionTool
         {
             try
             {
-                Console.WriteLine("Processing CoreDataSet");
-            }catch(Exception ex)
+                var groupings = new CalculatorGroupingListProvider(ReaderFactory.GetGroupDataReader()).GetGroupings();
+                _bulkCoreDataSetAverageCalculator.Calculate(groupings, new AverageCalculationConfig());
+            }
+            catch (Exception ex)
             {
                 NLogHelper.LogException(_logger, ex);
                 ExceptionLog.LogException(ex, null);

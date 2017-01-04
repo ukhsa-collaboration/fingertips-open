@@ -74,6 +74,7 @@
     <Compile Include="CoverSheet.cs" />
     <Compile Include="ExcelFileBuilder.cs" />
     <Compile Include="ExcelFileWriter.cs" />
+    <Compile Include="ExcelHelper.cs" />
     <Compile Include="ExportDIRegistry.cs" />
     <Compile Include="GroupRootUniqueKey.cs" />
     <Compile Include="ParentDataWriter.cs" />

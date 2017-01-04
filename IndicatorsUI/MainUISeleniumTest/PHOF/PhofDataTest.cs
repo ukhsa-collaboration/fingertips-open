@@ -14,21 +14,21 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void TestTartanRugLoadsForAllDomains()
         {
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             FingertipsDataTest.CheckTartanRugLoadsForAllDomains(driver);
         }
 
         [TestMethod]
         public void TestAllTabsLoad()
         {
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             FingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast(driver);
         }
 
         [TestMethod]
         public void TestInequalitiesChartLoadsForEachIndicatorForAllDomains()
         {
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             FingertipsDataTest.SelectInequalitiesTab(driver);
 
             var domains = FingertipsDataTest.GetDomainOptions(driver);
@@ -52,7 +52,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void TestLastSelectedAreaIsRetainedBetweenPageViews()
         {
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             var areaName = "Middlesbrough";
 
             FingertipsHelper.SwitchToAreaSearchMode(driver);
@@ -61,7 +61,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
 
             // Leave and return to data page
             navigateTo.PhofHomePage();
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
 
             // Check area menu contains searched for area
             Assert.AreEqual(areaName, FingertipsHelper.GetSelectedAreaNameFromMenu(driver));
@@ -70,7 +70,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void TestSearchForAnArea()
         {
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             var areaName = "Croydon";
 
             FingertipsHelper.SwitchToAreaSearchMode(driver);
@@ -102,7 +102,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             parameters.AddIndicatorId(IndicatorIds.GapInLifeExpectancyAtBirth);
             parameters.AddSexId(SexIds.Female);
             parameters.AddAgeId(AgeIds.AllAges);
-            parameters.AddTabId(TabIds.BarChart);
+            parameters.AddTabId(TabIds.CompareAreas);
 
             navigateTo.GoToUrl(UrlKey + parameters.HashParameterString);
             waitFor.FingertipsBarChartTableToLoad();
@@ -149,7 +149,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         public void TestPdfLinkIsDisplayedForCountyUa()
         {
             // Navigate to PHOF data page for county & UA
-            navigateTo.PhofDataPage();
+            navigateTo.PhofTartanRug();
             waitFor.FingertipsTartanRugToLoad();
 
             // Select download tab

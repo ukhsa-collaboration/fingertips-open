@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web.Mvc;
+using Newtonsoft.Json;
 using Profiles.DataAccess;
 using Profiles.DataConstruction;
+using Profiles.DomainObjects;
 using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Models;
 using Profiles.MainUI.Skins;
-using Profiles.DomainObjects;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Profiles.MainUI.Controllers
 {
@@ -30,7 +29,7 @@ namespace Profiles.MainUI.Controllers
         }
 
         protected void InitPageModel()
-        {  
+        {
             ProfileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), appConfig);
             NewPageModel();
 
@@ -47,29 +46,34 @@ namespace Profiles.MainUI.Controllers
 
             PageModel.NationalProfileCollection = ProfileCollectionBuilder.GetCollection(ProfileCollectionIds.NationalProfiles);
 
+            PageModel.HighlightedProfileCollection =
+                ProfileCollectionBuilder.GetCollection((ProfileCollectionIds.HighlightedProfiles));
+
             SetBridgeServicesUrl();
             ViewBag.ImagesUrl = appConfig.StaticContentUrl + versionFolder + "images/";
             ViewBag.PdfUrl = appConfig.PdfUrl;
             ViewBag.UseGoogleAnalytics = appConfig.UseGoogleAnalytics;
             ViewBag.JavaScriptVersion = versionFolder;
             ViewBag.ShowCancer = appConfig.ShowCancer;
-            ViewBag.ShowNearestNeighbours = appConfig.ShowNearestNeighbours;
             ViewBag.FeatureSwitch = appConfig.FeatureSwitch;
         }
 
         private void SetBridgeServicesUrl()
         {
-            string bridge = appConfig.BridgeWsUrl;
-            if (string.IsNullOrWhiteSpace(bridge))
+            var bridge = appConfig.BridgeWsUrl;
+            if (string.IsNullOrEmpty(bridge))
             {
                 IfRequestNotDefinedExplainWhy();
-                var protocol = new FingertipsUrl(appConfig).Protocol;
+
+                var url = Request.Url;
+
+                // Use same protocol (http/https) as for the page
+                var protocol = "//";
                 ViewBag.Protocol = protocol;
-                bridge = protocol + Request.Url.Authority + "/";
+                bridge = protocol + url.Authority + "/";
             }
             PageModel.BridgeServicesUrl = bridge;
         }
-
 
         private void IfRequestNotDefinedExplainWhy()
         {
@@ -138,21 +142,22 @@ namespace Profiles.MainUI.Controllers
 
                 PageModel.IgnoredSpineChartAreas = details.AreasToIgnoreForSpineCharts;
                 PageModel.HasExclusiveSkin = details.HasExclusiveSkin;
-                PageModel.YearRange = details.Id == ProfileIds.HealthInequalities
-                                          ? new YearRange { StartYear = 2005, EndYear = 2008 }
-                                          : null;
                 ViewBag.ShowDataQuality = details.ShowDataQuality.ToString().ToLower();
-                ViewBag.IsNational = details.IsNational.ToString().ToLower();
+                ViewBag.IsNational = details.IsNational;
 
-                ViewBag.FingertipsUrl = new FingertipsUrl(appConfig).Host;
+                ViewBag.FingertipsUrl = new FingertipsUrl(appConfig, Request.Url).ProtocolAndHost;
                 PageModel.IsOfficialStatistics = details.IsOfficialStatistics;
-                PageModel.IsProfileWithOnlyStaticReports = details.IsProfileWithOnlyStaticReports;
+                PageModel.ShowAreaSearchOnProfileFrontPage = details.ShowAreaSearchOnProfileFrontPage;
+                PageModel.HasAnyData = details.HasAnyData;
+                PageModel.HasStaticReports = details.HasStaticReports;
                 ViewBag.StaticReportsTimePeriods = details.StaticReportsTimePeriods ?? string.Empty;
 
                 PageModel.SpineChartMinMaxLabel = new SpineChartMinMaxLabelBuilder(
-                    details.SpineChartMinMaxLabel, 
+                    details.SpineChartMinMaxLabel,
                     PageModel.RagColourId
                     ).MinMaxLabels;
+
+                ViewBag.NNConfig = JsonConvert.SerializeObject(new NearestNeighbourHelper().GetNeighbourConfig(details.Id));
             }
         }
 
@@ -177,6 +182,12 @@ namespace Profiles.MainUI.Controllers
             ViewBag.Title = longerLivesDetails.Title;
             ViewBag.DomainsToDisplay = longerLivesDetails.DomainsToDisplay;
 
+            // Temporary to restrict access to suicide prevention before launch
+            if (details.Id == ProfileIds.SuicidePrevention &&
+                 appConfig.ShowLongerLivesSuicidePrevention == false)
+            {
+                throw new FingertipsException("Suicide prevention profile is not available");
+            }
         }
 
         protected void AssignDomainHeadings(ProfileDetails details)

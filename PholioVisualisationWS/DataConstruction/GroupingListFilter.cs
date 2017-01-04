@@ -22,7 +22,17 @@ namespace PholioVisualisation.DataConstruction
         {
             if (areaTypeIds != null)
             {
-                return groupings.Where(g => areaTypeIds.Contains(g.AreaTypeId));
+                return groupings.Where(x => areaTypeIds.Contains(x.AreaTypeId));
+            }
+
+            return groupings;
+        }
+
+        public IEnumerable<Grouping> SelectForIndicatorIds(IList<int> indicatorIds)
+        {
+            if (indicatorIds != null)
+            {
+                return groupings.Where(x => indicatorIds.Contains(x.IndicatorId));
             }
 
             return groupings;

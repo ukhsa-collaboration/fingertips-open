@@ -31,7 +31,9 @@
     <property name="AccessControlGroup" column="access_control_group"/>
     <property name="IsOfficialStatistics" column="is_official_statistics"/>
     <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
-    <property name="IsProfileWithOnlyStaticReports" column="is_profile_with_only_static_reports"/>
+    <property name="ShowAreaSearchOnProfileFrontPage" column="show_area_search_on_profile_front_page"/>
+    <property name="HasAnyData" column="has_any_data"/>
+    <property name="HasStaticReports" column="has_static_reports"/>
     <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
 
     <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
@@ -157,6 +159,26 @@
 
   <class name="SpineChartMinMaxLabel" table="UI_SpineChartMinMaxLabel">
     <id name="Id" column="LabelId" type="int" unsaved-value="-1"/>
+  </class>
+
+  <class name="ProfileNearestNeighbourAreaTypeMapping" table="ui_profilenearestneighbourareatypemapping">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name ="ProfileId"       column="profileid"/>
+    <property name ="NeighbourTypeId" column="neighbourtypeid" />    
+    <property name ="AreaTypeId"      column="areatypeid" />
+  </class>
+
+  <class name="NeighbourType" table="l_areacodeneighbourtypes">
+    <id name="NeighbourTypeId" column="neighbourtypeid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name ="Name"      column="name" />
+    <property name ="Description"      column="description" />
+    <property name ="LinkText"      column="linktext" />
+    <property name ="SelectedText"      column="selectedtext" />
+    <property name ="ExtraLink"      column="extralink" />
   </class>
   
 </hibernate-mapping>

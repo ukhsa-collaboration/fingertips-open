@@ -51,7 +51,7 @@ namespace Ckan.DataTransformation
                 areasReader, groupDataReader);
             var parameters = new ProfileParameters(areaTypeListProvider, profileId, ckanGroup.Name);
 
-            var metadataRepo = IndicatorMetadataRepository.Instance;
+            var metadataRepo = IndicatorMetadataProvider.Instance;
             var areaCodesToIgnore = profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredEverywhere;
 
             var lookUpManager = new LookUpManager(pholioReader, areasReader,

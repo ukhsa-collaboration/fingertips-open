@@ -126,6 +126,7 @@ namespace PholioVisualisation.DataAccessTest
             Assert.AreEqual(AgeIds.Over60, ages[1].Id);
         }
 
+
         [TestMethod]
         public void TestGetAllAges()
         {

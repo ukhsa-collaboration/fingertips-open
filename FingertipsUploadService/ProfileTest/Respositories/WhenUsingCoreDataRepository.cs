@@ -74,6 +74,12 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
         }
 
         [TestMethod]
+        public void TestDeletePrecalculatedCoreData()
+        {
+            _coreDataRepository.DeletePrecalculatedCoreData(IndicatorIds.ObesityYear6);
+        }
+
+        [TestMethod]
         public void GetCoreDataSet_Returns_Non_Zero_Result()
         {
             int rowsCount;

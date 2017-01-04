@@ -98,7 +98,7 @@ on t1.areacode = t2.code
             return shortName.Trim();
         }
 
-        private static IList<Area> GetAreas()
+        private static IList<IArea> GetAreas()
         {
             IAreasReader areasReader = ReaderFactory.GetAreasReader();
             return areasReader.GetAreasByAreaTypeId(AreaTypeIds.AmbulanceTrust);

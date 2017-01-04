@@ -78,7 +78,9 @@ namespace FingertipsDataExtractionTool
 
         private static bool ShouldExcelFilesBeBuiltForProfile(ProfileConfig profile)
         {
-            return profile.ShouldBuildExcel && 
+            var shouldBuild = profile.ShouldBuildExcel || profile.IsProfileLive;
+
+            return shouldBuild && 
                 profile.IsNational &&
                 profile.ProfileId != ProfileIds.PracticeProfiles;
         }

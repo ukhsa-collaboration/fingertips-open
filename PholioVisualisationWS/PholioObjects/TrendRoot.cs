@@ -21,6 +21,7 @@ namespace PholioVisualisation.PholioObjects
             DataPoints = new Dictionary<string, IList<TrendDataPoint>>();
             ComparatorValueFs = new List<Dictionary<int, string>>();
             ComparatorValue = new List<Dictionary<int, double>>();
+            ComparatorData = new List<Dictionary<int, CoreDataSet>>();
             Periods = new List<string>();
         }
 
@@ -30,11 +31,20 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "Data")]
         public Dictionary<string, IList<TrendDataPoint>> DataPoints { get; private set; }
 
+        /// <summary>
+        /// Deprecated: duplicate of ComparatorData
+        /// </summary>
         [JsonProperty(PropertyName = ("ComparatorValueFs"))]
         public List<Dictionary<int, string>> ComparatorValueFs { get; private set; }
 
+        /// <summary>
+        /// Deprecated: duplicate of ComparatorData
+        /// </summary>
         [JsonProperty(PropertyName = ("ComparatorValue"))]
         public List<Dictionary<int, double>> ComparatorValue { get; private set; }
+
+        [JsonProperty(PropertyName = ("ComparatorData"))]
+        public List<Dictionary<int, CoreDataSet>> ComparatorData { get; private set; }
 
         [JsonProperty(PropertyName = "Periods")]
         public IList<string> Periods { get; set; }

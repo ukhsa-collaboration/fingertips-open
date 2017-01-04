@@ -1,8 +1,8 @@
 ﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PageModel
 <div id="footer">
-    <div id="footer_wrap" class="clearfix">
-        <div class="footer_links">
+    <div id="footer_wrap" class="clearfix container">
+        <div class="col-md-9 footer_links">
 
 
             @if (Model.NationalProfileCollection != null)
@@ -22,7 +22,7 @@
                         </li>
                     }
                 </ul>
-                    columnAssigner.NewColumn();
+                columnAssigner.NewColumn();
                 <ul>
                     @while (columnAssigner.IsNextIndexInCurrentColumn)
                     {
@@ -38,3 +38,4 @@
         @Html.Partial("_PoliciesAndCopyright")
     </div>
 </div>
+

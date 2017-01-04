@@ -45,8 +45,8 @@ namespace PholioVisualisation.DataConstruction
         private IList<string> GetChildAreaCodes(ComparatorMap comparatorMap, int childAreaTypeId, int profileId)
         {
             var parentAreaCode = comparatorMap.GetSubnationalComparator().Area.Code;
-            IList<string> childAreaCodes = new ChildAreaListBuilder(areasReader, parentAreaCode,childAreaTypeId)
-                .ChildAreas
+            IList<string> childAreaCodes = new ChildAreaListBuilder(areasReader)
+                .GetChildAreas(parentAreaCode,childAreaTypeId)
                 .Select(x => x.Code)
                 .ToList();
 

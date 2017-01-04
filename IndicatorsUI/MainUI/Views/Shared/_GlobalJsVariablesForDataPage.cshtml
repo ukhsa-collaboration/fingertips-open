@@ -11,5 +11,7 @@
     FT.config.profileCollectionUrlKey = '@ViewBag.LeadProfileUrlKey';
     FT.config.startZeroYAxis = @JsHelper.GetJsBool(Model.StartZeroYAxis);
     FT.config.areAnyPdfsForProfile = @JsHelper.GetJsBool(Model.AreAnyPdfsForProfile);
+    FT.config.hasStaticReports = @JsHelper.GetJsBool(Model.HasStaticReports);
     FT.staticReportTimePeriods = '@ViewBag.StaticReportsTimePeriods'.split(',');
+    FT.config.nearestNeighbour = @Html.Raw(   @ViewBag.NNConfig);
     //]]</script>

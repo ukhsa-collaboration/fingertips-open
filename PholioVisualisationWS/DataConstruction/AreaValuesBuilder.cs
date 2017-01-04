@@ -37,7 +37,7 @@ namespace PholioVisualisation.DataConstruction
             if (grouping != null)
             {
                 Grouping = grouping;
-                IndicatorMetadata = IndicatorMetadataRepository.Instance.GetIndicatorMetadata(grouping.IndicatorId);
+                IndicatorMetadata = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(grouping.IndicatorId);
                 Period = new DataPointOffsetCalculator(grouping, DataPointOffset, IndicatorMetadata.YearType).TimePeriod;
                 Formatter = GetFormatter();
             }

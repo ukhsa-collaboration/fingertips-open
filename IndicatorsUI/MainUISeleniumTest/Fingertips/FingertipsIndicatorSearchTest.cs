@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
@@ -33,6 +34,17 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             FingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast(driver);
         }
 
+        [TestMethod]
+        public void TestAreaTypesWithNoResultsAreNotDisplayed()
+        {
+            navigateTo.FingertipsIndicatorSearchResults("hiv");
+            waitFor.FingertipsTartanRugToLoad();
+
+            var html = driver.FindElement(By.Id("searchResultText")).Text;
+            Assert.IsTrue(html.Contains("Region"));
+            Assert.IsFalse(html.Contains("Acute"), "Results for acute trust not expected");
+        }
+
         public static void CheckSearchFindsSomeIndicators(IWebDriver driver, string searchText)
         {
             new NavigateTo(driver).FingertipsIndicatorSearchResults(searchText);
@@ -56,6 +68,36 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             var text = driver.FindElement(By.ClassName(Classes.NoSearchResultMessage)).Text;
             TestHelper.AssertTextContains(text, "no matching indicators");
             TestHelper.AssertTextContains(text, searchText);
+        }
+
+        public static void CheckProfilesPerIndicatorPopup(IWebDriver driver)
+        {
+            // Click show me which profiles these indicators are in
+            var profilePerIndicator = driver
+                .FindElement(By.Id(FingertipsIds.ProfilePerIndicator))
+                .FindElement(By.TagName("a"));
+            profilePerIndicator.Click();
+
+            // Wait for indicator menu to be visible in pop up
+            var byIndicatorMenu = By.Id(FingertipsIds.ListOfIndicators);
+            new WaitFor(driver).ExpectedElementToBeVisible(byIndicatorMenu);
+
+            // Select 2nd indicator in list
+            var listOfIndicators = driver.FindElement(byIndicatorMenu);
+            var selectMenu = new SelectElement(listOfIndicators);
+            selectMenu.SelectByIndex(1);
+
+            // Check list of profiles is displayed
+            var listOfProfiles = driver.FindElements(By.XPath(XPaths.ListOfProfilesInPopup));
+            Assert.IsTrue(listOfProfiles.Count > 0);
+        }
+
+        public static void CheckProfilesPerIndicatorLinkExists(IWebDriver driver)
+        {
+            var profilePerIndicatorLink = driver
+                .FindElement(By.Id(FingertipsIds.ProfilePerIndicator))
+                .FindElement(By.TagName("a"));
+            Assert.IsTrue(profilePerIndicatorLink != null);
         }
     }
 }

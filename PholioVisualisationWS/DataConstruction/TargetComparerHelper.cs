@@ -35,7 +35,6 @@ namespace PholioVisualisation.DataConstruction
                 //Get the Upper and Lower Benchmark ranges
                 new TargetComparerHelper(groupDataReader, parentArea).GetPercentileData(targetComparer, grouping, indicatorMetadata);
             }
-
         }
 
         public void GetPercentileData(TargetComparer targetComparer, Grouping grouping, IndicatorMetadata indicatorMetadata)
@@ -43,8 +42,14 @@ namespace PholioVisualisation.DataConstruction
             var bespokeComparer = targetComparer as BespokeTargetPercentileRangeComparer;
             if (bespokeComparer != null)
             {
-                var nationalValues = groupDataReader.GetCoreDataForAllAreasOfType(grouping, TimePeriod.GetDataPoint(grouping));
-                var percentileCalculator = new BespokeTargetPercentileRangeCalculator(nationalValues.Where(x => x.IsValueValid).Select(x => x.Value).ToList());
+                // Upper tier LA values should always be used
+                var utlaGrouping = new Grouping(grouping)
+                {
+                    AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                };
+                var utlaValues = groupDataReader.GetCoreDataForAllAreasOfType(utlaGrouping, TimePeriod.GetDataPoint(utlaGrouping));
+
+                var percentileCalculator = new BespokeTargetPercentileRangeCalculator(utlaValues.Where(x => x.IsValueValid).Select(x => x.Value).ToList());
 
                 bespokeComparer.LowerTargetPercentileBenchmarkData =
                     new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetLowerTargetPercentile()) };

@@ -1,4 +1,5 @@
-﻿@using Profiles.MainUI.Models;
+﻿@using Profiles.DataAccess
+@using Profiles.MainUI.Models;
 @model PageModel
 @* Header for Healthier Lives style profiles *@
 <div id="header_top" class="clearfix">
@@ -8,14 +9,18 @@
     
     <div id="topic-links">
         <a href="/topic/mortality" id="mortality-topic">Premature Mortality</a>
+        @if (AppConfig.Instance.ShowLongerLivesSuicidePrevention)
+        {
+            <a href="/topic/suicide-prevention" id="suicide-topic">Suicide</a>
+        }
         <a href="/topic/diabetes" id="diabetes-topic">Diabetes</a>
         <a href="/topic/hypertension" id="blood-pressure-topic">High Blood Pressure</a>
         <a href="/topic/nhs-health-check" id="health-checks-topic">NHS Health Check</a>
         <a href="/topic/drugs-and-alcohol" id="drugs-and-alcohol-topic">Alcohol & Drugs</a>
-        @if (ViewBag.ShowCancer)
-        {
-            <a href="/topic/cancer" id="cancer-topic">Cancer</a>
-        }
+@*        @if (ViewBag.ShowCancer)*@
+@*        {*@
+@*            <a href="/topic/cancer" id="cancer-topic">Cancer</a>*@
+@*        }*@
     </div>
 </div>
    

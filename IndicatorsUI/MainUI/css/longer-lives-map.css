@@ -126,6 +126,7 @@
 
 #map-overlay-zoom {
     display: none;
+    min-height: 70px;
 }
 
 #map-zoom-box {
@@ -528,6 +529,13 @@ span.map-info-close {
         padding: 0;
         margin: 0;
     }
+
+div.plan {
+    background: url("../images/Mortality/plan.png") no-repeat;
+    height: 45px;
+    position: relative;
+    left: -3px;
+}
 
 div.grey-man {
     background: url("../images/Mortality/ranking_icons.png") 0 -1400px no-repeat;

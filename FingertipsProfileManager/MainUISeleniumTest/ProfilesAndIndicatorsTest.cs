@@ -10,7 +10,7 @@ namespace Fpm.MainUISeleniumTest
     public class ProfilesAndIndicatorsTest : BaseUnitTest
     {
         [TestMethod]
-        public void PageLoads()
+        public void ProfilesAndIndicatorsPageLoads()
         {
             var driver = Driver;
             new NavigateTo(driver).ProfilesAndIndicatorsPage();
@@ -28,7 +28,7 @@ namespace Fpm.MainUISeleniumTest
             new NavigateTo(driver).ProfilesAndIndicatorsPage();
             new WaitFor(driver).PageWithModalPopUpToLoad();
 
-            // Select option in menu
+            // Select profile
             var profileSelect = driver.FindElement(By.Id("selectedProfile"));
             var selectElement = new SelectElement(profileSelect);
             selectElement.SelectByValue("diabetes");

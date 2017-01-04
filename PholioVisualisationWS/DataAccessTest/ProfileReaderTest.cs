@@ -83,7 +83,14 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetAllProfiles()
         {
             var profiles = Reader().GetAllProfiles();
-            Assert.IsTrue(profiles.Count> 0);
+            Assert.IsTrue(profiles.Any());
+        }
+
+        [TestMethod]
+        public void TestGetAllProfileIds()
+        {
+            var ids = Reader().GetAllProfileIds();
+            Assert.IsTrue(ids.Any());
         }
 
         [TestMethod]

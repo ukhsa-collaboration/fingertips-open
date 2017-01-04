@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using Fpm.MainUI.Helpers;
 
 namespace Fpm.MainUI.ViewModels.Upload
 {
@@ -8,5 +8,6 @@ namespace Fpm.MainUI.ViewModels.Upload
         public string SimpleTemplateUrl { get; set; }
         public string BatchLastUpdated { get; set; }
         public string SimpleLastUpdated { get; set; }
+        public UserDetails User { get; set; }
     }
 }

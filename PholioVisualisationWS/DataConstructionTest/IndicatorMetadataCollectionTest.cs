@@ -23,7 +23,7 @@ namespace PholioVisualisation.DataConstructionTest
                 new Grouping { IndicatorId = indicatorId2}
             };
 
-            IndicatorMetadataCollection collection = IndicatorMetadataRepository.Instance.GetIndicatorMetadataCollection(grouping);
+            IndicatorMetadataCollection collection = IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(grouping);
             Assert.AreEqual(2, collection.IndicatorMetadata.Count);
 
             IndicatorMetadata metadata = collection.GetIndicatorMetadataById(indicatorId1);

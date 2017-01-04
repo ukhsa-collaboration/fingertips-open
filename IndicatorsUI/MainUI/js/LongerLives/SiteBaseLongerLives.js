@@ -254,6 +254,9 @@ function highlightSelectedTopic() {
         case ProfileIds.Diabetes:
             id = 'diabetes';
             break;
+        case ProfileIds.Suicide:
+            id = 'suicide';
+            break;
         case ProfileIds.Mortality:
             id = 'mortality';
             break;
@@ -294,25 +297,27 @@ function highlightSelectedTab() {
     $('#' + id).addClass('selected');
 }
 
+function getDecileCategoryTypeId(areaTypeId) {
+    switch (areaTypeId) {
+        case AreaTypeIds.CountyUA:
+            return CategoryTypeIds.DeprivationDecileCountyUA2015;
+        case AreaTypeIds.DistrictUA:
+            return CategoryTypeIds.DeprivationDecileDistrictUA2015;
+        case AreaTypeIds.CCG:
+            return CategoryTypeIds.DeprivationDecileCCG2010;
+        default:
+            throw 'Unsupported area type';
+    }
+}
+
 /*
 * Get deprivation decile of each area. Response is key/value pair list of 
 * area code -> decile number
 */
 function getDecileData(model) {
     if (!loaded.categories[AreaTypeIds.DeprivationDecile]) {
-        switch (model.areaTypeId) {
-            case AreaTypeIds.CountyUA:
-                var categoryTypeId = CategoryTypeIds.CountyUA;
-                break;
-            case AreaTypeIds.DistrictUA:
-                categoryTypeId = CategoryTypeIds.DistrictUA;
-                break;
-            case AreaTypeIds.CCG:
-                categoryTypeId = CategoryTypeIds.CCG;
-                break;
-            default:
-                throw 'Unsupported area type';
-        }
+
+        var categoryTypeId = getDecileCategoryTypeId(model.areaTypeId);
 
         var parameters = new ParameterBuilder(
             ).add('profile_id', model.profileId

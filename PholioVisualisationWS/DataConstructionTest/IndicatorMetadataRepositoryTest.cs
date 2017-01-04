@@ -12,21 +12,21 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestReduceDescriptiveMetadata()
         {
-            IndicatorMetadata indicatorMetadata =IndicatorMetadataRepository.Instance
+            IndicatorMetadata indicatorMetadata =IndicatorMetadataProvider.Instance
                 .GetIndicatorMetadata(IndicatorIds.ObesityYear6);
 
             Assert.IsTrue(
                 indicatorMetadata.Descriptive.ContainsKey(IndicatorMetadataTextColumnNames.Definition));
 
-            IndicatorMetadataRepository.Instance.ReduceDescriptiveMetadata(
+            IndicatorMetadataProvider.Instance.ReduceDescriptiveMetadata(
                 new List<IndicatorMetadata> { indicatorMetadata });
 
             Assert.AreEqual(
-                IndicatorMetadataRepository.Instance.TruncatedPropertyNames.Length,
+                IndicatorMetadataProvider.Instance.TruncatedPropertyNames.Length,
                 indicatorMetadata.Descriptive.Count);
 
             // Assert all expected properties are present
-            foreach (var propertyName in IndicatorMetadataRepository.Instance.TruncatedPropertyNames)
+            foreach (var propertyName in IndicatorMetadataProvider.Instance.TruncatedPropertyNames)
             {
                 Assert.IsTrue(indicatorMetadata.Descriptive.ContainsKey(propertyName));
             }
@@ -36,7 +36,8 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetMetadataForSpecifiedGroup()
         {
             IList<Grouping> groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupId(GroupIds.Diabetes_TreatmentTargets);
-            var list = IndicatorMetadataRepository.Instance.GetIndicatorMetadata(groupings);
+            var list = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(groupings, 
+                IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific);
             Assert.IsTrue(list.Count > 0);
         }
     }

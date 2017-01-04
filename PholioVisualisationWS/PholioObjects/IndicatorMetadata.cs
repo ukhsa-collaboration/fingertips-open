@@ -16,6 +16,9 @@ namespace PholioVisualisation.PholioObjects
         public int UnitId { get; set; }
 
         [JsonIgnore]
+        public bool AlwaysShowSpineChart { get; set; }
+
+        [JsonIgnore]
         public int ConfidenceIntervalMethodId { get; set; }
 
         [JsonIgnore]

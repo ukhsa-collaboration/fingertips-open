@@ -10,14 +10,16 @@
     <script src="@(Model.JsPath)SiteKeyIndicators.js" type="text/javascript"></script>
     @Html.Partial("_GlobalJsVariablesForContentPage")
 }
-<div class="full-width title-divider"></div>
-<div class="standardWidth">
-    <div class="w100 fl">
-        @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row">
+        <div id="profile-collection-with-front-page" class="col-md-12">
+            @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
 
-        @foreach (var profileCollection in Model.ProfileCollections)
-        {
-            @Html.Partial("_ProfileCollection", profileCollection)
-        }
+            @foreach (var profileCollection in Model.ProfileCollections)
+            {
+                @Html.Partial("_ProfileCollection", profileCollection)
+            }
+        </div>
     </div>
 </div>

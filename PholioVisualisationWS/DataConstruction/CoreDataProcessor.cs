@@ -51,9 +51,32 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
+        /// <summary>
+        /// Fact that Fingertips calculated data with no value is not relevant from now
+        /// </summary>
+        public void RemoveRedundantValueNotesForDataList(IList<CoreDataSet> dataList)
+        {
+            foreach (var coreDataSet in dataList)
+            {
+                RemoveRedundantValueNote(coreDataSet);
+            }
+        }
+
+        /// <summary>
+        /// Fact that Fingertips calculated data with no value is not relevant from now
+        /// </summary>
+        public void RemoveRedundantValueNote(CoreDataSet coreDataSet)
+        {
+                if (coreDataSet.ValueNoteId == ValueNoteIds.ValueAggregatedFromAllKnownGeographyValuesByFingertips &&
+                    coreDataSet.IsValueValid == false)
+                {
+                    coreDataSet.ValueNoteId = ValueNoteIds.NoNote;
+                }
+        }
+
         private static void RoundCount(CoreDataSet data)
         {
-            if (data.Count.HasValue && 
+            if (data.Count.HasValue &&
                 data.Count.Value.Equals(ValueWithCIsData.CountMinusOne) == false)
             {
                 data.Count = Round(data.Count.Value);

@@ -1,4 +1,5 @@
-﻿using FingertipsUploadService.Helpers;
+﻿using FingertipsUploadService.FpmFileReader;
+using FingertipsUploadService.Helpers;
 using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Repositories;
@@ -18,7 +19,7 @@ namespace FingertipsUploadService
         private StatusHelper jobStatus;
 
         public void ProcessJob(UploadJob job, IWorksheetNameValidator nameValidator,
-            ISimpleWorksheetDataProcessor processor, IExcelFileReader excelFileReader)
+            ISimpleWorksheetDataProcessor processor, IUploadFileReader uploadFileReader)
         {
             try
             {
@@ -27,15 +28,15 @@ namespace FingertipsUploadService
                 // Create SimpleUpload object from job
                 var simpleUpload = ToSimpleUpload(job);
                 jobStatus = new StatusHelper(_jobRepository, _logger);
-                _logger.Info("Job# {0} current status is {1} ", job.Guid, job.Status);
+                _logger.Info("Job ID {0} current status is {1} ", job.Guid, job.Status);
 
                 if (job.Status == UploadJobStatus.ConfirmationGiven)
                 {
                     jobStatus.InProgress(job);
                     // Get indicator details worksheet as data table
-                    var indicatorDetails = excelFileReader.GetIndicatorDetails();
+                    var indicatorDetails = uploadFileReader.GetIndicatorDetails();
                     // Get pholio data worksheet as data table
-                    var pholioData = excelFileReader.GetPholioData();
+                    var pholioData = uploadFileReader.GetPholioData();
                     // Save the total number of rows in file
                     WorkerHelper.UpdateNumberOfRowsInFile(job, pholioData, _jobRepository, true);
                     // Validate the Data            
@@ -52,14 +53,14 @@ namespace FingertipsUploadService
                     // Update the job status to in progress            
                     jobStatus.InProgress(job);
                     // Get worksheets from file
-                    var worksheets = excelFileReader.GetWorksheets();
+                    var worksheets = uploadFileReader.GetWorksheets();
                     // Check worksheet names are correct
                     var worksheetsOk = CheckWorksheets(job, worksheets, nameValidator);
                     if (!worksheetsOk) return;
                     //  Get indicator details worksheet as data table
-                    var indicatorDetails = excelFileReader.GetIndicatorDetails();
+                    var indicatorDetails = uploadFileReader.GetIndicatorDetails();
                     // Get pholio data worksheet as data table
-                    var pholioData = excelFileReader.GetPholioData();
+                    var pholioData = uploadFileReader.GetPholioData();
                     // Save the total number of rows in file
                     WorkerHelper.UpdateNumberOfRowsInFile(job, pholioData, _jobRepository, true);
                     // Validate the Data            
@@ -102,7 +103,7 @@ namespace FingertipsUploadService
             var error = ErrorBuilder.GetDuplicateRowInDatabaseError(job.Guid,
                 simpleUpload.DuplicateRowInDatabaseErrors);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0}, There are duplicate rows in database", job.Guid);
+            _logger.Info("Job ID {0}, There are duplicate rows in database", job.Guid);
             return true;
         }
 
@@ -114,7 +115,7 @@ namespace FingertipsUploadService
 
             var error = ErrorBuilder.GetConversionError(job.Guid, simpleUpload.UploadValidationFailures);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0}, Data type conversion errors occurred ", job.Guid);
+            _logger.Info("Job ID {0}, Data type conversion errors occurred ", job.Guid);
             return false;
         }
 
@@ -124,8 +125,8 @@ namespace FingertipsUploadService
             {
                 var dataWithoutDuplicates = new FileDuplicationHandler().RemoveDuplicatesInSimple(pholioData);
                 pholioData = dataWithoutDuplicates;
-                _logger.Info("Job# {0}, There are duplicate rows in spreadsheet", job.Guid);
-                _logger.Info("Job# {0}, Dupllicate rows removed", job.Guid);
+                _logger.Info("Job ID {0}, There are duplicate rows in spreadsheet", job.Guid);
+                _logger.Info("Job ID {0}, Dupllicate rows removed", job.Guid);
             }
         }
 
@@ -163,8 +164,8 @@ namespace FingertipsUploadService
 
             var error = ErrorBuilder.GetWorkSheetNameValidationError(job);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0} doesn't have required worksheets", job.Guid);
-            _logger.Info("Job# {0} status changed to {1} ", job.Guid, job.Status);
+            _logger.Info("Job ID {0} doesn't have required worksheets", job.Guid);
+            _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
             return false;
         }
 
@@ -177,7 +178,7 @@ namespace FingertipsUploadService
 
             jobStatus.FailedValidation(job);
 
-            _logger.Info("Job# {0}, User doesn't have permission for indicator", job.Guid);
+            _logger.Info("Job ID {0}, User doesn't have permission for indicator", job.Guid);
             return false;
         }
 

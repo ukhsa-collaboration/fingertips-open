@@ -59,12 +59,13 @@ $(document).ready(function () {
     var $saveButton = $('#save'),
         $saveNewButton = $('.save-new-indicator');
 
-    $saveButton.click(function () {        
+    $saveButton.click(function () {
+        updateShowSpineChartValue();
        if(checkFieldLength()) {
             if (checkMandatoryFields()) {
                 loading();
                 $('.create-indicator-dropdown').removeAttr('disabled');
-                $('.indicator-text').removeAttr('disabled');
+                $('.indicator-text').removeAttr('disabled');                                              
                 $('form#IndicatorEditForm').submit();
                 configurePermissions();
             } else {
@@ -76,6 +77,7 @@ $(document).ready(function () {
     $saveNewButton.removeAttr('href');
 
     $saveNewButton.click(function () {
+        updateShowSpineChartValue();
         if (checkFieldLength()) {
             if ($(this).hasClass('save-required')) {
                 var selectedProfile = $selectedProfile.find(':selected')[0].text;
@@ -266,7 +268,7 @@ $(document).ready(function () {
     }
 
     $('#confirm-ok').live('click', function () {
-
+        updateShowSpineChartValue();
         // Save new indicator
         var frequency = $('#selectedFrequency').val();
         setPeriodRanges(frequency);
@@ -319,7 +321,7 @@ $(document).ready(function () {
     });
 
     $('#confirmOldFromNew').live('click', function () {
-
+        updateShowSpineChartValue();
         // Save as
         var frequency = $('#selectedFrequency').val();
         setPeriodRanges(frequency);
@@ -457,12 +459,12 @@ function dropdownFocus(e) {
 }
 
 function dropdownChanged(e) {
+    
+    var $menu = $(e);
+    var startDropdownValue = $menu.attr('start-dropdown-value');
 
-    var jq = $(e);
-    var startDropdownValue = jq.attr('start-dropdown-value');
-
-    var dropdownValue = jq.val();
-    var key = jq.attr('id').replace('v', '');
+    var dropdownValue = $menu.val();
+    var key = $menu.attr('id').replace('v', ''); // Why do this???
     var profileName = $('.profile-title').text();
     var domainName = $('#domainName').val();
     var indicatorName = $('#indicatorName').val();
@@ -471,10 +473,10 @@ function dropdownChanged(e) {
         // Changed
         otherChanges[key] = key + ' changed from ' + encodeURI(startDropdownValue) +
             ' to ' + encodeURI(dropdownValue) + ' in ' + profileName + ' - (' + domainName + ' / ' + indicatorName + ')';
-        jq.addClass(CHANGED);
+        $menu.addClass(CHANGED);
     } else {
         // Text unaltered
-        jq.removeClass(CHANGED);
+        $menu.removeClass(CHANGED);
         delete otherChanges[key];
     }
 
@@ -752,6 +754,16 @@ function loadDefaultTextMetadata() {
         $.get('/indicator/metadata/' + selectedIndicatorId, function(data) {
             indicatorDefaultMetadata = data;
         });
+    }
+}
+
+function updateShowSpineChartValue() {
+    var $showSpineChart = $('#ShouldAlwaysShowSpineChart');
+    var isChecked = $showSpineChart.is(':checked');
+    if (isChecked) {                
+        $('#AlwaysShowSpineChart').val(true);
+    } else {        
+        $('#AlwaysShowSpineChart').val(false);
     }
 }
 

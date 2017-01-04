@@ -1,9 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Criterion;
 using Profiles.DomainObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Profiles.DataAccess
 {
@@ -39,7 +38,7 @@ namespace Profiles.DataAccess
             var domains = CurrentSession.CreateCriteria<Domain>()
                 .Add(Restrictions.In("GroupId", groupIds.ToList()))
                 .AddOrder(Order.Asc("Number"))
-               .List<Domain>();
+                .List<Domain>();
 
             return domains;
         }
@@ -93,7 +92,7 @@ namespace Profiles.DataAccess
         {
             return CurrentSession.CreateCriteria<ProfileCollectionItem>()
                 .Add(Restrictions.Eq("ProfileCollectionId", profilecollectionid))
-                .AddOrder(new Order("Sequence",true))
+                .AddOrder(new Order("Sequence", true))
                 .List<ProfileCollectionItem>();
         }
 

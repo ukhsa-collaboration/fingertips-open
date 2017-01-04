@@ -2,12 +2,9 @@
 @using Profiles.MainUI.Helpers
 @model ProfileCollection
 
-@if (Model.IsNationalProfilesCollection == false)
-{
-    <h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
-}
+<h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
 
-<table class="home-profiles">
+<table class="table margin-left">
     <tbody>
         @{
             int itemCount = Model.ProfileCollectionItems.Count();
@@ -27,10 +24,10 @@
 
         <td style="width:@(columnWidth)%;">
             @Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)
-            
+
 
             @ContentProvider.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
-            
+
 
             @if (profileCollectionItem.DisplayDomains)
             {
@@ -64,3 +61,4 @@
         }
         </tbody>
     </table>
+

@@ -18,7 +18,17 @@ namespace PholioVisualisation.ServicesTest
         {
             Assert.AreNotEqual(0, data.Length);
 
-            Debug.WriteLine(System.Text.Encoding.UTF8.GetString(data));
+            Debug.WriteLine(GetDataString(data));
+        }
+
+        public static void AssertDataContainsString(byte[] data, string s)
+        {
+            Assert.IsTrue(GetDataString(data).Contains(s));
+        }
+
+        public static string GetDataString(byte[] data)
+        {
+            return Encoding.UTF8.GetString(data);
         }
     }
 }

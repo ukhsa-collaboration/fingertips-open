@@ -77,7 +77,7 @@ namespace PholioVisualisation.Export
             Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndIndicatorId(
                 GroupIds.First(), // only ever 1 group Id for population data
                 IndicatorIds.QuinaryPopulations);
-            var metadataList = IndicatorMetadataRepository.Instance
+            var metadataList = IndicatorMetadataProvider.Instance
                 .GetIndicatorMetadataCollection(grouping)
                 .IndicatorMetadata;
 
@@ -176,7 +176,7 @@ namespace PholioVisualisation.Export
                 IList<GroupRoot> roots = new GroupRootBuilder().BuildGroupRoots(groupings);
 
                 IndicatorMetadataCollection metadataCollection =
-                    IndicatorMetadataRepository.Instance.GetIndicatorMetadataCollection(groupings);
+                    IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(groupings);
 
                 allMetadata.AddIndicatorMetadata(metadataCollection.IndicatorMetadata);
 

@@ -328,7 +328,7 @@ namespace Fpm.ProfileDataTest
             Assert.IsTrue(areas.Any());
 
             //Test for LA/UA 
-            areas = reader.GetAreas("Cam", AreaTypeIds.LocalAuthorityAndUnitaryAuthority);
+            areas = reader.GetAreas("Cam", AreaTypeIds.DistrictAndUnitaryAuthority);
             Assert.IsTrue(areas.Any());
 
             //Test for CCG - Not Found 

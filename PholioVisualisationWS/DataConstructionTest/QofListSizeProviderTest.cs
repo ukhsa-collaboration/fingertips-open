@@ -39,7 +39,7 @@ namespace PholioVisualisation.DataConstructionTest
             // Practice
             var size = new QofListSizeProvider(groupDataReader,
                 areasReader.GetAreaFromCode(AreaCodes.Gp_MonkfieldCambourne), GroupId, 0, calendarYearType).Value;
-            Assert.IsTrue(size > 5000 && size < 10000);
+            Assert.IsTrue(size > 5000 && size < 15000);
         }
 
         [TestMethod]

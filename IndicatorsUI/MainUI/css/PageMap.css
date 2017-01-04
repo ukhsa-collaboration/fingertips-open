@@ -116,9 +116,6 @@
 	border-left-style: solid;
 }
 
-table.customKeyTable {
-
-}
 table.customKeyTable td {
 	width: 90px;
 	text-align: center;
@@ -128,54 +125,12 @@ table.customKeyTable td {
 td.continual_range
 {
 	width: 200px !important;
-	background: url("continuous_range.png") repeat-y scroll center center;
+	background: url("../images/continuous_range.png") repeat-y scroll center center;
 }
 td.whiteText {
 	color: #FFFFFF;
 }
 
-
-/* Export map to PDF */
-.my-pdf-control {
-	background-image: url(PDF2.png);
-   /* width: 26px;*/
-    height: 26px;
-    background-position: 3px 50%;
-    background-repeat: no-repeat;
-    display: block;
-    padding: 3px 3px 3px 32px;
-    border-radius: 4px;
-    -webkit-border-radius: 4px;
-    -moz-border-radius: 4px;
-    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.65);
-    cursor: auto;
-    text-align: center;
-    background-color: #FFFFFF;
-}
-
-div#createTrendPDF {
-	float: left;
-	width: auto;
-	padding: 3px 10px;
-	background-color: rgb(0,174,158);
-	color: #fff;
-	margin: 10px;
-}
-div#createTrendPDF:hover {
-	background-color: rgb(152,0,46);
-}
-
-#PDFPreview {
-	border: 2px solid #EEE;
-	height: 600px;
-	width: 100%;
-}
-
-#ExportToPDFStatus {
-    font-size: 1.2em;
-    padding-top: 1px;
-    vertical-align: bottom;
-}
 /* Allow the PDF and the map layers buttons to both float on same line */
 .leaflet-right .leaflet-control {
 	clear: none;
@@ -224,7 +179,7 @@ div#createTrendPDF:hover {
 	background-position: -6px -278px;
 }
 .layerControl div.Gray span {
-	background-position: -7 -383px;
+	background-position: -7px -383px;
 }
 .layerControl div.DarkGray span {
 	background-position: -13px -645px;

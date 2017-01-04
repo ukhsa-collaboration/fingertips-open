@@ -1,4 +1,8 @@
-﻿namespace Profiles.DomainObjects
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Web.UI;
+
+namespace Profiles.DomainObjects
 {
     public class ProfileCollectionItem
     {
@@ -19,5 +23,10 @@
                 return ParentCollection != null && ParentCollection.IsCollectionFrontPage;
             }
         }
+
+        //Get All Profile ID whole ProfileCollectionID=11 (ProfileCollectionID=11 belong to HIghlighted Profile
+
+        public IList<ProfileCollectionItem> ProfileCollections { get; set; }
+
     }
 }

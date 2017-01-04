@@ -44,7 +44,7 @@ namespace PholioVisualisation.DataConstruction
         public void Clear()
         {
             GroupRoots = new List<GroupRoot>();
-            InitIndicatorMetadata(IndicatorMetadataRepository.Instance.GetIndicatorMetadataCollection(
+            InitIndicatorMetadata(IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(
                 new List<Grouping>()));
             Areas = new List<IArea>();
         }

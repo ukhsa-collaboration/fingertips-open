@@ -37,7 +37,7 @@ namespace PholioVisualisation.DataConstruction
             IList<int> indicatorIds = groupDataReader.GetIndicatorIdsByGroupIdAndAreaTypeId(groupId, areaTypeId);
 
             DoubleOverlappingCIsComparer comparer = new DoubleOverlappingCIsComparer();
-            IndicatorMetadataRepository repository = IndicatorMetadataRepository.Instance;
+            IndicatorMetadataProvider provider = IndicatorMetadataProvider.Instance;
 
             List<SparklineRoot> roots = new List<SparklineRoot>();
 
@@ -45,7 +45,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 var grouping = GetGrouping(groupIds, indicatorId, areaTypeId, sexId);
 
-                IndicatorMetadata metadata = repository.GetIndicatorMetadata(grouping);
+                IndicatorMetadata metadata = provider.GetIndicatorMetadata(grouping);
 
                 IList<TimePeriod> timePeriods = grouping.GetTimePeriodIterator(metadata.YearType).TimePeriods;
 

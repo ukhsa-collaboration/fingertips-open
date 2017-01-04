@@ -9,6 +9,7 @@ namespace Fpm.ProfileData.Entities.Profile
         public int DenominatorTypeId { get; set; }
         public int CIMethodId { get; set; }
         public double ConfidenceLevel { get; set; }
+        public bool AlwaysShowSpineChart { get; set; }
 
         [Display(Name = "ValueTypeId")]
         public int ValueTypeId { get; set; }

@@ -1,8 +1,10 @@
 ﻿@using Profiles.MainUI.Helpers
 @model Profiles.MainUI.Models.PhofBody
-<div class="full-width title-divider"></div>
-<div class="standardWidth clearfix">
-    <div class="supporting-information">
-        @ContentProvider.GetContent(Model.ContentKey, Model.ProfileId)
+<div class="title-divider"></div>
+<div id="contact-us-public-health-outcomes-framework" class="container">
+    <div class="row">
+        <div class="col-md-12">
+            @ContentProvider.GetContent(Model.ContentKey, Model.ProfileId)
+        </div>
     </div>
 </div>

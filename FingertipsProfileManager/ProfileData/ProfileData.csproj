@@ -34,8 +34,8 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
@@ -80,6 +80,7 @@
     <Compile Include="Entities\Job\UploadJob.cs" />
     <Compile Include="Entities\Job\UploadJobStatus.cs" />
     <Compile Include="Entities\Job\UploadJobType.cs" />
+    <Compile Include="Entities\Logging\DatabaseLog.cs" />
     <Compile Include="Entities\LookUps\Age.cs" />
     <Compile Include="Entities\LookUps\AreaType.cs" />
     <Compile Include="BaseReader.cs" />

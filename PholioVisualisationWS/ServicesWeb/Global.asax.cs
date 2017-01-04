@@ -17,6 +17,7 @@ namespace ServicesWeb
             //IoC.Register();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            AutoMapperConfig.RegisterMappings();
         }
 
         // Uncomment these two methods to enable Mini Profiler

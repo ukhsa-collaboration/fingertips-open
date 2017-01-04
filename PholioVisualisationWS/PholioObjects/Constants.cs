@@ -11,6 +11,7 @@ namespace PholioVisualisation.PholioObjects
         public const int GoRegion = 6;
         public const int GpPractice = 7;
         public const int County = 9;
+        public const int CountyQuintile = 10;
         public const int AcuteTrust = 14;
         public const int Country = 15;
         public const int UnitaryAuthority = 16;
@@ -34,6 +35,7 @@ namespace PholioVisualisation.PholioObjects
         public const int CombinedMentalHealthAndAcuteTrust = 117;
         public const int AcuteTrustsIncludingCombinedMentalHealthTrusts = 118;
         public const int MentalHealthTrustsIncludingCombinedAcuteTrusts = 119;
+        public const int Stp = 120;
     }
 
     public class CategoryIds
@@ -89,7 +91,13 @@ namespace PholioVisualisation.PholioObjects
 
     public class ValueNoteIds
     {
+        public const int NoNote = 0;
+
+        // Value calculated on the fly
         public const int ValueAggregatedFromAllKnownGeographyValues = 500;
+
+        // Value precalculated to be stored in PHOLIO
+        public const int ValueAggregatedFromAllKnownGeographyValuesByFingertips = 506;
     }
 
     public class AgeIds
@@ -115,6 +123,7 @@ namespace PholioVisualisation.PholioObjects
         public const int From85To89 = 21;
         public const int Over65 = 27;
         public const int From0To4 = 28;
+        public const int Is6 = 35;
         public const int Is65 = 94;
         public const int Under75 = 163;
         public const int Over18 = 168;
@@ -169,8 +178,6 @@ namespace PholioVisualisation.PholioObjects
         public const int SmokingAtTimeOfDelivery = 20301;
         public const int TeenagePregnancy = 20401;
         public const int HospitalStaysForSelfHarm = 21001;
-        public const int TreatmentCompletionForTB = 30501;
-        public const int IncidenceOfTB = 30502;
         public const int MortalityRateFromCausesConsideredPreventable = 40301;
         public const int AdultUnder75MortalityRateCvd = 40401;
         public const int AdultUnder75MortalityRateCancer = 40501;
@@ -179,6 +186,7 @@ namespace PholioVisualisation.PholioObjects
         public const int ObesityYear6 = 90323;
         public const int SlopeIndexOfInequalityForLifeExpectancy = 90364;
         public const int LifeExpectancyAtBirth = 90366;
+        public const int SchoolReadiness = 90634;
         public const int AdultExcessWeight = 90640;
         public const int ExcessWinterDeaths = 90641;
         public const int BMIRecorded = 90689;
@@ -193,6 +201,8 @@ namespace PholioVisualisation.PholioObjects
         public const int LongTermUnemployment = 91133;
         public const int NumberInTreatmentAtSpecialistDrugMisuseServices = 91181;
         public const int SexuallyTransmittedInfection = 91306;
+        public const int IncidenceOfTB = 91361;
+        public const int TreatmentCompletionForTB = 91367;
         public const int AlcoholAdmissionsToHospital = 91414;
         public const int GcseAchievement = 92199;
         public const int AdultDrugMisuse = 91467;
@@ -203,6 +213,7 @@ namespace PholioVisualisation.PholioObjects
         public const int SurgicalSiteInfectionKneeProsthesis = 92420;
         public const int AdultDrugMisuse2 = 92432;
         public const int AdultSmokingPrevalence2 = 92443;
+        public const int SuicidePreventionPlan = 92607;
     }
 
     public class ConfidenceIntervalMethodIds
@@ -331,6 +342,8 @@ namespace PholioVisualisation.PholioObjects
         public const int Phof_HealthcarePrematureMortality = 1000044;
         public const int Phof_HealthProtection = 1000043;
         public const int SexualAndReproductiveHealth = 8000057;
+        public const int Population = 1938133081;
+        public const int PopulationSummary = 1200006;
 
         // Practice profiles
         public const int PracticeProfiles_PracticeSummary = 2000005;
@@ -353,19 +366,22 @@ namespace PholioVisualisation.PholioObjects
         public const int Hypertension_RiskAndPrevention = 1938132757;
         public const int HealthProfiles_OurCommunities = 3007000;
         public const int HealthProfiles_AllSpineChartIndicators = 1938132701;
+        public const int Suicide_RelatedRiskFactors = 1938132831;
     }
 
     public class ProfileIds
     {
         public const int Undefined = -1;
         public const int ChildHealth = 2;
-        public const int HealthInequalities = 7;
+        public const int AdultSocialCare = 8;
         public const int Search = 13;
         public const int SubstanceMisuse = 17;
         public const int Tobacco = 18;
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
         public const int LongerLives = 22;
+        public const int Unassigned = 23;
+        public const int Archived = 24;
         public const int HealthProfiles = 26;
         public const int ChildrenAndYoungPeoplesBenchmarkingTool = 39;
         public const int SexualHealth = 45;
@@ -381,7 +397,7 @@ namespace PholioVisualisation.PholioObjects
         public const int PhysicalActivity = 99;
         public const int Amr = 101;
         public const int ChildHealthProfiles = 105;
-
+        public const int Suicide = 91;
     }
 
     public class ComparatorIds
@@ -403,6 +419,7 @@ namespace PholioVisualisation.PholioObjects
         public const int SpcForProportions = 5;
         public const int SpcForDsr = 6;
         public const int DoubleOverlappingCIs = 12;
+        public const int SuicidePreventionPlan = 14;
         public const int Quintiles = 15;
     }
 

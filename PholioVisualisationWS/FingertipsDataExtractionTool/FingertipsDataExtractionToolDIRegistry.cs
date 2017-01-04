@@ -1,5 +1,7 @@
-﻿using StructureMap.Configuration.DSL;
+﻿using NHibernate;
+using StructureMap.Configuration.DSL;
 using NLog;
+using PholioVisualisation.DataAccess.Repositories;
 
 namespace FingertipsDataExtractionTool
 {
@@ -10,7 +12,9 @@ namespace FingertipsDataExtractionTool
             For<IProgram>().Use<Program>();
           
             For<ILogger>()
-                .Use<Logger>(x => LogManager.GetLogger("ExcelFileGenerator"));
+                .Use(x => LogManager.GetLogger("ExcelFileGenerator"));
+
+            For<ISessionFactory>().Use(x => NHibernateSessionFactory.GetSession());
         }  
     }
 }

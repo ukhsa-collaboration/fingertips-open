@@ -82,24 +82,38 @@ namespace IndicatorsUI.MainUISeleniumTest
             GoToUrl("/");
         }
 
-        public void PhofDataPage()
+        public void PhofInequalities()
         {
-            FingertipsDataForProfile(ProfileUrlKeys.Phof);
+            PhofDataTab(TabIds.Inequalities);
+            waitFor.InequalitiesTabToLoad();
         }
 
-        public void PhofInequalitiesPage()
+        public void PhofCompareAreas()
         {
-            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/7");
+            PhofDataTab(TabIds.CompareAreas);
+            waitFor.FingertipsBarChartTableToLoad();
         }
 
-        public void PhofCompareAreasPage()
+        public void PhofTartanRug()
         {
-            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/3");
+            PhofDataTab(TabIds.TartanRug);
+            waitFor.FingertipsTartanRugToLoad();
+        }
+
+        public void PhofAreaProfile()
+        {
+            PhofDataTab(TabIds.AreaProfile);
+            waitFor.FingertipsSpineChartToLoad();
         }
 
         public void GoToUrl(string relativeUrl)
         {
             driver.Navigate().GoToUrl(BaseUrl + relativeUrl);
+        }
+
+        private void PhofDataTab(int tabId)
+        {
+            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/" + tabId);
         }
     }
 }

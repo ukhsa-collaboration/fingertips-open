@@ -41,24 +41,37 @@
     public class AreaTypeIds
     {
         public const int Undefined = 0;
-        public const int LocalAuthority = 1;
+        public const int District = 1;
         public const int Pct = 2;
+        public const int Lsoa = 4;
         public const int Sha = 5;
-        public const int Gor = 6;
+        public const int GoRegion = 6;
         public const int GpPractice = 7;
-        public const int Ward = 8;
         public const int County = 9;
         public const int CountyQuintile = 10;
+        public const int AcuteTrust = 14;
         public const int Country = 15;
         public const int UnitaryAuthority = 16;
-        public const int GpDeprivationDecile = 17;
         public const int Shape = 18;
         public const int Ccg = 19;
         public const int MentalHealthTrust = 20;
-        public const int PheCentre = 43;
-        public const int LocalAuthorityAndUnitaryAuthority = 101;
+        public const int AmbulanceTrust = 41;
+        public const int PheCentreObsolete = 43;
+        public const int Subregion = 46;
+        public const int PheCentreFrom2013 = 48;
+        public const int PheCentreFrom2015 = 49;
+        public const int PheCentreFrom2013To2015 = 50;
+        public const int CountyAndUnitaryAuthorityDeprivationDecile = 23;
+        public const int DistrictAndUnitaryAuthority = 101;
         public const int CountyAndUnitaryAuthority = 102;
-        public const int OnsClusterGroup = 110;
+        public const int PheCentresFrom2013To2015 = 103;
+        public const int PheCentresFrom2015 = 104;
+        public const int OnsClusterGroup2001 = 110;
+        public const int StrategicClinicalNetwork = 112;
+        public const int OnsClusterGroup2011 = 115;
+        public const int CombinedMentalHealthAndAcuteTrust = 117;
+        public const int AcuteTrustsIncludingCombinedMentalHealthTrusts = 118;
+        public const int MentalHealthTrustsIncludingCombinedAcuteTrusts = 119;
     }
 
     public class AreaCodes
@@ -121,6 +134,12 @@
         public const int ChildrenAndYoungPeoplesHealthBenchmarkingTool = 39;
         public const int SexualHealth = 45;
         public const int Diabetes = 51;
+
+
+        public const int ProfileId = 115;
+        
+
+
     }
 
     public class UrlKeys
@@ -142,7 +161,10 @@
     {
         public const int Doris = 11;
         public const int UserWithNoRightsToAnything = 34/*Tim Packer*/;
+        public const int TimWinters = 51;
         public const int FarrukhAyub = 54;
+
+        public const int UserId = 146;
     }
 
     public class PolarityIds
@@ -156,6 +178,7 @@
     public class ValueNoteIds
     {
         public const int ThereIsDataQualityIssueWithThisValue = 401;
+        public const int AggregatedFromAllKnownLowerGeographyValuesByFingertips = 506;
     }
 
     public class CategoryTypeIds
@@ -209,5 +232,8 @@
         public const string Quarter = "[Quarter]";
     }
 
-
+    public class DatabaseLogIds
+    {
+        public const int FusCheckedJobs = 2;
+    }
 }

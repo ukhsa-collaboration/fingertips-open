@@ -154,7 +154,10 @@ namespace Fpm.MainUI.Controllers
             var domains = new ProfileMembers();
 
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
-            defaultProfile.Selected = true;
+            if (defaultProfile != null)
+            {
+                defaultProfile.Selected = true;
+            }
 
             ViewBag.listOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile, _profileRepository);
 
@@ -184,7 +187,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult IndicatorEditSave(int? decimalPlaces, int? targetId, string urlKey, int areaType, int selectedDomainNumber,
+        public ActionResult IndicatorEditSave(int? decimalPlaces, int? targetId, bool alwaysShowSpineChart, string urlKey, int areaType, int selectedDomainNumber,
             int indicatorId, int valueTypeId, int ciMethodId, string ciComparatorConfidence, int polarityId,
             int unitId, int denominatorTypeId, int yearTypeId, int areaTypeId, int sexId, int ageId, int comparatorId,
             int comparatorMethodId, double comparatorConfidence, int yearRange, int selectedFrequency, int baselineYear,
@@ -202,7 +205,7 @@ namespace Fpm.MainUI.Controllers
                 comparatorConfidence,
                 yearRange, selectedFrequency, baselineYear, datapointYear, startQuarterRange, endQuarterRange,
                 startMonthRange,
-                endMonthRange, indicatorSequence, currentAgeId, currentSexId, currentAreaTypeId, decimalPlaces, targetId, profile.Id);
+                endMonthRange, indicatorSequence, currentAgeId, currentSexId, currentAreaTypeId, decimalPlaces, targetId, alwaysShowSpineChart, profile.Id);
 
             return Redirect(returnUrl);
         }
@@ -212,7 +215,7 @@ namespace Fpm.MainUI.Controllers
             int areaTypeId, int sexId, int ageId, int comparatorId, int comparatorMethodId, double comparatorConfidence,
             int yearRange, int selectedFrequency, int baselineYear, int datapointYear, int baselineQuarter,
             int dataPointQuarter, int baselineMonth, int dataPointMonth, int indicatorSequence, int currentAgeId,
-            int currentSexId, int currentAreaTypeId, int? decimalPlaces, int? targetId, int profileId)
+            int currentSexId, int currentAreaTypeId, int? decimalPlaces, int? targetId, bool alwaysShowSpineChart, int profileId)
         {
             DateTime timeOfChange = DateTime.Now;
 
@@ -240,7 +243,7 @@ namespace Fpm.MainUI.Controllers
                 comparatorId, comparatorMethodId, ciComparatorConfidence, comparatorConfidence, yearTypeId, yearRange, valueTypeId,
                 ciMethodId, polarityId, unitId, denominatorTypeId, baselineYear, datapointYear, baselineQuarter,
                 dataPointQuarter, baselineMonth, dataPointMonth, indicatorSequence, currentAgeId, currentSexId,
-                currentAreaTypeId, indicatorMetadataTextChanges, _userName, CommonUtilities.AuditType.Change.ToString(), decimalPlaces, targetId);
+                currentAreaTypeId, indicatorMetadataTextChanges, _userName, CommonUtilities.AuditType.Change.ToString(), decimalPlaces, targetId, alwaysShowSpineChart);
         }
 
         private string[] SaveIndicatorMetadataTextChanges(int indicatorId, int? groupId, DateTime timeOfChange, int profileId)
@@ -569,9 +572,9 @@ namespace Fpm.MainUI.Controllers
         {
             return new List<SelectListItem>
                 {
-                    new SelectListItem { Text = "Not Applicable", Value = "-1" }, 
-                    new SelectListItem { Text = "Overview", Value = "0" }, 
-                    new SelectListItem { Text = "Map", Value = "8" }, 
+                    new SelectListItem { Text = "Not Applicable", Value = "-1" },
+                    new SelectListItem { Text = "Overview", Value = "0" },
+                    new SelectListItem { Text = "Map", Value = "8" },
                     new SelectListItem { Text = "Trends", Value = "4" },
                     new SelectListItem { Text = "Compare areas", Value = "3" },
                     new SelectListItem { Text = "Area profiles", Value = "1" },

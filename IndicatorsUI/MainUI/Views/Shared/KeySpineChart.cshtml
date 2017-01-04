@@ -28,8 +28,7 @@
                     Higher
                 </td>
             }
-            <td class="keySpacer"></td>
-
+            
             @*Show quintile legend*@
             <td class="keySpacer"></td>
             <td id="quintile-key" class='keySpine quintileKey' colspan="5">
@@ -41,14 +40,10 @@
                 <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile5_mini.png" alt=""/>&nbsp;
                 High
             </td>
-
-            @if (Model.DisplayBothKeyColorings)
-            {
                 <td class='keySpine'>
                     <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt=""/>
                     Not Compared
                 </td>
-            }
         </tr>
     </table>
 </div>

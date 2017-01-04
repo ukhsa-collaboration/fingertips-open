@@ -28,25 +28,17 @@ function getPdfUrl(areaCode) {
     var profileId = FT.model.profileId;
     var pdfUrlKey = environmentTest.getProfileUrlKey();
 
-    // Display please wait message
-    $('#pdf-download-text').html(
-        '<h2>Please wait</h2><p>The PDF is being generated, please be patient this may take a while...</p>');
-
     // Determine host
+    var url = FT.url.pdf + pdfUrlKey ;
     if (profileId === ProfileIds.HealthProfiles) {
-        var url = 'https://londevapppor01.phe.gov.uk:5022/onthefly/api/api.php';
-    } else {
-        url = 'https://pdfs.nepho.org.uk/onthefly/api/api.php';
-    }
+        url = url + '/' + download.timePeriod;
+    } 
 
     // Return URL with parameters
-    return url + '?c=profile&a=generatePDF&i=' + pdfUrlKey +
-        '&area=' + areaCode + 
-        '&region=' + FT.model.parentCode +
-        '&areaTypeId=' + FT.model.areaTypeId +
-        '&groupId=6&output=browser';
+    return url + '/' + areaCode + '.pdf';
 }
 
 download.excelExportText =
-        "Excel files for all England data are now pre-calculated every night so any data that has been uploaded or changed today will not be included.";
+        'Excel files for all England data are now pre-calculated every night so any data that has been uploaded or changed today will not be included.' +
+        '<br><br>Downloaded data is only available if your machine is on the PHE network.';
 

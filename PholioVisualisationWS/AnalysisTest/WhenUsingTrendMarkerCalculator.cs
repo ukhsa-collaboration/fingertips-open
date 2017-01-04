@@ -258,24 +258,6 @@ namespace PholioVisualisation.AnalysisTest
         }
 
         [TestMethod]
-        public void GetResults_Return_IncreasingTrend_For_Proportion_And_TrendData_8()
-        {
-            // Arrange
-            var values = GetTrendData_8();
-            var unitValue = 100000;
-            var trendRequest = GetTrendRequest(values, ValueTypeIds.DirectlyStandardisedRate, unitValue);
-
-            // Act
-            var result = _trendMarkerCalculator.GetResults(trendRequest);
-
-            // Assert
-            WriteResult(result);
-            Assert.IsFalse(result.IsSignificant);
-            Assert.AreEqual(1.4948, Math.Round(result.ChiSquare, 4));
-            Assert.AreEqual(TrendMarker.NoChange, result.Marker);
-        }
-
-        [TestMethod]
         public void GetResults_Return_Not_Calculated_For_Invalid_Values()
         {
             // Arrange
@@ -335,57 +317,33 @@ namespace PholioVisualisation.AnalysisTest
             };
         }
 
-        private IEnumerable<CoreDataSet> GetTrendData_8()
-        {
-            return new List<CoreDataSet>()
-            {
-                new CoreDataSet {Count = 10936.06, Denominator = 2252383, Value = 49372, Year = 2008},
-                new CoreDataSet {Count = 11274.7, Denominator = 2268354, Value = 50525, Year = 2009},
-                new CoreDataSet {Count = 11369.44, Denominator = 2285373, Value = 50551, Year = 2010},
-                new CoreDataSet {Count = 11106.21, Denominator = 2300469, Value = 49016, Year = 2011},
-                new CoreDataSet {Count = 11024.38, Denominator = 2315677, Value = 48313, Year = 2012},
-                new CoreDataSet {Count = 11681.04, Denominator = 2330591, Value = 50802, Year = 2013},
-                new CoreDataSet {Count = 11738.96, Denominator = 2349351, Value = 50623, Year = 2014}
-            };
-        }
-
         private IEnumerable<CoreDataSet> GetTrendData_1()
         {
+            // Details from URL: are/E08000021/iid/20301/age/1/sex/2
             return new List<CoreDataSet>()
             {
-                new CoreDataSet() {Count = 5, Denominator = 22, Value = 0.22727*100, Year = 2006},
-                new CoreDataSet() {Count = 7, Denominator = 35, Value = 0.20000*100, Year = 2007},
-                new CoreDataSet() {Count = 6, Denominator = 42, Value = 0.14286*100, Year = 2008},
-                new CoreDataSet {Count = 7, Denominator = 48, Value = 0.14583*100, Year = 2009},
-                new CoreDataSet {Count = 8, Denominator = 54, Value = 0.14815*100, Year = 2010},
-                new CoreDataSet {Count = 10, Denominator = 150, Value = 0.06667*100, Year = 2011},
+                new CoreDataSet {Count = 621, Denominator = 3454, Value = 17.9791546033584, Year = 2010},
+                new CoreDataSet {Count = 599, Denominator = 3195, Value = 18.7480438184664, Year = 2011},
+                new CoreDataSet {Count = 556, Denominator = 3256, Value = 17.0761670761671, Year = 2012},
+                new CoreDataSet {Count = 535, Denominator = 3227, Value = 16.5788658196467, Year = 2013},
+                new CoreDataSet {Count = 447, Denominator = 3121, Value = 14.3223325857097, Year = 2014}
             };
         }
 
         private IEnumerable<CoreDataSet> GetTrendData_1_Shuffled()
         {
-            return new List<CoreDataSet>()
-            {
-                new CoreDataSet {Count = 7, Denominator = 48, Value = 0.14583*100, Year = 2009},
-                new CoreDataSet {Count = 5, Denominator = 22, Value = 0.22727*100, Year = 2006},
-                new CoreDataSet {Count = 10, Denominator = 150, Value = 0.06667*100, Year = 2011},
-                new CoreDataSet {Count = 6, Denominator = 42, Value = 0.14286*100, Year = 2008},
-                new CoreDataSet {Count = 7, Denominator = 35, Value = 0.20000*100, Year = 2007},
-                new CoreDataSet {Count = 8, Denominator = 54, Value = 0.14815*100, Year = 2010},
-
-            };
+            return GetTrendData_1().ToList().OrderBy(x => Guid.NewGuid());
         }
 
         private IEnumerable<CoreDataSet> GetTrendData_2()
         {
             return new List<CoreDataSet>()
                 {
-                    new CoreDataSet {Count = 10, Denominator = 150, Value = 0.06667 * 100, Year= 2006 },
-                    new CoreDataSet {Count = 8, Denominator = 54, Value = 0.14815 * 100, Year = 2007 },
-                    new CoreDataSet {Count = 7, Denominator = 48, Value = 0.14583 * 100, Year = 2008 },
-                    new CoreDataSet {Count = 6, Denominator = 42, Value = 0.14286 * 100, Year = 2009 },
-                    new CoreDataSet {Count = 7, Denominator = 35, Value = 0.20000 * 100, Year = 2010},
-                    new CoreDataSet {Count = 5, Denominator = 22, Value = 0.22727 * 100, Year= 2011 },
+                    new CoreDataSet {Count = 2157, Denominator = 3454, Value = 62.4493341053851, Year = 2010},
+                    new CoreDataSet {Count = 2090, Denominator = 3195, Value = 65.414710485133, Year = 2011},
+                    new CoreDataSet {Count = 2194, Denominator = 3256, Value = 67.3832923832924, Year = 2012},
+                    new CoreDataSet {Count = 2134.81, Denominator = 3152, Value = 67.7287436548223, Year = 2013},
+                    new CoreDataSet {Count = 2094, Denominator = 3062, Value = 68.3866753755715, Year = 2014}
                 };
         }
 
@@ -415,13 +373,6 @@ namespace PholioVisualisation.AnalysisTest
                 new CoreDataSet {Count = 8, Denominator = 100, Year = 5},
                 new CoreDataSet {Count = 9, Denominator = 200, Year = 6},
             });
-            // Values
-            //0.23
-            //0.20
-            //0.14
-            //0.16
-            //0.08
-            //0.05
         }
 
         private IEnumerable<CoreDataSet> GetTrendData_5()
@@ -435,13 +386,6 @@ namespace PholioVisualisation.AnalysisTest
                 new CoreDataSet {Count = 5480, Denominator = 17890, Year = 2011},
                 new CoreDataSet {Count = 5315, Denominator = 17860, Year = 2012},
             });
-
-            //Values
-            //29.8701298701299
-            //30.2696752889378
-            //30.1860594279367
-            //30.6316377864729
-            //29.7592385218365
         }
 
 
@@ -473,12 +417,6 @@ namespace PholioVisualisation.AnalysisTest
                 new CoreDataSet {Count = 20955, Denominator = 69835, Year = 2011},
                 new CoreDataSet {Count = 19055, Denominator = 70910, Year = 2012},
             });
-            //Values
-            //34.0543412264724
-            //33.0559646539028
-            //31.0967178516847
-            //30.0064437602921
-            //26.8720913834438
         }
 
         private IEnumerable<CoreDataSet> GetTrendData_7a()

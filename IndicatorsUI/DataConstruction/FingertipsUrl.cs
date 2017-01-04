@@ -7,47 +7,70 @@ using Profiles.DomainObjects;
 
 namespace Profiles.DataConstruction
 {
+    public enum FingertipsEnvironment
+    {
+        Development,
+        Testing,
+        Live
+    }
+
     public class FingertipsUrl
     {
-        private AppConfig appConfig;
+        private readonly FingertipsEnvironment _environment;
 
-        public FingertipsUrl(AppConfig appConfig)
+        public FingertipsUrl(AppConfig appConfig, Uri uri)
         {
-            this.appConfig = appConfig;
+            if (appConfig.IsEnvironmentLive)
+            {
+                _environment = FingertipsEnvironment.Live;
+            }
+            else if (uri.Host.Contains("localhost"))
+            {
+                _environment = FingertipsEnvironment.Development;
+            }
+            else
+            {
+                _environment = FingertipsEnvironment.Testing;
+            }
         }
 
-        public string Host
+        /// <summary>
+        /// Hostname preceeded by protocol, e.g. "http://fingertips.phe.org.uk"
+        /// </summary>
+        public string ProtocolAndHost
         {
             get
             {
-                var isEnvironmentLive = appConfig.IsEnvironmentLive;
-
-                var isEnvironmentDevelopment = appConfig.BridgeWsUrl.ToLower().Contains("localhost") &&
-                    isEnvironmentLive == false;
-
-                if (isEnvironmentDevelopment)
+                if (_environment == FingertipsEnvironment.Development)
                 {
                     return string.Empty;
                 }
 
                 var coreSkin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
-
-                var host = isEnvironmentLive
-                    ? coreSkin.LiveHost
-                    : coreSkin.TestHost;
-
+                var host = GetHost(coreSkin);
                 return Protocol + host;
             }
         }
 
+        /// <summary>
+        /// HTTP or HTTPS
+        /// </summary>
         public string Protocol
         {
             get
             {
-                var protocol = appConfig.IsSecureConnection ? "https" : "http";
-                protocol += "://";
-                return protocol;
+                return _environment == FingertipsEnvironment.Development ?
+                    "http://" :
+                    "https://";
             }
+        }
+
+        private string GetHost(Skin coreSkin)
+        {
+            var host = _environment == FingertipsEnvironment.Live
+                ? coreSkin.LiveHost
+                : coreSkin.TestHost;
+            return host;
         }
     }
 }

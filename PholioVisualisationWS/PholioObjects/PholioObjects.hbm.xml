@@ -68,6 +68,7 @@
     <property name="IsNational" column="is_national"/>
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
+    <property name="IsProfileLive" column="is_profile_live"/>
   </class>
 
   <!-- ValueNote class -->
@@ -335,6 +336,7 @@
     <property name="ConfidenceLevel" column="confidencelevel"/>
     <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
     <property name="TargetId" column="targetid"/>
+    <property name="AlwaysShowSpineChart" column="alwaysshowspinechart"/>
 
     <many-to-one name="Unit" column="unitid" lazy="false"/>
     <many-to-one name="YearType" column="yeartypeid" lazy="false"/>
@@ -562,6 +564,10 @@
     exec [dbo].[usp_find_nearby_gp_practices] :easting, :northing, :areatypeid
   </sql-query>
 
+  <sql-query name="SelectIndicatorsChangedWithPreviousDays">
+    exec usp_select_indicators_changed_with_previous_days :days
+  </sql-query>
+  
   <!-- SQL Queries -->
   <sql-query name="GetCoreDataSetCount">
     SELECT COUNT(*)

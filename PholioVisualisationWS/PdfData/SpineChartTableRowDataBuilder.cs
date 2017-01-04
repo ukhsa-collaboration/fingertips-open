@@ -11,7 +11,6 @@ namespace PholioVisualisation.PdfData
     {
         private readonly IList<string> areaCodes;
         private readonly IList<string> areaCodesToIgnore;
-        private int profileId;
         private readonly Dictionary<string, CoreDataSetProvider> coreDataSetProviders =
             new Dictionary<string, CoreDataSetProvider>();
 
@@ -26,7 +25,6 @@ namespace PholioVisualisation.PdfData
         public SpineChartTableRowDataBuilder(int profileId, IList<string> areaCodes)
         {
             this.areaCodes = areaCodes;
-            this.profileId = profileId;
             InitCoreDataSetProviders();
             areaCodesToIgnore = profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
             nationalArea = areasReader.GetAreaFromCode(AreaCodes.England);
@@ -38,7 +36,7 @@ namespace PholioVisualisation.PdfData
         }
 
         public override SpineChartTableRowData GetIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata,
-            IList<Area> benchmarkAreas)
+            IList<IArea> benchmarkAreas)
         {
             currentRow = new SpineChartTableRowData();
 
@@ -46,16 +44,27 @@ namespace PholioVisualisation.PdfData
             Grouping grouping = groupRoot.GetNationalGrouping();
 
             SetIndicatorData(groupRoot, metadata, benchmarkAreas);
+            SetLongIndicatorName(groupRoot, metadata);
+            currentRow.ComparatorMethodId = grouping.ComparatorMethodId;
+            SetStats(grouping, timePeriod);
+            AssignChildAreaData(grouping, timePeriod, metadata);
+            
+            //TODO FIN-1372
+            currentRow.HasEnoughValuesForSpineChart = true;
 
+            return currentRow;
+        }
+
+        private void SetLongIndicatorName(GroupRoot groupRoot, IndicatorMetadata metadata)
+        {
+            var textMetadata = metadata.Descriptive;
+            if (textMetadata.ContainsKey(IndicatorMetadataTextColumnNames.NameLong) == false)
+            {
+                throw new FingertipsException("Indicator long name not defined for " + metadata.IndicatorId);
+            }
             string longName = metadata.Descriptive[IndicatorMetadataTextColumnNames.NameLong];
             currentRow.LongName = SexTextAppender.GetIndicatorName(longName,
                 groupRoot.SexId, groupRoot.StateSex);
-            currentRow.ComparatorMethodId = grouping.ComparatorMethodId;
-            SetStats(grouping, timePeriod);
-
-            AssignChildAreaData(grouping, timePeriod, metadata);
-
-            return currentRow;
         }
 
         private void InitCoreDataSetProviders()

@@ -46,8 +46,12 @@
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
     <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
-    <property name="IsProfileWithOnlyStaticReports" column="is_profile_with_only_static_reports"/>
+    <property name="ShowAreaSearchOnProfileFrontPage" column="show_area_search_on_profile_front_page"/>
+    <property name="HasAnyData" column="has_any_data"/>
+    <property name="HasStaticReports" column="has_static_reports"/>
     <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
+    
+    <property name="LeadProfileForCollectionIds" column="lead_profile_for_collection_ids"/>
   </class>
   
   <!-- GroupingMetadata class -->
@@ -108,6 +112,7 @@
     <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
     <property name="TargetId" column="targetid"/>
     <property name="DateEntered" column="DateEnteredInPHOLIO"/>
+    <property name="AlwaysShowSpineChart" column="alwaysshowspinechart"/>
   </class>
 
   <!-- IndicatorMetadataTextProperty class -->

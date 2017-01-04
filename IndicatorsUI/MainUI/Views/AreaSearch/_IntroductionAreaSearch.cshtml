@@ -3,7 +3,7 @@
 @using Profiles.MainUI.Models
 @model PageModel
 
-@if (Model.ProfileId == ProfileIds.HealthProfiles || Model.IsProfileWithOnlyStaticReports)
+@if (Model.ShowAreaSearchOnProfileFrontPage)
 {
     @* Area search title *@
 if (Model.ProfileId == ProfileIds.HealthProfiles)
@@ -15,14 +15,14 @@ if (Model.ProfileId == ProfileIds.HealthProfiles)
 else
 {
     <h2>
-        Find reports for your area
+        Find your area
     </h2>
 }
 
     @Html.Partial("Spinner")
 
 
-    <table id="area-search" style="display:none;">
+    <table id="area-search" class="table margin-left" style="display:none;">
         <tr><td>Search by postcode, town or local authority</td></tr>
         <tr><td>
                 <input id="area-search-text" type="text" name="search_text" />

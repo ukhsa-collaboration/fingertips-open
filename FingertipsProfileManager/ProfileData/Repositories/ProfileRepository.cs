@@ -354,7 +354,7 @@ namespace Fpm.ProfileData.Repositories
             int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
             int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange,
             int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId, IEnumerable<string> userAudit,
-            string user, string auditType, int? selectedDecimalPlaces, int? targetId)
+            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart)
         {
             try
             {
@@ -369,6 +369,7 @@ namespace Fpm.ProfileData.Repositories
                 indicatorMetaData.YearTypeId = selectedYearType;
                 indicatorMetaData.DecimalPlacesDisplayed = selectedDecimalPlaces;
                 indicatorMetaData.TargetId = targetId;
+                indicatorMetaData.AlwaysShowSpineChart = alwaysShowSpineChart;
 
                 transaction = CurrentSession.BeginTransaction();
 
@@ -408,7 +409,7 @@ namespace Fpm.ProfileData.Repositories
             int startMonthRange, int endMonthRange, int indicatorSequence)
         {
 
-            if (comparatorId == ComparatorIds.Subnational && selectedAreaType == AreaTypeIds.Gor)
+            if (comparatorId == ComparatorIds.Subnational && selectedAreaType == AreaTypeIds.GoRegion)
             {
                 return;
             }
@@ -501,7 +502,7 @@ namespace Fpm.ProfileData.Repositories
                     grouping.SexId = toSexId;
                     grouping.AgeId = toAgeId;
 
-                    if (!(grouping.AreaTypeId == AreaTypeIds.Gor && grouping.ComparatorId == ComparatorIds.Subnational))
+                    if (!(grouping.AreaTypeId == AreaTypeIds.GoRegion && grouping.ComparatorId == ComparatorIds.Subnational))
                     {
                         CurrentSession.Update(grouping);
                     }
@@ -557,7 +558,7 @@ namespace Fpm.ProfileData.Repositories
                         PolarityId = grouping.PolarityId
                     };
 
-                    if (!(newGrouping.AreaTypeId == AreaTypeIds.Gor &&
+                    if (!(newGrouping.AreaTypeId == AreaTypeIds.GoRegion &&
                           newGrouping.ComparatorId == ComparatorIds.Subnational))
                     {
                         CurrentSession.Save(newGrouping);

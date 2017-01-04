@@ -2,6 +2,7 @@
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Helpers;
 using FingertipsUploadService.ProfileData.Repositories;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,12 +16,15 @@ namespace FingertipsUploadService.Upload
         private readonly ProfilesReader _profilesReader = ReaderFactory.GetProfilesReader();
         private readonly CoreDataRepository _coreDataRepository;
         private readonly LoggingRepository _loggingRepository;
+        private readonly Logger _logger;
         private List<int> _indicators = new List<int>();
 
-        public BatchWorksheetDataProcessor(CoreDataRepository coreDataRepository, LoggingRepository loggingRepository)
+        public BatchWorksheetDataProcessor(CoreDataRepository coreDataRepository, LoggingRepository loggingRepository,
+            Logger logger)
         {
             _coreDataRepository = coreDataRepository;
             _loggingRepository = loggingRepository;
+            _logger = logger;
         }
 
         public BatchUpload Validate(DataTable indicators, BatchUpload batchUpload)
@@ -375,16 +379,35 @@ namespace FingertipsUploadService.Upload
         {
             var batchUpload = new BatchUpload();
 
-            for (int i = 0; i < indicators.Rows.Count; i++)
+            int totalRows = indicators.Rows.Count;
+            var indicatorIds = new HashSet<int>();
+
+            // Upload core data
+            for (int i = 0; i < totalRows; i++)
             {
                 var upload = new BatchRowParser(indicators.Rows[i]).GetUploadDataModel();
                 _coreDataRepository.InsertCoreData(upload.ToCoreDataSet(), job.Guid);
                 batchUpload.DataToUpload.Add(upload);
+                indicatorIds.Add(upload.IndicatorId);
+
+                // Log periodically that rows have been uploaded
+                if (i % 1000 == 0)
+                {
+                    LogRowsUploaded(i + 1);
+                }
+            }
+
+            LogRowsUploaded(totalRows);
+
+            // Delete any precalculated core data as it will need to be calculated again
+            foreach (var indicatorId in indicatorIds)
+            {
+                _coreDataRepository.DeletePrecalculatedCoreData(indicatorId);
             }
 
             var dataToUpload = batchUpload.DataToUpload;
 
-            int uploadId = _loggingRepository.InsertUploadAudit(job.Guid, job.Username, dataToUpload.Count, job.Filename,
+            int uploadId = _loggingRepository.InsertUploadAudit(job.Guid, job.Username, totalRows, job.Filename,
                 WorksheetNames.BatchPholio);
 
             batchUpload.ShortFileName = Path.GetFileName(job.Filename);
@@ -393,6 +416,14 @@ namespace FingertipsUploadService.Upload
             batchUpload.Id = uploadId;
 
             return batchUpload;
+        }
+
+        private void LogRowsUploaded(int rowCount)
+        {
+            if (_logger != null)
+            {
+                _logger.Info(rowCount + " rows uploaded");
+            }
         }
 
         public void ArchiveDuplicates(IEnumerable<DuplicateRowInDatabaseError> duplicateRows, UploadJob job)

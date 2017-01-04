@@ -53,8 +53,8 @@
     <Reference Include="Antlr3.Runtime">
       <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
     </Reference>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="itextsharp">
@@ -135,6 +135,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionFilter\MultipleButtonAttribute.cs" />
     <Compile Include="AppConfig.cs" />
     <Compile Include="App_Start\AutoMapperConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
@@ -162,6 +163,7 @@
     </Compile>
     <Compile Include="Helpers\CurrentUser.cs" />
     <Compile Include="Helpers\FileNameHelper.cs" />
+    <Compile Include="Helpers\FusStatus.cs" />
     <Compile Include="Helpers\IndicatorOwnerChanger.cs" />
     <Compile Include="Helpers\UIHelper.cs" />
     <Compile Include="Helpers\UploadHelper.cs" />
@@ -201,6 +203,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Routes\CoreRoutes.cs" />
+    <Compile Include="ViewModels\EditUserViewModel.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseDataViewModel.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\CoreDataSetViewModel.cs" />
     <Compile Include="ViewModels\ProfileAreaType.cs" />
@@ -215,6 +218,9 @@
     <Content Include="AngularApps\upload\upload-app.js" />
     <Content Include="AngularApps\upload\view\upload-index.html" />
     <Content Include="AngularApps\upload\view\upload-progress.html" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\Site.css" />
     <Content Include="css\bootstrap-theme.css" />
     <Content Include="css\bootstrap-theme.min.css" />
     <Content Include="css\bootstrap.css" />
@@ -356,6 +362,12 @@
     <Content Include="css\bootstrap.css.map" />
     <Content Include="js\bootstrap.js" />
     <Content Include="js\bootstrap.min.js" />
+    <Content Include="Scripts\bootstrap.js" />
+    <Content Include="Scripts\bootstrap.min.js" />
+    <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\jquery-1.10.2.js" />
+    <Content Include="Scripts\jquery-1.10.2.min.js" />
+    <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\IndicatorNew\IndicatorNew.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\ProfilesAndIndicators.cshtml" />
@@ -533,36 +545,6 @@
     <Content Include="Views\Shared\_FooterB.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Lookup\_Ages.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_Categories.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_LookupSidebar.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_Sexes.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_TableHeader.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_Targets.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\_ValueNotes.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\LookUpList.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\LookUpTablesIndex.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Lookup\TargetEdit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\ProfilesAndIndicators\BrowseIndicatorDataFullPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -570,6 +552,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="js\jquery-migrate-1.3.0.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_Layout.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Scripts\jquery-1.10.2.min.map" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

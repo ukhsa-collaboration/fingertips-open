@@ -25,7 +25,7 @@ namespace PholioVisualisation.PdfData
             return spineChartTableData;
         }
 
-        protected override void AddIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<Area> benchmarkAreas)
+        protected override void AddIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<IArea> benchmarkAreas)
         {
             spineChartTableData.IndicatorData.Add(rowBuilder.GetIndicatorData(groupRoot, metadata, benchmarkAreas));
         }

@@ -12,6 +12,7 @@ namespace PholioVisualisation.DataConstruction
     {
         protected IAreasReader AreasReader = ReaderFactory.GetAreasReader();
         protected IGroupDataReader GroupDataReader = ReaderFactory.GetGroupDataReader();
+        private CoreDataProcessor _coreDataProcessor = new CoreDataProcessor(null);
 
         public bool AssignAreas = true;
         public bool AssignChildAreaData = true;
@@ -43,7 +44,7 @@ namespace PholioVisualisation.DataConstruction
                     }
 
                     GroupData.InitIndicatorMetadata(
-                        IndicatorMetadataRepository.Instance.GetIndicatorMetadataCollection(Groupings));
+                        IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(Groupings));
                     BuildGroupRoots();
 
                     if (AssignData)
@@ -94,6 +95,7 @@ namespace PholioVisualisation.DataConstruction
                 if (AssignChildAreaData)
                 {
                     root.Data = GroupDataReader.GetCoreData(firstGrouping, timePeriod, areaCodes);
+                    _coreDataProcessor.RemoveRedundantValueNotesForDataList(root.Data);
                 }
 
                 AssignComparatorData(root, timePeriod);
@@ -138,6 +140,8 @@ namespace PholioVisualisation.DataConstruction
                         data = benchmarkDataProvider.GetBenchmarkData(grouping, timePeriod,
                             averageCalculator, comparatorArea);
                     }
+
+                    _coreDataProcessor.RemoveRedundantValueNote(data);
                 }
                 grouping.ComparatorData = data;
             }

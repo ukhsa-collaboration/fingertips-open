@@ -47,7 +47,8 @@ var PAGE_MODES = {
     MAP: 8,
     DOWNLOAD: 9,
     SCATTER_PLOT: 10,
-    ENGLAND: 11
+    ENGLAND: 11,
+    POPULATION: 12
 };
 
 /**
@@ -1553,10 +1554,10 @@ var AreaTypeIds = {
 * @class CategoryTypeIds
 */
 var CategoryTypeIds = {
-    CountyUA: 2,
-    DistrictUA: 3,
+    DeprivationDecileCountyUA2015: 39,
+    DeprivationDecileDistrictUA2015: 40,
     HealthProfilesSSILimit: 5,
-    CCG: 11,
+    DeprivationDecileCCG2010: 11,
     DeprivationDecileGp2015: 38
 };
 
@@ -1569,6 +1570,15 @@ var ValueTypeIds = {
     Ratio: 6,
     Count: 7,
     LifeExpectancy: 11
+};
+
+/**
+* Enum of PHOLIO comparator method IDs.
+* @class ComparatorMethodIds
+*/
+var ComparatorMethodIds = {
+    SuicidePlan : 14,
+    Quintiles : 15
 };
 
 /**
@@ -1619,7 +1629,8 @@ var ProfileIds = {
     HealthChecks: 77,
     ChildHealth: 105,
     ChiMatWAY: 94,
-    Phof: 19
+    Phof: 19,
+    Suicide: 73
 };
 
 var TrendMarkerValue = {

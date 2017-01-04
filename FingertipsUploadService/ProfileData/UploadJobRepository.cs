@@ -27,7 +27,7 @@ namespace FingertipsUploadService.ProfileData
             return CurrentSession
                 .CreateCriteria<UploadJob>()
                 .Add(Restrictions.Or(
-                    Restrictions.Eq("Status", UploadJobStatus.NotStart),
+                    Restrictions.Eq("Status", UploadJobStatus.NotStarted),
                     Restrictions.Eq("Status", UploadJobStatus.ConfirmationGiven)
                 ))
                 .SetCacheMode(CacheMode.Refresh)

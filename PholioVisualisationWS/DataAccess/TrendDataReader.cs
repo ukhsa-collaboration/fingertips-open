@@ -27,6 +27,8 @@ namespace PholioVisualisation.DataAccess
         /// <returns>List of CoreDataSet</returns>
         IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode);
 
+        IDictionary<string, IList<CoreDataSet>> GetTrendDataForMultipleAreas(Grouping grouping, params string[] areaCodes);
+
         IList<CoreDataSet> GetTrendDataForSpecificCategory(Grouping grouping, string areaCode,
             int categoryTypeId, int categoryId);
     }
@@ -66,21 +68,71 @@ namespace PholioVisualisation.DataAccess
             return GetLimit(grouping, "max", areaCodes).Max();
         }
 
-        /// <summary>
-        /// Gets all core data between the base line and data point time points of a grouping.
-        /// </summary>
-        /// <returns>List of CoreDataSet</returns>
-        public IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode)
+        public IDictionary<string, IList<CoreDataSet>> GetTrendDataForMultipleAreas(Grouping grouping, params string[] areaCodes)
         {
-            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode, 
-                CategoryTypeIds.Undefined , CategoryIds.Undefined);
-            return RestrictDataToTimePeriodsLimits(grouping, data);
+            return GetTrendDataForSpecificCategoryForMultiplesAreas(grouping,
+                CategoryTypeIds.Undefined, CategoryIds.Undefined, areaCodes);
         }
 
         /// <summary>
         /// Gets all core data between the base line and data point time points of a grouping.
         /// </summary>
         /// <returns>List of CoreDataSet</returns>
+        public IDictionary<string, IList<CoreDataSet>> GetTrendDataForSpecificCategoryForMultiplesAreas(Grouping grouping, 
+            int categoryTypeId, int categoryId, params string[] areaCodes)
+        {
+            var allData = new List<CoreDataSet>();
+
+            // Query the database 1000 areas at a time, for large numbers of areas the query will fail otherwise
+            var splitter = new AreaCodeListSplitter(areaCodes);
+            while (splitter.AnyLeft())
+            {
+                var criteria = CurrentSession.CreateCriteria<CoreDataSet>();
+                criteria.Add(Restrictions.In("AreaCode", splitter.NextCodes().ToList()));
+                AddGroupingRestrictions(grouping, criteria);
+                AddTimePeriodRestriction(grouping, criteria);
+                criteria.Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
+                    .Add(Restrictions.Eq("CategoryId", categoryId))
+                    .AddOrder(Order.Asc("AreaCode"));
+
+                AddTimeOrdering(criteria);
+
+                var listFiltered = RestrictDataToTimePeriodsLimits(grouping, criteria.List<CoreDataSet>());
+
+                allData.AddRange(listFiltered);
+            }
+
+            // Transform data list for all areas to dictionary of areacode to data list
+            var d = new Dictionary<string, IList<CoreDataSet>>();
+            var currentAreaCode = "";
+            List<CoreDataSet> currentList = null;
+            foreach (var coreDataSet in allData)
+            {
+                var areaCode = coreDataSet.AreaCode;
+                if (areaCode != currentAreaCode)
+                {
+                    currentAreaCode = areaCode;
+                    currentList = new List<CoreDataSet>();
+                    d[currentAreaCode] = currentList;
+                }
+
+                currentList.Add(coreDataSet);
+            }
+
+            return d;
+        }
+
+        /// <summary>
+        /// Gets all core data between the base line and data point time points of a grouping.
+        /// </summary>
+        /// <returns>List of CoreDataSet</returns>
+        public IList<CoreDataSet> GetTrendData(Grouping grouping, string areaCode)
+        {
+            IList<CoreDataSet> data = GetTrendDataForSpecificCategory(grouping, areaCode,
+                CategoryTypeIds.Undefined , CategoryIds.Undefined);
+            return RestrictDataToTimePeriodsLimits(grouping, data);
+        }
+
         public IList<CoreDataSet> GetTrendDataForSpecificCategory(Grouping grouping, string areaCode,
             int categoryTypeId, int categoryId)
         {

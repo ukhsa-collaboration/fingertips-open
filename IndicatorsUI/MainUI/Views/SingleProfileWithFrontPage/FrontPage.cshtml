@@ -8,8 +8,12 @@
     <script src="@(Model.JsPath)SiteKeyIndicators.js" type="text/javascript"></script>
     @Html.Partial("_GlobalJsVariablesForContentPage")
 }
-<div class="full-width title-divider"></div>
-<div class="standardWidth">
-    @Html.Partial("_UpdateDelayedMessage")
+<div class="title-divider"></div>
+<div id="single-profile-with-front-page">
+    <div class="container">
+        <div class="row">
+            @Html.Partial("_UpdateDelayedMessage")
+        </div>
+    </div>
     @Html.Partial("_IntroductionAndRecentUpdates")
 </div>

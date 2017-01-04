@@ -53,6 +53,10 @@
       <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\PholioVisualisationWS\DataAccess\bin\Debug\NHibernate.dll</HintPath>
@@ -89,10 +93,14 @@
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
     <Compile Include="BatchJobWorker.cs" />
-    <Compile Include="Helpers\ExcelFileReader.cs" />
+    <Compile Include="FpmFileReader\CsvFileReader.cs" />
+    <Compile Include="FpmFileReader\FileReaderFactory.cs" />
+    <Compile Include="Helpers\CsvRowParser.cs" />
+    <Compile Include="FpmFileReader\ExcelFileReader.cs" />
+    <Compile Include="Helpers\DataSanitizer.cs" />
     <Compile Include="Helpers\FileDuplicationHandler.cs" />
     <Compile Include="Helpers\FilePathHelper.cs" />
-    <Compile Include="Helpers\IExcelFileReader.cs" />
+    <Compile Include="FpmFileReader\IUploadFileReader.cs" />
     <Compile Include="Helpers\StatusHelper.cs" />
     <Compile Include="Helpers\UserDetails.cs" />
     <Compile Include="Helpers\ErrorBuilder.cs" />

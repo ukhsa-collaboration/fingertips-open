@@ -26,11 +26,14 @@
 </head>
 <body>
     @Html.Partial("_Banner")
-    <div id="main" class="clearfix">
-        @Html.Partial("_LightboxAndInfobox")
-        @RenderBody()
+    <div id="main" class="container">
+        <div class="row no-gutters">
+            @Html.Partial("_LightboxAndInfobox")
+            @RenderBody()
+        </div>
     </div>
-    @Html.Partial("_Footer")
-    @RenderSection("AngularApp", required:false);
+        @Html.Partial("_Footer")
+        @RenderSection("AngularApp", required: false);
+
 </body>
 </html>

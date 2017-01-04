@@ -1,7 +1,7 @@
-﻿using System;
-using System.Web.Http;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.ServiceActions;
+using System;
+using System.Web.Http;
 
 namespace ServicesWeb.Controllers
 {

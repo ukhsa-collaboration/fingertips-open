@@ -64,7 +64,7 @@ namespace PholioVisualisation.DataAccessTest
 
         private List<int> GetChildAreaTypeIdsThatHaveParentOptionDefined(int profileId)
         {
-            var defaultChildAreaTypeIds = areasReader.GetParentAreaGroups(profileId)
+            var defaultChildAreaTypeIds = areasReader.GetParentAreaGroupsForProfile(profileId)
                 .Select(x => x.ChildAreaTypeId)
                 .Distinct()
                 .ToList();

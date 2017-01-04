@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
@@ -24,6 +23,18 @@ namespace PholioVisualisation.DataConstructionTest
             {
                 Assert.AreNotEqual((int)Significance.None, significance, "Significance should not be none");
             }
+        }
+        /// <summary>
+        /// Suicide Related Risk Factors
+        /// </summary>
+        [TestMethod]
+        public void TestGetAreaDetails_Suicide()
+        {
+            var areaCode = AreaCodes.England;
+            var areaDetails = new LongerLivesAreaDetailsBuilder()
+                .GetAreaDetails(ProfileIds.Suicide, GroupIds.Suicide_RelatedRiskFactors, AreaTypeIds.CountyAndUnitaryAuthority, areaCode);
+
+            Assert.IsNotNull(areaDetails);
         }
 
         //profile_id=51&group_id=1938132700&area_code=cat-2-9&child_area_type_id=102
@@ -90,7 +101,7 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNull(areaDetails.Decile, "Decile should not be defined");
             Assert.IsNotNull(areaDetails.Significances);
-            Assert.AreEqual(2, areaDetails.Benchmarks.Count, 
+            Assert.AreEqual(2, areaDetails.Benchmarks.Count,
                 "Both England and ONS clsuter should be available as benchmarks");
         }
 

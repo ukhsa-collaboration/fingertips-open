@@ -1,12 +1,12 @@
-﻿using System;
+﻿using PholioVisualisation.DataConstruction;
+using PholioVisualisation.PholioObjects;
+using PholioVisualisation.RequestParameters;
+using PholioVisualisation.Services;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web.Http;
-using PholioVisualisation.DataConstruction;
-using PholioVisualisation.PholioObjects;
-using PholioVisualisation.RequestParameters;
-using PholioVisualisation.Services;
 
 namespace ServicesWeb.Controllers
 {
@@ -87,7 +87,7 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                return IndicatorMetadataRepository.Instance.IndicatorMetadataTextProperties
+                return IndicatorMetadataProvider.Instance.IndicatorMetadataTextProperties
                     .OrderBy(x => x.DisplayOrder)
                     .ToList();
             }
@@ -108,7 +108,7 @@ namespace ServicesWeb.Controllers
         /// for which the metadata matches the search text.
         /// </remarks>
         /// <param name="search_text">Text to search indicator metadata with</param>
-        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
+        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs (optional)</param>
         [HttpGet]
         [Route("indicator_search")]
         public IDictionary<int, List<int>> GetIndicatorsThatMatchText(string search_text,

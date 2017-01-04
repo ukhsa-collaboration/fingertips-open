@@ -48,8 +48,9 @@ function selectIndicator(rootIndex, indicatorId) {
 
         var model = MT.model;
 
-        selectedRootIndex = rootIndex;
+        selectedRootIndex = rootIndex;   
         model.indicatorId = indicatorId;
+        model.sexId = groupRoots[selectedRootIndex].Sex.Id;
 
         // Only render calloutbox if we have ranking available for clicked area
         if (isAnyIndicatorData()) {
@@ -64,12 +65,12 @@ function selectIndicator(rootIndex, indicatorId) {
             unlock();
         }
 
-        displayIndicatorSelected();
+        displayIndicatorSelected(rootIndex);
     }
 }
 
-function displayIndicatorSelected() {
-    var $selectedCause = $('#iid-' + MT.model.indicatorId);
+function displayIndicatorSelected(index) {
+    var $selectedCause = $('#'+ index + '-iid-' + MT.model.indicatorId);
     var cssClass = 'active';
     $('.causes li').removeClass(cssClass);
     $selectedCause.addClass(cssClass);
@@ -133,15 +134,25 @@ function displayMapLegend(root) {
 
     var prefix = '#map-legend-';
 
-    if (useBlueOrangeBlue(root.PolarityId)) {
-        $(prefix + 'bob').show();
-        $(prefix + 'quintiles').hide();
-        $(prefix + 'deaths').hide();
+    var $bobLegend = $(prefix + 'bob');
+    var $quintilesLegend = $(prefix + 'quintiles');
+    var $ragLegend = $(prefix + 'rag');
+
+    // Hide all
+    $bobLegend.hide();
+    $quintilesLegend.hide();
+    $ragLegend.hide();
+
+    // Show specific legend
+    if (root.IID === IndicatorIds.SuicidePlan) {
+        // No legend
+        return;
+    } else if (useBlueOrangeBlue(root.PolarityId)) {
+        $bobLegend.show();
     } else {
-        $(prefix + 'bob').hide();
         new MutuallyExclusiveDisplay({
-            a: $(prefix + 'quintiles'),
-            b: $(prefix + 'deaths')
+            a: $quintilesLegend,
+            b: $ragLegend
         }).showA(useQuintiles(root.ComparatorMethodId));
     }
 }
@@ -160,6 +171,7 @@ function displayPage() {
         // Get area values
         var root = groupRoots[selectedRootIndex];
         MT.model.indicatorId = root.IID;
+        MT.model.sexId = root.Sex.Id;
         var key = getIndicatorKey(root, model, comparatorAreaCode);
         var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
 
@@ -206,9 +218,11 @@ function getPolygonColourFunction(root) {
         return function () { return noComparison; };
     }
 
-    var ragColors = [];
-    if (polarityId == PolarityIds.BlueOrangeBlue) {
+    var ragColors;
+    if (polarityId === PolarityIds.BlueOrangeBlue) {
         ragColors = [c.bobLower, c.bobSimilar, c.bobHigher];
+    } else if (polarityId === PolarityIds.RAGLowIsGood) {
+        ragColors = [c.better, c.sameWorse, c.worse];
     } else {
         ragColors = [c.worse, c.sameWorse, c.better];
     }
@@ -263,19 +277,7 @@ CallOutBox.getPopUpHtml = function () {
         
         var rank = supportingAreaData.Ranks[NATIONAL_CODE][0].AreaRank;
         
-        var areaPopulation = !!rank
-            ? rank.Count
-            : 'Data unavailable';
-        
-        // For NHS Health Checks we use Denom of the indicator #91111 as population
-        if (model.profileId === ProfileIds.HealthChecks) {
-            
-            var denom = loaded.groupDataAtDataPoint.getData(healthChecksAlternativeModel(model))[0].Denom;
-            
-            areaPopulation = !!denom ? denom : 'Data unavailable';
-        }
-
-        var content = CallOutBox.getCausePopUpHtml(ranks, areaDetails, areaPopulation);
+        var content = CallOutBox.getCausePopUpHtml(ranks, areaDetails, rank);
     } else {
         content = templates.render('nodatafound', {
             nameofplace: areaDetails.Area.Name
@@ -285,56 +287,78 @@ CallOutBox.getPopUpHtml = function () {
     return content;
 }
 
-CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, areaPopulation) {
+CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank) {
+
+    var model = MT.model;
+    var areaPopulation;
+    var profileId = model.profileId;
+
+    // Top indicator
+    if (profileId === ProfileIds.HealthChecks) {
+        // For NHS Health Checks we use Denom of the indicator #91111 as population
+        var denom = loaded.groupDataAtDataPoint.getData(healthChecksAlternativeModel(model))[0].Denom;
+        areaPopulation = !!denom ? denom : 'Data unavailable';
+    } else if (profileId === ProfileIds.Suicide) {
+        areaPopulation = supportingDataRank;
+    } else {
+        areaPopulation = !!supportingDataRank
+            ? supportingDataRank.Count
+            : 'Data unavailable';
+    }
+
+    var groupId = model.groupId;
     var index = selectedRootIndex;
     var imageClass = 'stat_overall';
     var root = groupRoots[index];
     var indicatorId = root.IID;
 
     // Grade class
-    var areaRank = ranks[index].AreaRank;
-    var parentCode = MT.model.parentCode;
+    var parentCode = model.parentCode;
     var getGrade = getGradeFunctionFromGroupRoot(root);
     var sig = areaDetails.Significances[parentCode][index];
     var gradeClass = getGrade(sig, root);
-    var rank = areaRank.Rank;
     var topLink = getTopLink('Compare with ');
 
     var footerLink = hasPracticeData
         ? '<span style="float: left; padding-bottom: 10px;"><a href=javascript:MT.nav.rankings();><strong style="font-size: 1em;">See local GP practice comparison table</strong></a></span>'
         : '';
 
-    var metadataHash = loaded.indicatorMetadata[MT.model.groupId];
+    var metadataHash = loaded.indicatorMetadata[groupId];
     var metadata = metadataHash[indicatorId];
     var textMetadata = metadata.Descriptive;
 
     var comparatorAreaCode = getCurrentComparator().Code;
-    var key = getIndicatorKey(root, MT.model, comparatorAreaCode);
+    var key = getIndicatorKey(root, model, comparatorAreaCode);
     var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
-    var valF = areaValues[MT.model.areaCode].ValF;
+    var valF = areaValues[model.areaCode].ValF;
+
     if (metadata.ValueType.Id === 2/*indirectly standardised ratio*/) {
         // e.g. Diabetes complications
         var indicatorName = textMetadata.Name;
         var indicatorDescription = '';
         var rankingValF = indicatorName + ' is <span class="complication_premature_death_stat"><strong>' + valF +
             '</strong></span> times as likely in people with diabetes in this area than the general population';
-        var populationText = 'Adults with this diabetic complication in this area';
+        var topIndicatorText = 'Adults with this diabetic complication in this area';
         var isDomainNormal = false;
     } else {
 
+        // Indicator name
         indicatorName = replacePercentageWithArialFont(textMetadata.Definition);
         indicatorName = trimName(indicatorName, 350);
 
-        indicatorDescription = trimName(isDefined(textMetadata.IndicatorContent) ? replacePercentageWithArialFont(textMetadata.IndicatorContent) : replacePercentageWithArialFont(textMetadata.NameLong), 140);
+        // Indicator desecription
+        indicatorDescription = trimName(isDefined(textMetadata.IndicatorContent)
+            ? replacePercentageWithArialFont(textMetadata.IndicatorContent)
+            : replacePercentageWithArialFont(textMetadata.NameLong), 140);
 
-        // For D&A, we use definition of numerator
-        if (MT.model.groupId === GroupIds.DrugsAndAlcohol.PrevalenceAndRisks ||
-            MT.model.groupId === GroupIds.DrugsAndAlcohol.TreatmentAndRecovery) {
-            populationText = metadata.Descriptive.CountDefinition;
+        // Top indicator text
+        if (groupId === GroupIds.DrugsAndAlcohol.PrevalenceAndRisks ||
+            groupId === GroupIds.DrugsAndAlcohol.TreatmentAndRecovery) {
+            // For D&A, we use definition of numerator
+            topIndicatorText = metadata.Descriptive.CountDefinition;
         } else {
-            populationText = loaded.contentText;
+            topIndicatorText = loaded.contentText;
         }
-
 
         if (indicatorId === IndicatorIds.Deprivation) {
             rankingValF = deprivationDefinitions[sig];
@@ -345,26 +369,29 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, areaPopulation) {
         isDomainNormal = true;
     }
 
-    var data = areaValues[MT.model.areaCode];
+    var data = areaValues[model.areaCode];
 
     var valueNoteText = new CoreDataSetInfo(data).isNote()
         ? getValueNoteText(data.NoteId)
         : '';
 
-
     var unitFormat = new UnitFormat(metadata, data.Val);
 
-    var templateModel = {
+    var hideSupportingData = indicatorId === IndicatorIds.SuicidePlan;
+
+    var showMan = profileId !== ProfileIds.Suicide;
+
+    var viewModel = {
+        showMan : showMan,
+        hideSupportingData : hideSupportingData,
+        rankingHtml: CallOutBox.getRankingHtml(ranks[index], indicatorId),
         nameofplace: areaDetails.Area.Name,
         indirectlyStandardisedRate: new CommaNumber(data.Count).rounded(),
         ranking: rankingValF,
         period: ranks[index].Period,
         unit: unitFormat.getLongLabel(),
         unitClass: unitFormat.getClass(),
-        ranked: rank + getCardinal(rank),
-        rankoutof: ranks[index].Max.Rank,
-        areatypename: getAreaTypeNamePlural(MT.model.areaTypeId),
-        areaCode: MT.model.areaCode,
+        areaCode: model.areaCode,
         imageclass: imageClass,
         filterheader: metadata.ValueType.Id === 2 ? textMetadata.Definition : indicatorName,
         rankClass: gradeClass,
@@ -374,23 +401,42 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, areaPopulation) {
         footerLinkText: footerLink,
         indicatordescription: indicatorDescription,
         isdomainnormal: isDomainNormal,
-        populationText: populationText,
+        topIndicatorText: topIndicatorText,
         dataSource: textMetadata.DataSource,
         isDefinitionOpen: mapState.isDefinitionOpen,
-        area: getAreaTypeNameSingular(MT.model.areaTypeId),
+        area: getAreaTypeNameSingular(model.areaTypeId),
         hasPracticeData: hasPracticeData
     };
 
-    var extendedModel = CallOutBox.getExtendedModel(areaPopulation, getGrade, areaValues);
-    jQuery.extend(templateModel, extendedModel);
+    var extendedViewModel = CallOutBox.getExtendedModel(areaPopulation, getGrade, areaValues);
+    jQuery.extend(viewModel, extendedViewModel);
 
-    return templates.render('areaoverlay', templateModel);
+    return templates.render('areaoverlay', viewModel);
 }
 
 CallOutBox.getExtendedModel = function () {
     alert('You need to include a callout js file');
 }
 
+CallOutBox.getRankingHtml = function (rankInfo, indicatorId) {
+
+    // Values should not be ranked for all indicators
+    if (indicatorId === IndicatorIds.SuicidePlan) {
+        return '';
+    }
+
+    var areaRank = rankInfo.AreaRank.Rank;
+
+    var viewModel = {
+        ranked: areaRank + getCardinal(areaRank),
+        areaCount: rankInfo.Max.Rank,
+        areatypename: getAreaTypeNamePlural(MT.model.areaTypeId)
+    };
+
+    templates.add('rankings',
+        'Ranked <strong style="font-size: 1em; padding-left: 0px;">{{ranked}}</strong> out of <span class="rank-max">{{areaCount}} {{{areatypename}}}.');
+    return templates.render('rankings', viewModel);
+}
 
 function healthChecksAlternativeModel(model) {
     var modelForHealthCheck = {};
@@ -407,5 +453,5 @@ templates.add('areaHover',
     + '<h4 class="hover-place-name">{{nameofplace}}</h4>' + '</div><div class="map-info-footer clearfix"></div><div class="{{hoverTemplateTailClass}}" onclick="pointerClicked()"><i></i></div></div>');
 
 templates.add('causes',
-    '{{#causes}}<li id=iid-{{id}} class="{{cssClass}}"><a href="javascript:selectIndicator({{index}}, {{id}})">{{{name}}}</a></li>{{/causes}}');
+    '{{#causes}}<li id={{index}}-iid-{{id}} class="{{cssClass}}"><a href="javascript:selectIndicator({{index}}, {{id}})">{{{name}}}</a></li>{{/causes}}');
 

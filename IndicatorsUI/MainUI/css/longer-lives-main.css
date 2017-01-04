@@ -1147,6 +1147,14 @@ body {
     color: #BC1E2C;
 }
 
+#data_page_table .bobHigher .col1 b {
+    color: #BED2FF;
+}
+
+#data_page_table .bobLower .col1 b {
+    color: #5555E6;
+}
+
 #data_page_table .grade-quintile-1 .col1 b {
     color: #DED3EC;
     text-shadow: -1px -1px 0 #9e7cc8,1px -1px 0 #9e7cc8,-1px 1px 0 #9e7cc8,1px 1px 0 #9e7cc8;

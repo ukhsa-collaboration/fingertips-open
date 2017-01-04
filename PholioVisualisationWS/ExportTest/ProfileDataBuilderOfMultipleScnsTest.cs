@@ -12,7 +12,7 @@ namespace PholioVisualisation.ExportTest
     [TestClass]
     public class ProfileDataBuilderOfMultipleScnsTest
     {
-        private static IWorkbook workbook;
+        private static IWorkbook _workbook;
 
         [ClassInitialize]
         public static void RunOnceBeforeAllTests(TestContext testContext)
@@ -32,7 +32,7 @@ namespace PholioVisualisation.ExportTest
             var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
             var parentAreaTypeId = AreaTypeIds.Country;
 
-            workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId },
+            _workbook = new ProfileDataBuilder(map, profile, new List<int> { profileId },
                 parentAreas, AreaTypeFactory.New(ReaderFactory.GetAreasReader(), parentAreaTypeId)
                 ).BuildWorkbook();
         }
@@ -40,9 +40,9 @@ namespace PholioVisualisation.ExportTest
         [TestMethod]
         public void TestOnlyOneSheetContainsNationalData()
         {
-            var worksheets = workbook.Worksheets;
+            var worksheets = _workbook.Worksheets;
             Assert.IsNotNull(worksheets[ProfileDataBuilder.NationalLabel]);
-            Assert.IsNull(worksheets["Country"]);
+            Assert.IsNull(worksheets[WorksheetNames.Country]);
         }
 
     }

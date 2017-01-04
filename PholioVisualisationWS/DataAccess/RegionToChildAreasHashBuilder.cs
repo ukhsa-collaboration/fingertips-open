@@ -10,12 +10,12 @@ namespace PholioVisualisation.DataAccess
         private IProfileReader profileReader = ReaderFactory.GetProfileReader();
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
-        public Dictionary<ParentArea, IList<Area>> Build(Profile profile, IEnumerable<string> parentAreaCodes, int childAreaTypeId)
+        public Dictionary<ParentArea, IList<IArea>> Build(Profile profile, IEnumerable<string> parentAreaCodes, int childAreaTypeId)
         {
-            Dictionary<ParentArea, IList<Area>> regionalChildAreas = new Dictionary<ParentArea, IList<Area>>();
+            Dictionary<ParentArea, IList<IArea>> regionalChildAreas = new Dictionary<ParentArea, IList<IArea>>();
             foreach (var parentAreaCode in parentAreaCodes)
             {
-                IList<Area> areas = areasReader.GetChildAreas(parentAreaCode, childAreaTypeId);
+                IList<IArea> areas = areasReader.GetChildAreas(parentAreaCode, childAreaTypeId);
 
                 // Remove areas to ignore
                 IList<string> codesToIgnore = profileReader.GetAreaCodesToIgnore(profile.Id).AreaCodesIgnoredEverywhere;

@@ -7,7 +7,6 @@
 
 
 function goToIndicatorDetailsPage(rootIndex) {
-
 	if (!groupRoots.length) {
 		// Search results empty
 		noDataForAreaType();
@@ -143,7 +142,7 @@ function addBarChartTemplate() {
 		'<table id="indicatorDetailsTable" class="borderedTable" cellspacing="0">' +
 		'<thead><tr><th style="width:200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th>' +
 		'{{#hasRecentTrends}} <th>Recent<br>Trend</th> {{/hasRecentTrends}}' +
-		'<th class="nearest-neighbours-show" style="border-right:none"><div class="center">Rank</div><a class="columnSort" href="javascript:sortIndicatorDetailsByRank();" title="Sort by rank"></a></th>' +
+		'<th class="nearest-neighbours-show" style="border-right:none"><div class="center">Neighbour Rank</div><a class="columnSort" href="javascript:sortIndicatorDetailsByRank();" title="Sort by rank"></a></th>' +
 		'<th style="border-right: none;"><div class="center">Count</div><a class="columnSort" href="javascript:sortIndicatorDetailsByCount();" title="Sort by count"></a></th>' +
 		'<th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th>' +
 		'<th class="bar">&nbsp;</th><th title="Lower confidence interval"><span class="sig-level" style="width:100%;display:block;"></span>Lower CI</th>' +
@@ -465,10 +464,9 @@ function addIndicatorTableComparatorRow(html, grouping, comparatorId, comparison
 	}
 };
 
-function getDataSortedByArea(data, areas) {
-
+function getDataSortedByArea(data, areas) {    
 	var a = [];
-	for (var i in areas) {
+	for (var i in areas) {	    
 		var d = getDataFromAreaCode(data, areas[i].Code);
 		a.push(d);
 	}
@@ -500,7 +498,7 @@ function sortIndicatorDetailsByCount() {
 		newOrder = invertSortOrder(state.countOrder);
 	state.countOrder = newOrder;
 
-	if (state.areaDisplayed === 0) {
+	if (state.areaDisplayed === 0) {	    
 	    FT.data.sortedAreas = new AreaAndDataSorter(newOrder, root.Data, FT.data.sortedAreas, areaHash).byCount();
 	}
 	else {
@@ -675,8 +673,8 @@ var BAR_CHART_VIEW_MODES = {
 };
 
 function barChartRenderTrendCell(areaCode,innerContent) {
-	templates.add('barChartTrendCell', '<td id="bar-trend_{{areaCode}}" class="center">{{{innerContent}}}</td>');
-	var html = templates.render('barChartTrendCell',
+    templates.add('barChartTrendCell', '<td id="bar-trend_{{areaCode}}" onclick="recentTrendSelected.fromCompareArea(\'{{areaCode}}\');" class="cursor-pointer center">{{{innerContent}}}</td>');
+    var html = templates.render('barChartTrendCell',
 	{
 		areaCode: areaCode,
 		innerContent: innerContent

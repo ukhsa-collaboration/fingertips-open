@@ -31,6 +31,9 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool ShouldBuildExcel { get; set; }
 
+        [JsonIgnore]
+        public bool IsProfileLive { get; set; }
+
         [JsonProperty]
         public bool HasTrendMarkers { get; set; }
     }

@@ -1,10 +1,8 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NHibernate;
 using NHibernate.Cfg;
+using System;
+using System.Collections.Generic;
 
 namespace Profiles.DataAccess
 {
@@ -61,23 +59,31 @@ namespace Profiles.DataAccess
             }
         }
 
+        public static NearestNeighbourReader GetNearestNeighbourReader()
+        {
+            var service = new NearestNeighbourReader(GetSessionFactory());
+            service.OpenSession();
+            return service;
+        }
+
+
         public static ProfileReader GetProfileReader()
         {
-            ProfileReader service = new ProfileReader(GetSessionFactory());
+            var service = new ProfileReader(GetSessionFactory());
             service.OpenSession();
             return service;
         }
 
         public static TwitterSettingReader GetTwitterSettingReadr()
         {
-            TwitterSettingReader service = new TwitterSettingReader(GetSessionFactory());
+            var service = new TwitterSettingReader(GetSessionFactory());
             service.OpenSession();
             return service;
         }
 
         public static DocumentReader GetDocumentReader()
         {
-            DocumentReader service = new DocumentReader(GetSessionFactory());
+            var service = new DocumentReader(GetSessionFactory());
             service.OpenSession();
             return service;
         }

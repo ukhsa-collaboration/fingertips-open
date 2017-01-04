@@ -17,5 +17,9 @@ namespace PholioVisualisation.ServiceActions
 
         [JsonProperty]
         public Limits Limits { get; set; }
+
+        [JsonProperty]
+        public IList<CoreDataSet> AreaAverage { get; set; }
+
     }
 }

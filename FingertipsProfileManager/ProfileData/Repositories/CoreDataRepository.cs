@@ -266,14 +266,14 @@ namespace Fpm.ProfileData.Repositories
 
             var sqlDeleteCoreData = "DELETE FROM Coredataset " + sqlWhere;
 
-
-            Debug.WriteLine(sqlInsertArchive);
-            Debug.WriteLine(sqlDeleteCoreData);
-
-
             try
             {
                 transaction = CurrentSession.BeginTransaction();
+
+                // Delete all values calculated by Fingertips as they may need to be recalculated
+                CurrentSession.CreateSQLQuery(string.Format("DELETE FROM CoreDataSet WHERE ValueNoteId = {0} AND IndicatorId = {1}",
+                    ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips, indicatorId))
+                    .ExecuteUpdate();
 
                 CurrentSession.CreateSQLQuery(sqlInsertArchive)
                     .ExecuteUpdate();
@@ -287,7 +287,6 @@ namespace Fpm.ProfileData.Repositories
                     .SetParameter("rowsDeleted", rowsDeleted)
                     .SetParameter("userName", userName)
                     .SetParameter("deleteBatchId", deleteBatchId)
-
                     .ExecuteUpdate();
 
                 transaction.Commit();

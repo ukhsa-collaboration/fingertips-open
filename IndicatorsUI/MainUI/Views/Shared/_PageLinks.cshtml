@@ -25,7 +25,7 @@
     }
     else
     {
-        @*Profile specific pages*@
+        @*Profile specific pages - TODO add these in the database and editable in FPM*@
         if (profileId == ProfileIds.SexualHealth)
         {
             <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
@@ -33,11 +33,15 @@
         else if (profileId == ProfileIds.LiverDisease)
         {
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
-            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
+                <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
         }
         else if (profileId == ProfileIds.HealthProfiles)
         {
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+        }
+        else if (profileId == ProfileIds.WiderDeterminantsOfHealth)
+        {
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherResources, profileId).Link)</li>
         }
     }
 

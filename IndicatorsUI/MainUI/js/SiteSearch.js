@@ -70,27 +70,65 @@ function getSearchResults() {
     ajaxGet('api/indicator_search',
         parameters.build(),
         function (areaTypeToIndicatorIdsMap) {
-            indicatorIdList = new IndicatorIdList(areaTypeToIndicatorIdsMap);
+
+            // Only keep results where area type contains some results
+            var filteredResults = indicatorSearch.filterResults(areaTypeToIndicatorIdsMap);
+
+            // Init area types
+            var areaTypeIds = _.keys(filteredResults);
+            var filterAreaTypes = indicatorSearch.filterAreaTypes(loaded.areaTypes, areaTypeIds);
+            loaded.areaTypes = filterAreaTypes;
+            FT.menus.areaType = new AreaTypeMenu(FT.model,
+                new AreaTypes(filterAreaTypes));
+
+            searchState.areaTypeIdsWithResults = areaTypeIds;
+
+            // Init indicator list
+            indicatorIdList = new IndicatorIdList(filteredResults);
+
             ajaxMonitor.callCompleted();
         }, handleAjaxFailure);
 
     logEvent('Search', 'IndicatorSearch', searchText);
 }
 
+indicatorSearch.filterResults = function (areaTypeToIndicatorIdsMap) {
+    var toKeep = {};
+    for (var areaTypeId in areaTypeToIndicatorIdsMap) {
+        if (areaTypeToIndicatorIdsMap[areaTypeId].length > 0) {
+            toKeep[areaTypeId] = areaTypeToIndicatorIdsMap[areaTypeId];
+        }
+    }
+    return toKeep;
+}
+
+indicatorSearch.filterAreaTypes = function (areaTypes, areaTypeIds) {
+    var toKeep = [];
+    for (var i in areaTypes) {
+        var id = areaTypes[i].Id;
+        if (_.contains(areaTypeIds, id.toString())) {
+            toKeep.push(areaTypes[i]);
+        }
+    }
+    return toKeep;
+}
+
+indicatorSearch.hideAreaTypesWithNoResults = function () {
+
+    var areaTypeIdsWithResults = searchState.areaTypeIdsWithResults;
+
+    $("#areaTypes option").each(function () {
+        var $option = $(this);
+        var id = $option.val();
+
+        if (!_.contains(areaTypeIdsWithResults, id)) {
+            $option.hide();
+        }
+    });
+}
 
 function initData() {
     initSearch();
-    stems = new SpineChartStems(spineHeaders);
-    getValueNotesCall();
-}
-
-function getAreaTypes() {
-
-    if (!FT.menus.areaType) {
-        getAreaTypesCall(FT.model.profileId);
-    } else {
-        ajaxMonitor.callCompleted();
-    }
 }
 
 function SearchResultSummary(indicatorIdList) {
@@ -98,9 +136,12 @@ function SearchResultSummary(indicatorIdList) {
     var messageId = 'searchResultText';
     $('<br><div id="' + messageId + '" class="standardWidth">&nbsp;</div>').insertBefore('#main');
     var $label = $('#' + messageId);
-    var indicatorProfileOriginLink = 'indicator-profile-origin-link';
-    $('<br><div id="' + indicatorProfileOriginLink + '" class="standardWidth" onclick="showIndicatorProfileOrigin()"><a> Show me the profiles these indicators are from</a></div>'
+    $('<br><div id="indicator-profile-origin-link" class="standardWidth"><a href="#"> Show me the profiles these indicators are from</a></div>'
         ).insertAfter('#' + messageId);
+
+    $('#indicator-profile-origin-link a').click(function(e) {
+        showIndicatorProfileOrigin(e);
+    });
 
     this.display = function (selectedAreaTypeId) {
 
@@ -109,17 +150,19 @@ function SearchResultSummary(indicatorIdList) {
         addTd(h, 'Search results for <i><b>' + searchText + '</i></b>&nbsp;&nbsp;');
 
         var areaTypes = new AreaTypes().getAreaTypes();
+        areaTypes = _.sortBy(areaTypes, 'Short');
+
         for (var i in areaTypes) {
 
             var areaTypeId = areaTypes[i].Id,
             count = indicatorIdList.getIndicatorCount(areaTypeId);
 
-            var selected = areaTypeId === selectedAreaTypeId ?
-                'selected' :
-                '';
+            var selected = areaTypeId === selectedAreaTypeId ? 'selected' : '';
 
-            addSearchLink(h, areaTypes[i].Short + ' (' + count + ')',
-                areaTypeId, selected);
+            addSearchLink(h,
+                areaTypes[i].Short + ' [' + count + ']',
+                areaTypeId,
+                selected);
         }
 
         h.push('<tr/></table>');
@@ -156,8 +199,7 @@ function getAreaTypes() {
     ajaxGet('api/area_types',
         parameters.build(),
         function (areaTypes) {
-            FT.menus.areaType = new AreaTypeMenu(FT.model,
-                new AreaTypes(areaTypes, loaded.areaTypes));
+            loaded.areaTypes = areaTypes;
             ajaxMonitor.callCompleted();
         });
 }
@@ -224,7 +266,8 @@ function IndicatorIdList(areaTypeToIndicatorIdsMap) {
     };
 
     _this.anyForAreaType = function (areaTypeId) {
-        return areaTypeToIndicatorIdsMap[areaTypeId].length > 0;
+        return areaTypeToIndicatorIdsMap.hasOwnProperty(areaTypeId) &&
+        areaTypeToIndicatorIdsMap[areaTypeId].length > 0;
     };
 
     _this.areaTypeIdWithMostIndicators = function () {
@@ -232,7 +275,9 @@ function IndicatorIdList(areaTypeToIndicatorIdsMap) {
     };
 
     _this.getIndicatorCount = function (areaTypeId) {
-        return areaTypeToIndicatorIdsMap[areaTypeId].length;
+        return _this.anyForAreaType(areaTypeId)
+            ? areaTypeToIndicatorIdsMap[areaTypeId].length
+            : 0;
     };
 
     _this.getIds = function (areaTypeId) {
@@ -275,7 +320,9 @@ function highlightSearchSummaryAreaType(areaTypeId) {
     $('#search-area-type-' + areaTypeId).addClass(selected);
 }
 
-function showIndicatorProfileOrigin() {
+function showIndicatorProfileOrigin(event) {
+
+    event.preventDefault();
 
     if (!FT.ajaxLock) {
         lock();
@@ -347,7 +394,8 @@ function renderProfilesForSelectedIndicator(indicatorId) {
 }
 
 searchState = {
-    profilesPerIndicator: {}
+    profilesPerIndicator: {},
+    areaTypeIdsWithResults: []
 };
 
 templates.add('profiles-per-indicator',

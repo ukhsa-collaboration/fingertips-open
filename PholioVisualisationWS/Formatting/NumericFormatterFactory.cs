@@ -25,6 +25,11 @@ namespace PholioVisualisation.Formatting
         /// <param name="limits">May be null if fixed decimal place is specified in metadata.</param>
        public static NumericFormatter NewWithLimits(IndicatorMetadata metadata, Limits limits)
         {
+            if (metadata.IndicatorId == IndicatorIds.SuicidePreventionPlan)
+            {
+                return new SuicidePreventionPlanFormatter();
+            }
+
             int? decimalPlacesDisplayed = metadata.DecimalPlacesDisplayed;
             if (decimalPlacesDisplayed.HasValue && decimalPlacesDisplayed.Value >= 0)
             {

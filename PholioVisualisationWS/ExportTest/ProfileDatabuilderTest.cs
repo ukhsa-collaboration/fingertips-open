@@ -68,7 +68,7 @@ namespace PholioVisualisation.ExportTest
 
         private static IWorksheet IndicatorMetadataWorksheet(IWorkbook workbook)
         {
-            return workbook.Worksheets["Indicator Metadata"];
+            return workbook.Worksheets[WorksheetNames.IndicatorMetadata];
         }
 
     }

@@ -130,11 +130,21 @@ namespace PholioVisualisation.PholioObjects
             return CategoryTypeId != -1;
         }
 
+        public void CopyValues(Grouping grouping, TimePeriod timePeriod)
+        {
+            IndicatorId = grouping.IndicatorId;
+            AgeId = grouping.AgeId;
+            SexId = grouping.SexId;
+            Year = timePeriod.Year;
+            YearRange = timePeriod.YearRange;
+            Quarter = timePeriod.Quarter;
+            Month = timePeriod.Month;
+        }
+
         public static CoreDataSet GetNullObject(string areaCode)
         {
-            var data = new CoreDataSet();
+            var data = GetNullObject();
             data.AreaCode = areaCode;
-            SetDefaults(data);
             return data;
         }
 

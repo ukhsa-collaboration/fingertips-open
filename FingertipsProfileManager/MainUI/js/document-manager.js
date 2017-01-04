@@ -27,10 +27,36 @@
             upload();
         } 
     });
+
+    // Init delete document buttons
+    $('.document-delete').click(function (evt) {
+        evt.preventDefault();
+        var $deleteLink = $(this);
+        var documentId = $deleteLink.attr("documentId");
+
+        lightbox.show("<h3>Delete document</h3>" +
+            "<p>This document will be deleted and no copy will be retained.</p>" +
+            "<p>Are you sure you want to go ahead?</p>" +
+            '<button class="btn btn-primary active" onclick="deleteDocument(' + documentId + ')">Confirm</button>' +
+            '<button class="btn btn-secondary active" onclick="lightbox.hide()">Cancel</button>',
+            20, 400, 600);
+    });
+}
+
+function deleteDocument(documentId) {
+
+    $.post("documents/delete?id=" + documentId
+      ).done(function () {
+          location.reload();
+      }).fail(function () {
+          alert("Failed to delete");
+      });
+
 }
 
 function showUploadControl() {
     $('#upload-control').show();
+
     var selectedProfileId = $('#selectedProfile').val();
     $('#selectedProfileId').val(selectedProfileId);
 }

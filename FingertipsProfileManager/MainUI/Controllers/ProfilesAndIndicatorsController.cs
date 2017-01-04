@@ -6,7 +6,6 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
-using Fpm.MainUI.ViewModels;
 using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;

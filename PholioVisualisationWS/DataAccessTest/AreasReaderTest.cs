@@ -13,8 +13,20 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetParentAreaGroup()
         {
-            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroups(ProfileIds.Undefined);
+            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Undefined);
             Assert.IsTrue(parentAreaGroups.Count > 0);
+        }
+
+        [TestMethod]
+        public void TestGetParentAreaGroupsForChildAreaType()
+        {
+            var areaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority;
+            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForChildAreaType(areaTypeId);
+
+            // Assert: all child areas match expected type ID
+            Assert.IsTrue(parentAreaGroups.Count > 0);
+            Assert.AreEqual(parentAreaGroups.Count, 
+                parentAreaGroups.Where(x => x.ChildAreaTypeId == areaTypeId).Count());
         }
 
         [TestMethod]
@@ -49,14 +61,14 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetParentAreaGroup_DeprivationDecileRetrieved()
         {
-            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroups(ProfileIds.Phof);
+            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Phof);
             Assert.IsNotNull(parentAreaGroups.FirstOrDefault(x => x.CategoryTypeId.HasValue));
         }
 
         [TestMethod]
         public void TestGetParentAreaGroup_CategoryTypeIdAndParentTypeIdAreMutuallyExclusive()
         {
-            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroups(ProfileIds.Undefined);
+            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Undefined);
 
             foreach (ParentAreaGroup parentAreaGroup in parentAreaGroups)
             {
@@ -183,7 +195,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetChildAreasInRegionByIndicatorIds()
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
-            IList<Area> areas = reader
+            IList<IArea> areas = reader
                 .GetChildAreas(AreaCodes.Sha_EastOfEngland, AreaTypeIds.Pct);
             Assert.IsTrue(areas.Count > 0);
 
@@ -263,7 +275,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetChildAreas()
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
-            IList<Area> areas = reader.GetChildAreas(AreaCodes.Sha_EastOfEngland, 2);
+            IList<IArea> areas = reader.GetChildAreas(AreaCodes.Sha_EastOfEngland, 2);
             Assert.AreEqual(13, areas.Count);
             Assert.AreEqual(AreaCodes.Pct_Bedfordshire, areas[0].Code);
         }
@@ -419,7 +431,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestNhsIsUppercaseForAllCcgs()
         {
-            List<Area> areasWithNhsNotUppercase = new List<Area>();
+            List<IArea> areasWithNhsNotUppercase = new List<IArea>();
 
             var ccgs = ReaderFactory.GetAreasReader().GetAreasByAreaTypeId(AreaTypeIds.Ccg);
             foreach (var ccg in ccgs)

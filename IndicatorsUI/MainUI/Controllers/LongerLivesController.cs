@@ -25,15 +25,6 @@ namespace Profiles.MainUI.Controllers
             SetMetaTagContent();
         }
 
-        private void SetMetaTagContent()
-        {
-            ViewBag.MetaDescription = ContentHelper.RemoveHtmlTags(
-                profileReader.GetContentItem(ContentKeys.MetaDescription, ProfileIds.LongerLives).Content);
-
-            ViewBag.MetaKeywords = ContentHelper.RemoveHtmlTags(
-                profileReader.GetContentItem(ContentKeys.MetaKeywords, ProfileIds.LongerLives).Content);
-        }
-
         [CheckUserCanAccessSkin]
         public ActionResult Home(string profileKey = DefaultProfileKey)
         {
@@ -138,6 +129,15 @@ namespace Profiles.MainUI.Controllers
             var profileDetails = new ProfileDetailsBuilder(profileKey).Build();
             ConfigureWithProfile(profileDetails);
             PageModel.PageTitle = pageName;
+        }
+
+        private void SetMetaTagContent()
+        {
+            ViewBag.MetaDescription = ContentHelper.RemoveHtmlTags(
+                profileReader.GetContentItem(ContentKeys.MetaDescription, ProfileIds.LongerLives).Content);
+
+            ViewBag.MetaKeywords = ContentHelper.RemoveHtmlTags(
+                profileReader.GetContentItem(ContentKeys.MetaKeywords, ProfileIds.LongerLives).Content);
         }
 
         public ActionResult Get404Error()

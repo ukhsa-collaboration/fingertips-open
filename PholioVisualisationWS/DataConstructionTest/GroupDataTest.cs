@@ -23,7 +23,7 @@ namespace PholioVisualisation.DataConstructionTest
             };
 
             GroupData data = new GroupData();
-            data.InitIndicatorMetadata(IndicatorMetadataRepository.Instance.GetIndicatorMetadataCollection(grouping));
+            data.InitIndicatorMetadata(IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(grouping));
 
             Assert.AreEqual(2, data.IndicatorMetadata.Count);
             Assert.IsNotNull(data.GetIndicatorMetadataById(IndicatorIds.LifeExpectancyAtBirth));

@@ -10,11 +10,12 @@ namespace PholioVisualisation.DataAccess
 {
     public interface IAreasReader
     {
-        IList<ParentAreaGroup> GetParentAreaGroups(int profileId);
+        IList<ParentAreaGroup> GetParentAreaGroupsForProfile(int profileId);
+        IList<ParentAreaGroup> GetParentAreaGroupsForChildAreaType(int childAreaTypeId);
         IList<ParentAreaGroup> GetParentAreaGroups(int profileId, int childAreaTypeId);
         Area GetAreaFromCode(string code);
-        IList<Area> GetAreasFromCodes(IEnumerable<string> codes);
-        IList<Area> GetAreasByAreaTypeId(int areaTypeId);
+        IList<IArea> GetAreasFromCodes(IEnumerable<string> codes);
+        IList<IArea> GetAreasByAreaTypeId(int areaTypeId);
         AreaAddress GetAreaWithAddressFromCode(string code);
 
         /// <summary>
@@ -26,7 +27,7 @@ namespace PholioVisualisation.DataAccess
         IList<PostcodeParentAreas> GetAllPostCodeParentAreasStartingWithLetter(string firstLetter);
         IList<AreaAddress> GetAreaWithAddressFromCodes(IEnumerable<string> codes);
         IList<AreaAddress> GetAreaWithAddressByAreaTypeId(int areaTypeId);
-        IList<Area> GetChildAreas(string parentArea, int childAreaTypeId);
+        IList<IArea> GetChildAreas(string parentArea, int childAreaTypeId);
 
         /// <summary>
         ///     Hash key(childAreaCode) -> value(parentArea)
@@ -105,10 +106,17 @@ namespace PholioVisualisation.DataAccess
         {
         }
 
-        public virtual IList<ParentAreaGroup> GetParentAreaGroups(int profileId)
+        public virtual IList<ParentAreaGroup> GetParentAreaGroupsForProfile(int profileId)
         {
             return CurrentSession.CreateCriteria<ParentAreaGroup>()
                 .Add(Restrictions.Eq("ProfileId", profileId))
+                .List<ParentAreaGroup>();
+        }
+
+        public IList<ParentAreaGroup> GetParentAreaGroupsForChildAreaType(int childAreaTypeId)
+        {
+            return CurrentSession.CreateCriteria<ParentAreaGroup>()
+                .Add(Restrictions.Eq("ChildAreaTypeId", childAreaTypeId))
                 .List<ParentAreaGroup>();
         }
 
@@ -129,24 +137,24 @@ namespace PholioVisualisation.DataAccess
             return area;
         }
 
-        public virtual IList<Area> GetAreasFromCodes(IEnumerable<string> codes)
+        public virtual IList<IArea> GetAreasFromCodes(IEnumerable<string> codes)
         {
             if ((codes == null) || !codes.Any())
             {
-                return new List<Area>();
+                return new List<IArea>();
             }
 
             var q = CurrentSession.CreateQuery("from Area a where a.Code in (:codes)");
             q.SetParameterList("codes", codes.ToList());
-            return q.List<Area>();
+            return q.List<IArea>();
         }
 
-        public virtual IList<Area> GetAreasByAreaTypeId(int areaTypeId)
+        public virtual IList<IArea> GetAreasByAreaTypeId(int areaTypeId)
         {
-            return CurrentSession.CreateCriteria<Area>()
+            return CurrentSession.CreateCriteria<IArea>()
                 .Add(Restrictions.In("AreaTypeId", new AreaTypeIdSplitter(areaTypeId).Ids))
                 .Add(Restrictions.Eq("IsCurrent", true))
-                .List<Area>();
+                .List<IArea>();
         }
 
         public AreaAddress GetAreaWithAddressFromCode(string code)
@@ -199,12 +207,12 @@ namespace PholioVisualisation.DataAccess
             return q.List<AreaAddress>();
         }
 
-        public virtual IList<Area> GetChildAreas(string parentArea, int childAreaTypeId)
+        public virtual IList<IArea> GetChildAreas(string parentArea, int childAreaTypeId)
         {
             var q = CurrentSession.GetNamedQuery("GetChildAreas");
             q.SetParameter("parentArea", parentArea);
             q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(childAreaTypeId).Ids);
-            return GetAreas(q);
+            return GetAreas(q).Cast<IArea>().ToList();
         }
 
         /// <summary>

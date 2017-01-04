@@ -1,11 +1,12 @@
-﻿using System;
+﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Firefox;
+using OpenQA.Selenium.Remote;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Text.RegularExpressions;
-using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
-using System.Configuration;
-using OpenQA.Selenium.Firefox;
 
 namespace IndicatorsUI.MainUISeleniumTest
 {
@@ -30,12 +31,14 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public static List<IWebDriver> Drivers()
         {
-            return new List<IWebDriver>
-            {
-               /* new InternetExplorerDriver(new InternetExplorerOptions{IgnoreZoomLevel = true}),  We cannot test IE as we don't have admin rights on our machines to change Zoom Level */
-                new FirefoxDriver()
-                //new ChromeDriver(ConfigurationManager.AppSettings["DriverPath"])                
-            };
+            /* new InternetExplorerDriver(new InternetExplorerOptions{IgnoreZoomLevel = true}), 
+             *  We cannot test IE as we don't have admin rights on our machines to change Zoom Level */
+            const string driverDirectory = @"C:\fingertips\3rdPartyLibraries\selenium";
+            IWebDriver driver = new ChromeDriver(driverDirectory);
+
+            //            FirefoxDriverService service = FirefoxDriverService.CreateDefaultService(@"c:\Fingertips\3rdPartyLibraries\selenium");
+            //            IWebDriver driver = new FirefoxDriver(service);
+            return new List<IWebDriver> { driver };
         }
 
         public static void DisposeDrivers(List<IWebDriver> drivers)

@@ -100,6 +100,7 @@
     <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilder.cs" />
     <Compile Include="PostcodeProvider.cs" />
+    <Compile Include="ProfileFilter.cs" />
     <Compile Include="ProfilePerIndicatorBuilder.cs" />
     <Compile Include="ProfileUrl.cs" />
     <Compile Include="RankDataList.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="PracticeAreaValuesBuilder.cs" />
     <Compile Include="SingleGroupingProvider.cs" />
     <Compile Include="SparklineRootBuilder.cs" />
+    <Compile Include="SubnationalAreaAverageCalculator.cs" />
     <Compile Include="TargetComparerHelper.cs" />
     <Compile Include="TrendMarkersProvider.cs" />
     <Compile Include="TrendMarkerWriter.cs" />
@@ -153,7 +155,7 @@
     <Compile Include="ICacheable.cs" />
     <Compile Include="AreaFilter.cs" />
     <Compile Include="IndicatorMetadataCollection.cs" />
-    <Compile Include="IndicatorMetadataRepository.cs" />
+    <Compile Include="IndicatorMetadataProvider.cs" />
     <Compile Include="ITimePeriodTextListBuilder.cs" />
     <Compile Include="LimitsBuilder.cs" />
     <Compile Include="MapCoordinateConverter.cs" />

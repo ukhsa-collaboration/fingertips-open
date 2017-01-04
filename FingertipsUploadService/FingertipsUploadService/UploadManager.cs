@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FingertipsUploadService.FpmFileReader;
 using FingertipsUploadService.Helpers;
 using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Core;
@@ -48,7 +49,7 @@ namespace FingertipsUploadService
 
             foreach (var job in jobs)
             {
-                _logger.Info("Starting a new job, batch id is {0}", job.Guid);
+                _logger.Info("### Starting new job: '{0}'", job.Guid);
                 StartJob(job);
             }
         }
@@ -57,25 +58,45 @@ namespace FingertipsUploadService
         {
             var validator = new WorksheetNameValidator();
             var actualFilePath = FilePathHelper.GetActualFilePath(job);
-            var excelFileReader = new ExcelFileReader(actualFilePath);
+            var fileReader = new FileReaderFactory().Get(actualFilePath, job.JobType);
 
             if (job.JobType == UploadJobType.Simple)
             {
                 SetUsername(job);
-                _logger.Info("Processing at Simple upload for {0} and jobid# is {1}", job.Username, job.Guid);
+                _logger.Info("Processing simple upload for {0} with ID '{1}'", job.Username, job.Guid);
                 var worker = new SimpleJobWorker();
                 var processor = new SimpleWorksheetDataProcessor(_coreDataRepository, _loggingRepository);
-                worker.ProcessJob(job, validator, processor, excelFileReader);
+                worker.ProcessJob(job, validator, processor, fileReader);
             }
             else
             {
                 SetUsername(job);
-                _logger.Info("Processing at Batch upload for {0} and jobid# is {1}", job.Username, job.Guid);
+                _logger.Info("Processing batch upload for {0} with ID '{1}'", job.Username, job.Guid);
                 var worker = new BatchJobWorker();
-                var processor = new BatchWorksheetDataProcessor(_coreDataRepository, _loggingRepository);
-                worker.ProcessJob(job, validator, processor, excelFileReader);
+                var processor = new BatchWorksheetDataProcessor(_coreDataRepository, _loggingRepository, _logger);
+                worker.ProcessJob(job, validator, processor, fileReader);
             }
         }
+
+        //        private IUploadFileReader GetFileReader(UploadJob job, string actualFilePath)
+        //        {
+        //            IUploadFileReader fileReader;
+        //            if (isCsv(actualFilePath) && job.JobType == UploadJobType.Batch)
+        //            {
+        //                fileReader = new CsvFileReader(actualFilePath);
+        //            }
+        //            else
+        //            {
+        //                fileReader = new ExcelFileReader(actualFilePath);
+        //            }
+        //            return fileReader;
+        //        }
+
+        //        public bool isCsv(string dataFilePath)
+        //        {
+        //            var fileExt = Path.GetExtension(dataFilePath);
+        //            return fileExt != null && fileExt.ToLower() == ".csv";
+        //        }
 
         private void SetUsername(UploadJob job)
         {

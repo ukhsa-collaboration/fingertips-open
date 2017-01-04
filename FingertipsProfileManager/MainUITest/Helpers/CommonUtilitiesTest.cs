@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Linq;
+using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.Profile;
+using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Fpm.MainUITest.Helpers
@@ -74,5 +77,23 @@ namespace Fpm.MainUITest.Helpers
                 );
         }
 
+        [TestMethod]
+        public void TestGetOrderedListOfDomainsWithGroupId_When_Valid_Profile()
+        {
+            var selectListItem = new SelectListItem {Value = UrlKeys.Phof};
+            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), selectListItem, new ProfileRepository());
+
+            // Assert: expected number of domains
+            Assert.AreEqual(6, domainList.Count());
+        }
+
+        [TestMethod]
+        public void TestGetOrderedListOfDomainsWithGroupId_When_Profile_Is_Null()
+        {
+            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), null, new ProfileRepository());
+
+            // Assert
+            Assert.AreEqual(0, domainList.Count());
+        }
     }
 }

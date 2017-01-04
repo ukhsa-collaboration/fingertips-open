@@ -15,10 +15,10 @@ namespace PholioVisualisation.PdfData
         protected IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         protected TimePeriod timePeriod;
         protected abstract IndicatorData IndicatorData { get; }
-        public abstract T GetIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<Area> benchmarkAreas);
+        public abstract T GetIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<IArea> benchmarkAreas);
 
         protected void SetIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata,
-            IList<Area> benchmarkAreas)
+            IList<IArea> benchmarkAreas)
         {
             benchmarkDataProvider = new BenchmarkDataProvider(groupDataReader);
             Grouping grouping = groupRoot.FirstGrouping;
@@ -30,7 +30,7 @@ namespace PholioVisualisation.PdfData
             SetBenchmarkData(grouping, benchmarkAreas, metadata);
         }
 
-        private void SetBenchmarkData(Grouping grouping, IList<Area> benchmarkAreas, IndicatorMetadata metadata)
+        private void SetBenchmarkData(Grouping grouping, IList<IArea> benchmarkAreas, IndicatorMetadata metadata)
         {
             var dataList = new Dictionary<string, CoreDataSet>();
             IndicatorData.BenchmarkData = dataList;

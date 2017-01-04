@@ -191,11 +191,13 @@ function getMetadataHtml(indicatorMetadata, root) {
     // Text - Standard population
     addMetadataRow(rows, des, properties[propertyIndex++]);
 
-    // Age
-    rows.push(['Age', root.Age.Name]);
+    if (root) {
+        // Age
+        rows.push(['Age', root.Age.Name]);
 
-    // Sex
-    rows.push(['Sex', root.Sex.Name]);
+        // Sex
+        rows.push(['Sex', root.Sex.Name]);
+    }
 
     // Year type
     rows.push(['Year type', indicatorMetadata.YearType.Name]);

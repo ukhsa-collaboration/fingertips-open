@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Fpm.ProfileData.Entities.User;
 using NHibernate;
 
@@ -10,14 +9,48 @@ namespace Fpm.ProfileData.Repositories
 {
     public class UserRepository : RepositoryBase
     {
-    
-     // poor man injection, should be removed when we use DI containers
-        public UserRepository() :this(NHibernateSessionFactory.GetSession())
+
+        // poor man injection, should be removed when we use DI containers
+        public UserRepository() : this(NHibernateSessionFactory.GetSession())
         {
         }
 
-        public UserRepository(ISessionFactory sessionFactory) : base(sessionFactory) 
+        public UserRepository(ISessionFactory sessionFactory) : base(sessionFactory) { }
+
+
+
+        public void DeleteUserGroupPermissions(int profileId, int userId)
         {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+                var sqlQuery = CurrentSession.CreateSQLQuery("delete [FPM_UserGroupPermissions] where profileId=" +
+                    profileId + " and userid=" + userId);
+                sqlQuery.ExecuteUpdate();
+
+                transaction.Commit();
+
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
+        public void SaveUserGroupPermissions(UserGroupPermissions userGroupPermissions)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                CurrentSession.Save(userGroupPermissions);
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
         }
 
         public IEnumerable<FpmUser> GetAllFpmUsers()
@@ -25,7 +58,7 @@ namespace Fpm.ProfileData.Repositories
             IQuery q = CurrentSession.CreateQuery("from FpmUser fu");
             return q.List<FpmUser>();
         }
-        
+
         public bool CreateUserItem(FpmUser user, string loggedInUser)
         {
             try
@@ -73,6 +106,9 @@ namespace Fpm.ProfileData.Repositories
             IQuery q = CurrentSession.CreateQuery(
                 "from UserAudit ua where ua.UserId in (:userIds) order by ua.Timestamp desc");
             q.SetParameterList("userIds", userIds);
+
+            
+           
             return q.List<UserAudit>();
         }
 
@@ -94,5 +130,23 @@ namespace Fpm.ProfileData.Repositories
             });
         }
 
+        public UserGroupPermissions GetUserGroupPermissions(int profileId,int userId)
+        {
+            UserGroupPermissions ugGroupPermissions = null;
+            try
+            {
+                ugGroupPermissions =   CurrentSession.QueryOver<UserGroupPermissions>()
+                    .Where(ugp => ugp.ProfileId == profileId && ugp.UserId == userId)
+                    .SingleOrDefault();
+
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+
+            return ugGroupPermissions;
+
+        }
     }
- }
+}

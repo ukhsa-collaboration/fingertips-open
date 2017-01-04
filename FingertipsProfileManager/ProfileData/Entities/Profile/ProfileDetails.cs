@@ -37,12 +37,15 @@ namespace Fpm.ProfileData.Entities.Profile
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
-        public bool IsProfileWithOnlyStaticReports { get; set; }
+        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public bool HasAnyData { get; set; }
+        public bool HasStaticReports { get; set; }
         public bool IsNational { get; set; }
         public bool HasOwnFrontPage { get; set; }
         public bool AreIndicatorsExcludedFromSearch { get; set; }
         public string AccessControlGroup { get; set; }
         public string StaticReportsTimePeriods { get; set; }
+        public string LeadProfileForCollectionIds { get; set; }
 
         public string SortBy { get; set; }
 

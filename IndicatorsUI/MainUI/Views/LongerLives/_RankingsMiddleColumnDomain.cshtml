@@ -1,6 +1,14 @@
-﻿@model Profiles.DomainObjects.Domain
+﻿@using Profiles.DomainObjects
+@model Domain
 
-<h5><span id="prevalence-risk-order" class="pretext"></span><span class="posttext">Select @Model.SubHeading factors to compare</span></h5>
+@{
+    var headingText = Model.ProfileId == ProfileIds.Diabetes
+        ? "Select prevalence and risk factors to compare"
+        : "Select other indicators to compare:";
+}
+
+
+<h5><span id="prevalence-risk-order" class="pretext"></span><span class="posttext">@headingText</span></h5>
 
 <ul class="filters" style="padding-left: 6px;">
     @{

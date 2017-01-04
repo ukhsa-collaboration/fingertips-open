@@ -52,6 +52,6 @@ namespace PholioVisualisation.PdfData
         }
 
         protected abstract DomainData NewDomainData();
-        protected abstract void AddIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<Area> benchmarkAreas);
+        protected abstract void AddIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, IList<IArea> benchmarkAreas);
     }
 }

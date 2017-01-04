@@ -40,7 +40,9 @@ namespace Profiles.DomainObjects
         public string AccessControlGroup { get; set; }
         public LongerLivesProfileDetails LongerLivesProfileDetails { get; set; }
         public bool IsOfficialStatistics { get; set; }
-        public bool IsProfileWithOnlyStaticReports { get; set; }
+        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public bool HasAnyData { get; set; }
+        public bool HasStaticReports { get; set; }
         public string StaticReportsTimePeriods { get; set; }
 
         public bool HasDomains

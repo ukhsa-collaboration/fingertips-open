@@ -129,12 +129,24 @@
             @Html.CheckBoxFor(model => model.UseTargetBenchmarkByDefault)
         </div>
         <div class="content-row">
-            <label class="content-item-detail-label">Has only static PDF reports?</label>
-            @Html.CheckBoxFor(model => model.IsProfileWithOnlyStaticReports)
+            <label class="content-item-detail-label">Show area search on front page?</label>
+            @Html.CheckBoxFor(model => model.ShowAreaSearchOnProfileFrontPage)
         </div>
         <div class="content-row">
-            <label class="content-item-detail-label">Static report time periods:<br><small>(comma separated list or empty, most recent period first)</small></label>
+            <label class="content-item-detail-label">Has any data?</label>
+            @Html.CheckBoxFor(model => model.HasAnyData)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Has static reports?</label>
+            @Html.CheckBoxFor(model => model.HasStaticReports)
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Static report time periods:<br><small>(optional: comma separated list or empty, most recent period first)</small></label>
             @Html.TextBoxFor(model => model.StaticReportsTimePeriods, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+        <div class="content-row">
+            <label class="content-item-detail-label">Lead profile for profile collections:<br><small>(comma separated list of profile collection IDs)</small></label>
+            @Html.TextBoxFor(model => model.LeadProfileForCollectionIds, new { @class = "unselected-domain wide-profile-textbox" })
         </div>
 
         <div class="button-box clearfix">

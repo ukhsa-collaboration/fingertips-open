@@ -9,7 +9,6 @@ using System.Web.Routing;
 using Profiles.DataAccess;
 using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Controllers;
-using Profiles.MainUI.Routes;
 
 namespace Profiles.MainUI
 {
@@ -22,6 +21,7 @@ namespace Profiles.MainUI
             RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+            AutoMapperConfig.RegisterMappings();
         }
 
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)

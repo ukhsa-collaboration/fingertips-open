@@ -21,13 +21,13 @@
 
     <div id="data_page_header" class="clearfix">        
         @{
-            var style = @Model.ProfileId == ProfileIds.HealthChecks
+            var style = Model.ProfileId == ProfileIds.HealthChecks
                 ? "width:908px;"
                 : string.Empty;
         }
         
         <div id="info_box_1" class="info_box" style="@style">
-            @if (@Model.ProfileId == ProfileIds.DrugsAndAlcohol)
+            @if (Model.ProfileId == ProfileIds.DrugsAndAlcohol)
             {        
                 @ContentProvider.GetContent("page-rankings-no-of-alcohol-dependent-people", Model.ProfileId)                    
             }
@@ -93,7 +93,14 @@
             <h5>More Information</h5>
 
             <ul>
-                <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+                @if (Model.ProfileId == ProfileIds.SuicidePrevention)
+                {
+                    <li>@Html.Partial("_MentalHealthLink")</li>
+                }
+                else
+                {
+                    <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+                }
                 <li class="external_ccg_link" style="display: none;"><a href="javascript:goToPracticeProfiles();" class="external_link">View more data about this CCG at National General Practice Profiles</a></li>
                 <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data">About the data</a></li>
             </ul>

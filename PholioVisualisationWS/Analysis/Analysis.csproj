@@ -72,6 +72,7 @@
     <Compile Include="SpcForDsrComparer.cs" />
     <Compile Include="SpcForProportionsComparer.cs" />
     <Compile Include="StatisticalMethods.cs" />
+    <Compile Include="SuicidePreventPlanComparer.cs" />
     <Compile Include="TargetComparer.cs" />
     <Compile Include="TargetComparerFactory.cs" />
     <Compile Include="SingleValueTargetComparer.cs" />

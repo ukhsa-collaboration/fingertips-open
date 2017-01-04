@@ -40,11 +40,6 @@ namespace Profiles.DataAccess
             get { return ParseBool("IsContentCachedInMemory"); }
         }
 
-        public bool IsSecureConnection
-        {
-            get { return ParseBool("IsSecureConnection"); }
-        }
-
         public bool IsAccessControlToProfiles
         {
             get { return ParseBool("IsAccessControlToProfiles"); }
@@ -98,11 +93,6 @@ namespace Profiles.DataAccess
         public bool ShowCancer
         {
             get { return ParseBool("ShowCancer"); }
-        }
-
-        public bool ShowNearestNeighbours
-        {
-            get { return ParseBool("ShowNearestNeighbours"); }
         }
 
         public bool UseDatabaseCaching
@@ -240,6 +230,11 @@ namespace Profiles.DataAccess
         public bool ShowUpdateDelayedMessage
         {
             get { return ParseBool("ShowUpdateDelayedMessage"); }
+        }
+
+        public bool ShowLongerLivesSuicidePrevention
+        {
+            get { return ParseBool("ShowLongerLivesSuicidePrevention"); }
         }
 
         public string EnsureUrlEndsWithForwardSlash(string url)

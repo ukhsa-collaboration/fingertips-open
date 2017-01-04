@@ -13,39 +13,47 @@ namespace IndicatorsUI.DataConstructionTest
     public class FingertipsUrlTest
     {
         [TestMethod]
-        public void TestHostInDevEnvironment()
+        public void TestHostAndProtocolInDevEnvironment()
         {
+            var url = "http://localhost:59822/";
             var parameters = new NameValueCollection();
             parameters.Add("Environment", "test");
             parameters.Add("BridgeWsUrl", "http://localhost:59822/");
             var config = new AppConfig(parameters);
+            var host = new FingertipsUrl(config, new Uri(url)).ProtocolAndHost;
 
-            Assert.AreEqual("", new FingertipsUrl(config).Host);
+            // Assert 
+            Assert.AreEqual("", host);
         }
 
         [TestMethod]
-        public void TestHostInTestEnvironment()
+        public void TestHostAndProtocolInTestEnvironment()
         {
+            var url = "http://testprofiles.phe.org.uk/";
             var parameters = new NameValueCollection();
             parameters.Add("Environment", "test");
-            parameters.Add("BridgeWsUrl", "https://testprofiles.phe.org.uk/");
+            parameters.Add("BridgeWsUrl", url);
             var config = new AppConfig(parameters);
+            var host = new FingertipsUrl(config, new Uri(url)).ProtocolAndHost;
 
+            // Assert 
             var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
-            var host = new FingertipsUrl(config).Host;
-            Assert.AreEqual("http://" + skin.TestHost, host);
+            Assert.AreEqual("https://" + skin.TestHost, host);
         }
 
         [TestMethod]
-        public void TestHostInLiveEnvironment()
+        public void TestHostAndProtocolInLiveEnvironment()
         {
+            // Arrange: construct protocol and host
             var parameters = new NameValueCollection();
             parameters.Add("Environment", "live");
-            parameters.Add("BridgeWsUrl", "http://fingertips.phe.org.uk/");
             var config = new AppConfig(parameters);
+            var url = "https://fingertips.phe.org.uk";
+            var host = new FingertipsUrl(config, new Uri(url)).ProtocolAndHost;
 
+            // Assert 
             var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
-            Assert.AreEqual("http://" + skin.LiveHost, new FingertipsUrl(config).Host);
+            Assert.AreEqual("https://" + skin.LiveHost, host);
         }
     }
 }

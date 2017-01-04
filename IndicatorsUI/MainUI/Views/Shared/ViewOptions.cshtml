@@ -15,13 +15,12 @@
     </div>
     <div class="row">
         <span id="nearest-neighbour-header"></span>   
-        @if (ViewBag.ShowNearestNeighbours && ViewBag.IsNational == "true")
+        @if (ViewBag.IsNational)
         {
-            <div id="nearestNeighbours-wrapper"><a id="nearest-neighbour-link" onclick="findNearestNeighbours()" class="a-link"></a></div>
+            <div id="nearestNeighbours-wrapper"><a id="nearest-neighbour-link" onclick="nearestNeighboursSelected()" class="a-link"></a></div>
         }         
         @Html.Partial("AreaMenu")        
         @Html.Partial("ParentAreaMenu")    
-@*        @Html.Partial("_MenuEmpty")*@
     </div>
     <div class="row">
         @Html.Partial("IndicatorsMenu")

@@ -1,4 +1,7 @@
-﻿@using Profiles.MainUI.Models
+﻿@using Profiles.DataAccess
+@using Profiles.DomainObjects
+@using Profiles.MainUI.Helpers
+@using Profiles.MainUI.Models
 @model PageModel
 @{
     Layout = "~/Views/Shared/_LayoutPage.cshtml";
@@ -8,27 +11,26 @@
     <script src="@(Model.JsPath)SiteKeyIndicators.js" type="text/javascript"></script>
     @Html.Partial("_GlobalJsVariablesForContentPage")
 }
-<div class="full-width title-divider"></div>
-
-<div class="standardWidth">
-    @Html.Partial("_ProfileCollection", Model.NationalProfileCollection)
-
-    <div id="about-fingertips">
-        <h2>
-            About the profiles
-        </h2>
-        <p>
-            These profiles are a rich source of indicators across a range of health and
-            wellbeing themes that has been designed to support JSNA and commissioning to
-            improve health and wellbeing, and reduce inequalities. With these profiles you can:
-        </p>
-        <ul>
-            <li>Browse indicators at different geographical levels</li>
-            <li>Benchmark against the regional or England average</li>
-            <li>Export data to use locally</li>
-        </ul>
-        <p>
-            These profiles have been developed by Public Health England.
-        </p>
+<div class="title-divider"></div>
+<div id="views-public-health-profiles-front-page" class="container">
+    <div class="row">
+        <div class="col-md-8">
+            @Html.Partial("_ProfileCollectionLinks", Model.HighlightedProfileCollection)
+            <!--All Profiles-->
+            @Html.Partial("_ProfileCollectionLinks", Model.NationalProfileCollection)
+        </div>
+        <div class="col-md-4">
+            @* User Guide *@
+            @*            @Html.Partial("_UserGuide")*@
+            @* Latest News *@
+            @if (AppConfig.Instance.ShowLongerLivesSuicidePrevention)
+            {
+                @Html.Partial("_LatestNews")
+            }
+        </div>
+        @* About the profiles *@
+        <div id="about-fingertips" class="col-md-8">
+            @ContentProvider.GetContent("front-page-about-the-profiles", ProfileIds.UnassignedIndicators)
+        </div>
     </div>
 </div>

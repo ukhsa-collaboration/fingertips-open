@@ -78,7 +78,7 @@ namespace PholioVisualisation.SearchIndexing
             }
         }
 
-        private void IndexParentAreas(IndexWriter writer, IEnumerable<Area> areas, int areaTypeId)
+        private void IndexParentAreas(IndexWriter writer, IEnumerable<IArea> areas, int areaTypeId)
         {
             foreach (var county in areas)
             {
@@ -108,7 +108,7 @@ namespace PholioVisualisation.SearchIndexing
             }
         }
 
-        private void IndexParentArea(Area area, IndexWriter writer, int childAreaTypeId)
+        private void IndexParentArea(IArea area, IndexWriter writer, int childAreaTypeId)
         {
             Document doc = new Document();
             AddAnalysedField(doc, FieldNames.PlaceName, area.Name.ToLower());

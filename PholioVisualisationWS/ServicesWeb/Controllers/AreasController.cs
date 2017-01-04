@@ -363,8 +363,7 @@ namespace ServicesWeb.Controllers
             IAreasReader reader = ReaderFactory.GetAreasReader();
 
             // Get child areas
-            IList<IArea> areas = new ChildAreaListBuilder(reader, parent_area_code, area_type_id)
-                .ChildAreas;
+            IList<IArea> areas = new ChildAreaListBuilder(reader).GetChildAreas(parent_area_code, area_type_id);
 
             // Remove areas that should be ignored for the profile
             areas = IgnoredAreasFilterFactory.New(profile_id)

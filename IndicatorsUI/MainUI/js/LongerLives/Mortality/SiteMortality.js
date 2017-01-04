@@ -204,7 +204,7 @@ MT.nav = {
 }
 
 function getDecileCode(decile) {
-    return 'cat-2-' + decile;
+    return 'cat-' + getDecileCategoryTypeId(MT.model.areaTypeId) + '-' + decile;
 }
 
 function getGradeFunction(parentValue) {
@@ -212,7 +212,7 @@ function getGradeFunction(parentValue) {
     return function (sig, areaValue) {
         switch (sig) {
             case 1:
-                return 3 // Red
+                return 3; // Red
             case 2:
                 return areaValue > parentValue ?
                     2 : // Orange

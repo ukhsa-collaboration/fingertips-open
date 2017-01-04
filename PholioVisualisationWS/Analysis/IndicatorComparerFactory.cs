@@ -43,6 +43,9 @@ namespace PholioVisualisation.Analysis
                 case ComparatorMethodId.Quintiles:
                     comparer = new QuintilesComparer();
                     break;
+                case ComparatorMethodId.SuicidePreventionPlan:
+                    comparer = new SuicidePreventPlanComparer();
+                    break;
                 default:
                     throw new FingertipsException("Invalid comparator method ID: " + grouping.ComparatorMethodId);
             }

@@ -20,8 +20,6 @@ namespace Profiles.MainUI.Models
 
         public PageType PageType = PageType.Undefined;
 
-        public YearRange YearRange { get; set; }
-
         public Skin Skin
         {
             get
@@ -78,13 +76,15 @@ namespace Profiles.MainUI.Models
         public bool DisplayProfileTitle { get; set; }
 
         public bool HasExclusiveSkin { get; set; }
-
-        public bool IsProfileWithOnlyStaticReports { get; set; }
-
+        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public bool HasAnyData { get; set; }
+        public bool HasStaticReports { get; set; }
         public int ProfileId { get; set; }
 
         public IList<ProfileCollection> ProfileCollections { get; set; }
         public ProfileCollection NationalProfileCollection { get; set; }
+
+        public ProfileCollection HighlightedProfileCollection { get; set; }
 
         /// <summary>
         ///     Used to limit search results and parent areas that are displayed in the region menu.

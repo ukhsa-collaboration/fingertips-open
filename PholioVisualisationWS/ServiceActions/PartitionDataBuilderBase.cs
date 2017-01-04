@@ -22,7 +22,7 @@ namespace PholioVisualisation.ServiceActions
 
         protected void InitMetadata(Grouping grouping)
         {
-            _indicatorMetadata = IndicatorMetadataRepository.Instance.GetIndicatorMetadata(grouping);
+            _indicatorMetadata = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(grouping);
         }
 
         protected void FormatData(IList<CoreDataSet> dataList)

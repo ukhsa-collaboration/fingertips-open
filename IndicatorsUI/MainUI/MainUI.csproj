@@ -54,6 +54,10 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Hammock.ClientProfile, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c148cfba29ed1a4d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Hammock.ClientProfile.dll</HintPath>
@@ -139,9 +143,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App_Start\AutoMapperConfig.cs" />
     <Compile Include="Controllers\SwaggerBridgeController.cs" />
     <Compile Include="Helpers\AjaxUrl.cs" />
     <Compile Include="Helpers\ContentProvider.cs" />
+    <Compile Include="Helpers\NearestNeighbourHelper.cs" />
     <Compile Include="Helpers\SpineChartMinMaxLabelBuilder.cs" />
     <Compile Include="Controllers\AreaSearchController.cs" />
     <Compile Include="Filters\CheckUserCanAccessSkin.cs" />
@@ -231,9 +237,13 @@
     <Content Include="images\circle_quintile4_mini.png" />
     <Content Include="images\circle_quintile5_medium.png" />
     <Content Include="images\circle_quintile5_mini.png" />
+    <Content Include="images\englandTemp\EnglandOverview.jpg" />
     <Content Include="images\header-high.png" />
     <Content Include="images\header-low.png" />
     <Content Include="images\image-icon.png" />
+    <Content Include="images\image-video\introduction-fingertips-tool.png" />
+    <Content Include="images\image-video\play_large.png" />
+    <Content Include="images\latest-news\suicide-prevention.png" />
     <Content Include="images\map_width.png" />
     <Content Include="images\Mortality\arrow-down.png" />
     <Content Include="images\Mortality\bar-high.png" />
@@ -382,6 +392,7 @@
     <Content Include="js\LongerLives\PageBaseLongerLivesRankings.js" />
     <Content Include="js\LongerLives\PageBaseLongerLivesHome.js" />
     <Content Include="js\PageEngland.js" />
+    <Content Include="js\PagePopulationNew.js" />
     <Content Include="js\PageScatterPlot.js" />
     <Content Include="js\PageTwitterFeed.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesPracticeDetails.js" />
@@ -512,6 +523,8 @@
     <Content Include="Views\Phof\Data.cshtml" />
     <Content Include="Views\AreaSearch\AreaSearchResults.cshtml" />
     <Content Include="Views\AreaSearch\_IntroductionAreaSearch.cshtml" />
+    <Content Include="Views\MidlandsAndEast\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
+    <Content Include="Views\LongerLives\_MentalHealthLink.cshtml" />
     <None Include="Views\Shared\Banner.cshtml" />
     <Content Include="Views\Shared\KeyBarChart.cshtml" />
     <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
@@ -530,14 +543,12 @@
     <Content Include="Views\Shared\ParentTypeMenu.cshtml" />
     <Content Include="Views\Shared\_Html2Canvas.cshtml" />
     <None Include="Views\Shared\SiteFooter.cshtml" />
-    <Content Include="Views\MidlandsAndEast\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\Shared\SexMenu.cshtml" />
     <Content Include="Views\Shared\ParentAreaMenu.cshtml" />
     <None Include="Views\Shared\Spinner.cshtml" />
     <Content Include="Views\Shared\_JavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\Shared\ViewOptions.cshtml" />
     <Content Include="Views\Shared\SupportingInformation.cshtml" />
-    <None Include="Views\Shared\YearSelector.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -597,6 +608,9 @@
     <Content Include="Views\Shared\_JsUrls.cshtml" />
     <Content Include="Views\SingleProfileWithFrontPage\SupportingInformation.cshtml" />
     <Content Include="Views\Shared\_KeyRecentTrends.cshtml" />
+    <Content Include="Views\Shared\_ProfileCollectionLinks.cshtml" />
+    <Content Include="Views\Shared\_LatestNews.cshtml" />
+    <Content Include="Views\Shared\_UserGuide.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
@@ -627,6 +641,7 @@
     <Folder Include="css\chosen\" />
     <Folder Include="images\chosen\" />
     <Folder Include="js\vendor\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

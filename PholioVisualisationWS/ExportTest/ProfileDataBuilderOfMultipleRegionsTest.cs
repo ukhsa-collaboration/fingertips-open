@@ -64,7 +64,7 @@ namespace PholioVisualisation.ExportTest
 
         private static IWorksheet RegionWorksheet()
         {
-            return workbook.Worksheets["Region"];
+            return workbook.Worksheets[WorksheetNames.Region];
         }
     }
 }

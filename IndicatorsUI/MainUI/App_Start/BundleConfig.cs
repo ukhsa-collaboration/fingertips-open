@@ -92,11 +92,13 @@ namespace Profiles.MainUI
         {
             var cssFiles = new[]
             {
+                "bootstrap/bootstrap.min.css",
                 "common.css",
                 "fingertips.css",
                 "jquery-ui-1.10.1.css",
                 "core-allpages.css",
                 "chosen/chosen.min.css"
+                
             };
             return cssFiles;
         }
@@ -105,7 +107,10 @@ namespace Profiles.MainUI
         {
             var jsFiles = new[]
             {
+
                 "vendor/jquery-legacy/jquery.min.js",
+                "vendor/tether/tether.js",
+                "vendor/bootstrap/bootstrap.min.js",
                 "vendor/chosen/chosen.jquery.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
                 "vendor/highcharts/highcharts.js",

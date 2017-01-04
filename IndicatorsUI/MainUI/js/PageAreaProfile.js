@@ -39,20 +39,28 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
     var count = formatter.getAreaCount();
     addTd(html, count, CSS_NUMERIC);
 
+    var columnNumber = 1;
     // Area value
     var dataInfo = new CoreDataSetInfo(coreDataSet);
-    addTd(html, formatter.getAreaValue(), CSS_NUMERIC, null, dataInfo.getNoteId());
-
+    var id = 'apc_' + rowNumber + '_' + columnNumber;
+    addTd(html, formatter.getAreaValue(), CSS_NUMERIC, null, dataInfo.getNoteId(), id);
+    
     if (!FT.model.isNearestNeighbours()) {
         // Regional average
         if (isSubnationalColumn()) {
-            addTd(html, formatter.getVal(regionalData, 'ValF'), CSS_NUMERIC);
+            var regionalDataInfo = new CoreDataSetInfo(regionalData);
+            columnNumber = columnNumber + 1;
+            id = 'apc_' + rowNumber + '_' + columnNumber;
+            addTd(html, new ValueDisplayer().byDataInfo(regionalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, regionalDataInfo.getNoteId(), id);
         }
     }
 
     // England average
     if (enumParentDisplay != PARENT_DISPLAY.REGIONAL_ONLY) {
-        addTd(html, formatter.getVal(nationalData, 'ValF'), CSS_NUMERIC);
+        var nationalDataInfo = new CoreDataSetInfo(nationalData);
+        columnNumber = columnNumber + 1;
+        id = 'apc_' + rowNumber + '_' + columnNumber;
+        addTd(html, new ValueDisplayer().byDataInfo(nationalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, nationalDataInfo.getNoteId(), id);
     }
 
     // Min, spine chart, max
@@ -115,8 +123,8 @@ function renderIndicatorCell(rootIndex, indicatorText, targetLegend) {
     return html;
 }
 
-function renderTrendCell(rootIndex, innerContent) {
-    templates.add('spineTrendCell', '<td id="spine-trend_{{rootIndex}}" class="center">{{{innerContent}}}</td>');
+function renderTrendCell(rootIndex, innerContent) {    
+    templates.add('spineTrendCell', '<td id="spine-trend_{{rootIndex}}" onclick="recentTrendSelected.fromAreaProfile({{rootIndex}})" class="cursor-pointer center" >{{{innerContent}}}</td>');
     var html = templates.render('spineTrendCell',
     {
         rootIndex: rootIndex,
@@ -140,7 +148,6 @@ function goToAreaProfilePage(areaCode) {
         ajaxMonitor.setCalls(3);
 
         getGroupingData();
-
         getIndicatorMetadata(FT.model.groupId);
         getIndicatorStats();
 
@@ -174,7 +181,6 @@ function displayAreaProfile() {
     unlock();
 
     loadValueNoteToolTips();
-
 }
 
 function initAreaProfile() {
@@ -257,8 +263,6 @@ function addRecentTrendTooltip(rowNumber, trendData) {
     areaProfileState.trendstooltip.addTooltip(trendCellId, trendData);
 }
 
-
-
 function getIndicatorStats() {
 
     ui.storeScrollTop();
@@ -302,7 +306,8 @@ function setAreaProfileHtml(areaCode) {
     clearSpineTables();
     for (var i in groupRoots) {
 
-        var statsBase = indicatorStats[i];
+        var root = groupRoots[i];
+        var statsBase = areaProfile.findMatchingStat(root, indicatorStats);
         if (statsBase) {
 
             var statsF = statsBase.StatsF,
@@ -317,8 +322,7 @@ function setAreaProfileHtml(areaCode) {
         }
 
 
-        var root = groupRoots[i],
-            period = root.Grouping[0].Period,
+        var period = root.Grouping[0].Period,
             metadata = metadataHash[root.IID],
             coreDataSet = getDataFromAreaCode(root.Data, areaCode);
 
@@ -338,6 +342,16 @@ function setAreaProfileHtml(areaCode) {
     }
 
     setAreaHeadings(area, benchmark);
+}
+
+/**
+* Finds the indicator stat that matches the group root. These should be in same order
+* but are not always in the search results on live (reason unknown).
+* @class findMatchingStat
+*/
+areaProfile.findMatchingStat = function(root, indicatorStats) {
+    // Stats should be in same order as roots but are not always in the search results on live (reason unknown)
+    return matchBySexAgeAndIID(root, indicatorStats);
 }
 
 function getIndicatorStatsCallback(obj) {
@@ -409,8 +423,10 @@ AreaTooltipProvider.prototype = {
             firstBit = bits[0];
 
         // Value cell with a value note asterisk
-        if (firstBit === 'ft') {
-            return new ValueNoteTooltipProvider().getHtml(id);
+        if (firstBit === 'apc') {
+            var noteId = $('#' + id).attr('vn');;
+            var html = new ValueNoteTooltipProvider().getHtmlFromNoteId(noteId);
+            return html;
         }
 
         // Indicator name, e.g. 'spine-indicator_1'

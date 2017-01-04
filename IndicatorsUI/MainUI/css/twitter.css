@@ -42,8 +42,12 @@
     color: #FFF;
 }
 
+/*----------------------------------------
+    FIN-1156 Flatten start button
+------------------------------------------*/
+
 .twitter_follow {
-    background: url("../images/Mortality/twitter_corner.png") no-repeat scroll right bottom #02AE94;
+    background: /*url("../images/Mortality/twitter_corner.png") no-repeat scroll right bottom*/ #02AE94;
     font-family: Arial, Helvetica, sans-serif;
     margin: 0 0 40px;
     padding: 11px 15px 13px;

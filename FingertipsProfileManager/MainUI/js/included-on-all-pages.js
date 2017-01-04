@@ -225,4 +225,11 @@ function setCopyMetadataOption() {
     } 
 }
 
-$(document).ready(initFaqLink);
+$(document).ready(function () {
+
+    // Init Bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+
+    initFaqLink();
+});
+

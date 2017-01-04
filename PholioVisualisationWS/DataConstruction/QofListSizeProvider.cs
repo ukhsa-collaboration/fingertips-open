@@ -20,19 +20,22 @@ namespace PholioVisualisation.DataConstruction
             YearType yearType)
         {
             Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndIndicatorId(groupId, IndicatorId);
-            var period = new DataPointOffsetCalculator(grouping, dataPointOffset, yearType).TimePeriod;
+            if (grouping != null)
+            {
+                var period = new DataPointOffsetCalculator(grouping, dataPointOffset, yearType).TimePeriod;
 
-            if (area.IsCcg)
-            {
-                //Note: zeroes may occur and should be included
-                Value = groupDataReader
-                    .GetCoreDataListForChildrenOfArea(grouping, period, area.Code)
-                    .Where(x => x.IsValueValid)
-                    .Average(x => x.Value);
-            }
-            else
-            {
-                SetSingleAreaValue(groupDataReader, area, grouping, period);
+                if (area.IsCcg)
+                {
+                    //Note: zeroes may occur and should be included
+                    Value = groupDataReader
+                        .GetCoreDataListForChildrenOfArea(grouping, period, area.Code)
+                        .Where(x => x.IsValueValid)
+                        .Average(x => x.Value);
+                }
+                else
+                {
+                    SetSingleAreaValue(groupDataReader, area, grouping, period);
+                }
             }
         }
 

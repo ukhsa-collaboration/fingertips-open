@@ -1,5 +1,5 @@
 ﻿using FingertipsUploadService;
-using FingertipsUploadService.Helpers;
+using FingertipsUploadService.FpmFileReader;
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -142,7 +142,7 @@ namespace FingertipsUploadServiceTest
             var processor = new SimpleWorksheetDataProcessor(CoreDataRepository, LoggingRepository);
 
             var wrongWorksheets = new List<string> { "Fus", "FPM" };
-            var fileReader = new Mock<IExcelFileReader>();
+            var fileReader = new Mock<IUploadFileReader>();
             fileReader.Setup(f => f.GetWorksheets()).Returns(wrongWorksheets);
 
             worker.ProcessJob(job, validator, processor, fileReader.Object);
@@ -168,7 +168,7 @@ namespace FingertipsUploadServiceTest
             var indicatorDetailsTable = GetIndicatorDetailsTable();
             var pholioTable = GetPholioTable();
 
-            var fileReader = new Mock<IExcelFileReader>();
+            var fileReader = new Mock<IUploadFileReader>();
             fileReader.Setup(x => x.GetWorksheets()).Returns(correctWorksheet);
             fileReader.Setup(x => x.GetIndicatorDetails()).Returns(indicatorDetailsTable);
             fileReader.Setup(x => x.GetPholioData()).Returns(pholioTable);
@@ -193,7 +193,7 @@ namespace FingertipsUploadServiceTest
             var indicatorDetailsTable = GetIndicatorDetailsTable();
             var pholioTable = GetPholioTable();
 
-            var fileReader = new Mock<IExcelFileReader>();
+            var fileReader = new Mock<IUploadFileReader>();
             fileReader.Setup(x => x.GetWorksheets()).Returns(correctWorksheet);
             fileReader.Setup(x => x.GetIndicatorDetails()).Returns(indicatorDetailsTable);
             fileReader.Setup(x => x.GetPholioData()).Returns(pholioTable);

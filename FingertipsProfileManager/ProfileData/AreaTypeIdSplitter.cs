@@ -29,9 +29,29 @@ namespace Fpm.ProfileData
                         Ids.Add(AreaTypeIds.UnitaryAuthority);
                         break;
 
-                    case AreaTypeIds.LocalAuthorityAndUnitaryAuthority:
-                        Ids.Add(AreaTypeIds.LocalAuthority);
+                    case AreaTypeIds.DistrictAndUnitaryAuthority:
+                        Ids.Add(AreaTypeIds.District);
                         Ids.Add(AreaTypeIds.UnitaryAuthority);
+                        break;
+
+                    case AreaTypeIds.PheCentresFrom2013To2015:
+                        Ids.Add(AreaTypeIds.PheCentreFrom2013);
+                        Ids.Add(AreaTypeIds.PheCentreFrom2013To2015);
+                        break;
+
+                    case AreaTypeIds.PheCentresFrom2015:
+                        Ids.Add(AreaTypeIds.PheCentreFrom2015);
+                        Ids.Add(AreaTypeIds.PheCentreFrom2013To2015);
+                        break;
+
+                    case AreaTypeIds.MentalHealthTrustsIncludingCombinedAcuteTrusts:
+                        Ids.Add(AreaTypeIds.MentalHealthTrust);
+                        Ids.Add(AreaTypeIds.CombinedMentalHealthAndAcuteTrust);
+                        break;
+
+                    case AreaTypeIds.AcuteTrustsIncludingCombinedMentalHealthTrusts:
+                        Ids.Add(AreaTypeIds.AcuteTrust);
+                        Ids.Add(AreaTypeIds.CombinedMentalHealthAndAcuteTrust);
                         break;
 
                     default:

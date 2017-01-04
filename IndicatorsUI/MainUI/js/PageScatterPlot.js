@@ -18,20 +18,29 @@ function goToScatterPlotPage() {
         setPageMode(PAGE_MODES.SCATTER_PLOT);
         var sp = scatterplot;
         sp.init();
-        sp.getDataForSelectedArea();
+        if (FT.model.areaTypeId === AreaTypeIds.Practice)
+            sp.getGpDataForSelectedArea();
+        else
+            sp.getDataForSelectedArea();
     }
 }
 
 /**
-* Initialises the scatterplot page. Only the first call has an effect
+* Initialises the scatterplot page based on the areatypeId. Only the first call has an effect
 * @class scatterplot.init
 */
 scatterplot.init = function () {
     var sp = scatterplot;
-
-    if (!sp.viewManager) {
-        sp.viewManager = new sp.ViewManager(pages.getContainerJq());
-        sp.viewManager.init();
+    if (FT.model.areaTypeId === AreaTypeIds.Practice) {
+        if (!sp.viewManagerGPScatterPlot) {
+            sp.viewManagerGPScatterPlot = new sp.ViewManagerGpScatterPlot(pages.getContainerJq());
+            sp.viewManagerGPScatterPlot.init();
+        }
+    } else {
+        if (!sp.viewManager) {
+            sp.viewManager = new sp.ViewManager(pages.getContainerJq());
+            sp.viewManager.init();
+        }
     }
 };
 
@@ -105,6 +114,58 @@ scatterplot.getSecondaryData = function () {
     scatterplot.getAreaValues(areaValueModel);
 
     ajaxMonitor.monitor(scatterplot.displayPage);
+};
+
+scatterplot.getGpDataForSelectedArea = function () {
+    var model = FT.model;
+    ajaxMonitor.setCalls(1);
+    scatterplot.getGroupingDataForProfile(model);
+    ajaxMonitor.monitor(scatterplot.displayGpScatterPlotGraph);
+};
+scatterplot.setScatterSrc = function (src) {
+
+    $('#scatter-plot-chart').html('<img src="' + src + '" alt="" />');
+};
+
+scatterplot.displayGpScatterPlotGraph = function () {
+    var model = FT.model,
+       groupRoot = getGroupRoot();
+    var selectedSupportingIndicatorIndex = 0;
+    var currentlySelectedYIndicator = $('#supportingIndicators option:selected').attr('key');
+
+    // populate supporting indicators
+    var $supportingIndicators = $('#supportingIndicators');
+    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
+        var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
+        var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
+        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
+        $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
+        if (key == currentlySelectedYIndicator) {
+            selectedSupportingIndicatorIndex = i;
+        }
+    }
+
+    var supportingGroupRoots = loaded.groupingDataForProfile;
+    var groupRootSecondary = supportingGroupRoots[selectedSupportingIndicatorIndex];
+
+    var src = [FT.url.bridge, 'img/gp-scatter-chart?width=900&height=500&',
+        'off=', 0];
+
+    var isPractice = isDefined(model.areaCode);
+    if (isPractice) {
+        src.push("&are=", model.areaCode);
+    }
+    src.push("&gid1=", model.groupId,
+        "&iid1=", groupRoot.IID,
+        "&sex1=", groupRoot.Sex.Id,
+        '&age1=', groupRoot.Age.Id);
+    src.push("&gid2=", groupRootSecondary.GroupId,
+        "&iid2=", groupRootSecondary.IID,
+        "&sex2=", groupRootSecondary.Sex.Id,
+        '&age2=', groupRootSecondary.Age.Id);
+    scatterplot.setScatterSrc(src.join(''));
+    showAndHidePageElements();
+    unlock();
 };
 
 /**
@@ -595,7 +656,9 @@ scatterplot.getIndicatorsUnit = function () {
 scatterplot.getSelectedSupportingIndicator = function () {
     scatterplot.getSecondaryData();
 };
-
+scatterplot.getSelectedGpSupportingIndicator = function () {
+    scatterplot.displayGpScatterPlotGraph();
+};
 /**
 * Returns title for x axis of chart
 * @method scatterplot.xAxisTitle
@@ -736,3 +799,74 @@ if (FT.model.profileId !== ProfileIds.SearchResults) {
         jqIdsNotInitiallyShown: []
     });
 }
+
+scatterplot.ViewManagerGpScatterPlot = function($container) {
+
+    var isInitialised = false,
+        $header,
+        $chartBox,
+        $supportingIndicators;
+
+    this.tabSpecificOptions = null;
+
+    this.init = function() {
+        if (!isInitialised) {
+
+            $header = $('<div id="scatterplot-header" class="clearfix"></div>');
+            $chartBox =
+                $('<div id="scatter-plot-chart-box-wrapper"><div id="scatter-plot-chart-box" class="clearfix"><div id="scatter-plot-chart"></div></div></div>');
+            $supportingIndicators =
+                $('<div id="supportingIndicatorsWrapper"><div class="supportingIndicators">Indicator on Y axis&nbsp;</div><div class="supportingIndicatorsMenu"><select id="supportingIndicators"  onchange="scatterplot.getSelectedGpSupportingIndicator(this);"></select></div></div>');
+
+            $container.prepend($header, $supportingIndicators, $chartBox);
+            //this.initTabSpecificOptions();
+            isInitialised = true;
+        }
+    };
+
+    /**
+    * Sets the HTML to display above the chart
+    * @method setHeaderHTML
+    */
+    this.setHeaderHtml = function(html) {
+        $header.html(html);
+    };
+
+    /**
+    * Hides the chart and filter menu and tells the user there is no data
+    * @method displayNoData
+    */
+    this.displayNoData = function() {
+
+        scatterplot.getNoDataIndicatorName();
+        var noDataText = '<p style="text-align: center; padding:150px 0 150px 0;">' +
+            scatterplot.getNoDataIndicatorName() +
+            '</p>';
+
+        $('#scatter-plot-chart').html(noDataText);
+        $('#scatterplot-filters').hide();
+    };
+
+    /**
+    * Initialises the area switch 
+    * @method initTabSpecificOptions
+    */
+    this.initTabSpecificOptions = function() {
+        var clickHandler = scatterplot.getDataForSelectedArea;
+        this.tabSpecificOptions = new TabSpecificOptions({
+            eventHandlers: [clickHandler, clickHandler],
+            eventName: 'ScatterplotAreaSelected'
+        });
+    };
+
+    /**
+    * Updates the area switch 
+    * @method updateTabSpecificOptionsOptions
+    */
+    this.updateTabSpecificOptionsOptions = function() {
+        this.tabSpecificOptions.setHtml({
+            label: 'Scatter plot for',
+            optionLabels: ['England', areaHash[FT.model.areaCode].Name]
+        });
+    };
+};

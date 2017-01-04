@@ -15,6 +15,20 @@ namespace PholioVisualisation.DataConstructionTest
         private string areaCode = "a";
         private double practiceValue = 10;
 
+        private IndicatorMetadata _indicatorMetadata;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            // Init valid indicator metadata
+            _indicatorMetadata = new IndicatorMetadata
+            {
+                ValueType = new PholioObjects.ValueType { Id = ValueTypeId.CrudeRate },
+                Unit = new Unit { Value = 1 },
+                ValueTypeId = ValueTypeId.CrudeRate
+            };
+        }
+
         [TestMethod]
         public void TestCheckDatabaseForValueBeforeCalculating()
         {
@@ -47,7 +61,7 @@ namespace PholioVisualisation.DataConstructionTest
                 ValidPopulationProvider(),
                 ValidDataListProvider(grouping, area, timePeriod),
                 EmptyGroupDataReader(grouping, timePeriod));
-            var coreDataSet = provider.GetData(grouping, timePeriod, new IndicatorMetadata());
+            var coreDataSet = provider.GetData(grouping, timePeriod, _indicatorMetadata);
 
             Assert.AreEqual(practiceValue, coreDataSet.Value);
         }
@@ -63,7 +77,7 @@ namespace PholioVisualisation.DataConstructionTest
                 ValidPopulationProvider(),
                 EmptyDataListProvider(grouping, area, timePeriod),
                 EmptyGroupDataReader(grouping, timePeriod));
-            var coreDataSet = provider.GetData(grouping, timePeriod, new IndicatorMetadata());
+            var coreDataSet = provider.GetData(grouping, timePeriod, _indicatorMetadata);
 
             Assert.IsNull(coreDataSet);
         }
@@ -79,7 +93,7 @@ namespace PholioVisualisation.DataConstructionTest
                 ValidPopulationProvider(),
                 ValidDataListProvider(grouping, area, timePeriod),
                 EmptyGroupDataReader(grouping, timePeriod));
-            var coreDataSet = provider.GetData(grouping, timePeriod, new IndicatorMetadata());
+            var coreDataSet = provider.GetData(grouping, timePeriod, _indicatorMetadata);
 
             Assert.IsNull(coreDataSet);
         }

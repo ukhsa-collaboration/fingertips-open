@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
@@ -37,15 +39,14 @@ namespace Fpm.MainUI.Controllers
             AssignProfileId(model, profileId, userProfiles);
 
             GetDocumentItems(model);
-            return View(model);
-        }
 
-        private static void AssignProfileId(DocumentsGridModel model, string profileId, IList<ProfileDetails> userProfiles)
-        {
-            // If request params don't have any selected profile, use the first profile to populate the model
-            model.ProfileId = profileId == null
-                ? userProfiles[0].Id
-                : int.Parse(profileId);
+
+
+          //  Session["GetAllProfile"] = model.ProfileList;
+
+            //ViewBag.GetAllProfile = model;
+
+            return View(model);
         }
 
         [HttpPost]
@@ -81,7 +82,7 @@ namespace Fpm.MainUI.Controllers
                         if (docFromDatabase != null)
                         {
                             docFromDatabase.ProfileId = profileId;
-                            docFromDatabase.FileName = fileName;                            
+                            docFromDatabase.FileName = fileName;
                             docFromDatabase.FileData = uploadedFile;
                             docFromDatabase.UploadedBy = new CurrentUser().Name;
                             docFromDatabase.UploadedOn = DateTime.Now;
@@ -109,20 +110,57 @@ namespace Fpm.MainUI.Controllers
         }
 
         public ActionResult IsFileNameUnique(string filename, string selectedProfileId)
-        {            
+        {
             if (string.IsNullOrEmpty(selectedProfileId))
             {
                 return new HttpStatusCodeResult(400, "bad request");
             }
-            
+
             var profileId = Convert.ToInt32(selectedProfileId);
             var fileNameHelper = new FileNameHelper();
-            
+
             return new JsonResult
             {
                 Data = fileNameHelper.IsUnique(filename, profileId),
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
+        }
+
+        [HttpPost]
+        [Route("documents/delete")]
+        public ActionResult Delete(int id)
+        {
+            Document doc = _reader.GetDocument(id);
+
+            if (doc == null)
+            {
+                throw new FpmException("Content item could not be deleted with id " + id);
+            }
+
+            if (UserDetails.CurrentUser().HasWritePermissionsToProfile(doc.ProfileId))
+            {
+                _writer.DeleteDocument(doc);
+
+                return new JsonResult
+                {
+                    Data = "Success",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+            }
+
+            throw new FpmException("User does not have the right to delete document " + id);
+        }
+
+        private static void AssignProfileId(DocumentsGridModel model, string profileId,
+            IList<ProfileDetails> profilesThatUserCanEdit)
+        {
+            // If request params don't have any selected profile, use the first profile to populate the model
+            if (profilesThatUserCanEdit.Count > 0)
+            {
+                model.ProfileId = profileId == null
+                    ? profilesThatUserCanEdit[0].Id
+                    : int.Parse(profileId);
+            }
         }
 
         private void AssignProfileList(DocumentsGridModel model, IList<ProfileDetails> profilesDetails)

@@ -6,14 +6,16 @@
 @Scripts.Render("~/bundles/js-practice-profiles")
 @{
     // Set Practice profiles PDF URL
-    var pdfUrl = AppConfig.Instance.IsEnvironmentLive 
-        ? "http://fingertipsreports.phe.org.uk/gpp/index.php"
-        : "http://www.nepho.org.uk/gpp/staging.php";
+    var host = AppConfig.Instance.IsEnvironmentLive
+        ? "http://fingertipsreports.phe.org.uk"
+        : "https://testfingertipsreports.phe.org.uk";
+
+    var pdfUrl = host + "/gpp/index.php";
 }
 <script type="text/javascript">//<![CDATA[
     populationGroupId = @GroupIds.PracticeProfiles_SupportingIndicators;
     earliestYear = 2010;
-    latestYear = 2015;
+    latestYear = 2016;
     profileCollectionIdList = [];
     restrictSearchProfileId = @(Model.ProfileId);
     FT.url.pdf = '@(pdfUrl)';

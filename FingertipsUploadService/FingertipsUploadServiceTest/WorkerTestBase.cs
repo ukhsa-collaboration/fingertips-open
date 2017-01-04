@@ -39,7 +39,7 @@ namespace FingertipsUploadServiceTest
             var job = new UploadJob
             {
                 Guid = jobGuid,
-                Status = UploadJobStatus.NotStart,
+                Status = UploadJobStatus.NotStarted,
                 DateCreated = DateTime.Now,
                 JobType = jobType,
                 Filename = @"fake.xls",

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServiceActions;
+using System.Linq;
 
 namespace PholioVisualisation.ServiceActionsTest
 {
@@ -14,11 +12,12 @@ namespace PholioVisualisation.ServiceActionsTest
         public void TestGetPartitionDataWhereNoPersonsData()
         {
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
+            var ageId = AgeIds.AllAges;
 
-            var data = GetPartitionData(indicatorId);
+            var data = GetPartitionData(indicatorId, ageId);
 
             Assert.AreEqual(AreaCodes.England, data.AreaCode);
-            Assert.AreEqual(AgeIds.AllAges, data.AgeId);
+            Assert.AreEqual(ageId, data.AgeId);
             Assert.AreEqual(indicatorId, data.IndicatorId);
             Assert.IsTrue(data.Sexes.Any(), "No sexes");
             CheckData(data);
@@ -33,14 +32,15 @@ namespace PholioVisualisation.ServiceActionsTest
         [TestMethod]
         public void TestGetPartitionDataWhereIsPersonsData()
         {
-            var indicatorId = IndicatorIds.MortalityRateFromCausesConsideredPreventable;
+            var indicatorId = IndicatorIds.SchoolReadiness;
+            var ageId = AgeIds.Is6;
 
-            var data = GetPartitionData(indicatorId);
+            var data = GetPartitionData(indicatorId, ageId);
 
             Assert.AreEqual(AreaCodes.England, data.AreaCode);
-            Assert.AreEqual(AgeIds.AllAges, data.AgeId);
+            Assert.AreEqual(ageId, data.AgeId);
             Assert.AreEqual(indicatorId, data.IndicatorId);
-            Assert.IsTrue(data.Sexes.Any(), "No sexes");
+            Assert.IsTrue(data.Sexes.Any(), "Person");
             CheckData(data);
 
             // Check significance is set because person data is available
@@ -53,21 +53,21 @@ namespace PholioVisualisation.ServiceActionsTest
         [TestMethod]
         public void TestGetPartitionTrendData()
         {
-            var indicatorId = IndicatorIds.MortalityRateFromCausesConsideredPreventable;
+            var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
             var trendData = new PartitionDataForAllSexesBuilder().GetPartitionTrendData(ProfileIds.Phof,
                 AreaCodes.England, indicatorId, AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthority);
 
             Assert.IsNotNull(trendData.Limits);
-            Assert.IsTrue(trendData.Labels.Select(x=>x.Name).Contains("Male"));
+            Assert.IsTrue(trendData.Labels.Select(x => x.Name).Contains("Male"));
             Assert.IsTrue(trendData.Periods.Count > 0);
             Assert.IsTrue(trendData.TrendData[SexIds.Male].Count > 0, "Expected trend data");
         }
 
-        private static PartitionDataForAllSexes GetPartitionData(int indicatorId)
+        private static PartitionDataForAllSexes GetPartitionData(int indicatorId, int ageId)
         {
             var response = new PartitionDataForAllSexesBuilder().GetPartitionData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, ageId, AreaTypeIds.CountyAndUnitaryAuthority);
             return response;
         }
 

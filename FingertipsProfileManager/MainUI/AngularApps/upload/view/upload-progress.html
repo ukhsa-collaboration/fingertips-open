@@ -1,123 +1,132 @@
 ﻿<div ng-controller="progressCtrl">
-
+<div class="row" ng-show="isCurrentUserAdmin">
+    <div class="col-md-4 col-md-offset-8">
+        <strong>User:</strong>
+        <select class="form-control"  ng-model="selectedUserId"
+                ng-options="item.Id as item.DisplayName for item in users"
+                ng-change="switchUser()">
+            <option value="">-- Select User --</option>
+        </select>
+    </div>
+</div>
 <!-- Progress tab -->
-    <div id="progress-menu" class="tab-pane">
-        <div ng-show="!loading && !nofiles ">
-            <div class="row">
-                <h3 class="col-md-2">My pending files</h3>
-            </div>
-            <div class="row"></div>
-            <div class="row">
-                <div>
-                    <div class="col-md-2">
-                        <span class="in-progress">In progress:<span class="progress-count">{{progress.InProgress}}</span></span>
-                    </div>
-                    <div class="col-md-2">
-
-                        <span class="in-queue">In the queue:<span class="progress-count">{{progress.InQueue}}</span></span>
-                    </div>
-                    <div class="col-md-3">
-                        <span class="awaiting-confirmation">Awaiting confirmation:<span class="progress-count">{{progress.AwaitingConfomation}}</span></span>
-                    </div>
+<div id="progress-menu" class="tab-pane">
+    <div ng-show="!loading && !nofiles ">
+        <div class="row">
+            <h3 class="col-md-2">My pending files</h3>
+        </div>
+        <div class="row"></div>
+        <div class="row">
+            <div>
+                <div class="col-md-2">
+                    <span class="in-progress">In progress:<span class="progress-count">{{progress.InProgress}}</span></span>
                 </div>
+                <div class="col-md-2">
 
+                    <span class="in-queue">In the queue:<span class="progress-count">{{progress.InQueue}}</span></span>
+                </div>
+                <div class="col-md-3">
+                    <span class="awaiting-confirmation">Awaiting confirmation:<span class="progress-count">{{progress.AwaitingConfomation}}</span></span>
+                </div>
             </div>
-            <br/>
-            <div class="row">
-                <h3 class="col-md-2">All my files</h3>
-            </div>
-            <div class="row">
-                <div class="container">
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
 
-                            <th class="col-md-2">Date</th>
+        </div>
+        <br/>
+        <div class="row">
+            <h3 class="col-md-2">All my files</h3>
+        </div>
+        <div class="row">
+            <div class="container">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
 
-                            <th class="col-md-1 text-center">Rows in file</th>
+                        <th class="col-md-2">Date</th>
 
-                            <th class="col-md-1 text-center">Rows uploaded</th>
+                        <th class="col-md-1 text-center">Rows in file</th>
 
-                            <th class="col-md-2 text-center">Status</th>
+                        <th class="col-md-1 text-center">Rows uploaded</th>
 
-                            <th class="col-md-2 text-center">Summary</th>
+                        <th class="col-md-2 text-center">Status</th>
 
-                            <th class="col-md-1 text-center">Actions</th>
+                        <th class="col-md-2 text-center">Summary</th>
 
-                            <th class="col-md-1 text-center">Type</th>
-                            <th>Download original files</th>
+                        <th class="col-md-1 text-center">Actions</th>
 
-                        </tr>
+                        <th class="col-md-1 text-center">Type</th>
+                        <th>Download original files</th>
 
-                        </thead>
+                    </tr>
 
-                        <tbody>
+                    </thead>
 
-
-                        <tr ng-repeat="job in progress.Jobs" ng-class="getRowClass(job)">
-
-
-                            <td>{{job.DateCreatedF}}</td>
-
-                            <td class="text-center">
-
-                                <span ng-if="job.TotalRows==0">-</span>
-                                <span ng-if="job.TotalRows!=0">{{job.TotalRows}}</span>
-
-                            </td>
-
-                            <td class="text-center">
-                                <span ng-if="job.TotalRowsCommitted==-1">-</span>
-                                <span ng-if="job.TotalRowsCommitted!=-1">{{job.TotalRowsCommitted}}</span>
-                            </td>
-
-                            <td class="text-center" ng-switch="job.Status">
-
-                                <span ng-switch-when="0">In queue</span>
-                                <span ng-switch-when="200">In progress</span>
-                                <span ng-switch-when="300">Awaiting confirmation that file should be uploaded and existing data be replaced</span>
-                                <span ng-switch-when="302">Cancelled</span>
-                                <span ng-switch-when="400">Validation Failed</span>
-                                <span ng-switch-when="500">Unexpected Error</span>
-                                <span ng-switch-when="1000">Successful Upload</span>
-                                <span ng-switch-default>Unknown</span>
-
-                            </td>
-
-                            <td class="text-center" ng-switch="job.Status">
+                    <tbody>
 
 
-                                <div ng-switch-when="200" class="progress">
+                    <tr ng-repeat="job in progress.Jobs" ng-class="getRowClass(job)">
 
-                                    <div class="progress-bar active progress-bar-striped" role="progressbar" aria-valuenow="{{getProgress(job).percent}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : ( getProgress(job).percent + '%' ) }">
 
-                                        {{getProgress(job).percent}}%
+                        <td>{{job.DateCreatedF}}</td>
 
-                                    </div>
+                        <td class="text-center">
+
+                            <span ng-if="job.TotalRows==0">-</span>
+                            <span ng-if="job.TotalRows!=0">{{job.TotalRows}}</span>
+
+                        </td>
+
+                        <td class="text-center">
+                            <span ng-if="job.TotalRowsCommitted==-1">-</span>
+                            <span ng-if="job.TotalRowsCommitted!=-1">{{job.TotalRowsCommitted}}</span>
+                        </td>
+
+                        <td class="text-center" ng-switch="job.Status">
+
+                            <span ng-switch-when="0">In queue</span>
+                            <span ng-switch-when="200">In progress</span>
+                            <span ng-switch-when="300">Awaiting confirmation that file should be uploaded and existing data be replaced</span>
+                            <span ng-switch-when="302">Cancelled</span>
+                            <span ng-switch-when="400">Validation Failed</span>
+                            <span ng-switch-when="500">Unexpected Error</span>
+                            <span ng-switch-when="1000">Successful Upload</span>
+                            <span ng-switch-default>Unknown</span>
+
+                        </td>
+
+                        <td class="text-center" ng-switch="job.Status">
+
+
+                            <div ng-switch-when="200" class="progress">
+
+                                <div class="progress-bar active progress-bar-striped" role="progressbar" aria-valuenow="{{getProgress(job).percent}}" aria-valuemin="0" aria-valuemax="100" ng-style="{width : ( getProgress(job).percent + '%' ) }">
+
+                                    {{getProgress(job).percent}}%
 
                                 </div>
-                                <div ng-switch-when="200">{{getProgress(job).text}}</div>
-                                <a ng-switch-when="300" ng-click="showSummary(job)" class="cursor-pointer">View existing data</a>
-                                <a ng-switch-when="400" ng-click="showSummary(job)" class="cursor-pointer">View validation failures</a>
-                                <a ng-switch-when="500" ng-click="showSummary(job)" class="cursor-pointer">View Details</a>
 
-                                <div ng-switch-when="1000" class="progress">
+                            </div>
+                            <div ng-switch-when="200">{{getProgress(job).text}}</div>
+                            <a ng-switch-when="300" ng-click="showSummary(job)" class="cursor-pointer">View existing data</a>
+                            <a ng-switch-when="400" ng-click="showSummary(job)" class="cursor-pointer">View validation failures</a>
+                            <a ng-switch-when="500" ng-click="showSummary(job)" class="cursor-pointer">View Details</a>
 
-                                    <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
+                            <div ng-switch-when="1000" class="progress">
 
-                                        100%
+                                <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;">
 
-                                    </div>
+                                    100%
 
                                 </div>
-                                <span ng-switch-default>-</span>
 
-                            </td>
+                            </div>
+                            <span ng-switch-default>-</span>
 
-                            <td class="text-center">
+                        </td>
 
-                                <span ng-if="job.Status!=300">-</span>
-                                <span ng-if="job.Status==300">
+                        <td class="text-center">
+
+                            <span ng-if="job.Status!=300">-</span>
+                            <span ng-if="job.Status==300">
                                     <a ng-href="" ng-click="updateStatus(job,301)">Upload</a>
                                     <br />
                                     <span>or</span>
@@ -125,260 +134,260 @@
                                      <a ng-href="" ng-click="updateStatus(job,302)">Cancel</a>
                                 </span>
 
-                            </td>
+                        </td>
 
-                            <td class="text-center">
+                        <td class="text-center">
 
-                                <span ng-if="job.JobType==0">Simple</span>
-                                <span ng-if="job.JobType==1">Batch</span>
+                            <span ng-if="job.JobType==0">Simple</span>
+                            <span ng-if="job.JobType==1">Batch</span>
 
-                            </td>
-                        
-                            <td>
+                        </td>
 
-                                <a href="/upload/download/{{job.Guid}}">{{job.OriginalFile}}</a>
+                        <td>
 
-                            </td>
+                            <a href="/upload/download/{{job.Guid}}">{{job.OriginalFile}}</a>
 
-                        </tr>
+                        </td>
 
-                        </tbody>
+                    </tr>
 
-                    </table>
+                    </tbody>
 
-                </div>
+                </table>
 
             </div>
-        </div>
-        <div ng-show="loading" class="text-center">
-            <br/>
-            <br/>
-            <br/>
-            <img src="/images/ajax-loader.gif"/>
-        </div>
 
-        <div ng-show="nofiles" class="text-center">
-            <br />
-            <br />
-            <br />
-            <strong>You have not uploaded any data files yet.</strong>
         </div>
     </div>
+    <div ng-show="loading" class="text-center">
+        <br/>
+        <br/>
+        <br/>
+        <img src="/images/ajax-loader.gif"/>
+    </div>
 
-    <!-- Summary Modal -->
-    <div id="summary" class="modal" aria-hidden="true">
+    <div ng-show="nofiles" class="text-center">
+        <br/>
+        <br/>
+        <br/>
+        <strong>You have not uploaded any data files yet.</strong>
+    </div>
+</div>
 
-    <div class="modal-dialog" ng-class="{'modal-large' : summary.ErrorType=='40004'}" >
+<!-- Summary Modal -->
+<div id="summary" class="modal" aria-hidden="true">
 
-            <div class="modal-content">
+<div class="modal-dialog" ng-class="{'modal-large' : summary.ErrorType=='40004'}">
 
-                <div class="modal-header" ng-switch="summary.JobStatus">
+<div class="modal-content">
 
-                    <button type="button" class="close" data-dismiss="modal">X</button>
-                    <h2 ng-switch-when="200">Upload progress</h2>
-                    <h2 ng-switch-when="300">
+<div class="modal-header" ng-switch="summary.JobStatus">
 
-                        <span ng-if="summary.ErrorType==40003">Duplicate data in spreadsheet</span>
-                        <span ng-if="summary.ErrorType==40004">Data already exists in database</span>
+    <button type="button" class="close" data-dismiss="modal">X</button>
+    <h2 ng-switch-when="200">Upload progress</h2>
+    <h2 ng-switch-when="300">
 
-                    </h2>
-                    <h2 ng-switch-when="400">Validation errors</h2>
-                    <h2 ng-switch-when="500">Unexpected error</h2>
-                    <h2 ng-switch-default></h2>
+        <span ng-if="summary.ErrorType==40003">Duplicate data in spreadsheet</span>
+        <span ng-if="summary.ErrorType==40004">Data already exists in database</span>
 
-                </div>
-                <!-- Modal body-->
-                <div class="modal-body" ng-switch="summary.JobStatus">
+    </h2>
+    <h2 ng-switch-when="400">Validation errors</h2>
+    <h2 ng-switch-when="500">Unexpected error</h2>
+    <h2 ng-switch-default></h2>
 
-                    <!-- Progress Status -->
-                    <div ng-switch-when="200">
+</div>
+<!-- Modal body-->
+<div class="modal-body" ng-switch="summary.JobStatus">
 
-                        <div class="row">
+    <!-- Progress Status -->
+    <div ng-switch-when="200">
 
-                            <h4 class="col-md-4">Rows scanned:</h4>
-                            <h4 class="col-md-2"></h4>
+        <div class="row">
 
-                        </div>
-
-                    </div>
-                    <!-- Duplication Errors -->
-                    <div ng-switch-when="300">
-
-                        <div>
-
-                            {{summary.ErrorText}}
-
-                        </div>
-                        <br />
-                        <!-- Error body for duplicate in file ErrorType 40003 -->
-                        <div class="modal-table-height-400" ng-if="summary.ErrorType==40003">
-
-                            <table class="table">
-
-
-                                <thead>
-
-
-                                    <tr>
-
-
-                                        <th>Row</th>
-
-                                        <th>Error</th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-
-                                    <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber">
-
-
-                                        <td>{{err.RowNumber}}</td>
-
-                                        <td>{{err.DuplicateRowMessage}}</td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                        <!-- Error body for duplicate in database ErrorType 40004 -->
-                        <div class="modal-table-height-400"  ng-if="summary.ErrorType==40004">
-
-                            <table class="table">
-
-
-                                <thead>
-
-
-                                    <tr>
-
-
-                                        <th>Row</th>
-
-                                        <th>Indicator</th>
-
-                                        <th>Age Id</th>
-
-                                        <th>Sex Id</th>
-
-                                        <th>Area Code</th>
-
-                                        <th>Excel Value</th>
-
-                                        <th>Database Value</th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-
-                                    <tr ng-repeat="err in summary.ErrorJson| limitTo:30:0">
-
-
-                                        <td>{{err.RowNumber}}</td>
-
-                                        <td>{{err.IndicatorId}}</td>
-
-                                        <td>{{err.AgeId}}</td>
-
-                                        <td>{{err.SexId}}</td>
-
-                                        <td>{{err.AreaCode}}</td>
-
-                                        <td>{{err.ExcelValue}}</td>
-
-                                        <td>{{err.DbValue}}</td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    </div>
-                    <!-- Validation Errors -->
-                    <div ng-switch-when="400" ng-switch="summary.ErrorType">
-
-                        <div class="modal-table-height-400" ng-switch-when="40005">
-
-                            <table class="table">
-
-
-                                <thead>
-
-
-                                    <tr>
-
-
-                                        <th>Row</th>
-
-                                        <th>Error</th>
-
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-
-
-                                    <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber + err.FieldName">
-
-
-                                        <td>{{err.RowNumber}}</td>
-
-                                        <td>{{err.ErrorMessage}}</td>
-
-                                    </tr>
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-                        <div class="modal-table-height-400" ng-switch-when="40001">
-
-                            <div>{{summary.ErrorText}} </div>
-                            <br />
-                            <div ng-repeat="err in summary.ErrorJson">
-
-                                <div>{{err}}</div>
-
-                            </div>
-
-                        </div>
-                        <div ng-switch-default>
-                            {{summary.ErrorText}} 
-                        </div>
-                    </div>
-                    <!-- Unexpected Error -->
-                    <div ng-switch-when="500">
-
-                        {{summary.ErrorText}}
-
-                    </div>
-                    <span ng-switch-default></span>
-
-                </div>
-                <div class="modal-footer">
-
-                    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-
-                </div>
-
-            </div>
+            <h4 class="col-md-4">Rows scanned:</h4>
+            <h4 class="col-md-2"></h4>
 
         </div>
 
     </div>
+    <!-- Duplication Errors -->
+    <div ng-switch-when="300">
+
+        <div>
+
+            {{summary.ErrorText}}
+
+        </div>
+        <br/>
+        <!-- Error body for duplicate in file ErrorType 40003 -->
+        <div class="modal-table-height-400" ng-if="summary.ErrorType==40003">
+
+            <table class="table">
+
+
+                <thead>
+
+
+                <tr>
+
+
+                    <th>Row</th>
+
+                    <th>Error</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+
+                <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber">
+
+
+                    <td>{{err.RowNumber}}</td>
+
+                    <td>{{err.DuplicateRowMessage}}</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+        <!-- Error body for duplicate in database ErrorType 40004 -->
+        <div class="modal-table-height-400" ng-if="summary.ErrorType==40004">
+
+            <table class="table">
+
+
+                <thead>
+
+
+                <tr>
+
+
+                    <th>Row</th>
+
+                    <th>Indicator</th>
+
+                    <th>Age Id</th>
+
+                    <th>Sex Id</th>
+
+                    <th>Area Code</th>
+
+                    <th>Excel Value</th>
+
+                    <th>Database Value</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+
+                <tr ng-repeat="err in summary.ErrorJson| limitTo:30:0">
+
+
+                    <td>{{err.RowNumber}}</td>
+
+                    <td>{{err.IndicatorId}}</td>
+
+                    <td>{{err.AgeId}}</td>
+
+                    <td>{{err.SexId}}</td>
+
+                    <td>{{err.AreaCode}}</td>
+
+                    <td>{{err.ExcelValue}}</td>
+
+                    <td>{{err.DbValue}}</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+    <!-- Validation Errors -->
+    <div ng-switch-when="400" ng-switch="summary.ErrorType">
+
+        <div class="modal-table-height-400" ng-switch-when="40005">
+
+            <table class="table">
+
+
+                <thead>
+
+
+                <tr>
+
+
+                    <th>Row</th>
+
+                    <th>Error</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody>
+
+
+                <tr ng-repeat="err in summary.ErrorJson track by err.RowNumber + err.FieldName">
+
+
+                    <td>{{err.RowNumber}}</td>
+
+                    <td>{{err.ErrorMessage}}</td>
+
+                </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+        <div class="modal-table-height-400" ng-switch-when="40001">
+
+            <div>{{summary.ErrorText}} </div>
+            <br/>
+            <div ng-repeat="err in summary.ErrorJson">
+
+                <div>{{err}}</div>
+
+            </div>
+
+        </div>
+        <div ng-switch-default>
+            {{summary.ErrorText}}
+        </div>
+    </div>
+    <!-- Unexpected Error -->
+    <div ng-switch-when="500">
+
+        {{summary.ErrorText}}
+
+    </div>
+    <span ng-switch-default></span>
+
+</div>
+<div class="modal-footer">
+
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>

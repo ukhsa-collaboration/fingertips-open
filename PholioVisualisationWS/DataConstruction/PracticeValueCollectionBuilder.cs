@@ -25,14 +25,14 @@ namespace PholioVisualisation.DataConstruction
 
         private IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
         private PracticeValueCollection collection = new PracticeValueCollection();
-        private IndicatorMetadataRepository indicatorMetadataRepository = IndicatorMetadataRepository.Instance;
+        private IndicatorMetadataProvider indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
 
         public PracticeValueCollection Build(PracticeAxis axis1, PracticeAxis axis2)
         {
             bool isAreacode = !string.IsNullOrEmpty(AreaCode);
 
             // Indicator 1
-            IndicatorMetadata indicatorMetadata1 = indicatorMetadataRepository.GetIndicatorMetadata(IndicatorId1);
+            IndicatorMetadata indicatorMetadata1 = indicatorMetadataProvider.GetIndicatorMetadata(IndicatorId1);
             Grouping grouping1 = reader.GetGroupings(GroupId1, IndicatorId1, AreaTypeIds.GpPractice, SexId1, AgeId1).FirstOrDefault();
             TimePeriod period1 = new DataPointOffsetCalculator(grouping1, DataPointOffset, indicatorMetadata1.YearType).TimePeriod;
 
@@ -56,7 +56,7 @@ namespace PholioVisualisation.DataConstruction
             }
 
             // Indicator 2
-            IndicatorMetadata indicatorMetadata2 = indicatorMetadataRepository.GetIndicatorMetadata(IndicatorId2);
+            IndicatorMetadata indicatorMetadata2 = indicatorMetadataProvider.GetIndicatorMetadata(IndicatorId2);
             Grouping grouping2 = reader.GetGroupings(GroupId2, IndicatorId2, AreaTypeIds.GpPractice, SexId2, AgeId2).FirstOrDefault();
             TimePeriod period2 = new DataPointOffsetCalculator(grouping2, DataPointOffset, indicatorMetadata2.YearType).TimePeriod;
 

@@ -66,7 +66,7 @@ namespace PholioVisualisation.Export
         private readonly TrendMarkersProvider _trendMarkersProvider;
         private readonly TrendMarkerLabelProvider _trendMarkerLabelProvider;
 
-        public TrendMarkerWriter(ProfileDataWriter profileDataWriter, TrendMarkersProvider trendMarkersProvider, 
+        public TrendMarkerWriter(ProfileDataWriter profileDataWriter, TrendMarkersProvider trendMarkersProvider,
             TrendMarkerLabelProvider trendMarkerLabelProvider)
         {
             _profileDataWriter = profileDataWriter;
@@ -77,12 +77,22 @@ namespace PholioVisualisation.Export
         public void WriteChildTrendMarkers(WorksheetInfo worksheetInfo,
             Dictionary<string, TrendMarkerResult> trendMarkerResults, IList<string> childAreaCodes)
         {
-            int rowOffset = childAreaCodes.Count;
-            foreach (var childAreaCode in childAreaCodes.OrderBy(x => x))
+            try
             {
-                var trendLabel = GetLabel(trendMarkerResults[childAreaCode]);
-                _profileDataWriter.AddTrendMarker(trendLabel, rowOffset, worksheetInfo);
-                rowOffset--;
+                int rowOffset = childAreaCodes.Count;
+                foreach (var childAreaCode in childAreaCodes.OrderBy(x => x))
+                {
+                    if (trendMarkerResults.ContainsKey(childAreaCode))
+                    {
+                        var trendLabel = GetLabel(trendMarkerResults[childAreaCode]);
+                        _profileDataWriter.AddTrendMarker(trendLabel, rowOffset, worksheetInfo);
+                    }
+                    rowOffset--;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -112,8 +122,11 @@ namespace PholioVisualisation.Export
         public void WriteNationalTrendMarkers(WorksheetInfo worksheetInfo,
             Dictionary<string, TrendMarkerResult> trendMarkerResults, string areaCode)
         {
-            var label = GetLabel(trendMarkerResults[areaCode]);
-            _profileDataWriter.AddTrendMarker(label, RowOffsetForOneArea, worksheetInfo);
+            if (trendMarkerResults.ContainsKey(areaCode))
+            {
+                var label = GetLabel(trendMarkerResults[areaCode]);
+                _profileDataWriter.AddTrendMarker(label, RowOffsetForOneArea, worksheetInfo);
+            }
         }
 
         private TrendMarkerLabel GetLabel(TrendMarkerResult trendMarkerResult)

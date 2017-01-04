@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 
@@ -52,12 +53,11 @@ namespace PholioVisualisation.DataConstruction
 
         public void Build()
         {
-            var metadataRepo = IndicatorMetadataRepository.Instance;
+            var metadataRepo = IndicatorMetadataProvider.Instance;
 
             const int indicatorId = IndicatorIds.QuinaryPopulations;
 
             Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndIndicatorId(GroupId, indicatorId);
-
             area = areasReader.GetAreaFromCode(AreaCode);
 
             var metadata = metadataRepo.GetIndicatorMetadata(indicatorId);
@@ -116,6 +116,88 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
+
+        public void BuildPopulation(string areaCode,int areaTypeId)
+        {
+            var metadataRepo = IndicatorMetadataProvider.Instance;
+            area = areasReader.GetAreaFromCode(areaCode);
+            const int indicatorId = IndicatorIds.QuinaryPopulations;
+            var groupIds = new List<int> {GroupId};
+            var indicatorIds = new List<int> {indicatorId};
+            //Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(GroupId, areaTypeId).FirstOrDefault(); 
+            Grouping grouping = groupDataReader.GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(groupIds, indicatorIds, areaTypeId).FirstOrDefault();
+            if (grouping != null)
+            {
+                var metadata = metadataRepo.GetIndicatorMetadata(grouping.IndicatorId);
+                period = new DataPointOffsetCalculator(grouping, 0, metadata.YearType).TimePeriod;
+
+                // Get data for each sex
+                int overallTotal = 0;
+                foreach (var sexId in sexIds)
+                {
+                    IEnumerable<double> vals;
+
+                    if (area.IsCcg)
+                    {
+                        QuinaryPopulation population = practiceReader.GetCcgQuinaryPopulation(metadata.IndicatorId, period,
+                            AreaCode, sexId);
+                        vals = new QuinaryPopulationSorter(population.Values).SortedValues;
+                    }
+                    else
+                    {
+                        IList<CoreDataSet> data = groupDataReader.GetCoreDataForAllAges(metadata.IndicatorId, period, AreaCode,
+                            sexId);
+                        vals = new QuinaryPopulationSorter(data).SortedValues;
+                    }
+
+                    // Add total
+                    int total = Convert.ToInt32(Math.Round(vals.Sum(), MidpointRounding.AwayFromZero));
+                    overallTotal += total;
+
+                    Values.Add(sexId, vals);
+                }
+
+                // Convert to %
+                foreach (var sexId in sexIds)
+                {
+                    Values[sexId] =
+                        Values[sexId].Select(x => Math.Round((x/overallTotal)*100, 2, MidpointRounding.AwayFromZero));
+                }
+                var val = new QofListSizeProvider(groupDataReader, area, GroupId, DataPointOffset, metadata.YearType).Value;
+                if (val.HasValue)
+                {
+                    metadata = metadataRepo.GetIndicatorMetadata(QofListSizeProvider.IndicatorId);
+                    ListSize = new ValueData { Value = val.Value };
+
+                    var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+                    formatter.Format(ListSize);
+                }
+            }
+        }
+
+        public void BuildSummary()
+        {
+            var metadataRepo = IndicatorMetadataProvider.Instance;
+
+            const int indicatorId = IndicatorIds.QuinaryPopulations;
+
+            Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndIndicatorId(GroupId, indicatorId);
+            area = areasReader.GetAreaFromCode(AreaCode);
+
+            var metadata = metadataRepo.GetIndicatorMetadata(indicatorId);
+            period = new DataPointOffsetCalculator(grouping, DataPointOffset, metadata.YearType).TimePeriod;
+            
+            if (area.IsGpPractice && AreOnlyPopulationsRequired == false)
+            {
+                SetEthnicityText();
+
+                SetDeprivationDecile();
+
+                Shape = practiceReader.GetShape(AreaCode);
+
+                AdHocValues = new PracticePerformanceIndicatorValues(groupDataReader, AreaCode, DataPointOffset).IndicatorToValue;
+            }
+        }
         private void SetDeprivationDecile()
         {
             var decile = areasReader.GetCategorisedArea(AreaCode, AreaTypeIds.Country, AreaTypeIds.GpPractice,

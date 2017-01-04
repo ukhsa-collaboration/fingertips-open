@@ -47,9 +47,14 @@
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <Choose>
@@ -68,6 +73,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AutoMapperConfig.cs" />
+    <Compile Include="CsvRowParserTest.cs" />
+    <Compile Include="DataSanitizerTest.cs" />
+    <Compile Include="FingertipsUploadServiceTest.cs" />
     <Compile Include="WorkerTestBase.cs" />
     <Compile Include="SimpleJobWorkerTest.cs" />
     <Compile Include="FilePathHelperTest.cs" />
@@ -90,6 +98,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="NLog.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
     <None Include="TestFiles\batch-indicator-upload-duplicate-rows.xlsx" />
     <None Include="TestFiles\batch-indicator-upload-new-data.xlsx" />

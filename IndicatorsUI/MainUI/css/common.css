@@ -670,12 +670,6 @@ th.rugPeriod {
     font-size: 150%;
 }
 
-#searchContents {
-    width: 100%;
-    margin: auto;
-    float: left;
-}
-
 #searchResultText td.selected {
     text-decoration: underline;
 }
@@ -694,7 +688,7 @@ th.rugPeriod {
     color:#666;
     text-decoration: none;
     width: 90px;
-    height: 58px;
+    height: 71px;
     float: left;
     cursor: pointer;
     position: relative;
@@ -758,6 +752,14 @@ background-image: url('../images/tabs/inequalities.gif');
 
 #page-download div {
     background-image: url('../images/tabs/download.gif');
+}
+
+#page-england div {
+    background-image: url('../images/tabs/england.gif');
+}
+
+#page-population div {
+    background-image: url('../images/tabs/population.gif');
 }
 
 div.pageSelected div {
@@ -1034,13 +1036,17 @@ a.start, a.start:active, a.start:visited {
 ul.menu {
     list-style: none;
     float: left;
-    width: 350px;
+    width: 400px;
 }
 
 ul.inner-menu {
     list-style: none;
     float: right;
-    width: 150px;
+    width: 80px;
+}
+
+#indicatorMenuDiv ul.inner-menu {
+    width: 100px;
 }
 
 ul.menu li {
@@ -1062,7 +1068,11 @@ ul.right-menu {
     width: 240px;
     float: right;
 }
-
+ul.left-menu {
+    list-style: none;
+    width: 300px;
+    float: left;
+}
     #benchmark-box select {
         width: 150px;
     }
@@ -1137,7 +1147,7 @@ ul.right-menu {
  .indicator-row {
     list-style: none;
     float: left;
-    width: 880px;
+    width: 830px;
 }
 
 .indicator-row li {
@@ -1295,3 +1305,6 @@ ul.right-menu {
     }
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}

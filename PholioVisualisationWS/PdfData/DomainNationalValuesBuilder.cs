@@ -51,7 +51,7 @@ namespace PholioVisualisation.PdfData
         }
 
         protected override void AddIndicatorData(GroupRoot groupRoot, IndicatorMetadata metadata, 
-            IList<Area> benchmarkAreas)
+            IList<IArea> benchmarkAreas)
         {
             domainNationalValues.IndicatorData.Add(
                 builder.GetIndicatorData(groupRoot, metadata, benchmarkAreas));

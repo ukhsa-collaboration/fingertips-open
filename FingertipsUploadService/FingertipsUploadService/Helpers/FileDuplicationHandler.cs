@@ -90,24 +90,7 @@ namespace FingertipsUploadService.Helpers
                     .ToList();
 
             // Create new table without duplicats
-            var table = new DataTable();
-            table.Columns.Add("IndicatorID", typeof(double));
-            table.Columns.Add("Year", typeof(double));
-            table.Columns.Add("YearRange", typeof(double));
-            table.Columns.Add("Quarter", typeof(double));
-            table.Columns.Add("Month", typeof(double));
-            table.Columns.Add("AgeID", typeof(double));
-            table.Columns.Add("SexID", typeof(double));
-            table.Columns.Add("AreaCode", typeof(string));
-            table.Columns.Add("Count", typeof(double));
-            table.Columns.Add("Value", typeof(double));
-            table.Columns.Add("LowerCI", typeof(double));
-            table.Columns.Add("UpperCI", typeof(double));
-            table.Columns.Add("Denominator", typeof(double));
-            table.Columns.Add("Denominator_2", typeof(double));
-            table.Columns.Add("ValueNoteId", typeof(double));
-            table.Columns.Add("CategoryTypeId", typeof(double));
-            table.Columns.Add("CategoryId", typeof(double));
+            var table = new UploadDataSchema().CreateEmptyTable();
 
             foreach (var r in noDupData)
             {

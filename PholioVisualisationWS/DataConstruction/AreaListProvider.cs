@@ -48,7 +48,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 IList<string> parentCodes = areasReader.GetProfileParentAreaCodes(profileId, areaTypeId);
 
-                IList<Area> areas = parentCodes.Any()
+                IList<IArea> areas = parentCodes.Any()
                     ? areasReader.GetAreasFromCodes(parentCodes)
                     : areasReader.GetAreasByAreaTypeId(areaTypeId);
 
@@ -74,9 +74,8 @@ namespace PholioVisualisation.DataConstruction
 
         public virtual void CreateChildAreaList(string parentAreaCode, int childAreaTypeId)
         {
-            Areas = new ChildAreaListBuilder(areasReader, parentAreaCode, childAreaTypeId).ChildAreas;
+            Areas = new ChildAreaListBuilder(areasReader).GetChildAreas(parentAreaCode, childAreaTypeId);
         }
-
 
         public virtual void RemoveAreasIgnoredEverywhere(IgnoredAreasFilter ignoredAreasFilter)
         {

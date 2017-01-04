@@ -10,6 +10,7 @@ namespace PholioVisualisation.PdfData
     {
         public string LongName { get; set; }
         public int ComparatorMethodId { get; set; }
+        public bool HasEnoughValuesForSpineChart { get; set; }
 
         public double? Min { get; set; }
         public string MinF { get; set; }

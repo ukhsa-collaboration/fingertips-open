@@ -16,7 +16,7 @@ namespace PholioVisualisation.PdfData
         }
 
         public override GroupRootNationalValues GetIndicatorData(GroupRoot groupRoot,
-            IndicatorMetadata metadata, IList<Area> benchmarkAreas)
+            IndicatorMetadata metadata, IList<IArea> benchmarkAreas)
         {
             if (ChildAreaValuesBuilder == null)
             {

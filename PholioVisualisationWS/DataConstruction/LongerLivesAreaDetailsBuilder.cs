@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.Analysis;
+﻿using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -15,7 +14,7 @@ namespace PholioVisualisation.DataConstruction
         private IndicatorComparerFactory indicatorComparerFactory;
         private IArea area;
 
-        public LongerLivesAreaDetails GetAreaDetails(int profileId, int groupId, 
+        public LongerLivesAreaDetails GetAreaDetails(int profileId, int groupId,
             int childAreaTypeId, string areaCode)
         {
             area = AreaFactory.NewArea(areasReader, areaCode);
@@ -186,7 +185,7 @@ namespace PholioVisualisation.DataConstruction
             return dataList;
         }
 
-        private void AddOnsClusterToParentAreas(int childAreaTypeId, IArea area, 
+        private void AddOnsClusterToParentAreas(int childAreaTypeId, IArea area,
             List<IArea> parentAreas)
         {
             var isParentAreaTypeOnsCluster =
@@ -219,13 +218,13 @@ namespace PholioVisualisation.DataConstruction
             {
                 decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
                     AreaTypeIds.DistrictAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileDistrictAndUA2010);
+                    CategoryTypeIds.DeprivationDecileDistrictAndUA2015);
             }
             else if (childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority)
             {
                 decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
                     AreaTypeIds.CountyAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileCountyAndUA2010);
+                    CategoryTypeIds.DeprivationDecileCountyAndUA2015);
             }
 
             return decileArea;

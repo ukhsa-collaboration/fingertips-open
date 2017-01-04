@@ -42,10 +42,10 @@ namespace PholioVisualisation.Services
             var profileId = _parameters.GetNonSearchProfileId();
 
             // Get parent area groups
-            var parentAreaGroups = areasReader.GetParentAreaGroups(profileId);
+            var parentAreaGroups = areasReader.GetParentAreaGroupsForProfile(profileId);
             if (parentAreaGroups.Any() == false)
             {
-                parentAreaGroups = areasReader.GetParentAreaGroups(ProfileIds.Undefined);
+                parentAreaGroups = areasReader.GetParentAreaGroupsForProfile(ProfileIds.Undefined);
             }
 
             // Limit to supported area types for that profile

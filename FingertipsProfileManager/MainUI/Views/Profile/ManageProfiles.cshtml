@@ -36,7 +36,8 @@
                             @item.Id
                         </td>
                         <td class="left">
-                            @Html.ActionLink(item.Name, "EditProfile", new { profileId = item.Id, profileKey = item.UrlKey, profileName = item.Name }, null)
+                            @Html.ActionLink(item.Name, "EditProfile", new { profileId = item.Id, profileKey = item.UrlKey, profileName = item.Name }, 
+                           new {@class = "profile-link"})
                         </td>
                         <td class="left">
                             @item.UrlKey

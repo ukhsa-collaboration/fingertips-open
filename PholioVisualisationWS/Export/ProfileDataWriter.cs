@@ -13,6 +13,7 @@ namespace PholioVisualisation.Export
     {
         private readonly Profile _profile;
         private readonly Dictionary<string, WorksheetInfo> _wsDictionary = new Dictionary<string, WorksheetInfo>();
+        private bool maxRowCountExceeded;
 
         public ProfileDataWriter(Profile profile)
         {
@@ -140,23 +141,35 @@ namespace PholioVisualisation.Export
 
         public void AddTrendMarker(TrendMarkerLabel trendMarkerLabel, int rowOffset, WorksheetInfo ws)
         {
-            int currentRowIndex = ws.CurrentRow;
-            int column = 0;
-            IRange cells = ws.Worksheet.Cells;
-            int rowIndex = currentRowIndex - rowOffset;
-            if (rowIndex > 1)
+            if (maxRowCountExceeded == false)
             {
-                cells[rowIndex, ColumnIndexes.RecentTrend].Value = trendMarkerLabel.Text;
+                int currentRowIndex = ws.CurrentRow;
+                int column = 0;
+                IRange cells = ws.Worksheet.Cells;
+                int rowIndex = currentRowIndex - rowOffset;
+                if (rowIndex > 1)
+                {
+                    cells[rowIndex, ColumnIndexes.RecentTrend].Value = trendMarkerLabel.Text;
+                }
             }
         }
 
-        private static void AddDataRow(WorksheetInfo ws, RowLabels rowLabels, IArea area, CoreDataSet coreData,
+        private void AddDataRow(WorksheetInfo ws, RowLabels rowLabels, IArea area, CoreDataSet coreData,
             IRange cells, string parentAreaCode, string parentAreaName)
         {
+            if (maxRowCountExceeded) return;
+
+            int rowIndex;
+            int column = 0;
+
             try
             {
-                int rowIndex = ws.NextRow;
-                int column = 0;
+                rowIndex = ws.NextRow;
+                if (rowIndex == ExcelHelper.MaximumNumberOfRowsInXlsxFile)
+                {
+                    maxRowCountExceeded = true;
+                    return;
+                }
 
                 // Indicator / time period
                 cells[rowIndex, column++].Value = rowLabels.IndicatorName;

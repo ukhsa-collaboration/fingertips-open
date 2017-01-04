@@ -125,6 +125,15 @@ namespace Fpm.MainUI.Routes
 
 
             routes.MapRoute(
+                "GetAllUsers",
+                "User/All",
+                new
+                {
+                    controller = "User",
+                    action = "GetAllUsers"
+                });
+
+            routes.MapRoute(
                 "EditUser", // Route name
                 "EditUser", // URL with parameters
                 new
@@ -173,6 +182,28 @@ namespace Fpm.MainUI.Routes
                     action = "GetUserAudit",
                 }
                 );
+            routes.MapRoute(
+              "AddProfile", // Route name
+              "AddProfile", // URL with parameters
+              new
+              {
+                  controller = "User",
+                  action = "AddProfile",
+              }
+              );
+
+
+
+            routes.MapRoute(
+            "RemoveProfile", // Route name
+            "RemoveProfile", // URL with parameters
+            new
+            {
+                controller = "User",
+                action = "RemoveProfile",
+            }
+            );
+
 
             routes.MapRoute(
                 "ProfileManager", // Route name
@@ -285,6 +316,17 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
+                "DocumentDelete",
+                "Documents/Delete/{id}",
+                new
+                {
+                    controller = "Documents",
+                    action = "Delete",
+                }
+                );
+
+
+            routes.MapRoute(
                 "ValidateUploadDocumentName",
                 "validateDocumentName",
                 new
@@ -388,7 +430,7 @@ namespace Fpm.MainUI.Routes
 
             routes.MapRoute(
                 "CurrentUserJobProgress",
-                "upload/progress",
+                "upload/progress/{userId}",
                 new
                 {
                     controller = "Upload",

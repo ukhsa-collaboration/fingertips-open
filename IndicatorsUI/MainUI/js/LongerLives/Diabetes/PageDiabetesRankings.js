@@ -1,4 +1,5 @@
 rankingsState = null;
+
 function initPage() {
     showLoadingSpinner();
     tooltipManager.init();
@@ -134,10 +135,22 @@ function resetRankingsState() {
 }
 
 function displayRankingLegend() {
-    var template = MT.model.areaTypeId === AreaTypeIds.Practice
-    ? 'bobLegend'
-    : 'ragLegend';
-    $('#data_legend').html(templates.render(template));
+
+    var template;
+    var viewModel = {};
+
+    if (MT.model.profileId === ProfileIds.Suicide) {
+        viewModel.comparator = 'national';
+        template = 'bobLegend';
+    } else if (MT.model.areaTypeId === AreaTypeIds.Practice) {
+        viewModel.comparator = 'area';
+        template = 'bobLegend';
+    } else {
+        template = 'ragLegend';
+    }
+
+    var html = templates.render(template, viewModel);
+    $('#data_legend').html(html);
 }
 
 function displayPage() {
@@ -173,7 +186,7 @@ function displayPage() {
     $('#similar-areas-tooltip').html(getSimilarAreaTooltipText());
 
     var comparisonText;
-    if (MT.model.parentCode == NATIONAL_CODE) {
+    if (MT.model.parentCode === NATIONAL_CODE) {
         comparisonText = "Compared to other areas";
     } else {
         comparisonText = "Compared to the other practices in the " + getSimpleAreaTypeName();
@@ -338,14 +351,14 @@ function createExportLinks() {
     }
 }
 
-function getIndexOfGroupRootThatContainsIndicator(indicatorId, groupRoots) {
+function getIndexOfGroupRootThatContainsIndicator(model, groupRoots) {
 
     var index = 0;
 
     var selectedIndex = 0;
 
     _.each(groupRoots, function (root) {
-        if (root.IID === indicatorId) {
+        if (root.IID === model.indicatorId && root.Sex.Id === model.sexId) {
             selectedIndex = index;
         }
         index++;
@@ -407,10 +420,15 @@ function getSupportingIndicators(groupId) {
 
         var indicatorId = supportingGroupRoots[i].IID;
         metadata = metadataHash[indicatorId];
+        var stateSex = supportingGroupRoots[i].StateSex;
+        var indicatorName = metadata.Descriptive.Name;
+        if (stateSex) {
+            indicatorName = indicatorName + ' (' + supportingGroupRoots[i].Sex.Name + ')';
+        }
 
         causes.push({
             index: i,
-            name: replacePercentageWithArialFont(metadata.Descriptive.Name),
+            name: replacePercentageWithArialFont(indicatorName),
             id: indicatorId,
             cssClass: indicatorId === selectedIndicatorId
                 ? 'sub prev_risk_active'
@@ -546,12 +564,12 @@ function selectPrimaryIndicator(rootIndex) {
         loaded.primaryDataValues.fetchDataByAjax(groupRoots[selectedRootIndex]);
         ajaxMonitor.monitor(reloadData);
 
-        setSelectedPrimaryIndicator();
+        setSelectedPrimaryIndicator(rootIndex);
     }
 }
 
-function setSelectedPrimaryIndicator() {
-    selectedCause = $('#iid-' + MT.model.indicatorId);
+function setSelectedPrimaryIndicator(index) {
+    selectedCause = $('#' + index + '-iid-' + MT.model.indicatorId);
     var cssClass = 'active';
     $('.causes li').removeClass(cssClass);
     selectedCause.addClass(cssClass);
@@ -629,16 +647,23 @@ function getNewRowsWithCoreData() {
 
     for (var i in dataList) {
 
-        row = areaCodeToRowHash[dataList[i].AreaCode];
+        var areaCode = dataList[i].AreaCode;
+        row = areaCodeToRowHash[areaCode];
 
         if (row) {
             row.PrimaryData = isPrimaryData && new CoreDataSetInfo(primaryDataList[i]).isValue()
              ? primaryDataList[i]
              : null;
 
-            row.SupportingData = isSupportingData && new CoreDataSetInfo(supportingDataList[i]).isValue()
-                ? supportingDataList[i]
-                : null;
+            // Assign supporting data
+            var supportingData = null;
+            if (isSupportingData) {
+                var coreData = _.find(supportingDataList, function(data) { return data.AreaCode === areaCode });
+                if (new CoreDataSetInfo(coreData).isValue()) {
+                    supportingData = coreData;
+                }
+            }
+            row.SupportingData = supportingData;
         }
     }
 }
@@ -662,7 +687,12 @@ function displayInfoBoxes() {
     });
     var ranks = supportingAreaData.Ranks[NATIONAL_CODE];
 
+
     switch (MT.model.profileId) {
+        case ProfileIds.Suicide:
+            displayInfoBox1(ranks[1]);
+            displayInfoBox2(ranks[2]);
+            break;
         case ProfileIds.HealthChecks:
             displayInfoBox1(ranks[1]);
             break;
@@ -688,26 +718,29 @@ function displayInfoBox1(rank) {
 
 function displayInfoBox2(rank) {
 
+    var count, template;
     var templateModel = {};
+    var profileId = MT.model.profileId;
 
-    if (MT.model.profileId === ProfileIds.DrugsAndAlcohol) {
-        var count = new CommaNumber(rank.AreaRank.Count).rounded();
-        var template = '<h2>Estimated number of opiate and/or crack cocaine users in England</h2><p><span>{{count}}</span> {{period}}</p>';
-
+    if (profileId === ProfileIds.DrugsAndAlcohol) {
+        count = new CommaNumber(rank.AreaRank.Count).rounded();
+        template = '<h2>Estimated number of opiate and/or crack cocaine users in England</h2>';
+    } else if (profileId === ProfileIds.Suicide) {
+        count = new CommaNumber(rank.AreaRank.Count).rounded();
+        template = '<h2>Deaths from suicide in England</h2>';
     } else {
-
         count = isDefined(rank.AreaRank)
             ? new CommaNumber(rank.AreaRank.Count).rounded()
             : 'Data unavailable';
-
-        template = '<h2>Adults in <span class="area_name"></span> with {{condition}}</h2><p><span>{{count}}</span> {{period}}</p>';
+        template = '<h2>Adults in <span class="area_name"></span> with {{condition}}';
         templateModel.condition = getConditionWord();
     }
 
     templateModel.period = rank.Period;
     templateModel.count = count;
 
-    $('#info_box_2').html(templates.renderOnce(template, templateModel)).show();
+    $('#info_box_2').html(templates.renderOnce(template + '<p><span>{{count}}</span> {{period}}</p>',
+        templateModel)).show();
 }
 
 function setPrimaryDataHeader(metadata) {
@@ -715,7 +748,8 @@ function setPrimaryDataHeader(metadata) {
     if (metadata.IID == IndicatorIds.Deprivation) {
         var columnHeader = getDeprivationColumnHeader();
     } else {
-        columnHeader = new ColumnHeader(metadata).text
+        var root = groupRoots[selectedRootIndex];
+        columnHeader = new ColumnHeader(metadata, root).text;
     }
 
     $('#value_type_heading').html(columnHeader +
@@ -1104,14 +1138,14 @@ function setGlobalIndicatorIds() {
     } else if (isSupportingIndicatorSelected) {
         // Indicator in hash is in a supporting domain
         selectedSupportingGroupRootIndex = getIndexOfGroupRootThatContainsIndicator(
-            model.indicatorId, supportingGroupRoots);
+            model, supportingGroupRoots);
         model.indicatorId = getDefaultIndicator();
         selectedRootIndex = 0;
     } else {
         // model.indicatorId already is set to an indicator in a primary domain
         selectedSupportingGroupRootIndex = 0;
         selectedRootIndex = getIndexOfGroupRootThatContainsIndicator(
-            model.indicatorId, groupRoots);
+            model, groupRoots);
     }
 }
 
@@ -1154,14 +1188,19 @@ function displayColumnHeadersAndAddDataToRows() {
     assignDataLabelsToRows(primaryMetadata, supportingMetadata);
 }
 
-function ColumnHeader(metadata) {
+function ColumnHeader(metadata, root) {
 
     var unit = metadata.Unit;
     var unitLabel = unit.Id === 5
         ? '' :
         unit.Label;
 
-    this.text = replacePercentageWithArialFont(metadata.Descriptive.Name) +
+    var sexLabel = '';
+    if (root && root.StateSex) {
+        sexLabel = ' (' + root.Sex.Name + ')';
+    }
+
+    this.text = replacePercentageWithArialFont(metadata.Descriptive.Name) + sexLabel +
         '<small>' + unitLabel + '</small>';
 }
 
@@ -1176,7 +1215,7 @@ function getDeprivationColumnHeader() {
 }
 
 templates.add('causes',
-    '{{#causes}}<li id=iid-{{id}} class="{{cssClass}}"><a href="javascript:selectPrimaryIndicator({{index}})">{{{name}}}</a></li>{{/causes}}');
+    '{{#causes}}<li id={{index}}-iid-{{id}} class="{{cssClass}}"><a href="javascript:selectPrimaryIndicator({{index}})">{{{name}}}</a></li>{{/causes}}');
 
 templates.add('prevandriskcauses',
     '{{#causes}}<li id=prev-{{id}} class="{{cssClass}}"><a href="javascript:selectSupportingIndicator({{index}})">{{{name}}}</a></li>{{/causes}}');
@@ -1186,10 +1225,10 @@ templates.add('rows',
     {{#rows}}<tr class="odd {{selected}}"><td>\
     <a href="javascript:selectPractice(\'{{Code}}\')">{{Name}}</a></td>\
     <td><span class="grade grade-quintile-{{supportingGrade}}">{{{supportingSignificanceImage}}}</span>{{supportingDataText}}<span>{{{supportingDataUnitLabel}}}</span>{{{supportingValueNote}}}</td>\
-    <td class="last-child"><span class="grade {{grade}}"><img src="' + FT.url.img + 'Mortality/{{grade}}.png" /></span><span>{{primaryDataText}}</span><span>{{{unitLabel}}}</span>{{{primaryValueNote}}}{{{compareSimilar}}}</td></tr>{{/rows}}');
+    <td class="last-child"><span class="grade {{grade}}"><img src="' + FT.url.img + 'Mortality/{{grade}}.png" /></span><span style="max-width:170px;">{{primaryDataText}}</span><span>{{{unitLabel}}}</span>{{{primaryValueNote}}}{{{compareSimilar}}}</td></tr>{{/rows}}');
 
 templates.add('bobLegend',
-'<p class="legend">Comparison with area average\
+'<p class="legend">Comparison with {{comparator}} average\
     <span class="grade">\
         <img src="' + FT.url.img + 'Mortality/bobLower.png" alt="worse" />lower\
     </span>\

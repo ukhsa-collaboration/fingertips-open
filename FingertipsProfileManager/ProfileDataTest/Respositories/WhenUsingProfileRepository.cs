@@ -315,7 +315,7 @@ namespace Fpm.ProfileDataTest.Respositories
                 collectionNameToUpdate, collectionSkinTitleToUpdate);
 
             // Assert
-            Assert.IsTrue(result == true);
+            Assert.IsTrue(result);
         }
 
         [TestMethod]
@@ -328,12 +328,12 @@ namespace Fpm.ProfileDataTest.Respositories
             const int newOwnerProfileId = ProfileIds.Diabetes;
 
             var currentOwnerProfile = reader.GetIndicatorMetadata(indicatorId).OwnerProfileId;
-            var properties = reader.GetIndicatorMetadataTextProperties();
+            var indicatorMetadataTextProperties = reader.GetIndicatorMetadataTextProperties();
 
-            var newOwnerIMDTVs = reader.GetOverriddenIndicatorTextValuesForSpecificProfileId(indicatorId, properties, newOwnerProfileId);
+            var newOwnerIMDTVs = reader.GetOverriddenIndicatorTextValuesForSpecificProfileId(indicatorId, indicatorMetadataTextProperties, newOwnerProfileId);
 
-            //Get IndicatorMetadataTextValues where indicatorId = Null (currentOwner)
-            var currentOwnerIMDTVs = reader.GetIndicatorTextValues(indicatorId, properties, currentOwnerProfile);
+            // Get IndicatorMetadataTextValues where indicatorId = Null (currentOwner)
+            var currentOwnerIMDTVs = reader.GetIndicatorTextValues(indicatorId, indicatorMetadataTextProperties, currentOwnerProfile);
 
             // Act
             _profileRepository.ChangeOwner(indicatorId, newOwnerProfileId, 

@@ -1,6 +1,6 @@
 ﻿
 h2 {
-    margin: 45px 10px 3px 10px;
+    margin: 35px 0px 3px 0;
     padding: 0 0 3px 0;
     border-bottom: 5px solid #02ae94;
     font-weight: bold;
@@ -10,29 +10,40 @@ td {
     vertical-align: top;
 }
 
-#introduction {
-    float: left;
+#introduction a {
+    text-decoration: underline
 }
 
     #about-fingertips ul, #introduction ul, #recent-updates ul, .phof-domains ul {
         font-size: 17px;
         line-height: 1.3em;
-        margin: 0 10px 0 20px;
+        margin: 0 10px 0 18px;
         list-style: disc;
         list-style-position: outside;
     }
 
-    #about-fingertips li, #introduction li, #recent-updates li, .phof-domains li {
+    #introduction li, #recent-updates li, .phof-domains li {
         margin-left: 10px;
     }
 
-    #about-fingertips p, #introduction p {
+    #about-fingertips li {
+        margin-left: 0px;
+    }
+
+    #about-fingertips p {
         margin-top: 12px;
         margin-bottom: 12px;
+        font-size: 17px;
+        line-height: 1.5;
+    }
+
+        #introduction p {
+            margin-top: 12px;
+
     }
 
     #introduction table {
-        margin: 0 10px;
+        margin: 0 0px;
         font-size: 17px;
     }
 
@@ -65,6 +76,30 @@ td {
     font-weight: bold;
     margin: 0 10px 0 10px;
     display: block;
+}
+
+.table a.title {
+    text-decoration: none;
+    font-style: normal;
+    color: #39836e;
+    font-size: 1.6em;
+    line-height: 1.3;
+    font-weight: bold;
+    margin: 5px 0 5px 0;
+    display: block;
+}
+
+.table a.title:hover {
+    text-decoration: underline;
+}
+
+.margin-left {
+    margin-left: -10px;
+}
+
+.table td, .table th {
+
+    border-top: 0px solid #eceeef;
 }
 
 .home-profiles a, .phof-domains a {
@@ -104,20 +139,66 @@ td {
         background-position: 0 -68px;
     }
 
+.start-button {
+    color: #ffffff !important;
+    margin:67px 0 0 0;
+    float:left;
+    height:150px;
+    width:100% !important;
+    text-align: center;
+
+}
+
+.start-button a {
+    color: #ffffff !important;
+    width: 100%;
+    text-decoration: none !important;
+    font-style: normal;
+    font-size: 1.6em;
+    font-weight: bold;
+    display: block;
+    margin: -5pt 0 -5px 0;
+}
+
+.start-button p {
+    margin: -5pt 0 -5px 0 !important;
+}
+
+.start-button a:hover {
+    text-decoration: none !important;
+    color: #ffffff !important;
+}
+
+.btn {
+  background: #02ae94;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  font-family: Arial;
+  color: #ffffff !important;
+  font-size: 1.6em;
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: #048874;
+  text-decoration: none;
+}
+
+
 /*----------------------------------------
     Recent updates
 ------------------------------------------*/
-
-#recent-updates, #twitter-box {
-    width: 30%;
-    float: left;
-    margin-left: 5%;
+#recent-updates a, .standardWidth p a {
+    color: #2e3191;
+    text-decoration: underline;
 }
 
     #recent-updates h3 {
-        padding-left: 10px;
+        padding-left: 0px;
         font-size: 16px;
         padding-top: 10px;
+        font-weight: bold;
     }
 
     #recent-updates ul li {
@@ -126,13 +207,21 @@ td {
     }
 
     #recent-updates div {
-        width: 96.4%;
+        width: 100%;
     }
 
     #recent-updates .scrollable-box {
         overflow-y: scroll;
         overflow-x: hidden;
-        height: 500px;
+        height: 700px;
+    }
+
+    .scrollable-box ul li {
+        list-style-type: disc;
+    }
+
+    #note-box {
+        margin-top: 15px;
     }
 
 /*----------------------------------------
@@ -175,7 +264,7 @@ td {
 }
 
 .practice-profiles-domain-list h2 {
-    margin: 1px 10px 3px 10px;
+    margin: 0px 0px 0px 0px;
     padding: 0 0 3px 0;
     border-bottom: 5px solid #02ae94;
     font-weight: bold;

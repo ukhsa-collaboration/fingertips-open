@@ -126,13 +126,13 @@ tartanRug.ViewManager = function (config) {
 }
 
 function TartanRugCellBuilder(coreDataSet, columnNumber, rowNumber, comparisonConfig,
-    trendDisplay, hasTrends) {
+    trendDisplay, hasTrends, areaCode) {
 
     this.data = coreDataSet;
     this.dataInfo = new CoreDataSetInfo(coreDataSet);
     this.isValue = this.dataInfo.isValue();
 
-    var html = ['<td id="tc-', columnNumber, '-', rowNumber, '"'],
+    var html = ['<td  id="tc-' + columnNumber + '-' + rowNumber + '"'],
         useRag = comparisonConfig.useRagColours,
         useQuintileColouring = comparisonConfig.useQuintileColouring;
 
@@ -142,17 +142,20 @@ function TartanRugCellBuilder(coreDataSet, columnNumber, rowNumber, comparisonCo
         if (trendDisplay !== TrendDisplayOption.TrendsOnly) {
             this.sig = coreDataSet.Sig[comparisonConfig.comparatorId];
             var sigClass = this.getSigClass(useRag, useQuintileColouring);
-            html.push(' class="', this.dataInfo.isNote() ?
-                    sigClass + ' valueNote' :
-                    sigClass, '"');
+            html.push(' class="', this.dataInfo.isNote() ? sigClass + ' valueNote' : sigClass, '"');
         }
 
         if (this.dataInfo.isNote()) {
             html.push(' vn="', this.data.NoteId, '"');
         }
-
         html.push(' areacode="', coreDataSet.AreaCode, '" categoryid="', coreDataSet.CategoryId, '"');
+
+    } else {
+        html.push(' areacode="' + areaCode + '"');
     }
+
+    html.push(' style="cursor:pointer;" onclick="recentTrendSelected.fromTartanRug(\'' + areaCode + '\',' + rowNumber + ')"');
+
     html.push('>');
 
     if (hasTrends && trendDisplay && trendDisplay !== TrendDisplayOption.ValuesOnly) {
@@ -315,7 +318,7 @@ function setTartanRugHtml(isDownloadable) {
                     var nationalGrouping = getNationalComparatorGrouping(groupRoot);
                     html = new TartanRugCellBuilder(nationalGrouping.ComparatorData,
                         columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends).getHtml();
+                        hasTrends, nationalArea.Code).getHtml();
                     rug.addBenchmarkValue(html);
                 }
 
@@ -323,7 +326,7 @@ function setTartanRugHtml(isDownloadable) {
                 if (isRegionalDisplayed) {
                     html = new TartanRugCellBuilder(regionalGrouping.ComparatorData,
                         columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends).getHtml();
+                        hasTrends, regionalArea.Code).getHtml();
                     rug.addBenchmarkValue(html);
                 }
 
@@ -338,7 +341,7 @@ function setTartanRugHtml(isDownloadable) {
                     var code = sortedAreas[j].Code;
                     html = new TartanRugCellBuilder(getDataFromAreaCode(data, code),
                         columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends).getHtml();
+                        hasTrends, code).getHtml();
                     rug.addRowValue(html);
                 }
             }
@@ -360,7 +363,7 @@ function setTartanRugHtml(isDownloadable) {
     for (groupRootIndex in groupRoots) {
 
         // Value cells
-        for (i = 0; i <= sortedAreas.length + 2; i += 1) {            
+        for (i = 0; i <= sortedAreas.length + 2; i += 1) {
             tooltipManager.initElement('tc-' + i + '-' + groupRootIndex);
         }
 
@@ -695,7 +698,7 @@ function TartanRugTooltipProvider() {
                 return getIndicatorNameTooltip(rootIndex /*root index*/);
             }
 
-            return this.getTartanText(id, rootIndex);            
+            return this.getTartanText(id, rootIndex);
         }
         return '';
     };
@@ -709,6 +712,7 @@ function TartanRugTooltipProvider() {
         var $tartanCell = $('#' + id);
 
         var areaCode = $tartanCell.attr('areacode');
+
         if (!areaCode) {
             // Area code is not defined because no data is available
             return '';
@@ -733,8 +737,10 @@ function TartanRugTooltipProvider() {
             // Try get comparator data
             var categoryId = $tartanCell.attr('categoryid');
             var parentAreaCode = FT.model.parentCode;
+            var unacceptableCategories = ['', '0'];
+
             var isSubnational = areaCode === parentAreaCode ||
-                categoryId !== ''/*e.g deprivation deciles*/;
+                !_.contains(unacceptableCategories, categoryId);
 
             var grouping = isSubnational
                 ? getRegionalComparatorGrouping(root)
@@ -746,10 +752,10 @@ function TartanRugTooltipProvider() {
                 message = this._val(metadata.Unit, data.ValF);
             }
 
-            var codeForName = isSubnational ? parentAreaCode : data.AreaCode;
+            var codeForName = isSubnational ? parentAreaCode : areaCode;
             areaName = getComparatorFromAreaCode(codeForName).Name;
         }
-        
+
         var valueNote = new ValueNoteTooltipProvider().getHtmlFromNoteId(valueNoteId);
         return renderTooltip(id, areaName, message, valueNote, metadata.Descriptive.NameLong);
     };
@@ -776,7 +782,7 @@ function renderTooltip(id, areaName, message, valueNote, getIndicatorNameLong) {
         message: message,
         trendMessage: trendMessage,
         valueNote: valueNote,
-        getIndicatorNameLong: getIndicatorNameLong,        
+        getIndicatorNameLong: getIndicatorNameLong,
         isDisplayValuesAndTrends: tartanRugState.rug.displayValuesAndTrends
     });
     return html;
@@ -846,7 +852,7 @@ function showTrendInfo() {
         left = ($(window).width() - popupWidth) / 2;
 
     var parameters = new ParameterBuilder().add('profile_id', ProfileIds.Phof).add('key', 'trends-info');
-    
+
     ajaxGet('api/content',
         parameters.build(),
         function (contentText) {
@@ -855,9 +861,9 @@ function showTrendInfo() {
             $('#leftTartanTable,#rightTartanTable').floatThead('destroy');
             // enable floatThead before closing lightbox
             lightbox.preHide = function () {
-                $('#leftTartanTable,#rightTartanTable').floatThead({position:'absolute'});
+                $('#leftTartanTable,#rightTartanTable').floatThead({ position: 'absolute' });
             };
-                        
+
             lightbox.show(html, top, left, popupWidth);
             ajaxMonitor.callCompleted();
         });

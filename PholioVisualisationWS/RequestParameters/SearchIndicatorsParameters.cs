@@ -12,7 +12,7 @@ namespace PholioVisualisation.RequestParameters
 
         public string SearchText { get; set; }
 
-        public List<int> RestrictResultsToProfileIdList { get; set; }
+        public IList<int> RestrictResultsToProfileIdList { get; set; }
 
         public SearchIndicatorsParameters(NameValueCollection parameters)
             : base(parameters)

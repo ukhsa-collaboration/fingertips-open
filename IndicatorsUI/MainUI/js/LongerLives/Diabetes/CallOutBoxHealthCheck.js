@@ -1,5 +1,5 @@
 ﻿
-CallOutBox.getExtendedModel = function (areaPopulation, getGrade, areaValues) {
+CallOutBox.getExtendedModel = function (areaPopulation, getGrade) {
    
     var model = MT.model;
     var indicatorId = model.indicatorId;
@@ -29,8 +29,7 @@ CallOutBox.getExtendedModel = function (areaPopulation, getGrade, areaValues) {
 
 var header = '<div class="map-template map-info"><div class="map-info-header clearfix"><span class="map-info-close" onclick="closeInfo()">&times;</span></div><div class="map-info-body map-info-stats clearfix">';
 var footer = '</div><div class="map-info-footer clearfix">{{^hasPracticeData}}<a href="javascript:MT.nav.areaDetails();">View local authority details</a>{{/hasPracticeData}}</div><div class="map-info-tail" onclick="pointerClicked()"><i></i></div>\</div>';
-var rankings = 'Ranked <strong style="font-size: 1em; padding-left: 0px;">{{ranked}}</strong> out of <span class="rank-max">{{rankoutof}} {{{areatypename}}}.';
-var indicatorText = '{{{indicatordescription}}} {{period}}. ' + rankings;
+var indicatorText = '{{{indicatordescription}}} {{period}}. {{{rankingHtml}}}';
 
 var selectedIndicatorContent = '<div id="selected-indicator-content">' +
     '<div class="{{rankClass}} man"></div>' +
@@ -44,7 +43,7 @@ var indicator3Content = '{{#isindicatorselected2}}' + selectedIndicatorContent +
 var line = '<hr style="border: 0;height: 2px;background: #333; margin-left:30px;"/>';
 var content = '<h4 class="diabetes-place-name">{{nameofplace}}</h4>' +
         '<div id="cbox_population">' +
-        '<div class="t-cell width-30 grey-man">&nbsp;</div><div class="t-cell"><div><strong>{{population}}</strong></div><div id="population-text">{{{populationText}}}</div></div>' +
+        '<div class="t-cell width-30 grey-man">&nbsp;</div><div class="t-cell"><div><strong>{{population}}</strong></div><div id="population-text">{{{topIndicatorText}}}</div></div>' +
         '</div>' +
         line +
         '{{#isHealthChecksDomain}}' + indicator1Content + indicator2Content + indicator3Content + '{{/isHealthChecksDomain}}{{^isHealthChecksDomain}}' + selectedIndicatorContent + '{{/isHealthChecksDomain}}' +

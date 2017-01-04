@@ -157,19 +157,31 @@ namespace Fpm.MainUI.Helpers
             return items;
         }
 
-        public static IEnumerable<SelectListItem> GetOrderedListOfDomainsWithGroupId(ProfileMembers domains, SelectListItem defaultProfile, ProfileRepository profileRepository)
+        public static IEnumerable<SelectListItem> GetOrderedListOfDomainsWithGroupId(ProfileMembers domains,
+            SelectListItem defaultProfile, ProfileRepository profileRepository)
         {
             if (defaultProfile != null)
+            {
                 domains.Profile = GetProfile(defaultProfile.Value, 0, -1, profileRepository);
 
-            var listOfDomains = new SelectList(domains.Profile.GroupingMetadatas.OrderBy(g => g.Sequence), "GroupId", "GroupName");
-            var selectedDomain = new SelectList(listOfDomains, "Value", "Key", listOfDomains.FirstOrDefault().Value).SelectedValue.ToString();
-            return listOfDomains.Select(x => new SelectListItem { Selected = (x.Value == selectedDomain), Text = x.Text, Value = x.Value }); ;
+                var groupingMetadataList = domains.Profile.GroupingMetadatas.OrderBy(g => g.Sequence);
+                var listOfDomains = new SelectList(groupingMetadataList, "GroupId", "GroupName");
+                var selectedDomain = new SelectList(listOfDomains, "Value", "Key", listOfDomains.FirstOrDefault().Value)
+                    .SelectedValue.ToString();
+                return listOfDomains.Select(x => new SelectListItem
+                {
+                    Selected = (x.Value == selectedDomain),
+                    Text = x.Text,
+                    Value = x.Value
+                });
+            }
+
+            return new List<SelectListItem>();
         }
 
-        public static IEnumerable<SelectListItem> GetOrderedListOfProfiles(IEnumerable<ProfileDetails> model)
+        public static IEnumerable<SelectListItem> GetOrderedListOfProfiles(IEnumerable<ProfileDetails> profileDetailsList)
         {
-            return GetOrderedListOfProfilesWithSpecificProfileSelected(model, null);
+            return GetOrderedListOfProfilesWithSpecificProfileSelected(profileDetailsList, null);
         }
 
         public static IEnumerable<SelectListItem> GetOrderedListOfProfilesWithSpecificProfileSelected(

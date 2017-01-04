@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.DataConstruction;
+﻿using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.ServiceActions
 {
@@ -10,7 +10,21 @@ namespace PholioVisualisation.ServiceActions
         public PartitionDataForAllCategories GetPartitionData(int profileId,
             string areaCode, int indicatorId, int sexId, int ageId, int areaTypeId)
         {
+            var partitionData = new PartitionDataForAllCategories
+            {
+                AreaCode = areaCode,
+                IndicatorId = indicatorId,
+                AgeId = ageId,
+                SexId = sexId
+            };
+
+            // Check grouping exists
             InitGrouping(profileId, areaTypeId, indicatorId, sexId, ageId);
+            if (_grouping == null)
+            {
+                return partitionData;
+            }
+
             InitMetadata(_grouping);
 
             var timePeriod = TimePeriod.GetDataPoint(_grouping);
@@ -22,25 +36,27 @@ namespace PholioVisualisation.ServiceActions
             CalculateSignificances(areaCode, timePeriod, categoryDataList);
             FormatData(categoryDataList);
 
-            return new PartitionDataForAllCategories
-            {
-                AreaCode = areaCode,
-                IndicatorId = indicatorId,
-                AgeId = ageId,
-                SexId = sexId,
-                CategoryTypes = GetCategoryTypes(categoryDataList),
-                Data = categoryDataList
-            };
+            partitionData.CategoryTypes = GetCategoryTypes(categoryDataList);
+            partitionData.Data = categoryDataList;
+            return partitionData;
         }
 
         public PartitionTrendData GetPartitionTrendData(int profileId,
             string areaCode, int indicatorId, int ageId, int sexId, int categoryTypeId, int areaTypeId)
         {
             InitGrouping(profileId, areaTypeId, indicatorId, sexId, ageId);
+            if (_grouping == null)
+            {
+                return null;
+            }
+
             InitMetadata(_grouping);
             var categories = _areasReader.GetCategories(categoryTypeId);
+
             var dictionaryBuilder = new PartitionTrendDataDictionaryBuilder(
                 categories.Cast<INamedEntity>().ToList(), PartitionDataType.Category);
+
+            IList<CoreDataSet> areaAverage = new List<CoreDataSet>();
 
             // Add data for each time period
             var timePeriods = _grouping.GetTimePeriodIterator(_indicatorMetadata.YearType).TimePeriods;
@@ -49,21 +65,47 @@ namespace PholioVisualisation.ServiceActions
                 IList<CoreDataSet> dataList = _groupDataReader.GetAllCategoryDataWithinParentArea(areaCode,
                 indicatorId, sexId, ageId, timePeriod).Where(x => x.CategoryTypeId == categoryTypeId).ToList();
                 dictionaryBuilder.AddDataForNextTimePeriod(dataList);
+
+                // Get coredata for selected area
+                var coreDataSetForSelectedArea = _groupDataReader.GetCoreData(_grouping, timePeriod, areaCode).Where(x => x.CategoryTypeId == -1).ToList();
+                if (coreDataSetForSelectedArea.Any())
+                {
+                    areaAverage.Add(coreDataSetForSelectedArea.First());
+                }
             }
 
             // Remove entities without data from dictionary
             var allData = dictionaryBuilder.AllDataAsList;
 
-            // Return trend data
             timePeriods = RemoveEarlyEmptyTimePeriods(dictionaryBuilder, timePeriods);
+
+            var areaAverageAccordingToTimePeriod = new List<CoreDataSet>();
+            // Remove unwanted period data
+            foreach (var timePeriod in timePeriods)
+            {
+                foreach (var dataSet in areaAverage)
+                {
+                    if (dataSet.Year == timePeriod.Year)
+                    {
+                        areaAverageAccordingToTimePeriod.Add(dataSet);
+                    }
+                }
+            }
+
+
+            // Format category data
             FormatData(allData);
+            // Format area average            
+            FormatData(areaAverageAccordingToTimePeriod);
             var limits = new LimitsBuilder().GetLimits(allData);
+
             return new PartitionTrendData
             {
                 Limits = limits,
                 Labels = categories.Cast<INamedEntity>().ToList(),
                 TrendData = dictionaryBuilder.Dictionary,
-                Periods = GetTimePeriodStrings(timePeriods)
+                Periods = GetTimePeriodStrings(timePeriods),
+                AreaAverage = areaAverageAccordingToTimePeriod
             };
         }
 

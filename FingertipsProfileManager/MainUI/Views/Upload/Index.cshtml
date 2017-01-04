@@ -24,6 +24,7 @@
             batchTemplateUrl: '@Model.BatchTemplateUrl',
             batchLastUpdated: '@Model.BatchLastUpdated'
         }
+        var currentUser = @Html.Raw(Json.Encode(@Model.User));
     </script>
 }
 

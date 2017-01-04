@@ -46,7 +46,7 @@ namespace IndicatorsUI.MainUISeleniumTest.PHOF
 
         private void GoToPhofInequalities()
         {
-            navigateTo.PhofInequalitiesPage();
+            navigateTo.PhofInequalities();
             new WaitFor(driver).PhofTrendOptionButtonToLoad();
         }
 

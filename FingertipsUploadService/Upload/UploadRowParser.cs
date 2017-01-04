@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using FingertipsUploadService.ProfileData;
 
 namespace FingertipsUploadService.Upload
 {
@@ -6,7 +7,7 @@ namespace FingertipsUploadService.Upload
     {
         public const double UndefinedDouble = -1;
         public const int UndefinedInt = -1;
-        public const int DefaultValueNoteId = 0;
+        public const int DefaultValueNoteId = ValueNoteIds.NoNote;
 
         protected DataRow Row;
 

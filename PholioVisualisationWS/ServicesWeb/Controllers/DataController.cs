@@ -538,6 +538,40 @@ namespace ServicesWeb.Controllers
         }
 
         /// <summary>
+        /// Gets population data used in Profiles
+        /// </summary>
+        /// <param name="area_code">Area code</param>
+        /// <param name="area_type_id">AraeType ID</param>
+        /// <param name="data_point_offset">Time period offset from the data point (i.e. latest available time period)</param>
+        [HttpGet]
+        [Route("quinary_population")]
+        public Dictionary<string, object> GetQuinaryPopulation(string area_code,int area_type_id, int data_point_offset = 0)
+        {
+            try
+            {
+                return new QuinaryPopulationDataAction().GetPopulationResponse(area_code, area_type_id, data_point_offset);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+        [HttpGet]
+        [Route("quinary_population_summary")]
+        public Dictionary<string, object> GetQuinaryPopulationSummary(string area_code, int area_type_id, int data_point_offset = 0)
+        {
+            try
+            {
+                return new QuinaryPopulationDataAction().GetPopulationSummaryResponse(area_code, area_type_id, data_point_offset);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+        /// <summary>
         /// Gets a list of minimum and maximum value limits for a group
         /// </summary>
         /// <remarks>

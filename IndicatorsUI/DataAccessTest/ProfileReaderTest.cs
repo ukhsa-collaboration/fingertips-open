@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Profiles.DataAccess;
 using Profiles.DomainObjects;
 using Profiles.MainUI.Skins;
+using System.Collections.Generic;
 
 namespace IndicatorsUI.DataAccessTest
 {
@@ -99,8 +97,8 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetProfileDomainsReturnedInAscendingOrderOfSequence()
         {
-            var firstDomain = GroupIds.SevereMentalIllness_RiskFactors;
-            var secondDomain = GroupIds.SevereMentalIllness_Prevalence;
+            var firstDomain = GroupIds.SevereMentalIllness_PsychosisPathway;
+            var secondDomain = GroupIds.SevereMentalIllness_RiskFactors;
 
             AssertFirstBeforeSecond(new[] { firstDomain, secondDomain });
             AssertFirstBeforeSecond(new[] { secondDomain, firstDomain });
@@ -191,7 +189,7 @@ namespace IndicatorsUI.DataAccessTest
         public void TestGetContentItem()
         {
             var profileReader = ReaderFactory.GetProfileReader();
-            var contentItem = profileReader.GetContentItem("introduction",ProfileIds.Tobacco);
+            var contentItem = profileReader.GetContentItem("introduction", ProfileIds.Tobacco);
             AssertContains("tobacco", contentItem.Content.ToLower());
         }
 
@@ -244,7 +242,7 @@ namespace IndicatorsUI.DataAccessTest
 
             var details = reader.GetProfileDetails(ProfileIds.Diabetes).LongerLivesProfileDetails;
 
-            Assert.IsNotNull(details);            
+            Assert.IsNotNull(details);
             Assert.IsNotNull(details.Title);
         }
 

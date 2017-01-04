@@ -1,0 +1,5 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Helpers
+<div id="latest-news" class="col-md-12">
+    @ContentProvider.GetContent("front-page-latest-news", ProfileIds.UnassignedIndicators)
+</div>

@@ -4,18 +4,21 @@ describe('getIndexOfGroupRootThatContainsIndicator', function () {
     it('correct index if found', function () {
 
         var roots = [
-        { IID: 2 },
-        { IID: 20 },
-        { IID: 200 }
+        { IID: 2, Sex: {Id:1} },
+        { IID: 20, Sex: { Id: 2 } },
+        { IID: 200, Sex: { Id: 4 } }
         ];
 
-        var index = getIndexOfGroupRootThatContainsIndicator(2, roots);
+        var model = { indicatorId: 2, sexId: 1 };
+        var index = getIndexOfGroupRootThatContainsIndicator(model, roots);
         expect(index).toBe(0);
 
-        index = getIndexOfGroupRootThatContainsIndicator(20, roots);
+        model = { indicatorId: 20, sexId: 2 };
+        index = getIndexOfGroupRootThatContainsIndicator(model, roots);
         expect(index).toBe(1);
 
-        index = getIndexOfGroupRootThatContainsIndicator(200, roots);
+        model = { indicatorId: 200, sexId: 4 };
+        index = getIndexOfGroupRootThatContainsIndicator(model, roots);
         expect(index).toBe(2);
     });
 });

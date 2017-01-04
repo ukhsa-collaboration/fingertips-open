@@ -33,8 +33,8 @@ namespace PholioVisualisation.DataConstruction
         public static CoreDataSet CalculateAverage(IList<CoreDataSet> validData)
         {
             var average = CoreDataSet.GetNullObject();
-            average.Count = validData.Sum(x => x.Count.Value);
-            average.Value = validData.Sum(x => x.Count).Value / validData.Count;
+            average.Count = validData.Sum(x => x.Count);
+            average.Value = average.Count.Value;
             return average;
         }
     }

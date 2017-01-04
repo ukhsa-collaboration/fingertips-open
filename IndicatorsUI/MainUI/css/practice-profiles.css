@@ -775,6 +775,15 @@ img.spinner {
 }
 
 /* Definition table*/
+#definitionTable p, #definitionTable tr td:nth-child(2) {
+    margin: 3px 0 3px 0;
+    font-size: 1.0625rem !important;
+}
+
+#definitionTable h2 {
+    margin: 10px 0;
+}
+
 th.header, td.header {
     background-color: #f6f7f7; /*!!!*/
     font-weight: bold;
@@ -1241,9 +1250,9 @@ vertical-align: top;
 }
 
 .domainContent {
-    margin: 3px 10px 3px 10px;
+    margin: 3px 10px 3px 0px;
     font-size: 17px;
-    line-height: 1.3em;
+    line-height: 1.5;
 }
 
 /*----------------------------------------

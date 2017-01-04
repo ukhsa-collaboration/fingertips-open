@@ -49,6 +49,8 @@
     <Compile Include="Document.cs" />
     <Compile Include="LongerLivesProfileDetails.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="NeighbourType.cs" />
+    <Compile Include="ProfileNearestNeighbourAreaTypeMapping.cs" />
     <Compile Include="SkinProfileCollection.cs" />
     <Compile Include="ProfileCollection.cs" />
     <Compile Include="Domain.cs" />

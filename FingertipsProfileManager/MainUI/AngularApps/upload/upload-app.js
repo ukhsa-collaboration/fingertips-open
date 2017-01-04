@@ -12,7 +12,6 @@ app.config(function($routeProvider, $httpProvider) {
     $httpProvider.defaults.headers.get["Cache-Control"] = "no-cache";
     $httpProvider.defaults.headers.get["Pragma"] = "no-cache";
 
-
     $routeProvider
         .when("/", {
             templateUrl: "angularapps/upload/view/upload-index.html",
@@ -28,8 +27,8 @@ app.config(function($routeProvider, $httpProvider) {
 app.factory("uploadService", function($http) {
     var url = "/upload/";
     return {
-        getJobs: function() {
-            return $http.get(url + "progress");
+        getJobs: function(userId) {
+            return $http.get(url + "progress/" + userId);
         },
         getJobSummary: function(guid) {
             return $http.get(url + "summary/" + guid);
@@ -39,6 +38,9 @@ app.factory("uploadService", function($http) {
         },
         getRowsProcessed: function(guid) {
             return $http.get(url + "rows-processed/" + guid);
+        },
+        getAllFpmUsers: function() {
+            return $http.get("/user/all");
         }
     };
 });
@@ -58,7 +60,7 @@ app.controller("uploadCtrl", function($scope, $window) {
         var isAllowed = true;
         if (filePath.length > 0) {
             var ext = filePath.substring(filePath.lastIndexOf(".") + 1).toLowerCase();
-            if (ext != "xlsx" && ext != "xls" && ext != "csv") {
+            if (ext !== "xlsx" && ext !== "xls" && ext !== "csv") {
                 isAllowed = false;
             }
         }
@@ -144,10 +146,20 @@ app.controller("progressCtrl", function($scope, uploadService, $interval, $windo
 
     $scope.loading = true;
     $scope.nofiles = false;
+    $scope.selectedUserId;
+    $scope.isCurrentUserAdmin = currentUser.IsAdministrator;
+    // Get all fpm users
+    uploadService.getAllFpmUsers().success(function(data) {
+        $scope.users = data;
+    });
+        
 
     // Calls progress web service, which contains list of jobs 
-    var getJobs = function() {
-        uploadService.getJobs().success(function (data) {            
+    var getJobs = function () {
+        var userId = _.isUndefined($scope.selectedUserId) ? currentUser.Id : $scope.selectedUserId;
+
+        uploadService.getJobs(userId).success(function (data) {
+
             if ($scope.progress !== data) {
                 $scope.loading = false;
                 if (data.Jobs.length === 0) {
@@ -163,7 +175,7 @@ app.controller("progressCtrl", function($scope, uploadService, $interval, $windo
     };
 
     // Auto refresh jobs list
-    $interval(function() {
+    $interval(function () {
         getJobs();
     }, 2000);
 
@@ -219,10 +231,8 @@ app.controller("progressCtrl", function($scope, uploadService, $interval, $windo
 
     // Change status
     $scope.updateStatus = function (job, statusCode) {
-        console.log('clicked');
         uploadService.updateJobStatus(job.Guid, statusCode).success(function(data) {
         }).error(function () {
-            console.log('error');
             // do nothing
         });
     };
@@ -262,6 +272,12 @@ app.controller("progressCtrl", function($scope, uploadService, $interval, $windo
         }
         return progress;
     };
+
+    $scope.switchUser = function () {
+        $scope.nofiles = false;
+        getJobs();
+
+    }
 });
 
 
@@ -304,7 +320,6 @@ function uploadSimple() {
     $("#upload-batch-browse-control").addClass("hidden");
     $("#upload-simple-browse-control").removeClass("hidden");
 }
-
 
 function uploadBatch() {
     toggleBrowseControl();

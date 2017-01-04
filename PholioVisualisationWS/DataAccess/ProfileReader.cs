@@ -18,6 +18,7 @@ namespace PholioVisualisation.DataAccess
         IList<ProfileConfig> GetAllProfiles();
         IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds, int areaTypeId);
         ProfileConfig GetProfileConfig(int profileId);
+        IList<int> GetAllProfileIds();
 
         /// <summary>
         /// Opens a data access session
@@ -96,8 +97,15 @@ namespace PholioVisualisation.DataAccess
             var profiles = CurrentSession.CreateCriteria<ProfileConfig>()
                 .List<ProfileConfig>();
             return profiles;
-            
-        } 
+        }
+
+        public virtual IList<int> GetAllProfileIds()
+        {
+            var ids = CurrentSession.CreateCriteria<ProfileConfig>()
+                .SetProjection(Projections.Property("ProfileId"))
+                .List<int>();
+            return ids;
+        }
 
         public virtual ProfileConfig GetProfileConfig(int profileId)
         {

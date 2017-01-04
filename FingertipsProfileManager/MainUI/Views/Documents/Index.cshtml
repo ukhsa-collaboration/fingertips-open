@@ -8,20 +8,22 @@
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 <script src="@(AppConfig.JsPath)document-manager.js" type="text/javascript"></script>
 
-<div class="standardWidth">       
+<div class="standardWidth">
 
-    <form id="DocManagementForm"  action="/Documents" method="GET">
-        <h2 class="subheading">Documents
-        <span class="info-tooltip"><i>Use this page to upload documents that you need to create links to in content. The documents can be of any type.</i></span></h2>
+    <form id="DocManagementForm" action="/Documents" method="GET">
+        <h2 class="subheading">
+            Documents
+            <span class="info-tooltip"><i>Use this page to upload documents that you need to create links to in content. The documents can be of any type.</i></span>
+        </h2>
         <div class="standardWidth">
             <b>Profile:</b>
-            @Html.DropDownListFor(model => model.ProfileId, Model.ProfileList, 
-                new {@Id= "selectedProfile", @Name="selectedProfile",  @Class = "create-indicator-dropdown" })       
+            @Html.DropDownListFor(model => model.ProfileId, Model.ProfileList,
+                new { @Id = "selectedProfile", @Name = "selectedProfile", @Class = "create-indicator-dropdown" })
             @Html.Hidden("sortBy", Model.SortBy)
             @Html.Hidden("ascending", Model.SortAscending)
         </div>
-    </form>   
-    
+    </form>
+
     <div class="standardWidth clearfix">
         <div class="button-box">
             <input type="button" value="Upload document" class="auto-width-button" onclick="showUploadControl()" />
@@ -54,11 +56,12 @@
                         <th class="header">File name</th>
                         <th class="header">Content URL</th>
                         <th class="header">Download</th>
+                        <th class="header">Delete</th>
                     </tr>
                 </thead>
                 @foreach (var doc in Model.DocumentItems)
-                {
-                    var path = "documents/" + doc.FileName;
+                    {
+                        var path = "documents/" + doc.FileName;
                     <tr>
                         <td class="left">
                             @doc.UploadedOn.ToShortDateString()
@@ -70,8 +73,11 @@
                             /@path
                         </td>
                         <td>
-                            <a href="@AppConfig.DefaultTestUrl@path" target="_blank" 
+                            <a href="@AppConfig.DefaultTestUrl@path" target="_blank"
                                title="Download @doc.FileName from the test site">Download</a>
+                        </td>
+                        <td>
+                            <a href="" class="document-delete" documentId="@doc.Id" title="Delete @doc.FileName from the test site">Delete</a>
                         </td>
                     </tr>
                 }
@@ -80,15 +86,15 @@
         else
         {
             <div class="document-message">No documents have been uploaded yet for this profile</div>
-        }        
-    }   
-   
+        }
+    }
+
 </div>
 <div id="errorInfoBox" style="top: 750px; left: 699.5px; width: 500px; display: none;">
     <div id="error-message">
         <h3 style="text-align: center;">File name is already used by another profile</h3>
         <br>
-        <input class="medium-button" type="button" onclick="lightbox.hide()" value="OK" style="margin-left: 37%;"/>
+        <input class="medium-button" type="button" onclick="lightbox.hide()" value="OK" style="margin-left: 37%;" />
     </div>
     <div class="close" onclick="lightbox.hide();"></div>
 </div>
@@ -99,8 +105,8 @@
         <h3 style="text-align: center;">This will overwrite the current file</h3>
         <br>
         <div>
-            <input class="medium-button" type="button" onclick="submitForm()" value="OK" style="margin-left: 23%;"/>
-            <input class="medium-button" type="button" onclick="donotOverwrite()" value="Cancel" style="margin-left: 10%;"/>
+            <input class="medium-button" type="button" onclick="submitForm()" value="OK" style="margin-left: 23%;" />
+            <input class="medium-button" type="button" onclick="donotOverwrite()" value="Cancel" style="margin-left: 10%;" />
         </div>
     </div>
     <div class="close" onclick="lightbox.hide();"></div>

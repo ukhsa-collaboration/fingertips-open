@@ -41,8 +41,20 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Moq, Version=4.5.29.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.5.29\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -88,6 +100,7 @@
     <Compile Include="Fingertips\FingertipsBaseUnitTest.cs" />
     <Compile Include="Fingertips\FingertipsIndicatorSearchTest.cs" />
     <Compile Include="Fingertips\PracticeProfilesTest.cs" />
+    <Compile Include="Fingertips\FingertipsPopulationTest.cs" />
     <Compile Include="HashParameters.cs" />
     <Compile Include="HealthierLives\HealthierLivesSearchTest.cs" />
     <Compile Include="HealthierLives\PageDiabetesAreaDetailsTest.cs" />
@@ -104,6 +117,7 @@
     <Compile Include="PHOF\PhofContentPageTest.cs" />
     <Compile Include="PHOF\PhofDataTest.cs" />
     <Compile Include="PHOF\PhofBaseUnitTest.cs" />
+    <Compile Include="PHOF\PhofGoToRecentTrends.cs" />
     <Compile Include="PHOF\PhofIndicatorSearchTest.cs" />
     <Compile Include="PHOF\PhofInequalityTrendTest.cs" />
     <Compile Include="PHOF\PhofNearestNeighboursTest.cs" />
@@ -158,7 +172,10 @@
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>xcopy "C:\fingertips\3rdPartyLibraries\selenium\geckodriver.exe" "$(TargetDir)" /i /d /y</PreBuildEvent>
+    <PreBuildEvent>xcopy "C:\fingertips\3rdPartyLibraries\selenium\geckodriver.exe" "$(TargetDir)" /i /d /y
+
+xcopy "C:\fingertips\3rdPartyLibraries\selenium\chromedriver.exe" "$(TargetDir)" /i /d /y
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

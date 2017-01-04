@@ -83,7 +83,9 @@
 
     public class ValueNoteIds
     {
+        public const int NoNote = 0;
         public const int ThereIsDataQualityIssueWithThisValue = 401;
+        public const int AggregatedFromAllKnownLowerGeographyValuesByFingertips = 506;
     }
 
     public class CategoryTypeIds
@@ -116,5 +118,9 @@
         public const string Quarter = "[Quarter]";
     }
 
+    public class DatabaseLogIds
+    {
+        public const int FusCheckedJobs = 2;
+    }
 
 }

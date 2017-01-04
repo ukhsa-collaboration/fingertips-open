@@ -78,6 +78,14 @@ namespace ServicesWeb
     {
         public static void Register()
         {
+            var uiUrl = ApplicationConfiguration.UrlUI;
+
+            // Only allow HTTPS access on live
+            if (ApplicationConfiguration.IsEnvironmentLive)
+            {
+                uiUrl = "https://" + UrlHelper.TrimProtocol(uiUrl);
+            }
+
             GlobalConfiguration.Configuration
                 .EnableSwagger(c =>
                     {
@@ -85,7 +93,7 @@ namespace ServicesWeb
                         // However, there may be situations (e.g. proxy and load-balanced environments) where this does not
                         // resolve correctly. You can workaround this by providing your own code to determine the root URL.
                         //
-                        c.RootUrl(req => ApplicationConfiguration.UrlUI);
+                        c.RootUrl(req => uiUrl);
 
                         // If schemes are not explicitly provided in a Swagger 2.0 document, then the scheme used to access
                         // the docs is taken as the default. If your API supports multiple schemes and you want to be explicit

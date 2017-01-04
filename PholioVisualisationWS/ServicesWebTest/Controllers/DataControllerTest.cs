@@ -40,5 +40,28 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
 
             Assert.AreEqual(data["Code"], areaCode);
         }
+
+        [TestMethod]
+        public void TestGetQuinaryPopulation()
+        {
+            var areaCode = AreaCodes.Ccg_AireDaleWharfdaleAndCraven;
+            var areTypeId = AreaTypeIds.Ccg;
+
+            var data = new DataController().GetQuinaryPopulation(areaCode,
+                areTypeId, 0);
+
+            Assert.AreEqual(data["Code"], areaCode);
+        }
+        [TestMethod]
+        public void TestGetQuinaryPopulationSummary()
+        {
+            var areaCode = AreaCodes.Gp_KingStreetBlackpool;
+            var areTypeId = AreaTypeIds.GpPractice;
+
+            var data = new DataController().GetQuinaryPopulationSummary(areaCode,
+                areTypeId, 0);
+
+            Assert.AreEqual(data["Code"], areaCode);
+        }
     }
 }

@@ -48,12 +48,6 @@
       <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PholioVisualisation.DataAccess">
-      <HintPath>..\DataAccess\bin\Debug\PholioVisualisation.DataAccess.dll</HintPath>
-    </Reference>
-    <Reference Include="PholioVisualisation.PholioObjects">
-      <HintPath>..\DataAccess\bin\Debug\PholioVisualisation.PholioObjects.dll</HintPath>
-    </Reference>
     <Reference Include="SpreadsheetGear">
       <HintPath>..\lib\SpreadsheetGear.dll</HintPath>
     </Reference>
@@ -66,6 +60,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -74,13 +69,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AverageCalculator\Calculator.cs" />
-    <Compile Include="AverageCalculator\GroupingManager.cs" />
-    <Compile Include="AverageCalculator\IndicatorManager.cs" />
-    <Compile Include="CoreDataSetAverageCalculator.cs" />
+    <Compile Include="AverageCalculator\AverageCalculationConfig.cs" />
+    <Compile Include="AverageCalculator\BulkCoreDataSetAverageCalculator.cs" />
+    <Compile Include="AverageCalculator\CalculatorGroupingListProvider.cs" />
+    <Compile Include="AverageCalculator\ParentAreaProvider.cs" />
     <Compile Include="ExcelFileDeleter.cs" />
     <Compile Include="ExcelFileGenerator.cs" />
     <Compile Include="ExcelFileTimer.cs" />
+    <Compile Include="FdetConfiguration.cs" />
     <Compile Include="FingertipsDataExtractionToolDIRegistry.cs" />
     <Compile Include="PracticeProfilesExcelFileGenerator.cs" />
     <Compile Include="Program.cs" />
@@ -97,6 +93,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataAccess\DataAccess.csproj">
+      <Project>{93fcce58-31af-467d-adc2-3067bea82e7d}</Project>
+      <Name>DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288f7-5950-49db-8642-63587cb8146e}</Project>
       <Name>ExceptionLogger</Name>
@@ -112,6 +112,10 @@
     <ProjectReference Include="..\Export\Export.csproj">
       <Project>{85526825-84fb-4ead-a98a-16ece3cce8ca}</Project>
       <Name>Export</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
+      <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
+      <Name>PholioObjects</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,9 +2,9 @@
 
 describe('TrendData', function () {
 
-    var getBenchmarkPoints = function(point) {
+    var getBenchmarkPoints = function(coreData) {
         var trendData = new TrendData();
-        trendData.addBenchmarkPoint(point,point);
+        trendData.addBenchmarkPoint(coreData);
         return trendData.getBenchmarkPoints();
     };
 
@@ -15,7 +15,7 @@ describe('TrendData', function () {
     };
 
     it('addBenchmarkPoint y is set correctly', function () {
-        expect(getBenchmarkPoints(1)[0].y).toBe(1);
+        expect(getBenchmarkPoints({Val:1, ValF:'1'})[0].y).toBe(1);
     });
 
     it('addBenchmarkPoint y is null if value is null', function () {

@@ -23,7 +23,7 @@ namespace PholioVisualisation.ExportTest
         [TestMethod]
         public void TestCreatesParentAreaWorksheet()
         {
-            Assert.IsTrue(DeprivationDecileWorksheet().Name.Contains("Deprivation decile"));
+            Assert.IsTrue(DeprivationDecileWorksheet().Name.Contains("decile"));
         }
 
         [TestMethod]
@@ -71,12 +71,12 @@ namespace PholioVisualisation.ExportTest
 
         private static IWorksheet DeprivationDecileWorksheet()
         {
-            return _workbook.Worksheets["Deprivation decile (IMD..."];
+            return _workbook.Worksheets[WorksheetNames.DeprivationDecile];
         }
 
         private static IWorksheet DistrictUAWorksheet()
         {
-            return _workbook.Worksheets["District & UA"];
+            return _workbook.Worksheets[WorksheetNames.DistrictUa];
         }
     }
 }

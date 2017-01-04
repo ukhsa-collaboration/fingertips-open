@@ -2,7 +2,7 @@
 {
     public enum UploadJobStatus
     {
-        NotStart = 0,
+        NotStarted = 0,
         InProgress = 200,
         ConfirmationAwaited = 300,
         ConfirmationGiven = 301,
@@ -19,6 +19,6 @@
         CheckingPermission = 203,
         CheckingDuplicationInFile = 204,
         CheckingDuplicationInDb = 205,
-        WrittingToDb = 206
+        WritingToDb = 206
     }
 }

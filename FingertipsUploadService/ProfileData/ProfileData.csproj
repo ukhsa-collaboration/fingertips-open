@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CoreDataSetSchema.cs" />
     <Compile Include="DuplicateRowInDatabaseError.cs" />
     <Compile Include="Entities\Core\CoreDataSetDuplicateResponse.cs" />
     <Compile Include="Entities\JobError\UploadJobErrorType.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Entities\Job\UploadJob.cs" />
     <Compile Include="Entities\Job\UploadJobStatus.cs" />
     <Compile Include="Entities\Job\UploadJobType.cs" />
+    <Compile Include="Entities\Logging\DatabaseLog.cs" />
     <Compile Include="Entities\LookUps\Age.cs" />
     <Compile Include="Entities\LookUps\AreaType.cs" />
     <Compile Include="BaseReader.cs" />

@@ -16,6 +16,8 @@ namespace PholioVisualisation.Services
     public class IndicatorStatsResponse
     {
         public int IID { get; set; }
+        public Sex Sex { get; set; }
+        public Age Age { get; set; }
         public IndicatorStatsPercentiles Stats { get; set; }
         public IndicatorStatsPercentilesFormatted StatsF { get; set; }
         public bool? HaveRequiredValues { get; set; }
@@ -25,7 +27,7 @@ namespace PholioVisualisation.Services
     {
         private IndicatorStatsParameters _parameters;
 
-        private IndicatorMetadataRepository indicatorMetadataRepository = IndicatorMetadataRepository.Instance;
+        private IndicatorMetadataProvider indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
         private PholioReader pholioReader = ReaderFactory.GetPholioReader();
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
@@ -37,7 +39,7 @@ namespace PholioVisualisation.Services
         private IList<string> areaCodesToIgnore;
         private IList<int> profileIds;
 
-        private bool? doEnoughAreasHaveValues;
+        private bool? shouldShowSpineChart;
 
         private int childAreaCount;
 
@@ -83,10 +85,10 @@ namespace PholioVisualisation.Services
             foreach (var root in roots)
             {
                 Grouping grouping = root.Grouping[0];
-                IndicatorMetadata metadata = indicatorMetadataRepository.GetIndicatorMetadata(grouping);
+                IndicatorMetadata metadata = indicatorMetadataProvider.GetIndicatorMetadata(grouping);
                 TimePeriod timePeriod = new DataPointOffsetCalculator(grouping, _parameters.DataPointOffset, metadata.YearType).TimePeriod;
 
-                IEnumerable<double> values = GetValuesForStats(grouping, timePeriod);
+                IEnumerable<double> values = GetValuesForStats(grouping, timePeriod, metadata);
 
                 IndicatorStatsResponse statsAndStatF;
                 if (values != null)
@@ -98,9 +100,11 @@ namespace PholioVisualisation.Services
                     statsAndStatF = new IndicatorStatsResponse
                     {
                         IID = metadata.IndicatorId,
+                        Sex = grouping.Sex,
+                        Age = grouping.Age,
                         Stats = statsPercentiles,
                         StatsF = formatter.FormatStats(statsPercentiles),
-                        HaveRequiredValues = doEnoughAreasHaveValues
+                        HaveRequiredValues = shouldShowSpineChart
                     };
                 }
                 else
@@ -109,7 +113,9 @@ namespace PholioVisualisation.Services
                     statsAndStatF = new IndicatorStatsResponse
                     {
                         IID = metadata.IndicatorId,
-                        HaveRequiredValues = doEnoughAreasHaveValues
+                        Sex = grouping.Sex,
+                        Age = grouping.Age,
+                        HaveRequiredValues = shouldShowSpineChart
                     };
                 }
                 responseObjects[rootIndex] = statsAndStatF;
@@ -145,7 +151,7 @@ namespace PholioVisualisation.Services
             return new GroupRootBuilder().BuildGroupRoots(groupings);
         }
 
-        private IEnumerable<double> GetValuesForStats(Grouping grouping, TimePeriod timePeriod)
+        private IEnumerable<double> GetValuesForStats(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata metadata)
         {
             IList<CoreDataSet> data = null;
             IList<double> values;
@@ -168,10 +174,9 @@ namespace PholioVisualisation.Services
             int areaTypeId = grouping.AreaTypeId;
             if (areaTypeId != AreaTypeIds.GpPractice)
             {
-                doEnoughAreasHaveValues = IsRequiredNumberOfAreaValues(values) ||
-                    ShouldSpineChartAlwaysBeAvailable(grouping.IndicatorId);
+                shouldShowSpineChart = IsRequiredNumberOfAreaValues(values) || metadata.AlwaysShowSpineChart;
 
-                if (doEnoughAreasHaveValues == false)
+                if (shouldShowSpineChart == false)
                 {
                     values = null;
                 }
@@ -186,15 +191,6 @@ namespace PholioVisualisation.Services
             }
 
             return values;
-        }
-
-        /// <summary>
-        /// See FIN-1084: spine chart should be displayed for SSI indicator
-        /// </summary>
-        private bool ShouldSpineChartAlwaysBeAvailable(int indicatorId)
-        {
-            return indicatorId == IndicatorIds.SurgicalSiteInfectionHipProsthesis ||
-                   indicatorId == IndicatorIds.SurgicalSiteInfectionKneeProsthesis;
         }
 
         /// <summary>

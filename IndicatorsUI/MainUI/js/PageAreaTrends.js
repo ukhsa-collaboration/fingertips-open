@@ -6,7 +6,6 @@
 */
 var areaTrends = {};
 
-
 function goToAreaTrendsPage() {
     var model = FT.model;
     sortedAreasForTrends = FT.data.sortedAreas;
@@ -112,6 +111,7 @@ function initTabSpecificOptions() {
         eventHandlers: [singleAreaClickHandler, multiAreaClickHandler],
         eventName: 'ChartCountChanged'
     });
+
 }
 
 function displayChartOptions() {
@@ -141,6 +141,7 @@ function displayChartOptions() {
         var html = templates.render(templateName);
 
         $('#trends-chart-sorter-az').html(html);
+        $("#tab-specific-options").append(html);
 
         // add rank sorting option after template is randered
         if (model.isNearestNeighbours()) {
@@ -151,13 +152,17 @@ function displayChartOptions() {
     }
 }
 
-function addTrendRow(h, dataPoint, comparatorValues, period, comparisonConfig) {
+function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig) {
 
-    var regionalVal = comparatorValues[REGIONAL_COMPARATOR_ID],
-        nationalVal = comparatorValues[NATIONAL_COMPARATOR_ID],
-        dataInfo = new TrendDataInfo(dataPoint),
-        isValue = dataInfo.isValue();
-    if (!isValue && regionalVal === '-' && nationalVal === '-') {
+    var regionalData = comparatorData[REGIONAL_COMPARATOR_ID];
+    var nationalData = comparatorData[NATIONAL_COMPARATOR_ID];
+    var dataInfo = new TrendDataInfo(dataPoint);
+    var regionalDataInfo = new CoreDataSetInfo(regionalData);
+    var nationalDataInfo = new CoreDataSetInfo(nationalData);
+
+    var isValue = dataInfo.isValue();
+
+    if (!isValue && regionalDataInfo.isValue() && nationalDataInfo.isValue()) {
         return false;
     }
 
@@ -176,15 +181,17 @@ function addTrendRow(h, dataPoint, comparatorValues, period, comparisonConfig) {
     addTd(h, valueDisplayer.byDataInfo(dataInfo), CSS_NUMERIC, null, dataInfo.getNoteId());
     addTd(h, valueDisplayer.byNumberString(dataPoint.L), CSS_NUMERIC);
     addTd(h, valueDisplayer.byNumberString(dataPoint.U), CSS_NUMERIC);
-    // Add the row only if not in Nearest Neighbour mode
+
+    // Subnational column
     if (!FT.model.isNearestNeighbours()) {
         if (isSubnationalColumn()) {
-            addTd(h, valueDisplayer.byNumberString(regionalVal), CSS_NUMERIC);
+            addTd(h, valueDisplayer.byDataInfo(regionalDataInfo), CSS_NUMERIC, null, regionalDataInfo.getNoteId());
         }
     }
 
+    // National column
     if (enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY) {
-        addTd(h, valueDisplayer.byNumberString(nationalVal), CSS_NUMERIC);
+        addTd(h, valueDisplayer.byDataInfo(nationalDataInfo), CSS_NUMERIC, null, nationalDataInfo.getNoteId());
     }
 
     h.push('</tr>');
@@ -212,61 +219,69 @@ function getTrendMarkerHtml(data, comparisonConfig) {
 
 function displayTrendRootTables() {
 
-    var html = [],
-    indexesDisplayed = [],
-        areaCode, i, root, comparatorName, index;
+    var html = [];
+    var rootIndexesDisplayed = [];
 
     var viewMode = areaTrendsState.tabSpecificOptions.getOption();
 
+    // Set HTML for page
     if (currentTrendRoots !== null) {
         displayChartOptions();
         html = viewMode === VIEW_MODES.MULTI_AREA ?
-            getMultiAreaTrendsHtml() :
-            getSingleAreaTrendsHtml(indexesDisplayed);
+            getSmallMultipleTrendChartsHtml() :
+            getLargeTrendChartAndTableHtml(rootIndexesDisplayed);
     }
-
     pages.getContainerJq().html(html.join(''));
 
     // Display charts (after HTML has been set)
     if (viewMode === VIEW_MODES.AREA) {
-        // One big trend chart for a single area
-        comparatorName = getCurrentComparator().Name;
-
-        areaCode = getSingleTrendsAreaCode();
-
-        for (i = 0; i < indexesDisplayed.length; i++) {
-            index = indexesDisplayed[i];
-            root = displayedTrendRoots[index];
-
-            new Highcharts.Chart(
-                getLargeTrendChartOptions('trendChart' + index, root, areaCode, comparatorName)
-            );
-        }
+        initLargeTrendCharts(rootIndexesDisplayed);
     }
     else {
-        // Multiple small trend charts
-        index = getIndicatorIndex();
-        root = currentTrendRoots[index];
-        comparatorName = getCurrentComparator().Name;
+        initSmallMultipleTrendCharts();
+    }
+}
 
-        if (isDefined(root)) {
-            var comparatorVals = [],
-                vals = root.ComparatorValue;
-            for (i in vals) {
-                comparatorVals.push(vals[i][comparatorId]);
-            }
+function initSmallMultipleTrendCharts() {
+    // Multiple small trend charts
+    var i;
+    var rootIndex = getIndicatorIndex();
+    var groupRoot = groupRoots[rootIndex];
+    var trendRoot = areaTrends.findMatchingTrendRoot(groupRoot, currentTrendRoots);
 
-            var metadata = ui.getMetadataHash()[root.IID];
-            var comparisonConfig = new ComparisonConfig(root, metadata);
+    var comparatorName = getCurrentComparator().Name;
 
-            for (i in sortedAreasForTrends) {
-                areaCode = sortedAreasForTrends[i].Code;
-                if (new CoreDataSetList(root.Data[areaCode]).areAnyValidTrendValues()) {
-                    createSmallTrendChart('at-' + areaCode, root, areaCode,
-                        comparatorName, comparisonConfig);
-                }
+    if (isDefined(trendRoot)) {
+        var comparatorVals = [],
+            vals = trendRoot.ComparatorValue;
+        for (i in vals) {
+            comparatorVals.push(vals[i][comparatorId]);
+        }
+
+        var metadata = ui.getMetadataHash()[trendRoot.IID];
+        var comparisonConfig = new ComparisonConfig(trendRoot, metadata);
+
+        for (i in sortedAreasForTrends) {
+            var areaCode = sortedAreasForTrends[i].Code;
+            if (new CoreDataSetList(trendRoot.Data[areaCode]).areAnyValidTrendValues()) {
+                createSmallTrendChart('at-' + areaCode, trendRoot, areaCode,
+                    comparatorName, comparisonConfig);
             }
         }
+    }
+}
+
+function initLargeTrendCharts(indexesDisplayed) {
+    var comparatorName = getCurrentComparator().Name;
+    var areaCode = getSingleTrendsAreaCode();
+
+    for (var i = 0; i < indexesDisplayed.length; i++) {
+        var index = indexesDisplayed[i];
+        var groupRoot = displayedGroupRoots[index];
+        var trendRoot = areaTrends.findMatchingTrendRoot(groupRoot, currentTrendRoots);
+        new Highcharts.Chart(
+            getLargeTrendChartOptions('trendChart' + index, trendRoot, areaCode, comparatorName)
+        );
     }
 }
 
@@ -344,13 +359,13 @@ function getLargeTrendChartOptions(id, root, areaCode, comparatorName) {
 
         var data = dataList[j],
         significance = data.Sig[comparisonConfig.comparatorId],
-        markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours, colours, comparisonConfig.useQuintileColouring);
+        markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours,
+            colours, comparisonConfig.useQuintileColouring);
 
         trendData.addAreaPoint(data, markerColor);
 
         if (showBenchmarkData) {
-            trendData.addBenchmarkPoint(root.ComparatorValue[j][comparatorId],
-                root.ComparatorValueFs[j][comparatorId]);
+            trendData.addBenchmarkPoint(root.ComparatorData[j][comparatorId]);
         }
 
         labels.push(root.Periods[j]);
@@ -479,7 +494,7 @@ function getLargeTrendChartOptions(id, root, areaCode, comparatorName) {
 
 function exportChart(groupRootIndex) {
     var areaCode = FT.model.areaCode;
-    var root = displayedTrendRoots[groupRootIndex];
+    var root = displayedGroupRoots[groupRootIndex];
     var indicatorName = ui.getMetadataHash()[root.IID].Descriptive.Name + new SexAndAge().getLabel(root);
 
     var newChart = new Highcharts.Chart(getLargeTrendChartOptions('trendChart' + groupRootIndex,
@@ -714,17 +729,17 @@ function chartTooltip() {
         row.highlightCIs();
     }
     // Generate HTML
-    var indicatorId = displayedTrendRoots[rootIndex].IID;
+    var indicatorId = displayedGroupRoots[rootIndex].IID;
     var unit = ui.getMetadataHash()[indicatorId].Unit;
     var value = new ValueWithUnit(unit).getFullLabel(row.getValF());
     return '<b> ' + value + '<br/>' +
         '</b><br/><i>' + series.name + '</i><br/>' + period;
 }
 
-function getTrendRootsToDisplay() {
+function getGroupRootsToDisplay() {
     return showAllIndicators() ?
-        currentTrendRoots :
-        [currentTrendRoots[getIndicatorIndex()]];
+        groupRoots :
+        [groupRoots[getIndicatorIndex()]];
 }
 
 function getSingleTrendsAreaCode() {
@@ -735,25 +750,38 @@ function getSingleTrendsAreaCode() {
     return FT.model.areaCode;
 }
 
-function getSingleAreaTrendsHtml(indexesDisplayed) {
+/**
+* Finds the trend root that matches the group root. These should be in same order
+* but are not always in the search results on live (reason unknown)
+* @class findMatchingTrendRoot
+*/
+areaTrends.findMatchingTrendRoot = function (groupRoot, trendRoots) {
+    return matchBySexAgeAndIID(groupRoot, trendRoots);
+}
+
+function getLargeTrendChartAndTableHtml(indexesDisplayed) {
 
     var html = [];
     var areaCode = getSingleTrendsAreaCode();
     var areaName = getAreaNameToDisplay(areaHash[areaCode]);
 
-    displayedTrendRoots = getTrendRootsToDisplay();
+    displayedGroupRoots = getGroupRootsToDisplay();
 
     var indicatorMetadataHash = ui.getMetadataHash();
 
-    for (var i in displayedTrendRoots) {
-        var root = displayedTrendRoots[i];
-        if (isDefined(root)) {
+    for (var i in displayedGroupRoots) {
 
-            var metadata = indicatorMetadataHash[root.IID],
+        var groupRoot = displayedGroupRoots[i];
+
+        var trendRoot = areaTrends.findMatchingTrendRoot(groupRoot, currentTrendRoots);
+
+        if (isDefined(trendRoot)) {
+
+            var metadata = indicatorMetadataHash[trendRoot.IID],
                 h = [],
-                comparisonConfig = new ComparisonConfig(root, metadata);
+                comparisonConfig = new ComparisonConfig(trendRoot, metadata);
 
-            h.push(getTrendHeader(metadata, root, areaName,
+            h.push(getTrendHeader(metadata, trendRoot, areaName,
                 'goToMetadataPage(' + i + ')'));
 
             var showCIText = areaTrendsState.showConfBars
@@ -767,9 +795,9 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
             h.push('<div class="trendContainer">' + exportTypes + '<div id="trendChart', i, '" class="trendChart"></div>');
            
             // Trend table contents
-            if (root.RecentTrends) {
+            if (trendRoot.RecentTrends) {
                 var recentTrend = FT.config.hasRecentTrends
-                    ? 'Recent trend:' + getTrendMarkerImage(root.RecentTrends[areaCode].Marker, root.PolarityId)
+                    ? 'Recent trend:' + getTrendMarkerImage(trendRoot.RecentTrends[areaCode].Marker, trendRoot.PolarityId)
                     : '';
                 h.push('<div class="trend-marker" onmouseover="showRecentTrendTooltip(this,true);"  onmouseout="showRecentTrendTooltip(this,false);"">'+  recentTrend +
                     '</div>');
@@ -797,16 +825,16 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
             addTrendTableHeader(h, useWide);
             var areAnyRows = false;
 
-            var areaData = root.Data[areaCode];
-            var periods = root.Periods;
+            var areaData = trendRoot.Data[areaCode];
+            var periods = trendRoot.Periods;
             for (var j in periods) {
 
                 var period = periods[j];
 
                 if (isDefined(areaData)) {
                     var data = areaData[j];
-                    var comparatorValues = root.ComparatorValueFs[j];
-                    addTrendRow(h, data, comparatorValues, period, comparisonConfig);
+                    var comparatorData = trendRoot.ComparatorData[j];
+                    addTrendRow(h, data, comparatorData, period, comparisonConfig);
                 }
                 areAnyRows = true;
             }
@@ -822,7 +850,7 @@ function getSingleAreaTrendsHtml(indexesDisplayed) {
         }
     }
 
-    if (displayedTrendRoots.length == 0) {
+    if (displayedGroupRoots.length === 0) {
         html.push(NO_TREND_DATA);
     }
 
@@ -867,7 +895,7 @@ function displayTrends() {
     hideAndShowTrendKeys();
 }
 
-function getMultiAreaTrendsHtml() {
+function getSmallMultipleTrendChartsHtml() {
 
     var h = [],
     index = getIndicatorIndex(),
@@ -943,17 +971,17 @@ function getMultiAreaTrendsHtml() {
 }
 
 function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonConfig) {
-    var labels = [],
+    var labels = [], data,
     trendData = new TrendData(),
     dataList = root.Data[areaCode];
 
     for (var j in dataList) {
-        var data = dataList[j],
-        significance = data.Sig[comparisonConfig.comparatorId],
-        markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours, colours, comparisonConfig.useQuintileColouring);
+        var data = dataList[j];
+        var significance = data.Sig[comparisonConfig.comparatorId];
+        var markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours, colours,
+            comparisonConfig.useQuintileColouring);
         trendData.addAreaPoint(data, markerColor);
-        trendData.addBenchmarkPoint(root.ComparatorValue[j][comparatorId],
-            parseFloat(root.ComparatorValueFs[j][comparatorId]));
+        trendData.addBenchmarkPoint(root.ComparatorData[j][comparatorId]);
         labels.push(root.Periods[j]);
     }
 
@@ -977,7 +1005,7 @@ function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonCon
                 height: 140,
                 events: {
                     click: function (e) {
-                        toggleViewMode(areaCode); /* swtich to single chart view  */
+                        toggleViewMode(areaCode); /* switch to single chart view  */
                     }
                 }
             },
@@ -1052,9 +1080,16 @@ function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonCon
             },
             tooltip: {
                 formatter: function () {
+
+                    var data = this.point.data;
+
+                    // Data object type may be CoreDataSet or TrendDataPoint
+                    var valF = !!data['V'] ? data.V : data.ValF;
+
+                    // Tooltip over value on small trend chart
                     var indicatorId = root.IID,
                         unit = ui.getMetadataHash()[indicatorId].Unit,
-                        value = new ValueWithUnit(unit).getFullLabel(this.point.ValF);
+                        value = new ValueWithUnit(unit).getFullLabel(valF);
 
                     return '<b>' + value + '</b> ' +
                         '<br/><i>' + this.series.name + '</i><br/>' + this.x;
@@ -1203,11 +1238,10 @@ function TrendData() {
 
     this.addAreaPoint = function (trendDataPoint, markerColor) {
 
-        var isValid = trendDataPoint.V !== '-';
-
+        var info = new TrendDataInfo(trendDataPoint);
         areaPoints.push({
-            y: isValid ? trendDataPoint.D : null,
-            ValF: isValid ? parseFloat(trendDataPoint.V) : null,
+            y: info.isValue() ? trendDataPoint.D : null,
+            data: trendDataPoint,
             color: markerColor,
             noteId: trendDataPoint.NoteId,
             marker: {
@@ -1223,13 +1257,14 @@ function TrendData() {
             parseFloat(trendDataPoint.U)]);
     };
 
-    this.addBenchmarkPoint = function (value, valueF) {
+    this.addBenchmarkPoint = function (trendDataPoint) {
 
-        var y = isValidValue(value) ? value : null;
+        var info = new CoreDataSetInfo(trendDataPoint);
+        var y = info.isValue() ? trendDataPoint.Val : null;
 
         benchmarkPoints.push({
             y: y,
-            ValF: valueF,
+            data: trendDataPoint,
             isBenchmark: true
         });
     };
@@ -1308,14 +1343,11 @@ function TrendTableRow() {
     };
 }
 
-
-
-
 var NO_TREND_DATA = '<div class="noData300">No trend data available</div>';
 var currentTrendRoots = null;
 var viewModeState = 0;
 var sortedAreasForTrends = [];
-var displayedTrendRoots;
+var displayedGroupRoots;
 
 pages.add(PAGE_MODES.AREA_TRENDS, {
     id: 'trends',

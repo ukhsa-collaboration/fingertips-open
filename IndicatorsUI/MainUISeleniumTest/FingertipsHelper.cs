@@ -40,12 +40,22 @@ namespace IndicatorsUI.MainUISeleniumTest
             return lastText;
         }
 
+        public static void SelectAreaType(IWebDriver driver, int areaTypeId)
+        {
+            var areasDropdown = driver.FindElement(By.Id("areaTypes"));
+            var selectElements = new SelectElement(areasDropdown);
+            selectElements.SelectByValue(areaTypeId.ToString());
+            WaitForAjaxLock(driver);
+        }
+
+        public static void SelectDomain(IWebDriver driver, int groupId)
+        {
+            ClickElement(driver, "domain" + groupId);
+        }
+
         public static void SelectFingertipsTab(IWebDriver driver, string pageId)
         {
-            var tab = driver.FindElement(By.Id(pageId));
-            tab.Click();
-            WaitFor.ThreadWait(0.1);
-            new WaitFor(driver).AjaxLockToBeUnlocked();
+            ClickElement(driver, pageId);
         }
 
         public static string GetSelectedAreaNameFromMenu(IWebDriver driver)
@@ -63,8 +73,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             searchText.SendKeys(text);
             new WaitFor(driver).ExpectedElementToBeVisible(By.Id(LongerLivesIds.AreaSearchAutocompleteOptions));
             searchText.SendKeys(Keys.Return);
-            WaitFor.ThreadWait(0.1);
-            new WaitFor(driver).AjaxLockToBeUnlocked();
+            WaitForAjaxLock(driver);
         }
 
         public static void LeaveAreaSearchMode(IWebDriver driver)
@@ -98,6 +107,25 @@ namespace IndicatorsUI.MainUISeleniumTest
         {
             var trendsButton = driver.FindElement(By.Id(FingertipsIds.InequalitiesLatestValues));
             trendsButton.Click();
+        }
+
+        public static void SelectTrendsOnTartanRug(IWebDriver driver)
+        {
+            var trendsButton = driver.FindElement(By.Id("tab-option-1"));
+            trendsButton.Click();
+        }
+
+        public static void ClickElement(IWebDriver driver, string pageId)
+        {
+            var tab = driver.FindElement(By.Id(pageId));
+            tab.Click();
+            WaitForAjaxLock(driver);
+        }
+
+        private static void WaitForAjaxLock(IWebDriver driver)
+        {
+            WaitFor.ThreadWait(0.1);
+            new WaitFor(driver).AjaxLockToBeUnlocked();
         }
     }
 }

@@ -29,8 +29,7 @@ namespace PholioVisualisation.DataConstruction
             }
             else
             {
-                childAreas = new ChildAreaListBuilder(_areasReader, parentAreaCode, childAreaTypeId)
-                    .ChildAreas;
+                childAreas = new ChildAreaListBuilder(_areasReader).GetChildAreas(parentAreaCode, childAreaTypeId);
             }
 
             IgnoredAreasFilter filter = IgnoredAreasFilterFactory.New(profileId);

@@ -51,29 +51,7 @@ namespace FingertipsUploadService.UploadTest
 
         private DataRow DataRow()
         {
-            DataTable table = new DataTable();
-            var columns = table.Columns;
-
-            var doubleType = typeof(double);
-
-            columns.Add(UploadColumnNames.IndicatorId, doubleType);
-            columns.Add(UploadColumnNames.Year, doubleType);
-            columns.Add(UploadColumnNames.YearRange, doubleType);
-            columns.Add(UploadColumnNames.Quarter, doubleType);
-            columns.Add(UploadColumnNames.Month, doubleType);
-            columns.Add(UploadColumnNames.AgeId, doubleType);
-            columns.Add(UploadColumnNames.SexId, doubleType);
-            columns.Add(UploadColumnNames.AreaCode, typeof(string));
-            columns.Add(UploadColumnNames.Count, doubleType);
-            columns.Add(UploadColumnNames.Value, doubleType);
-            columns.Add(UploadColumnNames.LowerCI, doubleType);
-            columns.Add(UploadColumnNames.UpperCI, doubleType);
-            columns.Add(UploadColumnNames.Denominator, doubleType);
-            columns.Add(UploadColumnNames.Denominator2, doubleType);
-            columns.Add(UploadColumnNames.ValueNoteId, doubleType);
-            columns.Add(UploadColumnNames.CategoryTypeId, doubleType);
-            columns.Add(UploadColumnNames.CategoryId, doubleType);
-
+            var table = new UploadDataSchema().CreateEmptyTable();
             table.Rows.Add(indicatorId, year, yearRange, quarter, month, ageId, sexId, areaCode, count, value,
                            lowerCI, upperCI, denominator, denominator2, valueNoteId, categoryTypeId, categoryId);
 

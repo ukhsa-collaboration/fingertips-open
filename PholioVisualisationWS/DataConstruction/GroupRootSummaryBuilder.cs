@@ -9,7 +9,7 @@ namespace PholioVisualisation.DataConstruction
     {
         public IList<GroupRootSummary> Build(int profileId, int areaTypeId)
         {
-            IndicatorMetadataRepository metadataRepo = IndicatorMetadataRepository.Instance;
+            IndicatorMetadataProvider metadataRepo = IndicatorMetadataProvider.Instance;
             IList<int> groupIds = ReaderFactory.GetGroupDataReader().GetGroupingIds(profileId);
 
             IList<GroupRootSummary> groupRootSummaries = new List<GroupRootSummary>();

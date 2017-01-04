@@ -435,17 +435,11 @@ namespace PholioVisualisation.DataAccess
             var allData = new List<CoreDataSet>();
 
             // Query the database 1000 areas at a time, for large numbers of areas the query will fail otherwise
-            const int numberOfCodesToTake = 1000;
-            var nextAreaCodes = areaCodes.Take(numberOfCodesToTake);
-            int numberTaken = numberOfCodesToTake;
-            while (nextAreaCodes.Any())
+            var splitter = new AreaCodeListSplitter(areaCodes);
+            while (splitter.AnyLeft())
             {
-                var nextData = GetCoreDataForAreaCodes(grouping, period, nextAreaCodes);
-
+                var nextData = GetCoreDataForAreaCodes(grouping, period, splitter.NextCodes());
                 allData.AddRange(nextData);
-
-                nextAreaCodes = areaCodes.Skip(numberTaken).Take(numberOfCodesToTake);
-                numberTaken += numberOfCodesToTake;
             }
             return allData;
         }
@@ -497,7 +491,7 @@ namespace PholioVisualisation.DataAccess
                 .List<CoreDataSet>();
         }
 
-        public CoreDataSet GetCoreDataForCategory(Grouping grouping, TimePeriod timePeriod, 
+        public CoreDataSet GetCoreDataForCategory(Grouping grouping, TimePeriod timePeriod,
             string areaCode, int categoryTypeId, int categoryId)
         {
             return CurrentSession.CreateCriteria<CoreDataSet>()

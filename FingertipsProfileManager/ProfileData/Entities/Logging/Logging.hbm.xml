@@ -44,6 +44,15 @@
 
   </class>
 
+  <class name="DatabaseLog" table="DatabaseLog">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="Event" column="event"/>
+    <property name="Timestamp" column="timestamp"/>
+  </class>
+
   <sql-query name="Insert_FPMAreaAudit">
     INSERT INTO Fpm_AreaAudit (AreaCode, AreaName, AreaShortName, AreaTypeId, AddressLine1, AddressLine2, AddressLine3, AddressLine4, IsCurrent,
     Postcode, ChangedAreaCode, Timestamp, UserName ) 

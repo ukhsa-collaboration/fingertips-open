@@ -113,6 +113,31 @@ namespace FingertipsUploadService.ProfileData.Repositories
             }
         }
 
+        /// <summary>
+        /// Deletes core data that has been precalculated by Fingertips and stored in PHOLIO
+        /// </summary>
+        public void DeletePrecalculatedCoreData(int indicatorId)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                CurrentSession.CreateQuery(
+                    "delete CoreDataSet c where c.IndicatorId = :indicatorId and c.ValueNoteId = :valueNoteId")
+                    .SetParameter("indicatorId", indicatorId)
+                    .SetParameter("valueNoteId", ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips)
+                    .ExecuteUpdate();
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+
+                HandleException(exception);
+                throw;
+            }
+        }
+
         public IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, out int totalRows)
         {
             return GetCoreDataSet(indicatorId, null, out totalRows);

@@ -52,6 +52,14 @@ describe('IndicatorIdList', function () {
         expect(new IndicatorIdList(hash).anyForAreaType(areaTypeId2)).toBe(true);
     });
 
+    it('anyForAreaType where area type id is not in list', function () {
+
+        var hash = {};
+        hash[areaTypeId] = [indicatorId];
+
+        expect(new IndicatorIdList(hash).anyForAreaType(areaTypeId2)).toBe(false);
+    });
+
     it('getIds', function () {
 
         var hash = {};
@@ -70,4 +78,30 @@ describe('IndicatorIdList', function () {
     });
 });
 
+describe('indicatorSearch.filterResults', function () {
+
+    var areaTypeToIndicatorIdsMap = { 1: [], 2: [1, 2], 3: [4, 5] };
+
+    it('filterResults removes areas types with no indicator results',
+        function () {
+
+            var filtered = indicatorSearch.filterResults(areaTypeToIndicatorIdsMap);
+            expect(_.size(filtered)).toBe(2);
+        });
+});
+
+
+describe('indicatorSearch.filterAreaTypes', function () {
+
+    var areaTypes = [{ Id: 1 }, { Id: 2 }, { Id: 3 }, { Id: 4 }];
+
+    var areaTypeIds = ['2', '4'];
+
+    it('filterAreaTypes only keeps those with specified IDs',
+        function () {
+
+            var filtered = indicatorSearch.filterAreaTypes(areaTypes, areaTypeIds);
+            expect(filtered.length).toBe(2);
+        });
+});
 

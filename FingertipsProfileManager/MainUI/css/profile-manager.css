@@ -518,11 +518,6 @@ input[type=checkbox] {
         background: #E5F0FF;
     }
 
-.btn {
-    margin-right: 15px;
-}
-
-
 #upload-cancel {
     color: #003399;
     float: left;
@@ -687,7 +682,7 @@ a.upload-error {
 
 .content-item-detail-label {
     display: inline-block;
-    width: 200px;
+    width: 240px;
     text-align: left;
     margin-top: 5px;
     color: #666;
@@ -2501,6 +2496,26 @@ LI.site-link {
   Filter data
 ------------------------------------------*/
 
+.nopadding {
+   padding: 0 !important;
+   margin: 0 !important;
+}
+
+.row.no-gutters {
+  margin-left: -6px !important;
+}
+.row.no-gutters > [class^="col-"],
+.row.no-gutters > [class*=" col-"] {
+  margin-left: 0 !important;
+}
+
+/*end*/
+
+.button-box-margin {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
 .filters {
     border: 1px solid gray;
     padding: 0 10px;
@@ -2580,3 +2595,22 @@ LI.site-link {
     top: 4px;
     margin-left: 5px;
 }
+
+/*----------------------------------------
+  Generic Bootstrap overrides
+------------------------------------------*/
+.container label {
+    padding-right: 0;
+    color: #666;
+    font-size: 11pt;
+}
+
+.form-control {
+    color: #333;
+}
+
+.form-horizontal .checkbox-inline {
+    margin-top: 10px;
+}
+
+

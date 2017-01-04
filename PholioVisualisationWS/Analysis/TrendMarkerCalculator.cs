@@ -16,8 +16,7 @@ namespace PholioVisualisation.Analysis
         public bool IsValid(ref string validationMessage)
         {
             var valid = ValueTypeId == ValueTypeIds.Proportion
-                    || ValueTypeId == ValueTypeIds.CrudeRate
-                    || ValueTypeId == ValueTypeIds.DirectlyStandardisedRate;
+                    || ValueTypeId == ValueTypeIds.CrudeRate;
 
             if (!valid)
             {

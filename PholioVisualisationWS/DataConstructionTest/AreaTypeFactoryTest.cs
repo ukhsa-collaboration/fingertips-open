@@ -31,7 +31,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewCategoryAreaType_NameIsDefined()
         {
-            var name = "deprivation decile";
+            var name = "decile";
             var id = CategoryTypeIds.DeprivationDecileCountyAndUA2010;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), new ParentAreaGroup { CategoryTypeId = id });
 

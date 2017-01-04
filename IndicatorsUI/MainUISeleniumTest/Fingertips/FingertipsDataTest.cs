@@ -160,14 +160,10 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             driver.FindElement(By.Id("page-content")).Click();
             new WaitFor(driver).InequalitiesTabToLoad();
         }
-
+        
         public void SelectTab(string tabId)
         {
-            driver.FindElement(By.Id(tabId)).Click();
-
-            // Added because this method was finishing before the page had fully switched area type
-            WaitFor.ThreadWait(0.1);
-            waitFor.PageToFinishLoading();
+            FingertipsHelper.SelectFingertipsTab(driver, tabId);
         }
     }
 }

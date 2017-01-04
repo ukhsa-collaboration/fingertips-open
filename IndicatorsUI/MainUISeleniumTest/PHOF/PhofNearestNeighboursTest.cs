@@ -13,7 +13,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void CheckNearestNeighboursLink()
         {
-            LoadPhofPage();
+            navigateTo.PhofTartanRug();
 
             var selectArea = FingertipsHelper.GetSelectedAreaNameFromMenu(driver);
             var selectedNearestNeighbourArea = driver.FindElement(By.Id("nearest-neighbour-link")).Text;
@@ -27,16 +27,16 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void CheckNearestNeighboursMenuLoadedCorrectly()
         {
-            LoadPhofPage();
+            navigateTo.PhofTartanRug();
             var selectedAreaName = FingertipsHelper.GetSelectedAreaNameFromMenu(driver);
             ClickNearestNeighbourLink();
 
             new WaitFor(driver).FingertipsNearestNeighboursMenuToLoad();
 
             // Check the back button text
-            var backToMenuText = driver.FindElement(By.Id("goBack")).Text;
-            TestHelper.AssertTextContains(backToMenuText, "Exit nearest neighbours");
-            TestHelper.AssertTextContains(backToMenuText, "More information");
+            var exitNearestNeighboursText = driver.FindElement(By.Id("goBack")).Text;
+            TestHelper.AssertTextContains(exitNearestNeighboursText, "Exit nearest neighbours");
+            TestHelper.AssertTextContains(exitNearestNeighboursText, "More information");
 
             // Check NN text loaded correctly
             var selectAreaText = driver.FindElement(By.Id("nearest-neighbour-header")).Text;
@@ -49,7 +49,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         [TestMethod]
         public void TestNearestNeighboursForAnAreaLoadedCorrectly()
         {
-            LoadPhofPage();
+            navigateTo.PhofTartanRug();
             ClickNearestNeighbourLink();
             new WaitFor(driver).AjaxLockToBeUnlocked();
 
@@ -63,23 +63,18 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         ///     Test the back to menu link
         /// </summary>
         [TestMethod]
-        public void TestBackToMenuLink()
+        public void TestExitNearestNeighboursLink()
         {
-            LoadPhofPage();
+            navigateTo.PhofTartanRug();
             ClickNearestNeighbourLink();
             new WaitFor(driver).AjaxLockToBeUnlocked();
-            ClickBackToMenuLink();
+            ClickExitNearestNeighboursLink();
             new WaitFor(driver).AjaxLockToBeUnlocked();
 
             var columns = driver.FindElements(By.XPath("//*[@id='rightTartanTable']/thead/tr/th"));
             
-            // Assert: number of area columns is 1 area + 15 neighbours
-            Assert.AreEqual(16, columns.Count - ExtraColumns);     
-        }
-
-        private void LoadPhofPage()
-        {
-            navigateTo.PhofDataPage();
+            // Assert: nearest neighbours is no longer displayed
+            Assert.AreEqual(9, columns.Count - ExtraColumns);     
         }
 
         private void ClickNearestNeighbourLink()
@@ -87,7 +82,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             driver.FindElement(By.Id("nearest-neighbour-link")).Click();
         }
 
-        private void ClickBackToMenuLink()
+        private void ClickExitNearestNeighboursLink()
         {
             driver.FindElement(By.Id("goBack")).Click();
         }

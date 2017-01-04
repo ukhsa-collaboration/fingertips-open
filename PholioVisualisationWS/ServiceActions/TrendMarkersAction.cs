@@ -20,7 +20,7 @@ namespace PholioVisualisation.ServiceActions
 
         public Dictionary<string, TrendMarkerResult> GetTrendMarkers(string parentAreaCode, int profileId, int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
         {
-            var indicatorMetadata = IndicatorMetadataRepository.Instance.GetIndicatorMetadata(indicatorId);
+            var indicatorMetadata = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(indicatorId);
 
             var grouping = _singleGroupingProvider.GetGroupingByGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(
                 groupId, areaTypeId, indicatorId, sexId, ageId);

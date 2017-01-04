@@ -27,17 +27,14 @@ namespace PholioVisualisation.ServiceActionsTest
         }
 
         [TestMethod]
-        public void TestGetPartitionDataWhenNoData()
+        public void TestGetPartitionData_When_No_Grouping_Returns_Empty_Data()
         {
             var data = new PartitionDataForAllCategoriesBuilder().GetPartitionData(ProfileIds.SexualHealth,
-                AreaCodes.England, IndicatorIds.SyphilisDiagnosis, SexIds.Persons, AgeIds.AllAges,
+                AreaCodes.England, IndicatorIds.SyphilisDiagnosis, SexIds.Persons, AgeIds.From0To4,
                 AreaTypeIds.CountyAndUnitaryAuthority);
 
-            Assert.AreEqual(AreaCodes.England, data.AreaCode);
-            Assert.AreEqual(SexIds.Persons, data.SexId);
-            Assert.AreEqual(AgeIds.AllAges, data.AgeId);
-            Assert.IsFalse(data.Data.Any(), "There should be no data");
-            Assert.IsFalse(data.CategoryTypes.Any(), "There should be no category types");
+            Assert.IsNull(data.CategoryTypes);
+            Assert.IsNull(data.Data);
         }
 
         [TestMethod]

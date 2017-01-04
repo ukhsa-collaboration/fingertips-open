@@ -6,10 +6,15 @@
 
 @if (details.HasExclusiveSkin)
 {
-    <a class="title" href="@(ViewBag.Protocol)@Model.ExternalUrl">@details.Title</a>
+    // Live URLs that end in ".info" cannot be served over https
+    var protocol = Model.ExternalUrl.Contains(".info") ? "http://"
+        : ViewBag.Protocol;
+
+    <a class="title" href="@(protocol)@Model.ExternalUrl">@details.Title</a>
 }
 else if (Model.IsBeingDisplayedOnCollectionFrontPage)
 {
+    
     // When displayed on profile collection's own front page
     <a class="title" href="@(fingertipsUrl)/profile-group/@Model.ParentCollection.UrlKey/profile/@details.ProfileUrlKey">@details.Title</a>
 }

@@ -19,7 +19,7 @@ namespace PholioVisualisation.DataConstruction
             IEnumerable<CoreDataSet> sortedData = ageIds
                 .Select(ageId => data.FirstOrDefault(x => x.AgeId == ageId));
 
-            SortedValues = sortedData.Where(x => x != null).Select(x => x.Value).ToList();
+            SortedValues = sortedData.Where(x => x != null &&  x.Value != ValueData.NullValue).Select(x => x.Value).ToList();
         }
 
         public QuinaryPopulationSorter(IEnumerable<QuinaryPopulationValue> data)
@@ -27,7 +27,7 @@ namespace PholioVisualisation.DataConstruction
             IEnumerable<QuinaryPopulationValue> sortedData = GetAgeIdsToOver95()
                 .Select(ageId => data.FirstOrDefault(x => x.AgeId == ageId));
 
-            SortedValues = sortedData.Where(x => x != null).Select(x => x.Value).ToList();
+            SortedValues = sortedData.Where(x => x != null && x.Value != ValueData.NullValue).Select(x => x.Value).ToList();
         }
 
         public static IEnumerable<int> GetAgeIdsToOver95()

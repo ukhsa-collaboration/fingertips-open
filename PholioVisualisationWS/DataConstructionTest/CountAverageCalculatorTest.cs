@@ -20,8 +20,11 @@ namespace PholioVisualisation.DataConstructionTest
             };
 
             var calculator = new CountAverageCalculator(CoreDataSetFilter(dataList));
-            Assert.AreEqual(3, calculator.Average.Value);
-            Assert.AreEqual(6, calculator.Average.Count);
+            var average = calculator.Average;
+
+            // Assert: count and value are the same
+            Assert.AreEqual(6, average.Value);
+            Assert.AreEqual(6, average.Count);
         }
 
         [TestMethod]

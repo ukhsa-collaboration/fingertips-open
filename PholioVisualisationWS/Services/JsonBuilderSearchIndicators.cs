@@ -40,7 +40,8 @@ namespace PholioVisualisation.Services
         public IDictionary<int, List<int>> GetAreaTypeIdToIndicatorIdsWithData()
         {
             var indicatorIds = new IndicatorSearch().SearchIndicators(_parameters.SearchText);
-            var profileIds = _parameters.RestrictResultsToProfileIdList;
+
+            var profileIds = GetProfileIds();
 
             var areaTypes = new AreaTypeListProvider(new GroupIdProvider(profileReader), areasReader, groupDataReader)
                 .GetChildAreaTypesUsedInProfiles(profileIds);
@@ -70,6 +71,20 @@ namespace PholioVisualisation.Services
             }
 
             return areaTypeIdToIndicatorIdsWithData;
+        }
+
+        private IList<int> GetProfileIds()
+        {
+            var profileIds = _parameters.RestrictResultsToProfileIdList;
+
+            // If no profiles specified then use all available
+            if (profileIds.Any() == false)
+            {
+                profileIds = profileReader.GetAllProfileIds();
+                profileIds = ProfileFilter.RemoveSystemProfileIds(profileIds);
+            }
+
+            return profileIds;
         }
     }
 }

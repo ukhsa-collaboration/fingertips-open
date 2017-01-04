@@ -11,7 +11,7 @@ namespace PholioVisualisation.DataConstruction
             int parentAreaTypeId)
         {
             var areasReader = ReaderFactory.GetAreasReader();
-            var childAreas = new ChildAreaListBuilder(areasReader, parentAreaCode, childAreaTypeId).ChildAreas;
+            var childAreas = new ChildAreaListBuilder(areasReader).GetChildAreas(parentAreaCode, childAreaTypeId);
 
             Dictionary<string, IArea> map = new Dictionary<string, IArea>();
 

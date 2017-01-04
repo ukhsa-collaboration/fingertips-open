@@ -9,14 +9,15 @@
     @if (UserDetails.CurrentUser().IsAdministrator)
     {
         <div class="standardWidth clearfix">
-            <ul style="float:right;">
-                <li class="site-link"><a href="/profilemanager">Profiles</a></li>
-                <li class="site-link"><a href="/user">Users</a></li>
-                <li class="site-link"><a href="/ProfileCollectionManager">Profile collections</a></li>
-                <li class="site-link"><a href="/ExceptionLog">Exceptions</a></li>
-                <li class="site-link"><a href="/admin">Admin</a></li>
-            </ul>
-        </div>
+                <small>@FusStatus.Message() <a href="http://londevapppor01.phe.gov.uk:1234/fingertips-logs/fus.txt" target="_blank">FUS log</a></small>
+                <ul style="float: right;">
+                    <li class="site-link"><a href="/profilemanager">Profiles</a></li>
+                    <li class="site-link"><a href="/user">Users</a></li>
+                    <li class="site-link"><a href="/ProfileCollectionManager">Profile collections</a></li>
+                    <li class="site-link"><a href="/ExceptionLog">Exceptions</a></li>
+                    <li class="site-link"><a href="/admin">Admin</a></li>
+                </ul>
+            </div>
     }
     <div id="site-links-box" class="standardWidth clearfix">
         <span id="app-title">Fingertips Profile Manager</span>

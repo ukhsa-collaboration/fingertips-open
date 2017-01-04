@@ -46,11 +46,12 @@ namespace FingertipsUploadService.Upload
 
             var allowedData = new AllowedData(_profilesReader);
 
-            // TODO: find out why were are calling it again here as its caled in Validate()
+            // TODO: find out why were are calling it again here as its called in Validate()
             ValidateIndicatorDetails(indicatorDetails, simpleUpload, allowedData);
 
-            var dataToUpload = new List<UploadDataModel>();
+            DeletePrecalculatedDataForIndicator(pholioData.Rows[0], simpleUpload);
 
+            var dataToUpload = new List<UploadDataModel>();
             for (int i = 0; i < pholioData.Rows.Count; i++)
             {
                 DataRow row = pholioData.Rows[i];
@@ -82,6 +83,12 @@ namespace FingertipsUploadService.Upload
             return simpleUpload;
         }
 
+        private void DeletePrecalculatedDataForIndicator(DataRow row, SimpleUpload simpleUpload)
+        {
+            var rowParser = new UploadSimpleRowParser(row);
+            var indicatorId = rowParser.GetUploadDataModelWithUnparsedValuesSetToDefaults(simpleUpload).IndicatorId;
+            _coreDataRepository.DeletePrecalculatedCoreData(indicatorId);
+        }
 
         // Validate indicator details
         private void ValidateIndicatorDetails(DataTable dataTable, SimpleUpload simpleUpload, AllowedData allowedData)

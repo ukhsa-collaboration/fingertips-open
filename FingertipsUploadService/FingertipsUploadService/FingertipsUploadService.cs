@@ -31,13 +31,13 @@ namespace FingertipsUploadService
 
         protected override void OnStart(string[] args)
         {
-            _timer = new System.Timers.Timer(500D);
+            _timer = new System.Timers.Timer(1000D);
             _timer.AutoReset = true;
             _timer.Elapsed += timer_Elapsed;
             _timer.Start();
         }
 
-        private void Init()
+        public void InitLogger()
         {
             if (_logger == null)
             {
@@ -58,54 +58,68 @@ namespace FingertipsUploadService
             }
         }
 
-        private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        public void CheckJobs()
         {
+            // Are there already jobs being processed?
             if (inProgress)
             {
                 return;
             }
-
             inProgress = true;
 
-            Init();
-
+            // Init
+            InitLogger();
             try
             {
-                _fusUploadRepository = new UploadJobRepository();
-                _coreDataRepository = new CoreDataRepository();
-                _loggingRepository = new LoggingRepository();
-                _uploadManager = new UploadManager(_fusUploadRepository, _coreDataRepository, _loggingRepository);
-                _logger.Debug("...");
+                InitDependencies();
             }
             catch (Exception ex)
             {
                 LogException(ex);
-                _logger.Info("--- Initialisation failed ---");
+                Log("--- Initialisation failed ---");
                 inProgress = false;
                 return;
             }
 
-
+            // Process jobs
             try
             {
+                _loggingRepository.UpdateFusCheckedJobs();
                 _uploadManager.ProcessUploadJobs();
             }
             catch (Exception ex)
             {
                 LogException(ex);
-                _logger.Info("--- Process jobs failed ---");
+                Log("--- Process jobs failed ---");
             }
             finally
             {
-                _fusUploadRepository = null;
-                _coreDataRepository = null;
-                _loggingRepository = null;
-                _uploadManager = null;
+                CleanUpDependencies();
                 ReaderFactory.DisposeStatic();
             }
 
             inProgress = false;
+        }
 
+        private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            CheckJobs();
+        }
+
+        private void InitDependencies()
+        {
+            _fusUploadRepository = new UploadJobRepository();
+            _coreDataRepository = new CoreDataRepository();
+            _loggingRepository = new LoggingRepository();
+            _uploadManager = new UploadManager(_fusUploadRepository, _coreDataRepository, _loggingRepository);
+        }
+
+        private void CleanUpDependencies()
+        {
+            _fusUploadRepository = null;
+            _coreDataRepository = null;
+            _loggingRepository = null;
+            _uploadManager = null;
         }
 
         protected override void OnStop()
@@ -120,13 +134,19 @@ namespace FingertipsUploadService
                     _coreDataRepository.Dispose();
                 }
 
-                _logger.Info("--- STOPPED ---");
+                Log("--- STOPPED ---");
             }
             catch (Exception ex)
             {
                 LogException(ex);
-                _logger.Info("--- Stop failed ---");
+                Log("--- Stop failed ---");
             }
         }
+
+        public void Log(string message)
+        {
+            _logger.Info(message);
+        }
+
     }
 }

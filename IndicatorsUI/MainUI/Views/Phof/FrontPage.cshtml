@@ -7,55 +7,56 @@
 }
 
 @section headContent {
-    @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForContentPages")) 
+    @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForContentPages"))
     @Html.Partial("_TwitterStyle")
-    <script type="text/javascript">//<![CDATA[
+    <script type="text/javascript">
+//<![CDATA[
         Twitter_Handle = '@(Model.GetTwitterHandle())';
-    //]]</script>
+        //]]</script>
 }
 
-<div class="full-width title-divider"></div>
+<div class="title-divider"></div>
 @{
     HtmlString recentUpdates = ContentProvider.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
     var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
     var areUpdates = recentUpdates != null;
-    var introductionWidth = areUpdates ? 65 : 100;
 }
-<div class="standardWidth">
-    @Html.Partial("_UpdateDelayedMessage")
-    <div  style="width: @(introductionWidth)%; float: left;">
-        <div class="">
+<div id="public-health-outcomes-framework" class="container">
+    <div class="row">
+        @Html.Partial("_UpdateDelayedMessage")
+        <div class="col-md-8">
             @if (Model.Skin.IsPhof)
             {
                 @Html.Partial(Model.GetSkinView("_PhofDomains"))
             }
         </div>
+        <div class="col-md-4">
+            @if (Model.Skin.IsPhof)
+            {
+                @Html.Partial("_TwitterFeed")
+            }
+        </div>
     </div>
-    <div style="width: @(95 - introductionWidth)%; float: right;">
-        @if (Model.Skin.IsPhof)
+</div>
+<div id="search-box-public-health-outcomes-framework" class="container">
+    <div class="row">
+
+        <div id="introduction" class="col-md-8">
+            @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
+            @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
+        </div>
+        @if (areUpdates)
         {
-            @Html.Partial("_TwitterFeed")
+            <div id="recent-updates" class="col-md-4">
+                @if (Model.Skin.IsTobacco)
+                {
+                    @Html.Partial("_StartButton")
+                }
+                <h2>Recent updates</h2>
+                <div class="@updatesCssClass">
+                    @recentUpdates
+                </div>
+            </div>
         }
     </div>
 </div>
-<div class="standardWidth clearfix">
-    <div id="introduction" style="width: @(introductionWidth)%; margin-top: 0px;">
-        @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
-    </div>
-    @if (areUpdates)
-    {
-        <div id="recent-updates">
-            <h2>Recent updates</h2>
-            <div class="@updatesCssClass">
-                @recentUpdates
-            </div>
-        </div>
-    }
-</div>
-
-@if (Model.Skin.IsTobacco)
-{
-    <div class="standardWidth clearfix">
-        <a id="startButton" href="/tobacco-control"></a>
-    </div>
-}

@@ -44,5 +44,12 @@ namespace Fpm.ProfileData.Repositories
 
             CurrentSession.CreateQuery(queryString).ExecuteUpdate();
         }
+
+        public DatabaseLog GetDatabaseLog(int databaseLogId)
+        {
+           return CurrentSession.QueryOver<DatabaseLog>()
+                .Where(x => x.Id == databaseLogId)
+                .SingleOrDefault();
+        }
     }
 }

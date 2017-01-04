@@ -1,0 +1,37 @@
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Helpers
+
+@model ProfileCollection
+
+<h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
+
+@{
+    int itemCount = Model.ProfileCollectionItems.Count();
+    var result = Model.ProfileCollectionItems;
+    int record = 1;
+    int oneSideDivRecord = itemCount / 2;
+    @*<h1>Total @itemCount</h1>
+    <h1>One Side  @oneSideDivRecord</h1>*@
+}
+
+<!-- create 2 parts and render first and Second here -->
+<div class="container">
+    <div class="row">
+        <div id="data-column">
+            <ul class="nav-col-2">
+                @foreach (var profileCollectionItem in Model.ProfileCollectionItems)
+                {
+                    if (record <= oneSideDivRecord)
+                    {
+                        <li>@Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)</li>
+                    }
+                    else
+                    {
+                        <li>@Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)</li>
+                    }
+                    record++;
+                }
+            </ul>
+        </div>
+    </div>
+</div>

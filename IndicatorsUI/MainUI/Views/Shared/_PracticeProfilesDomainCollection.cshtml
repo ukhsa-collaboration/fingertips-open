@@ -1,40 +1,44 @@
 ﻿@using Profiles.MainUI.Helpers
-    <div class="standardWidth clearfix practice-profiles-domain-list" style="position: relative;">
-        <h2>Topics</h2>
-        <table class="home-profiles">
-            <tbody>
-                @{
-                    int itemCount = ViewBag.AvailableDomains.Count;
-                    int columnCount = itemCount == 4
-                        ? 2 // 2 x 2
-                        : 3;
-                    int columnWidth = 100 / columnCount;
-                    var rowAssigner = new RowAssigner(columnCount);
-                }
-
-                @foreach (var domain in ViewBag.AvailableDomains)
-                {
-                    if (rowAssigner.IsItemFirstOfRow)
-                    {
-                    @Html.Raw("<tr>")
+<div class="container">
+    <div class="row">
+        <div id="practice-profiles-domain-collection" class="col-md-12 practice-profiles-domain-list" style="position: relative;">
+            <h2>Topics</h2>
+            <table class="table margin-left">
+                <tbody>
+                    @{
+                        int itemCount = ViewBag.AvailableDomains.Count;
+                        int columnCount = itemCount == 4
+                            ? 2 // 2 x 2
+                            : 3;
+                        int columnWidth = 100 / columnCount;
+                        var rowAssigner = new RowAssigner(columnCount);
                     }
+
+                    @foreach (var domain in ViewBag.AvailableDomains)
+            {
+                if (rowAssigner.IsItemFirstOfRow)
+                {
+                            @Html.Raw("<tr>")
+                        }
 
                     <td style="width:@(columnWidth)%;">
-                            @{
-                                string tooltip = domain.Tooltip ?? string.Empty;
-                                const int currentYear = 2015;
-                            }
-                            <a class="title" href="/profile/@ViewBag.ProfileUrlKey/data#mod,1,pyr,@currentYear,pat,19,par,-,are,-,sid1,@domain.GroupId,ind1,-,sid2,-,ind2,-">@domain.SubHeading</a>
-                            <p class="domainContent">@tooltip</p>                                
+                        @{
+                            string tooltip = domain.Tooltip ?? string.Empty;
+                            const int currentYear = 2016;
+                        }
+                        <a class="title" href="/profile/@ViewBag.ProfileUrlKey/data#mod,1,pyr,@currentYear,pat,19,par,-,are,-,sid1,@domain.GroupId,ind1,-,sid2,-,ind2,-">@domain.SubHeading</a>
+                        <p class="domainContent">@tooltip</p>
                     </td>
 
-                    if (rowAssigner.IsItemLastOfRow)
-                    {
-                    @Html.Raw("</tr>")
-                    }
+                            if (rowAssigner.IsItemLastOfRow)
+                            {
+                                @Html.Raw("</tr>")
+                                }
 
-                    rowAssigner.ItemAdded();
-                }
-            </tbody>
-        </table>
+                                rowAssigner.ItemAdded();
+                            }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>

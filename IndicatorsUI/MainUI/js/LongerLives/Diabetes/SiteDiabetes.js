@@ -48,6 +48,10 @@ MT.model = {
             var prop = pairs['iid'];
             if (prop) m.indicatorId = parseInt(prop);
 
+            // Sex ID
+            var prop = pairs['sexId'];
+            if (prop) m.sexId = parseInt(prop);
+
             // Group Id
             prop = pairs['gid'];
             if (prop) m.groupId = parseInt(prop);
@@ -82,6 +86,7 @@ MT.model = {
             'par', m.parentCode,
             'ati', m.areaTypeId,
             'iid', m.indicatorId,
+            'sexId', m.sexId,
             'gid', m.groupId,
             'pat', m.parentAreaType
         ];
@@ -174,24 +179,41 @@ ROOT_INDEXES = {
 
 function populateCauseList() {
 
-    var groupId = MT.model.groupId;
+    var model = MT.model;
+    var groupId = model.groupId;
     var metadataHash = loaded.indicatorMetadata[groupId];
     var indicators = [];
-    var selectedIndicatorId = groupRoots[selectedRootIndex].IID;
+    var root = groupRoots[selectedRootIndex];
+    var selectedIndicatorId = root.IID;
 
-    if (!isDefined(MT.model.indicatorId)) {
-        MT.model.indicatorId = selectedIndicatorId;
+    if (!isDefined(model.indicatorId)) {
+        model.indicatorId = selectedIndicatorId;
+        model.sexId = root.Sex.Id;
     }
 
     for (var i = 0; i < groupRoots.length; i++) {
 
         var indicatorId = groupRoots[i].IID;
-        var isIndicatorSelected = indicatorId === selectedIndicatorId;
+        var indicatorSex = groupRoots[i].Sex.Id;
         var metadata = metadataHash[indicatorId];
+
+        // Consider sex and indicator ID to determine whether it should be selected
+        var isIndicatorSelected, lastIndicatorSex, lastIndicator;
+        if (indicatorId !== lastIndicator && lastIndicatorSex !== indicatorSex) {
+            lastIndicator = indicatorId;
+            isIndicatorSelected = indicatorId === selectedIndicatorId;
+        } else {
+            lastIndicatorSex = indicatorSex;
+            isIndicatorSelected = false;
+        }
+       
+        var stateSex = groupRoots[i].StateSex;
+        var sex = groupRoots[i].Sex.Name;
+        var indicatorName = stateSex ? metadata.Descriptive.Name + ' (' + sex + ')' : metadata.Descriptive.Name;
 
         indicators.push({
             index: i,
-            name: replacePercentageWithArialFont(metadata.Descriptive.Name),
+            name: replacePercentageWithArialFont(indicatorName),
             id: indicatorId,
             cssClass: isIndicatorSelected ? 'sub active' : 'sub',
             noteText: '<span class=asterisk>*</span>'
@@ -407,7 +429,9 @@ MT.nav = {
 
         //Force in the selected indicator Id
         if (groupRoots.length) {
-            model.indicatorId = groupRoots[selectedRootIndex].IID;
+            var root = groupRoots[selectedRootIndex];
+            model.indicatorId = root.IID;
+            model.sexId = root.Sex.Id;
         }
         setUrl('/topic/' + profileUrlKey + '/comparisons#' + model.toString());
     },
@@ -420,6 +444,12 @@ MT.nav = {
         model.parentCode = NATIONAL_CODE;
         model.areaCode = null;
         model.areaTypeId = model.parentAreaType;
+
+        if (isDefined(groupRoots) && groupRoots.length) {
+            var root = groupRoots[selectedRootIndex];
+            model.indicatorId = root.IID;
+            model.sexId = root.Sex.Id;
+        }
 
         setUrl('/topic/' + profileUrlKey + '/comparisons#' + model.toString());
     },
@@ -479,10 +509,6 @@ function useBlueOrangeBlue(comparatorMethodId) {
     return comparatorMethodId === PolarityIds.BlueOrangeBlue;
 }
 
-function getDecileCode(decile) {
-    return 'IMD10-UTLA-D' + decile;
-}
-
 function getGradeFunctionFromGroupRoot(groupRoot) {
     return getGradeFunction(groupRoot.ComparatorMethodId);
 }
@@ -508,6 +534,15 @@ function getGradeFunction(comparatorMethodId) {
                     case 3:
                         return 'bobHigher';
                 }
+            case PolarityIds.RAGLowIsGood:
+                switch (sig) {
+                    case 1:
+                        return 'grade-' + 0; // Green
+                    case 2:
+                        return 'grade-' + 2; // Amber
+                    case 3:
+                        return 'grade-' + 3; // Red
+                }
             case PolarityIds.RAGHighIsGood:
                 switch (sig) {
                     case 1:
@@ -524,11 +559,7 @@ function getGradeFunction(comparatorMethodId) {
 
     return function (sig, groupRoot) {
         if (isDefined(groupRoot)) {
-            if (groupRoot.PolarityId == PolarityIds.BlueOrangeBlue) {
-                return getSignificanceColour(sig, PolarityIds.BlueOrangeBlue);
-            } else {
-                return getSignificanceColour(sig, PolarityIds.RAGHighIsGood);
-            }
+            return getSignificanceColour(sig, groupRoot.PolarityId);
         } else {
             return getSignificanceColour(sig, PolarityIds.BlueOrangeBlue);
         }
@@ -652,7 +683,8 @@ loaded.contentText = '';
 loaded.groupDataAtDataPoint = new GroupDataAtDataPointOfSpecificAreasDataManager(MT.model);
 
 IndicatorIds = {
-    Deprivation: 338
+    Deprivation: 338,
+    SuicidePlan : 92607
 };
 
 groupRoots = null;
@@ -660,6 +692,7 @@ selectedRootIndex = ROOT_INDEXES.POPULATION;
 treatmentTargetSelected = null;
 comparatorId = NATIONAL_COMPARATOR_ID;
 shouldSearchRetreiveCoordinates = true;
+NO_SUICIDE_PLAN = 'No information on current suicide plan status';
 
 GroupIds = {
     HealthChecks: {
@@ -676,6 +709,11 @@ GroupIds = {
     },
     Cancer: {
         IncidenceAndMortality: 1938132749
+    },
+    Suicide: {
+        SuicideData: 1938132762,
+        RelatedRiskFactors: 1938132763,
+        RelatedServiceContacts: 1938133082
     }
 }
 

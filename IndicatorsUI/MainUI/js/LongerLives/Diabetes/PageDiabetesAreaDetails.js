@@ -1,5 +1,5 @@
 ﻿function initPage() {
-    
+
     showLoadingSpinner();
     lock();
 
@@ -8,7 +8,7 @@
     var model = MT.model,
         isSimilar = isSimilarAreas();
 
-    var callCount = model.profileId === ProfileIds.HealthChecks? 7: 6;
+    var callCount = model.profileId === ProfileIds.HealthChecks ? 7 : 6;
     if (isSimilar) {
         callCount += 2;
     }
@@ -28,7 +28,7 @@
 
     if (isSimilar) {
         getChildAreas(model);
-        loaded.areaDetails.fetchDataByAjax({ areaCode : model.parentCode });
+        loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
     }
 
     ajaxMonitor.monitor(displayPage);
@@ -37,7 +37,7 @@
 function displayPage() {
     var isSimilar = isSimilarAreas(),
         model = MT.model;
-        
+
     if (isSimilar) {
         populateSimilarAreasList();
         selectAreaOption('#show_similar_areas');
@@ -45,7 +45,7 @@ function displayPage() {
         selectAreaOption('#show_all_areas');
     }
 
-    var comparisonText = "Compared to other areas";   
+    var comparisonText = "Compared to other areas";
     $('#comparison-header').html(comparisonText);
 
 
@@ -58,7 +58,7 @@ function displayPage() {
 
     // Used to set the areaname in breadcrumb
     $('.area_name').html(areaName);
-    
+
     // Area grouping
     if (areaDetails.Decile) {
         var decileNumber = areaDetails.Decile.Number,
@@ -77,9 +77,7 @@ function displayPage() {
     var metadataHash = loaded.indicatorMetadata[getGroupId().groupId];
 
     if (model.profileId === ProfileIds.HealthChecks) {
-        var areaDetailsForDiseaseAndDeath = loaded.areaDetailsForDiseaseAndDeath.getData(
-        { groupId: GroupIds.HealthChecks.DiseaseAndDeath });
-        headlineIndicator = new HeadlineIndicator(areaDetailsForDiseaseAndDeath, CVD_INDICATOR_INDEX);
+        headlineIndicator = new HeadlineIndicator();
     }
 
     // Render Reset of the page content
@@ -90,25 +88,31 @@ function displayPage() {
     renderRelatedLinks(areaDetails.Url);
 
     var ranks = areaDetails.Ranks[parentCode];
-    var significancesForHealthChecks = areaDetails.Significances[parentCode];
-   
+    var significances = areaDetails.Significances[parentCode];
+
     var html = [];
-    var noOfIndicators = _.size(areaDetails.Benchmarks[NATIONAL_CODE]);    
+    var noOfIndicators = _.size(areaDetails.Benchmarks[NATIONAL_CODE]);
     var overallMax = getOverallMax(ranks, noOfIndicators);
     var causeOptions = getCauseOptions();
     for (var i = 0; i < noOfIndicators; i++) {
         var causeInfo = causeOptions[i];
         var root = groupRoots[i],
             rank = ranks[i];
-        
-        if (rank.AreaRank) {
-            causeClass = getCauseClass(significancesForHealthChecks[i],
-                rank.AreaRank.Val, root.ComparatorMethodId);
-        } else {
-            causeClass = 'none';
-        }
 
-        var causeBar = getCauseBars(area, causeInfo, rank, overallMax, causeClass, metadataHash[root.IID], root.ComparatorMethodId);
+        // Do not display suicide plan as bars
+        if (root.ComparatorMethodId === ComparatorMethodIds.SuicidePlan) continue;
+
+        // Sex label if required
+        var sexForCurrectIndicator = root.StateSex
+            ? sexForCurrectIndicator = ' (' + root.Sex.Name + ')'
+            : '';
+
+        var causeClass = (rank && rank.AreaRank)
+            ? getCauseClass(significances[i], root)
+            : 'none';
+
+        var causeBar = getCauseBars(area, causeInfo, rank, overallMax, causeClass,
+            metadataHash[root.IID], root.ComparatorMethodId, sexForCurrectIndicator);
         html.push(causeBar);
     }
 
@@ -137,8 +141,13 @@ function displayPage() {
     unlock();
 }
 
+// First indicator with bars for Health Checks
+function HeadlineIndicator() {
+    var overallIndex = CVD_INDICATOR_INDEX;
 
-function HeadlineIndicator(areaDetails, overallIndex) {
+    var areaDetails = loaded.areaDetailsForDiseaseAndDeath.getData(
+        { groupId: GroupIds.HealthChecks.DiseaseAndDeath });
+
     var parentCode = MT.model.parentCode;
     var ranks = areaDetails.Ranks[parentCode];
     var significances = areaDetails.Significances[parentCode];
@@ -146,15 +155,18 @@ function HeadlineIndicator(areaDetails, overallIndex) {
 
     this.ranks = areaDetails.Ranks;
     this.areaRank = areaRank;
-    this.overallMax = ranks[overallIndex].Max.Val;    
+    this.overallMax = ranks[overallIndex].Max.Val;
     this.decileNumber = areaDetails.Decile.Number;
     this.decileInfo = getDecileInfo(this.decileNumber);
     this.dataTimeStamp = areaDetails.Ranks[NATIONAL_CODE][overallIndex].Period;
     this.causeClass = function () {
         var cssClass = "no-data";
         if (areaRank.AreaRank) {
-            cssClass = getCauseClass(significances[overallIndex], areaRank.AreaRank.Val,
-                0 /*this should be comparator method ID*/);
+            var root = {
+                PolarityId: PolarityIds.RAGLowIsGood,
+                ComparatorMethodId: -1
+            };
+            cssClass = getCauseClass(significances[overallIndex], root);
             applySigClass(cssClass);
         }
         return cssClass;
@@ -180,17 +192,17 @@ function renderHeader(areaDetails) {
             headlineIndicator.ranks[NATIONAL_CODE][overallIndex].AreaRank.Count : 0;
 
         var preventableCvdMortalityFormatted = new CommaNumber(preventableCvdMortality).rounded();
-        
+
         pageHeaderModel = {
             areaName: headlineIndicator.areaName,
             eligibleEnglang: eligibleInEnglandFormated,
             eligibleThisArea: eligibleInThisAreaFormated,
             preventableCvdMortality: preventableCvdMortality === 0 ? 'No data for ' : '<strong>' + preventableCvdMortalityFormatted + '</strong>'
-        };        
+        };
     } else {
         pageHeaderModel = {
             areaName: areaDetails.areaName
-       };
+        };
     }
     pageHeader(pageHeaderModel);
 }
@@ -198,7 +210,7 @@ function renderHeader(areaDetails) {
 function renderLegend(areaName) {
     var pageLegendModel = {
         contentHeading: 'Similar local authorities',
-        isSimilarViewMode: MT.model.parentCode == NATIONAL_CODE ? false : true,
+        isSimilarViewMode: MT.model.parentCode !== NATIONAL_CODE,
         areaName: areaName
     };
     pageLegend(pageLegendModel);
@@ -212,8 +224,8 @@ function renderHeadliningBarChart() {
             headlineIndicator.area, true, false, metadataHash[headlineIndicator.overallIndex]);
 
         var areaRank = headlineIndicator.areaRank;
-        var comparisonStatement = areaRank.AreaRank 
-            ? getComparisonStatement(areaRank.AreaRank.Rank, areaRank.Max.Rank) 
+        var comparisonStatement = areaRank.AreaRank
+            ? getComparisonStatement(areaRank.AreaRank.Rank, areaRank.Max.Rank)
             : '';
 
         var pageHeadliningBarChartModel = {
@@ -228,7 +240,7 @@ function renderHeadliningBarChart() {
     }
 }
 
-function renderRanks() {   
+function renderRanks() {
     var areaDetails = loaded.areaDetails.getData(getGroupId());
     var pageRanksModel = {
         rankingTableName: getRankingTableName(),
@@ -264,16 +276,18 @@ function groupColour(imgUrl, grade) {
 }
 
 function getCauseBars(area, causeInfo, rankInfo, overallMax, causeClass,
-    metadata, comparatorMethodId) {
+    metadata, comparatorMethodId, indicatorSex) {
 
-    var areaRank = rankInfo.AreaRank;
-    var comparisonStatement = areaRank
-        ? getComparisonStatement(areaRank.Rank, rankInfo.Max.Rank)
-        : '';
+    var comparisonStatement = '';
+    if (rankInfo && rankInfo.AreaRank) {
+        var areaRank = rankInfo.AreaRank;
+        comparisonStatement = getComparisonStatement(areaRank.Rank, rankInfo.Max.Rank);
+    }
 
-    var flip = !useQuintiles(comparatorMethodId);
+    // Whether to flip lowest and highest
+    var flip = MT.model.profileId !== ProfileIds.Suicide && !useQuintiles(comparatorMethodId);
 
-    return templates.render('causeBars', {
+    var viewModel = {
         parentCode: MT.model.parentCode,
         areaCode: area.Code,
         areaRank: areaRank ? areaRank.Rank : 0,
@@ -283,13 +297,16 @@ function getCauseBars(area, causeInfo, rankInfo, overallMax, causeClass,
         indicatorName: metadata.Descriptive.Name,
         barsHtml: getBars(rankInfo, overallMax, area, false, flip, metadata),
         rankHtml: comparisonStatement,
-        isProfileDrugsAndAlcohol : isProfileDrugsAndAlcohol()
-    });
+        isProfileDrugsAndAlcohol: isProfileDrugsAndAlcohol(),
+        indicatorSex: indicatorSex
+    };
+
+    return templates.render('causeBars', viewModel);
 }
 
-function getCauseClass(sig, areaValue, comparatorMethodId) {
-    var getGrade = getGradeFunction(comparatorMethodId);
-    var grade = getGrade(sig, areaValue);
+function getCauseClass(sig, groupRoot) {
+    var getGrade = getGradeFunction(groupRoot.ComparatorMethodId);
+    var grade = getGrade(sig, groupRoot);
 
     return grade === '' ?
         'none' : grade;
@@ -298,25 +315,41 @@ function getCauseClass(sig, areaValue, comparatorMethodId) {
 function getJudgment(sig) {
     var suffix = ' than avg';
     switch (sig) {
-    case 0:
-        return 'Best';
-    case 1:
-        return 'Better' + suffix;
-    case 2:
-        return 'Worse' + suffix;
-    case 3:
-        return 'Worst';
+        case 0:
+            return 'Best';
+        case 1:
+            return 'Better' + suffix;
+        case 2:
+            return 'Worse' + suffix;
+        case 3:
+            return 'Worst';
     }
     return '';
 }
 
 function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData) {
+
+    if (!rankInfo) {
+        // No data for any areas
+        return templates.render('barItem', {
+            level: '',
+            barImage: "area-bar",
+            val: '',
+            unit: '',
+            barWidth: 0,
+            areaName: area.Name,
+            label: '',
+            message: 'NO DATA',
+            labelClass: ''
+        });
+    }
+
     var min = rankInfo.Min,
         max = rankInfo.Max,
-        template = 'barItem',
-        pixelsPerUnit = 470 /*available width in px*/ / overallMax,
-        lowestLabel = 'LOWEST: ',
-        highestLabel = 'HIGHEST: ';
+        template = 'barItem';
+    var pixelsPerUnit = 470 /*available width in px*/ / overallMax;
+    var lowestLabel = 'LOWEST';
+    var highestLabel = 'HIGHEST';
 
     if (flip) {
         min = rankInfo.Max;
@@ -345,7 +378,7 @@ function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData)
     var overallBarGrade = '';
 
     if (mainRanking.hasClass('grade-1')) {
-        overallBarGrade = 'overalbarl-bar1';
+        overallBarGrade = 'overall-bar1';
     } else {
         overallBarGrade = 'overall-bar';
     }
@@ -355,20 +388,20 @@ function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData)
         templates.render(template, {
             level: 'low',
             barImage: isOverall ? overallBarGrade : "low-bar",
-            val:min.ValF,
+            val: min.ValF,
             unit: indicatorUnit,
             barWidth: min.Val * pixelsPerUnit,
             areaName: min.Area.Name,
-            label: lowestLabel,
-            message: isMin ? 'LOWEST' : null,
+            label: lowestLabel + ': ',
+            message: isMin ? lowestLabel : null,
             labelClass: min.Val === 0 ? 'zero_val' : ''
         }));
 
     // Area label if required
     if (isMin) {
-        var label = lowestLabel;
+        var label = lowestLabel + ': ';
     } else if (isMax) {
-        label = highestLabel;
+        label = highestLabel + ': ';
     } else {
         label = '';
     }
@@ -396,11 +429,11 @@ function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData)
             unit: indicatorUnit,
             barWidth: max.Val * pixelsPerUnit,
             areaName: max.Area.Name,
-            label: highestLabel,
-            message: isMax ? 'HIGHEST' : null,
+            label: highestLabel + ': ',
+            message: isMax ? highestLabel : null,
             labelClass: max.Val === 0 ? 'zero_val' : ''
 
-}));
+        }));
 
     return html.join('');
 }
@@ -408,10 +441,11 @@ function getBars(rankInfo, overallMax, area, isOverall, flip, indicatorMetaData)
 function showSimilarAreas() {
     if (!FT.ajaxLock) {
         lock();
-        if (MT.model.areaTypeId == AreaTypeIds.CountyUA) {
-            MT.model.parentCode = loaded.areaDetails.getData(getGroupId()).Decile.Code;
+        var model = MT.model;
+        if (model.areaTypeId === AreaTypeIds.CountyUA) {
+            model.parentCode = loaded.areaDetails.getData(getGroupId()).Decile.Code;
         } else {
-            MT.model.parentCode = onsClusterCode;
+            model.parentCode = onsClusterCode;
         }
         initPage();
 
@@ -509,12 +543,8 @@ function removeAllGradeClasses(jq) {
     }
 }
 
-function isProfileDrugsAndAlcohol() {
-    return MT.model.profileId === ProfileIds.DrugsAndAlcohol ? true : false;
-}
-
 function getRankingTableName() {
-    var tableName ='';
+    var tableName = '';
     if (MT.model.profileId === ProfileIds.HealthChecks) {
         tableName = "NHS Health Checks";
     } else if (MT.model.profileId === ProfileIds.DrugsAndAlcohol) {
@@ -535,19 +565,26 @@ function getGroupId() {
         case ProfileIds.Cancer:
             groupId = { groupId: GroupIds.Cancer.IncidenceAndMortality };
             break;
+        case ProfileIds.Suicide:
+            groupId = { groupId: GroupIds.Suicide.SuicideData };
+            break;
     }
     return groupId;
 }
 
 function getOverallMax(ranks, noOfIndicators) {
-    var max=0, min = 0;
+    var max = 0, min = 0;
+
     for (var i = 0; i < noOfIndicators; i++) {
-        if (ranks[i].Min.Val > min) {
-            min = ranks[i].Min.Val;
-        }
-       
-        if (ranks[i].Max.Val > max) {
-            max = ranks[i].Max.Val;
+        var rank = ranks[i];
+        if (rank) {
+            if (rank.Min.Val > min) {
+                min = rank.Min.Val;
+            }
+
+            if (rank.Max.Val > max) {
+                max = rank.Max.Val;
+            }
         }
     }
 
@@ -566,7 +603,7 @@ templates.add('barItem', '{{#message}}<li class="high_low_message">{{message}}</
 
 templates.add('causeBars', '<tr id="{{causeKey}}_row" class="{{causeSig}}">\
 <td class="col1">{{#isProfileDrugsAndAlcohol}}<div class="drugs-n-alcohol">{{{rankHtml}}}</div>{{/isProfileDrugsAndAlcohol}}{{^isProfileDrugsAndAlcohol}}<div><img src="' + FT.url.img + 'health-checks/icons-large.png" alt="" height="149px;"/></div>{{{rankHtml}}}{{/isProfileDrugsAndAlcohol}}</td>\
-<td class="col2" style="width:540px;"><h3>{{indicatorName}}</h3><ul class="bar_chart">{{{barsHtml}}}</ul>\
+<td class="col2" style="width:540px;"><h3>{{indicatorName}}{{indicatorSex}}</h3><ul class="bar_chart">{{{barsHtml}}}</ul>\
 </td></tr>');
 
 templates.add('similarAreas', '{{#areas}}<li><a href="javascript:selectArea(\'{{Code}}\')">{{Name}}</a></li>{{/areas}}');
@@ -575,96 +612,135 @@ templates.add('verdict', '<span>{{judgement}}</span> | {{rank}} out of {{total}}
 
 
 function getOnsClusterName(onsClusterCode) {
-   
+
     return loaded.areaDetails.getData({ areaCode: onsClusterCode }).Area.Name;
 }
 
 function pageHeader(model) {
-    var htmlOut;
-    var pageHeaderTempl = function () {
 
-        if (isProfileDrugsAndAlcohol()) {
-            return '<h1 class="area_name">{{areaName}}</h1><div class="hr"></div>';
-        } else {
-            return '<h1 class="area_name">{{areaName}}</h1>' +
-                    '<div id="c1" class="info_box_3">' +
-                    '<h2><strong>{{eligibleEnglang}}</strong> people eligible for an NHS Health Check in England</h2>' +
-                    '</div>' +
-                    '<div id="c2" class="info_box_3">' +
-                    '<h2><strong>{{eligibleThisArea}}</strong> people eligible for an NHS Health Check in this area</h2>' +
-                    '</div>' +
-                    '<div id="c3" class="info_box_3">' +
-                    '<h2>{{{preventableCvdMortality}}} preventable cardio-vascular disease deaths in this area</h2>' +
-                    '</div>' +
-                    '</div>';
-        }        
-    };
+    // Define template and view model
+    var pageHeaderTemplate, viewModel;
+    if (MT.model.profileId === ProfileIds.HealthChecks) {
+        pageHeaderTemplate = '<h1 class="area_name">{{areaName}}</h1>' +
+                '<div id="c1" class="info_box_3">' +
+                '<h2><strong>{{eligibleEnglang}}</strong> people eligible for an NHS Health Check in England</h2>' +
+                '</div>' +
+                '<div id="c2" class="info_box_3">' +
+                '<h2><strong>{{eligibleThisArea}}</strong> people eligible for an NHS Health Check in this area</h2>' +
+                '</div>' +
+                '<div id="c3" class="info_box_3">' +
+                '<h2>{{{preventableCvdMortality}}} preventable cardio-vascular disease deaths in this area</h2>' +
+                '</div>' +
+                '</div>';
 
-    templates.add('page-header',pageHeaderTempl());
-    if (ProfileIds.HealthChecks) {
-        htmlOut = templates.render('page-header', {
+        viewModel = {
             areaName: model.areaName,
             eligibleEnglang: model.eligibleEnglang,
             eligibleThisArea: model.eligibleThisArea,
             preventableCvdMortality: model.preventableCvdMortality
-        });
-    } else if(ProfileIds.DrugsAndAlcohol) {
-        htmlOut = templates.render('page-header', {
-            areaName: model.areaName            
-        });
-    }    
-    $('#data_page_header').html(htmlOut);
+        };
+    } else if (MT.model.profileId === ProfileIds.Suicide) {
+        pageHeaderTemplate = '<h1 class="area_name">{{areaName}}</h1><div class="hr"></div><h2 style="margin:0;float:left;">{{plan}}</div><h2 style="float:right;margin:0;">{{suicides}}</h2>';
+
+        var areaDetails = loaded.areaDetails.getData(getGroupId());
+
+        var ranks = areaDetails.Ranks[NATIONAL_CODE];
+
+        // Find index of suicide plan indicator
+        var planIndex = 0;
+        for (var i in groupRoots) {
+            if (groupRoots[i].IID === IndicatorIds.SuicidePlan) {
+                planIndex = i;
+                break;
+            }
+        }
+
+        // Suicide plan in place
+        var plan = (ranks[planIndex].AreaRank)
+            ? ranks[planIndex].AreaRank.ValF
+            : NO_SUICIDE_PLAN;
+
+        // Suicides for area
+        var indexOfPersonSuicides = 0;
+        if (ranks[indexOfPersonSuicides].AreaRank) {
+            var suicides = ranks[indexOfPersonSuicides].AreaRank.Count + ' suicides (' + ranks[indexOfPersonSuicides].Period + ')';
+        } else {
+            suicides = '';
+        }
+
+        viewModel = {
+            areaName: model.areaName,
+            plan: plan,
+            suicides: suicides
+        };
+    } else {
+        pageHeaderTemplate = '<h1 class="area_name">{{areaName}}</h1><div class="hr">';
+        viewModel = {
+            areaName: model.areaName
+        };
+    }
+
+    // Render HTML
+    templates.add('page-header', pageHeaderTemplate);
+    var html = templates.render('page-header', viewModel);
+    $('#data_page_header').html(html);
+}
+
+function isProfileDrugsAndAlcohol() {
+    return MT.model.profileId === ProfileIds.DrugsAndAlcohol;
 }
 
 function pageHeadliningBarChart(model) {
-    var headlingIndicatorBarChartTempl = function () {
-        if (isProfileDrugsAndAlcohol()) {
-            return ""; // Don't render the top chart
-        } else {
-            return '<div id="main_ranking" class="clearfix {{topIndicatorSig}}">' +
-                    '<h3>{{topIndicatorHeading}} <span>per 100,000 for {{{topIndicatorDate}}}</span><span class="tooltip tooltip-inverse"><i>{{topIndicatorToolTip}}</i></span></h3>' +
-                    '<div class="ranking">{{{topIndicatorRanking}}}</div>' +
-                    '<ul class="bar_chart">' +
-                    '{{{topIndicatorBarChart}}}' +
-                    '</ul>' +
-                    '</div>';
-        }
-    };
 
-    templates.add('page-headling-indicator-bar-chart', headlingIndicatorBarChartTempl());
-    var htmlOut = templates.render('page-headling-indicator-bar-chart', {       
+    var viewModel = {
         topIndicatorSig: model.topIndicatorSig,
         topIndicatorHeading: model.topIndicatorHeading,
         topIndicatorRanking: model.topIndicatorRanking,
         topIndicatorDate: model.topIndicatorDate,
         topIndicatorToolTip: model.topIndicatorToolTip,
         topIndicatorBarChart: model.topIndicatorBarChart
-    });
-    $('#headline_bar_chart').html(htmlOut);
+    };
+
+    var template = '<div id="main_ranking" class="clearfix {{topIndicatorSig}}">' +
+        '<h3>{{topIndicatorHeading}} <span>per 100,000 for {{{topIndicatorDate}}}</span><span class="tooltip tooltip-inverse"><i>{{topIndicatorToolTip}}</i></span></h3>' +
+        '<div class="ranking">{{{topIndicatorRanking}}}</div>' +
+        '<ul class="bar_chart">' +
+        '{{{topIndicatorBarChart}}}' +
+        '</ul>' +
+        '</div>';
+
+    templates.add('page-headling-indicator-bar-chart', template);
+    var html = templates.render('page-headling-indicator-bar-chart', viewModel);
+    $('#headline_bar_chart').html(html);
 }
 
 function pageLegend(model) {
-    var pageLegendTempl = '{{#isSimilarViewMode}}<h2>{{contentHeading}}</h2>{{/isSimilarViewMode}}' +
+
+    var viewModel = {
+        contentHeading: model.contentHeading,
+        isSimilarViewMode: model.isSimilarViewMode,
+        areaName: model.areaName,
+        imgUrl: FT.url.img,
+        useBob: MT.model.profileId === ProfileIds.Suicide
+    };
+
+    var pageLegendTemplate = '{{#isSimilarViewMode}}<h2>{{contentHeading}}</h2>{{/isSimilarViewMode}}' +
         '{{^isSimilarViewMode}}<h2>All local authorities</h2>{{/isSimilarViewMode}}' +
         '{{#isSimilarViewMode}}<p class="ranking_note"><b>Similar view:</b> <span>{{areaName}}</span>&apos;s rank within the local authorities in the same <span class="area-bracket" id="comparisondd"></span>.</p>{{/isSimilarViewMode}}' +
         '{{^isSimilarViewMode}}<p class="ranking_note"><b>National view:</b> <span>{{areaName}}</span>&apos;s rank within local authorities in England.</p>{{/isSimilarViewMode}}' +
         '<p class="legend"> Comparison with the average' +
-        '<span class="grade"><img src="{{imgUrl}}Mortality/grade-3.png" alt="worse" />worse</span>' +
+        '<span class="grade"><img src="{{imgUrl}}Mortality/{{#useBob}}bobLower.png" alt="lower" />lower{{/useBob}}{{^useBob}}grade-3.png" alt="worse" />worse{{/useBob}}</span>' +
         '<span class="grade"><img src="{{imgUrl}}Mortality/grade-2.png" alt="consistent" />consistent</span>' +
-        '<span class="grade"><img src="{{imgUrl}}Mortality/grade-0.png" alt="better" />better</span>' +
+        '<span class="grade"><img src="{{imgUrl}}Mortality/{{#useBob}}bobHigher.png" alt="higher" />higher{{/useBob}}{{^useBob}}grade-0.png" alt="better" />better{{/useBob}}</span>' +
         '</p>';
-    templates.add('page-legend', pageLegendTempl);
-    var htmlOut = templates.render('page-legend', {
-        contentHeading: model.contentHeading,
-        isSimilarViewMode: model.isSimilarViewMode,
-        areaName: model.areaName,
-        imgUrl: FT.url.img
-    });
-    $('#legend').html(htmlOut);
+
+    templates.add('page-legend', pageLegendTemplate);
+    var html = templates.render('page-legend', viewModel);
+    $('#legend').html(html);
 }
 
-function pageRanks(model) {    
-    var pageRanksTempl = 
+function pageRanks(model) {
+    var pageRanksTempl =
         '<table id="data_page_table" style="display:none;">' +
         '<thead><tr>' +
         '<th class="col1"><div><span>Rank</span></div></th>' +

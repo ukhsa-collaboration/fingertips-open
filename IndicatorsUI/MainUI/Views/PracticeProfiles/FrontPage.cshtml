@@ -10,9 +10,14 @@
 
     @Html.Partial("../PracticeProfiles/_IE8")
 }
-<div class="full-width title-divider"></div>
-<div class="standardWidth clearfix">
-    @Html.Partial("_IntroductionAndRecentUpdates")
-    @Html.Partial("_PracticeProfilesDomainCollection")
+<div class="title-divider"></div>
+<div id="views-national-general-practice-profiles-front-page">
+        <div id="national-general-practice-profiles">
+                @Html.Partial("_IntroductionAndRecentUpdates")
+
+                @Html.Partial("_PracticeProfilesDomainCollection")
+
+        </div>
+
 </div>
 

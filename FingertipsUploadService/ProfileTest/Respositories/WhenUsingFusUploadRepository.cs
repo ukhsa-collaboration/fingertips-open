@@ -88,7 +88,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
                 DateCreated = DateTime.Now,
                 JobType = UploadJobType.Simple,
                 TotalRows = 0,
-                Status = UploadJobStatus.NotStart
+                Status = UploadJobStatus.NotStarted
             };
             return newJob;
         }

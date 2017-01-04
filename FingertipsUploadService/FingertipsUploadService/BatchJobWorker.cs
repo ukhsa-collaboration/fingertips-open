@@ -1,4 +1,5 @@
 ﻿
+using FingertipsUploadService.FpmFileReader;
 using FingertipsUploadService.Helpers;
 using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Job;
@@ -16,46 +17,52 @@ namespace FingertipsUploadService
         private UploadJobErrorRepository _jobErrorRepository;
         private UploadJobRepository _jobRepository;
         private readonly Logger _logger = LogManager.GetLogger("BatchJobWorker");
-        private StatusHelper jobStatus;
+        private StatusHelper _jobStatus;
 
         public void ProcessJob(UploadJob job, IWorksheetNameValidator nameValidator,
-            IBatchWorksheetDataProcessor processor, IExcelFileReader excelFileReader)
+            IBatchWorksheetDataProcessor processor, IUploadFileReader fileReader)
         {
             try
             {
                 _jobRepository = new UploadJobRepository();
                 _jobErrorRepository = new UploadJobErrorRepository();
                 var batchUpload = ToBatchUpload(job);
-                jobStatus = new StatusHelper(_jobRepository, _logger);
+                _jobStatus = new StatusHelper(_jobRepository, _logger);
 
-                _logger.Info("Job# {0} current status is {1} ", job.Guid, job.Status);
+                _logger.Info("Job ID {0} current status is {1} ", job.Guid, job.Status);
 
                 // If user wants to override duplications 
                 if (job.Status == UploadJobStatus.ConfirmationGiven)
                 {
-                    jobStatus.InProgress(job);
+                    _jobStatus.InProgress(job);
+
                     // Read indicators in datatable
-                    var batchDataTable = GetBatchData(excelFileReader);
+                    var batchDataTable = GetBatchData(fileReader);
+
+                    SanitizeDataTable(fileReader, batchDataTable);
+
                     // Save the total number of rows in file
                     WorkerHelper.UpdateNumberOfRowsInFile(job, batchDataTable, _jobRepository, true);
-                    // 
+
                     //Perform validation once again to get the list 
                     // of duplicate rows in database
-                    //
                     processor.Validate(batchDataTable, batchUpload);
+
                     // Remove duplications in file
                     CheckDuplicateRowsInWorksheet(job, batchUpload, ref batchDataTable);
+
                     // Archive rows
                     processor.ArchiveDuplicates(batchUpload.DuplicateRowInDatabaseErrors, job);
+
                     // Upload data to core data set
                     UploadDataToCoreDataSet(job, processor, batchDataTable);
                 }
                 else // If we have a new job
                 {
-                    jobStatus.InProgress(job);
+                    _jobStatus.InProgress(job);
 
                     // Get worksheets from file
-                    var worksheets = excelFileReader.GetWorksheets();
+                    var worksheets = fileReader.GetWorksheets();
 
                     UpdateJobProgress(job, ProgressStage.ValidatingWorksheets);
 
@@ -63,8 +70,9 @@ namespace FingertipsUploadService
                     var worksheetsOk = CheckWorksheets(job, nameValidator, worksheets);
                     if (!worksheetsOk) return;
 
+                    var batchDataTable = GetBatchData(fileReader);
 
-                    var batchDataTable = GetBatchData(excelFileReader);
+                    SanitizeDataTable(fileReader, batchDataTable);
 
                     // Save the total number of rows in file
                     WorkerHelper.UpdateNumberOfRowsInFile(job, batchDataTable, _jobRepository, true);
@@ -101,8 +109,19 @@ namespace FingertipsUploadService
             }
             catch (Exception ex)
             {
-                jobStatus.UnexpectedError(job);
+                _jobStatus.UnexpectedError(job);
                 _logger.Error(ex);
+            }
+        }
+
+        /// <summary>
+        /// Replace missing values with defaults for Excel file only. This is done on parsing for CSV file.
+        /// </summary>
+        private static void SanitizeDataTable(IUploadFileReader fileReader, DataTable batchDataTable)
+        {
+            if (fileReader is ExcelFileReader)
+            {
+                new DataSanitizer().SanitizeExcelData(batchDataTable);
             }
         }
 
@@ -110,12 +129,12 @@ namespace FingertipsUploadService
         {
             if (batchUpload.DuplicateRowInDatabaseErrors.Count <= 0) return false;
 
-            jobStatus.ConfirmationAwaited(job);
+            _jobStatus.ConfirmationAwaited(job);
 
             var error = ErrorBuilder.GetDuplicateRowInDatabaseError(job.Guid,
                 batchUpload.DuplicateRowInDatabaseErrors);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0}, There are duplicate rows in database", job.Guid);
+            _logger.Info("Job ID {0}, There are duplicate rows in database", job.Guid);
 
             return true;
         }
@@ -124,11 +143,11 @@ namespace FingertipsUploadService
         {
             if (batchUpload.UploadValidationFailures.Count <= 0) return true;
 
-            jobStatus.FailedValidation(job);
+            _jobStatus.FailedValidation(job);
 
             var error = ErrorBuilder.GetConversionError(job.Guid, batchUpload.UploadValidationFailures);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0}, Data type conversion errors occurred ", job.Guid);
+            _logger.Info("Job ID {0}, Data type conversion errors occurred ", job.Guid);
             return false;
         }
 
@@ -138,8 +157,8 @@ namespace FingertipsUploadService
             {
                 var dataWithoutDuplicates = new FileDuplicationHandler().RemoveDuplicatesInBatch(batchDataTable);
                 batchDataTable = dataWithoutDuplicates;
-                _logger.Info("Job# {0}, There are duplicate rows in spreadsheet", job.Guid);
-                _logger.Info("Job# {0}, Dupllicate rows removed", job.Guid);
+                _logger.Info("Job ID {0}, There are duplicate rows in spreadsheet", job.Guid);
+                _logger.Info("Job ID {0}, Dupllicate rows removed", job.Guid);
             }
         }
 
@@ -147,9 +166,9 @@ namespace FingertipsUploadService
         {
             var hasPermission = new IndicatorPermission().Check(indicatorIdsInBatch, job, _jobErrorRepository);
             if (hasPermission) return true;
-            jobStatus.FailedValidation(job);
+            _jobStatus.FailedValidation(job);
 
-            _logger.Info("Job# {0}, User doesn't have permission for indicator", job.Guid);
+            _logger.Info("Job ID {0}, User doesn't have permission for indicator", job.Guid);
             return false;
         }
 
@@ -157,12 +176,12 @@ namespace FingertipsUploadService
         {
             if (nameValidator.ValidateBatch(worksheets)) return true;
 
-            jobStatus.FailedValidation(job);
+            _jobStatus.FailedValidation(job);
 
             var error = ErrorBuilder.GetWorkSheetNameValidationError(job);
             _jobErrorRepository.Log(error);
-            _logger.Info("Job# {0} doesn't have required worksheets", job.Guid);
-            _logger.Info("Job# {0} status changed to {1} ", job.Guid, job.Status);
+            _logger.Info("Job ID {0} doesn't have required worksheets", job.Guid);
+            _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
             return false;
         }
 
@@ -177,11 +196,11 @@ namespace FingertipsUploadService
             // Upload to DB
             var rowsUploaded = processor.UploadData(batchDataTable, job).DataToUpload.Count;
             // All good job completed
-            jobStatus.SuccessfulUpload(job, rowsUploaded);
-            UpdateJobProgress(job, ProgressStage.WrittingToDb);
+            _jobStatus.SuccessfulUpload(job, rowsUploaded);
+            UpdateJobProgress(job, ProgressStage.WritingToDb);
         }
 
-        private static DataTable GetBatchData(IExcelFileReader excelFileReader)
+        private static DataTable GetBatchData(IUploadFileReader excelFileReader)
         {
             // Get batch indicator data from worksheet as data table 
             DataTable batchDataTable = excelFileReader.GetBatchData();

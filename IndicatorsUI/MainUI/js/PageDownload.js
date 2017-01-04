@@ -179,13 +179,13 @@ function downloadCachedPdf(areaCode) {
     var profileId = FT.model.profileId;
     var url;
 
-    // Child Health profiles are hosted on Chimat site
-    if (profileId === ProfileIds.ChildHealth || profileId === ProfileIds.ChiMatWAY) {
+    // What about youth profiles are hosted on Chimat site
+    if (profileId === ProfileIds.ChiMatWAY) {
         downloadChildHealthPdf(areaCode,profileId);
         return;
     }
 
-    if (FT.isProfileWithOnlyStaticReports) {
+    if (FT.config.hasStaticReports) {
         // Static reports
         url = FT.url.corews + 'static-reports?profile_key=' + profileUrlKey + '&file_name=' + areaCode + '.pdf';
 
@@ -241,7 +241,7 @@ templates.add('excel',
 <div class="text"><h2>Get the data</h2><p>Download the data as an Excel spreadsheet for</p>\
 <a class="excel" href="javascript:exportExcel(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}{{#isNotNN}}<a class="excel" href="javascript:exportExcel(\'{{parentCode}}\')">{{parentLabel}}</a>{{/isNotNN}}{{/showSubnational}}' +
-    '<br><p>{{excelExportText}}</p></div>');
+    '<br><p>{{{excelExportText}}}</p></div>');
 
 /**
 * Stores results of previous AJAX requests for information on what profiles PDFs are available for.

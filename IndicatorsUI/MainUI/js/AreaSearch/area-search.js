@@ -341,8 +341,7 @@ areaSearchResults.prepareViewModel = function () {
         areaTypeNames: ['Counties / Unitary Authorities', 'Districts'],
         showAreaTypeHeader: showAreaTypeHeader,
         placeName: state.placeName,
-        profileUrlKey: profileUrlKey,
-        showWebLinks: FT.isProfileWithOnlyStaticReports
+        profileUrlKey: profileUrlKey
     });
 
     areaSearchResults.ensureParentAreaCodeIsDefined(areaLists);
@@ -436,8 +435,8 @@ areaSearchResults.displayAreaLists = function (viewModel) {
 
     areaSearchResults.displayTimePeriodOptions();
 
-    // Hide web links if necessary
-    if (FT.isProfileWithOnlyStaticReports) {
+    // Hide links to view data if necessary
+    if (!FT.config.hasAnyData) {
         $('.web-links').hide();
     }
 }

@@ -24,6 +24,11 @@ namespace Fpm.MainUISeleniumTest
             GoToUrl(string.Empty);
         }
 
+        public void ProfilesPage()
+        {
+            GoToUrl("profilemanager");
+        }
+
         public void ContentIndexPage()
         {
             GoToUrl("content");

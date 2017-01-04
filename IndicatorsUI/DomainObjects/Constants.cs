@@ -20,9 +20,9 @@ namespace Profiles.DomainObjects
         public const string Twitter = "twitter";
         public const string ContactUs = "contact-us";
         public const string FurtherInfo = "further-info";
-        public const string Faqs= "faqs";
+        public const string Faqs = "faqs";
         public const string Inequalities = "inequalities";
-        public const string Evidence = "evidence";
+        public const string FurtherResources = "evidence-and-resources";
 
         /// <summary>
         /// The instructions on the map page of Longer Lives
@@ -63,6 +63,7 @@ namespace Profiles.DomainObjects
         public const string PracticeProfiles = "general-practice";
         public const string MarmotHealthyLifeExpectancy = "marmot-healthy-life-expectancy";
         public const string MarmotIndicatorsForLocalAuthorities = "marmot-indicators";
+        public const string AmrLocalIndicators = "amr-local-indicators";
     }
 
     public class ProfileIds
@@ -74,19 +75,25 @@ namespace Profiles.DomainObjects
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
         public const int LongerLives = 22;
+        public const int UnassignedIndicators = 23;
         public const int HealthProfiles = 26;
         public const int MentalHealth = 36;
         public const int SevereMentalIllness = 41;
         public const int SexualHealth = 45;
         public const int Diabetes = 51;
         public const int LiverDisease = 55;
-        public const int HealthChecks = 77;
+        public const int SuicidePrevention = 73;
         public const int DrugsAndAlcohol = 75;
+        public const int HealthChecks = 77;
+        public const int ChildHealth = 105;
+        public const int WiderDeterminantsOfHealth = 130;
     }
 
     public class GroupIds
     {
+        public const int AMR_AntibioticPrescribing = 1938132909;
         public const int PracticeProfiles_SupportingIndicators = 1200006;
+        public const int SevereMentalIllness_PsychosisPathway = 1938132719;
         public const int SevereMentalIllness_RiskFactors = 8000027;
         public const int SevereMentalIllness_Prevalence = 8000030;
         public const int SevereMentalIllness_Finance = 8000040;
@@ -98,12 +105,6 @@ namespace Profiles.DomainObjects
     public class IndicatorIds
     {
         public const int GapInLifeExpectancyAtBirth = 90365;
-    }
-
-    public class TabIds
-    {
-        public const int BarChart = 3;
-        public const int ScatterPlot = 10;
     }
 
     public class SexIds
@@ -120,9 +121,10 @@ namespace Profiles.DomainObjects
 
     public class AreaTypeIds
     {
+        public const int GpPractice = 7;
+        public const int CCG = 19;
         public const int DistrictAndUnitaryAuthority = 101;
         public const int CountyAndUnitaryAuthority = 102;
-        public const int CCG = 19;
     }
 
     public class AreaCodes
@@ -152,7 +154,7 @@ namespace Profiles.DomainObjects
 
     public class SkinIds
     {
-        public const int Core= 2;
+        public const int Core = 2;
         public const int Phof = 3;
         public const int Tobacco = 4;
         public const int LongerLives = 5;
@@ -161,6 +163,8 @@ namespace Profiles.DomainObjects
     public class ProfileCollectionIds
     {
         public const int NationalProfiles = 4;
+        //For Highlighted
+        public const int HighlightedProfiles = 11;
     }
 
     public class SpineChartMinMaxLabels
@@ -169,5 +173,21 @@ namespace Profiles.DomainObjects
         public const int LowestAndHighest = 1;
         public const int WorstAndBest = 2;
         public const int WorstLowestAndBestHighest = 3;
+    }
+
+    public class TabIds
+    {
+        public const int TartanRug = 0;
+        public const int AreaProfile = 1;
+        public const int CompareAreas = 3;
+        public const int Inequalities = 7;
+        public const int ScatterPlot = 10;
+    }
+
+    public class NeighbourTypes
+    {
+        public const int CIPFA = 1;
+        public const int TenMostSimilarCCGs = 2;
+        public const int ChildrensServicesStatisticalNeighbours = 3;
     }
 }

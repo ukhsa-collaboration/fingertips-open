@@ -36,7 +36,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             var first = notStartedUploadJobs.FirstOrDefault();
 
             Assert.AreEqual(job.Guid, first.Guid);
-            Assert.AreEqual(UploadJobStatus.NotStart, first.Status);
+            Assert.AreEqual(UploadJobStatus.NotStarted, first.Status);
         }
 
         [TestMethod]
@@ -90,7 +90,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
                 DateCreated = DateTime.Now,
                 JobType = UploadJobType.Simple,
                 TotalRows = 0,
-                Status = UploadJobStatus.NotStart
+                Status = UploadJobStatus.NotStarted
             };
             return newJob;
         }

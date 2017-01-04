@@ -60,7 +60,14 @@
         </div>
         
         <ul class="related_links no-print">
-            <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+            @if (Model.ProfileId == ProfileIds.SuicidePrevention)
+            {
+                <li>@Html.Partial("_MentalHealthLink")</li>
+            }
+            else
+            {
+                <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+            }
             <li><a href="/topic/@(ViewBag.ProfileUrlKey)/about-data">About the data</a></li>
             @if (Model.ProfileId == ProfileIds.HealthChecks)
             {

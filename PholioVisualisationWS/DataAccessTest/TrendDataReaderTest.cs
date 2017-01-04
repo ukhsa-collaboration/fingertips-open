@@ -12,11 +12,17 @@ namespace PholioVisualisation.DataAccessTest
     [TestClass]
     public class TrendDataReaderTest
     {
+        private ITrendDataReader reader;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            reader = ReaderFactory.GetTrendDataReader();
+        }
+
         [TestMethod]
         public void TestYearlyData()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
-
             Grouping grouping = new Grouping
             {
                 IndicatorId = IndicatorIds.ObesityYear6,
@@ -29,7 +35,7 @@ namespace PholioVisualisation.DataAccessTest
                 AgeId = AgeIds.From10To11
             };
 
-            IList<CoreDataSet> data = reader.GetTrendData(grouping, 
+            IList<CoreDataSet> data = reader.GetTrendData(grouping,
                 AreaCodes.CountyUa_Leicestershire);
 
             Assert.AreEqual(4, data.Count);
@@ -50,8 +56,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestQuarterlyData()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
-
             Grouping grouping = new Grouping
             {
                 IndicatorId = IndicatorIds.AdultSmokingPrevalence,
@@ -89,10 +93,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestMonthlyData()
         {
-            /* DF 19-12-2011 : test fails because data in database incorrect, 2011 data has been entered with year 2011 */
-
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
-
             Grouping grouping = new Grouping
             {
                 IndicatorId = 734,
@@ -136,10 +136,9 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestMin()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
             IList<string> areaCodes = new[]
             {
-                AreaCodes.CountyUa_Cambridgeshire, 
+                AreaCodes.CountyUa_Cambridgeshire,
                 AreaCodes.CountyUa_Cumbria
             };
             var min = reader.GetMin(GetLimitsGrouping(), areaCodes);
@@ -149,7 +148,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestMax()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
             IList<string> areaCodes = new[]
             {
                 AreaCodes.CountyUa_Cambridgeshire,
@@ -162,7 +160,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestMinWithNoResults()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
             IList<string> areaCodes = new[] { AreaCodes.Pct_Norfolk, AreaCodes.Pct_MidEssex };
             Grouping g = GetLimitsGrouping();
             g.IndicatorId = -1;
@@ -172,7 +169,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestMaxWithNoResults()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
             IList<string> areaCodes = new[] { AreaCodes.Pct_Norfolk, AreaCodes.Pct_MidEssex };
             Grouping g = GetLimitsGrouping();
             g.IndicatorId = -1;
@@ -182,7 +178,29 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetTrendDataForSpecificCategory()
         {
-            ITrendDataReader reader = ReaderFactory.GetTrendDataReader();
+            var grouping = GroupingWithTrendData();
+
+            IList<CoreDataSet> data = reader.GetTrendDataForSpecificCategory(grouping,
+                AreaCodes.CountyUa_Buckinghamshire,
+                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, 1);
+
+            Assert.AreEqual(2, data.Count);
+        }
+
+        [TestMethod]
+        public void TestGetTrendDataForSpecificCategoryForMultiplesAreas()
+        {
+            var areaCode = AreaCodes.CountyUa_Buckinghamshire;
+
+            var grouping = GroupingWithTrendData();
+
+            var data = reader.GetTrendDataForMultipleAreas(grouping, areaCode);
+
+            Assert.AreEqual(areaCode, data.Keys.First());
+        }
+
+        private static Grouping GroupingWithTrendData()
+        {
             Grouping grouping = new Grouping
             {
                 SexId = SexIds.Persons,
@@ -192,12 +210,7 @@ namespace PholioVisualisation.DataAccessTest
                 BaselineYear = 2010,
                 DataPointYear = 2012
             };
-
-            IList<CoreDataSet> data = reader.GetTrendDataForSpecificCategory(grouping,
-                AreaCodes.CountyUa_Buckinghamshire,
-                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, 1);
-
-            Assert.AreEqual(2, data.Count);
+            return grouping;
         }
 
         private static Grouping GetLimitsGrouping()

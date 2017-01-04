@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
@@ -21,17 +22,16 @@ namespace PholioVisualisation.DataConstruction
             _trendCalculator = trendCalculator;
         }
 
-        public Dictionary<string, TrendMarkerResult> GetTrendResults(IList<IArea> areas, IndicatorMetadata indicatorMetadata, Grouping grouping)
+        public Dictionary<string, TrendMarkerResult> GetTrendResults(IList<IArea> areas, IndicatorMetadata indicatorMetadata,
+            Grouping grouping)
         {
-            //var writer = new TrendMarkerWriter();
-
             var trendMarkers = new Dictionary<string, TrendMarkerResult>();
 
-            foreach (var area in areas)
-            {
-                var areaCode = area.Code;
+            var areaCodeToTrendDataList = _trendReader.GetTrendDataForMultipleAreas(grouping, areas.Select(x => x.Code).ToArray());
 
-                var dataList = _trendReader.GetTrendData(grouping, areaCode);
+            foreach (var areaCode in areaCodeToTrendDataList.Keys)
+            {
+                var dataList = areaCodeToTrendDataList[areaCode];
 
                 var result = GetTrendMarkerResult(indicatorMetadata, grouping, dataList);
 

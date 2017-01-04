@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -102,9 +103,9 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestValueLimits()
         {
-            byte[] data = GetData("value_limits?"+
+            byte[] data = GetData("value_limits?" +
                 "group_id=" + GroupIds.PracticeProfiles_PracticeSummary +
-                "&area_type_id=" + AreaTypeIds.GpPractice + 
+                "&area_type_id=" + AreaTypeIds.GpPractice +
                 "&parent_area_code=" + AreaCodes.Ccg_Chiltern);
             TestHelper.IsData(data);
         }
@@ -112,8 +113,26 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetQuinaryPopulationData()
         {
-            byte[] data = GetData("quinary_population_data?"+
+            byte[] data = GetData("quinary_population_data?" +
                 "group_id=" + GroupIds.PracticeProfiles_SupportingIndicators +
+                "&area_code=" + AreaCodes.Gp_MeersbrookSheffield);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetQuinaryPopulation()
+        {
+            byte[] data = GetData("quinary_population?" +
+                "area_type_id=" + AreaTypeIds.GpPractice +
+                "&area_code=" + AreaCodes.Gp_MeersbrookSheffield);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetQuinaryPopulationSummary()
+        {
+            byte[] data = GetData("quinary_population_summary?" +
+                "area_type_id=" + AreaTypeIds.GpPractice +
                 "&area_code=" + AreaCodes.Gp_MeersbrookSheffield);
             TestHelper.IsData(data);
         }
@@ -121,7 +140,7 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetProfilesPerIndicator()
         {
-            byte[] data = GetData("profiles_containing_indicators?" + 
+            byte[] data = GetData("profiles_containing_indicators?" +
                 "area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
                 "&indicator_ids=" + IndicatorIds.TeenagePregnancy);
             TestHelper.IsData(data);
@@ -215,7 +234,11 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetIndicatorsThatMatchText()
         {
             byte[] data = GetData("indicator_search?search_text=hip");
+
             TestHelper.IsData(data);
+
+            // Contains PHOF ID
+            TestHelper.AssertDataContainsString(data, "\"" + ProfileIds.Phof + "\"");
         }
 
         public static byte[] GetData(string path)

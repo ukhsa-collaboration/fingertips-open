@@ -21,6 +21,5 @@ namespace FingertipsUploadService.Upload
         public const string ValueNoteId = "ValueNoteId";
         public const string CategoryTypeId = "CategoryTypeId";
         public const string CategoryId = "CategoryId";
-        public const string AreaName = "AreaName";
     }
 }

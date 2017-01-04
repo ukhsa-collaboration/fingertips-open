@@ -1,7 +1,5 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
@@ -23,8 +21,6 @@ namespace PholioVisualisation.DataConstruction
 
             foreach (GroupRoot groupRoot in groupRoots)
             {
-                Debug.WriteLine(_groupDataReader.GetCoreDataCountAtDataPoint(groupRoot.FirstGrouping));
-
                 if (_groupDataReader.GetCoreDataCountAtDataPoint(groupRoot.FirstGrouping) > 0)
                 {
                     rootsToKeep.Add(groupRoot);

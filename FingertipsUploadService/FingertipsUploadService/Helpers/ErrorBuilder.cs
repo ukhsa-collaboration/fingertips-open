@@ -64,7 +64,7 @@ namespace FingertipsUploadService.Helpers
                     "To upload data for the following indicator(s) you will need permission to the owner profile" :
                     "Following indicator(s) does not exist",
 
-                ErrorJson = new JavaScriptSerializer().Serialize(listOfErrors)
+                ErrorJson = new JavaScriptSerializer().Serialize(listOfErrors.Take(1000))
             };
             return error;
         }
@@ -76,7 +76,7 @@ namespace FingertipsUploadService.Helpers
                 JobGuid = jobGuid,
                 ErrorType = UploadJobErrorType.ValidationFailureError,
                 ErrorText = "Data type conversion errors occurred in the following spreadsheet rows",
-                ErrorJson = new JavaScriptSerializer().Serialize(validationFailures)
+                ErrorJson = new JavaScriptSerializer().Serialize(validationFailures.Take(1000))
             };
             return error;
         }
@@ -89,7 +89,7 @@ namespace FingertipsUploadService.Helpers
                 JobGuid = jobGuid,
                 ErrorType = UploadJobErrorType.DuplicateRowInSpreadsheetError,
                 ErrorText = GetRowDuplicationInFileErrorText(duplicateRows.Count),
-                ErrorJson = new JavaScriptSerializer().Serialize(duplicateRows)
+                ErrorJson = new JavaScriptSerializer().Serialize(duplicateRows.Take(1000))
             };
             return error;
         }

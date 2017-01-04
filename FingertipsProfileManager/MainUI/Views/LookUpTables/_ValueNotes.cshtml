@@ -1,4 +1,5 @@
-﻿@model Fpm.MainUI.Models.LookupModel
+﻿@using Fpm.ProfileData
+@model Fpm.MainUI.Models.LookupModel
 
 @if (Model.ValueNotes != null)
 {
@@ -12,6 +13,11 @@
                     @if (valueNote.IsGeneric)
                     {
                         <td colspan="2" class="generic-value-note">@valueNote.Text</td>
+                    }
+                    else if (valueNote.ValueNoteId == ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips)
+                    {
+                        <td>@valueNote.ValueNoteId</td>
+                        <td>DO NOT USE: values have been aggregated automatically by Fingertips </td>
                     }
                     else
                     {
