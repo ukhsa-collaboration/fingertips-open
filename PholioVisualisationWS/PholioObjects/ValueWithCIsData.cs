@@ -21,6 +21,12 @@ namespace PholioVisualisation.PholioObjects
             };
         }
 
+        [JsonIgnore]
+        public bool HasFormattedCIs
+        {
+            get { return LowerCIF != null && UpperCIF != null; }
+        }
+
         [JsonProperty(PropertyName = "LoCI")]
         public double LowerCI { get; set; }
 
@@ -33,12 +39,15 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "UpCIF")]
         public string UpperCIF { get; set; }
 
+        [JsonIgnore]
+        public bool HasBeenTruncated { get; set; }
+
         /// <summary>
         /// Whether or not LowerCIF should be serialised by JSON.NET.
         /// </summary>
         public bool ShouldSerializeLowerCIF()
         {
-            return ShouldSerializeLowerCI() && LowerCIF != null;
+            return AreCIsValid && LowerCIF != null;
         }
 
         /// <summary>
@@ -46,7 +55,7 @@ namespace PholioVisualisation.PholioObjects
         /// </summary>
         public bool ShouldSerializeUpperCIF()
         {
-            return ShouldSerializeUpperCI() && UpperCIF != null;
+            return AreCIsValid && UpperCIF != null;
         }
 
         /// <summary>
@@ -54,7 +63,7 @@ namespace PholioVisualisation.PholioObjects
         /// </summary>
         public bool ShouldSerializeLowerCI()
         {
-            return LowerCI != NullValue;
+            return AreCIsValid;
         }
 
         /// <summary>
@@ -62,13 +71,17 @@ namespace PholioVisualisation.PholioObjects
         /// </summary>
         public bool ShouldSerializeUpperCI()
         {
-            return UpperCI != NullValue;
+            return AreCIsValid;
         }
 
         [JsonIgnore]
         public bool AreCIsValid
         {
-            get { return UpperCI != NullValue && LowerCI != NullValue; }
+            get
+            {
+                // Tolerate single minus one so analysts do not have to use 1.00001 to represent actual -1
+                return UpperCI != NullValue || LowerCI != NullValue;
+            }
         }
 
         public static ValueWithCIsData GetNullObject()

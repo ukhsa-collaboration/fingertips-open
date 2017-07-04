@@ -79,6 +79,9 @@
     <Compile Include="ProfilesReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProfilesWriterTest.cs" />
+    <Compile Include="Respositories\WhenUsingAreaTypesRepository.cs" />
+    <Compile Include="Respositories\WhenUsingDocumentsRepository.cs" />
+    <Compile Include="Respositories\WhenUsingExceptionLogRepository.cs" />
     <Compile Include="Respositories\WhenUsingLoggingRepository.cs" />
     <Compile Include="Respositories\WhenUsingUploadRepository.cs" />
     <Compile Include="Respositories\WhenUsingLooksUpRepository.cs" />

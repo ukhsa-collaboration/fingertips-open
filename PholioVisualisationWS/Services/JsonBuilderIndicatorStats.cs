@@ -4,45 +4,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Newtonsoft.Json;
-using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
-using PholioVisualisation.Formatting;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
+using PholioVisualisation.ServiceActions;
 
 namespace PholioVisualisation.Services
 {
-    public class IndicatorStatsResponse
-    {
-        public int IID { get; set; }
-        public Sex Sex { get; set; }
-        public Age Age { get; set; }
-        public IndicatorStatsPercentiles Stats { get; set; }
-        public IndicatorStatsPercentilesFormatted StatsF { get; set; }
-        public bool? HaveRequiredValues { get; set; }
-    }
-
     public class JsonBuilderIndicatorStats : JsonBuilderBase
     {
         private IndicatorStatsParameters _parameters;
 
-        private IndicatorMetadataProvider indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
-        private IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        private PholioReader pholioReader = ReaderFactory.GetPholioReader();
-        private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-        private IProfileReader profileReader = ReaderFactory.GetProfileReader();
-        private IndicatorStatsProcessor indicatorStatsProcessor = new IndicatorStatsProcessor();
+        private IndicatorMetadataProvider _indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
+        private IProfileReader _profileReader = ReaderFactory.GetProfileReader();
 
-        private IArea parentArea;
-        private CcgPopulation ccgPopulation;
-        private IList<string> areaCodesToIgnore;
-        private IList<int> profileIds;
-
-        private bool? shouldShowSpineChart;
-
-        private int childAreaCount;
-
+        private IList<int> _profileIds;
 
         public JsonBuilderIndicatorStats(HttpContextBase context)
             : base(context)
@@ -63,73 +41,34 @@ namespace PholioVisualisation.Services
             return JsonConvert.SerializeObject(responseObjects);
         }
 
-        public Dictionary<int, IndicatorStatsResponse> GetIndicatorStats()
+        public Dictionary<int, IndicatorStats> GetIndicatorStats()
         {
-            profileIds = _parameters.RestrictResultsToProfileIdList;
-            parentArea = AreaFactory.NewArea(areasReader, _parameters.ParentAreaCode);
+            _profileIds = _parameters.RestrictResultsToProfileIdList;
 
             var roots = GetRoots();
-            var responseObjects = new Dictionary<int, IndicatorStatsResponse>();
+            var responseObjects = new Dictionary<int, IndicatorStats>();
 
-            SetAreaCodesToIgnore();
-
-            if (parentArea.IsCcg)
-            {
-                ccgPopulation = new CcgPopulationProvider(pholioReader).GetPopulation(parentArea.Code);
-            }
-
-            childAreaCount = new ChildAreaCounter(areasReader)
-                .GetChildAreasCount(parentArea, _parameters.ChildAreaTypeId);
+            var indicatorStatsBuilder = new IndicatorStatsBuilder();
 
             int rootIndex = 0;
             foreach (var root in roots)
             {
                 Grouping grouping = root.Grouping[0];
-                IndicatorMetadata metadata = indicatorMetadataProvider.GetIndicatorMetadata(grouping);
-                TimePeriod timePeriod = new DataPointOffsetCalculator(grouping, _parameters.DataPointOffset, metadata.YearType).TimePeriod;
+                IndicatorMetadata metadata = _indicatorMetadataProvider.GetIndicatorMetadata(grouping);
+                TimePeriod timePeriod = new DataPointOffsetCalculator(grouping, _parameters.DataPointOffset,
+                    metadata.YearType).TimePeriod;
 
-                IEnumerable<double> values = GetValuesForStats(grouping, timePeriod, metadata);
+                var parentArea = new ParentArea(_parameters.ParentAreaCode, _parameters.ChildAreaTypeId);
 
-                IndicatorStatsResponse statsAndStatF;
-                if (values != null)
-                {
-                    IndicatorStatsPercentiles statsPercentiles = new IndicatorStatsCalculator(values).GetStats();
-                    var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
-                    indicatorStatsProcessor.Truncate(statsPercentiles);
+                var indicatorStatsResponse = indicatorStatsBuilder.GetIndicatorStats(timePeriod,grouping,
+                    metadata, parentArea,_parameters.ProfileId);
 
-                    statsAndStatF = new IndicatorStatsResponse
-                    {
-                        IID = metadata.IndicatorId,
-                        Sex = grouping.Sex,
-                        Age = grouping.Age,
-                        Stats = statsPercentiles,
-                        StatsF = formatter.FormatStats(statsPercentiles),
-                        HaveRequiredValues = shouldShowSpineChart
-                    };
-                }
-                else
-                {
-                    // No stats calculated
-                    statsAndStatF = new IndicatorStatsResponse
-                    {
-                        IID = metadata.IndicatorId,
-                        Sex = grouping.Sex,
-                        Age = grouping.Age,
-                        HaveRequiredValues = shouldShowSpineChart
-                    };
-                }
-                responseObjects[rootIndex] = statsAndStatF;
+                responseObjects[rootIndex] = indicatorStatsResponse;
 
                 rootIndex++;
             }
 
             return responseObjects;
-        }
-
-        private void SetAreaCodesToIgnore()
-        {
-            var profileId = _parameters.ProfileId;
-            areaCodesToIgnore = profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
         }
 
         private IEnumerable<GroupRoot> GetRoots()
@@ -138,8 +77,8 @@ namespace PholioVisualisation.Services
             IList<Grouping> groupings;
             if (_parameters.UseIndicatorIds)
             {
-                groupings = new GroupingListProvider(reader, profileReader).GetGroupings(
-                    profileIds,
+                groupings = new GroupingListProvider(reader, _profileReader).GetGroupings(
+                    _profileIds,
                     _parameters.IndicatorIds,
                     _parameters.ChildAreaTypeId);
 
@@ -151,62 +90,5 @@ namespace PholioVisualisation.Services
             return new GroupRootBuilder().BuildGroupRoots(groupings);
         }
 
-        private IEnumerable<double> GetValuesForStats(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata metadata)
-        {
-            IList<CoreDataSet> data = null;
-            IList<double> values;
-
-            if (parentArea.IsCountry)
-            {
-                // Optimisation for large number of areas
-                values = groupDataReader.GetOrderedCoreDataValidValuesForAllAreasOfType(grouping, timePeriod,
-                    areaCodesToIgnore);
-            }
-            else
-            {
-                data = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(grouping, parentArea, timePeriod);
-                data = new CoreDataSetFilter(data).RemoveWithAreaCode(areaCodesToIgnore).ToList();
-                data = data.OrderBy(x => x.Value).ToList();
-                values = new ValueListBuilder(data).ValidValues;
-            }
-
-            // Apply rules
-            int areaTypeId = grouping.AreaTypeId;
-            if (areaTypeId != AreaTypeIds.GpPractice)
-            {
-                shouldShowSpineChart = IsRequiredNumberOfAreaValues(values) || metadata.AlwaysShowSpineChart;
-
-                if (shouldShowSpineChart == false)
-                {
-                    values = null;
-                }
-            }
-            else if (parentArea.IsCcg)
-            {
-                // CCG average of GP practices
-                if (RuleShouldCcgAverageBeCalculated.Validates(grouping, data, ccgPopulation) == false)
-                {
-                    values = null;
-                }
-            }
-
-            return values;
-        }
-
-        /// <summary>
-        /// Rule that values must be available for at least 75% of the child areas.
-        /// </summary>
-        private bool IsRequiredNumberOfAreaValues(IEnumerable<double> values)
-        {
-            if (childAreaCount > 0)
-            {
-                double fractionOfAreasWithValues = Convert.ToDouble(values.Count()) /
-                    Convert.ToDouble(childAreaCount);
-
-                return fractionOfAreasWithValues >= 0.75;
-            }
-
-            return false;
-        }
     }
 }

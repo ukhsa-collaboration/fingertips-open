@@ -19,7 +19,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
         }
 
         [TestMethod]
-        public void TestAllTabsLoad()
+        public void TestAllPhofTabsLoad()
         {
             navigateTo.PhofTartanRug();
             FingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast(driver);
@@ -60,7 +60,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             FingertipsHelper.LeaveAreaSearchMode(driver);
 
             // Leave and return to data page
-            navigateTo.PhofHomePage();
+            navigateTo.HomePage();
             navigateTo.PhofTartanRug();
 
             // Check area menu contains searched for area
@@ -108,14 +108,15 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             waitFor.FingertipsBarChartTableToLoad();
 
             // Check area menu contains searched for area
-            var text = driver.FindElement(By.Id("indicatorDetailsHeader")).Text;
+            var text = driver.FindElement(By.Id("indicator-details-header")).Text;
             TestHelper.AssertTextContains(text, "gap in life expectancy at birth");
             TestHelper.AssertTextContains(text, "(Female)");
         }
 
         [TestMethod]
-        public void TestChangingAreaTypeRepopulatesButRetainsSelectedSupportingIndicator()
+        public void TestScatterPlotChangingAreaTypeRepopulatesButRetainsSelectedSupportingIndicator()
         {
+            // Navidate to scatter plot
             var parameters = new HashParameters();
             parameters.AddAreaTypeId(AreaTypeIds.CountyAndUnitaryAuthority);
             parameters.AddIndicatorId(IndicatorIds.GapInLifeExpectancyAtBirth);
@@ -124,7 +125,8 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             parameters.AddTabId(TabIds.ScatterPlot);
             navigateTo.GoToUrl(UrlKey + parameters.HashParameterString);
             waitFor.FingertipsScatterPlotChartToLoad();
-            var countyUaAreaCount = driver.FindElements(By.CssSelector("#supportingIndicators option"));
+
+            var countyUaAreaCount = driver.FindElements(By.CssSelector("#supporting-indicators option")).Count;
 
             //Set supporting indicator
             driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single")).Click();
@@ -137,7 +139,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             SelectElement clickThis = new SelectElement(areaTypeDropdown);
             clickThis.SelectByText("District & UA");
             waitFor.FingertipsScatterPlotChartToLoad();
-            var distictUaAreaCount = driver.FindElements(By.CssSelector("#supportingIndicators option"));
+            var distictUaAreaCount = driver.FindElements(By.CssSelector("#supporting-indicators option")).Count;
 
             var selectedSupportinIndicator = driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single span"));
 
@@ -184,7 +186,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
 
         private string GetInequalityIndicatorName()
         {
-            return driver.FindElement(By.ClassName("trendLink")).Text;
+            return driver.FindElement(By.ClassName("trend-link")).Text;
         }
     }
 }

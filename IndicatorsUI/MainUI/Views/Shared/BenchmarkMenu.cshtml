@@ -1,12 +1,8 @@
 ﻿@using Profiles.MainUI.Models
 @model PageModel
-@{
-    var targetBenchmarkChecked = Model.UseTargetBenchmarkByDefault ? "checked='checked'" : "";
-}
-
 @if ((int)ViewBag.EnumParentDisplay == (int)ParentDisplay.NationalAndRegional)
 {
-    <ul id="benchmark-box" class="menu geo-menu right-menu" style="display:none;">
+    <ul id="benchmark-box" class="menu geo-menu right-menu" style="display: none;">
         <li>
             <select id="comparator" onchange="benchmarkChanged();">
                 <option value="4" selected="selected">England</option>
@@ -17,14 +13,4 @@
             Benchmark
         </li>
     </ul>
-    <div id="target-benchmark-box" style="display:none;">
-        <ul class="menu">
-            <li class="label">
-                Benchmark against goal where applicable
-            </li>
-            <li>
-                <input id="target-benchmark" type="checkbox" @(targetBenchmarkChecked)>
-            </li>
-        </ul>
-    </div>
 }

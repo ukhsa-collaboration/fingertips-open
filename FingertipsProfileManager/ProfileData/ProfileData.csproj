@@ -76,6 +76,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AreaTypeIdSplitter.cs" />
+    <Compile Include="Entities\Documents\DocumentContent.cs" />
     <Compile Include="Entities\JobError\UploadJobError.cs" />
     <Compile Include="Entities\Job\UploadJob.cs" />
     <Compile Include="Entities\Job\UploadJobStatus.cs" />
@@ -94,7 +95,10 @@
     <Compile Include="Entities\LookUps\DenominatorType.cs" />
     <Compile Include="Entities\LookUps\Unit.cs" />
     <Compile Include="Entities\LookUps\YearType.cs" />
+    <Compile Include="Entities\Profile\DisclosureControl.cs" />
     <Compile Include="Entities\Profile\Indicator.cs" />
+    <Compile Include="Entities\Report\Report.cs" />
+    <Compile Include="Entities\Report\ReportsProfileMapping.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="IndicatorMetadataTextItem.cs" />
     <Compile Include="Entities\Profile\ComparatorConfidence.cs" />
@@ -109,11 +113,14 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Entities\LookUps\Polarity.cs" />
     <Compile Include="ProfilesWriter.cs" />
-    <Compile Include="Entities\Profile\ExceptionLog.cs" />
+    <Compile Include="Entities\Exceptions\ExceptionLog.cs" />
     <Compile Include="FpmException.cs" />
     <Compile Include="Entities\Profile\ProfileCollectionItem.cs" />
     <Compile Include="Entities\Profile\ProfileCollection.cs" />
     <Compile Include="Entities\LookUps\IndicatorValueType.cs" />
+    <Compile Include="Repositories\AreaTypeRepository.cs" />
+    <Compile Include="Repositories\DocumentsRepository.cs" />
+    <Compile Include="Repositories\ExceptionsRepository.cs" />
     <Compile Include="Repositories\IFpmUploadRepository.cs" />
     <Compile Include="Repositories\LoggingRepository.cs" />
     <Compile Include="Repositories\LookUpsRepository.cs" />
@@ -121,6 +128,7 @@
     <Compile Include="Repositories\IRepositoryBase.cs" />
     <Compile Include="NHibernateSessionFactory.cs" />
     <Compile Include="Repositories\ProfileRepository.cs" />
+    <Compile Include="Repositories\ReportRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
     <Compile Include="Repositories\UploadJobRepository.cs" />
     <Compile Include="Repositories\UserRepository.cs" />
@@ -184,6 +192,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Entities\JobError\JobError.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\Exceptions\ExceptionLog.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\Documents\Documents.hbm.xml" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Entities\Report\report.hbm.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

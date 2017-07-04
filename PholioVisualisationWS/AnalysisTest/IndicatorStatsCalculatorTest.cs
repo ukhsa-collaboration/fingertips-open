@@ -20,6 +20,7 @@ namespace PholioVisualisation.AnalysisTest
             IndicatorStatsPercentiles statsPercentiles = calc.GetStats();
             Assert.AreEqual(min, statsPercentiles.Min);
             Assert.AreEqual(max, statsPercentiles.Max);
+            Assert.AreEqual(55, statsPercentiles.Median);
             Assert.AreEqual(52.5, statsPercentiles.Percentile25);
             Assert.AreEqual(57.5, statsPercentiles.Percentile75);
         }
@@ -35,18 +36,9 @@ namespace PholioVisualisation.AnalysisTest
             IndicatorStatsPercentiles statsPercentiles = calc.GetStats();
             Assert.AreEqual(min, statsPercentiles.Min);
             Assert.AreEqual(max, statsPercentiles.Max);
+            Assert.AreEqual(50.5, statsPercentiles.Median);
             Assert.AreEqual(25.75, statsPercentiles.Percentile25);
             Assert.AreEqual(75.25, statsPercentiles.Percentile75);
-        }
-
-        private static List<double> GetValues(int min, int max)
-        {
-            var data = new List<double>();
-            for (int i = min; i <= max; i++)
-            {
-                data.Add(i);
-            }
-            return data;
         }
 
         [TestMethod]
@@ -153,9 +145,19 @@ namespace PholioVisualisation.AnalysisTest
             IndicatorStatsPercentiles statsPercentiles = calc.GetStats();
             Assert.AreEqual(50, statsPercentiles.Min);
             Assert.AreEqual(60, statsPercentiles.Max);
+            Assert.AreEqual(55, statsPercentiles.Median);
             Assert.AreEqual(52.5, statsPercentiles.Percentile25);
             Assert.AreEqual(57.5, statsPercentiles.Percentile75);
         }
 
+        private static List<double> GetValues(int min, int max)
+        {
+            var data = new List<double>();
+            for (int i = min; i <= max; i++)
+            {
+                data.Add(i);
+            }
+            return data;
+        }
     }
 }

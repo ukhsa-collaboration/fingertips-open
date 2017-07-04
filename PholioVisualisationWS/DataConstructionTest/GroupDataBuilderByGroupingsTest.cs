@@ -16,8 +16,8 @@ namespace PholioVisualisation.DataConstructionTest
         {
             GroupData data = new GroupDataBuilderByGroupings
             {
-                GroupId = GroupIds.SubstanceMisuse_Over18Misuse,
-                ProfileId = ProfileIds.SubstanceMisuse,
+                GroupId = GroupIds.Phof_HealthProtection,
+                ProfileId = ProfileIds.Phof,
                 ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
                 ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 AssignData = false
@@ -32,23 +32,6 @@ namespace PholioVisualisation.DataConstructionTest
                     Assert.IsNull(grouping.ComparatorData);
                 }
             }
-        }
-
-        [TestMethod]
-        public void TestSubstanceMisuseOver18Misuse()
-        {
-            GroupData data = new GroupDataBuilderByGroupings
-            {
-                GroupId = GroupIds.SubstanceMisuse_Over18Misuse,
-                ProfileId = ProfileIds.SubstanceMisuse,
-                ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
-            }.Build();
-
-            Assert.IsTrue(data.GroupRoots.Count > 20);
-            Assert.AreEqual(9, data.Areas.Count);
-            Assert.AreEqual(AreaCodes.Gor_EastOfEngland,
-                data.GroupRoots.First().Grouping.First().ComparatorData.AreaCode);
         }
 
         [TestMethod]

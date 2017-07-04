@@ -28,9 +28,8 @@ namespace PholioVisualisation.DataConstructionTest
 
             IndicatorMetadata metadata = collection.GetIndicatorMetadataById(indicatorId1);
 
-            Assert.IsNotNull(metadata.Descriptive[IndicatorMetadataTextColumnNames.Name]);
-            Assert.IsNotNull(collection.GetIndicatorMetadataById(indicatorId2)
-                .Descriptive[IndicatorMetadataTextColumnNames.Name]);
+            Assert.IsNotNull(metadata.Name);
+            Assert.IsNotNull(collection.GetIndicatorMetadataById(indicatorId2).Name);
             Assert.IsNull(collection.GetIndicatorMetadataById(IndicatorIds.ObesityYear6));
         }
 

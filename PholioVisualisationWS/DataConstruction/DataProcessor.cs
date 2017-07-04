@@ -16,11 +16,12 @@ namespace PholioVisualisation.DataConstruction
 
         protected static void TruncateValuesOfValueDataWithCIs(ValueWithCIsData data)
         {
-            if (data != null)
+            if (data != null && data.HasBeenTruncated == false)
             {
                 data.Value = Round(data.Value);
                 data.LowerCI = Round(data.LowerCI);
                 data.UpperCI = Round(data.UpperCI);
+                data.HasBeenTruncated = true;
             }
         }
 

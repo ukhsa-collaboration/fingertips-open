@@ -11,12 +11,18 @@ namespace PholioVisualisation.PdfData
 
         private SpineChartTableData spineChartTableData;
 
-        public List<SpineChartTableData> GetDomainDataForProfile(int profileId, int childAreaTypeId, IList<string> areaCodes, 
-            IList<string> benchmarkAreaCodes)
+        public List<SpineChartTableData> GetDomainDataForProfile(SpineChartDataParameters parameters)
         {
-            rowBuilder = new SpineChartTableRowDataBuilder(profileId, areaCodes);
+            var profileId = parameters.ProfileId;
+            var profileConfig = profileReader.GetProfileConfig(profileId);
 
-            return BuildDomainDataForProfile(profileId, childAreaTypeId, benchmarkAreaCodes).ConvertAll(x => (SpineChartTableData)x);
+            rowBuilder = new SpineChartTableRowDataBuilder(profileId, parameters.AreaCodes)
+            {
+                IncludeTrendMarkers = profileConfig.HasTrendMarkers && parameters.IncludeRecentTrends
+            };
+
+            return BuildDomainDataForProfile(profileId, parameters.ChildAreaTypeId, parameters.BenchmarkAreaCodes)
+                .ConvertAll(x => (SpineChartTableData)x);
         }
 
         protected override DomainData NewDomainData()

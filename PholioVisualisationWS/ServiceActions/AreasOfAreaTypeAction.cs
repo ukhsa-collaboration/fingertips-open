@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.ServiceActions

@@ -77,7 +77,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             GoToUrl("search/" + searchText);
         }
 
-        public void PhofHomePage()
+        public void HomePage()
         {
             GoToUrl("/");
         }

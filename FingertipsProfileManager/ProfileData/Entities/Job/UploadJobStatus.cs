@@ -8,6 +8,7 @@ namespace Fpm.ProfileData.Entities.Job
         ConfirmationAwaited = 300,
         ConfirmationGiven = 301,
         ConfirmationRefused = 302,
+        SmallNumberWarningConfirmationAwaited = 310,
         FailedValidation = 400,
         SuccessfulUpload = 1000,
     }

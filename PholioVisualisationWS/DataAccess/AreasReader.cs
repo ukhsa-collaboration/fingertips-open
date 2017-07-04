@@ -37,7 +37,7 @@ namespace PholioVisualisation.DataAccess
         /// <returns></returns>
         Dictionary<string, Area> GetParentsFromChildAreaIdAndParentAreaTypeId(int parentAreaTypeIds, int childAreaTypeId);
 
-        Dictionary<string, Area> GetParentAreasFromChildAreaId(int childAreaTypeId);
+        Dictionary<string, Area> GetParentAreasFromChildAreaId(int parentAreaTypeId, int childAreaTypeId);
         IList<string> GetParentCodesFromChildAreaId(int childAreaTypeId);
         IList<Area> GetParentAreas(string childAreaCode);
         IList<AreaType> GetAreaTypes(IEnumerable<int> areaTypeIds);
@@ -231,10 +231,11 @@ namespace PholioVisualisation.DataAccess
             return q.List().Cast<object[]>().ToDictionary(row => (string)row[4], GetAreaFromRow);
         }
 
-        public Dictionary<string, Area> GetParentAreasFromChildAreaId(int childAreaTypeId)
+        public Dictionary<string, Area> GetParentAreasFromChildAreaId(int parentAreaTypeId, int childAreaTypeId)
         {
             var q = CurrentSession.GetNamedQuery("GetAllParentsFromChildAreaId");
-            q.SetParameter("childAreaTypeId", childAreaTypeId);
+            q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(childAreaTypeId).Ids);
+            q.SetParameterList("parentAreaTypeIds", new AreaTypeIdSplitter(parentAreaTypeId).Ids);
 
             return q.List().Cast<object[]>().ToDictionary(row => (string)row[4], GetAreaFromRow);
         }

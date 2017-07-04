@@ -22,50 +22,19 @@ namespace Profiles.MainUI.Helpers
         public Dictionary<int, NeighbourType> GetNeighbourConfig(int profileId)
         {
             var mappings = _reader.GetProfileNearestNeighbourAreaTypeMapping(profileId);
+            var orderedMappings = mappings.OrderByDescending(x => x.ProfileId);
 
-            var mappingForNonMatchingProfile = new List<ProfileNearestNeighbourAreaTypeMapping>();
-
-            var mappingForMatchingProfile = new List<ProfileNearestNeighbourAreaTypeMapping>();
-
-
-            foreach (var mapping in mappings)
-            {
-                if (mapping.ProfileId == profileId)
-                {
-                    mappingForMatchingProfile.Add(mapping);
-                }
-
-                mappingForNonMatchingProfile.Add(mapping);
-            }
-
-
-            List<int> areaTypeIds;
-            List<int> neighbourTypeIds;
-
-            if (mappingForMatchingProfile.Count > 0)
-            {
-                areaTypeIds = mappingForMatchingProfile.Select(a => a.AreaTypeId).ToList();
-                neighbourTypeIds = mappingForMatchingProfile.Select(n => n.NeighbourTypeId).ToList();
-            }
-            else
-            {
-                areaTypeIds = mappingForNonMatchingProfile.Select(a => a.AreaTypeId).ToList();
-                neighbourTypeIds = mappingForNonMatchingProfile.Select(n => n.NeighbourTypeId).ToList();
-
-            }
-
-            var nearestNeighbourAreaTypes = _reader.GetNearestNeighbourAreaType(neighbourTypeIds);
+            var nearestNeighbourTypeIds = mappings.Select(x => x.NeighbourTypeId).Distinct().ToList();
+            var nearestNeighbourAreaTypes = _reader.GetNearestNeighbourAreaType(nearestNeighbourTypeIds);
             var response = new Dictionary<int, NeighbourType>();
 
-            foreach (var area in areaTypeIds)
+            foreach (var mapping in orderedMappings)
             {
-                var neighbour = mappingForMatchingProfile.Count > 0
-                    ? mappingForMatchingProfile.First(x => x.AreaTypeId == area)
-                    : mappingForNonMatchingProfile.First(x => x.AreaTypeId == area);
-
-                var neighbourData = nearestNeighbourAreaTypes.First(n => n.NeighbourTypeId == neighbour.NeighbourTypeId);
-
-                response.Add(area, neighbourData);
+                if (response.ContainsKey(mapping.AreaTypeId) == false)
+                {
+                    var type = nearestNeighbourAreaTypes.FirstOrDefault(x => x.NeighbourTypeId == mapping.NeighbourTypeId);
+                    response.Add(mapping.AreaTypeId, type);
+                }
             }
 
             return response;

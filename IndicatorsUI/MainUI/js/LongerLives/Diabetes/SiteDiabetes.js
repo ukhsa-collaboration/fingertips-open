@@ -534,16 +534,8 @@ function getGradeFunction(comparatorMethodId) {
                     case 3:
                         return 'bobHigher';
                 }
-            case PolarityIds.RAGLowIsGood:
-                switch (sig) {
-                    case 1:
-                        return 'grade-' + 0; // Green
-                    case 2:
-                        return 'grade-' + 2; // Amber
-                    case 3:
-                        return 'grade-' + 3; // Red
-                }
-            case PolarityIds.RAGHighIsGood:
+            default:
+                // Polarity handled in web services re: HighIsGood/LowIsGood
                 switch (sig) {
                     case 1:
                         return 'grade-' + 3; // Red
@@ -714,6 +706,10 @@ GroupIds = {
         SuicideData: 1938132762,
         RelatedRiskFactors: 1938132763,
         RelatedServiceContacts: 1938133082
+    },
+    LAScorecard: {
+        DrugTreatment: 1938133144,
+        ChildObesity: 1938133145
     }
 }
 

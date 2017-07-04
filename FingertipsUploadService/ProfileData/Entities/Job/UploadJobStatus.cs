@@ -7,7 +7,11 @@
         ConfirmationAwaited = 300,
         ConfirmationGiven = 301,
         ConfirmationRefused = 302,
+        SmallNumberWarningConfirmationAwaited = 310,
+        SmallNumberWarningConfirmationGiven = 311,
+        SmallNumberWarningConfirmationRefused = 312,
         FailedValidation = 400,
+        ColumnNameValidationFailed = 401,
         UnexpectedError = 500,
         SuccessfulUpload = 1000
     }

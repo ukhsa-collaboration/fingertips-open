@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using PholioVisualisation.DataHelpers;
+using PholioVisualisation.DataSorting;
 
-namespace PholioVisualisation.DataHelpersTest
+namespace PholioVisualisation.DataSortingTest
 {
     [TestClass]
     public class CoreDataSetSorterTest

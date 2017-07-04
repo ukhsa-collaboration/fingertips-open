@@ -7,11 +7,14 @@
     FT.model.profileId = @Model.ProfileId;
     indicatorIds = @Html.Raw(ViewData.ContainsKey("indicatorIds") ? ("'" + ViewData["indicatorIds"] + "'") : "null");
     FT.features = @ViewBag.FeatureSwitch;
-    FT.config.hasRecentTrends =  @JsHelper.GetJsBool(@Model.HasRecentTrends);
+    FT.config.hasRecentTrends =  @JsHelper.GetJsBool(Model.HasRecentTrends);
     FT.config.profileCollectionUrlKey = '@ViewBag.LeadProfileUrlKey';
     FT.config.startZeroYAxis = @JsHelper.GetJsBool(Model.StartZeroYAxis);
     FT.config.areAnyPdfsForProfile = @JsHelper.GetJsBool(Model.AreAnyPdfsForProfile);
     FT.config.hasStaticReports = @JsHelper.GetJsBool(Model.HasStaticReports);
-    FT.staticReportTimePeriods = '@ViewBag.StaticReportsTimePeriods'.split(',');
-    FT.config.nearestNeighbour = @Html.Raw(   @ViewBag.NNConfig);
+    FT.config.staticReportsFolders = '@ViewBag.StaticReportsFolders'.split(',');
+    FT.config.staticReportsLabel = '@ViewBag.StaticReportsLabel';
+    FT.config.nearestNeighbour = @Html.Raw(ViewBag.NNConfig);
+    FT.config.profileName = '@Model.PageTitle';
+    FT.config.isChangeFromPreviousPeriodShown = @JsHelper.GetJsBool(ViewBag.IsChangeFromPreviousPeriodShown);
     //]]</script>

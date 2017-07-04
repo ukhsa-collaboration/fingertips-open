@@ -1,0 +1,77 @@
+﻿<div ng-controller="editReportCtrl">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="reportName" class="control-label col-xs-2">Report Name</label>
+            <div class="col-xs-8">
+                <input id="reportName" ng-model="report.name" class="form-control" type="text"/>
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+        <div class="form-group">
+            <label for="profiles" class="control-label col-xs-2">Profiles</label>
+            <div class="col-xs-4">
+                <select id="profiles" ng-model="selectedProfile" ng-options="p.Id as p.Name for p in userProfiles" class="form-control"></select>
+            </div>
+            <div>
+                <button class="btn" ng-click="addProfile()">Add</button>
+            </div>
+        </div>
+        <!-- List of profiles for report-->
+        <div class="row col-md-offset-2">
+            <div ng-if="hasProfiles">
+                List of profiles
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ProfileId</th>
+                        <th>Name</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tr ng-repeat="p in report.profiles">
+                        <td>{{p}}</td>
+                        <td>xx</td>
+                        <td><button ng-click="removeProfileFromList($index)" class="btn btn-danger">Remove</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+
+        <div class="form-group">
+            <label for="newParameter" class="control-label col-xs-2">Parameter</label>
+            <div class="col-xs-4">
+                <select id="availableParameters" ng-model="newParameter" ng-options="p.val  as p.label  for p in availableParameters" class="form-control">
+                </select>
+            </div>
+            <div>
+                <button class="btn" ng-click="addParameter()">Add</button>
+            </div>
+        </div>
+        <!-- Parameters for the report -->
+        <div class="row col-md-offset-2">
+            <div ng-if="hasParameters">
+                List of parameters
+                <table class="table">
+                    <tr ng-repeat="parameter in report.parameters">
+                        <td>{{parameter}}</td>
+                        <td><button ng-click="removeParameterFromList($index)" class="btn btn-danger">Remove</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <br/>
+        <br/>
+
+        <div>
+            <button class="btn-primary btn-lg" ng-click="saveReport()">Save</button>
+            <button class="btn-primary btn-lg" ng-click="cancel()">Cancel</button>
+        </div>
+
+    </form>
+</div>

@@ -16,10 +16,13 @@ namespace Profiles.DomainObjects
     {
         public const string Description = "description";
         public const string Introduction = "introduction";
+        public const string IntroductionSidebar = "introduction-sidebar";
         public const string RecentUpdates = "recent-updates";
         public const string Twitter = "twitter";
         public const string ContactUs = "contact-us";
         public const string FurtherInfo = "further-info";
+        public const string AdditionalDataAndReports = "additional-data-and-reports";
+        public const string QuarterlyData = "quarterly-data";
         public const string Faqs = "faqs";
         public const string Inequalities = "inequalities";
         public const string FurtherResources = "evidence-and-resources";
@@ -51,6 +54,7 @@ namespace Profiles.DomainObjects
     public class ProfileUrlKeys
     {
         public const string AdultSocialCare = "adultsocialcare";
+        public const string ChildHealthOverview = "child-health-overview";
         public const string SevereMentalIllness = "severe-mental-illness";
         public const string ChildrenAndYoungPeoplesHealthBenchmarkingTool = "cyphof";
         public const string Phof = "public-health-outcomes-framework";
@@ -85,6 +89,7 @@ namespace Profiles.DomainObjects
         public const int SuicidePrevention = 73;
         public const int DrugsAndAlcohol = 75;
         public const int HealthChecks = 77;
+        public const int LocalAlcoholProfiles = 87;
         public const int ChildHealth = 105;
         public const int WiderDeterminantsOfHealth = 130;
     }
@@ -98,7 +103,10 @@ namespace Profiles.DomainObjects
         public const int SevereMentalIllness_Prevalence = 8000030;
         public const int SevereMentalIllness_Finance = 8000040;
         public const int Phof_HealthImprovment = 1000042;
+        public const int Phof_WiderDeterminantsofHealth = 1000041;
+        public const int Phof_HealthProtection = 1000043;
         public const int Phof_PrematureMortality = 1000044;
+        public const int Phof_OverarchingIndicators = 1000049;
         public const int DomainThatDoesNotExist = 123456;
     }
 

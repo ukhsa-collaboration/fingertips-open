@@ -6,6 +6,7 @@ using NLog;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace FingertipsDataExtractionTool.AverageCalculator
@@ -123,7 +124,7 @@ namespace FingertipsDataExtractionTool.AverageCalculator
 
                 if (coreData == null)
                 {
-                    // Get core data set
+                    // Get parent core data set
                     var childAreaListBuilder = new ChildAreaListBuilder(_areasReader);
                     coreData = new SubnationalAreaAverageCalculator(_groupDataReader, childAreaListBuilder)
                         .CalculateAverage(grouping, timePeriod, indicatorMetadata, parentArea);
@@ -156,7 +157,7 @@ namespace FingertipsDataExtractionTool.AverageCalculator
                 _valueCount = 0;
                 currentIndicatorId = indicatorMetadata.IndicatorId;
                 _logger.Info(string.Format("# Starting indicator {0} {1}", currentIndicatorId,
-                    indicatorMetadata.Descriptive[IndicatorMetadataTextColumnNames.Name]));
+                    indicatorMetadata.Name));
             }
         }
     }

@@ -110,17 +110,17 @@ namespace PholioVisualisation.DataConstruction
             // Comparator data
             foreach (Grouping grouping in root.Grouping)
             {
-                Comparator comparator = ComparatorMap.GetComparatorById(grouping.ComparatorId, grouping.AreaTypeId);
+                ComparatorDetails comparatorDetails = ComparatorMap.GetComparatorById(grouping.ComparatorId, grouping.AreaTypeId);
                 CoreDataSet data;
-                if (comparator == null)
+                if (comparatorDetails == null)
                 {
                     data = CoreDataSet.GetNullObject(string.Empty);
                 }
                 else
                 {
-                    var comparatorArea = NearestNeighbourArea.IsNearestNeighbourAreaCode(comparator.Area.Code)
-                         ? AreaFactory.NewArea(AreasReader, comparator.Area.Code.Substring(5))
-                         : comparator.Area;
+                    var comparatorArea = NearestNeighbourArea.IsNearestNeighbourAreaCode(comparatorDetails.Area.Code)
+                         ? AreaFactory.NewArea(AreasReader, comparatorDetails.Area.Code.Substring(5))
+                         : comparatorDetails.Area;
 
                     // Only get subnational data, do not want to prefetch England data as usually won't be needed
                     var dataList = grouping.ComparatorId == ComparatorIds.Subnational
@@ -162,9 +162,7 @@ namespace PholioVisualisation.DataConstruction
         {
             if (GroupData.Areas != null)
             {
-                var trendCalculator = new TrendMarkerCalculator();
-                var trendReader = ReaderFactory.GetTrendDataReader();
-                var trendMarkersProvider = new TrendMarkersProvider(trendReader, trendCalculator);
+                var trendMarkersProvider = TrendMarkersProvider.New();
 
                 var areas = GroupData.Areas.ToList();
                 AddParentAreas(areas);
@@ -174,11 +172,11 @@ namespace PholioVisualisation.DataConstruction
                 {
                     var grouping = groupRoot.Grouping.FirstOrDefault();
 
-                    var indicatorMetaData = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
+                    var indicatorMetadata = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
 
-                    var recentTrends = indicatorMetaData == null
+                    var recentTrends = indicatorMetadata == null
                         ? new Dictionary<string, TrendMarkerResult>()
-                        : trendMarkersProvider.GetTrendResults(areas, indicatorMetaData, grouping);
+                        : trendMarkersProvider.GetTrendResults(areas, indicatorMetadata, grouping);
 
                     groupRoot.RecentTrends = recentTrends;
                 }

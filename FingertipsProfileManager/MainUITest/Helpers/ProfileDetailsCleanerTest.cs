@@ -41,17 +41,15 @@ namespace Fpm.MainUITest.Helpers
         }
 
         [TestMethod]
-        public void TestExtraFilesStringsConvertedToNulls()
+        public void TestExtraCssFilesStringsConvertedToNulls()
         {
             var details = new ProfileDetails
             {
-                ExtraJsFiles = string.Empty,
                 ExtraCssFiles = string.Empty
             };
 
             ProfileDetailsCleaner.CleanUserInput(details);
 
-            Assert.IsNull(details.ExtraJsFiles);
             Assert.IsNull(details.ExtraCssFiles);
         }
     }

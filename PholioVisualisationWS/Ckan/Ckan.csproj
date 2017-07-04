@@ -69,14 +69,12 @@
     <Compile Include="Exceptions\CkanInternalServerException.cs" />
     <Compile Include="Exceptions\CkanNotAuthorizedException.cs" />
     <Compile Include="Exceptions\CkanTimeoutException.cs" />
-    <Compile Include="DataTransformation\CkanFileNamer.cs" />
     <Compile Include="DataTransformation\CkanFrequency.cs" />
     <Compile Include="DataTransformation\CkanPackagePropertySetter.cs" />
     <Compile Include="DataTransformation\ProfileParameters.cs" />
     <Compile Include="DataTransformation\CoreDataResourceBuilder.cs" />
     <Compile Include="DataTransformation\CsvWriter.cs" />
     <Compile Include="DataTransformation\AuthorDetails.cs" />
-    <Compile Include="DataTransformation\LookUpManager.cs" />
     <Compile Include="DataTransformation\ProfileUploader.cs" />
     <Compile Include="DataTransformation\MetadataResourceBuilder.cs" />
     <Compile Include="Client\ICkanApi.cs" />
@@ -110,9 +108,17 @@
       <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
       <Name>DataConstruction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DIResolver\DIResolver.csproj">
       <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
       <Name>DIResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Export\Export.csproj">
+      <Project>{85526825-84fb-4ead-a98a-16ece3cce8ca}</Project>
+      <Name>Export</Name>
     </ProjectReference>
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>

@@ -134,12 +134,12 @@ function initData() {
 function SearchResultSummary(indicatorIdList) {
 
     var messageId = 'searchResultText';
-    $('<br><div id="' + messageId + '" class="standardWidth">&nbsp;</div>').insertBefore('#main');
+    $('<br><div id="' + messageId + '" class="standard-width">&nbsp;</div>').insertBefore('#main');
     var $label = $('#' + messageId);
-    $('<br><div id="indicator-profile-origin-link" class="standardWidth"><a href="#"> Show me the profiles these indicators are from</a></div>'
+    $('<br><div id="indicator-profile-origin-link" class="standard-width"><a href="#"> Show me the profiles these indicators are from</a></div>'
         ).insertAfter('#' + messageId);
 
-    $('#indicator-profile-origin-link a').click(function(e) {
+    $('#indicator-profile-origin-link a').click(function (e) {
         showIndicatorProfileOrigin(e);
     });
 
@@ -206,7 +206,7 @@ function getAreaTypes() {
 
 function displaySearchFindsNothing() {
     $('#searchContents').html(
-        '<div class="tallCentralMessage">No matching indicators found for<div id="noMatch">' +
+        '<div class="tall-central-message">No matching indicators found for<div id="noMatch">' +
             searchText + '</div>Please click <a href="/">Home</a> to browse indicators by theme, domain or area</div>');
 
 }
@@ -241,6 +241,17 @@ function getIndicatorIdArgument() {
     return indicatorIdList.anyForAreaType(areaTypeId) ?
         '&iids=' + indicatorIdList.getIds(areaTypeId) :
         indicatorIds = [];
+}
+
+function getIndicatorIdsParameter() {
+
+    var areaTypeId = FT.model.areaTypeId;
+
+    var ids = indicatorIdList.anyForAreaType(areaTypeId) ?
+         indicatorIdList.getIds(areaTypeId) :
+         [];
+
+    return ids.join(',');
 }
 
 function addIndicatorIdParameter(parameters) {

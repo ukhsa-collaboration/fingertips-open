@@ -13,6 +13,9 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public TrendMarker Marker { get; set; }
 
+        [JsonProperty]
+        public TrendMarker MarkerForMostRecentValueComparedWithPreviousValue { get; set; }
+
         [JsonProperty("PointsUsed")]
         public int NumberOfPointsUsedInCalculation { get; set; }
 

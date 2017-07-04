@@ -5,6 +5,7 @@ using System.Web;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.SearchQuerying;
 

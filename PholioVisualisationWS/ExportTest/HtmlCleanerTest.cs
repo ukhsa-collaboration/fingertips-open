@@ -43,6 +43,23 @@ namespace PholioVisualisation.ExportTest
         }
 
         [TestMethod]
+        public void TestLessThansAreIgnored()
+        {
+            var html =
+                @"<p>2005-2006: Small numbers (&lt;5) are suppressed but have been used throughout all calculations. The counts and denominators for the City of London and Isles of Scilly have been combined with Hackney and Cornwall respectively.</p>";
+            var htmlCleaned = new HtmlCleaner().RemoveHtml(html);
+            Assert.IsTrue(htmlCleaned.Contains("Cornwall"));
+        }
+
+        [TestMethod]
+        public void TestNonBreakingSpacesRemoved()
+        {
+            var html = @"a.&nbsp;b";
+            var htmlCleaned = new HtmlCleaner().RemoveHtml(html);
+            Assert.AreEqual("a.b", htmlCleaned);
+        }
+
+        [TestMethod]
         public void TestTransformLinks()
         {
             var htmlCleaner = new HtmlCleaner();

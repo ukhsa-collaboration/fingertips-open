@@ -21,8 +21,5 @@ namespace Fpm.ProfileData.Entities.User
         }
 
         public bool IsAdministrator { get; set; }
-
-        public string ReturnUrl { get; set; }
-
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
 using SpreadsheetGear;
 
 namespace PholioVisualisation.ExportTest
@@ -30,7 +31,7 @@ namespace PholioVisualisation.ExportTest
         [TestMethod]
         public void TestWrite()
         {
-            Assert.IsFalse(File.Exists(filepath));
+            Assert.IsFalse(System.IO.File.Exists(filepath));
 
             var fileInfo = new Mock<BaseExcelFileInfo>();
             fileInfo.Setup(x => x.FilePath).Returns(filepath);
@@ -39,7 +40,7 @@ namespace PholioVisualisation.ExportTest
             new ExcelFileWriter { UseFileCache = true }
                 .Write(fileInfo.Object, Factory.GetWorkbook());
 
-            Assert.IsTrue(File.Exists(filepath), "Export file path does not exist: " + filepath);
+            Assert.IsTrue(System.IO.File.Exists(filepath), "Export file path does not exist: " + filepath);
         }
 
         private static void EnsureExportDirectoryExists()
@@ -58,9 +59,9 @@ namespace PholioVisualisation.ExportTest
 
         private void DeleteFile()
         {
-            if (File.Exists(filepath))
+            if (System.IO.File.Exists(filepath))
             {
-                File.Delete(filepath);
+                System.IO.File.Delete(filepath);
             }
         }
     }

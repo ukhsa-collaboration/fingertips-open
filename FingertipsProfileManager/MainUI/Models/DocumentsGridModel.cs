@@ -17,7 +17,7 @@ namespace Fpm.MainUI.Models
         public int NumericPageCount { get; set; }
 
         public int ProfileId { get; set; }
-        public IEnumerable<SelectListItem> ProfileList { get; set; }
+        public SelectList ProfileList { get; set; }
         public IList<Document> DocumentItems { get; set; }
     }
 }

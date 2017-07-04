@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -16,7 +17,7 @@ namespace PholioVisualisation.DataConstruction
         /// </summary>
         public SingleGroupingProvider()
         {
-            
+
         }
 
         public SingleGroupingProvider(IGroupDataReader groupDataReader, GroupIdProvider groupIdProvider)
@@ -25,13 +26,22 @@ namespace PholioVisualisation.DataConstruction
             this.groupIdProvider = groupIdProvider;
         }
 
-        public virtual Grouping GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int groupId,
+            int areaTypeId, int indicatorId, int sexId, int ageId)
         {
             var groupIds = GetGroupIds(groupId, profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
         }
 
-        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId, int indicatorId, int sexId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId,
+            GroupingDifferentiator groupingDifferentiator)
+        {
+            var groupIds = groupIdProvider.GetGroupIds(profileId);
+            return GetGrouping(groupIds, areaTypeId, groupingDifferentiator.IndicatorId, groupingDifferentiator.SexId, groupingDifferentiator.AgeId);
+        }
+
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId,
+            int indicatorId, int sexId, int ageId)
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
@@ -39,7 +49,7 @@ namespace PholioVisualisation.DataConstruction
 
         public virtual Grouping GetGroupingByGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
         {
-            return GetGrouping(new List<int> { groupId}, areaTypeId, indicatorId, sexId, ageId);
+            return GetGrouping(new List<int> { groupId }, areaTypeId, indicatorId, sexId, ageId);
         }
 
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexId(int profileId, int areaTypeId, int indicatorId, int sexId)
@@ -52,6 +62,30 @@ namespace PholioVisualisation.DataConstruction
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingByAgeId(groupIds, areaTypeId, indicatorId, ageId);
+        }
+
+        public virtual Grouping GetGroupingWithLatestDataPoint(
+            IList<int> groupIds, int indicatorId, int childAreaTypeId)
+        {
+            var groupings = groupDataReader
+                .GetGroupingsByGroupIdsAndIndicatorIds(groupIds, new List<int> { indicatorId })
+                .Where(x => x.AreaTypeId == childAreaTypeId)
+                .ToList();
+
+            var sortedGroupings = new GroupingSorter(groupings).SortByDataPointTimePeriodMostRecentFirst();
+            return sortedGroupings.FirstOrDefault();
+        }
+
+        public virtual Grouping GetGroupingWithLatestDataPointForAnyProfile(GroupingDifferentiator groupingDifferentiator, int childAreaTypeId)
+        {
+            var groupings = groupDataReader.GetGroupingsByIndicatorId(groupingDifferentiator.IndicatorId)
+                .Where(x => x.AreaTypeId == childAreaTypeId &&
+                        x.SexId == groupingDifferentiator.SexId &&
+                        x.AgeId == groupingDifferentiator.AgeId)
+                .ToList();
+
+            var sortedGroupings = new GroupingSorter(groupings).SortByDataPointTimePeriodMostRecentFirst();
+            return sortedGroupings.FirstOrDefault();
         }
 
         private Grouping GetGroupingByAgeId(IEnumerable<int> groupIds, int areaTypeId, int indicatorId, int ageId)

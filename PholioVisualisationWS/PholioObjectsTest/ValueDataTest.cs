@@ -34,15 +34,22 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.IsFalse(new ValueWithCIsData
             {
                 Value = 1,
-                LowerCI = ValueWithCIsData.NullValue,
+                LowerCI = ValueData.NullValue,
+                UpperCI = ValueData.NullValue
+            }.AreCIsValid);
+
+            Assert.IsTrue(new ValueWithCIsData
+            {
+                Value = 1,
+                LowerCI = ValueData.NullValue,
                 UpperCI = 3
             }.AreCIsValid);
 
-            Assert.IsFalse(new ValueWithCIsData
+            Assert.IsTrue(new ValueWithCIsData
             {
                 Value = 1,
                 LowerCI = 2,
-                UpperCI = ValueWithCIsData.NullValue
+                UpperCI = ValueData.NullValue
             }.AreCIsValid);
 
             Assert.IsTrue(new ValueWithCIsData

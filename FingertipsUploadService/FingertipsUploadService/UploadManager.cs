@@ -60,43 +60,12 @@ namespace FingertipsUploadService
             var actualFilePath = FilePathHelper.GetActualFilePath(job);
             var fileReader = new FileReaderFactory().Get(actualFilePath, job.JobType);
 
-            if (job.JobType == UploadJobType.Simple)
-            {
-                SetUsername(job);
-                _logger.Info("Processing simple upload for {0} with ID '{1}'", job.Username, job.Guid);
-                var worker = new SimpleJobWorker();
-                var processor = new SimpleWorksheetDataProcessor(_coreDataRepository, _loggingRepository);
-                worker.ProcessJob(job, validator, processor, fileReader);
-            }
-            else
-            {
-                SetUsername(job);
-                _logger.Info("Processing batch upload for {0} with ID '{1}'", job.Username, job.Guid);
-                var worker = new BatchJobWorker();
-                var processor = new BatchWorksheetDataProcessor(_coreDataRepository, _loggingRepository, _logger);
-                worker.ProcessJob(job, validator, processor, fileReader);
-            }
+            SetUsername(job);
+            _logger.Info("Processing batch upload for {0} with ID '{1}'", job.Username, job.Guid);
+            var worker = new BatchJobWorker();
+            var processor = new BatchWorksheetDataProcessor(_coreDataRepository, _loggingRepository, _logger);
+            worker.ProcessJob(job, validator, processor, fileReader);
         }
-
-        //        private IUploadFileReader GetFileReader(UploadJob job, string actualFilePath)
-        //        {
-        //            IUploadFileReader fileReader;
-        //            if (isCsv(actualFilePath) && job.JobType == UploadJobType.Batch)
-        //            {
-        //                fileReader = new CsvFileReader(actualFilePath);
-        //            }
-        //            else
-        //            {
-        //                fileReader = new ExcelFileReader(actualFilePath);
-        //            }
-        //            return fileReader;
-        //        }
-
-        //        public bool isCsv(string dataFilePath)
-        //        {
-        //            var fileExt = Path.GetExtension(dataFilePath);
-        //            return fileExt != null && fileExt.ToLower() == ".csv";
-        //        }
 
         private void SetUsername(UploadJob job)
         {

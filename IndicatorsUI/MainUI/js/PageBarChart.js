@@ -7,12 +7,12 @@
 
 
 function goToIndicatorDetailsPage(rootIndex) {
-	if (!groupRoots.length) {
-		// Search results empty
-		noDataForAreaType();
-	} else {
 
-		setPageMode(PAGE_MODES.INDICATOR_DETAILS);
+    setPageMode(PAGE_MODES.INDICATOR_DETAILS);
+
+	if (!areIndicatorsInDomain()) {
+	    displayNoData();
+	} else {
 
 		// The user may have come from another page on which they have scrolled down
 		var $window = $(window);
@@ -30,7 +30,6 @@ function goToIndicatorDetailsPage(rootIndex) {
 
 		setIndicatorIndex(rootIndex);
 		indicatorChanged(rootIndex);
-	  
 
 		showAndHidePageElements();
 		showDataQualityLegend();
@@ -42,6 +41,7 @@ function goToIndicatorDetailsPage(rootIndex) {
 			if (isNearestNeighboursAndSingleAreaView()) {
 				barChartState.areaDisplayed = BAR_CHART_VIEW_MODES.REGION;
 			}
+		    addBarChartOptions();
 		}
 		else {
 			addBarChartOptions();
@@ -136,10 +136,10 @@ function barAreasClicked() {
 
 function addBarChartTemplate() {
 	templates.add('indicators',
-		'<div id="indicatorDetailsNoData">No Data</div>' +
-		'<div id="indicatorDetailsData" style="display: none;">' +
-		'<div style="float:none; clear: both; width: 1000px;"><div id="indicatorDetailsHeader"></div><div id="indicatorDetailsBox" style="width:100%;">' +
-		'<table id="indicatorDetailsTable" class="borderedTable" cellspacing="0">' +
+		'<div id="indicator-details-no-data">No Data</div>' +
+		'<div id="indicator-details-data" style="display: none;">' +
+		'<div style="float:none; clear: both; width: 1000px;"><div id="indicator-details-header"></div><div id="indicator-details-box" style="width:100%;">' +
+		'<table id="indicator-details-table" class="bordered-table" cellspacing="0">' +
 		'<thead><tr><th style="width:200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th>' +
 		'{{#hasRecentTrends}} <th>Recent<br>Trend</th> {{/hasRecentTrends}}' +
 		'<th class="nearest-neighbours-show" style="border-right:none"><div class="center">Neighbour Rank</div><a class="columnSort" href="javascript:sortIndicatorDetailsByRank();" title="Sort by rank"></a></th>' +
@@ -148,14 +148,22 @@ function addBarChartTemplate() {
 		'<th class="bar">&nbsp;</th><th title="Lower confidence interval"><span class="sig-level" style="width:100%;display:block;"></span>Lower CI</th>' +
 		'<th title="Upper confidence interval"><span class="sig-level" style="width:100%;display:block;"></span>Upper CI</th></tr></thead>' +
 		'<tbody></tbody></table><br>' +
-		'<div id="indicatorDetailsSource"></div></div></div></div>');
+		'<div id="indicator-details-source"></div></div></div></div>');
 }
 
 function addBarChartOptions() {
-	barChartState.tabSpecificOptions.setOption(barChartState.areaDisplayed);
+    barChartState.tabSpecificOptions.setOption(barChartState.areaDisplayed);
+    var selectedArea;
+
+    if (FT.model.isNearestNeighbours()) {
+        selectedArea = areaHash[FT.model.areaCode].Name + ' & nearest neighbours';
+    } else {
+       selectedArea =  'All in ' + getParentArea().Name;
+    }
+
 	barChartState.tabSpecificOptions.setHtml({
-		label: 'Areas in',
-		optionLabels: [getParentArea().Name, 'England']
+		label: 'Areas',
+		optionLabels: [selectedArea, 'All in England']
 	});
 }
 
@@ -199,11 +207,11 @@ function displayIndicatorDetailsHtml() {
 		data = getBarChartData(root);
 	state.comparisonConfig = comparisonConfig;
 
-	var $quintileKey = $('.quintileKey');
+	var $quintileKey = $('.quintile-key');
 	if (state.comparisonConfig.useQuintileColouring) {
-		$quintileKey.show();
+	    $quintileKey.show();
 	} else {
-		$quintileKey.hide();
+	    $quintileKey.hide();
 	}
 
 	var isData = data.length > 0;
@@ -228,7 +236,7 @@ function displayIndicatorDetailsHtml() {
 	}
 
 	if (hasStateChanged) {
-		toggleDataOrNot('indicatorDetails', isData);
+		toggleDataOrNot('indicator-details', isData);
 
 		// Set page state
 		state.setState(rootIndex, key, regionalAreaCode, comparisonConfig.comparatorId, state.areaDisplayed);
@@ -251,16 +259,18 @@ function displayIndicatorDetailsHtml() {
 };
 
 function displayBarChartLegend() {
-	var $keyAdHoc = $('#keyAdHoc');
-	var $keyBarChart = $('#key-bar-chart');
+    if (areIndicatorsInDomain()) {
+        var $keyAdHoc = $('#key-ad-hoc');
+        var $keyBarChart = $('#key-bar-chart');
 
-	if (barChartState.comparisonConfig.useTarget) {
-		$keyAdHoc.show();
-		$keyBarChart.hide();
-	} else {
-		$keyAdHoc.hide();
-		$keyBarChart.show();
-	}
+        if (barChartState.comparisonConfig.useTarget) {
+            $keyAdHoc.show();
+            $keyBarChart.hide();
+        } else {
+            $keyAdHoc.hide();
+            $keyBarChart.show();
+        }
+    }
 }
 
 function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
@@ -295,8 +305,6 @@ function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
 		var trimLength = 25;
 		var areaName = '';
 		var nameColumnWidth;
-        
-
 
 		// Show short name only if it is an Acute Trust
 		if (area.AreaTypeId === AreaTypeIds.AcuteTrust) {
@@ -307,13 +315,13 @@ function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
 			areaName = getAreaNameToDisplay(area);
 			nameColumnWidth = '200px';
 		}
-		$('#indicatorDetailsTable thead tr th:first').css('width', nameColumnWidth);
+		$('#indicator-details-table thead tr th:first').css('width', nameColumnWidth);
 
 		addIndicatorTableAreaRow(html, data[i], area.Code,
 			trimName(areaName, trimLength)/*area name label*/, i, null, comparisonConfig, root);
 	}
 
-	$('#indicatorDetailsTable tbody').html(html.join(''));
+	$('#indicator-details-table tbody').html(html.join(''));
 
 	var metadata = state.metadata;
 
@@ -323,7 +331,7 @@ function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
 	$('.sig-level').html(sigLabel);
 
 	// Source
-	$('#indicatorDetailsSource').html(
+	$('#indicator-details-source').html(
 		getSource(state.metadata)
 	);
 };
@@ -358,7 +366,7 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
 		html.push('<td class="pLink"', click, behaviour, '>',
 			areaName, '</td>');
 		var extraBarClass = dataIndex == (barChartState.currentData.length - 1) ?
-			'barLast ' : '';
+			'bar-last ' : '';
 
 	} else {
 		// Benchmark
@@ -367,7 +375,7 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
 			extraBarClass = 'hide ';
 		} else {
 			extraBarClass = barChartState.row == 0 ?
-				'barFirst ' :
+				'bar-first ' :
 				'';
 		}
 
@@ -704,8 +712,6 @@ BarChartTooltipProvider.prototype = {
 
 	getValueNoteCellText: function (bits) {
 		var valueNoteId = $('#ft_' + bits[1]).attr('vn');
-
-		//TODO template this
 		return !valueNoteId ?
 			'' :
 			'<span id="tooltipData"></span>' + this.getHtmlFromNoteId(valueNoteId);
@@ -733,7 +739,7 @@ pages.add(PAGE_MODES.INDICATOR_DETAILS, {
 	gotoName: 'goToIndicatorDetailsPage',
 	needsContainer: true,
 	showHide: displayBarChartLegend,
-	jqIds: ['indicatorMenuDiv', '.geo-menu', 'tab-specific-options', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
-	jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'keyAdHoc', 'key-bar-chart', 'key-spine-chart']
+	jqIds: ['indicator-menu-div', '.geo-menu', 'tab-specific-options', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
+	jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-ad-hoc', 'key-bar-chart', 'key-spine-chart']
 });
 

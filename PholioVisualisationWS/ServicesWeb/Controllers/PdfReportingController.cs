@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.ServiceModel.Web;
 using System.Web.Http;
+using NHibernate.Type;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PdfData;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServiceActions;
+using ServicesWeb.Common;
 
 namespace ServicesWeb.Controllers
 {
@@ -21,16 +23,25 @@ namespace ServicesWeb.Controllers
         /// <param name="profile_id">Profile ID</param>
         /// <param name="area_codes">List of area codes</param>
         /// <param name="child_area_type_id">Child area type ID</param>
+        /// <param name="include_recent_trends">Whether or not to include recent trends [default = "no"]</param>
         [HttpGet]
         [Route("pdf/spine_chart")]
         [AspNetCacheProfile("PdfService")]
         public IList<SpineChartTableData> SpineChartData(int profile_id = 0,
-            string area_codes = null, int child_area_type_id = 0)
+            string area_codes = null, int child_area_type_id = 0, string include_recent_trends = "no")
         {
             try
             {
-                return new SpineChartDataAction().GetResponse(profile_id,
-                    child_area_type_id, new StringListParser(area_codes).StringList, AreaCodes.England);
+                var parameters = new SpineChartDataParameters
+                {
+                    ProfileId = profile_id,
+                    ChildAreaTypeId = child_area_type_id,
+                    AreaCodes = new StringListParser(area_codes).StringList,
+                    BenchmarkAreaCodes = new List<string> { AreaCodes.England},
+                    IncludeRecentTrends = ServiceHelper.ParseYesOrNo(include_recent_trends)
+                };
+
+                return new SpineChartDataAction().GetResponse(parameters);
             }
             catch (Exception ex)
             {

@@ -100,8 +100,6 @@
     <Compile Include="TrendDataPointTest.cs" />
     <Compile Include="TrendRootTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SparklineStatsTest.cs" />
-    <Compile Include="SparklineTimePointTest.cs" />
     <Compile Include="TimePeriodTest.cs" />
     <Compile Include="AreaHierarchyTest.cs" />
     <Compile Include="ParentAreaTest.cs" />

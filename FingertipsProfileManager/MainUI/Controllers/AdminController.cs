@@ -1,22 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Controllers
 {
+    [AdminUsersOnly]
+    [RoutePrefix("admin")]
     public class AdminController : Controller
     {
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private ProfilesWriter writer = ReaderFactory.GetProfilesWriter();
+        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
         private ProfileRepository _profileRepository;
 
+        [Route("")]
         public ActionResult Admin()
         {
             var model = new AdminModel
@@ -27,6 +27,7 @@ namespace Fpm.MainUI.Controllers
             return View(model);
         }
 
+        [Route("delete-indicator")]
         public ActionResult DeleteIndicator()
         {
             var model = new AdminModel
@@ -38,6 +39,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
+        [Route("delete-indicator")]
         public JsonResult DeleteIndicator(string indicatorIds)
         {
             var indicatorList = indicatorIds.Split(',').ToList();
@@ -50,10 +52,10 @@ namespace Fpm.MainUI.Controllers
                         "User not allowed to delete indicators: " + user.Name);
                 }
 
-                var indicatorMetadata = writer.GetIndicatorMetadata(Convert.ToInt32(indicatorId));
+                var indicatorMetadata = _writer.GetIndicatorMetadata(Convert.ToInt32(indicatorId));
                 if (indicatorMetadata != null)
                 {
-                    writer.DeleteIndicatorMetatdataById(indicatorMetadata);
+                    _writer.DeleteIndicatorMetatdataById(indicatorMetadata);
                 }
             }
 
@@ -64,6 +66,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpGet]
+        [Route("change-indicator-owner")]
         public ActionResult ChangeIndicatorOwner()
         {
             var model = new AdminModel
@@ -76,9 +79,9 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
+        [Route("change-indicator-owner")]
         public JsonResult ChangeIndicatorOwner(int indicatorId, int newOwnerProfileId)
         {
-            CheckUserIsPholioDataManager();
             EnsureProfileRepositoryDefined();
             new IndicatorOwnerChanger(_reader, _profileRepository)
                 .AssignIndicatorToProfile(indicatorId, newOwnerProfileId);
@@ -87,16 +90,6 @@ namespace Fpm.MainUI.Controllers
             {
                 Id = indicatorId
             });
-        }
-
-        private static void CheckUserIsPholioDataManager()
-        {
-            var user = UserDetails.CurrentUser();
-            if (user.IsPholioDataManager == false)
-            {
-                throw new FpmException(
-                    "User not allowed to delete indicators: " + user.Name);
-            }
         }
 
         /// <summary>

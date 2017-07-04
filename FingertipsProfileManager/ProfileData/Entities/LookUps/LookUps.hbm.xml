@@ -106,6 +106,8 @@
     <property name="ShortName" column="areatype"/>
     <property name="IsCurrent" column="iscurrent"/>
     <property name="IsSupported" column="issupported"/>
+    <property name="IsSearchable" column="issearchable"/>
+    <property name="ShouldWarnForSmallNumbers" column="shouldwarnforsmallnumbers"/>
   </class>
 
   <!-- Value Type class -->

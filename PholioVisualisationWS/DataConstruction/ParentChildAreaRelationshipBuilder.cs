@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 
 namespace PholioVisualisation.DataConstruction
 {

@@ -37,16 +37,18 @@ namespace Fpm.ProfileData.Entities.Profile
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
-        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public string FrontPageAreaSearchAreaTypes { get; set; }
         public bool HasAnyData { get; set; }
         public bool HasStaticReports { get; set; }
         public bool IsNational { get; set; }
         public bool HasOwnFrontPage { get; set; }
         public bool AreIndicatorsExcludedFromSearch { get; set; }
         public string AccessControlGroup { get; set; }
-        public string StaticReportsTimePeriods { get; set; }
+        public string StaticReportsFolders { get; set; }
+        public string StaticReportsLabel { get; set; }
         public string LeadProfileForCollectionIds { get; set; }
-
+        public bool IsChangeFromPreviousPeriodShown { get; set; }
+        
         public string SortBy { get; set; }
 
         public List<int> GroupIds { get; set; }
@@ -55,11 +57,10 @@ namespace Fpm.ProfileData.Entities.Profile
 
         public IEnumerable<AreaType>PdfAreaTypes { get; set; }
 
-        public void SetDefaultValues()
+        public void SetDefaultValues(string extraJsFiles)
         {
             DefaultAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
-            ExtraJsFiles =
-                "PageTartanRug.js,+map,PageAreaTrends.js,PageBarChartAndFunnelPlot.js,PageAreajs,PageMetadata.js,PageDownload.js";
+            ExtraJsFiles = extraJsFiles;
             ExtraCssFiles = "+map";
             EnumParentDisplay = 0;
             AreasIgnoredForSpineChart =

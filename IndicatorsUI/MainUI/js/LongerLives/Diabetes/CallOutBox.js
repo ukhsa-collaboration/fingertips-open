@@ -28,7 +28,7 @@ var footer = '</div><div class="map-info-footer clearfix">{{^hasPracticeData}}<a
 
 var content = '<h4 class="diabetes-place-name">{{nameofplace}}</h4>' +
         '<div id="cbox_population" {{#hideSupportingData}}style="display:none;"{{/hideSupportingData}}>' +
-        '<div class="t-cell width-30 {{#showMan}}grey-man{{/showMan}}">&nbsp;</div><div class="t-cell"><div><strong>{{population}}</strong></div><div id="population-text">{{{topIndicatorText}}}</div></div></div>' +
+        '<div class="t-cell"><div class="width-30 {{#showMan}}grey-man{{/showMan}}">&nbsp;</div></div><div class="t-cell"><div><strong>{{population}}</strong></div><div id="population-text">{{{topIndicatorText}}}</div></div></div>' +
         '<div id="selected-indicator-content">' +
         '<div class="{{rankClass}} man"></div>' +
         '<div class="selected-indicator-text">' + 

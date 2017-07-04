@@ -1,0 +1,23 @@
+﻿@using System.Globalization
+@{
+    var dates = new List<DateTime>
+            {
+                new DateTime(2017, 2, 7),
+                new DateTime(2017, 3, 7),
+                new DateTime(2017, 4, 4),
+                new DateTime(2017, 5, 3), // Bank holiday week
+                new DateTime(2017, 6, 6),
+                new DateTime(2017, 7, 4),
+                new DateTime(2017, 8, 1),
+                new DateTime(2017, 9, 5),
+                new DateTime(2017, 10, 3),
+                new DateTime(2017, 11, 7),
+                new DateTime(2017, 12, 5)
+            };
+}
+<ul class="list-unstyled">
+    @foreach (var date in dates.Where(x => x > DateTime.Now).Take(6))
+    {
+        <li>@date.DayOfWeek.ToString().Substring(0, 3) @date.Day @date.ToString("MMM", CultureInfo.InvariantCulture) @date.Year</li>
+    }
+</ul>

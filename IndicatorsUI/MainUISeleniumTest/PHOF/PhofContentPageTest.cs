@@ -26,8 +26,8 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
 
         private void LoadPhofPage()
         {
-            navigateTo.GoToUrl("");
-            new WaitFor(driver).PhofDomainsToLoad();
+            navigateTo.HomePage();
+            waitFor.PhofDomainsToLoad();
         }
 
         private bool IsUpdateDelayedPresent()

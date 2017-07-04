@@ -1,0 +1,94 @@
+@using System.Web.Optimization
+@using Fpm.MainUI
+@using Fpm.ProfileData
+@model Fpm.MainUI.Models.DocumentsGridModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Document Management";
+}
+
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
+@Scripts.Render("~/documents.js")
+
+<div class="standardWidth">
+
+    @using (Html.BeginForm("DocumentsIndex", "Documents", FormMethod.Get, new { id = "selectedProfileForm" }))
+    {
+        <h2 class="subheading">
+            Documents
+            <span class="info-tooltip">
+                <i>
+                    Use this page to upload documents that you need to create links to in content.
+                    The documents can be of any type.
+                </i>
+            </span>
+        </h2>
+        <div class="standardWidth">
+            <b>Profile:</b>
+            @Html.DropDownListFor(model => model.ProfileId, Model.ProfileList,
+                new { @Id = "profileId", @Name = "profileId", @Class = "create-indicator-dropdown" })
+            @Html.Hidden("sortBy", Model.SortBy)
+            @Html.Hidden("ascending", Model.SortAscending)
+        </div>
+    }
+
+    @if (Model.ProfileId != ProfileIds.Undefined)
+    {
+        <div class="standardWidth clearfix">
+            <div class="button-box">
+                <input type="button" value="Upload document" class="btn btn-primary" onclick="showUploadControl()"/>
+            </div>
+        </div>
+    }
+
+    <br />
+
+    @using (Html.BeginForm("Upload", "Documents", FormMethod.Post,
+                    new { id = "documentUpload", enctype = "multipart/form-data" }))
+    {
+        <input id="uploadProfileId" name="uploadProfileId" type="hidden" value="@Model.ProfileId" />
+
+        <div id="upload-control" class="standardWidth upload-browse-control filtering clearfix" style="display: none;">
+            <div>
+                <div class="browse-control">
+                    <b>Select file to upload:&nbsp;</b>
+                    <input type="file" id="fileToBeUploaded" name="fileToBeUploaded" size="47">
+                </div>
+                <div id="selectedUploadFile" class="upload-browse hidden"></div>
+            </div>
+        </div>
+    }
+
+@if (Model.ProfileId != ProfileIds.Undefined)
+{
+    @Html.Partial("_DocumentsTable")
+}
+
+
+    <h3>Note</h3>
+    <ul class="bullet-list">
+        <li>Uploading a document will replace any existing file with the same name</li>
+    </ul>
+
+</div>
+<div id="errorInfoBox" style="top: 750px; left: 699.5px; width: 500px; display: none;">
+    <div id="error-message">
+        <h3 style="text-align: center;">File name is already used by another profile</h3>
+        <br>
+        <input class="medium-button" type="button" onclick="lightbox.hide()" value="OK" style="margin-left: 37%;" />
+    </div>
+    <div class="close" onclick="lightbox.hide();"></div>
+</div>
+
+
+<div id="overwriteInfoBox" style="top: 750px; left: 699.5px; width: 500px; display: none;">
+    <div id="overwrite-message">
+        <h3 style="text-align: center;">This will overwrite the current file</h3>
+        <br>
+        <div>
+            <input class="medium-button" type="button" onclick="submitForm()" value="OK" style="margin-left: 23%;" />
+            <input class="medium-button" type="button" onclick="donotOverwrite()" value="Cancel" style="margin-left: 10%;" />
+        </div>
+    </div>
+    <div class="close" onclick="lightbox.hide();"></div>
+</div>

@@ -1,5 +1,4 @@
-﻿@using Fpm.ProfileData
-@model Fpm.MainUI.Models.LookupModel
+﻿@model Fpm.MainUI.Models.LookupModel
 
 @if (Model.Targets != null)
 {
@@ -7,13 +6,14 @@
     <table id="lookup-table" class="grid sortable">
         @Html.Partial("_TableHeader", new List<string>
         {
-            "Description","Lower limit","Upper limit", "Polarity"
+            "ID","Description","Lower limit","Upper limit", "Polarity"
         })
         <tbody>
             @foreach (var target in Model.Targets)
             {
                 <tr>
-                    <td><a href="/lookup-tables/target/edit/@target.Id">@target.Description</a></td>
+                    <td>@target.Id</td>
+                    <td>@Html.ActionLink(target.Description, "TargetEdit", new {targetId = target.Id})</td>
                     <td>@target.GetLowerLimitDisplayValue()</td>
                     <td>@target.GetUpperLimitDisplayValue()</td>
                     <td>@Model.GetPolarityNameFromId(target.PolarityId)</td>

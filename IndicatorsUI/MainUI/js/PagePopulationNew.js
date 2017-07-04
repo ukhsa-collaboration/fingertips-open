@@ -10,28 +10,24 @@
 * @class goToPopulationPage
 */
 function goToPopulationPage() {
-    if (!groupRoots.length) {
-        noDataForAreaType();
-    } else {
-        var model = FT.model;
+    var model = FT.model;
 
-        setPageMode(PAGE_MODES.POPULATION);
+    setPageMode(PAGE_MODES.POPULATION);
 
-        var noOfApiCalls = model.areaTypeId === AreaTypeIds.Practice ? 5 : 3;
+    var noOfApiCalls = model.areaTypeId === AreaTypeIds.Practice ? 5 : 3;
 
-        ajaxMonitor.setCalls(noOfApiCalls);
+    ajaxMonitor.setCalls(noOfApiCalls);
 
-        // AJAX call to api/quinary_population
-        getPopulation(model.areaCode);
-        getPopulation(model.parentCode);
-        getPopulation(NATIONAL_CODE);
+    // AJAX call to api/quinary_population
+    getPopulation(model.areaCode);
+    getPopulation(model.parentCode);
+    getPopulation(NATIONAL_CODE);
 
-        if (FT.model.areaTypeId === AreaTypeIds.Practice) {
-            getLabelSeries();
-            getPopulationSummary(model.areaCode);
-        }
-        ajaxMonitor.monitor(displayPopulation);
+    if (FT.model.areaTypeId === AreaTypeIds.Practice) {
+        getLabelSeries();
+        getPopulationSummary(model.areaCode);
     }
+    ajaxMonitor.monitor(displayPopulation);
 }
 /**
 * Creates and displays the HTML for the population page.
@@ -46,19 +42,22 @@ function displayPopulation() {
     if (!isDefined(population[model.areaCode]) &&
         !isDefined(population[model.parentCode]) &&
         !isDefined(population[NATIONAL_CODE])) {
-        label = '<div class="NoPopulationData fl">&nbsp;</div><div class="NoPopulationData fl">No population data available for current area.</div>';
+        label = '<div class="no-population-data fl">&nbsp;</div><div class="no-population-data fl">No population data available for current area.</div>';
         $container.html(label);
     }
     else {
         label = '<div style="float: left;width: 600px">' +
                 '<div class="export-chart-box"><a class="export-link" href="javascript:exportPopulationChart()">Export chart as image</a></div>' +
-                '<div id="populationChart" style="float: left;clear: both; width: 600px; height: 600px;"></div>' +
+                '<div id="population-chart"></div>' +
+                '<div id="population-source"></div>' +
                 '</div>';
+
         if (model.areaTypeId === AreaTypeIds.Practice) {
             $container.html(label + displayPopulationInfo());
         } else {
             $container.html(label);
         }
+
         displayPopulationChart();
     }
 
@@ -110,20 +109,37 @@ var CHART_TEXT_STYLE = {
     fontFamily: 'Verdana'
 };
 
+function getPopulationMax(populations) {
+    var max = 5;
+    var min = -max;
+    for (var i in populations) {
+        if (populations[i] != null) {
+            min = _.min([min, _.min(populations[i].male)]);
+            max = _.max([max, _.max(populations[i].female)]);
+        }
+    }
+    return Math.ceil(_.max([max, Math.abs(min)]));
+}
+
 function displayPopulationChart() {
 
     var model = FT.model;
-
-    var maleString = ' (Male)',
-        femaleString = ' (Female)',
-        parentColour = chartColours.pink,
-        chartTitle = 'Age Distribution';
 
     // Define populations
     var population = loaded.population;
     var profilePopulation = new Population(population[model.areaCode]),
         parentPopulation = new Population(population[model.parentCode]),
         nationalPop = new Population(population[NATIONAL_CODE]);
+
+    var max = getPopulationMax([profilePopulation, parentPopulation, nationalPop]);
+
+    // Labels
+    var subtitle = population[NATIONAL_CODE].IndicatorName + " " + population[NATIONAL_CODE].Period;
+    var maleString = ' (Male)',
+        femaleString = ' (Female)',
+        parentColour = chartColours.pink,
+        chartTitle = '<div style="text-align:center;">Age Profile<br><span style="font-size:12px;">' + subtitle + '</span></div>';
+    populationState.chartTitle = chartTitle;
 
     var areaName = areaHash[model.areaCode].Name;
     var isParentNotEngland = model.parentCode.toUpperCase() !== NATIONAL_CODE;
@@ -171,16 +187,17 @@ function displayPopulationChart() {
     try {
         populationState.populationChart = new Highcharts.Chart({
             chart: {
-                renderTo: 'populationChart',
+                renderTo: 'population-chart',
                 defaultSeriesType: 'line',
-                margin: [40, 55, 150, 55],
+                margin: [60, 55, 150, 55],
                 /* margins must be set explicitly to avoid labels being positioned outside visible chart area */
                 width: 600,
                 height: 550
             },
             title: {
                 text: chartTitle,
-                style: CHART_TEXT_STYLE
+                style: CHART_TEXT_STYLE,
+                useHTML: true
             },
             xAxis: [{
                 categories: nationalPop.Labels,
@@ -194,8 +211,10 @@ function displayPopulationChart() {
             }
             ],
             yAxis: {
+                min: -max,
+                max: max,
                 title: {
-                    text: 'Population (%)',
+                    text: '% of total population',
                     style: CHART_TEXT_STYLE
                 },
                 labels: {
@@ -274,13 +293,13 @@ function exportPopulationChart() {
             spacingTop: 70,
             events: {
                 load: function () {
-                    this.renderer.text('<b><div style="font-weight: normal;font-family: Verdana">Age Distribution</div></b>', 250, 15)
+                    this.renderer.text(populationState.chartTitle, 300, 15)
                         .attr({
                             align: 'center'
                         })
                         .css({
-                            fontSize: '10px',
-                            width: '450px'
+                            fontSize: '14px',
+                            width: '600px'
                         })
                         .add();
                 }
@@ -310,17 +329,17 @@ function displayPopulationInfo() {
 
     templates.add('summary',
         '<div style="float: right; width: 360px;">' +
-        '<div id="populationTableBox">' +
+        '<div id="population-table-box">' +
         '<div style="float: left; text-align: center; width: 100%; font-weight: bold; position: relative;">' +
-        '<div class="right-tooltip-icon infoTooltip" onclick="showMetadata(114)">' +
+        '<div class="right-tooltip-icon info-tooltip" onclick="showMetadata(114)">' +
         '</div>' +
         '<div>Registered Persons</div>' +
         '</div>' +
         '{{{registeredPersons}}}' +
         '</div>' +
-        '<div id="populationInfo">' +
-        '<div id="practicePopInfo">' +
-        '<div id="practiceLabel" class="popLabel">{{practiceLabel}}</div>{{{furtherInfo}}}{{{deprivation}}}{{{ethnicity}}}' +
+        '<div id="population-info">' +
+        '<div id="practice-pop-info">' +
+        '<div id="practice-label" class="popLabel">{{practiceLabel}}</div>{{{furtherInfo}}}{{{deprivation}}}{{{ethnicity}}}' +
         '</div></div>' +
         '{{#noPopulation}}<div id="noPractice" class="selectLabel">No population data<br>available for current practice</div>{{/noPopulation}}' +
         '</div>');
@@ -361,7 +380,7 @@ function updateDeprivationTable(populationSummary) {
         // Define decile list
         viewModel.decile = [];
         for (var i = 1; i <= 10; i++) {
-            viewModel.decile.push({text:'', num: i});
+            viewModel.decile.push({ text: '', num: i });
         }
 
         // Selected decile
@@ -370,13 +389,13 @@ function updateDeprivationTable(populationSummary) {
         viewModel.decileName = '<i>Data not available for current practice</i>';
     }
     templates.add("deprivationInfo",
-        '<table id="deprivationTable" class="borderedTable" cellspacing="0">' +
+        '<table id="deprivation-table" class="bordered-table" cellspacing="0">' +
         '<thead>' +
         '<tr>' +
         '<th>' +
         '<div class="w100" style="position: relative;">' +
         'Deprivation' +
-        '<div class="right-tooltip-icon infoTooltip" onclick="showMetadata(91872)"></div>' +
+        '<div class="right-tooltip-icon info-tooltip" onclick="showMetadata(91872)"></div>' +
         '</div>' +
         '</th>' +
         '</tr>' +
@@ -408,13 +427,13 @@ function updateEthnicity(data) {
         '<i>Insufficient data to provide accurate summary</i>';
 
     templates.add('ethnicityInfo',
-        '<table id="ethnicityTable" class="borderedTable" cellspacing="0">' +
+        '<table id="ethnicity-table" class="bordered-table" cellspacing="0">' +
         '<thead>' +
         '<tr>' +
         '<th>' +
         '<div class="w100" style="position: relative;">' +
         'Ethnicity Estimate' +
-        '<div class="right-tooltip-icon infoTooltip" onclick="showMetadata(1679)">' +
+        '<div class="right-tooltip-icon info-tooltip" onclick="showMetadata(1679)">' +
         '</div>' +
         '</div>' +
         '</th>' +
@@ -429,7 +448,7 @@ function updateEthnicity(data) {
     return templates.render('ethnicityInfo', viewModel);
 };
 
-templates.add('furtherInfo', '{{#rows}}<tr><td class="header information">{{#iid}}<div class="fl infoTooltip" onclick="showMetadata({{iid}})"></div>{{/iid}}{{name}}</td><td>{{val}}{{^val}}' +
+templates.add('furtherInfo', '{{#rows}}<tr><td class="header information">{{#iid}}<div class="fl info-tooltip" onclick="showMetadata({{iid}})"></div>{{/iid}}{{name}}</td><td>{{val}}{{^val}}' +
         NO_DATA + '{{/val}}{{#average}} <span class="averageLabel">(average)</span>{{/average}}</td></tr>{{/rows}}');
 
 function updateFurtherInfo(adhocValues) {
@@ -463,9 +482,9 @@ function updateFurtherInfo(adhocValues) {
 
     var viewModel = {}
     viewModel.tablebody = templates.render('furtherInfo', { rows: rows });
-    templates.add('furtherInfoTable',
-        '<table id="furtherInfoTable" class="borderedTable" cellspacing="0">{{{tablebody}}}</table>');
-    return templates.render('furtherInfoTable', viewModel);
+    templates.add('further-info-table',
+        '<table id="further-info-table" class="bordered-table" cellspacing="0">{{{tablebody}}}</table>');
+    return templates.render('further-info-table', viewModel);
 };
 
 function PopulationNumber(coreDataSet) {
@@ -524,8 +543,8 @@ function updateRegisteredPersons() {
     var viewModel = {}
     viewModel.tablebody = templates.render('furtherInfo', { rows: rows });
 
-    templates.add("popTable", '<table id="popTable" class="borderedTable" cellspacing="0">{{{tablebody}}}</table>');
-    return templates.render('popTable', viewModel);
+    templates.add("pop-table", '<table id="pop-table" class="bordered-table" cellspacing="0">{{{tablebody}}}</table>');
+    return templates.render('pop-table', viewModel);
 };
 
 function showMetadata(indicatorId) {
@@ -533,7 +552,7 @@ function showMetadata(indicatorId) {
     ajaxMonitor.setCalls(2);
 
     getPopulationIndicatorMetadata(indicatorId);
-    getPopulationIndicatorMetadataProperties();
+    getMetadataProperties();
 
     ajaxMonitor.monitor(displayIndicatorMetadata);
 }
@@ -550,19 +569,6 @@ function getPopulationIndicatorMetadata(indicatorId) {
             populationIndicatorMetadata = data[indicatorId];
             ajaxMonitor.callCompleted();
         });
-}
-
-function getPopulationIndicatorMetadataProperties() {
-    if (isDefined(loaded.indicatorProperties)) {
-        ajaxMonitor.callCompleted();
-    } else {
-
-        ajaxGet('api/indicator_metadata_text_properties', '',
-            function (obj) {
-                loaded.indicatorProperties = obj;
-                ajaxMonitor.callCompleted();
-            });
-    }
 }
 
 function displayIndicatorMetadata() {
@@ -584,7 +590,8 @@ loaded.population = {};
 loaded.PopulationSummary = {}
 
 var populationState = {
-    populationChart: null
+    populationChart: null,
+    chartTitle : null
 };
 
 pages.add(PAGE_MODES.POPULATION, {

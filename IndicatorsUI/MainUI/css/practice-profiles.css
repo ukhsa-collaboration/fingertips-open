@@ -1,5 +1,5 @@
 ﻿
-.searchContainer {
+.search-container {
 display:none;
 }
 
@@ -125,7 +125,7 @@ div.column3 {
     width: 100%;
 }
 
-#trendsBox .infoTooltip {
+#trendsBox .info-tooltip {
     position: absolute;
     top: 1px;
     left: -1px;
@@ -135,7 +135,7 @@ div.column3 {
     Population 
 ------------------------------------------*/
 
-#populationChart {
+#population-chart {
     float: left;
     clear: both;
     width: 500px;
@@ -177,7 +177,7 @@ div.column3 {
     position: relative;
 }
 
-#indicatorsBox {
+#IndicatorsBox {
     position: relative;
 }
 
@@ -189,25 +189,25 @@ div.column3 {
     text-align: center;
 }
 
-#populationInfo, #populationTableBox {
+#population-info, #population-table-box {
     width: 355px;
     float: left;
     margin-top: 6px;
 }
 
-#populationInfo {
+#population-info {
     margin-top: 15px;
 }
 
-    #populationInfo TABLE, #popTable {
+    #population-info TABLE, #pop-table {
         width: 100%;
     }
 
-        #popTable TD, #furtherInfoTable TD {
+        #pop-table TD, #further-info-table TD {
             padding-left: 2px;
         }
 
-    #populationInfo #decileKey {
+    #population-info #decileKey {
         width: 100%;
     }
 
@@ -215,25 +215,25 @@ div.column3 {
     font-size: 9px;
 }
 
-.keyLabel {
+.key-label {
     font-size: 10px;
     line-height: 10px;
     color: #666;
     margin-bottom: 3px;
 }
 
-.borderedTable {
+.bordered-table {
     border: 1px solid #ddd;
 }
 
-    .borderedTable td, .borderedTable th {
+    .bordered-table td, .bordered-table th {
         border-color: #ddd;
         border-spacing: 0;
         border-style: solid;
         border-width: 1px;
     }
 
-    .borderedTable th {
+    .bordered-table th {
         background: #f6f7f7; /*!!!*/
         vertical-align: bottom;
     }
@@ -312,7 +312,7 @@ DIV.decileSpacer {
     width: 4px;
 }
 
-#deprivationTable, #ethnicityTable {
+#deprivation-table, #ethnicity-table {
     margin-top: 15px;
 }
 
@@ -333,13 +333,13 @@ DIV.decileSpacer {
     text-align: center;
 }
 
-#populationKeyBox {
+#population-key-box {
     float: left;
     width: 100%;
     clear: left;
 }
 
-#populationKey {
+#pop-key-tbl {
     font-size: 11px;
     color: #666;
     line-height: 16px;
@@ -358,16 +358,16 @@ DIV.decileSpacer {
     text-align: right;
 }
 
-.spineTable {
+.spine-table {
     width: 100%;
     margin-top: 6px;
 }
 
-    .spineTable a {
+    .spine-table a {
         text-decoration: none;
     }
 
-        .spineTable a:hover {
+        .spine-table a:hover {
             text-decoration: underline;
         }
 
@@ -404,11 +404,11 @@ TH.sex {
     font-size: 14px;
 }
 
-#practiceLabel {
+#practice-label {
     margin: 12px 0 6px 0;
 }
 
-#practicePopInfo {
+#practice-pop-info {
     width: 100%;
     height: 270px;
     float: left;
@@ -420,7 +420,7 @@ DIV.noData {
     text-align: center;
 }
 
-TD.popKey {
+TD.pop-key {
     width: 26px;
 }
 
@@ -428,7 +428,7 @@ TD.popKey {
     width: 100%;
 }
 
-a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
+a.page-selector, a.page-selector:visited, a.page-selector:active {
     background: #ccc;
     color: #444;
     border: 2px solid white;
@@ -440,12 +440,12 @@ a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
     font-weight: bold;
 }
 
-    a.pageSelector:hover {
+    a.page-selector:hover {
         background: #666;
         color: #eee;
     }
 
-a.pageSelected, a.pageSelected:visited, a.pageSelected:hover, a.pageSelected:active {
+a.page-selected, a.page-selected:visited, a.page-selected:hover, a.page-selected:active {
     background-color: black;
     color: white;
 }
@@ -489,7 +489,7 @@ a.pageSelected, a.pageSelected:visited, a.pageSelected:hover, a.pageSelected:act
     margin: 100px 20px 0 0;
 }
 
-#sortPracticeBox a.pageSelector {
+#sortPracticeBox a.page-selector {
     font-size: 80% !important;
     text-decoration: none;
     padding:4px 1px 3px 1px !important;
@@ -621,14 +621,14 @@ TD#timeline {
     Population 
 ------------------------------------------*/
 
-#benchmarkImg {
+#benchmark-img {
     height: 18px;
     width: 18px;
     margin-top: 5px;
 }
 
 
-#benchmarkSelection {
+#benchmark-selection {
     position: absolute;
     top: -25px;
     left: 390px;
@@ -636,7 +636,7 @@ TD#timeline {
     font-size: 18px;
 }
 
-#benchmarkSelection select {
+#benchmark-selection select {
     width: 200px;
 }
 
@@ -669,25 +669,14 @@ TD#timeline {
 /* Spinner */
 
 #spinner {
-    position: relative;
-    height: 400px;
-    width: 460px;
+    margin: 200px 0;
+    text-align: center;
     color: #999999;
     font-size: 10px;
-    float: left;
-    clear: both;
-}
-
-img.spinner {
-    position: absolute;
-    right: 4px;
-    top: 200px;
 }
 
 #spinnerLabel {
-    position: absolute;
-    right: 0;
-    top: 231px;
+    right: -2px;
 }
 
 /* Spine chart */
@@ -775,12 +764,12 @@ img.spinner {
 }
 
 /* Definition table*/
-#definitionTable p, #definitionTable tr td:nth-child(2) {
+#definition-table p, #definition-table tr td:nth-child(2) {
     margin: 3px 0 3px 0;
     font-size: 1.0625rem !important;
 }
 
-#definitionTable h2 {
+#definition-table h2 {
     margin: 10px 0;
 }
 
@@ -802,12 +791,12 @@ TD.info {
     text-align: right;
 }
 
-#furtherInfoTable TD.info {
+#further-info-table TD.info {
     width: 200px;
 }
 
 /* Info tooltip */
-DIV.infoTooltip {
+DIV.info-tooltip {
     margin: 0 auto 0 auto;
     height: 16px;
     width: 16px;
@@ -815,7 +804,7 @@ DIV.infoTooltip {
     cursor: pointer;
 }
 
-    DIV.infoTooltip:hover {
+    DIV.info-tooltip:hover {
         background-image: url(../images/info3-hover.png);
     }
 
@@ -853,7 +842,7 @@ padding-left:25px;
     border: 1px solid #000;
 }
 
-#spineKeyTable {
+#spine-key-table {
     position: absolute;
     right: 0;
     top: -32px;
@@ -918,7 +907,7 @@ padding-left:25px;
     width: 890px;
 }
 
-#popChartBox {
+#pop-chart-box {
     float: left;
     width: 510px;
 }
@@ -1069,7 +1058,7 @@ P.export {
     width: 300px;
 }
 
-#searchButton {
+#search-button {
     margin: 20px 0 0 0;
     float: left;
     background-repeat: no-repeat;
@@ -1271,3 +1260,33 @@ vertical-align: top;
     padding: 5px 30px;
     text-decoration: none;
 }
+
+/*----------------------------------------
+    Export pop up
+------------------------------------------*/
+.export {
+    padding: 3%;
+    margin: 30px 7% 10px 7%;
+    width: 80%;
+    float: left;
+}
+
+    .export TD {
+        vertical-align: top;
+        text-align: left;
+        padding-top: 4px;
+    }
+
+    .export INPUT {
+        margin-top: 2px;
+    }
+
+    .export span {
+        display: block;
+        padding: 5px;
+        text-align: right;
+    }
+
+    .export select {
+        width: 65%;
+    }

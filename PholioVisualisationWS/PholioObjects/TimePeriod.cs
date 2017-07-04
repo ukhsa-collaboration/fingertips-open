@@ -110,5 +110,15 @@ namespace PholioVisualisation.PholioObjects
         {
             return string.Format("{0}{1}{2}{3}", Year, YearRange, Quarter, Month);
         }
+
+        public int ToSortableNumber()
+        {
+            var q = Quarter;
+            var quarter = q == Undefined ? 0 : q;
+            var m = Month;
+            var month = m == Undefined ? 0 : m;
+
+            return int.Parse(string.Format("{0:0000}{1:00}{2:00}", Year, quarter, month));
+        }
     }
 }

@@ -40,10 +40,10 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string MapPopUp = "map-info-box";
         public const string AreaName = "area_name";
         public const string PracticePopulation = "practice_population";
-        public const string NoSearchResultMessage = "tallCentralMessage";
+        public const string NoSearchResultMessage = "tall-central-message";
         public const string MortalityRankingsHeader = "header";
         public const string PrimaryValueNoteTooltip = "primary-value-note-tooltip";
-        public const string BarchartIndicatorTitle = "trendTitle";
+        public const string BarchartIndicatorTitle = "trend-title";
     }
 
     public class AreaNames

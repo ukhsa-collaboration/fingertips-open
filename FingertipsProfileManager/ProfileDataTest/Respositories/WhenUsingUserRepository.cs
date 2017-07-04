@@ -45,7 +45,7 @@ namespace Fpm.ProfileDataTest.Respositories
             Assert.IsNull(_userRepository.GetUserGroupPermissions(ProfileIds.ProfileId, FpmUserIds.UserId));
 
             // Act: Save new permission
-            UserGroupPermissions permissions = new UserGroupPermissions { UserId = FpmUserIds.UserId, ProfileId = ProfileIds.ProfileId }; // ProfileIds. FpmUserIds
+            UserGroupPermissions permissions = new UserGroupPermissions { UserId = FpmUserIds.UserId, ProfileId = ProfileIds.ProfileId }; // Profiles. FpmUserIds
             _userRepository.SaveUserGroupPermissions(permissions);
 
             // Assert: Load permission to verify save

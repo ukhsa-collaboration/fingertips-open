@@ -1,5 +1,4 @@
 ﻿﻿using System;
-﻿using System.Diagnostics;
 ﻿using System.Linq;
 ﻿using System.Text.RegularExpressions;
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -96,6 +95,43 @@ namespace PholioVisualisation.PdfDataTest
             Assert.IsNotNull(Data().EmergencyAdmissionsEnglandByEthnicity);
             Assert.IsNotNull(Data().EmergencyAdmissionsLocal);
             Assert.IsNotNull(Data().EmergencyAdmissionsEngland);
+        }
+
+        [TestMethod]
+        public void TestPopulationPercentageAssigned()
+        {
+            Assert.IsNotNull(Data().PopulationPercentageFemale);
+            Assert.IsNotNull(Data().PopulationPercentageMale);
+        }
+
+        [TestMethod]
+        public void TestDependencyRatio()
+        {
+            Assert.IsNotNull(Data().DependencyRatio);
+        }
+
+        [TestMethod]
+        public void TestPercentageEthnicMinorites()
+        {
+            Assert.IsNotNull(Data().PercentageEthnicMinoritesCombined);
+            Assert.IsNotNull(Data().PercentageEthnicMinoritesMale);
+            Assert.IsNotNull(Data().PercentageEthnicMinoritesFemale);
+        }
+
+        [TestMethod]
+        public void TestPopulations()
+        {
+            Assert.IsNotNull(Data().PopulationCountFemale);
+            Assert.IsNotNull(Data().PopulationCountCombined);
+            Assert.IsNotNull(Data().PopulationCountMale);
+        }
+
+        [TestMethod]
+        public void TestProjectedPopulationChange()
+        {
+            Assert.IsNotNull(Data().ProjectedPopulationMale);
+            Assert.IsNotNull(Data().ProjectedPopulationFemale);
+            Assert.IsNotNull(Data().ProjectedPopulationCombined);
         }
 
         [TestMethod]

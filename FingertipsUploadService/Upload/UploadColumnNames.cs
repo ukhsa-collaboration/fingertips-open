@@ -1,5 +1,4 @@
-﻿
-namespace FingertipsUploadService.Upload
+﻿namespace FingertipsUploadService.Upload
 {
     public class UploadColumnNames
     {
@@ -21,5 +20,6 @@ namespace FingertipsUploadService.Upload
         public const string ValueNoteId = "ValueNoteId";
         public const string CategoryTypeId = "CategoryTypeId";
         public const string CategoryId = "CategoryId";
+        public const string DisclosureControlId = "DisclosureControlId";
     }
 }

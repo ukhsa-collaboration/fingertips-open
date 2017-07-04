@@ -24,7 +24,7 @@ namespace PholioVisualisation.DataConstruction
                 return new List<GroupingMetadata>();
             }
 
-            return groupDataReader.GetGroupMetadataList(GroupIds.ToList());
+            return groupDataReader.GetGroupingMetadataList(GroupIds.ToList());
         }
     }
 }

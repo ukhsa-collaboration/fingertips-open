@@ -27,17 +27,12 @@ namespace Fpm.ProfileData.Entities.Profile
         /// <summary>
         /// Only used to pass information to view. Is not stored in the database.
         /// </summary>
-        public string ReturnUrl { get; set; }
-
-        /// <summary>
-        /// Only used to pass information to view. Is not stored in the database.
-        /// </summary>
         public IEnumerable<SelectListItem> ProfileList { get; set; }
 
         /// <summary>
         /// Is this content stored as plain text only.
         /// </summary>
-        public bool PlainTextContent { get; set; }
+        public bool IsPlainText { get; set; }
 
     }
 }

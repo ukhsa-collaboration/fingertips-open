@@ -1,39 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Dynamic;
-using System.Web.Mvc;
-using System.Web.Routing;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 using Fpm.ProfileData.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Fpm.MainUI.Controllers
 {
     public class ProfilesAndIndicatorsController : Controller
     {
-        public const string ProfilesAndIndicators = "ProfilesAndIndicators";
+        public const string IndexView = "ProfilesAndIndicators";
 
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
-        
+
         private ProfileRepository _profileRepository;
         private LookUpsRepository _lookUpsRepository;
         private CoreDataRepository _coreDataRepository;
 
         private string _userName;
 
-
         public ProfilesAndIndicatorsController()
-        {
-                
-        }
-        
-        public ProfilesAndIndicatorsController(ProfileRepository profileRepository, LookUpsRepository lookUpsRepository, CoreDataRepository coreDataRepository)
+        { }
+
+        public ProfilesAndIndicatorsController(ProfileRepository profileRepository,
+            LookUpsRepository lookUpsRepository, CoreDataRepository coreDataRepository)
         {
             _profileRepository = profileRepository;
             _lookUpsRepository = lookUpsRepository;
@@ -47,51 +45,64 @@ namespace Fpm.MainUI.Controllers
             _userName = UserName;
         }
 
-        [Route("TestPage")]    
+        [Route("TestPage")]
         public ActionResult Test()
         {
             return Content("Test");
         }
 
-        public ActionResult Index(int profileId = -1/*this is currently ignored but one for the future*/)
+        public ActionResult Index(int profileId = ProfileIds.Undefined)
         {
             var model = new IndicatorGridModel
-                                           {
-                                               SortBy = "Sequence",
-                                               SortAscending = true,
-                                               CurrentPageIndex = 1,
-                                               PageSize = 200
-                                           };
+            {
+                SortBy = "Sequence",
+                SortAscending = true,
+                CurrentPageIndex = 1,
+                PageSize = 200
+            };
 
             GetProfiles(model);
-            GetDomains(model, null);
 
+            // Select profile
             Profile profile = null;
-            var firstOrDefault = model.DomainList.FirstOrDefault();
-            if (firstOrDefault != null)
+            if (profileId != ProfileIds.Undefined)
             {
-                profile = GetProfile(model.ProfileKey, Convert.ToInt32(firstOrDefault.Value), -1);
+                var urlKey = _reader.GetProfileUrlKeyFromId(profileId);
+                profile = GetProfile(urlKey);
+                if (profile != null)
+                {
+                    model.ProfileKey = urlKey;
+                }
+            }
+            GetDomains(model, null);
+            if (profile == null)
+            {
+                var domain = model.DomainList.FirstOrDefault();
+                if (domain != null)
+                {
+                    profile = GetProfile(model.ProfileKey, Convert.ToInt32(domain.Value));
+                }
             }
 
+            // Init profile
             if (profile != null)
             {
-                IQueryable<GroupingPlusName> indicators = profile.IndicatorNames.AsQueryable();
-
+                ViewBag.ProfileId = profile.Id;
                 model.Profile = profile;
                 model.UrlKey = model.ProfileKey;
 
-                var profileContact = _reader.GetUserByUserId(profile.ContactUserId);
-                model.ContactUserName = profileContact.DisplayName;
-                model.EmailAddress = profileContact.EmailAddress;
+                // Select area type
+                var areaType = profile.AreaTypes.FirstOrDefault();
+                profile.SelectedAreaType = areaType != null ? areaType.Id : AreaTypeIds.Undefined;
+
+                AssignContactDetails(profile, model);
 
                 AssignAreaTypeData(model, profile);
 
-                var userPermissions = GetUserGroupPermissions();
+                AssignUserPermissionsToIndicatorGridModel(model);
 
-                model.UserHasAssignedPermissions = userPermissions.Any();
-
-                model.UserGroupPermissions = userPermissions.FirstOrDefault(x => x.ProfileId == _reader.GetProfileDetails(model.UrlKey).Id);
-
+                // Indicators
+                IQueryable<GroupingPlusName> indicators = profile.IndicatorNames.AsQueryable();
                 indicators = indicators.Where(i => i.AreaTypeId == profile.SelectedAreaType);
 
                 model.TotalRecordCount = indicators.Count();
@@ -103,43 +114,7 @@ namespace Fpm.MainUI.Controllers
                     .Take(model.PageSize);
             }
 
-            return View(ProfilesAndIndicators, model);
-        }
-
-        private List<UserGroupPermissions> GetUserGroupPermissions()
-        {
-            var fpmUser = _reader.GetUserByUserName(_userName);
-            List<UserGroupPermissions> userPermissions = fpmUser != null
-                ? CommonUtilities.GetUserGroupPermissionsByUserId(fpmUser.Id).ToList()
-                : new List<UserGroupPermissions>();
-            return userPermissions;
-        }
-
-        private void GetDomains(IndicatorGridModel model, int? domainSequence)
-        {
-            var reloadedDomains = ReloadGridDomains(model.ProfileKey, _profileRepository);
-
-            if (domainSequence.HasValue)
-            {
-                model.SelectedGroupId =
-                    reloadedDomains.Where(x => x.Sequence == domainSequence).Select(x => x.GroupId).FirstOrDefault();
-            }
-            else
-            {
-                model.SelectedGroupId = reloadedDomains.Select(x => x.GroupId).FirstOrDefault();
-            }
-
-            model.DomainList = new SelectList(reloadedDomains.OrderBy(g => g.Sequence), "Sequence", "GroupName");
-        }
-
-        private void GetProfiles(IndicatorGridModel model)
-        {
-            var profiles = _reader.GetProfiles().OrderBy(x => x.Name);
-            IList<ProfileDetails> profilesWithAssignedIndicators = profiles.ToList();
-            var listOfProfiles = CommonUtilities.GetOrderedListOfProfiles(profilesWithAssignedIndicators);
-            model.ProfileList = listOfProfiles;
-            var firstOrDefault = model.ProfileList.FirstOrDefault();
-            if (firstOrDefault != null) model.ProfileKey = firstOrDefault.Value;
+            return View(IndexView, model);
         }
 
         public ActionResult SortPageAndFilter(int? domainSequence, int? indicatorId, string resetArea,
@@ -147,24 +122,22 @@ namespace Fpm.MainUI.Controllers
             bool ascending = true, int page = 1, int pageSize = 200, string profileKey = null)
         {
             var model = new IndicatorGridModel
-                {
-                    SortBy = sortBy,
-                    SortAscending = @ascending,
-                    CurrentPageIndex = page,
-                    PageSize = pageSize
-                };
+            {
+                SortBy = sortBy,
+                SortAscending = @ascending,
+                CurrentPageIndex = page,
+                PageSize = pageSize
+            };
 
             // Get all the profiles
             GetProfiles(model);
             var firstOrDefault = model.ProfileList.FirstOrDefault();
             if (firstOrDefault != null)
+            {
                 model.ProfileKey = string.IsNullOrEmpty(profileKey) ? firstOrDefault.Value : profileKey;
+            }
+
             GetDomains(model, domainSequence);
-
-            var areaTypeId = resetArea == "True"
-                ? -1
-                : selectedAreaTypeId;
-
             if (domainSequence == null)
             {
                 var selectListItem = model.DomainList.FirstOrDefault();
@@ -177,23 +150,27 @@ namespace Fpm.MainUI.Controllers
             Profile profile = null;
             if (domainSequence.HasValue)
             {
+                var areaTypeId = resetArea == "True"
+                    ? AreaTypeIds.Undefined
+                    : selectedAreaTypeId;
                 profile = GetProfile(model.ProfileKey, domainSequence.Value, areaTypeId);
             }
 
             if (profile != null)
             {
-                IQueryable<GroupingPlusName> indicators = profile.IndicatorNames.AsQueryable();
+                ViewBag.ProfileId = profile.Id;
 
                 AssignAreaTypeData(model, profile);
 
                 model.Profile = profile;
                 model.UrlKey = model.ProfileKey;
 
-                var profileContact = _reader.GetUserByUserId(profile.ContactUserId);
-                model.ContactUserName = profileContact.DisplayName;
-                model.EmailAddress = profileContact.EmailAddress;
+                AssignContactDetails(profile, model);
+
+                AssignUserPermissionsToIndicatorGridModel(model);
 
                 // Filter indicators for any search terms
+                IQueryable<GroupingPlusName> indicators = profile.IndicatorNames.AsQueryable();
                 if (indicatorId != null)
                 {
                     indicators = indicators.Where(i => i.IndicatorId.ToString().Contains(indicatorId.ToString()));
@@ -209,42 +186,12 @@ namespace Fpm.MainUI.Controllers
 
                 model.TotalRecordCount = indicators.Count();
 
-                var userPermissions = GetUserGroupPermissions();
-
-                model.UserHasAssignedPermissions = userPermissions.Any();
-
-                model.UserGroupPermissions = userPermissions
-                    .FirstOrDefault(x => x.ProfileId == _reader.GetProfileDetails(model.UrlKey).Id);
-
                 model.IndicatorNamesGrid = indicators
                     .Skip((model.CurrentPageIndex - 1) * model.PageSize)
                     .Take(model.PageSize);
             }
 
-            return View("ProfilesAndIndicators", model);
-        }
-
-        private static void AssignAreaTypeData(IndicatorGridModel model, Profile profile)
-        {
-            var builder = new AreaTypeSelectListBuilder(profile.AreaTypes, profile.SelectedAreaType);
-            model.SelectedAreaTypeId = builder.SelectedAreaTypeId;
-            model.AreaTypeList = builder.SelectListItems;
-        }
-
-        private  Profile GetProfile(string urlKey, int selectedDomainNumber, int areaType)
-        {
-            return new ProfileBuilder(_profileRepository).Build(urlKey, selectedDomainNumber, areaType);
-        }
-
-        private IList<GroupingMetadata> ReloadGridDomains(string selectedProfile, ProfileRepository profileRepository)
-        {
-            var model = new ProfileMembers
-                {
-                    UrlKey = selectedProfile,
-                    Profile = CommonUtilities.GetProfile(selectedProfile, 1, -1, profileRepository)
-                };
-
-            return model.Profile.GroupingMetadatas;
+            return View(IndexView, model);
         }
 
         public int GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(string selectedProfile, int domainNumber, int areaTypeId)
@@ -273,7 +220,7 @@ namespace Fpm.MainUI.Controllers
                 return PartialView("_ReorderIndicators", model);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         /// <summary>
@@ -295,8 +242,7 @@ namespace Fpm.MainUI.Controllers
 
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
 
-            model.UserGroupPermissions = userPermissions
-                .FirstOrDefault(x => x.ProfileId == _reader.GetProfileDetails(model.UrlKey).Id);
+            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
 
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
             var indicatorList = GetSpecifiedIndicatorNames(indicatorSpecifiers, model.Profile.IndicatorNames);
@@ -356,7 +302,7 @@ namespace Fpm.MainUI.Controllers
                 return PartialView("_DeleteSelectedIndicators", model);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         private static List<GroupingPlusName> GetSpecifiedIndicatorNames(List<IndicatorSpecifier> indicatorSpecifiers, IList<GroupingPlusName> allIndicators)
@@ -393,22 +339,22 @@ namespace Fpm.MainUI.Controllers
                 return PartialView("_IndicatorAudit", auditLog);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         public ActionResult MoveIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey, string selectedProfileName,
             int selectedDomainId, string selectedDomainName, int selectedAreaTypeId)
         {
             var model = new MoveIndicatorsModel
-                {
-                    UrlKey = selectedProfileUrlkey,
-                    Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
-                    DomainName = selectedDomainName,
-                    DomainId = selectedDomainId,
-                    ProfileName = selectedProfileName,
-                    AreaTypeId = selectedAreaTypeId,
-                    IndicatorsThatCantBeTransferred = null,
-                };
+            {
+                UrlKey = selectedProfileUrlkey,
+                Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
+                DomainName = selectedDomainName,
+                DomainId = selectedDomainId,
+                ProfileName = selectedProfileName,
+                AreaTypeId = selectedAreaTypeId,
+                IndicatorsThatCantBeTransferred = null,
+            };
 
             var listOfProfiles = GetOrderedListOfProfilesForCurrentUser(model);
 
@@ -416,10 +362,11 @@ namespace Fpm.MainUI.Controllers
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
             defaultProfile.Selected = true;
 
-            model.ListOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile,  _profileRepository);
+            model.ListOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile, _profileRepository);
 
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
-            model.UserGroupPermissions = userPermissions.FirstOrDefault(x => x.ProfileId == _reader.GetProfileDetails(model.UrlKey).Id);
+
+            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
 
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
             model.IndicatorsToTransfer = GetSpecifiedIndicatorNames(indicatorSpecifiers,
@@ -428,14 +375,14 @@ namespace Fpm.MainUI.Controllers
             ViewBag.SexList = _lookUpsRepository.GetSexes();
 
             ViewBag.AgeList = _lookUpsRepository.GetAges();
-         
+
 
             if (Request.IsAjaxRequest())
             {
                 return PartialView("_MoveSelectedIndicators", model);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         private IEnumerable<SelectListItem> GetOrderedListOfProfilesForCurrentUser(BaseDataModel model)
@@ -468,7 +415,8 @@ namespace Fpm.MainUI.Controllers
             model.GroupId = Convert.ToInt32(model.ListOfDomains.FirstOrDefault(x => x.Selected).Value);
 
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
-            model.UserGroupPermissions = userPermissions.FirstOrDefault(x => x.ProfileId == _reader.GetProfileDetails(model.UrlKey).Id);
+
+            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
 
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
             model.IndicatorsToTransfer = GetSpecifiedIndicatorNames(indicatorSpecifiers,
@@ -483,7 +431,13 @@ namespace Fpm.MainUI.Controllers
                 return PartialView("_CopySelectedIndicators", model);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
+        }
+
+        private UserGroupPermissions GetProfileUserPermissions(IEnumerable<UserGroupPermissions> userPermissions, string urlKey)
+        {
+            return userPermissions.FirstOrDefault(
+                x => x.ProfileId == _reader.GetProfileIdFromUrlKey(urlKey));
         }
 
         [HttpPost]
@@ -504,7 +458,7 @@ namespace Fpm.MainUI.Controllers
         [HttpPost]
         public ActionResult DeleteDomain(ProfileMembers pm, int domainDeleteId)
         {
-            var profileId = -1;
+            var profileId = ProfileIds.Undefined;
 
             if (ModelState.IsValid)
             {
@@ -553,7 +507,7 @@ namespace Fpm.MainUI.Controllers
                 return Redirect(Request.UrlReferrer.AbsoluteUri);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         [HttpPost]
@@ -589,7 +543,7 @@ namespace Fpm.MainUI.Controllers
                 return Redirect(Request.UrlReferrer.AbsoluteUri);
             }
 
-            return View("ProfilesAndIndicators");
+            return View(IndexView);
         }
 
         public ActionResult ConfirmCopyIndicators(CopyIndicatorsModel cim, List<int> selectedDomainId,
@@ -601,9 +555,9 @@ namespace Fpm.MainUI.Controllers
             var indicatorSpecifierStrings = indicatorTransferDetails.Split(',').ToList();
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
 
-            
+
             string targetProfileId = string.Empty;
-            int targetDomain=0, targetAreaTypeId=0;
+            int targetDomain = 0, targetAreaTypeId = 0;
             if (copyMetadataOption)
             {
                 var targetProfileData = targetProfile.Split('~');
@@ -633,7 +587,8 @@ namespace Fpm.MainUI.Controllers
                     if (copyMetadataOption)
                     {
 
-                        var targetProfileDetails = CommonUtilities.GetProfile(targetProfileId, targetDomain, targetAreaTypeId, _profileRepository);
+                        var targetProfileDetails = CommonUtilities.GetProfile(targetProfileId, targetDomain,
+                            targetAreaTypeId, _profileRepository);
                         var indicatorMetadataTextValue = _reader.GetMetadataTextValueForAnIndicatorById(indicatorId, cim.Profile.Id);
                         if (indicatorMetadataTextValue != null)
                         {
@@ -723,6 +678,7 @@ namespace Fpm.MainUI.Controllers
                     {
                         // Indicator is being moved out of owner profile so owner must change
                         var newOwnerProfileId = _reader.GetProfileDetails(selectedProfileId).Id;
+
                         new IndicatorOwnerChanger(_reader, _profileRepository)
                             .AssignIndicatorToProfile(indicatorId, newOwnerProfileId);
 
@@ -764,7 +720,7 @@ namespace Fpm.MainUI.Controllers
 
                         var groupings = GetGroupingsForIndicatorInProfile(profileId, indicatorId);
 
-                        var distinctGroupingsForProfile = 
+                        var distinctGroupingsForProfile =
                             GetDistinctGroupingsByGroupIdAndAreaTypeId(groupings);
 
                         if (distinctGroupingsForProfile.Count > 1)
@@ -828,30 +784,15 @@ namespace Fpm.MainUI.Controllers
                 IndicatorId = indicatorId,
                 Results = new CoreDataSetViewModel()
                 {
-                    DataSet = _coreDataRepository.GetCoreDataSet(indicatorId,out rowsCount),
+                    DataSet = _coreDataRepository.GetCoreDataSet(indicatorId, out rowsCount),
                     RowsFound = rowsCount,
                     CanDeleteDataSet = _coreDataRepository.CanDeleteDataSet(indicatorId, UserName)
                 }
             };
-            
+
             PopulateFilterDataDropDownLists(model);
 
             return PartialView("BrowseIndicatorData", model);
-        }
-
-        /// <summary>
-        /// Accessor that ensures username is defined.
-        /// </summary>
-        private string UserName
-        {
-            get
-            {
-                if (_userName == null)
-                {
-                    _userName = UserDetails.CurrentUser().Name;
-                }
-                return _userName;
-            }
         }
 
         [HttpPost]
@@ -875,14 +816,14 @@ namespace Fpm.MainUI.Controllers
         [Route("DeleteData")]
         public ActionResult DeleteIndicatorData(BrowseDataViewModel model)
         {
-           
+
             var filters = GetFilters(model);
 
             var coreDataSetViewModel = new CoreDataSetViewModel();
 
             try
             {
-               var rowsDeleted = _coreDataRepository.DeleteCoreDataSet(model.IndicatorId, filters, _userName);
+                var rowsDeleted = _coreDataRepository.DeleteCoreDataSet(model.IndicatorId, filters, _userName);
                 coreDataSetViewModel.DeleteStatus = true;
                 coreDataSetViewModel.Message = string.Format("{0} rows have been deleted",
                     rowsDeleted);
@@ -893,8 +834,8 @@ namespace Fpm.MainUI.Controllers
                 coreDataSetViewModel.DeleteStatus = false;
                 coreDataSetViewModel.Message = "Error occurred while deleting data - " + exception.Message;
             }
-            
-           return PartialView("_CoreData", coreDataSetViewModel);
+
+            return PartialView("_CoreData", coreDataSetViewModel);
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -904,6 +845,21 @@ namespace Fpm.MainUI.Controllers
             if (_lookUpsRepository == null) _lookUpsRepository = new LookUpsRepository();
 
             base.OnActionExecuting(filterContext);
+        }
+
+        /// <summary>
+        /// Accessor that ensures username is defined.
+        /// </summary>
+        private string UserName
+        {
+            get
+            {
+                if (_userName == null)
+                {
+                    _userName = UserDetails.CurrentUser().Name;
+                }
+                return _userName;
+            }
         }
 
         protected override void OnActionExecuted(ActionExecutedContext filterContext)
@@ -930,11 +886,18 @@ namespace Fpm.MainUI.Controllers
 
             return filters;
         }
-        
+
+        private void AssignContactDetails(Profile profile, IndicatorGridModel model)
+        {
+            var profileContact = _reader.GetUserByUserId(profile.ContactUserId);
+            model.ContactUserName = profileContact.DisplayName;
+            model.EmailAddress = profileContact.EmailAddress;
+        }
+
         private void PopulateFilterDataDropDownLists(BrowseDataViewModel model)
         {
             if (model.IndicatorId == 0) return;
-            
+
             ViewBag.AreaTypeId = new SelectList(_coreDataRepository.GetAreaTypes(model.IndicatorId), "Id", "Name").AddAnyOption();
 
             ViewBag.SexId = new SelectList(_coreDataRepository.GetSexes(model.IndicatorId), "SexID", "Description").AddAnyOption();
@@ -952,7 +915,7 @@ namespace Fpm.MainUI.Controllers
 
             ViewBag.YearRange = _coreDataRepository.GetYearRanges(model.IndicatorId).ConvertToSelectListWithAnyOption(); ;
 
-            ViewBag.Year = _coreDataRepository.GetYears(model.IndicatorId).ConvertToSelectListWithAnyOption(); 
+            ViewBag.Year = _coreDataRepository.GetYears(model.IndicatorId).ConvertToSelectListWithAnyOption();
 
             ViewBag.Month = _coreDataRepository.GetMonths(model.IndicatorId).ConvertToSelectListWithAnyOption(); ;
 
@@ -983,10 +946,40 @@ namespace Fpm.MainUI.Controllers
             return distinctGroupingsForProfile;
         }
 
+        private Profile GetProfile(string urlKey, int selectedDomainNumber = 0, int areaType = AreaTypeIds.Undefined)
+        {
+            return new ProfileBuilder(_profileRepository).Build(urlKey, selectedDomainNumber, areaType);
+        }
+
+        private static void AssignAreaTypeData(IndicatorGridModel model, Profile profile)
+        {
+            var builder = new AreaTypeSelectListBuilder(profile.AreaTypes, profile.SelectedAreaType);
+            model.SelectedAreaTypeId = builder.SelectedAreaTypeId;
+            model.AreaTypeList = builder.SelectListItems;
+        }
+
+        private IList<GroupingMetadata> ReloadGridDomains(string selectedProfile, ProfileRepository profileRepository)
+        {
+            var model = new ProfileMembers
+            {
+                UrlKey = selectedProfile,
+                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.Undefined, profileRepository)
+            };
+
+            return model.Profile.GroupingMetadatas;
+        }
+
+        private void AssignUserPermissionsToIndicatorGridModel(IndicatorGridModel model)
+        {
+            var userPermissions = GetUserGroupPermissions();
+            model.UserHasAssignedPermissions = userPermissions.Any();
+            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
+        }
+
         private IEnumerable<Grouping> GetGroupingsForIndicatorInProfile(int profileId, int indicatorId)
         {
             var groupingsForAllProfiles = _reader
-                .GetGroupingByIndicatorId(new List<int> {indicatorId});
+                .GetGroupingByIndicatorId(new List<int> { indicatorId });
 
             var profileGroupIds = _reader.GetGroupingIds(profileId);
 
@@ -1001,12 +994,48 @@ namespace Fpm.MainUI.Controllers
             // Profile doesn't own the indicator so actually deleted it from the grouping table 
             _profileRepository.DeleteIndicatorFromGrouping(groupId, indicatorId, areaTypeId, sexId, ageId);
 
-            // Also delete from the IndicatorMetaDataTextValue table (where it has an overridden groupId)
-            _profileRepository.DeleteOverriddenMetaDataTextValues(indicatorId, groupId);
+            // Also delete from the IndicatorMetadataTextValue table (where it has an overridden groupId)
+            _profileRepository.DeleteOverriddenMetadataTextValues(indicatorId, groupId);
 
             _profileRepository.LogAuditChange("Indicator " + indicatorId + " (Area: " + areaTypeId +
                                        ", SexId:" + sexId + ", AgeId:" + ageId + " )  has been deleted.",
                 indicatorId, null, _userName, DateTime.Now, CommonUtilities.AuditType.Delete.ToString());
+        }
+
+        private List<UserGroupPermissions> GetUserGroupPermissions()
+        {
+            var fpmUser = _reader.GetUserByUserName(_userName);
+            List<UserGroupPermissions> userPermissions = fpmUser != null
+                ? CommonUtilities.GetUserGroupPermissionsByUserId(fpmUser.Id).ToList()
+                : new List<UserGroupPermissions>();
+            return userPermissions;
+        }
+
+        private void GetDomains(IndicatorGridModel model, int? domainSequence)
+        {
+            var reloadedDomains = ReloadGridDomains(model.ProfileKey, _profileRepository);
+
+            if (domainSequence.HasValue)
+            {
+                model.SelectedGroupId =
+                    reloadedDomains.Where(x => x.Sequence == domainSequence).Select(x => x.GroupId).FirstOrDefault();
+            }
+            else
+            {
+                model.SelectedGroupId = reloadedDomains.Select(x => x.GroupId).FirstOrDefault();
+            }
+
+            model.DomainList = new SelectList(reloadedDomains.OrderBy(g => g.Sequence), "Sequence", "GroupName");
+        }
+
+        private void GetProfiles(IndicatorGridModel model)
+        {
+            var profiles = _reader.GetProfiles().OrderBy(x => x.Name);
+            IList<ProfileDetails> profilesWithAssignedIndicators = profiles.ToList();
+            var listOfProfiles = CommonUtilities.GetOrderedListOfProfiles(profilesWithAssignedIndicators);
+            model.ProfileList = listOfProfiles;
+            var firstOrDefault = model.ProfileList.FirstOrDefault();
+            if (firstOrDefault != null) model.ProfileKey = firstOrDefault.Value;
         }
     }
 }

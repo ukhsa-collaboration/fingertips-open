@@ -4,13 +4,14 @@ using PholioVisualisation.PholioObjects;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace PholioVisualisation.DataAccess
 {
     public interface IGroupDataReader
     {
         IList<int> GetIndicatorIdsByGroupIdAndAreaTypeId(int groupId, int areaTypeId);
-        IList<GroupingMetadata> GetGroupMetadataList(IList<int> groupIds);
+        IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds);
         IList<int> GetGroupingIds(int profileId);
         Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId);
         IList<Grouping> GetGroupings(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId);
@@ -22,7 +23,7 @@ namespace PholioVisualisation.DataAccess
         IList<Grouping> GetGroupingsByIndicatorIds(IList<int> indicatorIds, IList<int> groupingIds);
         IList<Grouping> GetGroupingsByIndicatorId(int indicatorId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(IList<int> groupIds,
-            IList<int> indicatorIds, int areaTypeId);
+        IList<int> indicatorIds, int areaTypeId);
 
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, IList<int> indicatorIds);
 
@@ -60,8 +61,8 @@ namespace PholioVisualisation.DataAccess
         CoreDataSet GetCoreDataForCategoryArea(Grouping grouping,
             TimePeriod timePeriod, ICategoryArea categoryArea);
 
-        IList<CoreDataSet> GetCoreDataForCategoryTypeId(Grouping grouping,
-            TimePeriod timePeriod, int categoryTypeId);
+        IList<CoreDataSet> GetCoreDataForCategoryTypeIds(Grouping grouping,
+            TimePeriod timePeriod, params int[] categoryTypeIds);
 
         CoreDataSet GetCoreDataForCategory(Grouping grouping,
             TimePeriod timePeriod, string areaCode, int categoryTypeId, int categoryId);
@@ -105,6 +106,10 @@ namespace PholioVisualisation.DataAccess
 
         IList<int> GetAllIndicators();
 
+        IList<CoreDataSet> GetDataIncludingInequalities(Grouping grouping, TimePeriod period,
+            IList<int> excludedCategoryTypeIds, params string[] areaCodes);
+
+        void ClearSession();
     }
 
     public class GroupDataReader : BaseReader, IGroupDataReader
@@ -113,8 +118,7 @@ namespace PholioVisualisation.DataAccess
         private const string PropertyIndicatorId = "IndicatorId";
         private const string PropertyAreaTypeId = "AreaTypeId";
 
-        private const string CategoryIdIsUndefined =
-            " and d.CategoryId = -1";
+        private const string CategoryIdIsUndefined = " and d.CategoryId = -1";
 
         private const string TimePeriodClause =
             " and d.Year = :year and d.YearRange = :yearRange and d.Quarter = :quarter and d.Month = :month";
@@ -154,6 +158,10 @@ namespace PholioVisualisation.DataAccess
         private const string OrderByIndicatorIdAndNewness =
             "order by g.IndicatorId, g.DataPointYear desc, g.DataPointQuarter desc, g.DataPointMonth desc";
 
+        private const string GetCoreDataQueryStringInequalities =
+            "from CoreDataSet d where d.IndicatorId = :indicatorId" + TimePeriodClause +
+            " and d.AreaCode {0}";
+
         /// <summary>
         /// For Mock object creation.
         /// </summary>
@@ -168,6 +176,11 @@ namespace PholioVisualisation.DataAccess
         {
         }
 
+        public void ClearSession()
+        {
+            CurrentSession.Clear();
+        }
+
         public IList<int> GetIndicatorIdsByGroupIdAndAreaTypeId(int groupId, int areaTypeId)
         {
             IQuery q = CurrentSession.CreateQuery(
@@ -178,7 +191,7 @@ namespace PholioVisualisation.DataAccess
             return (from g in groupings select g.IndicatorId).Distinct().ToList();
         }
 
-        public virtual IList<GroupingMetadata> GetGroupMetadataList(IList<int> groupIds)
+        public virtual IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds)
         {
             // Guard clause to avoid case where query will fail to execute
             if (groupIds.Any() == false)
@@ -296,12 +309,23 @@ namespace PholioVisualisation.DataAccess
                 .List<Grouping>();
         }
 
-        public virtual IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, IList<int> indicatorIds)
+        public virtual IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, 
+            IList<int> indicatorIds)
         {
-            return CurrentSession.CreateCriteria<Grouping>()
-                .Add(Restrictions.In("GroupId", groupIds.ToArray()))
-                .Add(Restrictions.In(PropertyIndicatorId, indicatorIds.ToArray()))
-                .List<Grouping>();
+            List<Grouping> allGroupings = new List<Grouping>();
+
+            // Query the database a little at a time, for large numbers of items the query will fail otherwise
+            var splitter = new LongListSplitter<int>(indicatorIds);
+            while (splitter.AnyLeft())
+            {
+                var nextData = CurrentSession.CreateCriteria<Grouping>()
+                    .Add(Restrictions.In("GroupId", groupIds.ToArray()))
+                    .Add(Restrictions.In(PropertyIndicatorId, splitter.NextCodes().ToArray()))
+                    .List<Grouping>();
+                allGroupings.AddRange(nextData);
+            }
+
+            return allGroupings;
         }
 
         /// <summary>
@@ -435,7 +459,7 @@ namespace PholioVisualisation.DataAccess
             var allData = new List<CoreDataSet>();
 
             // Query the database 1000 areas at a time, for large numbers of areas the query will fail otherwise
-            var splitter = new AreaCodeListSplitter(areaCodes);
+            var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
                 var nextData = GetCoreDataForAreaCodes(grouping, period, splitter.NextCodes());
@@ -443,7 +467,7 @@ namespace PholioVisualisation.DataAccess
             }
             return allData;
         }
-
+        //
         private IEnumerable<CoreDataSet> GetCoreDataForAreaCodes(Grouping grouping, TimePeriod period, IEnumerable<string> areaCodes)
         {
             IQuery q = CurrentSession.CreateQuery(string.Format(GetCoreDataQueryString, "in (:areaCodes)"));
@@ -474,8 +498,8 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<CoreDataSet>();
         }
 
-        public virtual IList<CoreDataSet> GetCoreDataForCategoryTypeId(Grouping grouping,
-            TimePeriod timePeriod, int categoryTypeId)
+        public virtual IList<CoreDataSet> GetCoreDataForCategoryTypeIds(Grouping grouping,
+            TimePeriod timePeriod, params int[] categoryTypeIds)
         {
             return CurrentSession.CreateCriteria<CoreDataSet>()
                 .Add(Restrictions.Eq("IndicatorId", grouping.IndicatorId))
@@ -485,7 +509,8 @@ namespace PholioVisualisation.DataAccess
                 .Add(Restrictions.Eq("Month", timePeriod.Month))
                 .Add(Restrictions.Eq("SexId", grouping.SexId))
                 .Add(Restrictions.Eq("AgeId", grouping.AgeId))
-                .Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
+                .Add(Restrictions.In("CategoryTypeId", categoryTypeIds))
+                .AddOrder(new Order("CategoryTypeId", true))
                 .AddOrder(new Order("AreaCode", true))
                 .AddOrder(new Order("CategoryId", true))
                 .List<CoreDataSet>();
@@ -833,6 +858,54 @@ namespace PholioVisualisation.DataAccess
         public IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties()
         {
             return CurrentSession.CreateQuery("from IndicatorMetadataTextProperty").List<IndicatorMetadataTextProperty>();
+        }
+
+        //Inequalities: Category Type and Category are NOT -1 and standard: -1
+        public virtual IList<CoreDataSet> GetDataIncludingInequalities(Grouping grouping, TimePeriod period,
+            IList<int> excludedCategoryTypeIds, params string[] areaCodes)
+        {
+            if (areaCodes.Length == 0)
+            {
+                return new List<CoreDataSet>();
+            }
+
+            var allData = new List<CoreDataSet>();
+
+            // Query the database a reduced number of areas at a time, for large numbers of areas the query will fail otherwise
+            //Inequalities: Category Type and Category are NOT -1 and standard: -1
+            var splitter = new LongListSplitter<string>(areaCodes);
+            while (splitter.AnyLeft())
+            {
+                var nextData = GetCoreDataForAreaCodesInequalities(grouping, period, excludedCategoryTypeIds, splitter.NextCodes());
+                allData.AddRange(nextData);
+            }
+            return allData;
+        }
+
+        private IEnumerable<CoreDataSet> GetCoreDataForAreaCodesInequalities(Grouping grouping, TimePeriod period,
+            IList<int> excludedCategoryTypeIds, IEnumerable<string> areaCodes)
+        {
+            StringBuilder sb = new StringBuilder("in (:areaCodes)");
+            if (excludedCategoryTypeIds.Any())
+            {
+                sb.Append(" and d.CategoryTypeId not in (:excludedCategoryTypeIds)");
+            }
+            sb.Append(" order by d.SexId, d.AgeId, d.AreaCode, d.CategoryTypeId, d.CategoryId");
+
+            IQuery q = CurrentSession.CreateQuery(string.Format(GetCoreDataQueryStringInequalities, sb));
+
+            q.SetParameterList("areaCodes", areaCodes);
+            if (excludedCategoryTypeIds.Any())
+            {
+                q.SetParameterList("excludedCategoryTypeIds", excludedCategoryTypeIds);
+            }
+
+            SetTimePeriodParameters(q, period);
+
+            q.SetParameter("indicatorId", grouping.IndicatorId);
+
+            var nextData = q.List<CoreDataSet>();
+            return nextData;
         }
 
     }

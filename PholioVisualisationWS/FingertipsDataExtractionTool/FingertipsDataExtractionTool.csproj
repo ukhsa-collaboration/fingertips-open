@@ -73,12 +73,12 @@
     <Compile Include="AverageCalculator\BulkCoreDataSetAverageCalculator.cs" />
     <Compile Include="AverageCalculator\CalculatorGroupingListProvider.cs" />
     <Compile Include="AverageCalculator\ParentAreaProvider.cs" />
-    <Compile Include="ExcelFileDeleter.cs" />
-    <Compile Include="ExcelFileGenerator.cs" />
-    <Compile Include="ExcelFileTimer.cs" />
+    <Compile Include="FileDeleter.cs" />
+    <Compile Include="DataFileGenerator.cs" />
+    <Compile Include="FileTimer.cs" />
     <Compile Include="FdetConfiguration.cs" />
     <Compile Include="FingertipsDataExtractionToolDIRegistry.cs" />
-    <Compile Include="PracticeProfilesExcelFileGenerator.cs" />
+    <Compile Include="PracticePopulationFileGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -96,6 +96,10 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
       <Project>{93fcce58-31af-467d-adc2-3067bea82e7d}</Project>
       <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288f7-5950-49db-8642-63587cb8146e}</Project>

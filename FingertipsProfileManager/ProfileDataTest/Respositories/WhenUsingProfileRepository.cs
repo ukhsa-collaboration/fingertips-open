@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Fpm.MainUI.Helpers;
 using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 using Fpm.ProfileData.Repositories;
@@ -15,6 +14,9 @@ namespace Fpm.ProfileDataTest.Respositories
     public class WhenUsingProfileRepository
     {
         private ProfileRepository _profileRepository;
+
+        /*a profile we can change which won't interfere with tests in other solutions*/
+        private const string ProfileUrlKey = UrlKeys.SevereMentalIllness;
 
         [TestInitialize]
         public void Init()
@@ -74,10 +76,7 @@ namespace Fpm.ProfileDataTest.Respositories
         {
             var reader = ReaderFactory.GetProfilesReader();
 
-            var details = reader.GetProfileDetails(
-                UrlKeys.SevereMentalIllness
-                /*a profile we can change which won't interfere with tests in other solutions*/
-                );
+            var details = reader.GetProfileDetails(ProfileUrlKey);
 
             string name = GuidSortedLast();
             details.Name = name;
@@ -125,7 +124,7 @@ namespace Fpm.ProfileDataTest.Respositories
             reader.ClearCache();
 
             // Check changes have been persisted
-            details = reader.GetProfileDetails(UrlKeys.SevereMentalIllness);
+            details = reader.GetProfileDetails(ProfileUrlKey);
             Assert.AreEqual(name, details.Name);
             Assert.AreEqual(isLive, details.IsLive);
             Assert.AreEqual(arePdfs, details.ArePdfs);
@@ -145,7 +144,7 @@ namespace Fpm.ProfileDataTest.Respositories
         public void TestUpdateProfile_ExtraFilesAreUpdated()
         {
             var reader = ReaderFactory.GetProfilesReader();
-            var details = reader.GetProfileDetails(UrlKeys.HealthProfiles);
+            var details = reader.GetProfileDetails(ProfileUrlKey);
 
             string extraCssFiles = Guid.NewGuid().ToString();
             details.ExtraCssFiles = extraCssFiles;
@@ -157,7 +156,7 @@ namespace Fpm.ProfileDataTest.Respositories
             reader.ClearCache();
 
             // Check changes have been persisted
-            details = reader.GetProfileDetails(UrlKeys.HealthProfiles);
+            details = reader.GetProfileDetails(ProfileUrlKey);
             Assert.AreEqual(extraJsFiles, details.ExtraJsFiles);
             Assert.AreEqual(extraCssFiles, details.ExtraCssFiles);
         }
@@ -166,7 +165,7 @@ namespace Fpm.ProfileDataTest.Respositories
         public void TestUpdateProfile_ExtraFilesCanBeUpdatedWithNulls()
         {
             var reader = ReaderFactory.GetProfilesReader();
-            var details = reader.GetProfileDetails(UrlKeys.HealthProfiles);
+            var details = reader.GetProfileDetails(ProfileUrlKey);
 
             details.ExtraCssFiles = null;
             details.ExtraJsFiles = null;
@@ -175,7 +174,7 @@ namespace Fpm.ProfileDataTest.Respositories
             reader.ClearCache();
 
             // Check changes have been persisted
-            details = reader.GetProfileDetails(UrlKeys.HealthProfiles);
+            details = reader.GetProfileDetails(ProfileUrlKey);
             Assert.IsNull(details.ExtraJsFiles);
             Assert.IsNull(details.ExtraCssFiles);
         }
@@ -310,7 +309,6 @@ namespace Fpm.ProfileDataTest.Respositories
 
             _profileRepository.OpenSession();
 
-
             var result = _profileRepository.UpdateProfileCollection(profileCollectionid, assignedProfilesToUpdate,
                 collectionNameToUpdate, collectionSkinTitleToUpdate);
 
@@ -325,22 +323,26 @@ namespace Fpm.ProfileDataTest.Respositories
             var reader = ReaderFactory.GetProfilesReader();
 
             const int indicatorId = IndicatorIds.ChildrenInPoverty;
-            const int newOwnerProfileId = ProfileIds.Diabetes;
+            var ownerProfileId = reader.GetIndicatorMetadata(indicatorId).OwnerProfileId;
 
-            var currentOwnerProfile = reader.GetIndicatorMetadata(indicatorId).OwnerProfileId;
+            // Select a different profile ID to change to
+            var newOwnerProfileId = reader.GetProfiles().Select(x => x.Id)
+                .First(x => x != ownerProfileId);
+
             var indicatorMetadataTextProperties = reader.GetIndicatorMetadataTextProperties();
-
-            var newOwnerIMDTVs = reader.GetOverriddenIndicatorTextValuesForSpecificProfileId(indicatorId, indicatorMetadataTextProperties, newOwnerProfileId);
+            var newOwnerIMDTVs = reader.GetOverriddenIndicatorTextValuesForSpecificProfileId(
+                indicatorId, indicatorMetadataTextProperties, newOwnerProfileId);
 
             // Get IndicatorMetadataTextValues where indicatorId = Null (currentOwner)
-            var currentOwnerIMDTVs = reader.GetIndicatorTextValues(indicatorId, indicatorMetadataTextProperties, currentOwnerProfile);
+            var currentOwnerIMDTVs = reader.GetIndicatorTextValues(indicatorId, 
+                indicatorMetadataTextProperties, ownerProfileId);
 
-            // Act
+            // Act: Change owner
             _profileRepository.ChangeOwner(indicatorId, newOwnerProfileId, 
                 newOwnerIMDTVs, currentOwnerIMDTVs);
 
-            // Assert
-            var indicatorMetadataChanged = reader.GetIndicatorMetadata(indicatorId);
+            // Assert: Check owner has been changed (must use new reader to avoid getting stale object)
+            var indicatorMetadataChanged = ReaderFactory.GetProfilesReader().GetIndicatorMetadata(indicatorId);
             Assert.AreEqual(newOwnerProfileId, indicatorMetadataChanged.OwnerProfileId);
         }
 
@@ -355,7 +357,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void LogPropertyChange_Creates_Logs()
         {
-            var result = _profileRepository.LogPropertyChange(10, "Test", 10, 10, "Test user", DateTime.Now);
+            var result = _profileRepository.LogIndicatorMetadataTextPropertyChange(10, "Test", 10, 10, "Test user", DateTime.Now);
 
             Assert.IsTrue(result == true);
         }

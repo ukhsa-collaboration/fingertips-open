@@ -107,6 +107,15 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
+        public void TestGetChildAreasWithAddressesAsCsv()
+        {
+            byte[] data = GetData("area_addresses/csv/by_parent_area_code?" +
+                "parent_area_code=" + AreaCodes.Ccg_AireDaleWharfdaleAndCraven +
+                "&area_type_id=" + AreaTypeIds.GpPractice);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetParentAreaOfSpecificTypeForChildAreas()
         {
             byte[] data = GetData("parent_area_of_specific_type_for_child_areas?" +

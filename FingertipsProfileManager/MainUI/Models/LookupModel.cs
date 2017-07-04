@@ -13,6 +13,7 @@ namespace Fpm.MainUI.Models
         public IList<Sex> Sexes { get; set; }
         public IList<Age> Ages { get; set; }
         public IList<ValueNote> ValueNotes { get; set; }
+        public IList<AreaType> AreaTypes { get; set; }
         public IList<CategoryType> CategoryTypes { get; set; }
         public int CategoryTypeId { get; set; }
         public IList<Category> Categories { get; set; }

@@ -25,6 +25,7 @@
 
     public class AreaCodes
     {
+        public const string England = "E92000001";
         public const string CountyUa_Cambridgeshire = "E10000003";
         public const string CountyUa_Bedfordshire = "09";
         public const string CountyUa_CityOfLondon = "E09000001";
@@ -121,6 +122,12 @@
     public class DatabaseLogIds
     {
         public const int FusCheckedJobs = 2;
+    }
+
+    public class DisclosureControlIds
+    {
+        public const int NoCheckRequired = -1;
+        public const int GreaterThan0LessThanOrEqualto5 = 1;
     }
 
 }

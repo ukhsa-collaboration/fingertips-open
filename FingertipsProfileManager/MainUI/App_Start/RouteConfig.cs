@@ -19,8 +19,6 @@ namespace Fpm.MainUI
 
             routes.MapRoute("NotFound", "{*url}",
                 new { controller = "Error", action = "Http404" });
-
-            
         }
     }
 }

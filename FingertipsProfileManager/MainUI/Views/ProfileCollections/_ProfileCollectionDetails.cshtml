@@ -1,0 +1,13 @@
+﻿@model Fpm.ProfileData.Entities.Profile.ProfileCollection
+
+<div class="row col-md-12">
+    <label class="content-item-detail-label">Collection Name:</label>
+    @Html.TextBoxFor(model => model.CollectionName, new { @class = "unselected-domain" })
+    <span class="field-validation-valid" data-valmsg-for="CollectionName" data-valmsg-replace="true"></span>
+</div>
+
+<div class="row col-md-12">
+    <label class="content-item-detail-label">Collection Title:</label>
+    @Html.TextBoxFor(model => model.CollectionSkinTitle, new { @class = "unselected-domain" })
+    <span class="field-validation-valid" data-valmsg-for="CollectionSkinTitle" data-valmsg-replace="true"></span>
+</div>

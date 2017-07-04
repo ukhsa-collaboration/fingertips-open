@@ -38,6 +38,10 @@ A {
     font-weight: bold;
 }
 
+ul.bullet-list {
+    margin-left: 20px;
+}
+
 #show-empty, #generic-metadata {
     margin-top: 4px;
     color: #999 !important;
@@ -324,7 +328,7 @@ TEXTAREA {
 }
 
 .wide-profile-textbox {
-    width: 900px;
+    width: 700px;
 }
 
 .disabled {
@@ -448,8 +452,8 @@ TEXTAREA {
 }
 
 input[type=checkbox] {
-    height: 14px;
-    width: 14px;
+    height: 17px;
+    width: 17px;
 }
 
 /* Styles for validation helpers
@@ -597,11 +601,6 @@ select, .indicator, .year-Range {
 
 .dropdown-selected {
     border-color: #003399;
-}
-
-/* Create Indicator Classes */
-.create-indicator-dropdown, .save-as-indicator-dropdown {
-    width: 400px;
 }
 
 .small-age-dropdown {
@@ -1811,43 +1810,21 @@ img.spinner {
     clear: both;
 }
 
+label.btn-file {
+    margin: 20px 0;
+    padding-right: 6px!important;
+    width: 150px;
+}
+
 #upload-container p {
     margin: 0;
     padding: 10px 0;
 }
 
-#upload-container .upload-batch, .upload-simple {
-    width: 45%;
-    text-align: left;
-    float: left;
-    padding-right: 30px;
-}
-
-.upload-simple, .upload-batch {
-    padding: 30px;
-    border: 2px solid #ffffff;
-    margin-bottom: 10px;
-}
-
-    .upload-simple.unselected, .upload-batch.unselected {
-        opacity: 0.40; /*IE9, etc*/
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)"; /*IE8*/
-        filter: alpha(opacity=40); /*IE6-7*/
-    }
-
-    .upload-simple.selected, .upload-batch.selected, .upload-simple:hover, .upload-batch:hover {
-        padding: 30px;
-        background: #ddd;
-        margin-bottom: 10px;
-    }
-
 .browse-control, .upload-browse {
     padding: 5px;
 }
 
-#select-simple-spreadsheet, #select-batch-spreadsheet {
-    margin-left: 10px;
-}
 
 #upload-container img {
     margin-bottom: 10px;
@@ -1856,7 +1833,7 @@ img.spinner {
     cursor: pointer;
 }
 
-#upload-iframe{
+#upload-iframe {
     display: none;
 }
 
@@ -1903,10 +1880,10 @@ img.spinner {
 }
 
 
-#progress-menu .awaiting-confirmation-bg a {
-    text-decoration: underline;
-    cursor: pointer;
-}
+    #progress-menu .awaiting-confirmation-bg a {
+        text-decoration: underline;
+        cursor: pointer;
+    }
 
 .cursor-pointer {
     cursor: pointer;
@@ -1925,19 +1902,20 @@ img.spinner {
 
 .allowed-filetypes {
     display: table;
-    height:40px;
+    height: 40px;
     background: #f2dede;
     color: #a94442;
     text-align: center;
     padding-top: 10px;
 }
+
 .modal-table-height-400 {
     height: 400px;
     overflow: auto;
 }
 
 .modal-large {
-    width: 80%;  
+    width: 80%;
 }
 
 .mce-tinymce {
@@ -2149,12 +2127,7 @@ LI.site-link {
         background: transparent;
     }
 
-.footer_links {
-    float: left;
-    padding-right: 40px;
-}
-
-    .footer_links h3 {
+    #footer h3 {
         border-bottom: 1px solid #a1acb2;
         font-size: 2.4em;
         font-weight: normal;
@@ -2162,27 +2135,19 @@ LI.site-link {
         padding: 0 0 25px;
     }
 
-    .footer_links ul {
-        float: left;
+    #footer ul {
         font-size: 1.2em;
         list-style: none;
         margin: 0;
         padding: 26px 0 3px;
-        width: 264px;
     }
 
-        .footer_links ul.col1 {
-            padding-right: 67px;
-        }
-
-        .footer_links ul li {
+        #footer ul li {
             padding: 0 0 23px;
         }
 
 #email-fpm-admin {
     margin-top: 18px;
-    display: block;
-    float: right;
 }
 
 /*----------------------------------------
@@ -2222,17 +2187,9 @@ LI.site-link {
 /*----------------------------------------
     Lookup tables
 ------------------------------------------*/
-.sidebar {
-    float: left;
-    width: 15%;
-}
 
-    .sidebar ul {
-        list-style: none;
-    }
-
-    .sidebar li {
-        padding: 0 0 10px 0;
+    .link-options {
+        padding-top:10px;
     }
 
 #lookup-table {
@@ -2388,13 +2345,12 @@ LI.site-link {
 }
 
 #profile-area-types-container {
-    margin-left: 2px;
-    font-family: Arial;
     font-size: 11pt;
 }
 
 #profile-area-types {
     height: auto;
+    border-radius: 4px;
     overflow: auto;
     border: 2px solid #003399;
     width: 250px;
@@ -2402,6 +2358,7 @@ LI.site-link {
     padding-bottom: 2px;
     margin-bottom: 10px;
     background: #E5F0FF;
+    margin-left: 15px;
 }
 
     #profile-area-types input[type=checkbox] {
@@ -2497,17 +2454,18 @@ LI.site-link {
 ------------------------------------------*/
 
 .nopadding {
-   padding: 0 !important;
-   margin: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .row.no-gutters {
-  margin-left: -6px !important;
+    margin-left: -6px !important;
 }
-.row.no-gutters > [class^="col-"],
-.row.no-gutters > [class*=" col-"] {
-  margin-left: 0 !important;
-}
+
+    .row.no-gutters > [class^="col-"],
+    .row.no-gutters > [class*=" col-"] {
+        margin-left: 0 !important;
+    }
 
 /*end*/
 
@@ -2597,6 +2555,21 @@ LI.site-link {
 }
 
 /*----------------------------------------
+    Profiles
+------------------------------------------*/
+#user-listing, #alert-success {
+    margin-top: 20px;
+}
+
+#tbl-profiles tr.live td{
+    background-color:#c0f5c0;
+}
+
+#tbl-profiles tr.not-live td{
+    background-color:#f9f9f9;
+}
+
+/*----------------------------------------
   Generic Bootstrap overrides
 ------------------------------------------*/
 .container label {
@@ -2612,5 +2585,3 @@ LI.site-link {
 .form-horizontal .checkbox-inline {
     margin-top: 10px;
 }
-
-

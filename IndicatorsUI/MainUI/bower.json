@@ -1,77 +1,78 @@
 {
-  "name": "mainui",
-  "homepage": "https://github.com/PublicHealthEngland/fingertips",
-  "authors": [
-    "Farrukh Ayub <farrukh.ayub@phe.gov.uk>"
-  ],
-  "description": "",
-  "main": "",
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "jquery-legacy": "jquery#1.10.2",
-    "modernizr": "#v2.6.2",
-    "js-cookie": "^2.1.2",
-    "hogan.js": "hogan#^3.0.2",
-    "google-maps-utility-library-v3-infobox": "^1.1.14",
-    "tablesorter": "*",
-    "underscore": "^1.8.3",
-    "jquery.floatThead": "floatThead#^1.4.2",
-    "highcharts": "highcharts.com#v4.1.10",
-    "html2canvas": "#0.5.0-alpha2",
-    "chosen": "^1.6.1",
-    "leaflet": "leaflet#0.7.3",
-    "esri-leaflet-v1.0.0-rc.2": "*",
-    "bootstrap": "bootstrap#v4.0.0-alpha.4"
-  },
-  "install": {
-    "path": "js/vendor",
-    "sources": {
-      "jquery-legacy": "bower_components/jquery-legacy/jquery.min.js",
-      "chosen": [
-        "bower_components/chosen/chosen.css",
-        "bower_components/chosen/chosen.jquery.js",
-        "bower_components/chosen/chosen-sprite.png",
-        "bower_components/chosen/chosen-sprite@2x.png"
-      ],
-      "google-maps-utility-library-v3-infobox": "bower_components/google-maps-utility-library-v3-infobox/dist/infobox.min.js",
-      "highcharts": [
-        "bower_components/highcharts/lib/highcharts.js",
-        "bower_components/highcharts/lib/highcharts-more.js",
-        "bower_components/highcharts/lib/modules/exporting.js"
-      ],
-      "hogan.js": {
-        "mapping": [
-          {
-            "bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js": "hogan.min.js"
-          }
-        ]
-      },
-      "html2canvas": [
-        "bower_components/html2canvas/dist/html2canvas.min.js",
-        "bower_components/html2canvas/dist/html2canvas.svg.min.js"
-      ],
-      "jquery.floatThead": "bower_components/jquery.floatThead/dist/jquery.floatThead.min.js",
-      "leaflet": [
-        "bower_components/leaflet/dist/leaflet.css",
-        "bower_components/leaflet/dist/leaflet.js"
-      ],
-      "bootstrap": {
-        "mapping":[            
-        {"bower_components/bootstrap/dist/css/bootstrap.min.css" : "../../../css/bootstrap/bootstrap.min.css" },
-        {"bower_components/bootstrap/dist/js/bootstrap.min.js": "bootstrap.min.js" }
-      ]},
-      "esri-leaflet-v1.0.0-rc.2": "bower_components/esri-leaflet-v1.0.0-rc.2/esri-leaflet.js",
-      "underscore": [
-        "bower_components/underscore/underscore-min.js"
-      ],
-      "modernizr": "bower_components/modernizr/modernizr.js"
+    "name": "mainui",
+    "homepage": "https://github.com/PublicHealthEngland/fingertips",
+    "authors": [
+        "Farrukh Ayub <farrukh.ayub@phe.gov.uk>"
+    ],
+    "description": "",
+    "main": "",
+    "license": "MIT",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "jquery": "#1.12.4",
+        "modernizr": "#v2.6.2",
+        "js-cookie": "^2.1.2",
+        "hogan.js": "hogan#^3.0.2",
+        "google-maps-utility-library-v3-infobox": "^1.1.14",
+        "tablesorter": "*",
+        "underscore": "^1.8.3",
+        "jquery.floatThead": "floatThead#^1.4.2",
+        "highcharts": "highcharts.com#^5.0.7",
+        "html2canvas": "#0.5.0-alpha2",
+        "chosen": "^1.6.1",
+        "leaflet": "leaflet#0.7.3",
+        "esri-leaflet-v1.0.0-rc.2": "*",
+        "bootstrap": "bootstrap#v4.0.0-alpha.6",
+		"tether": "^1.4.0"
+    },
+    "install": {
+        "path": "js/vendor",
+        "sources": {
+            "jquery": "bower_components/jquery/dist/jquery.min.js",
+            "chosen": [
+                "bower_components/chosen/chosen.css",
+                "bower_components/chosen/chosen.jquery.js",
+                "bower_components/chosen/chosen-sprite.png",
+                "bower_components/chosen/chosen-sprite@2x.png"
+            ],
+            "google-maps-utility-library-v3-infobox": "bower_components/google-maps-utility-library-v3-infobox/dist/infobox.min.js",
+            "highcharts": [
+                "bower_components/highcharts/lib/highcharts.js",
+                "bower_components/highcharts/lib/highcharts-more.js",
+                "bower_components/highcharts/lib/modules/exporting.js"
+            ],
+            "hogan.js": {
+                "mapping": [{
+                    "bower_components/hogan.js/web/builds/3.0.2/hogan-3.0.2.min.js": "hogan.min.js"
+                }]
+            },
+            "html2canvas": [
+                "bower_components/html2canvas/dist/html2canvas.min.js",
+                "bower_components/html2canvas/dist/html2canvas.svg.min.js"
+            ],
+            "jquery.floatThead": "bower_components/jquery.floatThead/dist/jquery.floatThead.min.js",
+            "leaflet": [
+                "bower_components/leaflet/dist/leaflet.css",
+                "bower_components/leaflet/dist/leaflet.js"
+            ],
+            "bootstrap": {
+                "mapping": [
+                    { "bower_components/bootstrap/dist/css/bootstrap.min.css": "../../../css/bootstrap/bootstrap.min.css" },
+                    { "bower_components/bootstrap/dist/js/bootstrap.min.js": "bootstrap.min.js" }
+                ]
+            },
+            "esri-leaflet-v1.0.0-rc.2": "bower_components/esri-leaflet-v1.0.0-rc.2/esri-leaflet.js",
+            "underscore": [
+                "bower_components/underscore/underscore-min.js"
+            ],
+            "modernizr": "bower_components/modernizr/modernizr.js",
+			"tether": "bower_components/tether/dist/js/tether.min.js"
+        }
     }
-  }
 }

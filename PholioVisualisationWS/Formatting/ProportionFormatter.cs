@@ -12,7 +12,7 @@ namespace PholioVisualisation.Formatting
 
         public override void Format(ValueData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedValue == false)
             {
                 data.ValueFormatted = formatMethod(data.Value);
             }
@@ -20,7 +20,7 @@ namespace PholioVisualisation.Formatting
 
         public override void FormatConfidenceIntervals(ValueWithCIsData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedCIs == false)
             {
                 data.UpperCIF = formatMethod(data.UpperCI);
                 data.LowerCIF = formatMethod(data.LowerCI);
@@ -37,8 +37,11 @@ namespace PholioVisualisation.Formatting
             {
                 Min = formatMethod(stats.Min),
                 Max = formatMethod(stats.Max),
+                Median = formatMethod(stats.Median),
+                Percentile5 = formatMethod(stats.Percentile5),
                 Percentile25 = formatMethod(stats.Percentile25),
-                Percentile75 = formatMethod(stats.Percentile75)
+                Percentile75 = formatMethod(stats.Percentile75),
+                Percentile95 = formatMethod(stats.Percentile95)
             };
         }
 

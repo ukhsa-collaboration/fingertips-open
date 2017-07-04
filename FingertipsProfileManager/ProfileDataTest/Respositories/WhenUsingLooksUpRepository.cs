@@ -35,15 +35,6 @@ namespace Fpm.ProfileDataTest.Respositories
             var skins = _lookUpsRepository.GetSkins();
             Assert.IsTrue(skins.Any());
         }
-
-        [TestMethod]
-        public void GetAreas_Returns_Result()
-        {
-            var result = _lookUpsRepository.GetAreaTypes();
-
-            Assert.IsTrue(result != null && result.Any());
-        }
-
       
         [TestMethod]
         public void GetSexes_Returns_Result()

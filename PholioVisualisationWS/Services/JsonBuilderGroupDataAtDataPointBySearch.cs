@@ -6,6 +6,7 @@ using System.Web;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 
@@ -53,7 +54,9 @@ namespace PholioVisualisation.Services
                 AreaTypeId = _parameters.AreaTypeId
             }.Build();
 
-            new GroupDataProcessor().Process(data);
+
+            var targetComparerProvider = new TargetComparerProvider(ReaderFactory.GetGroupDataReader(), ReaderFactory.GetAreasReader());
+            new GroupDataProcessor(targetComparerProvider).Process(data);
 
             if (data.IsDataOk)
             {

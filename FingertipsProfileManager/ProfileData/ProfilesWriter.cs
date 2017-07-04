@@ -28,6 +28,7 @@ namespace Fpm.ProfileData
             fromDatabase.UpperLimit = target.UpperLimit;
             fromDatabase.Description = target.Description;
             fromDatabase.PolarityId = target.PolarityId;
+            fromDatabase.LegendHtml = target.LegendHtml;
 
             UpdateObject(fromDatabase);
         }
@@ -116,7 +117,8 @@ namespace Fpm.ProfileData
                 Description = target.Description,
                 LowerLimit = target.LowerLimit,
                 UpperLimit = target.UpperLimit,
-                PolarityId = target.PolarityId
+                PolarityId = target.PolarityId,
+                LegendHtml = target.LegendHtml
             };
 
             var id = SaveNewObject(newTarget);
@@ -131,7 +133,7 @@ namespace Fpm.ProfileData
                 Content = content,
                 ContentKey = contentKey,
                 Description = description,
-                PlainTextContent = isPlainTextContent
+                IsPlainText = isPlainTextContent
             };
 
             var id = SaveNewObject(contentItem);
@@ -152,7 +154,7 @@ namespace Fpm.ProfileData
             fromDatabase.Content = contentItem.Content;
             fromDatabase.ContentKey = contentItem.ContentKey;
             fromDatabase.Description = contentItem.Description;
-            fromDatabase.PlainTextContent = contentItem.PlainTextContent;
+            fromDatabase.IsPlainText = contentItem.IsPlainText;
 
             UpdateObject(fromDatabase);
         }

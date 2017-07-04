@@ -3,9 +3,12 @@
 @using Profiles.MainUI.Models
 @model PageModel
 
-@if (Model.ShowAreaSearchOnProfileFrontPage)
+@if (Model.FrontPageAreaSearchAreaTypes != null)
 {
-    @* Area search title *@
+        var areaTypeLabel = Model.FrontPageAreaSearchAreaTypes.Contains(AreaTypeIds.CCG.ToString())
+            ? "CCG" : "local authority";
+
+@* Area search title *@
 if (Model.ProfileId == ProfileIds.HealthProfiles)
 {
     <h2>
@@ -23,7 +26,7 @@ else
 
 
     <table id="area-search" class="table margin-left" style="display:none;">
-        <tr><td>Search by postcode, town or local authority</td></tr>
+        <tr><td>Search by postcode, town or @areaTypeLabel</td></tr>
         <tr><td>
                 <input id="area-search-text" type="text" name="search_text" />
             </td></tr>
@@ -40,6 +43,7 @@ else
         FT.model.profileId = @Model.ProfileId;
         templateProfileId = -1;
         FT.version = '@ViewBag.JavaScriptVersion';
+        FT.config.frontPageAreaSearchAreaTypes = [@Model.FrontPageAreaSearchAreaTypes];
 
         // Initialisation
         $(document).ready(function() {

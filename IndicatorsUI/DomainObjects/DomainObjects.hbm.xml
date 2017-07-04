@@ -31,10 +31,12 @@
     <property name="AccessControlGroup" column="access_control_group"/>
     <property name="IsOfficialStatistics" column="is_official_statistics"/>
     <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
-    <property name="ShowAreaSearchOnProfileFrontPage" column="show_area_search_on_profile_front_page"/>
+    <property name="FrontPageAreaSearchAreaTypes" column="front_page_area_search_area_types"/>
     <property name="HasAnyData" column="has_any_data"/>
     <property name="HasStaticReports" column="has_static_reports"/>
-    <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
+    <property name="StaticReportsFolders" column="static_reports_folders"/>
+    <property name="StaticReportsLabel" column="static_reports_label"/>
+    <property name="IsChangeFromPreviousPeriodShown" column="is_change_from_previous_period_shown"/>
 
     <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
     <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/> 
@@ -180,7 +182,7 @@
     <property name ="SelectedText"      column="selectedtext" />
     <property name ="ExtraLink"      column="extralink" />
   </class>
-  
+    
 </hibernate-mapping>
 
 

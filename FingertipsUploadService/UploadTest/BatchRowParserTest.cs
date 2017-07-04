@@ -8,52 +8,52 @@ namespace FingertipsUploadService.UploadTest
     [TestClass]
     public class UploadBatchRowParserTest
     {
-        private int indicatorId = 1;
-        private int year = 2;
-        private int yearRange = 3;
-        private int quarter = 4;
-        private int month = 5;
-        private int ageId = 6;
-        private int sexId = 7;
-        private string areaCode = "a";
-        private double count = 1.1;
-        private double value = 1.2;
-        private double lowerCI = 1.4;
-        private double upperCI = 1.5;
-        private double denominator = 1.6;
-        private double denominator2 = 1.6;
-        private int valueNoteId = 300;
-        private int categoryTypeId = 1;
-        private int categoryId = 1;
+        private const int IndicatorId = 1;
+        private const int Year = 2;
+        private const int YearRange = 3;
+        private const int Quarter = 4;
+        private const int Month = 5;
+        private const int AgeId = 6;
+        private const int SexId = 7;
+        private const string AreaCode = "a";
+        private const double Count = 1.1;
+        private const double Value = 1.2;
+        private const double LowerCI = 1.4;
+        private const double UpperCI = 1.5;
+        private const double Denominator = 1.6;
+        private const double Denominator2 = 1.6;
+        private const int ValueNoteId = 300;
+        private const int CategoryTypeId = 1;
+        private const int CategoryId = 1;
 
         [TestMethod]
         public void TestGetUploadDataModel()
         {
-            var model = new BatchRowParser(DataRow()).GetUploadDataModel();
-            Assert.AreEqual(indicatorId, model.IndicatorId);
-            Assert.AreEqual(year, model.Year);
-            Assert.AreEqual(yearRange, model.YearRange);
-            Assert.AreEqual(quarter, model.Quarter);
-            Assert.AreEqual(month, model.Month);
-            Assert.AreEqual(ageId, model.AgeId);
-            Assert.AreEqual(sexId, model.SexId);
-            Assert.AreEqual(areaCode, model.AreaCode);
-            Assert.AreEqual(count, model.Count);
-            Assert.AreEqual(value, model.Value);
-            Assert.AreEqual(lowerCI, model.LowerCi);
-            Assert.AreEqual(upperCI, model.UpperCi);
-            Assert.AreEqual(denominator, model.Denominator);
-            Assert.AreEqual(denominator2, model.Denominator_2);
-            Assert.AreEqual(valueNoteId, model.ValueNoteId);
-            Assert.AreEqual(categoryTypeId, model.CategoryTypeId);
-            Assert.AreEqual(categoryId, model.CategoryId);
+            var model = new BatchRowParser(GetTestDataRow()).GetUploadDataModel();
+            Assert.AreEqual(IndicatorId, model.IndicatorId);
+            Assert.AreEqual(Year, model.Year);
+            Assert.AreEqual(YearRange, model.YearRange);
+            Assert.AreEqual(Quarter, model.Quarter);
+            Assert.AreEqual(Month, model.Month);
+            Assert.AreEqual(AgeId, model.AgeId);
+            Assert.AreEqual(SexId, model.SexId);
+            Assert.AreEqual(AreaCode, model.AreaCode);
+            Assert.AreEqual(Count, model.Count);
+            Assert.AreEqual(Value, model.Value);
+            Assert.AreEqual(LowerCI, model.LowerCi);
+            Assert.AreEqual(UpperCI, model.UpperCi);
+            Assert.AreEqual(Denominator, model.Denominator);
+            Assert.AreEqual(Denominator2, model.Denominator_2);
+            Assert.AreEqual(ValueNoteId, model.ValueNoteId);
+            Assert.AreEqual(CategoryTypeId, model.CategoryTypeId);
+            Assert.AreEqual(CategoryId, model.CategoryId);
         }
 
-        private DataRow DataRow()
+        public static DataRow GetTestDataRow()
         {
             var table = new UploadDataSchema().CreateEmptyTable();
-            table.Rows.Add(indicatorId, year, yearRange, quarter, month, ageId, sexId, areaCode, count, value,
-                           lowerCI, upperCI, denominator, denominator2, valueNoteId, categoryTypeId, categoryId);
+            table.Rows.Add(IndicatorId, Year, YearRange, Quarter, Month, AgeId, SexId, AreaCode, Count, Value,
+                           LowerCI, UpperCI, Denominator, Denominator2, ValueNoteId, CategoryTypeId, CategoryId);
 
             var row = table.Rows[0];
             return row;

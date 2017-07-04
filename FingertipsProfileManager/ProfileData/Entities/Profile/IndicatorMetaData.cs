@@ -21,5 +21,6 @@ namespace Fpm.ProfileData.Entities.Profile
         public int? DecimalPlacesDisplayed { get; set; }
         public int? TargetId { get; set; }
         public DateTime DateEntered { get; set; }
+        public int DisclosureControlId { get; set; }
     }
 }

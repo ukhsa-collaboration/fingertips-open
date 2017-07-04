@@ -8,7 +8,10 @@ namespace Fpm.ProfileData.Entities.Logging
         
         public int IndicatorId { get; set; }
 
-        public int GroupId { get; set; }
+        /// <summary>
+        /// Should be profile ID
+        /// </summary>
+        public int? GroupId { get; set; }
 
         public int PropertyId { get; set; }
 

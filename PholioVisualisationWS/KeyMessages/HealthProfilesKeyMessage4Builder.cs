@@ -173,8 +173,6 @@ namespace PholioVisualisation.KeyMessages
                 data.AdultStatutoryHomelessnessSig,
                 data.AdultViolentCrimeSig,
                 data.AdultLongTermUnemploymentSig,
-                data.AdultIncidenceOfMalignantMelanomaSig,
-                data.AdultDrugMisuseSig,
                 data.AdultExcessWinterDeathsSig,
                 data.AdultUnder75MortalityRateCvdSig,
                 data.AdultUnder75MortalityRateCancerSig
@@ -182,7 +180,7 @@ namespace PholioVisualisation.KeyMessages
 
             var significanceCounter = new SignificanceCounter(sigList);
 
-            if ((!(significanceCounter.ProportionGreen >= 0.5)) && (!(significanceCounter.ProportionAmber >= 0.5)))
+            if (significanceCounter.ProportionGreen < 0.5 && significanceCounter.ProportionAmber < 0.5)
             {
                 return string.Empty;
             }
@@ -195,10 +193,6 @@ namespace PholioVisualisation.KeyMessages
                 qualifiedItems.Add("violent crime");
             if (data.AdultLongTermUnemploymentSig == sig)
                 qualifiedItems.Add("long term unemployment");
-            if (data.AdultIncidenceOfMalignantMelanomaSig == sig)
-                qualifiedItems.Add("new cases of malignant melanoma");
-            if (data.AdultDrugMisuseSig == sig)
-                qualifiedItems.Add("deaths from drug misuse");
             if (data.AdultExcessWinterDeathsSig == sig)
                 qualifiedItems.Add("excess winter deaths");
             if (data.AdultUnder75MortalityRateCvdSig == sig)

@@ -10,34 +10,39 @@ function goToTartanRugPage() {
     // FT.ajaxLock test cannot go here 
     setPageMode(PAGE_MODES.TARTAN);
 
-    ui.storeScrollTop();
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
+    } else {
 
-    // Init view manager
-    var ns = tartanRug;
-    if (!ns.viewManager) {
-        // Init view
-        ns.viewManager = new ns.ViewManager(FT.config);
-        ns.viewManager.init();
+        ui.storeScrollTop();
+
+        // Init view manager
+        var ns = tartanRug;
+        if (!ns.viewManager) {
+            // Init view
+            ns.viewManager = new ns.ViewManager(FT.config);
+            ns.viewManager.init();
+        }
+
+        setTartanRugHtml(false);
+
+        showAndHidePageElements();
+
+        showDataQualityLegend();
+
+        showTargetBenchmarkOption(groupRoots);
+
+        ui.setScrollTop();
+
+        // Enable floating table header for area names
+        // **** Please note - 15/04/2016 - The jquery.floatThead.js file has been manualy modified to ensure
+        // the sticky-heading functionality works for IE - See comments in this file and FIN-748
+        if (!isIE8() && !isIE9()) {
+            $('#left-tartan-table,#rightTartanTable').floatThead({ position: 'absolute' });
+        }
+
+        unlock();
     }
-
-    setTartanRugHtml(false);
-
-    showAndHidePageElements();
-
-    showDataQualityLegend();
-
-    showTargetBenchmarkOption(groupRoots);
-
-    ui.setScrollTop();
-
-    // Enable floating table header for area names
-    // **** Please note - 15/04/2016 - The jquery.floatThead.js file has been manualy modified to ensure
-    // the sticky-heading functionality works for IE - See comments in this file and FIN-748
-    if (!isIE8() && !isIE9()) {
-        $('#leftTartanTable,#rightTartanTable').floatThead({ position: 'absolute' });
-    }
-
-    unlock();
 };
 
 /**
@@ -166,7 +171,7 @@ function TartanRugCellBuilder(coreDataSet, columnNumber, rowNumber, comparisonCo
             this.addTrendWithText(html, groupRoots[rowNumber], trendAreaCode);
         }
     } else {
-        html.push('<div class="tartanBox">', this.getTartanImage(useRag));
+        html.push('<div class="tartan-box">', this.getTartanImage(useRag));
         this.addText(html);
         html.push('</div>');
     }
@@ -188,25 +193,25 @@ TartanRugCellBuilder.prototype = {
 
         return img === null ?
             '' :
-            '<img class="tartanFill printOnly" src="' + FT.url.img + img + '"/>';
+            '<img class="tartan-fill print-only" src="' + FT.url.img + img + '"/>';
     },
 
     addText: function (html) {
-        html.push('<div class="tartanText">',
+        html.push('<div class="tartan-text">',
             new ValueDisplayer().byDataInfo(this.dataInfo, { noCommas: 'y' }),
             '</div>');
     },
 
     addTrend: function (html, root, areaCode) {
         var trendMarker = this._getTrendMarker(root, areaCode);
-        html.push('<div class="tartanTrend">',
+        html.push('<div class="tartan-trend">',
             trendMarker,
             '</div>');
     },
 
     addTrendWithText: function (html, root, areaCode) {
         var trendMarker = this._getTrendMarker(root, areaCode);
-        html.push('<div class="tartanValueAndTrend">',
+        html.push('<div class="tartan-value-and-trend">',
             trendMarker,
             '<br/>',
             new ValueDisplayer().byDataInfo(this.dataInfo, { noCommas: 'y' }),
@@ -258,109 +263,104 @@ function setTartanRugHtml(isDownloadable) {
     tartanRugState.rug = rug;
     rug.init();
 
-    if (!groupRoots.length) {
-        html = '<div class="tallCentralMessage">No indicators for current area type</div>';
+    tooltipManager.setTooltipProvider(
+        new TartanRugTooltipProvider());
+
+    // National benchmark
+    var isNationalDisplayed = enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY;
+    if (isNationalDisplayed) {
+        var nationalArea = getNationalComparator();
+        rug.addBenchmarkName(nationalArea.Name);
     }
-    else {
-        tooltipManager.setTooltipProvider(
-            new TartanRugTooltipProvider());
 
-        // National benchmark
-        var isNationalDisplayed = enumParentDisplay != PARENT_DISPLAY.REGIONAL_ONLY;
-        if (isNationalDisplayed) {
-            var nationalArea = getNationalComparator();
-            rug.addBenchmarkName(nationalArea.Name);
-        }
+    // Subnational benchmark
+    if (isRegionalDisplayed) {
+        var regionalArea = getParentArea();
+        rug.addBenchmarkName(trimName(regionalArea.Name, TARTAN_RUG_MAX_CHARS));
+    }
 
-        // Subnational benchmark
-        if (isRegionalDisplayed) {
-            var regionalArea = getParentArea();
-            rug.addBenchmarkName(trimName(regionalArea.Name, TARTAN_RUG_MAX_CHARS));
-        }
+    // Areas
+    for (var i in sortedAreas) {
+        rug.addArea(sortedAreas[i]);
+    }
 
-        // Areas
-        for (var i in sortedAreas) {
-            rug.addArea(sortedAreas[i]);
-        }
+    var indicatorMetadataHash = ui.getMetadataHash();
+    var useQuintileColouring = false;
 
-        var indicatorMetadataHash = ui.getMetadataHash();
-        var useQuintileColouring = false;
+    if (indicatorMetadataHash) {
 
-        if (indicatorMetadataHash) {
+        for (var groupRootIndex in groupRoots) {
 
-            for (var groupRootIndex in groupRoots) {
+            var groupRoot = groupRoots[groupRootIndex],
+            id = groupRoot.IID,
+            indicatorMetadata = indicatorMetadataHash[id],
+            metadataText = indicatorMetadata.Descriptive,
+            data = groupRoot.Data,
+            regionalGrouping = getRegionalComparatorGrouping(groupRoot);
+            var columnNumber = 1;
+            var hasTrends = groupRoot.RecentTrends;
 
-                var groupRoot = groupRoots[groupRootIndex],
-                id = groupRoot.IID,
-                indicatorMetadata = indicatorMetadataHash[id],
-                metadataText = indicatorMetadata.Descriptive,
-                data = groupRoot.Data,
-                regionalGrouping = getRegionalComparatorGrouping(groupRoot);
-                var columnNumber = 1;
-                var hasTrends = groupRoot.RecentTrends;
-
-                // Choose comparator & Colouring: RAG, Quintile or not
-                var comparisonConfig = new ComparisonConfig(groupRoot, indicatorMetadata);
-                if (!useQuintileColouring) {
-                    useQuintileColouring = comparisonConfig.useQuintileColouring;
-                }
-
-                rug.newRow(groupRootIndex);
-
-                rug.setIndicator(
-                    metadataText.Name + new SexAndAge().getLabel(groupRoot),
-                    getIndicatorDataQualityHtml(metadataText.DataQuality) + '<br>' +
-                    getTargetLegendHtml(comparisonConfig, indicatorMetadata)
-                );
-
-                // National data
-                if (isNationalDisplayed) {
-                    var nationalGrouping = getNationalComparatorGrouping(groupRoot);
-                    html = new TartanRugCellBuilder(nationalGrouping.ComparatorData,
-                        columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends, nationalArea.Code).getHtml();
-                    rug.addBenchmarkValue(html);
-                }
-
-                // Subnational data
-                if (isRegionalDisplayed) {
-                    html = new TartanRugCellBuilder(regionalGrouping.ComparatorData,
-                        columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends, regionalArea.Code).getHtml();
-                    rug.addBenchmarkValue(html);
-                }
-
-                // Time period
-                var periodGrouping = isNationalDisplayed && nationalGrouping.hasOwnProperty('Period')
-                ? nationalGrouping
-                    : regionalGrouping;
-                rug.setTimePeriod(periodGrouping.Period);
-
-                // Area values
-                for (var j in sortedAreas) {
-                    var code = sortedAreas[j].Code;
-                    html = new TartanRugCellBuilder(getDataFromAreaCode(data, code),
-                        columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
-                        hasTrends, code).getHtml();
-                    rug.addRowValue(html);
-                }
+            // Choose comparator & Colouring: RAG, Quintile or not
+            var comparisonConfig = new ComparisonConfig(groupRoot, indicatorMetadata);
+            if (!useQuintileColouring) {
+                useQuintileColouring = comparisonConfig.useQuintileColouring;
             }
 
-            rug.hasRecentTrends = isDefined(groupRoots[0]) && isDefined(groupRoots[0].RecentTrends);
+            rug.newRow(groupRootIndex);
 
-            html = templates.render('tartan', rug);
+            rug.setIndicator(
+                metadataText.Name + new SexAndAge().getLabel(groupRoot),
+                getIndicatorDataQualityHtml(metadataText.DataQuality) + '<br>' +
+                getTargetLegendHtml(comparisonConfig, indicatorMetadata)
+            );
 
-            tartanRug.viewManager.updateTabSpecificOptions();
+            // National data
+            if (isNationalDisplayed) {
+                var nationalGrouping = getNationalComparatorGrouping(groupRoot);
+                html = new TartanRugCellBuilder(nationalGrouping.ComparatorData,
+                    columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
+                    hasTrends, nationalArea.Code).getHtml();
+                rug.addBenchmarkValue(html);
+            }
+
+            // Subnational data
+            if (isRegionalDisplayed) {
+                html = new TartanRugCellBuilder(regionalGrouping.ComparatorData,
+                    columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
+                    hasTrends, regionalArea.Code).getHtml();
+                rug.addBenchmarkValue(html);
+            }
+
+            // Time period
+            var periodGrouping = isNationalDisplayed && nationalGrouping.hasOwnProperty('Period')
+            ? nationalGrouping
+                : regionalGrouping;
+            rug.setTimePeriod(periodGrouping.Period);
+
+            // Area values
+            for (var j in sortedAreas) {
+                var code = sortedAreas[j].Code;
+                html = new TartanRugCellBuilder(getDataFromAreaCode(data, code),
+                    columnNumber++, groupRootIndex, comparisonConfig, trendMarkerOption,
+                    hasTrends, code).getHtml();
+                rug.addRowValue(html);
+            }
         }
+
+        rug.hasRecentTrends = isDefined(groupRoots[0]) && isDefined(groupRoots[0].RecentTrends);
+
+        html = templates.render('tartan', rug);
+
+        tartanRug.viewManager.updateTabSpecificOptions();
     }
 
     pages.getContainerJq().html(html).width(
         rug.leftTableWidth + rug.viewport + rug.extraSpace /*required because tables are bigger in Chrome*/);
 
-    toggleQuintileLegend($('.quintileKey'), useQuintileColouring);
+    toggleQuintileLegend($('.quintile-key'), useQuintileColouring);
 
     // Tooltips
-    for (groupRootIndex in groupRoots) {
+    for (var groupRootIndex in groupRoots) {
 
         // Value cells
         for (i = 0; i <= sortedAreas.length + 2; i += 1) {
@@ -431,13 +431,13 @@ function TartanRug(areaCount, isSubnationalDisplayed, isDownloadable, trendDispl
     var displayedAreas
     , minimumAreaCount = 12
     , row = null
-    , borderWidth = 2 * 2;
+    , borderWidth = 2 * 1;
 
-    var indicatorWidth = 224 + borderWidth // width 220 + padding*2 2
-    , sortWidth = 34/*width*/ + borderWidth
-    , periodWidth = 58/*width*/ + borderWidth;
+    var indicatorWidth = 222 + borderWidth // width 220 + padding*2 2
+    , sortWidth = 32/*width*/ + borderWidth
+    , periodWidth = 56/*width*/ + borderWidth;
 
-    // (th.pLink, th.rotate, th.comparatorHeader)
+    // (th.pLink, th.rotate, th.comparator-header)
     this.valueCellWidth = 41/*width*/ + borderWidth;
 
     //to prevent browser horizontal scroll bar in some browsers
@@ -600,10 +600,10 @@ function tartanRugResize(displayState) {
             break;
     }
 
-    $('#leftTartanTable,#rightTartanTable').floatThead('destroy');
+    $('#left-tartan-table,#rightTartanTable').floatThead('destroy');
 
     //Redraw the 'sticky header'
-    $('#leftTartanTable,#rightTartanTable').floatThead({ position: 'absolute' });
+    $('#left-tartan-table,#rightTartanTable').floatThead({ position: 'absolute' });
 };
 
 function highlightCell(td) {
@@ -839,7 +839,7 @@ function styleTartanRugForExport() {
     $('#overview-container').css('background', 'white');
 
     // change the font
-    $('#rightTartanTable,#leftTartanBox').css('font-family', 'Arial');
+    $('#rightTartanTable,#left-tartan-box').css('font-family', 'Arial');
 }
 
 /**
@@ -858,10 +858,10 @@ function showTrendInfo() {
         function (contentText) {
             var html = contentText;
             // remove floatThead
-            $('#leftTartanTable,#rightTartanTable').floatThead('destroy');
+            $('#left-tartan-table,#rightTartanTable').floatThead('destroy');
             // enable floatThead before closing lightbox
             lightbox.preHide = function () {
-                $('#leftTartanTable,#rightTartanTable').floatThead({ position: 'absolute' });
+                $('#left-tartan-table,#rightTartanTable').floatThead({ position: 'absolute' });
             };
 
             lightbox.show(html, top, left, popupWidth);
@@ -894,33 +894,33 @@ var scrollPlaceHtml = '<div class="scrollbar" style="width:{{viewport}}px;">' +
 
 templates.add('tartan',
     // Static columns: indicator/period/sort/benchmarks  
-    '<div id="tartanTableBox" class="centered">' +
-    '<div id="leftTartanBox">' +
-    '<table id="leftTartanTable" class="borderedTable" cellspacing="0"><thead><tr>' +
-        '<th class="rugIndicator white-background"><div>Indicator</div></th>' +
-        '<th class="rugPeriod white-background">Period</th>' +
+    '<div id="tartan-table-box" class="centered">' +
+    '<div id="left-tartan-box">' +
+    '<table id="left-tartan-table" class="bordered-table" cellspacing="0"><thead><tr>' +
+        '<th class="rug-indicator white-background"><div>Indicator</div></th>' +
+        '<th class="rug-period white-background">Period</th>' +
         '<th class="sortHeader white-background"><a class="rowSort" title="Sort area names alphabetically" href="javascript:{{#isNotNN}}sortTartanRugAToZ(){{/isNotNN}}{{^isNotNN}}sortTartanRugByNearestNeighbours(){{/isNotNN}};">&nbsp;</a></th>' +
-        '{{#benchmarks}}<th class="comparatorHeader">{{{0}}}</th>{{/benchmarks}}' +
+        '{{#benchmarks}}<th class="comparator-header">{{{0}}}</th>{{/benchmarks}}' +
         '</tr></thead><tbody>{{#rows}}<tr>' +
-        '{{#divider}}<td class="tartanDivider" colspan="5"><div class="dividerBox">&nbsp;<div class="dividerText">{{heading}}</div></div></td>{{/divider}}' +
-        '{{^divider}}<td id="rug-indicator-{{rootIndex}}" class="rugIndicator pLink" onclick="indicatorNameClicked(\'{{rootIndex}}\');" onmouseover="highlightRow(this, false);" onmouseout="unhighlightRow(false);"><div>{{indicator}}{{{indicatorDataQuality}}}</div></td>' +
-        '<td class="rugPeriod center">{{period}}</td>' +
+        '{{#divider}}<td class="tartan-divider" colspan="5"><div class="divider-box">&nbsp;<div class="divider-text">{{heading}}</div></div></td>{{/divider}}' +
+        '{{^divider}}<td id="rug-indicator-{{rootIndex}}" class="rug-indicator pLink" onclick="indicatorNameClicked(\'{{rootIndex}}\');" onmouseover="highlightRow(this, false);" onmouseout="unhighlightRow(false);"><div>{{indicator}}{{{indicatorDataQuality}}}</div></td>' +
+        '<td class="rug-period center">{{period}}</td>' +
         '<td class="sort"><a class="rowSort" title="Sort on {{indicator}}" href="javascript:sortTartanRug({{number}});">&nbsp;</a></td>' +
         '{{#benchmarkValues}}{{{html}}}{{/benchmarkValues}}' +
         '{{/divider}}</tr>{{/rows}}</tbody></table></div>' +
     //Scrollable (areas)
     '<div class="scroll-pane" id="scrollable-pane" style="width:{{viewport}}px;">' +
         scrollPlaceHtml +
-        '<div id="tartanScrollBox"><table id="rightTartanTable" class="scrollContent borderedTable" cellspacing="0"><thead><tr>' +
+        '<div id="tartan-scroll-box"><table id="rightTartanTable" class="scrollContent bordered-table" cellspacing="0"><thead><tr>' +
         '{{#areas}}<th class="pLink white-background" {{#isNotNN}} onclick="goToAreaProfilePage(\'{{code}}\');" {{/isNotNN}} onmouseover="highlightCell(this);" onmouseout="unhighlightCell(this);" >{{{name}}}</th>{{/areas}}' +
-        '<th class="rugIndicator white-background"><div>Indicator</div></th>' +
-        '<th class="rugPeriod white-background">Period</th>' +
+        '<th class="rug-indicator white-background"><div>Indicator</div></th>' +
+        '<th class="rug-period white-background">Period</th>' +
         '<th class="sortHeader white-background"><div class="rowSort"></div></th>' +
         '</tr></thead><tbody>{{#rows}}<tr>' +
-        '{{#divider}}<td class="tartanDivider" colspan="{{colSpan}}">&nbsp;</td>{{/divider}}' +
+        '{{#divider}}<td class="tartan-divider" colspan="{{colSpan}}">&nbsp;</td>{{/divider}}' +
         '{{^divider}}{{#values}}{{{html}}}{{/values}}' +
-        '<td class="rugIndicator pLink"><div>{{indicator}}{{{indicatorDataQuality}}}</div></td>' +
-        '<td class="rugPeriod center">{{period}}</td>' +
+        '<td class="rug-indicator pLink"><div>{{indicator}}{{{indicatorDataQuality}}}</div></td>' +
+        '<td class="rug-period center">{{period}}</td>' +
         '<td class="sort"><div class="rowSort"></div></td>' +
         '{{/divider}}</tr>{{/rows}}</tbody></table>' + scrollPlaceHtml + '</div></div></div>'
 );

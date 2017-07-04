@@ -32,6 +32,16 @@ namespace PholioVisualisation.PholioObjects
         }
 
         /// <summary>
+        /// Factory method
+        /// </summary>
+        public static IList<TimePeriod> TimePeriodsFromGrouping(Grouping grouping, YearType yearType)
+        {
+            return new TimePeriodIterator(
+                TimePeriod.GetBaseline(grouping),
+                TimePeriod.GetDataPoint(grouping), yearType).TimePeriods;
+        }
+
+        /// <summary>
         /// Time periods in ascending order (e.g. 2007 first .... 2010 last). 
         /// </summary>
         public IList<TimePeriod> TimePeriods

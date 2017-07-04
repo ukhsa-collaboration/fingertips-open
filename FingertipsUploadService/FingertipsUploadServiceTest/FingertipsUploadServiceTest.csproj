@@ -77,7 +77,6 @@
     <Compile Include="DataSanitizerTest.cs" />
     <Compile Include="FingertipsUploadServiceTest.cs" />
     <Compile Include="WorkerTestBase.cs" />
-    <Compile Include="SimpleJobWorkerTest.cs" />
     <Compile Include="FilePathHelperTest.cs" />
     <Compile Include="BatchJobWorkerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,6 +15,9 @@ namespace PholioVisualisation.DataConstruction
             this.formatter = formatter;
         }
 
+        /// <summary>
+        /// Set formatted numeric value strings and round numeric values for list of CoreDataSet objects.
+        /// </summary>
         public override void FormatAndTruncateList(IList<CoreDataSet> dataList)
         {
             foreach (var data in dataList)
@@ -23,6 +26,9 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
+        /// <summary>
+        /// Set formatted numeric value strings and round numeric values
+        /// </summary>
         public override void FormatAndTruncate(CoreDataSet data)
         {
             if (data != null)
@@ -33,6 +39,9 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
+        /// <summary>
+        /// Round numeric values
+        /// </summary>
         public override void TruncateList(IList<CoreDataSet> dataList)
         {
             foreach (var data in dataList)
@@ -41,6 +50,9 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
+        /// <summary>
+        /// Round numeric values
+        /// </summary>
         public override void Truncate(CoreDataSet data)
         {
             if (data != null)

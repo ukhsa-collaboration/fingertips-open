@@ -1,5 +1,4 @@
 function initPage() {
-    console.log('cc');
     lock();
     updateModelFromHash();
 
@@ -92,10 +91,8 @@ function displayPage() {
             //Judgements and ranks
             var decileVal = areaDetails.Benchmarks[decileCode][overallIndex].Val;
             getGrade = getGradeFunction(decileVal, true);
-            console.log(significances[overallIndex]);
 
             grade = getGrade(significances[overallIndex], areaRank.Val);
-            console.log(grade);
 
             similarVerdict = getVerdictAndRank(grade, decileRank, decileRanks, overallIndex);
             similarVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
@@ -110,7 +107,6 @@ function displayPage() {
             var onsValue = areaDetails.Benchmarks[onsClusterCode][overallIndex].Val;
             getGrade = getGradeFunction(onsValue, true);
             grade = getGrade(significances[overallIndex], areaRank.Val);
-            console.log(grade);
             similarVerdict = getVerdictAndRank(grade, onsRank, onsRanks, overallIndex);
             similarVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
         }
@@ -245,7 +241,7 @@ function toggleDataHeaders(dataExists, areaName) {
 }
 
 function groupColour(imgUrl, grade) {
-    console.log(grade);
+
     // Group colour   
     $('#similar_colour').html(
         '<img src="' + imgUrl + 'Mortality/grade-' +

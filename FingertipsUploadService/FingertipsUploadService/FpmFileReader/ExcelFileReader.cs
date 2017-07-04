@@ -58,28 +58,6 @@ namespace FingertipsUploadService.FpmFileReader
         }
 
         /// <summary>
-        /// Reads indicatorDetails worksheet from simple upload file and  
-        /// return it as DataTable
-        /// </summary>
-        /// <returns>DataTable</returns>
-        public DataTable GetIndicatorDetails()
-        {
-            var indicatorDetails = GetDataTableFromWorksheet(WorksheetNames.SimpleIndicator, false, "indicatorDetails");
-            return indicatorDetails;
-        }
-
-        /// <summary>
-        /// Reads pholiodata worksheet from simple upload file and  
-        /// return it as DataTable
-        /// </summary>
-        /// <returns>DataTable</returns>
-        public DataTable GetPholioData()
-        {
-            var pholioData = GetDataTableFromWorksheet(WorksheetNames.SimplePholio, true, "indicatorDetails");
-            return pholioData;
-        }
-
-        /// <summary>
         /// Reads indicator worksheet from batch upload file and  
         /// return it as DataTable
         /// </summary>

@@ -1,9 +1,8 @@
 /* CSS Document */
 #maps_map {
-	background-color: #FFFFFF;
-    border: 1px solid #CCCCCC;
+	background-color: #fff;
+    border: 1px solid #CCC;
 	width: 470px;
-	margin-left: 10px;
 	height: 600px;
 	float: left;
 	margin-bottom: 10px;
@@ -116,7 +115,7 @@
 	border-left-style: solid;
 }
 
-table.customKeyTable td {
+table.custom-key-table td {
 	width: 90px;
 	text-align: center;
 	padding: 2px;

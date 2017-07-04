@@ -103,15 +103,15 @@ namespace PholioVisualisation.AnalysisTest
         {
             // No Lower CI
             CoreDataSet parent = new CoreDataSet { Value = 3.0, LowerCI = 3.0, UpperCI = 3.0 };
-            CoreDataSet data = new CoreDataSet { Value = 4.0, LowerCI = CoreDataSet.NullValue, UpperCI = 4.1 };
+            CoreDataSet data = new CoreDataSet { Value = 4.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
             Assert.AreEqual(Significance.None, Compare(data, parent, 0));
 
             // No Upper CI
-            data = new CoreDataSet { Value = 4.0, LowerCI = 4.0, UpperCI = CoreDataSet.NullValue };
+            data = new CoreDataSet { Value = 4.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
             Assert.AreEqual(Significance.None, Compare(data, parent, 0));
 
             // Both CIs missing
-            data = new CoreDataSet { Value = 4.0, LowerCI = CoreDataSet.NullValue, UpperCI = CoreDataSet.NullValue };
+            data = new CoreDataSet { Value = 4.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
             Assert.AreEqual(Significance.None, Compare(data, parent, 0));
         }
 

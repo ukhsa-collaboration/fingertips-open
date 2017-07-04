@@ -68,27 +68,29 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AddressFileBuilderTest.cs" />
+    <Compile Include="DataFileBuilderTest.cs" />
+    <Compile Include="ExportAreaHelperTest.cs" />
+    <Compile Include="File\CacheFileNamerTest.cs" />
+    <Compile Include="File\DummyFileBuilderTest.cs" />
+    <Compile Include="File\FileBuilderTest.cs" />
+    <Compile Include="IndicatorIdListProviderTest.cs" />
+    <Compile Include="LookUpManagerTest.cs" />
+    <Compile Include="MultipleIndicatorMetadataFileWriterTest.cs" />
+    <Compile Include="File\SingleEntityFileNamerTest.cs" />
     <Compile Include="CoreDataCollectorTest.cs" />
     <Compile Include="ExcelColumnIndexes.cs" />
     <Compile Include="ExportTestHelper.cs" />
     <Compile Include="PracticeProfileDataBuilderTest.cs" />
-    <Compile Include="ProfileDataBuilderOfMultipleCountyUasTest.cs" />
-    <Compile Include="ProfileDataBuilderOfMultipleScnsTest.cs" />
-    <Compile Include="ProfileDataBuilderOfMultipleRegionsTest.cs" />
     <Compile Include="HtmlCleanerTest.cs" />
-    <Compile Include="PracticeProfileFileInfoTest.cs" />
-    <Compile Include="ProfileFileInfoTest.cs" />
+    <Compile Include="File\PracticeProfileFileInfoTest.cs" />
+    <Compile Include="File\ProfileFileInfoTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SheetNamerTest.cs" />
     <Compile Include="AddressStringifierTest.cs" />
-    <Compile Include="SearchResultsFileInfoTest.cs" />
-    <Compile Include="ProfileDataBuilderOfSingleDeprivationDecileTest.cs" />
-    <Compile Include="ProfileDataBuilderOfMultipleDeprivationDecilesTest.cs" />
-    <Compile Include="ProfileDataBuilderOfSingleRegionTest.cs" />
+    <Compile Include="File\SearchResultsFileInfoTest.cs" />
     <Compile Include="ExcelFileWriterTest.cs" />
-    <Compile Include="ProfileDatabuilderTest.cs" />
-    <Compile Include="TrendMarkerWriterFactoryTest.cs" />
-    <Compile Include="TrendMarkerWriterTest.cs" />
+    <Compile Include="SingleIndicatorMetadataFileWriterTest.cs" />
     <Compile Include="WorksheetInfoTest.cs" />
     <Compile Include="WorksheetNames.cs" />
   </ItemGroup>
@@ -100,6 +102,10 @@
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
       <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
       <Name>DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataConstructionTest\DataConstructionTest.csproj">
+      <Project>{2B1CB9BB-6380-4ACE-9304-CCE00C27E1C4}</Project>
+      <Name>DataConstructionTest</Name>
     </ProjectReference>
     <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
       <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>

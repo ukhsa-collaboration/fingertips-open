@@ -5,10 +5,12 @@
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 
-<div class="standardWidth">
-    <h2 class="subheading">Lookup tables</h2>
+<div class="container row">
     @Html.Partial("_LookupSidebar")
-    <p>Select an option to see the contents of the lookup table. The IDs in these tables are required for batch uploads of data to PHOLIO.</p>
+    <div class="col-md-12">
+        <h2 class="subheading">PHOLIO Lookup tables</h2>
+        <p>Select an option above to see the contents of the lookup table. The IDs in these tables may be required for uploading data to PHOLIO.</p>
+    </div>
 </div>
 
 

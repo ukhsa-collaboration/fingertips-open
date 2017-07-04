@@ -15,57 +15,60 @@
     @using (Html.BeginForm())
     {
         @Html.HiddenFor(x => x.Target.Id)
-        <table class="edit-table">
-            <tr>
-                <td>&nbsp;</td>
-                <td class="warning">Please do not change this goal unless you have permission to do so</td>
-            </tr>
-            <tr>
-                <td>@Html.LabelFor(x => x.Target.Description):</td>
-                <td>
-                    @Html.TextBoxFor(x => x.Target.Description,
-                        new { @class = "long-text unselected-domain" })
-                    <span class="field-validation-valid" data-valmsg-for="Target.Description"
-                          data-valmsg-replace="true"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>@Html.LabelFor(x => x.Target.LowerLimit):</td>
-                <td>
-                    @Html.TextBoxFor(x => x.Target.LowerLimit,
-                            new { @class = "number unselected-domain" })
-                    <span class="field-validation-valid" data-valmsg-for="Target.LowerLimit"
-                          data-valmsg-replace="true"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>@Html.LabelFor(x => x.Target.UpperLimit):<br>(leave blank if not required)</td>
-                <td>
-                    @Html.TextBoxFor(x => x.Target.UpperLimit,
-                            new { @class = "number unselected-domain" })
-                    <span class="field-validation-valid" data-valmsg-for="Target.UpperLimit"
-                          data-valmsg-replace="true"></span>
-                </td>
-            </tr>
-            <tr>
-                <td>@Html.LabelFor(x => x.Target.PolarityId):</td>
-                <td>
-                    @Html.DropDownListFor(x => x.Target.PolarityId,
-                        CommonUtilities.GetListOfTargetPolarityTypes())
-                </td>
-            </tr>
-            <tr>
-                <td>&nbsp;</td>
-                <td>
-                    <input class="medium-button" name="button" type="submit" value="Save" />
-                    <input class="medium-button" type="button" onclick="setUrl('@SiteUrls.TargetIndex')"
-                           value="Cancel" />
-                    @if (UserDetails.CurrentUser().IsAdministrator)
-                    {
-                        <input class="auto-width-button" name="button" type="submit" value="Delete (admin only)" />
-                    }
-                </td>
-            </tr>
-        </table>
+
+        <p class="warning">Please do not change this goal unless you have permission to do so</p>
+
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.Description)</label>
+            <div class="col-md-8">
+                @Html.TextBoxFor(x => x.Target.Description, new {@class = "form-control"})
+            </div>
+            @Html.ValidationMessage("Target.Description")
+        </div>
+
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.LegendHtml)</label>
+            <div class="col-md-8">
+                @Html.TextBoxFor(x => x.Target.LegendHtml, new {@class = "form-control"})
+            </div>
+            @Html.ValidationMessage("Target.LegendHtml")
+        </div>
+
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.LowerLimit)</label>
+            <div class="col-md-2">
+                @Html.TextBoxFor(x => x.Target.LowerLimit, new {@class = "form-control"})
+            </div>
+            @Html.ValidationMessage("Target.LowerLimit")
+        </div>
+
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.UpperLimit)</label>
+            <div class="col-md-2">
+                @Html.TextBoxFor(x => x.Target.UpperLimit, new {@class = "form-control"})
+            </div>
+            @Html.ValidationMessage("Target.UpperLimit")
+        </div>
+
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.PolarityId)</label>
+            <div class="col-md-2">
+                @Html.DropDownListFor(x => x.Target.PolarityId, 
+                    CommonUtilities.GetListOfTargetPolarityTypes())
+            </div>
+        </div>
+
+        <div class="row form-group margin-top-space">
+            <div class="col-md-7 col-md-offset-2">
+                <input class="btn btn-primary" type="submit" name="action:Save" value="Save"/>
+                <input class="btn btn-default" type="button" onclick="setUrl('@SiteUrls.TargetIndex')" value="Cancel"/>
+            </div>
+            @if (UserDetails.CurrentUser().IsAdministrator)
+            {
+                <div class="col-md-2">
+                    <input class="btn btn-danger" type="submit" name="action:Delete" value="Delete"/>
+                </div>
+            }
+        </div>
     }
 </div>

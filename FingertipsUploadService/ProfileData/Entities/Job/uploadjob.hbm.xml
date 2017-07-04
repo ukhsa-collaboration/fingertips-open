@@ -19,6 +19,6 @@
     <property name="Filename" column="filename"/>
     <property name="ProgressStage" column="progressstage"/>
     <property name="TotalRowsCommitted" column="totalrowscommitted"/>
-
+    <property name="TotalSmallNumberWarnings" column="TotalSmallNumberWarnings"/>
   </class>
 </hibernate-mapping>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Fpm.MainUI.Helpers;
@@ -92,11 +91,15 @@ namespace Fpm.MainUI.Controllers
             int selectedDenominatorType, string userMTVChanges, int startYear, int endYear,
             int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange)
         {
-            var newIndicatorId = SaveUserMTVChanges(selectedProfileId, selectedDomain, selectedAreaType, selectedSex,
+            var profileId = _reader.GetProfileDetails(selectedProfileId/*urlkey*/).Id;
+            var groupId = int.Parse(selectedDomain);
+
+            var newIndicatorId = SaveUserMTVChanges(profileId, groupId, selectedAreaType, selectedSex,
                 selectedAge, selectedComparator, selectedComparatorMethod, selectedComparatorConfidence, selectedYearType,
                 selectedYearRange, selectedValueType, selectedCiMethodType, selectedCiConfidenceLevel, selectedPolarityType,
                 selectedUnitType, selectedDenominatorType, Uri.UnescapeDataString(userMTVChanges), startYear, endYear,
                 startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId);
+
             return Json(newIndicatorId);
         }
 
@@ -107,22 +110,26 @@ namespace Fpm.MainUI.Controllers
             return Json(indicatorDefaultMetadata, JsonRequestBehavior.AllowGet);
         }
 
-        private int SaveUserMTVChanges(string selectedProfileId, string selectedDomain, int selectedAreaType,
+        private int SaveUserMTVChanges(int profileId, int groupId, int selectedAreaType,
             int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod, 
             double selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType, 
             int selectedCiMethodType, double selectedCiConfidenceLevel, int selectedPolarityType, int selectedUnitType, 
             int selectedDenominatorType, string userMTVChanges, int startYear, int endYear, 
-            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange, int? selectedDecimalPlaces, int? selectedTargetId)
+            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange, int? selectedDecimalPlaces, 
+            int? selectedTargetId)
         {   
             var properties = _reader.GetIndicatorMetadataTextProperties();
 
-            var nextIndicatorId = _profileRepository.GetNextIndicatorId() + 1;
+            var nextIndicatorId = _profileRepository.GetNextIndicatorId();
            
             if (string.IsNullOrWhiteSpace(userMTVChanges) == false)
             {
-                CommonUtilities.CreateNewIndicatorTextValues(selectedDomain, userMTVChanges, properties, nextIndicatorId, _userName, _profileRepository);
+                var indicatorMetadataTextItems = new IndicatorMetadataTextParser().Parse(userMTVChanges);
 
-                _profileRepository.CreateGroupingAndMetaData(_reader.GetProfileDetails(selectedProfileId).Id, Convert.ToInt32(selectedDomain),
+                new IndicatorMetadataTextCreator(_profileRepository).CreateNewIndicatorTextValues(
+                    groupId, indicatorMetadataTextItems, properties, nextIndicatorId, _userName);
+
+                _profileRepository.CreateGroupingAndMetaData(profileId, groupId,
                     nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator, selectedComparatorMethod,
                     selectedComparatorConfidence, selectedYearType, selectedYearRange, selectedValueType, selectedCiMethodType,
                     selectedCiConfidenceLevel, selectedPolarityType, selectedUnitType, selectedDenominatorType, startYear, endYear,

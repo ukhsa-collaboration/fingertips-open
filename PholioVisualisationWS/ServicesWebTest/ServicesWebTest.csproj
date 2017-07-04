@@ -95,6 +95,7 @@
     <Compile Include="Controllers\NonPublicServicesControllerTest.cs" />
     <Compile Include="Controllers\ProfilesControllerTest.cs" />
     <Compile Include="Controllers\StaticReportsControllerTest.cs" />
+    <Compile Include="Helpers\FileResponseBuilderTest.cs" />
     <Compile Include="Helpers\UrlHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -103,9 +104,21 @@
       <Project>{93fcce58-31af-467d-adc2-3067bea82e7d}</Project>
       <Name>DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
+      <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
+      <Name>DataConstruction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Export\Export.csproj">
+      <Project>{85526825-84FB-4EAD-A98A-16ECE3CCE8CA}</Project>
+      <Name>Export</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
       <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServiceActions\ServiceActions.csproj">
+      <Project>{40254974-C7E8-4303-B3FF-BF8A0F8C6491}</Project>
+      <Name>ServiceActions</Name>
     </ProjectReference>
     <ProjectReference Include="..\ServicesWeb\ServicesWeb.csproj">
       <Project>{4241a7e2-0530-43b9-9db9-ccd0d5585811}</Project>

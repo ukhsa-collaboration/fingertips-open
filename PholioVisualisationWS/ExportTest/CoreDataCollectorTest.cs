@@ -30,7 +30,7 @@ namespace PholioVisualisation.ExportTest
             collector.AddDataList(GetDataThatVariesByAreaCode());
             collector.AddDataList(GetDataThatVariesByAreaCode());
 
-            Assert.AreEqual(2, collector.GetDataListForArea(new CategoryIdAndAreaCode {AreaCode = "a"}).Count);
+            Assert.AreEqual(2, collector.GetDataListForArea(new CoreDataSet {AreaCode = "a"}).Count);
         }
 
         [TestMethod]
@@ -41,7 +41,7 @@ namespace PholioVisualisation.ExportTest
             collector.AddDataList(GetDataThatVariesByCategoryId());
             collector.AddDataList(GetDataThatVariesByCategoryId());
 
-            Assert.AreEqual(2, collector.GetDataListForArea(new CategoryIdAndAreaCode { CategoryId = 2}).Count);
+            Assert.AreEqual(2, collector.GetDataListForArea(new CoreDataSet { CategoryId = 2}).Count);
         }
 
         private IList<CoreDataSet> GetDataThatVariesByAreaCode()

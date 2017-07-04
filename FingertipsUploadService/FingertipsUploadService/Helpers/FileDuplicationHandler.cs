@@ -8,56 +8,6 @@ namespace FingertipsUploadService.Helpers
 {
     public class FileDuplicationHandler
     {
-        public DataTable RemoveDuplicatesInSimple(DataTable pholioData)
-        {
-            var simpleUpload = new SimpleUpload();
-            var dataToBeUploaded = new List<UploadDataModel>();
-
-            for (var i = 0; i < pholioData.Rows.Count; i++)
-            {
-                var row = pholioData.Rows[i];
-                var rowParser = new UploadSimpleRowParser(row);
-
-                if (rowParser.DoesRowContainData == false)
-                {
-                    //There isn't an area code or value so assume the end of the data 
-                    break;
-                }
-
-                var uploadDataModel = rowParser.GetUploadDataModelWithUnparsedValuesSetToDefaults(simpleUpload);
-                dataToBeUploaded.Add(uploadDataModel);
-            }
-
-            // Remove the duplicate
-            var noDupData =
-                        dataToBeUploaded.GroupBy(
-                            x =>
-                                new
-                                {
-                                    x.AreaCode
-                                })
-                            .Select(y => y.First())
-                            .ToList();
-
-            // Create new table without duplicats            
-            var table = new DataTable();
-            table.Columns.Add("AreaCode", typeof(string));
-            table.Columns.Add("Count", typeof(double));
-            table.Columns.Add("Value", typeof(double));
-            table.Columns.Add("LowerCI", typeof(double));
-            table.Columns.Add("UpperCI", typeof(double));
-            table.Columns.Add("Denominator", typeof(double));
-            table.Columns.Add("ValueNoteId", typeof(double));
-
-            foreach (var data in noDupData)
-            {
-                table.Rows.Add(data.AreaCode, data.Count, data.Value, data.LowerCi, data.UpperCi, data.Denominator,
-                    data.ValueNoteId);
-            }
-            return table;
-        }
-
-
         public DataTable RemoveDuplicatesInBatch(DataTable batchData)
         {
             var dataToBeUploaded = new List<UploadDataModel>();

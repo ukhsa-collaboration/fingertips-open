@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using Profiles.DomainObjects;
@@ -86,7 +87,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             navigateTo.FingertipsDataForProfile(ProfileUrlKeys.HealthProfiles);
 
             var tabIds = new [] { "page-map", "page-scatter", "page-trends", "page-indicators",
-                "page-areas", "page-content", "page-metadata", "page-overview"};
+                "page-areas", "page-inequalities", "page-metadata", "page-overview"};
 
             foreach (var tabId in tabIds)
             {
@@ -94,20 +95,25 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             }
         }
 
-        private void AssertPageDoesNotContainUndefined(string tabId)
+        [TestMethod]
+        public void TestScatterPlotSupportingIndicatorCanBeSelected()
         {
-            SelectTab(tabId);
-            var body = driver.FindElement(By.TagName("body"));
-            var html = body.GetAttribute("innerHTML");
-            Assert.IsFalse(html.Contains("undefined"), "'undefined' found on " + tabId);
-        }
+            // Navidate to scatter plot
+            navigateTo.FingertipsDataForProfile(ProfileUrlKeys.HealthProfiles);
+            SelectTab("page-scatter");
+            waitFor.FingertipsScatterPlotChartToLoad();
 
-        private void CheckExportLinkPresent()
-        {
-            By byExportMenuId = By.ClassName("export-link");
-            waitFor.ExpectedElementToBeVisible(byExportMenuId);
-            var exportMenu = driver.FindElement(byExportMenuId);
-            waitFor.ElementToContainText(exportMenu, "Export");
+            //Set supporting indicator
+            var menu = driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single"));
+            menu.Click();
+            var searchText = driver.FindElement(By.CssSelector("div.chosen-search input"));
+            searchText.SendKeys("gcse");
+            searchText.SendKeys(Keys.Return);
+            waitFor.AjaxLockToBeUnlocked();
+
+            // Assert: selected indicator is selected
+            var selectedSupportinIndicator = driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single span"));
+            TestHelper.AssertTextContains(selectedSupportinIndicator.Text, "gcse");
         }
 
         public void CheckAllTabsLoadForProfile(string urlKey)
@@ -129,7 +135,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
                 SelectDomain(domain, waitFor);
                 var indicatorName = driver.FindElement(By.Id(LongerLivesIds.TartanRugIndicatorNameOnFirstRow)).Text;
 
-                var indicatorCount = driver.FindElements(By.ClassName("rugIndicator")).Count;
+                var indicatorCount = driver.FindElements(By.ClassName("rug-indicator")).Count;
 
                 // Check tartan rug is different for each domain
                 Assert.IsFalse(
@@ -151,19 +157,40 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
         public static ReadOnlyCollection<IWebElement> GetDomainOptions(IWebDriver driver)
         {
-            var domains = driver.FindElements(By.ClassName("domainOption"));
+            var domains = driver.FindElements(By.ClassName("domain-option"));
             return domains;
         }
 
         public static void SelectInequalitiesTab(IWebDriver driver)
         {
-            driver.FindElement(By.Id("page-content")).Click();
+            driver.FindElement(By.Id("page-inequalities")).Click();
             new WaitFor(driver).InequalitiesTabToLoad();
         }
-        
+
         public void SelectTab(string tabId)
         {
             FingertipsHelper.SelectFingertipsTab(driver, tabId);
+        }
+
+        private void AssertPageDoesNotContainUndefined(string tabId)
+        {
+            SelectTab(tabId);
+            var body = driver.FindElement(By.TagName("body"));
+            var html = body.GetAttribute("innerHTML");
+
+            var regex = new Regex(Regex.Escape(html));
+            var undefinedCount = regex.Matches("undefined").Count;
+            var ignoreUndefinedCount = regex.Matches("highcharts-color-undefined").Count;
+
+            Assert.AreEqual(0, undefinedCount - ignoreUndefinedCount, "'undefined' found on " + tabId);
+        }
+
+        private void CheckExportLinkPresent()
+        {
+            By byExportMenuId = By.ClassName("export-link");
+            waitFor.ExpectedElementToBeVisible(byExportMenuId);
+            var exportMenu = driver.FindElement(byExportMenuId);
+            waitFor.ElementToContainText(exportMenu, "Export");
         }
     }
 }

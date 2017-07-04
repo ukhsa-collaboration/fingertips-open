@@ -36,7 +36,7 @@ namespace Ckan.DataTransformation
             var areaTypeIds = areaTypeListProvider.GetAllAreaTypeIdsUsedInProfile(profileId);
             AreaTypeIds = new AreaTypeIdSplitter(areaTypeIds).Ids.Distinct().ToList();
 
-            CategoryTypeIds = areaTypeListProvider.GetCategoryTypeIdsUsedInProfile(profileId);
+            CategoryTypeIds = areaTypeListProvider.GetCategoryTypeIdsForExport();
         }
 
         public string CkanGroupName { get; set; }

@@ -16,20 +16,20 @@ namespace Profiles.MainUI.Controllers
         private readonly DateTime _startTime = DateTime.Now;
 
         [HttpGet]
-        public JsonResult Data(string serviceAction1, string serviceAction2 = "")
+        public JsonResult Data(string serviceAction1, string serviceAction2 = "", string serviceAction3 = "")
         {
             var request = HttpContext.Request;
             var ajaxUrl = new AjaxUrl(request);
             var serviceParameters = ajaxUrl.ServiceParameters;
 
             byte[] json;
-            if (serviceParameters.Contains("no_cache=true"))
+            if (serviceParameters.Contains("no_cache=true") || serviceAction2 == "csv")
             {
                 json = GetJsonFromWebServices(ajaxUrl.WebServicesUrl);
             }
             else
             {
-                var serviceKey = serviceAction1 + serviceAction2;
+                var serviceKey = serviceAction1 + serviceAction2 + serviceAction3;
                 json = _jsonCache.GetJson(serviceKey, serviceParameters);
 
                 if (JsonUnit.IsJsonOk(json) == false)

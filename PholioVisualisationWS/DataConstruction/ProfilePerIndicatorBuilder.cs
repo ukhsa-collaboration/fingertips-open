@@ -17,6 +17,9 @@ namespace PholioVisualisation.DataConstruction
         public Dictionary<int, List<ProfilePerIndicator>> Build(IList<int> indicatorIds, int areaTypeId)
         {
             var response = new Dictionary<int, List<ProfilePerIndicator>>();
+
+            if (indicatorIds == null || indicatorIds.Any() == false) return response;
+
             var profileReader = ReaderFactory.GetProfileReader();
             var profiles = profileReader.GetProfilesForIndicators(indicatorIds.ToList(), areaTypeId);
             var uniqueIndicators = profiles.Select(x => x.IndicatorId).Distinct().ToList();

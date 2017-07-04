@@ -23,27 +23,27 @@ namespace PholioVisualisation.Analysis
 
             switch (grouping.ComparatorMethodId)
             {
-                case ComparatorMethodId.NoComparison:
+                case ComparatorMethodIds.NoComparison:
                     comparer = new NoComparisonComparer();
                     break;
-                case ComparatorMethodId.SingleOverlappingCIs:
+                case ComparatorMethodIds.SingleOverlappingCIs:
                     comparer = new SingleOverlappingCIsComparer();
                     break;
-                case ComparatorMethodId.SpcForProportions:
+                case ComparatorMethodIds.SpcForProportions:
                     comparer = new SpcForProportionsComparer();
                     assignConfidenceVariable = true;
                     break;
-                case ComparatorMethodId.SpcForDsr:
+                case ComparatorMethodIds.SpcForDsr:
                     comparer = new SpcForDsrComparer();
                     assignConfidenceVariable = true;
                     break;
-                case ComparatorMethodId.DoubleOverlappingCIs:
+                case ComparatorMethodIds.DoubleOverlappingCIs:
                     comparer = new DoubleOverlappingCIsComparer();
                     break;
-                case ComparatorMethodId.Quintiles:
+                case ComparatorMethodIds.Quintiles:
                     comparer = new QuintilesComparer();
                     break;
-                case ComparatorMethodId.SuicidePreventionPlan:
+                case ComparatorMethodIds.SuicidePreventionPlan:
                     comparer = new SuicidePreventPlanComparer();
                     break;
                 default:

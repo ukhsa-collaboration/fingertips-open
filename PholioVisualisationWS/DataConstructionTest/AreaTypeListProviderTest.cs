@@ -72,16 +72,17 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetCategoryTypeIdsUsedInProfile()
         {
             var categoryTypeIds = AreaTypeListProvider()
-                .GetCategoryTypeIdsUsedInProfile(ProfileIds.Phof);
+                .GetCategoryTypeIdsForExport();
 
             Assert.IsTrue(categoryTypeIds.Contains(CategoryTypeIds.DeprivationDecileCountyAndUA2010));
+            Assert.IsFalse(categoryTypeIds.Contains(CategoryTypeIds.LimitsForHealthProfilesLifeExpectancyChart));
         }
 
         [TestMethod]
         public void TestGetCategoryTypeIdsUsedInProfile_When_Child_Has_No_Parent_Options()
         {
             var categoryTypeIds = AreaTypeListProvider()
-                .GetCategoryTypeIdsUsedInProfile(ProfileIds.Phof, AreaTypeIds.GoRegion);
+                .GetParentCategoryTypeIdsUsedInProfile(ProfileIds.Phof, AreaTypeIds.GoRegion);
 
             Assert.IsFalse(categoryTypeIds.Any());
         }

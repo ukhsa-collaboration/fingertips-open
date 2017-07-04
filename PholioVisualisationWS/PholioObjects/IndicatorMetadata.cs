@@ -43,7 +43,7 @@ namespace PholioVisualisation.PholioObjects
         public ConfidenceIntervalMethod ConfidenceIntervalMethod { get; set; }
 
         [JsonProperty]
-        public IDictionary<string,string> Descriptive { get; set; }
+        public IDictionary<string, string> Descriptive { get; set; }
 
         [JsonIgnore]
         public int? TargetId { get; set; }
@@ -52,8 +52,18 @@ namespace PholioVisualisation.PholioObjects
         public TargetConfig TargetConfig { get; set; }
 
         [JsonIgnore]
-        public bool HasTarget {
+        public bool HasTarget
+        {
             get { return TargetConfig != null; }
+        }
+
+        [JsonIgnore]
+        public string Name
+        {
+            get
+            {
+                return Descriptive[IndicatorMetadataTextColumnNames.Name];
+            }
         }
 
         /// <summary>

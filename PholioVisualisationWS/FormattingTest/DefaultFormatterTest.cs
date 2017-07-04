@@ -41,6 +41,28 @@ namespace PholioVisualisation.FormattingTest
             Assert.AreEqual("1.00", data.ValueFormatted);
         }
 
+        /// <summary>
+        /// Only want formatting to happen once. Otherwise may get formatting of truncated values.
+        /// </summary>
+        [TestMethod]
+        public void TestCanOnlyFormatOnce()
+        {
+            CoreDataSet data = new CoreDataSet
+            {
+                Value = 2000
+            };
+
+            // Format first time
+            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            formatter.Format(data);
+            Assert.AreEqual("2000", data.ValueFormatted);
+
+            // Once formatted then cannot be reformatted
+            data.Value = 2001;
+            formatter.Format(data);
+            Assert.AreEqual("2000", data.ValueFormatted);
+        }
+
         [TestMethod]
         public void TestCanFormatWithoutStats1000s()
         {
@@ -87,6 +109,7 @@ namespace PholioVisualisation.FormattingTest
             IndicatorStatsPercentilesFormatted stats = formatter.FormatStats(null);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Min);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Max);
+            Assert.AreEqual(NumericFormatter.NoValue, stats.Median);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile25);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile75);
         }

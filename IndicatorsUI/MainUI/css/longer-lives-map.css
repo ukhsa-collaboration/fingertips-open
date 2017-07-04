@@ -1211,6 +1211,11 @@ span.minus {
     margin-top: 0;
 }
 
+#population-text {
+    width: 392px;
+    overflow-wrap: break-word;
+}
+
 #population-text p {
     margin: 0;
     padding: 0;

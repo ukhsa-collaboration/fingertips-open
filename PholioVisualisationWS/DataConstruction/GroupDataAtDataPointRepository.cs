@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -30,7 +31,10 @@ namespace PholioVisualisation.DataConstruction
         public GroupData GetGroupDataProcessed(string parentAreaCode, int childAreaTypeId, int profileId, int groupId)
         {
             GroupData data = GetGroupData(parentAreaCode, childAreaTypeId, profileId, groupId);
-            new GroupDataProcessor().Process(data);
+
+            var targetComparerProvider = new TargetComparerProvider(ReaderFactory.GetGroupDataReader(), ReaderFactory.GetAreasReader());
+
+            new GroupDataProcessor(targetComparerProvider).Process(data);
             return data;
         }
     }

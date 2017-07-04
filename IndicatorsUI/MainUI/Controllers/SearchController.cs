@@ -29,7 +29,9 @@ namespace Profiles.MainUI.Controllers
             // Override according to skin
             ViewBag.DefaultAreaType = templateProfile.DefaultAreaType;
             ViewBag.EnumParentDisplay = templateProfile.EnumParentDisplay;
-            ViewBag.ExtraJsFiles = templateProfile.ExtraJavaScriptFiles.Concat(ViewBag.ExtraJsFiles as IList<string>);
+            ViewBag.ExtraJsFiles = templateProfile.ExtraJavaScriptFiles
+                .Concat((IList<string>)ViewBag.ExtraJsFiles)
+                .ToList();
             ViewBag.ExtraCssFiles = templateProfile.ExtraCssFiles;
 
             PageModel.PageTitle = TitleSearchResults;

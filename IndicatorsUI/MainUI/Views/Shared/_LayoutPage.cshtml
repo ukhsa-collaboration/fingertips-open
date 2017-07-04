@@ -5,22 +5,28 @@
 <!DOCTYPE html>
 <html lang="en-GB">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=10; IE=9; IE=8; IE=EDGE" />
-    <meta name="keywords" content="public,health,england,fingertips,population,alcohol,substance,misuse,drug,child,health,indicator,obesity,mortality,immunisation,england,hospital,breastfeeding,children,school,care,public,outcome,inequality" />
-    <meta name="author" content="Public Health England (PHE)" />
-    <meta name="description" content="@Model.Skin.MetaDescription" />
+    <!--[if lte IE 9]>
+        <script>
+            window.location = "/browser-not-supported";
+        </script>        
+    <![endif]-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=10; IE=EDGE"/>
+    <meta name="keywords" content="public,health,england,fingertips,population,alcohol,substance,misuse,drug,child,health,indicator,obesity,mortality,immunisation,england,hospital,breastfeeding,children,school,care,public,outcome,inequality"/>
+    <meta name="author" content="Public Health England (PHE)"/>
+    <meta name="description" content="@Model.Skin.MetaDescription"/>
     <title>
         @Model.Title
     </title>
+    <!-- @DateTime.Now -->
     @Html.Partial("_Favicon")
     @Styles.Render("~/bundles/css-fingertips")
     @Html.Partial("_GoogleAnalytics")
     @Scripts.Render("~/bundles/js-fingertips")
-
     @* Not included in bundle because the minification breaks the page *@
     <script src="@(Model.JsPath)vendor/tablesorter/jquery.tablesorter.min.js" type="text/javascript"></script>
-
+    @* Transpiled TypeScript files *@
+    @Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/ts-file")
     @Html.Partial("_Html2Canvas")
     @Scripts.Render("~/bundles/js-fingertips-js-file")
     @Html.Partial("_GlobalJsVariablesForDataPage")
@@ -31,18 +37,15 @@
     @Html.Partial("Banner")
     @RenderBody()
     <div class="container-fluid">
-        <div class="row">
-            <div class="get-skin-view-site-footer">
-                @Html.Partial(Model.GetSkinView("SiteFooter"))
-            </div>
-        </div> <!--row-->
+        @Html.Partial(Model.GetSkinView("SiteFooter"))
     </div> <!--container end-->
-    <div id="trendHelper" style="display: none;">
+    <div id="trend-helper" style="display: none;">
     </div>
     @* this form will be used to capture any part of profiles using html2canvas *@
     <form id="image-capture-form" action="/capture-shot" method="POST">
         @Html.Hidden("captured-image")
         @Html.Hidden("tab-name")
     </form>
+    <div app-root></div>
 </body>
 </html>

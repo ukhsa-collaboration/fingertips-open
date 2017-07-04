@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
@@ -12,12 +11,14 @@ using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("content")]
     public class ContentController : Controller
     {
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
 
-        public ActionResult ContentIndex()
+        [Route("content-index")]
+        public ActionResult ContentIndex(int profileId = ProfileIds.Undefined)
         {
             var model = new ContentGridModel
             {
@@ -29,131 +30,82 @@ namespace Fpm.MainUI.Controllers
 
             GetAllProfiles(model);
 
-            var profileId = Request.Params["profileId"];
-            if (profileId != null)
+            if (profileId != ProfileIds.Undefined)
             {
-                model.ProfileId = int.Parse(profileId);
+                model.ProfileId = profileId;
+                ViewBag.ProfileId = profileId;
             }
 
             GetContentItems(model);
             return View(model);
         }
 
-        private void GetAllProfiles(ContentGridModel model)
-        {
-            var profiles = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
-            var allProfiles = profiles.Select(c => new SelectListItem
-            {
-                Text = c.Name.ToString(CultureInfo.InvariantCulture),
-                Value = c.Id.ToString(CultureInfo.InvariantCulture)
-            });
-
-            model.ProfileList = allProfiles;
-            var firstOrDefault = model.ProfileList.FirstOrDefault();
-            if (firstOrDefault != null)
-            {
-                model.ProfileId = Convert.ToInt32(firstOrDefault.Value);
-            }
-        }
-
-        private void GetContentItems(ContentGridModel profiles)
-        {
-            profiles.ContentItems = _reader.GetProfileContentItems(profiles.ProfileId);
-        }
-
-        public ActionResult EditContent(string contentId, int profileId)
+        [Route("edit-content-item")]
+        public ActionResult EditContentItem(string contentId, int profileId)
         {
             var contentItem = _reader.GetContentItem(Convert.ToInt32(contentId));
             contentItem.ProfileName = _reader.GetProfiles().FirstOrDefault(x => x.Id == profileId).Name;
-
-            if (HttpContext.Request.UrlReferrer != null)
-            {
-                contentItem.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
-            }
-
-            return View("EditContent", contentItem);
+            ViewBag.ProfileId = profileId;
+            return View("EditContentItem", contentItem);
         }
 
-        public ActionResult CreateContent(string selectedProfile)
+        [Route("create-content-item")]
+        public ActionResult CreateContentItem(int selectedProfile)
         {
-            var model = new ContentGridModel();
-
-            GetAllProfiles(model);
-
-            model.ProfileId = Convert.ToInt32(selectedProfile);
-
-            var content = new ContentItem { ProfileList = model.ProfileList };
-            if (HttpContext.Request.UrlReferrer != null)
-            {
-                content.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
-            }
-
-            return View("CreateContent", content);
+            var content = new ContentItem ();
+            content.ProfileId = selectedProfile;
+            ViewBag.ProfileId = selectedProfile;
+            return View(content);
         }
 
+        [Route("insert-content-item")]
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult InsertContent(ContentItem fc, string description, string selectedProfile,
-            string content, string contentKey, bool plainTextContent)
+        public ActionResult InsertContentItem(ContentItem contentItem)
         {
-            if (!TryUpdateModel(fc))
+            if (!TryUpdateModel(contentItem))
             {
                 ViewBag.updateError = "Update Failure";
-                return View("CreateContent", fc);
+                return View("CreateContentItem", contentItem);
             }
 
-            var contentItem = _writer.NewContentItem(Convert.ToInt32(selectedProfile), contentKey, description, plainTextContent, plainTextContent ? formatPlainText(content) : content);
-            AuditContentChange(contentItem, "CREATED");
+            var content = contentItem.IsPlainText ? formatPlainText(contentItem.Content) : contentItem.Content;
+            var newContentItem = _writer.NewContentItem(contentItem.ProfileId, 
+                contentItem.ContentKey, contentItem.Description, contentItem.IsPlainText, content);
+            AuditContentChange(newContentItem, "CREATED");
 
-            return RedirectToAction("ContentIndex", new { profileId = selectedProfile });
+            return RedirectToAction("ContentIndex", new { profileId = contentItem.ProfileId });
         }
 
-        private void AuditContentChange(ContentItem contentItem, string oldContent)
-        {
-            _writer.NewContentAudit(new ContentAudit
-            {
-                ContentKey = contentItem.ContentKey,
-                ToContent = contentItem.Content,
-                FromContent = oldContent,
-                ContentId = contentItem.Id,
-                UserName = UserDetails.CurrentUser().Name,
-                Timestamp = DateTime.Now
-            });
-        }
-
+        [Route("content-audit-list")]
         public ActionResult GetContentAuditList(IEnumerable<int> contentIds)
         {
             var contentAuditList = _reader.GetContentAuditList(contentIds.ToList());
             return PartialView("_ContentAudit", contentAuditList);
         }
 
-        private string formatPlainText(string content)
-        {
-            //Persist any line breaks if plain text
-            var replacedLineBreaksContent = Regex.Replace(content, "(<br />)", "\r\n");
-            var removedHTMLContent = Regex.Replace(replacedLineBreaksContent, "<.*?>", string.Empty);
-            return Regex.Replace(removedHTMLContent, "(\r\n|\n)", "<br />");
-        }
-
+        [Route("update-content-item")]
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult UpdateContent(string description, string content, int id, string contentKey,
-            string returnUrl, string oldContent, bool plainTextContent)
+        public ActionResult UpdateContentItem(ContentItem contentItem)
         {
-            var contentItem = new ContentItem();
-            contentItem.Id = id;
-            contentItem.Description = description;
-            contentItem.ContentKey = contentKey;
-            contentItem.PlainTextContent = plainTextContent;
-            contentItem.Content = plainTextContent ? formatPlainText(content) : content;
+            var newContentItem = new ContentItem();
+            AutoMapper.Mapper.Map(contentItem, newContentItem);
 
-            _writer.UpdateContentItem(contentItem);
+            // Convert to plain text
+            if (contentItem.IsPlainText)
+            {
+                newContentItem.Content = formatPlainText(contentItem.Content);
+            }
 
-            AuditContentChange(contentItem, oldContent);
+            _writer.UpdateContentItem(newContentItem);
 
-            return Redirect(returnUrl);
+            AuditContentChange(newContentItem, contentItem.Content);
+
+            return RedirectToAction("ContentIndex", new { profileId = contentItem.ProfileId });
         }
 
+        [Route("delete-content-item")]
         public ActionResult DeleteContentItem(int contentItemId)
         {
             var contentItem = _writer.GetContentItem(contentItemId);
@@ -177,21 +129,60 @@ namespace Fpm.MainUI.Controllers
             });
         }
 
-
-
-   
-
-
-        public ActionResult ReloadContentItems(string selectedProfile)
+        [Route("view-in-own-page")]
+        public ActionResult ViewContentItemInOwnPage(int contentItemId)
         {
-            var model = new ContentGridModel();
+            var contentItem = _reader.GetContentItem(contentItemId);
 
-            GetAllProfiles(model);
+            if (contentItem == null)
+            {
+                throw new FpmException("Content item could not be deleted with id " + contentItemId);
+            }
 
-            model.ProfileId = Convert.ToInt32(selectedProfile);
-            GetContentItems(model);
+            return View(contentItem);
+        }
 
-            return View("ContentIndex", model);
+        private void GetContentItems(ContentGridModel profiles)
+        {
+            profiles.ContentItems = _reader.GetProfileContentItems(profiles.ProfileId);
+        }
+
+        private string formatPlainText(string content)
+        {
+            //Persist any line breaks if plain text
+            var replacedLineBreaksContent = Regex.Replace(content, "(<br />)", "\r\n");
+            var removedHTMLContent = Regex.Replace(replacedLineBreaksContent, "<.*?>", string.Empty);
+            return Regex.Replace(removedHTMLContent, "(\r\n|\n)", "<br />");
+        }
+
+        private void AuditContentChange(ContentItem contentItem, string oldContent)
+        {
+            _writer.NewContentAudit(new ContentAudit
+            {
+                ContentKey = contentItem.ContentKey,
+                ToContent = contentItem.Content,
+                FromContent = oldContent,
+                ContentId = contentItem.Id,
+                UserName = UserDetails.CurrentUser().Name,
+                Timestamp = DateTime.Now
+            });
+        }
+
+        private void GetAllProfiles(ContentGridModel model)
+        {
+            var profiles = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
+            var allProfiles = profiles.Select(c => new SelectListItem
+            {
+                Text = c.Name.ToString(CultureInfo.InvariantCulture),
+                Value = c.Id.ToString(CultureInfo.InvariantCulture)
+            });
+
+            model.ProfileList = allProfiles;
+            var firstOrDefault = model.ProfileList.FirstOrDefault();
+            if (firstOrDefault != null)
+            {
+                model.ProfileId = Convert.ToInt32(firstOrDefault.Value);
+            }
         }
     }
 }

@@ -7,11 +7,11 @@ namespace PholioVisualisation.Export
 {
     public class AddressStringifier
     {
-        private AreaAddress address;
+        private AreaAddress _address;
 
         public AddressStringifier(AreaAddress areaAddress)
         {
-            this.address = areaAddress;
+            _address = areaAddress;
         }
 
         public string AddressWithoutPostcode
@@ -19,10 +19,10 @@ namespace PholioVisualisation.Export
             get
             {
                 string[] addressParts = new [] { 
-                    address.Address1, 
-                    address.Address2, 
-                    address.Address3, 
-                    address.Address4 };
+                    _address.Address1, 
+                    _address.Address2, 
+                    _address.Address3, 
+                    _address.Address4 };
 
                 var validAddressParts = addressParts.Where(x => !string.IsNullOrWhiteSpace(x));
 

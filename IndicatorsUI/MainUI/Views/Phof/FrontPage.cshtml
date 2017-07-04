@@ -17,9 +17,10 @@
 
 <div class="title-divider"></div>
 @{
-    HtmlString recentUpdates = ContentProvider.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
-    var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
-    var areUpdates = recentUpdates != null;
+    HtmlString recentUpdates = ContentProvider.GetRecentUpdates(Model.ProfileId);
+    var updateLength = recentUpdates.ToString().Length;
+    var updatesCssClass = updateLength > 700 ? "scrollable-box" : "";
+    var areUpdates = updateLength > 0;
 }
 <div id="public-health-outcomes-framework" class="container">
     <div class="row">
@@ -43,7 +44,7 @@
 
         <div id="introduction" class="col-md-8">
             @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
-            @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
+            @ContentProvider.GetIntroduction(Model.ProfileId)
         </div>
         @if (areUpdates)
         {

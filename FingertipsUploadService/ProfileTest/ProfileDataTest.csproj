@@ -61,9 +61,12 @@
   <ItemGroup>
     <Compile Include="AutoMapperConfig.cs" />
     <Compile Include="FpmUserTest.cs" />
+    <Compile Include="Helpers\IndicatorDisclosureControlMApperTest.cs" />
     <Compile Include="ProfilesReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AllowedDataTest.cs" />
+    <Compile Include="Respositories\WhenUsingAreaTypeRepository.cs" />
+    <Compile Include="Respositories\WhenUsingDisclosureControl.cs" />
     <Compile Include="Respositories\WhenUsingLoggingRepository.cs" />
     <Compile Include="Respositories\WhenUsingFusUploadRepository.cs" />
     <Compile Include="Respositories\WhenUsingJobErrorRepository.cs" />

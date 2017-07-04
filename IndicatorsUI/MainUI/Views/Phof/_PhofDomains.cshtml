@@ -1,44 +1,41 @@
-﻿
-<div id="supporting-information">
-    <h1>
-        <a href="/public-health-outcomes-framework#gid/1000049" style="color: #39836e;">Overarching indicators</a>
-    </h1>
-</div>
+﻿@using Profiles.DomainObjects
+@{
+    var hrefBase = "/" + ViewBag.ProfileUrlKey + "#gid/";
+}
 
-<div class="phof-domains col-md-6">      
-    <p class="large">Find out about differences in life expectancy and healthy life expectancy between communities.</p>  
-</div>
-<div>
-    <div class="phof-domains-middle col-md-6">
-        <div class="btn">
-            <a href="/public-health-outcomes-framework#gid/1000049" title="START Go to the data">
-                START
-                <p>Go to the data</p>
-            </a>
-        </div>
-     </div>
-</div>
-<div class="phof-domains col-md-6">
-    <a href="/public-health-outcomes-framework#gid/1000041">Improving the wider determinants of health</a>
-    <p>
-        Browse indicators for tracking progress in wider factors that affect health and wellbeing.
-    </p>
-</div>
-<div class="phof-domains col-md-6">
-    <a href="/public-health-outcomes-framework#gid/1000042">Health improvement</a>
-    <p>
-        Browse indicators for tracking progress in helping people to live healthy lifestyles and make healthy choices.
-    </p>
-</div>
-<div class="phof-domains col-md-6">
-    <a href="/public-health-outcomes-framework#gid/1000043">Health protection</a>
-    <p>
-        Browse indicators for tracking progress in protecting the population’s health from major incidents and other threats.
-    </p>
-</div>
-<div class="phof-domains col-md-6">
-    <a href="/public-health-outcomes-framework#gid/1000044">Healthcare public health and preventing premature mortality</a>
-    <p>
-        Browse indicators for tracking progress in reducing numbers of people living with preventable ill health and people dying prematurely.
-    </p>
+<div class="row">
+    <div class="link-header col-md-12">
+        <a href="@hrefBase@GroupIds.Phof_OverarchingIndicators">Overarching indicators</a>
+    </div>
+
+    <div class="phof-domains col-md-6">
+        <p class="large">Find out about differences in life expectancy and healthy life expectancy between communities.</p>
+    </div>
+    <div class="phof-domains col-md-6">
+        @Html.Partial("_StartButton")
+    </div>
+    <div class="phof-domains col-md-6">
+        <a href="@hrefBase@GroupIds.Phof_WiderDeterminantsofHealth">Improving the wider determinants of health</a>
+        <p>
+            Browse indicators for tracking progress in wider factors that affect health and wellbeing.
+        </p>
+    </div>
+    <div class="phof-domains col-md-6">
+        <a href="@hrefBase@GroupIds.Phof_HealthImprovment">Health improvement</a>
+        <p>
+            Browse indicators for tracking progress in helping people to live healthy lifestyles and make healthy choices.
+        </p>
+    </div>
+    <div class="phof-domains col-md-6">
+        <a href="@hrefBase@GroupIds.Phof_HealthProtection">Health protection</a>
+        <p>
+            Browse indicators for tracking progress in protecting the population’s health from major incidents and other threats.
+        </p>
+    </div>
+    <div class="phof-domains col-md-6">
+        <a href="@hrefBase@GroupIds.Phof_PrematureMortality">Healthcare public health and preventing premature mortality</a>
+        <p>
+            Browse indicators for tracking progress in reducing numbers of people living with preventable ill health and people dying prematurely.
+        </p>
+    </div>
 </div>

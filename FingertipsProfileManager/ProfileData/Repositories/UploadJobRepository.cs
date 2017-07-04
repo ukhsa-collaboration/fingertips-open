@@ -76,6 +76,7 @@ namespace Fpm.ProfileData.Repositories
             return CurrentSession
                 .CreateCriteria<UploadJobError>()
                 .Add(Restrictions.Eq("JobGuid", jobGuid))
+                .AddOrder(Order.Desc("CreatedAt"))
                 .List<UploadJobError>();
         }
 

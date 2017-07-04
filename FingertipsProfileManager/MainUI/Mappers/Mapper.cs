@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Fpm.MainUI.ViewModels;
+using Fpm.MainUI.ViewModels.Profile;
 using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
@@ -61,6 +62,7 @@ namespace Fpm.MainUI.Mappers
         public static IEnumerable<ProfileUser> ToProfileUserList(this IEnumerable<UserGroupPermissions> userGroupPermissions )
         {
             return userGroupPermissions
+                                .OrderBy((s=>s.FpmUser.DisplayName))
                                 .Select(user => new ProfileUser()
                                 {
                                     Id = user.FpmUser.Id,

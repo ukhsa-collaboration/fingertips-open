@@ -84,7 +84,7 @@ namespace PholioVisualisation.DataAccess
             var allData = new List<CoreDataSet>();
 
             // Query the database 1000 areas at a time, for large numbers of areas the query will fail otherwise
-            var splitter = new AreaCodeListSplitter(areaCodes);
+            var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
                 var criteria = CurrentSession.CreateCriteria<CoreDataSet>();
@@ -92,8 +92,8 @@ namespace PholioVisualisation.DataAccess
                 AddGroupingRestrictions(grouping, criteria);
                 AddTimePeriodRestriction(grouping, criteria);
                 criteria.Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
-                    .Add(Restrictions.Eq("CategoryId", categoryId))
-                    .AddOrder(Order.Asc("AreaCode"));
+                    .Add(Restrictions.Eq("CategoryId", categoryId));
+                criteria.AddOrder(Order.Asc("AreaCode"));
 
                 AddTimeOrdering(criteria);
 

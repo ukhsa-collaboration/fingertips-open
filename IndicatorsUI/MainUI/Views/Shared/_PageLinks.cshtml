@@ -20,30 +20,44 @@
         // These links are only displayed on the Fingertips front page
         <li class="site-link">
             <a href="/documents/UserGuide.pdf" target="_blank"
-               title="The user guide provides a detailed explanation on how to interpret and understand the data presented">User Guide</a>
+               title="Provides an introduction on how to interpret and understand the data presented">Introduction</a>
         </li>
     }
     else
     {
         @*Profile specific pages - TODO add these in the database and editable in FPM*@
-        if (profileId == ProfileIds.SexualHealth)
-        {
-            <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
-        }
-        else if (profileId == ProfileIds.LiverDisease)
-        {
-            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
-                <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
-        }
-        else if (profileId == ProfileIds.HealthProfiles)
-        {
-            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
-        }
-        else if (profileId == ProfileIds.WiderDeterminantsOfHealth)
-        {
-            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherResources, profileId).Link)</li>
+    if (profileId == ProfileIds.SexualHealth)
+    {
+        <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
+    }
+    else if (profileId == ProfileIds.LiverDisease)
+    {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
+    }
+    else if (profileId == ProfileIds.HealthProfiles)
+    {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+    }
+    else if (profileId == ProfileIds.LocalAlcoholProfiles)
+    {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.QuarterlyData, profileId).Link)</li>
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.AdditionalDataAndReports, profileId).Link)</li>
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
+    }
+    else if (profileId == ProfileIds.WiderDeterminantsOfHealth)
+    {
+        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherResources, profileId).Link)</li>
         }
     }
+
+    @*Technical guidance*@
+    <li class="site-link">
+        <a href="/profile/guidance"
+           title="Supporting materials to assist with interpretation of the Fingertips profiles and further use of the indicator data">
+            Technical Guidance
+        </a>
+    </li>
 
     @*Contact us*@
     @if (profileId == ProfileIds.HealthProfiles)
@@ -52,6 +66,7 @@
     }
     else
     {
-        <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", profileUrlKey).Link)</li>
+        var subject = Model.PageType == PageType.SiteFrontPage ? "General enquiry" : profileUrlKey;
+        <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", subject).Link)</li>
     }
 </ul>

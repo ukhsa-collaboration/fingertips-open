@@ -13,7 +13,7 @@ namespace PholioVisualisation.AnalysisTest
         public void TestPolarityIsAssigned()
         {
             var polarityId = PolarityIds.RagHighIsGood;
-            var comparatorMethodId = ComparatorMethodId.DoubleOverlappingCIs;
+            var comparatorMethodId = ComparatorMethodIds.DoubleOverlappingCIs;
 
             var comparer = new IndicatorComparerFactory { PholioReader = MockPholioReader() }.New(
                 new Grouping
@@ -40,7 +40,7 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void TestNewNoComparisonComparer()
         {
-            var comparer = New(ComparatorMethodId.NoComparison, 0);
+            var comparer = New(ComparatorMethodIds.NoComparison, 0);
             Assert.IsTrue(comparer is NoComparisonComparer);
         }
 
@@ -62,21 +62,21 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void TestNewQuintilesComparer()
         {
-            var comparer = New(ComparatorMethodId.Quintiles, 0);
+            var comparer = New(ComparatorMethodIds.Quintiles, 0);
             Assert.IsTrue(comparer is QuintilesComparer);
         }
 
         [TestMethod]
         public void TestNewSingleOverlappingCIsComparer()
         {
-            var comparer = New(ComparatorMethodId.SingleOverlappingCIs, 0);
+            var comparer = New(ComparatorMethodIds.SingleOverlappingCIs, 0);
             Assert.IsTrue(comparer is SingleOverlappingCIsComparer);
         }
 
         [TestMethod]
         public void TestNewDoubleOverlappingCIsComparer()
         {
-            var comparer = New(ComparatorMethodId.DoubleOverlappingCIs, 0);
+            var comparer = New(ComparatorMethodIds.DoubleOverlappingCIs, 0);
             Assert.IsTrue(comparer is DoubleOverlappingCIsComparer);
         }
 
@@ -84,7 +84,7 @@ namespace PholioVisualisation.AnalysisTest
         public void TestNewSpcForDsrComparer()
         {
             var comparer = GetIndicatorComparerWithConfidenceVariable(
-                ComparatorMethodId.SpcForDsr, 95);
+                ComparatorMethodIds.SpcForDsr, 95);
             Assert.IsTrue(comparer is SpcForDsrComparer);
         }
 
@@ -105,7 +105,7 @@ namespace PholioVisualisation.AnalysisTest
         public void TestNewSpcForProportionsComparer()
         {
             var comparer = GetIndicatorComparerWithConfidenceVariable(
-                ComparatorMethodId.SpcForProportions, 95);
+                ComparatorMethodIds.SpcForProportions, 95);
             Assert.IsTrue(comparer is SpcForProportionsComparer);
         }
 

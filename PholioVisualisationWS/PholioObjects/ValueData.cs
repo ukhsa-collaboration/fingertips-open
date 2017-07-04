@@ -16,6 +16,12 @@ namespace PholioVisualisation.PholioObjects
         public double? Count { get; set; }
 
         [JsonIgnore]
+        public bool HasFormattedValue
+        {
+            get { return ValueFormatted != null; }
+        }
+
+        [JsonIgnore]
         public bool IsValueValid
         {
             get { return Value != NullValue; }

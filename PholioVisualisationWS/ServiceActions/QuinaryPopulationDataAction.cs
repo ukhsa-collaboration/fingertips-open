@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
@@ -7,7 +6,10 @@ namespace PholioVisualisation.ServiceActions
 {
     public class QuinaryPopulationDataAction
     {
-        public Dictionary<string, object> GetResponse(string areaCode, int groupId, int dataPointOffset)
+        /// <summary>
+        /// LEGACY: Only user for practice profiles
+        /// </summary>
+        public Dictionary<string, object> GetPopulationAndSummary(string areaCode, int groupId, int dataPointOffset)
         {
             QuinaryPopulationBuilder builder = new QuinaryPopulationBuilder
             {
@@ -17,7 +19,7 @@ namespace PholioVisualisation.ServiceActions
                 AreOnlyPopulationsRequired = false
             };
 
-            builder.Build();
+            builder.BuildPopulationAndSummary();
 
             Dictionary<string, object> responseObjects = new Dictionary<string, object>();
 
@@ -25,7 +27,7 @@ namespace PholioVisualisation.ServiceActions
 
             // Quinary population
             responseObjects.Add("Values", builder.Values);
-            responseObjects.Add("Labels", ReaderFactory.GetPholioReader().GetQuinaryPopulationLabels());
+            responseObjects.Add("Labels", builder.Labels);
 
             // Practice specific information
             if (builder.EthnicityText != null)
@@ -53,7 +55,21 @@ namespace PholioVisualisation.ServiceActions
 
             return responseObjects;
         }
-        public Dictionary<string, object> GetPopulationResponse(string areaCode, int areaTypeId,int dataPointOffset)
+
+        public Dictionary<string, object> GetPopulationOnly(string areaCode, int areaTypeId,
+            int profileId, int indicatorId, int dataPointOffset)
+        {
+            QuinaryPopulationBuilder builder = new QuinaryPopulationBuilder
+            {
+                DataPointOffset = dataPointOffset,
+                AreaCode = areaCode
+            };
+
+            builder.BuildPopulationOnly(areaCode, areaTypeId, profileId, indicatorId);
+            return GetResponseObjects(areaCode, builder);
+        }
+
+        public Dictionary<string, object> GetPopulationOnly(string areaCode, int areaTypeId, int dataPointOffset)
         {
             QuinaryPopulationBuilder builder = new QuinaryPopulationBuilder
             {
@@ -62,18 +78,22 @@ namespace PholioVisualisation.ServiceActions
                 GroupId = GroupIds.Population
             };
 
-            builder.BuildPopulation(areaCode,areaTypeId);
+            builder.BuildPopulationOnly(areaCode,areaTypeId);
+            return GetResponseObjects(areaCode, builder);
+        }
 
+        private static Dictionary<string, object> GetResponseObjects(string areaCode, QuinaryPopulationBuilder builder)
+        {
             Dictionary<string, object> responseObjects = new Dictionary<string, object>();
 
             responseObjects.Add("Code", areaCode);
 
             // Quinary population
             responseObjects.Add("Values", builder.Values);
-            if (builder.Values != null && builder.Values.Count > 0)
-                responseObjects.Add("Labels", ReaderFactory.GetPholioReader().GetQuinaryPopulationLabels());
-            else
-                responseObjects.Add("Labels", null);
+            responseObjects.Add("Labels", builder.Labels);
+            responseObjects.Add("IndicatorName", builder.PopulationIndicatorName);
+            responseObjects.Add("Period", builder.Period);
+
             var listSize = builder.ListSize;
             if (listSize != null)
             {
@@ -83,7 +103,7 @@ namespace PholioVisualisation.ServiceActions
             return responseObjects;
         }
 
-        public Dictionary<string, object> GetPopulationSummaryResponse(string areaCode, int areaTypeId, int dataPointOffset)
+        public Dictionary<string, object> GetSummaryOnly(string areaCode, int areaTypeId, int dataPointOffset)
         {
             if(areaTypeId != AreaTypeIds.GpPractice)
                 return null;
@@ -95,7 +115,7 @@ namespace PholioVisualisation.ServiceActions
                 GroupId = GroupIds.PopulationSummary
             };
             Dictionary<string, object> responseObjects = new Dictionary<string, object>();
-            builder.BuildSummary();
+            builder.BuildSummaryOnly();
 
             responseObjects.Add("Code", areaCode);
 

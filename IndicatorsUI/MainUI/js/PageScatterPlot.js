@@ -11,20 +11,73 @@ var scatterplot = {};
 * @class goToScatterPlotPage
 */
 function goToScatterPlotPage() {
-    if (!groupRoots.length) {
-        // Search results empty
-        noDataForAreaType();
+
+    setPageMode(PAGE_MODES.SCATTER_PLOT);
+
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
     } else {
-        setPageMode(PAGE_MODES.SCATTER_PLOT);
         var sp = scatterplot;
         sp.init();
-        if (FT.model.areaTypeId === AreaTypeIds.Practice)
-            sp.getGpDataForSelectedArea();
-        else
-            sp.getDataForSelectedArea();
+        sp.showHideElements();
+        sp.loadPrimaryIndicatorMenu();
     }
 }
 
+scatterplot.showHideElements = function () {
+
+    if (FT.model.areaTypeId === AreaTypeIds.Practice) {
+        $('#scatterplot-filters').hide();
+        $('#export-chart-box').hide();
+        $('#scatter-key-box').show();
+        $('#scatter-plot-gp-chart').show();
+        $('#scatter-plot-chart').hide().html('');
+    }
+    else {
+        $('#scatterplot-filters').show();
+        $('#export-chart-box').show();
+        $('#scatter-key-box').hide();
+        $('#scatter-plot-chart').show();
+        $('#scatter-plot-gp-chart').hide().html('');
+    }
+};
+
+scatterplot.displayGraph = function () {
+
+    scatterplot.loadSecondaryIndicatorMenu();
+    if (FT.model.areaTypeId === AreaTypeIds.Practice)
+        scatterplot.getGpDataForSelectedArea();
+    else
+        scatterplot.getDataForSelectedArea();
+};
+
+scatterplot.loadPrimaryIndicatorMenu = function () {
+    var model = FT.model;
+    ajaxMonitor.setCalls(1);
+    scatterplot.getGroupingDataForProfile(model);
+    ajaxMonitor.monitor(scatterplot.displayGraph);
+};
+
+scatterplot.loadSecondaryIndicatorMenu = function () {
+
+    var $supportingIndicators = $('#supporting-indicators');
+    //Set the supporting indicator (Y-Axis) to the currently selected one if it exists. Otherwise set it to the first in the list.
+    var selectedSupportingIndicatorIndex = 0;
+    var currentlySelectedYIndicator = $('#supporting-indicators option:selected').attr('key');
+
+    // populate supporting indicators
+    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
+        var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
+        var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
+        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
+        $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
+        if (key === currentlySelectedYIndicator) {
+            selectedSupportingIndicatorIndex = i;
+        }
+    }
+    var supportingGroupRoots = loaded.groupingDataForProfile;
+    loaded.groupRootSecondary = supportingGroupRoots[selectedSupportingIndicatorIndex];
+};
 /**
 * Initialises the scatterplot page based on the areatypeId. Only the first call has an effect
 * @class scatterplot.init
@@ -45,29 +98,42 @@ scatterplot.init = function () {
 };
 
 /**
-* Get all data for selected area by Ajax()
-* @class scatterplot.getDataForSelectedArea
+* Create a configuration object for the service call to get area values
+* @class scatterplot.getAreaValueModel
 */
-scatterplot.getDataForSelectedArea = function () {
-    var model = FT.model,
-        groupRoot = getGroupRoot();
+scatterplot.getAreaValueModel = function(groupRoot) {
+    var model = FT.model;
 
-    ajaxMonitor.setCalls(2);
+    scatterplotState.tempIndicatorKey =  getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
 
-    scatterplot.getGroupingDataForProfile(model);
-
-    scatterplotState.tempIndicatorKey = scatterplotState.indicatorKey1 = getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
+    var groupId = groupRoot.hasOwnProperty('GroupId')
+        ? groupRoot.GroupId
+        : groupRoot.Grouping[0].GroupId;
 
     var areaValueModel = {
-        groupId: model.groupId,
+        groupId: groupId,
         indicatorId: groupRoot.IID,
+        profileId: model.profileId,
         sexId: groupRoot.Sex.Id,
         ageId: groupRoot.Age.Id,
         areaTypeId: model.areaTypeId,
         key: scatterplotState.tempIndicatorKey
     };
-    scatterplot.getAreaValues(areaValueModel);
 
+    return areaValueModel;
+}
+
+/**
+* Get all data for selected area by Ajax()
+* @class scatterplot.getDataForSelectedArea
+*/
+scatterplot.getDataForSelectedArea = function () {
+    var groupRoot = getGroupRoot();
+    var areaValueModel = scatterplot.getAreaValueModel(groupRoot);
+    scatterplotState.indicatorKey1 = areaValueModel.key;
+
+    ajaxMonitor.setCalls(1);
+    scatterplot.getAreaValues(areaValueModel);
     ajaxMonitor.monitor(scatterplot.getSecondaryData);
 };
 
@@ -76,94 +142,54 @@ scatterplot.getDataForSelectedArea = function () {
 * @class scatterplot.getSecondaryData
 */
 scatterplot.getSecondaryData = function () {
-
-    //Set the supporting indicator (Y-Axis) to the currently selected one if it exists. Otherwise set it to the first in the list.
-    var selectedSupportingIndicatorIndex = 0;
-    var currentlySelectedYIndicator = $('#supportingIndicators option:selected').attr('key');
-
-    // populate supporting indicators
-    var $supportingIndicators = $('#supportingIndicators');
-    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
-        var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
-        var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
-        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
-        $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
-        if (key == currentlySelectedYIndicator) {
-            selectedSupportingIndicatorIndex = i;
-        }
-    }
-
     scatterplot.makeAreaNamesAndCodes();
+    var groupRoot = loaded.groupRootSecondary;
+    var areaValueModel = scatterplot.getAreaValueModel(groupRoot);
+    scatterplotState.indicatorKey2 = areaValueModel.key;
+
     ajaxMonitor.setCalls(1);
 
-    var supportingGroupRoots = loaded.groupingDataForProfile,
-        model = FT.model;
-
-    var groupRoot = supportingGroupRoots[selectedSupportingIndicatorIndex];
-
-    scatterplotState.tempIndicatorKey = scatterplotState.indicatorKey2 = getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
-
-    var areaValueModel = {
-        groupId: groupRoot.GroupId,
-        indicatorId: groupRoot.IID,
-        sexId: groupRoot.Sex.Id,
-        ageId: groupRoot.Age.Id,
-        areaTypeId: model.areaTypeId,
-        key: scatterplotState.tempIndicatorKey
-    };
     scatterplot.getAreaValues(areaValueModel);
 
     ajaxMonitor.monitor(scatterplot.displayPage);
 };
 
 scatterplot.getGpDataForSelectedArea = function () {
-    var model = FT.model;
-    ajaxMonitor.setCalls(1);
-    scatterplot.getGroupingDataForProfile(model);
-    ajaxMonitor.monitor(scatterplot.displayGpScatterPlotGraph);
+    scatterplot.reloadSupportingIndicators();
+    scatterplot.displayGpScatterPlotGraph();
 };
 scatterplot.setScatterSrc = function (src) {
 
-    $('#scatter-plot-chart').html('<img src="' + src + '" alt="" />');
+    $('#scatter-plot-gp-chart').html('<img src="' + src + '" alt="" />');
 };
 
 scatterplot.displayGpScatterPlotGraph = function () {
-    var model = FT.model,
-       groupRoot = getGroupRoot();
-    var selectedSupportingIndicatorIndex = 0;
-    var currentlySelectedYIndicator = $('#supportingIndicators option:selected').attr('key');
 
-    // populate supporting indicators
-    var $supportingIndicators = $('#supportingIndicators');
-    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
-        var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
-        var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
-        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
-        $supportingIndicators.append('<option key="' + key + '" value="' + i + '">' + indicatorName + '</option>');
-        if (key == currentlySelectedYIndicator) {
-            selectedSupportingIndicatorIndex = i;
-        }
-    }
+    var model = FT.model;
+    var groupRoot = getGroupRoot();
+    var groupRoot2 = loaded.groupRootSecondary;
 
-    var supportingGroupRoots = loaded.groupingDataForProfile;
-    var groupRootSecondary = supportingGroupRoots[selectedSupportingIndicatorIndex];
+    var parameters = new ParameterBuilder(
+        ).add('width', 900
+        ).add('height',500
+        ).add('off',0
+        ).add('par',model.parentCode
+        ).add('are', model.areaCode
+        ).add('gid1', groupRoot2.GroupId
+        ).add('iid1', groupRoot2.IID
+        ).add('sex1', groupRoot2.Sex.Id
+        ).add('age1', groupRoot2.Age.Id
+        ).add('gid2', model.groupId
+        ).add('iid2', groupRoot.IID
+        ).add('sex2', groupRoot.Sex.Id
+        ).add('age2', groupRoot.Age.Id);
 
-    var src = [FT.url.bridge, 'img/gp-scatter-chart?width=900&height=500&',
-        'off=', 0];
+    scatterplot.setScatterSrc(FT.url.bridge + 'img/gp-scatter-chart?' + parameters.build());
 
-    var isPractice = isDefined(model.areaCode);
-    if (isPractice) {
-        src.push("&are=", model.areaCode);
-    }
-    src.push("&gid1=", model.groupId,
-        "&iid1=", groupRoot.IID,
-        "&sex1=", groupRoot.Sex.Id,
-        '&age1=', groupRoot.Age.Id);
-    src.push("&gid2=", groupRootSecondary.GroupId,
-        "&iid2=", groupRootSecondary.IID,
-        "&sex2=", groupRootSecondary.Sex.Id,
-        '&age2=', groupRootSecondary.Age.Id);
-    scatterplot.setScatterSrc(src.join(''));
+    updateScatterPracticeLegendLabel();
+    updateScatterParentLegendLabel();
+    updateScatterOtherPracticeLegendLabel();
+
     showAndHidePageElements();
     unlock();
 };
@@ -195,13 +221,13 @@ scatterplot.displayPage = function () {
 };
 
 scatterplot.reloadSupportingIndicators = function () {
-    //Reload the Y-Axis indicator list and set to the previous selected one if it is available
-    var currentSelectionValue = $('#supportingIndicators option:selected').attr('key');
 
-    $('#supportingIndicators').empty();
+    //Reload the Y-Axis indicator list and set to the previous selected one if it is available
+    var currentSelectionValue = $('#supporting-indicators option:selected').attr('key');
 
     // Re-populate supporting indicators
-    var $supportingIndicators = $('#supportingIndicators');
+    var $supportingIndicators = $('#supporting-indicators');
+    $supportingIndicators.empty();
     for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
         var sex = new SexAndAge().getLabel(loaded.groupingDataForProfile[i]);
         var indicatorName = loaded.groupingDataForProfile[i].IndicatorName + sex;
@@ -210,7 +236,7 @@ scatterplot.reloadSupportingIndicators = function () {
         $supportingIndicators.append('<option key="' + IID + '-' + sexId + '" value="' + i + '">' + indicatorName + '</option>');
     }
 
-    $('#supportingIndicators [key="' + currentSelectionValue + '"]').attr('selected', 'selected');
+    $('#supporting-indicators [key="' + currentSelectionValue + '"]').attr('selected', 'selected');
     $supportingIndicators.chosen({ width: '95%', search_contains: true });
     $supportingIndicators.prop('disabled', false).trigger("chosen:updated");
 }
@@ -223,7 +249,6 @@ scatterplot.ViewManager = function ($container) {
     var isInitialised = false,
         $header,
         $chartBox,
-        $supportingIndicators,
         chart;
 
     this.tabSpecificOptions = null;
@@ -235,15 +260,13 @@ scatterplot.ViewManager = function ($container) {
                 '<input type="checkbox" id="selectedAreaFilter" onchange="scatterplot.highlightAreaFilter(this);">Highlight <span id="filterSelectedAreaName">' +
                  getAreaNameToDisplay(areaHash[FT.model.areaCode]) +
                 '</span><br>' +
-                '<input type="checkbox" id="r2Filter" onchange="scatterplot.addR2(this);">Add trendline & R\xB2' +
+                '<input type="checkbox" id="r2Filter" onchange="scatterplot.addR2(this);">Add regression line & R\xB2' +
                 ' <br></div>';
 
-            var exportTypes = '<div class="export-chart-box"><a class="export-link" href="javascript:scatterplot.viewManager.exportChart()">Export chart as image</a></div>';
+            var exportTypes = '<div id="export-chart-box" class="export-chart-box"><a class="export-link" href="javascript:scatterplot.viewManager.exportChart()">Export chart as image</a></div>';
 
-            $header = $('<div id="scatterplot-header" class="clearfix"></div>');
             $chartBox = $('<div id="scatter-plot-chart-box-wrapper">' + exportTypes + '<div id="scatter-plot-chart-box" class="clearfix"><div id="scatter-plot-chart"></div></div>' + $filters + '</div>');
-            $supportingIndicators = $('<div id="supportingIndicatorsWrapper"><div class="supportingIndicators">Indicator on Y axis&nbsp;</div><div class="supportingIndicatorsMenu"><select id="supportingIndicators"  onchange="scatterplot.getSelectedSupportingIndicator(this);"></select></div></div>');
-            $container.prepend($header, $supportingIndicators, $chartBox);
+            scatterplot.addSupportingIndicatorsMenu($container, $chartBox);
             this.initTabSpecificOptions();
             isInitialised = true;
         }
@@ -325,7 +348,7 @@ scatterplot.ViewManager = function ($container) {
             xAxis: {
                 title: {
                     enabled: true,
-                    text: scatterplot.formatTitle(scatterplot.xAxisTitle(), units.x),                      
+                    text: scatterplot.formatTitle(scatterplot.xAxisTitle(), units.x),
                     style: {
                         width: 400
                     }
@@ -333,11 +356,11 @@ scatterplot.ViewManager = function ($container) {
             },
             yAxis: {
                 title: {
-                text: scatterplot.formatTitle( scatterplot.yAxisTitle(), units.y),                   
-                margin: scatterplot.calculateMargin(scatterplot.yAxisTitle()),
-                style: {
-                    width: 300
-                }
+                    text: scatterplot.formatTitle(scatterplot.yAxisTitle(), units.y),
+                    margin: scatterplot.calculateMargin(scatterplot.yAxisTitle()),
+                    style: {
+                        width: 300
+                    }
                 }
             },
             legend: {
@@ -403,20 +426,20 @@ scatterplot.ViewManager = function ($container) {
 };
 
 
-scatterplot.formatTitle = function(indicatorName, unit) {
-    if (unit !== '') {        
+scatterplot.formatTitle = function (indicatorName, unit) {
+    if (unit !== '') {
         return indicatorName + ' / ' + unit;
     } else {
         return indicatorName;
     }
 };
 
-scatterplot.calculateMargin = function (indicatorName) {    
+scatterplot.calculateMargin = function (indicatorName) {
     var charCount = indicatorName.length;
     var newMargin = 30;
     if (charCount > 60) {
         newMargin = (charCount / 60) * 30;
-    }    
+    }
     return newMargin;
 }
 
@@ -460,6 +483,7 @@ scatterplot.getAreaValues = function (model) {
             ).add('group_id', model.groupId
             ).add('area_type_id', model.areaTypeId
             ).add('parent_area_code', getCurrentComparator().Code
+            ).add('profile_id', model.profileId
             ).add('comparator_id', comparatorId
             ).add('indicator_id', model.indicatorId
             ).add('sex_id', model.sexId
@@ -473,46 +497,10 @@ scatterplot.getAreaValues = function (model) {
 * Callback for getAreaValues
 * @method scatterplot.getAreaValuesCallback
 */
-scatterplot.getAreaValuesCallback = function (obj) {
+scatterplot.getAreaValuesCallback = function (coreDataList) {
 
     // Hash: Key -> area code, Value -> coredataset
-    var hash = {},
-        areaOrder = [];
-
-    _.each(obj, function (data) {
-        hash[data.AreaCode] = data;
-        areaOrder.push({ AreaCode: data.AreaCode, Val: data.Val, ValF: data.ValF });
-    });
-
-    areaOrder.sort(sortData).reverse();
-
-    // First, count number of areas which have a value.
-    var numAreas = 0;
-    $.each(areaOrder, function (i, coreData) {
-        if (coreData.ValF !== '-') {
-            numAreas++;
-        }
-    });
-
-    // Second, set orderFrac for each.
-    var j = 0;
-    $.each(areaOrder, function (i, coreData) {
-        var data = hash[coreData.AreaCode];
-        if (coreData.ValF === '-') {
-            data.order = -1;
-            data.orderFrac = -1;
-        }
-        else {
-            data.order = numAreas - j;
-            data.orderFrac = 1 - j / numAreas;
-            var position = numAreas + 1 - j + 1;
-            data.quartile = Math.ceil(position / (numAreas / 4));
-            data.quintile = Math.ceil(position / (numAreas / 5));
-            j++;
-        }
-    });
-
-    loaded.areaValues[scatterplotState.tempIndicatorKey] = hash;
+    loaded.areaValues[scatterplotState.tempIndicatorKey] = addOrderandPercentilesToData(coreDataList);
 
     ajaxMonitor.callCompleted();
 };
@@ -617,7 +605,8 @@ scatterplot.transformDataForIndicator = function () {
     if (isR2Selected) {
 
         var linearRegressionData = linearRegression(yAxis, xAxis);
-        var rSquareEquation = 'y = ' + Math.round(linearRegressionData.slope * 100) / 100 + 'x +' + Math.round(linearRegressionData.intercept * 100) / 100;
+        var rSquareEquation = 'y = ' + Math.round(linearRegressionData.slope * 100) / 100 + 'x +' +
+            Math.round(linearRegressionData.intercept * 100) / 100;
         var rSquaredValue = Math.round(linearRegressionData.r2 * 100) / 100;
         var rSquareThreshold = .15;
         var legendBaseText = rSquareEquation + '<br>R\xB2 = ' + Math.round(linearRegressionData.r2 * 100) / 100;
@@ -629,7 +618,9 @@ scatterplot.transformDataForIndicator = function () {
             dashStyle: 'solid',
             type: 'line',
             animation: false,
-            name: rSquaredValue > rSquareThreshold ? legendBaseText : 'Trend line not drawn when R\xB2<br>is below 0.15 (R\xB2 = ' + rSquaredValue + ')',
+            name: rSquaredValue > rSquareThreshold
+                ? legendBaseText
+                : 'Trend line not drawn when R\xB2<br>is below 0.15 (R\xB2 = ' + rSquaredValue + ')',
             lineWidth: 2,
             marker: {
                 enabled: false
@@ -643,7 +634,7 @@ scatterplot.getIndicatorsUnit = function () {
 
     var selectedMainIndicatorId = groupRoots[getIndicatorIndex()].IID;
 
-    var $supportingIndicator = $('#supportingIndicators :selected');
+    var $supportingIndicator = $('#supporting-indicators :selected');
     var selectedSupportingIndicatorId = loaded.groupingDataForProfile[$supportingIndicator.val()].IID;
 
     var units = {};
@@ -653,11 +644,26 @@ scatterplot.getIndicatorsUnit = function () {
     return units;
 };
 
-scatterplot.getSelectedSupportingIndicator = function () {
-    scatterplot.getSecondaryData();
-};
-scatterplot.getSelectedGpSupportingIndicator = function () {
-    scatterplot.displayGpScatterPlotGraph();
+scatterplot.supportingIndicatorChanged = function () {
+
+    var selectedSupportingIndicatorIndex = 0;
+
+    // Format of key "<iid>-<sexId>"
+    var currentlySelectedYIndicator = $('#supporting-indicators option:selected').attr('key');
+
+    for (var i = 0; i < _.size(loaded.groupingDataForProfile) ; i++) {
+        var key = loaded.groupingDataForProfile[i].IID + '-' + loaded.groupingDataForProfile[i].Sex.Id;
+        if (key === currentlySelectedYIndicator) {
+            selectedSupportingIndicatorIndex = i;
+        }
+    }
+
+    loaded.groupRootSecondary = loaded.groupingDataForProfile[selectedSupportingIndicatorIndex];
+    if (FT.model.areaTypeId === AreaTypeIds.Practice) {
+        scatterplot.displayGpScatterPlotGraph();
+    } else {
+        scatterplot.getSecondaryData();
+    }
 };
 /**
 * Returns title for x axis of chart
@@ -673,8 +679,8 @@ scatterplot.xAxisTitle = function () {
 * @method scatterplot.yAxisTitle
 */
 scatterplot.yAxisTitle = function () {
-    var yTitle = $('#supportingIndicators :selected').text();
-    return yTitle; //.wordWrap(60, '<br>');
+    var yTitle = $('#supporting-indicators :selected').text();
+    return yTitle;
 };
 
 scatterplot.makeAreaNamesAndCodes = function () {
@@ -702,7 +708,7 @@ scatterplot.getNoDataIndicatorName = function () {
         returnText = '';
 
     mainIndicatorName = $('#indicatorMenu :selected').text();
-    supportingIndicatorName = $('#supportingIndicators :selected').text();
+    supportingIndicatorName = $('#supporting-indicators :selected').text();
 
     var xLength = _.size(rawX);
     var yLength = _.size(rawY);
@@ -786,6 +792,7 @@ scatterplot.dataSeries = [];
 
 loaded.groupingDataForProfile = {};
 loaded.areaNamesAndCodes = {};
+loaded.groupRootSecondary = {};
 
 // Scatter plot does not currently work for search results
 if (FT.model.profileId !== ProfileIds.SearchResults) {
@@ -795,31 +802,36 @@ if (FT.model.profileId !== ProfileIds.SearchResults) {
         'goto': goToScatterPlotPage,
         gotoName: 'goToScatterPlotPage',
         needsContainer: true,
-        jqIds: ['.geo-menu', 'indicatorMenuDiv', 'nearest-neighbour-link'],
+        jqIds: ['.geo-menu', 'indicator-menu-div', 'nearest-neighbour-link'],
         jqIdsNotInitiallyShown: []
     });
 }
 
-scatterplot.ViewManagerGpScatterPlot = function($container) {
+scatterplot.addSupportingIndicatorsMenu = function($container, $chartBox) {
+    var supportingIndicators = $('#supporting-indicators');
+    var $supportingIndicators =
+      $('<div id="supporting-indicators-wrapper" class="clearfix"><div class="supporting-indicators">Indicator on Y axis&nbsp;</div><div class="supporting-indicators-menu"><select id="supporting-indicators"  onchange="scatterplot.supportingIndicatorChanged(this);"></select></div></div>');
+    if (supportingIndicators.length) {
+        $container.append($chartBox);
+    } else {
+        $container.append($supportingIndicators, $chartBox);
+    }
+}
+
+scatterplot.ViewManagerGpScatterPlot = function ($container) {
 
     var isInitialised = false,
         $header,
-        $chartBox,
-        $supportingIndicators;
+        $chartBox;
 
     this.tabSpecificOptions = null;
 
-    this.init = function() {
+    this.init = function () {
         if (!isInitialised) {
 
-            $header = $('<div id="scatterplot-header" class="clearfix"></div>');
             $chartBox =
-                $('<div id="scatter-plot-chart-box-wrapper"><div id="scatter-plot-chart-box" class="clearfix"><div id="scatter-plot-chart"></div></div></div>');
-            $supportingIndicators =
-                $('<div id="supportingIndicatorsWrapper"><div class="supportingIndicators">Indicator on Y axis&nbsp;</div><div class="supportingIndicatorsMenu"><select id="supportingIndicators"  onchange="scatterplot.getSelectedGpSupportingIndicator(this);"></select></div></div>');
-
-            $container.prepend($header, $supportingIndicators, $chartBox);
-            //this.initTabSpecificOptions();
+                $('<div id="scatter-plot-chart-box-wrapper"><div id="scatter-plot-gp-chart-box" class="clearfix"><div class="fl w100"><table cellspacing="0"><tr><td><div id="scatter-key-box"><table id="scatter-key-table" cellspacing="0"><tr><td id="scatterPractice"></td><td id="scatterParent" class="noLeft"></td><td id="scatterOther" class="noLeft"></td></tr></table></div></td></tr></table></div><div id="scatter-plot-gp-chart"></div></div></div>');
+            scatterplot.addSupportingIndicatorsMenu($container, $chartBox);
             isInitialised = true;
         }
     };
@@ -828,7 +840,7 @@ scatterplot.ViewManagerGpScatterPlot = function($container) {
     * Sets the HTML to display above the chart
     * @method setHeaderHTML
     */
-    this.setHeaderHtml = function(html) {
+    this.setHeaderHtml = function (html) {
         $header.html(html);
     };
 
@@ -836,7 +848,7 @@ scatterplot.ViewManagerGpScatterPlot = function($container) {
     * Hides the chart and filter menu and tells the user there is no data
     * @method displayNoData
     */
-    this.displayNoData = function() {
+    this.displayNoData = function () {
 
         scatterplot.getNoDataIndicatorName();
         var noDataText = '<p style="text-align: center; padding:150px 0 150px 0;">' +
@@ -844,29 +856,24 @@ scatterplot.ViewManagerGpScatterPlot = function($container) {
             '</p>';
 
         $('#scatter-plot-chart').html(noDataText);
-        $('#scatterplot-filters').hide();
     };
+};
+function updateScatterParentLegendLabel() {
+    var label = getParentArea().Name;
+    setScatterKeyImg('scatterParent', 'parent', label);
+};
 
-    /**
-    * Initialises the area switch 
-    * @method initTabSpecificOptions
-    */
-    this.initTabSpecificOptions = function() {
-        var clickHandler = scatterplot.getDataForSelectedArea;
-        this.tabSpecificOptions = new TabSpecificOptions({
-            eventHandlers: [clickHandler, clickHandler],
-            eventName: 'ScatterplotAreaSelected'
-        });
-    };
+function updateScatterPracticeLegendLabel() {
 
-    /**
-    * Updates the area switch 
-    * @method updateTabSpecificOptionsOptions
-    */
-    this.updateTabSpecificOptionsOptions = function() {
-        this.tabSpecificOptions.setHtml({
-            label: 'Scatter plot for',
-            optionLabels: ['England', areaHash[FT.model.areaCode].Name]
-        });
-    };
+    var code = FT.model.areaCode;
+    var label = areaHash[code].Name;
+    setScatterKeyImg('scatterPractice', 'practice', label);
+};
+
+function updateScatterOtherPracticeLegendLabel() {
+    setScatterKeyImg('scatterOther', 'other', 'Other practices in England');
+};
+
+function setScatterKeyImg(id, item, label) {
+    $('#' + id).html('<img src="' + FT.url.img + 'scatter-' + item + '.png" />' + label);
 };

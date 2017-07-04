@@ -34,10 +34,10 @@ namespace PholioVisualisation.ServiceActions
         protected virtual void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> categoryDataList)
         {
             var area = AreaFactory.NewArea(_areasReader, areaCode);
-            var nationalArea = GetNationalArea(area);
+            var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
 
             var indicatorComparisonHelper = new IndicatorComparisonHelper(_indicatorMetadata,
-                _grouping, _groupDataReader, _pholioReader, nationalArea);
+                _grouping, _groupDataReader, _pholioReader, targetComparerProvider);
 
             // Set benchmark data
             var benchmarkDataProvider = new BenchmarkDataProvider(_groupDataReader);

@@ -10,6 +10,17 @@ namespace PholioVisualisation.DataConstructionTest
     public class ProfilePerIndicatorBuilderTest
     {
         [TestMethod]
+        public void TestEmptyIndicatorList()
+        {
+            var builder = new ProfilePerIndicatorBuilder(true);
+            var result = builder.Build(new List<int>(), AreaTypeIds.DistrictAndUnitaryAuthority);
+
+            // Assert: result is returned
+            Assert.IsNotNull(result);
+            Assert.AreEqual(0, result.Keys.Count);
+        }
+
+        [TestMethod]
         public void BuildTest()
         {
             var result = BuildProfilesPerIndicator(false);

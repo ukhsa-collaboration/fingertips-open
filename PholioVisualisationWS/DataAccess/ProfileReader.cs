@@ -10,7 +10,7 @@ namespace PholioVisualisation.DataAccess
 {
     public interface IProfileReader
     {
-        bool CanPdfBeGenerated(int profileId, int areaTypeId);
+        IList<ProfilePdf> GetProfilePdfs(int profileId);
         IgnoredAreaCodes GetAreaCodesToIgnore(int profileId);
         IList<int> GetGroupIdsFromAllProfiles();
         IList<int> GetGroupIdsFromSpecificProfiles(IList<int> profileIds);
@@ -46,12 +46,11 @@ namespace PholioVisualisation.DataAccess
         {
         }
 
-        public bool CanPdfBeGenerated(int profileId, int areaTypeId)
+        public IList<ProfilePdf> GetProfilePdfs(int profileId)
         {
             return CurrentSession.CreateCriteria<ProfilePdf>()
                 .Add(Restrictions.Eq("ProfileId", profileId))
-                .Add(Restrictions.Eq("AreaTypeId", areaTypeId))
-                .UniqueResult<ProfilePdf>() != null;
+                .List<ProfilePdf>();
         }
 
         public virtual IgnoredAreaCodes GetAreaCodesToIgnore(int profileId)

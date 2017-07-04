@@ -5,7 +5,11 @@ a {
     cursor: pointer;
 }
 
-/* Lightbox */
+
+/*----------------------------------------
+	Lightbox
+------------------------------------------*/
+
 .lightbox-button-box {
     float: left;
     width: 100%;
@@ -23,6 +27,10 @@ h2.lightbox-title {
     font-size: 13px;
     color: #333;
     margin: 5px 0 5px 5px;
+}
+
+#infoBox h2 {
+	padding: 3px 0 12px 9px;
 }
 
 .exportBtn {
@@ -46,35 +54,8 @@ h2.lightbox-title {
     border: 1px solid #DDD;
 }
 
-.export {
-    padding: 3%;
-    margin: 30px 7% 10px 7%;
-    width: 80%;
-    float: left;
-}
-
-    .export TD {
-        vertical-align: top;
-        text-align: left;
-        padding-top: 4px;
-    }
-
-    .export INPUT {
-        margin-top: 2px;
-    }
-
-    .export span {
-        display: block;
-        padding: 5px;
-        text-align: right;
-    }
-
-    .export select {
-        width: 65%;
-    }
-
 /* Button options */
-a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
+a.page-selector, a.page-selector:visited, a.page-selector:active {
     color: #2e3191;
     text-decoration: none;
     margin-left: 4px;
@@ -85,53 +66,12 @@ a.pageSelector, a.pageSelector:visited, a.pageSelector:active {
     font-size: 90%;
 }
 
-    a.pageSelector:hover {
+    a.page-selector:hover {
         text-decoration: underline;
     }
 
-#sortSelectionBox {
+#sort-selection-box {
     padding-top: 5px;
-}
-
-/* Spine charts */
-#singleAreaTable th div {
-    line-height: 1.1em;
-}
-
-.noSpine {
-    height: 23px;
-    line-height: 23px;
-    width: 100%;
-    text-align: center;
-    font-style: italic;
-    font-size: 11px;
-}
-
-.q1, .q2, .q4, .spine {
-    height: 23px;
-    float: left;
-}
-
-.spine {
-    overflow: hidden;
-    padding: 0 0 0 0;
-}
-
-.spine250 {
-    width: 274px; /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
-    position: relative;
-}
-
-.average250 {
-    width: 2px;
-    left: 136px; /*half spine250 width - 1(i.e. half average bar width)*/
-    position: absolute;
-    height: 23px;
-}
-
-.marker {
-    position: absolute;
-    top: 2px;
 }
 
 div.close {
@@ -216,10 +156,10 @@ div#main {
     clear: both;
 }
 
-.borderedTable td, .borderedTable th, .key {
+.bordered-table td, .bordered-table th, .key {
     border-spacing: 0;
     border-style: solid;
-    border-width: 2px;
+    border-width: 1px;
     border-color: #eeeeee;
 }
 
@@ -277,7 +217,7 @@ th.numericHeader, th.numericWideHeader {
 }
 
 
-.tallCentralMessage {
+.tall-central-message {
     margin-top: 140px;
     height: 180px;
     width: 100%;
@@ -314,25 +254,14 @@ a.descLink {
 }
 
 #spinner {
-    position: relative;
-    height: 400px;
-    width: 510px;
+    margin: 200px 0;
     color: #999;
     font-size: 10px;
-    float: left;
-    clear: both;
-}
-
-img.spinner {
-    position: absolute;
-    right: 4px;
-    top: 200px;
+    text-align: center;
 }
 
 #spinnerLabel {
-    position: absolute;
-    right: 0;
-    top: 231px;
+    right: -2px;
 }
 
 .fl {
@@ -359,12 +288,12 @@ img.spinner {
     position: relative;
 }
 
-.homeHeader {
+.home-header {
     color: #333;
     text-decoration: none;
 }
 
-.homeHeader:hover {
+.home-header:hover {
     color: #333;
 }
 
@@ -425,7 +354,7 @@ img.spinner {
     bottom: 1px;
 }
 
-.tartanFill {
+.tartan-fill {
     width: 50px;
     height: 50px;
     position: absolute;
@@ -434,7 +363,7 @@ img.spinner {
     z-index: 1;
 }
 
-.printOnly {
+.print-only {
     display: none;
 }
 
@@ -477,26 +406,6 @@ a.rowSort, a.rowSort:visited, a.columnSort, a.columnSort:visited {
 .menuHeader {
     margin-top: 2px;
     margin-right: 3px;
-}
-
-#rug-container {
-    width: 100%;
-}
-
-div.tartanBox {
-    margin: 0 0 0 0;
-    padding: 0 0 0 0;
-    position: relative;
-    height: 23px;
-}
-
-div.tartanText {
-    width: 100%;
-    margin-top: 4px;
-    z-index: 3;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
 
 td.worse, td.same, td.better, td.none, .bobLower, .bobHigher, .grade-quintile-1, .grade-quintile-2, .grade-quintile-3, .grade-quintile-4, .grade-quintile-5  {
@@ -553,7 +462,7 @@ span.target {
     border-right: 4px solid #fff;
 }
 
-.keyTable span.target {
+.key-table span.target {
     padding: 2px 4px;
     margin: 0;
     font-size: 14px;
@@ -591,66 +500,13 @@ td.none {
 }
 
 /* ------------------------------------------------------------
-	Tartan rug
------------------------------------------------------------- */
-th.rugPeriod {
-    vertical-align: bottom;
-}
-
-.scroll-place {
-    background: #aaa;
-    height: 3px;
-}
-
-.rug-scroll-left, .rug-scroll-right {
-    height: 20px;
-    width: 50%;
-    background-color: #aaa;
-    background-repeat: no-repeat;
-    background-position: 50% 5px;
-    border-top: 2px solid white;
-}
-
-    .rug-scroll-left:hover, .rug-scroll-right:hover {
-        background-color: #666;
-    }
-
-.rug-scroll-left {
-    background-image: url('../images/back2.png');
-    border-right: 2px solid white;
-}
-
-.rug-scroll-right {
-    background-image: url('../images/forward2.png');
-}
-
-.tartanText span {
-    font-style: normal;
-    font-size: 1.4em;
-    width: 100%;
-    display: inline-block;
-    text-align: center;
-    margin-top: -3px;
-    cursor: default;
-}
-
-    .tartanText span.value-note-symbol {
-        font-size: 1.2em;
-        margin-top: 1px;
-    }
-
-.tartanText .noData {
-    cursor: default;
-}
-
-/* ------------------------------------------------------------
 	Search
 ------------------------------------------------------------ */
 .searchBlur {
     color: #aaa;
 }
 
-#searchButton {
+#search-button {
     font-size: 13px;
     width: 24px;
     height: 24px;
@@ -675,7 +531,7 @@ th.rugPeriod {
 }
 
 #indicator-profile-origin-link {
-    padding: 10px 0 10px 10px;
+    padding: 10px 0;
     color: #1f0aa1;
 }
 
@@ -683,12 +539,12 @@ th.rugPeriod {
 	Tabs
 ------------------------------------------------------------ */
 .page {
-    background: #D7EBE8;  /*#E5F0EE; */
-    margin-right:3px;
+    background: #D7EBE8; 
+    margin-right:2px;
     color:#666;
     text-decoration: none;
-    width: 90px;
-    height: 71px;
+    width: 81px;
+    height: 65px;
     float: left;
     cursor: pointer;
     position: relative;
@@ -700,7 +556,7 @@ background:#CAE4E0;
 color:#333;
 }
 
-div.pageSelected, div.pageSelected:hover
+div.page-selected, div.page-selected:hover
 {
     color:white;
     background-color: #02ae94;
@@ -711,7 +567,7 @@ div.pageSelected, div.pageSelected:hover
     height: 30px;
     width: 34px;
     top: 3px;
-    left: 28px;
+    left: 24px;
     background-repeat: no-repeat;
     opacity:0.5;
 }
@@ -732,11 +588,19 @@ div.pageSelected, div.pageSelected:hover
     background-image: url('../images/tabs/indicators.gif');
 }
 
+#page-boxplots div {
+    background-image: url('../images/tabs/box-plot.png');
+}
+
+#page-reports div {
+    background-image: url('../images/tabs/reports.gif');
+}
+
 #page-metadata div {
     background-image: url('../images/tabs/metadata.gif');
 }
 
-#page-content div {
+#page-inequalities div {
 background-image: url('../images/tabs/inequalities.gif');
     width: 60px;
     left: 15px;
@@ -762,11 +626,11 @@ background-image: url('../images/tabs/inequalities.gif');
     background-image: url('../images/tabs/population.gif');
 }
 
-div.pageSelected div {
+div.page-selected div {
     opacity:1.0;
 }
 
-div.pageSelected
+div.page-selected
 {
     color:white;
 }
@@ -793,7 +657,7 @@ div.page span
     height: 28px;
 }
 
-.standardWidth {
+.standard-width {
     width: 1000px;
     margin: 0 auto 0 auto;
     clear: both;
@@ -818,201 +682,11 @@ TH.topRow {
     padding-bottom: 1px;
 }
 
-/* ------------------------------------------------------------
-	Menu previous & next buttons
------------------------------------------------------------- */
-.menu-prev, .menu-next {
-    height: 22px;
-    width: 22px;
-    background-image: url(../images/left-right-arrows.png);
-    background-repeat: no-repeat;
-    border: 1px solid #ddd;
-    position: relative;
-}
-
-.menu-prev {
-    background-position: 6px 3px;
-    left: 2px;
-}
-
-.menu-next {
-    background-position: -16px 3px;
-    left: -2px;
-}
-
-    .menu-prev:hover, .menu-next:hover {
-        background-color: white;
-    }
-
-/* ------------------------------------------------------------
-	Indicator details bar chart
------------------------------------------------------------- */
-TH.bar {
-    text-align: left;
-    width: 240px;
-    vertical-align: top;
-    border-left: none;
-}
-
-TD.bar {
-    border-top: 2px solid white;
-    border-bottom: 2px solid white;
-}
-
-TD.barFirst {
-    border-top: 2px solid #eee;
-}
-
-TD.barLast {
-    border-bottom: 2px solid #eee;
-}
-
-.barBox {
-    position: relative;
-    width: 100%;
-    height: 17px;
-}
-
-IMG.bar {
-    top: 0;
-    left: 0;
-    height: 17px;
-    position: absolute;
-    background: #C9C9C9;
-    border: none;
-}
-
-.error, .errorMid {
-    top: 2px;
-    position: absolute;
-    width: 1px;
-    height: 11px;
-    line-height: 0;
-}
-
-.errorMid {
-    height: 2px;
-    top: 7px;
-}
-
-/* ------------------------------------------------------------
-	Sparkline view options
------------------------------------------------------------- */
-#sparkLineViews {
-    float: right;
-}
-
-#view0, #view1 {
-    text-decoration: none;
-    display: block;
-    width: 28px;
-    height: 28px;
-    float: right;
-}
-
-#view0 {
-    background-image: url(../images/oneAreaOff.png);
-}
-
-#view1 {
-    margin-left: 5px;
-    background-image: url(../images/multiAreaOff.png);
-}
-
-#view0.selected, #view0:hover {
-    background-image: url(../images/oneArea.png);
-}
-
-#view1.selected, #view1:hover {
-    background-image: url(../images/multiArea.png);
-}
-
-/* ------------------------------------------------------------
-	Sparkline view options
------------------------------------------------------------- */
-div.sparklineIndicator {
-    width: 240px;
-}
-
-img.sparklineIndicator {
-    /*To improve layout on rendering*/
-    height: 140px;
-    width: 240px;
-}
-/* Sparkline navigation elements */
-div.sparklineIndicator, img.sparklineArea {
-    border: 3px solid white;
-}
-
-    div.sparklineIndicator:hover, img.sparklineArea:hover {
-        border: 3px solid #bbb;
-    }
-
-.sparklineBox {
-    width: 100%;
-    float: left;
-    text-align: center;
-}
-
 .front-page-text {
     margin-left: 40px;
     margin-top: 20px;
     color: #444;
     line-height: 20px;
-}
-
-/* ------------------------------------------------------------
-	Bar chart and funnel plot
------------------------------------------------------------- */
-#indicatorDetailsData {
-    width: 100%;
-}
-
-#indicatorDetailsTable {
-    width: 100%;
-    float: left;
-    clear: both;
-}
-
-#indicatorDetailsNoData, #funnelPlotNoData {
-    margin: 120px 0 100px 0;
-}
-
-#indicatorDetailsNoData {
-    float: left;
-    margin-left: 480px;
-    font-style: italic;
-}
-
-div.noData, div.noData300 {
-    font-style: italic;
-    text-align: center;
-    width: 100%;
-}
-
-div.noData300 {
-    margin-top: 150px;
-    margin-bottom: 150px;
-}
-
-#funnelPlotBox {
-    float: left;
-}
-
-#funnelPlot, #funnelPlotBox {
-    width: 400px;
-}
-
-#indicatorDetailsBox {
-    width: 600px;
-    float: right;
-}
-
-#indicatorDetailsHeader {
-    background: #eee;
-    width: 100%;
-    font-weight: bold;
-    text-align: right;
 }
 
 a.start, a.start:active, a.start:visited {
@@ -1030,195 +704,14 @@ a.start, a.start:active, a.start:visited {
     font-size: 12px;
 }
 
-/* ------------------------------------------------------------
-	Menus
------------------------------------------------------------- */
-ul.menu {
-    list-style: none;
-    float: left;
-    width: 400px;
-}
-
-ul.inner-menu {
-    list-style: none;
-    float: right;
-    width: 80px;
-}
-
-#indicatorMenuDiv ul.inner-menu {
-    width: 100px;
-}
-
-ul.menu li {
-    display: inline-block;
-    float: right;
-}
-
-ul.menu .heading {
-    padding-top: 2px;
-    padding-right: 3px;
-}
-
-ul.menu select {
-    width: 200px;
-}
-
-ul.right-menu {
-    list-style: none;
-    width: 240px;
-    float: right;
-}
-ul.left-menu {
-    list-style: none;
-    width: 300px;
-    float: left;
-}
-    #benchmark-box select {
-        width: 150px;
-    }
-
-#indicatorMenu {
-    width: 550px;
-}
-
 .marginTop5 {
     margin-top:5px;
 }
 
-/* ------------------------------------------------------------
-	Tabs and view menus
------------------------------------------------------------- */
-.viewOptions
-{
-    float: left;
-    width: 100%;
-}
-
-#tabs, #view-options {
-    width: 1000px;
-    margin: 0 auto;
-    padding: 0;
-}
-
-#tabs {
-    background: none;
-    border: none;
-    margin-top: 6px;
-}
-
-#view-options {
-    padding: 5px 0;
-    background: #eee;
-}
-
-    #view-options .row {
-        clear: both;
-        width: 98%;
-        margin-left: 1%;
-        padding: 5px 0;
-        float: left;
-        position: relative;
-    }
-
-/* ------------------------------------------------------------
-	Indicator select all
------------------------------------------------------------- */
-#indicatorSelectAll {
-    float: left;
-    height: 20px;
-    line-height: 20px;
-}
-
-#indicatorSelectAllTd {
-    font-weight: bold;
-    font-size: 11px;
-    vertical-align: middle;
-    margin-left: 5px;
-}
-
-#allIndicatorsLabel {
-    display: inline-block;
-    float: left;
-    width: 200px;
-    padding-left: 2px;
-    line-height: 20px;
-}
-
- .indicator-row {
-    list-style: none;
-    float: left;
-    width: 830px;
-}
-
-.indicator-row li {
-    display: inline-block;
-    float: right;
-}
-
-/* ------------------------------------------------------------
-	Download tab
------------------------------------------------------------- */
-#download-container {
-    color: #666;
-    padding: 60px 0 120px 0;
-}
-
-#download-container h2 {
-    padding: 0;
-    color: #555;
-}
-
-#download-container a {
-    font-size: 20px;
-    color: #39836e;
-    margin: 15px 0 0 0;
-    background-repeat: no-repeat;
-    display: block;
-    text-decoration: none;
-}
-
-#download-container a:hover {
-    text-decoration: underline;
-}
-
-#download-container p {
-    line-height: 1.4em;
-    width: 80%;
-    margin: 0;
-}
-
-#download-container div {
-    text-align: left;
-    float: left;
-}
-
-#download-container div.text {
-    width: 24%;
-    padding:0 1%;
-}
-
-#download-container img{
-    height: 300px;
-    border: 2px solid #eee;
-    float: right;
-}
-
-#download-container img.pdf:hover, #download-container img.pdf:active {
-    border: 2px solid #bbb;
-    cursor: pointer;
-}
-
-#pdf-download-text p {
-    margin-bottom: 20px;
-}
-
 
 #trendDisplayOptions {
-/*    position: absolute; */
     float: left;
     width: auto;
-  /*  margin-bottom: 5px;
-    height: 23px; */
     vertical-align: middle;
     text-align: center;
 }
@@ -1234,63 +727,37 @@ ul.left-menu {
     margin-left: 10px;
 }
 
-.tartan-export-chart-box {
-    color: #450AA3;
-}
-
-.tartan-export-chart-box .export-link {
-    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
-    padding: 5px 30px;
-    text-decoration: none;
-}
-
-.tartanTrend {
-    margin-left: 12px;
-}
-
-.tartanValueAndTrend {
-    text-align: center;
-}
-
-.tartanValueAndTrend img {
-    border: 0;
-    vertical-align: top;
-    margin-top: 3px;
-}
-
-
-
 @media print {
     th.sortHeader, td.sort, .noPrint, .arrowUnselected, .arrowUnselected70, #download {
         display: none;
     }
 
-    .printOnly {
+    .print-only {
         display: block; /*inherit not work IE6/7*/
     }
 
-    div.tartanText {
+    div.tartan-text {
         color: black;
     }
 
-    #leftTartanTable {
+    #left-tartan-table {
         width: 38px;
     }
 
-     #tabs, div.pageSelector, a.pageSelector, .domainOption, #indicator-menu-prev, #indicator-menu-next {
+     #tabs, div.page-selector, a.page-selector, .domain-option, #indicator-menu-prev, #indicator-menu-next {
         display: none !important;
     }
 
-    div.pageSelected, a.pageSelected {
+    div.page-selected, a.page-selected {
         display: block !important;
     }
 
-    .domainOption {
+    .domain-option {
         border: none;
         width: 0 !important;
     }
 
-    .selectedDomain {
+    .selected-domain {
         display: block !important;
         width: 100% !important;
         font-size: 125%;

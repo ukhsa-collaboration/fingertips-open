@@ -191,7 +191,7 @@ var barChartState = {
     sortDirection: 1,
     practiceList: null,
     sortOptions: [
-        { id: 2, label: 'Indicator Value', extraClass: 'pageSelected', defaultOrder: 1 },
+        { id: 2, label: 'Indicator Value', extraClass: 'page-selected', defaultOrder: 1 },
         { id: 0, label: 'Practice Name', defaultOrder: 0 },
         { id: 1, label: 'Practice Code', defaultOrder: 0 }
     ],
@@ -654,6 +654,6 @@ var practiceProfilesLegend = '<div class="legends" style="position: relative; to
     </table></div>';
 
 templates.add('barChart', showExportChartLink() + practiceProfilesLegend + '<div id="sortPracticeBox" class="greyBoxed">Sort by:{{#options}}\
-<a href="javascript:sortPracticesClicked({{id}});" id="sortPractice{{id}}" class="{{extraClass}} practiceSort pageSelector" >{{label}}</a>\
+<a href="javascript:sortPracticesClicked({{id}});" id="sortPractice{{id}}" class="{{extraClass}} practiceSort page-selector" >{{label}}</a>\
 {{/options}}</div><div id="barChart"></div><div id="noBarChart" class="selectLabel"></div>');
 

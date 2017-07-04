@@ -1,6 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using Profiles.MainUI.Routes;
+using System;
+using System.Collections.Generic;
+using System.Web.Mvc;
 using System.Web.Routing;
-using Profiles.MainUI.Routes;
 
 namespace Profiles.MainUI
 {
@@ -12,8 +14,19 @@ namespace Profiles.MainUI
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-            routes.IgnoreRoute("{*favicon}", new { favicon = @".*?favicon.ico" });
             routes.IgnoreRoute("{resource}.ashx/{*pathInfo}");
+
+            // General ignores
+            routes.IgnoreRoute("{*favicon}", new { favicon = @".*?favicon.ico" });
+            routes.IgnoreRoute("htaccess.txt");
+            routes.IgnoreRoute("administrator");
+
+            // Wordpress ignores
+            routes.IgnoreRoute("{page}.php");
+            routes.IgnoreRoute("wp-admin");
+            routes.IgnoreRoute("{.*}/wp-admin");
+
+            Redirects(routes);
 
             AddDocumentDownloadRoute(routes);
             AddProfileCollectionRoutes(routes);
@@ -23,6 +36,27 @@ namespace Profiles.MainUI
             AddLongerLivesRoutes(routes);
             AddPhofRoutes(routes);
             AddTwitterRoutes(routes);
+
+            routes.MapRoute(
+                "SsrsReports",
+                "reports/ssrs",
+                new
+                {
+                    controller = "Ssrs",
+                    action = "Index"
+                }
+                );
+
+
+            routes.MapRoute(
+                "SssrsReportsImage",
+                "reports/ssrs/image",
+                new
+                {
+                    controller = "Ssrs",
+                    action = "Image"
+                }
+                );
 
             routes.MapRoute(
                 "VerticalText", // Route name
@@ -61,6 +95,17 @@ namespace Profiles.MainUI
                 {
                     controller = "Error",
                     action = "AccessNotAllowed"
+                }
+                );
+
+
+            routes.MapRoute(
+                "BrowserNotSupported",
+                "browser-not-supported",
+                new
+                {
+                    controller = "Error",
+                    action = "BrowserNotSupported"
                 }
                 );
 
@@ -124,6 +169,7 @@ namespace Profiles.MainUI
 
             routes.MapRoute("NotFound", "{*url}",
                 new { controller = "Error", action = "Http404" });
+
         }
 
         private static void AddDocumentDownloadRoute(RouteCollection routes)
@@ -573,6 +619,18 @@ namespace Profiles.MainUI
                 );
 
             routes.MapRoute(
+                "AreaDetailInfo", // Route name
+                "api/areadetail/{areaCode}", // URL with parameters
+                new
+                {
+                    controller = "AreaSearch",
+                    action = "AreaDetails",
+                    place_name = UrlParameter.Optional,
+                    search_type = UrlParameter.Optional
+                }
+            );
+
+            routes.MapRoute(
                 "AjaxBridgeApi", // Route name
                 "api/{serviceAction1}", // URL with parameters
                 new
@@ -583,8 +641,18 @@ namespace Profiles.MainUI
                 );
 
             routes.MapRoute(
-                "AjaxBridgeApiForPdfs", // Route name
+                "AjaxBridgeApiTwoLevel", // Route name
                 "api/{serviceAction1}/{serviceAction2}", // URL with parameters
+                new
+                {
+                    controller = "AjaxBridge",
+                    action = "Data"
+                }
+                );
+
+            routes.MapRoute(
+                "AjaxBridgeApiThreeLevel", // Route name
+                "api/{serviceAction1}/{serviceAction2}/{serviceAction3}", // URL with parameters
                 new
                 {
                     controller = "AjaxBridge",
@@ -601,6 +669,37 @@ namespace Profiles.MainUI
                     action = "Log"
                 }
                 );
+        }
+
+        /// <summary>
+        /// Redirects for renamed and old profiles
+        /// </summary>
+        private static void Redirects(RouteCollection routes)
+        {
+            var redirects = new Dictionary<string, string>
+            {
+                // What about youth profiles renamed
+                {"profile/what-aboutyouth", "/profile-group/child-health"},
+                // Common route not handled in live logs
+                {"profile/local-alcohol", "/profile/local-alcohol-profiles"},
+                // CHMP profile retired
+                {"profile-group/mental-health/profile/cmhp", "/profile-group/mental-health"},
+                //FIN-1574 Redirect now separate profiles for Diabetes in Longer Lives and Fingertips
+                {"profile/diabetes", "/profile/diabetes-ft"},
+                {"profile/diabetes/data", "/profile/diabetes-ft/data"}
+            };
+
+            foreach (var redirect in redirects)
+            {
+                routes.MapRoute("Redirect" + Guid.NewGuid(),
+                    redirect.Key,
+                    new
+                    {
+                        controller = "Redirect",
+                        action = "RedirectToUrl",
+                        newUrl = redirect.Value
+                    });
+            }
         }
     }
 }

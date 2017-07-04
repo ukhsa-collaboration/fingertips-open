@@ -36,7 +36,10 @@ namespace PholioVisualisation.DataAccess
                 using (TextWriter writer = new StreamWriter(memoryStream))
                 {
                     // Header
-                    writer.WriteLine(GetLine(headerItems));
+                    if (headerItems.Any())
+                    {
+                        writer.WriteLine(GetLine(headerItems));
+                    }
 
                     foreach (var rowItems in rowItemsList)
                     {

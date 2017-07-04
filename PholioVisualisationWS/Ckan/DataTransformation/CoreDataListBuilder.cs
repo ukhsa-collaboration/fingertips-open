@@ -2,7 +2,7 @@
 using System.Linq;
 using Ckan.Model;
 using PholioVisualisation.DataAccess;
-using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 
@@ -16,9 +16,7 @@ namespace Ckan.DataTransformation
             IList<int> sexIds, IList<int> ageIds, IList<int> areaTypeIds,
             IList<int> categoryTypeIds, IList<string> areaCodesToIgnore)
         {
-            var timePeriods = new TimePeriodIterator(
-                TimePeriod.GetBaseline(grouping),
-                TimePeriod.GetDataPoint(grouping), yearType).TimePeriods;
+            var timePeriods = TimePeriodIterator.TimePeriodsFromGrouping(grouping, yearType);
 
             var allDataList = new List<CkanCoreDataSet>();
             foreach (var sexId in sexIds)
@@ -32,26 +30,28 @@ namespace Ckan.DataTransformation
                         grouping.SexId = sexId;
                         grouping.AgeId = ageId;
 
+                        IList<CoreDataSet> dataList;
+                        IEnumerable<CkanCoreDataSet> ckanDataList;
+
+                        // Area types
                         foreach (var areaTypeId in areaTypeIds)
                         {
                             grouping.AreaTypeId = areaTypeId;
-                            var dataList = GroupDataReader
+                            dataList = GroupDataReader
                                 .GetCoreDataForAllAreasOfType(grouping, timePeriod);
 
-                            var ckanDataList = FilterAndConvert(areaCodesToIgnore, dataList, periodString);
+                            ckanDataList = FilterAndConvert(areaCodesToIgnore, dataList, periodString);
 
                             allDataList.AddRange(ckanDataList);
                         }
 
-                        foreach (var categoryTypeId in categoryTypeIds)
-                        {
-                            var dataList = GroupDataReader.GetCoreDataForCategoryTypeId(
-                                grouping, timePeriod, categoryTypeId);
+                        // Category types
+                        dataList = GroupDataReader.GetCoreDataForCategoryTypeIds(
+                            grouping, timePeriod, categoryTypeIds.ToArray());
 
-                            var ckanDataList = FilterAndConvert(areaCodesToIgnore, dataList, periodString);
+                        ckanDataList = FilterAndConvert(areaCodesToIgnore, dataList, periodString);
 
-                            allDataList.AddRange(ckanDataList);
-                        }
+                        allDataList.AddRange(ckanDataList);
                     }
                 }
             }

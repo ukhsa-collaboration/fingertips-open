@@ -77,6 +77,8 @@
     <Compile Include="CategoryValuesValidatorTest.cs" />
     <Compile Include="DataUploadValidationTest.cs" />
     <Compile Include="BatchRowParserTest.cs" />
+    <Compile Include="SmallNumberCheckerTest.cs" />
+    <Compile Include="SmallNumberFormulaHelperTest.cs" />
     <Compile Include="SimpleRowParserTest.cs" />
     <Compile Include="UploadTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

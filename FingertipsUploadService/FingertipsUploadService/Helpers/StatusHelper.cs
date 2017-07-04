@@ -37,9 +37,23 @@ namespace FingertipsUploadService.Helpers
             _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
         }
 
+        public void SmallNumbersFound(UploadJob job)
+        {
+            job.Status = UploadJobStatus.SmallNumberWarningConfirmationAwaited;
+            _jobRepository.UpdateJob(job);
+            _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
+        }
+
         public void FailedValidation(UploadJob job)
         {
             job.Status = UploadJobStatus.FailedValidation;
+            _jobRepository.UpdateJob(job);
+            _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
+        }
+
+        public void ColumnNameValidationFailed(UploadJob job)
+        {
+            job.Status = UploadJobStatus.ColumnNameValidationFailed;
             _jobRepository.UpdateJob(job);
             _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
         }

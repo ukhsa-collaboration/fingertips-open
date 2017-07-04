@@ -63,6 +63,29 @@ namespace ServicesWeb.Controllers
         }
 
         /// <summary>
+        /// Get a list of the area types for which PDF reports are available for a specific profile
+        /// </summary>
+        /// <param name="profile_id">Profile ID</param>
+        [HttpGet]
+        [Route("profile/area_types_with_pdfs")]
+        public IList<AreaType> GetAreaTypesWithPdfsForProfile(int profile_id)
+        {
+            try
+            {
+                var areaTypeIds = ReaderFactory.GetProfileReader()
+                    .GetProfilePdfs(profile_id)
+                    .Select(x => x.AreaTypeId);
+
+                return ReaderFactory.GetAreasReader().GetAreaTypes(areaTypeIds);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Gets name and sequence of specific profile groups
         /// </summary>
         /// <param name="group_ids">Comma-separated list of profile group IDs</param>
@@ -77,26 +100,6 @@ namespace ServicesWeb.Controllers
 
                 var parameters = new GroupingTreeParameters(nameValues);
                 return new JsonBuilderGroupingTree(parameters).GetGroupingMetadatas();
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Whether or not PDF reports can be generated for a profile
-        /// </summary>
-        /// <param name="profile_id">Profile ID</param>
-        /// <param name="area_type_id">Area type ID</param>
-        [HttpGet]
-        [Route("are_pdfs")]
-        public bool ArePdfs(int profile_id = 0, int area_type_id = 0)
-        {
-            try
-            {
-                return ReaderFactory.GetProfileReader().CanPdfBeGenerated(profile_id, area_type_id);
             }
             catch (Exception ex)
             {

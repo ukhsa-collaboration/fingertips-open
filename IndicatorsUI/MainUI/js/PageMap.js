@@ -1,4 +1,4 @@
-/**
+﻿/**
 * Map namespace
 * @module map
 */
@@ -100,25 +100,23 @@ if (!jQuery.support.cors && jQuery.ajaxTransport && window.XDomainRequest) {
 
 function goToMapPage() {
 
-    if (groupRoots.length == 0) {
-        // Search results empty
-        noDataForAreaType();
-    } else {
-        setPageMode(PAGE_MODES.MAP);
+    setPageMode(PAGE_MODES.MAP);
 
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
+    } else {
         ajaxMonitor.setCalls(1);
 
         var root = groupRoots[getIndicatorIndex()];
         mapState.root = root;
         getAreaValues(root, FT.model);
-
+        ajaxMonitor.monitor(displayMap);
         ajaxMonitor.monitor(displayMap);
     }
-
-    $('#goBack').bind('click', function () {
-        NEPHOMaps.SelectedFeatures = [];
-        NEPHOMaps.createTable();
-    });
+    $('#nearest-neighbour-links').bind('click', function () {
+            NEPHOMaps.SelectedFeatures = [];
+            NEPHOMaps.createTable();
+        });
 }
 
 mapState = {
@@ -182,6 +180,7 @@ function getAreaValues(root, model) {
             ).add('group_id', (isInSearchMode() ? root.Grouping[0].GroupId : FT.model.groupId)
             ).add('area_type_id', model.areaTypeId
             ).add('parent_area_code', getCurrentComparator().Code
+            ).add('profile_id', model.profileId
             ).add('comparator_id', comparatorId
             ).add('indicator_id', root.IID
             ).add('sex_id', root.Sex.Id
@@ -190,46 +189,10 @@ function getAreaValues(root, model) {
     }
 }
 
-function getAreaValuesCallback(obj) {
+function getAreaValuesCallback(coreDataList) {
 
     // Hash: Key -> area code, Value -> coredataset
-    var hash = {},
-        areaOrder = [];
-
-    _.each(obj, function (data) {
-        hash[data.AreaCode] = data;
-        areaOrder.push({ AreaCode: data.AreaCode, Val: data.Val, ValF: data.ValF });
-    });
-
-    areaOrder.sort(sortData).reverse();
-
-    // First, count number of areas which have a value.
-    var numAreas = 0;
-    $.each(areaOrder, function (i, v) {
-        if (v.ValF !== "-") {
-            numAreas++;
-        }
-    });
-
-    // Second, set orderFrac for each.
-    var j = 0;
-    $.each(areaOrder, function (i, v) {
-        var data = hash[v.AreaCode];
-        if (v.ValF === "-") {
-            data.order = -1;
-            data.orderFrac = -1;
-        }
-        else {
-            data.order = numAreas - j;
-
-            // Continuous scale
-            data.orderFrac = 1 - j / numAreas;
-
-            data.quartile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 4));
-            data.quintile = Math.ceil(((numAreas + 1) - (j + 1)) / (numAreas / 5));
-            j++;
-        }
-    });
+    var hash = addOrderandPercentilesToData(coreDataList);
 
     mapState.areaValues = hash;
 
@@ -305,13 +268,17 @@ function initMap() {
 }
 
 function updateComparisonConfig() {
-
-    mapState.root = groupRoots[getIndicatorIndex()];
-    mapState.metadata = ui.getMetadataHash()[mapState.root.IID];
-    mapState.comparisonConfig = new ComparisonConfig(mapState.root, mapState.metadata);
+    if (areIndicatorsInDomain()) {
+        mapState.root = groupRoots[getIndicatorIndex()];
+        mapState.metadata = ui.getMetadataHash()[mapState.root.IID];
+        mapState.comparisonConfig = new ComparisonConfig(mapState.root, mapState.metadata);
+    }
 }
 
 function hideAndShowMapMenus() {
+
+    if (!areIndicatorsInDomain()) return;
+
     var isNationalComparator = comparatorId === NATIONAL_COMPARATOR_ID;
 
     updateComparisonConfig();
@@ -338,7 +305,7 @@ function hideAndShowMapMenus() {
         }
     }
 
-    $('#keyAdHoc').toggle(showAdHocKey);
+    $('#key-ad-hoc').toggle(showAdHocKey);
     $('#keyTartanRug').toggle(!showAdHocKey);
 
     if (!isNationalComparator && mapState.initiated) {
@@ -649,8 +616,8 @@ function NEPHOMaps() {
         switch ($('#map_colour').val()) {
             case "quartile":
                 $('#keyTartanRug').hide();
-                $('#keyAdHoc').show();
-                html += "<table class='keyTable customKeyTable' cellspacing='2'><tbody><tr><td class='keyText'>Quartiles:</td>"
+                $('#key-ad-hoc').show();
+                html += "<table class='key-table custom-key-table' cellspacing='2'><tbody><tr><td class='key-text'>Quartiles:</td>"
                       + "<td style='background-color: #E8C7D1;'>Low</td>"
                       + "<td style='background-color: #B74D6D;' class='whiteText'>&nbsp;</td>"
                       + "<td style='background-color: #98002E;' class='whiteText'>&nbsp;</td>"
@@ -659,8 +626,8 @@ function NEPHOMaps() {
                 break;
             case "quintile":
                 $('#keyTartanRug').hide();
-                $('#keyAdHoc').show();
-                html += "<table class='keyTable customKeyTable' cellspacing='2'><tbody><tr><td class='keyText'>Quintiles:</td>"
+                $('#key-ad-hoc').show();
+                html += "<table class='key-table custom-key-table' cellspacing='2'><tbody><tr><td class='key-text'>Quintiles:</td>"
                       + "<td style='background-color: #DED3EC;'>Low</td>"
                       + "<td style='background-color: #BEA7DA;'>&nbsp;</td>"
                       + "<td style='background-color: #9E7CC8;' class='whiteText'>&nbsp;</td>"
@@ -671,8 +638,8 @@ function NEPHOMaps() {
                 break;
             case "continuous":
                 $('#keyTartanRug').hide();
-                $('#keyAdHoc').show();
-                html += "<table class='keyTable customKeyTable' cellspacing='0'><tbody><tr><td class='keyText'>Continuous:</td>"
+                $('#key-ad-hoc').show();
+                html += "<table class='key-table custom-key-table' cellspacing='0'><tbody><tr><td class='key-text'>Continuous:</td>"
                       + "<td style='background-color: #FFE97F;'>Lowest</td>"
                       + "<td class='continual_range whiteText'>&nbsp;</td>"
                       + "<td style='background-color: #151C55;' class='whiteText'>Highest</td>"
@@ -681,11 +648,11 @@ function NEPHOMaps() {
             case "benchmark":
             default:
                 $('#keyTartanRug').show();
-                $('#keyAdHoc').hide();
+                $('#key-ad-hoc').hide();
                 return;
         }
         html += "</div>";
-        $('#keyAdHoc').html(html).show();
+        $('#key-ad-hoc').html(html).show();
     }
 
     this.getSigColourFunction = function (groupRoot) {
@@ -1408,8 +1375,9 @@ pages.add(PAGE_MODES.MAP, {
     goto: goToMapPage,
     gotoName: 'goToMapPage',
     needsContainer: true,
-    jqIds: ['indicatorMenuDiv', '.geo-menu', 'benchmark-box', 'map-key-part2', 'value-note-legend',
+    jqIds: ['indicator-menu-div', '.geo-menu', 'benchmark-box', 'map-key-part2', 'value-note-legend',
         'nearest-neighbour-link', 'tab-specific-options'],
-    jqIdsNotInitiallyShown: ['keyAdHoc', 'keyTartanRug'],
+    jqIdsNotInitiallyShown: ['key-ad-hoc', 'keyTartanRug'],
     showHide: hideAndShowMapMenus
 });
+﻿

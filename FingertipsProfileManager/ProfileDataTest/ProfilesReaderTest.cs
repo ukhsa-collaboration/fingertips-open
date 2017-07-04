@@ -161,6 +161,20 @@ namespace Fpm.ProfileDataTest
         }
 
         [TestMethod]
+        public void TestGetProfileIdFromUrlKey()
+        {
+            var id = Reader().GetProfileIdFromUrlKey(UrlKeys.Phof);
+            Assert.AreEqual(ProfileIds.Phof, id);
+        }
+
+        [TestMethod]
+        public void TestGetProfileUrlKeyFromId()
+        {
+            var urlKey = Reader().GetProfileUrlKeyFromId(ProfileIds.Phof);
+            Assert.AreEqual(UrlKeys.Phof, urlKey);
+        }
+
+        [TestMethod]
         public void TestGetGroupings()
         {
             Assert.IsTrue(Reader().GetGroupings(GroupIds.PhofWiderDeterminantsOfHealth).Count > 10);
@@ -393,7 +407,7 @@ namespace Fpm.ProfileDataTest
             var filename = Guid.NewGuid().ToString();
             SaveNewDocument(filename);
             IList<Document> docList = GetDocumentsFromDb();
-            Document doc = Reader().GetDocument(docList.ToList().First().Id);
+            Document doc = Reader().GetDocumentWithoutFileData(docList.ToList().First().Id);
             Assert.IsNotNull(doc);
         }
 
@@ -402,25 +416,6 @@ namespace Fpm.ProfileDataTest
         {
             IList<Document> docList = GetDocumentsFromDb();
             Assert.IsTrue(docList.Count > 0);
-        }
-
-        [TestMethod]
-        public void TestGetExceptionsByServer()
-        {
-            var server = GetTestServerName();
-            IList<ExceptionLog> exceptions1day = Reader().GetExceptionsByServer(1, server);
-            IList<ExceptionLog> exceptions10days = Reader().GetExceptionsByServer(10, server);
-            Assert.IsTrue(exceptions10days.Count > exceptions1day.Count);
-        }
-
-        [TestMethod]
-        public void TestGetExceptionsForAllServers()
-        {
-            const int days = 10;
-            IList<ExceptionLog> allServers = Reader().GetExceptionsForAllServers(days);
-            IList<ExceptionLog> oneServer = Reader().GetExceptionsByServer(days, GetTestServerName());
-            Assert.IsTrue(allServers.Count > oneServer.Count,
-                "Expected more exceptions from all servers than just the test server");
         }
 
         [TestMethod]
@@ -439,12 +434,6 @@ namespace Fpm.ProfileDataTest
             Assert.IsNull(profile);
         }
 
-
-        private static string GetTestServerName()
-        {
-            return ConfigurationManager.AppSettings["TestServerName"];
-        }
-
         private void SaveNewDocument(string name)
         {
             var doc = new Document
@@ -460,7 +449,7 @@ namespace Fpm.ProfileDataTest
 
         private IList<Document> GetDocumentsFromDb()
         {
-            return Reader().GetDocuments(ProfileIds.Diabetes);
+            return Reader().GetDocumentsWithoutFileData(ProfileIds.Diabetes);
         }
 
         private static ProfilesReader Reader()

@@ -85,7 +85,8 @@ namespace PholioVisualisation.DataConstruction
 
         public IndicatorMetadataCollection GetIndicatorMetadataCollection(IList<Grouping> groupings)
         {
-            return new IndicatorMetadataCollection(GetIndicatorMetadata(groupings, IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific));
+            return new IndicatorMetadataCollection(
+                GetIndicatorMetadata(groupings, IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific));
         }
 
         public IndicatorMetadataCollection GetIndicatorMetadataCollection(Grouping grouping)

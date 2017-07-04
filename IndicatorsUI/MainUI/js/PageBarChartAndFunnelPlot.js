@@ -2,12 +2,11 @@
 
 function goToIndicatorDetailsPage(rootIndex) {
 
-    if (!groupRoots.length) {
-        // Search results empty
-        noDataForAreaType();
-    } else {
+    setPageMode(PAGE_MODES.INDICATOR_DETAILS);
 
-        setPageMode(PAGE_MODES.INDICATOR_DETAILS);
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
+    } else {
 
         // The user may have come from another page on which they have scrolled down
         var $window = $(window);
@@ -82,7 +81,7 @@ function displayIndicatorDetails() {
     } 
     
     if (hasStateChanged) {
-        toggleDataOrNot('indicatorDetails', isData);
+        toggleDataOrNot('indicator-details', isData);
         
         // Set page state
         state.setState(rootIndex, key,
@@ -98,7 +97,7 @@ function displayIndicatorDetails() {
 
     displayBarChartLegend();
 
-    toggleQuintileLegend($('.quintileKey'), comparisonConfig.useQuintileColouring);
+    toggleQuintileLegend($('.quintile-key'), comparisonConfig.useQuintileColouring);
 
     loadValueNoteToolTips();
 
@@ -106,7 +105,9 @@ function displayIndicatorDetails() {
 };
 
 function displayBarChartLegend() {
-    showBarChartLegend(barChartState.comparisonConfig.useTarget);
+    if (areIndicatorsInDomain()) {
+        showBarChartLegend(barChartState.comparisonConfig.useTarget);
+    }
 }
 
 function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
@@ -141,10 +142,10 @@ function displayIndicatorTable(root, regionalGrouping, nationalGrouping,
             trimName(getAreaNameToDisplay(area), 23)/*area name label*/, i, null, comparisonConfig);
     }
     
-    $('#indicatorDetailsTable tbody').html(html.join(''));
+    $('#indicator-details-table tbody').html(html.join(''));
     
     // Source
-    $('#indicatorDetailsSource').html(
+    $('#indicator-details-source').html(
         getSource(state.metadata)
     );
 };
@@ -159,12 +160,12 @@ function addIndicatorTableAreaRow(html, data, areaCode, areaName, dataIndex, com
         html.push('<td class="pLink"', click, behaviour, '>',
             areaName, '</td>');
         var extraBarClass = dataIndex == (barChartState.currentData.length -1) ?
-            'barLast ' : '';
+            'bar-last ' : '';
         
     } else {
         // Benchmark
         extraBarClass = barChartState.row == 0 ? 
-            'barFirst ' : 
+            'bar-first ' : 
             '';
 
         if (barChartState.metadata.ValueType.Id === ValueTypeIds.Count) {
@@ -239,7 +240,7 @@ function colourRow(dataIndex) {
 
     var ignoredRowCount = enumParentDisplay === PARENT_DISPLAY.NATIONAL_AND_REGIONAL ? 2 : 1;
 
-    $('#indicatorDetailsTable tbody tr:eq(' + (dataIndex + ignoredRowCount) + ') td').each(function () {
+    $('#indicator-details-table tbody tr:eq(' + (dataIndex + ignoredRowCount) + ') td').each(function () {
         highlightRow(this);
     });
 };
@@ -249,8 +250,8 @@ function displayFunnelPlot(root, comparatorGrouping, comparisonConfig) {
     barChartState.comparatorValue = null;
     
     var data = barChartState.currentData,
-    plot = $('#funnelPlot'),
-    noData = $('#funnelPlotNoData'),
+    plot = $('#funnel-plot'),
+    noData = $('#funnel-plot-no-data'),
     valueTypeId = barChartState.metadata.ValueType.Id,
     methodId = comparatorGrouping.ComparatorMethodId;
     
@@ -316,7 +317,7 @@ function getFunnelPlotOptions(root, data, comparatorGrouping, comparisonConfig) 
     
     var options = {
         chart: {
-            renderTo: 'funnelPlot',
+            renderTo: 'funnel-plot',
             defaultSeriesType: 'spline',
             zoomType: 'xy',
             width: 400,
@@ -871,13 +872,13 @@ function resetBarCells() {
 FT.data.highlightedRowCells = null;
 
 templates.add('indicators',
-    '<div id="indicatorDetailsData" style="display: none;"><div style="float:none; clear: both; width:100%;"><div id="indicatorDetailsHeader"></div>\
-    <div id="funnelPlotBox">' +
+    '<div id="indicator-details-data" style="display: none;"><div style="float:none; clear: both; width:100%;"><div id="indicator-details-header"></div>\
+    <div id="funnel-plot-box">' +
     showExportChartLink('barChartState.chart') +
-    '<div id="funnelPlot" style="display: none;"></div><div id="funnelPlotNoData" style="" class="noData">Funnel plot is<br>not available</div></div>\
-    <div id="indicatorDetailsBox">' +
-    showExportTableLink('indicatorDetailsBox', 'CompareAreasTable') +
-    '<table id="indicatorDetailsTable" class="borderedTable" cellspacing="0"><thead><tr><th style="width: 200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th><th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th><th class="bar">&nbsp;</th><th title="Lower confidence interval">Lower<br>CI</th><th title="Upper confidence interval">Upper<br>CI</th></tr></thead><tbody></tbody></table><br><div id="indicatorDetailsSource"></div></div></div></div><div id="indicatorDetailsNoData">No Data</div>');
+    '<div id="funnel-plot" style="display: none;"></div><div id="funnel-plot-no-data" style="" class="noData">Funnel plot is<br>not available</div></div>\
+    <div id="indicator-details-box">' +
+    showExportTableLink('indicator-details-box', 'CompareAreasTable') +
+    '<table id="indicator-details-table" class="bordered-table" cellspacing="0"><thead><tr><th style="width: 200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th><th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th><th class="bar">&nbsp;</th><th title="Lower confidence interval">Lower<br>CI</th><th title="Upper confidence interval">Upper<br>CI</th></tr></thead><tbody></tbody></table><br><div id="indicator-details-source"></div></div></div></div><div id="indicator-details-no-data">No Data</div>');
 
 pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     id: 'indicators',
@@ -886,7 +887,7 @@ pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     gotoName: 'goToIndicatorDetailsPage',
     needsContainer: true,
     showHide: displayBarChartLegend,
-    jqIds: ['indicatorMenuDiv', '.geo-menu', 'nearest-neighbour-link'],
-    jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'keyAdHoc',
+    jqIds: ['indicator-menu-div', '.geo-menu', 'nearest-neighbour-link'],
+    jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-ad-hoc',
         'key-bar-chart', 'key-spine-chart', 'value-note-legend']
 });

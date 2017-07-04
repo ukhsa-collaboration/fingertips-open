@@ -1,0 +1,7 @@
+﻿@model Fpm.ProfileData.Entities.Profile.ContentItem
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM";
+}
+@(new MvcHtmlString(Model.Content))
+

@@ -84,6 +84,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.DynamicData" />
@@ -141,17 +142,20 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\MainUIRegistry.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\LookupController.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
     <Compile Include="Controllers\LookUpTablesController.cs" />
     <Compile Include="Controllers\ExceptionLogController.cs" />
+    <Compile Include="Controllers\ProfileCollectionsController.cs" />
+    <Compile Include="Controllers\EmbeddedContentController.cs" />
+    <Compile Include="Controllers\ProfilesAndIndicatorsController.cs" />
+    <Compile Include="Controllers\ReportsApiController.cs" />
+    <Compile Include="Controllers\ReportsController.cs" />
     <Compile Include="Helpers\AjaxOnlyAttribute.cs" />
     <Compile Include="Helpers\ApplicationConfiguration.cs" />
     <Compile Include="Helpers\AreaTypeSelectListBuilder.cs" />
     <Compile Include="Helpers\CommonUtilities.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\ProfilesAndIndicatorsController.cs" />
     <Compile Include="Controllers\IndicatorNewController.cs" />
     <Compile Include="Controllers\AreasController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
@@ -162,9 +166,18 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CurrentUser.cs" />
+    <Compile Include="Helpers\ExtraJsFileHelper.cs" />
     <Compile Include="Helpers\FileNameHelper.cs" />
+    <Compile Include="Helpers\FrontPageAreaSearchOptions.cs" />
     <Compile Include="Helpers\FusStatus.cs" />
+    <Compile Include="Helpers\IFingertipsTabs.cs" />
+    <Compile Include="Helpers\IndicatorMetadataTextChanger.cs" />
+    <Compile Include="Helpers\IndicatorMetadataTextCreator.cs" />
     <Compile Include="Helpers\IndicatorOwnerChanger.cs" />
+    <Compile Include="Helpers\ProfileDetailsCopier.cs" />
+    <Compile Include="Helpers\ProfileMenuHelper.cs" />
+    <Compile Include="Helpers\TimePeriodReader.cs" />
+    <Compile Include="Helpers\TooltipHelper.cs" />
     <Compile Include="Helpers\UIHelper.cs" />
     <Compile Include="Helpers\UploadHelper.cs" />
     <Compile Include="Helpers\UserDetails.cs" />
@@ -176,14 +189,15 @@
     <Compile Include="Helpers\PleaseSelectOption.cs" />
     <Compile Include="Helpers\ProfileDetailsCleaner.cs" />
     <Compile Include="Mappers\Mapper.cs" />
-    <Compile Include="Models\AreaGridModel.cs" />
-    <Compile Include="Models\AreaGridDetail.cs" />
+    <Compile Include="ViewModels\Areas\AreasIndexViewModel.cs" />
+    <Compile Include="ViewModels\Areas\AreaDetailViewModel.cs" />
     <Compile Include="Models\AdminModel.cs" />
     <Compile Include="Models\DocumentsGridModel.cs" />
     <Compile Include="Models\DomainIndicatorsSearchResult.cs" />
-    <Compile Include="Models\ExceptionGridModel.cs" />
+    <Compile Include="ViewModels\EmbeddedContent\EmbeddedHtmlPage.cs" />
+    <Compile Include="ViewModels\ExceptionLog\ExceptionIndexViewModel.cs" />
     <Compile Include="Models\LookupModel.cs" />
-    <Compile Include="Models\ProfileCollectionGridModel.cs" />
+    <Compile Include="ViewModels\ProfileCollections\ProfileCollectionGridModel.cs" />
     <Compile Include="Helpers\Dynamic.cs" />
     <Compile Include="Helpers\MyAuthorizeAttribute.cs" />
     <Compile Include="Helpers\RouteValueDictionaryExtensions.cs" />
@@ -209,18 +223,21 @@
     <Compile Include="ViewModels\ProfileAreaType.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseIndicatorDataFullPageViewModel.cs" />
     <Compile Include="ViewModels\ProfileUser.cs" />
-    <Compile Include="ViewModels\ProfileViewModel.cs" />
+    <Compile Include="ViewModels\ProfileUserViewModel.cs" />
+    <Compile Include="ViewModels\Profile\ProfileViewModel.cs" />
+    <Compile Include="ViewModels\Report\ReportViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadProgressViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadIndexViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadSummaryViewModel.cs" />
+    <Compile Include="ViewModels\Profile\ProfileIndexViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="AngularApps\reports\reports-app.js" />
+    <Content Include="AngularApps\reports\view\reports-index.html" />
+    <Content Include="AngularApps\reports\view\reports-edit.html" />
     <Content Include="AngularApps\upload\upload-app.js" />
     <Content Include="AngularApps\upload\view\upload-index.html" />
     <Content Include="AngularApps\upload\view\upload-progress.html" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\Site.css" />
     <Content Include="css\bootstrap-theme.css" />
     <Content Include="css\bootstrap-theme.min.css" />
     <Content Include="css\bootstrap.css" />
@@ -232,10 +249,10 @@
     <Content Include="css\profile-manager.css" />
     <Content Include="css\dashboard.css" />
     <Content Include="css\ProfilesAndIndicators\BrowseIndicatorDataFullPage.css" />
-    <Content Include="css\site.css" />
     <Content Include="css\TableSorter.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
+    <Content Include="html\PHOLIOindicators.html" />
     <Content Include="images\BatchUpload.png" />
     <Content Include="images\Info.png" />
     <Content Include="images\ajax-loader.gif" />
@@ -250,22 +267,22 @@
     <Content Include="js\jquery-1.12.1.js" />
     <Content Include="js\jquery.form.js" />
     <Content Include="js\PageCoreData.js" />
-    <Content Include="js\document-manager.js" />
+    <Content Include="js\Documents\documents.js" />
     <Content Include="js\lookup-tables.js" />
     <Content Include="js\PageAdmin.js" />
     <Content Include="js\PageSearchResults.js" />
     <Content Include="js\jquery-ui-1.9.2.js" />
     <Content Include="js\chosen.jquery.min.js" />
     <Content Include="js\common-functions.js" />
-    <Content Include="js\content-management.js" />
-    <Content Include="js\area-management.js" />
+    <Content Include="js\Content\content.js" />
+    <Content Include="js\Areas\areas.js" />
     <Content Include="js\modernizr-2.6.2.min.js" />
     <Content Include="js\PageProfilesAndIndicators.js" />
-    <Content Include="js\exception-log.js" />
-    <Content Include="js\profile-collection-management.js" />
+    <Content Include="js\ExceptionLog\exception-log.js" />
+    <Content Include="js\ProfileCollections\profile-collections.js" />
     <Content Include="js\jquery.watermark.min.js" />
-    <Content Include="js\user-management.js" />
-    <Content Include="js\profile-management.js" />
+    <Content Include="js\Profile\profile.js" />
+    <Content Include="js\User\user.js" />
     <Content Include="js\jquery.tablesorter.js" />
     <Content Include="js\jquery.tablesorter.widgets.js" />
     <Content Include="js\tiny_mce\jquery.tinymce.min.js" />
@@ -382,18 +399,18 @@
     <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.ttf" />
     <Content Include="js\tiny_mce\skins\lightgray\fonts\icomoon.woff" />
     <Content Include="js\tiny_mce\skins\lightgray\fonts\readme.md" />
-    <Content Include="Views\Content\CreateContent.cshtml" />
+    <Content Include="Views\Content\CreateContentItem.cshtml" />
     <Content Include="Views\Content\_ContentAudit.cshtml" />
-    <Content Include="Views\Profile\ManageProfiles.cshtml" />
+    <Content Include="Views\Profile\ProfileIndex.cshtml" />
     <Content Include="Views\Profile\CreateProfile.cshtml" />
     <Content Include="Views\Profile\EditProfile.cshtml" />
     <Content Include="Views\Search\SearchAll.cshtml" />
-    <Content Include="Views\Profile\ManageProfileCollections.cshtml" />
-    <Content Include="Views\Profile\EditProfileCollection.cshtml" />
-    <Content Include="Views\Profile\CreateProfileCollection.cshtml" />
-    <Content Include="Views\ExceptionLog\Index.cshtml" />
+    <Content Include="Views\ProfileCollections\ProfileCollectionsIndex.cshtml" />
+    <Content Include="Views\ProfileCollections\EditProfileCollection.cshtml" />
+    <Content Include="Views\ProfileCollections\CreateProfileCollection.cshtml" />
+    <Content Include="Views\ExceptionLog\ExceptionIndex.cshtml" />
     <Content Include="Views\ExceptionLog\_ExceptionDetail.cshtml" />
-    <Content Include="Views\Areas\ManageAreas.cshtml" />
+    <Content Include="Views\Areas\AreasIndex.cshtml" />
     <Content Include="Views\Areas\_AreaDetail.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_MoveSelectedIndicators.cshtml" />
     <Content Include="Web.config">
@@ -414,25 +431,43 @@
     <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_DeleteSelectedIndicators.cshtml" />
     <Content Include="Views\Upload\Index.cshtml" />
-    <Content Include="Views\Content\EditContent.cshtml" />
+    <Content Include="Views\Content\EditContentItem.cshtml" />
     <Content Include="Views\Shared\_EditMetaDataText.cshtml" />
     <Content Include="Views\User\UserIndex.cshtml" />
     <Content Include="Views\User\EditUser.cshtml" />
     <Content Include="Views\User\CreateUser.cshtml" />
     <Content Include="Views\User\_UserAudit.cshtml" />
     <Content Include="Views\Shared\_LightboxAndInfobox.cshtml" />
-    <Content Include="Views\Shared\_FAQ.cshtml" />
+    <Content Include="Views\Content\_PlainTextCheckbox.cshtml" />
+    <Content Include="Views\Content\_PlainTextWarning.cshtml" />
+    <Content Include="Views\Content\_ContentTextArea.cshtml" />
+    <Content Include="Views\Content\_ContentDescription.cshtml" />
+    <Content Include="Views\Profile\_NonAdminProfileDetails.cshtml" />
+    <Content Include="Views\Profile\EditProfileNonAdmin.cshtml" />
+    <Content Include="Views\Profile\_NonAdminProfileCheckboxes.cshtml" />
+    <Content Include="Views\Profile\_NonAdminProfileOtherComponents.cshtml" />
+    <Content Include="Views\ProfileCollections\_ProfileCollectionDetails.cshtml" />
+    <Content Include="Views\ProfileCollections\_ProfileCollectionIncludes.cshtml" />
+    <Content Include="Views\Content\_CancelButton.cshtml" />
+    <Content Include="Views\Shared\_FooterDateList.cshtml" />
+    <Content Include="Views\Documents\_DocumentsTable.cshtml" />
+    <Content Include="Views\EmbeddedContent\EmbeddedHtmlPage.cshtml" />
+    <Content Include="Views\Content\ViewContentItemInOwnPage.cshtml" />
+    <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Profile\_FingertipsTabOptions.cshtml" />
+    <Content Include="Views\LookUpTables\_AreaTypes.cshtml" />
+    <Content Include="Views\LookUpTables\EditAreaType.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="js\Areas\Api\Controllers\" />
+    <Folder Include="js\Areas\Api\Models\" />
+    <Folder Include="js\Areas\Api\Views\Shared\" />
     <Folder Include="js\css\" />
     <Folder Include="Upload Templates\" />
     <Folder Include="Uploads\" />
+    <Folder Include="Views\ReportsApi\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DIResolver\DIResolver.csproj">
-      <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
-      <Name>DIResolver</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ProfileData\ProfileData.csproj">
       <Project>{DB5CE84B-BE14-44BB-A83E-506FFDF58094}</Project>
       <Name>ProfileData</Name>
@@ -440,10 +475,6 @@
     <ProjectReference Include="..\Search\Search.csproj">
       <Project>{dacfbced-dd56-4418-a17c-5542d36030f1}</Project>
       <Name>Search</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Upload\Upload.csproj">
-      <Project>{a028ee38-7d6d-4014-b91d-f3cdb46613a0}</Project>
-      <Name>Upload</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -495,7 +526,7 @@
     <Content Include="Views\Content\_ContentItemTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Documents\Index.cshtml" />
+    <Content Include="Views\Documents\DocumentsIndex.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Admin\_DeleteIndicator.cshtml" />
@@ -521,7 +552,7 @@
     <Content Include="Views\Shared\_UserPermissions.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Shared\_AreaTypes.cshtml" />
+    <Content Include="Views\Profile\_AreaTypes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\CoreData\Index.cshtml" />
@@ -531,18 +562,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ProfilesAndIndicators\_CoreData.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Shared\_LayoutPageB.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Shared\_BannerB.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\ProfilesAndIndicators\LookUpTablesIndexB.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\Shared\_FooterB.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ProfilesAndIndicators\BrowseIndicatorDataFullPage.cshtml" />

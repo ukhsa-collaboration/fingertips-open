@@ -337,7 +337,7 @@ MT.nav.rankings = function () {
 }
 
 function goToPracticeProfiles() {
-    var url = 'http://fingertips.phe.org.uk/profile/general-practice/data#mod,2,pyr,2013,pat,19,par,' +
+    var url = 'http://fingertips.phe.org.uk/profile/general-practice/data#mod,2,pat,19,par,' +
         MT.model.parentCode + ',are,' + MT.model.areaCode + ',sid1,2000005,ind1,-,sid2,-,ind2,-';
     window.open(url);
 }

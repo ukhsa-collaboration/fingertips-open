@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -23,7 +24,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 var dataList = coreDataSetFilter.SelectWhereCountAndDenominatorAreValid().ToList();
 
-                if (dataList.Any() && IsValueAsExpected(dataList.First()))
+                if (dataList.Any())
                 {
                     return CalculateAverage(dataList, unit);
                 }
@@ -41,17 +42,6 @@ namespace PholioVisualisation.DataConstruction
 
             average.ValueNoteId = ValueNoteIds.ValueAggregatedFromAllKnownGeographyValues;
             return average;
-        }
-
-        private bool IsValueAsExpected(CoreDataSet data)
-        {
-            var average = (data.Count.Value / data.Denominator) * unit.Value;
-            return Round(data.Value).Equals(Round(average));
-        }
-
-        private static double Round(double d)
-        {
-            return Math.Round(d, 0, MidpointRounding.AwayFromZero);
         }
     }
 }

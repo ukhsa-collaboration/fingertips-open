@@ -1,0 +1,35 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.LookupModel
+
+@if (Model.AreaTypes != null)
+{
+    var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
+    <table id="lookup-table" class="grid sortable">
+        @Html.Partial("_TableHeader", new List<string> { "ID", "Short name", "Long name", "Selectable", "Searchable", "Warn for small numbers" })
+        <tbody>
+            @foreach (var areaType in Model.AreaTypes)
+            {
+                var isSupported = areaType.IsSupported ? "yes" : "no";
+                var isSearchable = areaType.IsSearchable ? "yes" : "no";
+                var shouldWarnForSmallNumbers = areaType.ShouldWarnForSmallNumbers ? "yes" : "no";
+                <tr>
+                    <td>
+                        @if (UserDetails.CurrentUser().IsAdministrator)
+                        {
+                            @Html.ActionLink(areaType.Id.ToString(), "EditAreaType", new {areaTypeId = areaType.Id})
+                        }
+                        else
+                        {
+                            @areaType.Id
+                        }
+                    </td>
+                    <td>@areaType.ShortName</td>
+                    <td>@areaType.Name</td>
+                    <td>@(isSupported)</td>
+                    <td>@(isSearchable)</td>
+                    <td>@(shouldWarnForSmallNumbers)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData.Entities.Logging;
+﻿using Fpm.ProfileData.Entities.Logging;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Helpers;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
 using NHibernate.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.ProfileData.Repositories
 {
@@ -22,6 +22,15 @@ namespace Fpm.ProfileData.Repositories
         public ProfileRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
+        }
+
+        /// <summary>
+        /// Flush the session. May be required for testing to ensure changes are .
+        /// </summary>
+        public void RefreshObject(object o)
+        {
+            CurrentSession.Flush();
+            CurrentSession.Refresh(o);
         }
 
         public IList<ProfileDetails> GetProfiles()
@@ -94,6 +103,22 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
+        public void UpdateProfileDetail(ProfileDetails profileDetails)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                CurrentSession.Update(profileDetails);
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
         public void CreateIndicator(IEnumerable<IndicatorMetadataTextProperty> allPropertiesToAdd, int indicatorId)
         {
             var indicatorMetaDataTextValue = new IndicatorMetadataTextValue();
@@ -131,7 +156,7 @@ namespace Fpm.ProfileData.Repositories
             CurrentSession.Save(indicatorMetaDataTextValue);
         }
 
-        public bool DoesOverriddenIndicatorMetaDataRecordAlreadyExist(int indicatorId, int? profileId)
+        public bool DoesOverriddenIndicatorMetadataRecordAlreadyExist(int indicatorId, int? profileId)
         {
             var result = CurrentSession.CreateQuery(string.Format(
                 "from IndicatorMetadataTextValue  where IndicatorId = {0} and ProfileId = {1}", indicatorId, profileId))
@@ -153,6 +178,23 @@ namespace Fpm.ProfileData.Repositories
                 CurrentSession.CreateCriteria(typeof(IndicatorMetadataTextValue))
                     .SetProjection(Projections.Max("IndicatorId"))
                     .UniqueResult<int>() + 1;
+        }
+
+        public int CreateGrouping(Grouping grouping)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                var newGroupId = (int)CurrentSession.Save(grouping);
+                transaction.Commit();
+                return newGroupId;
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+            return -1;
         }
 
         public int CreateProfileCollection(ProfileCollection profileCollection, string assignedProfiles)
@@ -230,7 +272,7 @@ namespace Fpm.ProfileData.Repositories
         }
 
         public bool ChangeOwner(int indicatorId, int newOwnerProfileId,
-            IList<IndicatorText> newOwnerMetadataTextValues, 
+            IList<IndicatorText> newOwnerMetadataTextValues,
             IList<IndicatorText> currentOwnerMetadataTextValues)
         {
             try
@@ -259,8 +301,8 @@ namespace Fpm.ProfileData.Repositories
             return false;
         }
 
-        private void UpdateTextMetadata(int indicatorId, int newOwnerProfileId, int oldOwnerProfileId, 
-            IList<IndicatorText> newOwnerMetadataTextValues, 
+        private void UpdateTextMetadata(int indicatorId, int newOwnerProfileId, int oldOwnerProfileId,
+            IList<IndicatorText> newOwnerMetadataTextValues,
             IList<IndicatorText> oldOwnerMetadataTextValues)
         {
 
@@ -278,7 +320,7 @@ namespace Fpm.ProfileData.Repositories
                 // Switch around properties where both are defined
                 if (oldOwnerTextValue.HasGenericValue() && newOwnerTextValue.HasGenericValue())
                 {
-                    var metadataTextProperty = oldOwnerTextValue.IndicatorMetadataTextProperty;    
+                    var metadataTextProperty = oldOwnerTextValue.IndicatorMetadataTextProperty;
                     UpdateProperty(metadataTextProperty, newOwnerTextValue.ValueGeneric, indicatorId, null);
                     UpdateProperty(metadataTextProperty, oldOwnerTextValue.ValueGeneric, indicatorId, oldOwnerProfileId);
                 }
@@ -287,13 +329,13 @@ namespace Fpm.ProfileData.Repositories
 
         public void UpdateProperty(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId)
         {
-            var groupMatch = profileId.HasValue ? "=" + profileId.Value : "IS NULL";
+            var profileMatch = profileId.HasValue ? "=" + profileId.Value : "IS NULL";
 
-            var queryString = string.Format(
+            var hqlQueryString = string.Format(
                 @"update IndicatorMetadataTextValue set {0} = :text where IndicatorID = {1} AND ProfileId {2}",
-                     property.ColumnName, indicatorId, groupMatch);
+                     property.ColumnName, indicatorId, profileMatch);
 
-            var updateSession = CurrentSession.CreateQuery(queryString);
+            var updateSession = CurrentSession.CreateQuery(hqlQueryString);
 
             updateSession.SetParameter("text", text);
 
@@ -354,7 +396,7 @@ namespace Fpm.ProfileData.Repositories
             int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
             int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange,
             int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId, IEnumerable<string> userAudit,
-            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart)
+            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart, int disclosureControlId)
         {
             try
             {
@@ -370,6 +412,7 @@ namespace Fpm.ProfileData.Repositories
                 indicatorMetaData.DecimalPlacesDisplayed = selectedDecimalPlaces;
                 indicatorMetaData.TargetId = targetId;
                 indicatorMetaData.AlwaysShowSpineChart = alwaysShowSpineChart;
+                indicatorMetaData.DisclosureControlId = disclosureControlId;
 
                 transaction = CurrentSession.BeginTransaction();
 
@@ -378,13 +421,13 @@ namespace Fpm.ProfileData.Repositories
                 // Delete the existing grouping records for this indicator/domain 
                 DeleteIndicatorFromGroupingByAgeSexAndArea(selectedDomain, indicatorId, currentAgeId, currentSexId,
                     currentAreaTypeId);
-            
+
                 foreach (var comparatorId in GetComparatorIds(selectedComparator))
                 {
-                         InsertGrouping(selectedDomain, indicatorId, selectedAreaType, selectedSex, selectedAgeRange,
-                           selectedComparatorMethods, selectedComparatorConfidences, selectedYearRange,
-                           selectedPolarityType, startYear, endYear, startQuarterRange, endQuarterRange,
-                           comparatorId, startMonthRange, endMonthRange, indicatorSequence);
+                    InsertGrouping(selectedDomain, indicatorId, selectedAreaType, selectedSex, selectedAgeRange,
+                      selectedComparatorMethods, selectedComparatorConfidences, selectedYearRange,
+                      selectedPolarityType, startYear, endYear, startQuarterRange, endQuarterRange,
+                      comparatorId, startMonthRange, endMonthRange, indicatorSequence);
                 }
 
                 // Update the FPM Audit Log
@@ -445,13 +488,13 @@ namespace Fpm.ProfileData.Repositories
                     .UniqueResult<int>() + 1;
         }
 
-        public bool LogPropertyChange(int propertyId, string oldText, int indicatorId, int? groupId,
-            string userName, DateTime timestamp)
+        public bool LogIndicatorMetadataTextPropertyChange(int propertyId, string oldText, 
+            int indicatorId, int? profileId, string userName, DateTime timestamp)
         {
             CurrentSession.Save(new IndicatorMetadataLog()
             {
                 IndicatorId = indicatorId,
-                GroupId = groupId.HasValue ? groupId.Value : 0,
+                GroupId = profileId,
                 PropertyId = propertyId,
                 OldText = oldText,
                 Timestamp = timestamp,
@@ -531,7 +574,7 @@ namespace Fpm.ProfileData.Repositories
             {
                 transaction = CurrentSession.BeginTransaction();
 
-                foreach (var grouping in GetGroupings(fromGroupId, indicatorId, 
+                foreach (var grouping in GetGroupings(fromGroupId, indicatorId,
                     fromAreaTypeId, fromSexId, fromAgeId))
                 {
                     var newGrouping = new Grouping()
@@ -564,7 +607,7 @@ namespace Fpm.ProfileData.Repositories
                         CurrentSession.Save(newGrouping);
                     }
 
-                    
+
                 }
                 transaction.Commit();
             }
@@ -583,7 +626,7 @@ namespace Fpm.ProfileData.Repositories
             CurrentSession.CreateQuery(queryString).ExecuteUpdate();
         }
 
-        public void DeleteOverriddenMetaDataTextValues(int? indicatorId, int profileId)
+        public void DeleteOverriddenMetadataTextValues(int? indicatorId, int profileId)
         {
             var queryString = string.Format(
               @"delete from IndicatorMetadataTextValue where IndicatorId = {0} And ProfileId = {1}", indicatorId, profileId);
@@ -690,6 +733,15 @@ namespace Fpm.ProfileData.Repositories
                     );
 
             return CurrentSession.CreateQuery(query).List<Grouping>();
+        }
+
+        public ProfileDetails GetProfileDetailsById(int Id)
+        {
+            var profileDetail = CurrentSession.QueryOver<ProfileDetails>()
+                     .Where(ugp => ugp.Id == Id)
+                     .SingleOrDefault();
+
+            return profileDetail;
         }
     }
 }

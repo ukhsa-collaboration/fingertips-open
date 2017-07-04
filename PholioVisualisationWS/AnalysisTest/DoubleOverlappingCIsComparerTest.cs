@@ -45,13 +45,13 @@ namespace PholioVisualisation.AnalysisTest
         public void TestNoCIsReturnNoneSignificance()
         {
             // No Lower CI
-            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI = ValueWithCIsData.NullValue, UpperCI = 3.1 };
+            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
             CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
             Assert.AreEqual(Significance.None, Compare(d2, d1, 0));
             Assert.AreEqual(Significance.None, Compare(d1, d2, 0));
 
             // No Upper CI
-            d1 = new CoreDataSet { Value = 3.0, LowerCI = 2.9, UpperCI = ValueWithCIsData.NullValue };
+            d1 = new CoreDataSet { Value = 3.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
             d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
             Assert.AreEqual(Significance.None, Compare(d2, d1, 0));
             Assert.AreEqual(Significance.None, Compare(d1, d2, 0));

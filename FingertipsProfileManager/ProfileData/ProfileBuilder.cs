@@ -16,7 +16,7 @@ namespace Fpm.ProfileData
             _profileRepository = profileRepository;
         }
 
-        public Profile Build(string urlKey, int selectedDomainNumber = 0, int selectedAreaType = 0)
+        public Profile Build(string urlKey, int selectedDomainNumber = 0, int selectedAreaTypeId = AreaTypeIds.Undefined)
         {
             var profile = new Profile();
 
@@ -28,15 +28,11 @@ namespace Fpm.ProfileData
 
             profileDetails.GroupIds = _reader.GetGroupingIds(profile.Id).ToList();
             profile.GroupingMetadatas = _reader.GetGroupingMetadataList(profileDetails.GroupIds);
-
-            profile.AreIndicatorsToBeListed = profile.GroupingMetadatas.Count == 1 || (selectedDomainNumber > 0);
-
-            // Select default domain if none
-            profile.SelectedDomain = selectedDomainNumber <= 0 ? 1 : selectedDomainNumber;
-
-            var orderedGroupIds = profile.GroupingMetadatas.Select(x => x.GroupId).ToList();
+            profile.AreIndicatorsToBeListed = profile.GroupingMetadatas.Any();
 
             // Groupings
+            profile.SelectedDomain = selectedDomainNumber > 0 ? selectedDomainNumber : 1;
+            var orderedGroupIds = profile.GroupingMetadatas.Select(x => x.GroupId).ToList();
             var allGroupings = new List<Grouping>();
             List<Grouping> domainGroupings = null;
             int? selectedDomainId = null;
@@ -53,49 +49,52 @@ namespace Fpm.ProfileData
                 allGroupings.AddRange(groupings);
             }
 
-            if (allGroupings.Count > 0)
+            // Area type ID
+            if (allGroupings.Any())
             {
                 // There are groupings so get the available Area types
                 var areaTypeIds = allGroupings.Select(x => x.AreaTypeId).Distinct().ToList();
                 profile.AreaTypes = _reader.GetSpecificAreaTypes(areaTypeIds);
 
-                if (selectedAreaType != 0)
-                {
-                    selectedAreaType = selectedAreaType != -1 ? selectedAreaType : areaTypeIds.First();
-                    profile.SelectedAreaType = selectedAreaType;
-                }
+                selectedAreaTypeId = selectedAreaTypeId > 0 ? selectedAreaTypeId : areaTypeIds.First();
+                profile.SelectedAreaType = selectedAreaTypeId;
             }
 
             // Indicators
             if (profile.AreIndicatorsToBeListed)
             {
-                if (profile.SelectedDomain != 0 && domainGroupings != null)
+                if (profile.SelectedDomain > 0 && domainGroupings != null)
                 {
                     // Only include indicators from the selected domain and area type
                     IEnumerable<int> indicatorIds;
-                    if (selectedAreaType==0)
+                    if (selectedAreaTypeId > 0)
+                    {
+                        indicatorIds = domainGroupings
+                            .Where(x => x.AreaTypeId == selectedAreaTypeId)
+                            .OrderBy(v => v.Sequence)
+                            .Select(x => x.IndicatorId).Distinct();
+
+                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, 
+                            selectedAreaTypeId, profile.Id);
+                    }
+                    else
                     {
                         indicatorIds = domainGroupings
                             .OrderBy(v => v.Sequence)
                             .Select(x => x.IndicatorId)
                             .Distinct();
 
-                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaType, profile.Id);
-                    }
-                    else
-                    {
-                        indicatorIds =
-                            domainGroupings.Where(x => x.AreaTypeId == selectedAreaType).OrderBy(v => v.Sequence).Select(x => x.IndicatorId).Distinct();
-                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaType, profile.Id);
+                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, 
+                            selectedAreaTypeId, profile.Id);
                     }
                 }
                 else if (profile.GroupingMetadatas.Count == 0)
                 {
                     // No domains for this profile so use all groupings
                     var indicatorIds =
-                        allGroupings.Where(x => x.AreaTypeId == selectedAreaType).Select(x => x.IndicatorId).Distinct();
+                        allGroupings.Where(x => x.AreaTypeId == selectedAreaTypeId).Select(x => x.IndicatorId).Distinct();
 
-                    profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaType, profile.Id);
+                    profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaTypeId, profile.Id);
                 }
             }
 

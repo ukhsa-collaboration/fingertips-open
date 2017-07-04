@@ -83,6 +83,7 @@
     <property name="ShortName" column="areatype"/>
     <property name="IsCurrent" column="iscurrent"/>
     <property name="IsSupported" column="issupported"/>
+    <property name="ShouldWarnForSmallNumbers" column="shouldwarnforsmallnumbers"/>
   </class>
 
   <!-- Value Type class -->
@@ -148,6 +149,13 @@
     <property name="ShortName" column="shortname"/>
   </class>
 
+
+  <sql-query name="ShouldWarnAboutSmallNumbersForArea">
+    SELECT at.ShouldWarnForSmallNumbers from L_AreaTypes as at
+    JOIN L_areas on L_Areas.AreaTypeID = at.AreaTypeID
+    WHERE L_Areas.AreaCode = :areaCode
+  </sql-query>
+  
 </hibernate-mapping>
 
 

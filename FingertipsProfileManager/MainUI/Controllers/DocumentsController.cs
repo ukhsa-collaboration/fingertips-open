@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
@@ -14,6 +12,7 @@ using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("documents")]
     public class DocumentsController : Controller
     {
         public const int MaxFileSizeInBytes = 50000000/*50MB*/;
@@ -21,45 +20,31 @@ namespace Fpm.MainUI.Controllers
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
 
-        public ActionResult Index()
+        [Route("")]
+        public ActionResult DocumentsIndex(int profileId = ProfileIds.Undefined)
         {
-            var profileId = Request.Params["selectedProfile"];
-            var model = new DocumentsGridModel
-            {
-                SortBy = "Sequence",
-                SortAscending = true,
-                CurrentPageIndex = 1,
-                PageSize = 100
-            };
-
             var user = UserDetails.CurrentUser();
-            var userProfiles = user.GetProfilesUserHasPermissionsTo().ToList();
 
-            AssignProfileList(model, userProfiles);
-            AssignProfileId(model, profileId, userProfiles);
+            if (profileId != ProfileIds.Undefined && user.HasWritePermissionsToProfile(profileId) == false)
+            {
+                profileId = ProfileIds.Undefined;
+            }
 
-            GetDocumentItems(model);
+            var viewModel = GetViewModel(profileId);
 
-
-
-          //  Session["GetAllProfile"] = model.ProfileList;
-
-            //ViewBag.GetAllProfile = model;
-
-            return View(model);
+            viewModel.ProfileList = new ProfileMenuHelper()
+                .GetProfilesUserHasPermissionToExcludingSpecialProfiles(user);
+            ViewBag.DocumentItems = _reader.GetDocumentsWithoutFileData(profileId);
+            ViewBag.ProfileId = profileId;
+            return View(viewModel);
         }
 
         [HttpPost]
-        public ActionResult Upload(string selectedProfileId)
+        [Route("upload")]
+        public ActionResult Upload(int uploadProfileId)
         {
             if (Request != null)
             {
-                int profileId = -1;
-                if (!string.IsNullOrEmpty(selectedProfileId))
-                {
-                    profileId = Convert.ToInt32(selectedProfileId);
-                }
-
                 HttpPostedFileBase file = Request.Files["fileToBeUploaded"];
                 if (file != null)
                 {
@@ -74,14 +59,14 @@ namespace Fpm.MainUI.Controllers
                     var fileName = Path.GetFileName(file.FileName);
 
                     // check is filename unique.
-                    var docs = _reader.GetDocuments(fileName);
+                    var docs = _reader.GetDocumentsWithoutFileData(fileName);
                     if (docs.Count > 0)
                     {
                         // now check is this name used with current profile.
-                        var docFromDatabase = docs.FirstOrDefault(x => x.ProfileId == profileId);
+                        var docFromDatabase = docs.FirstOrDefault(x => x.ProfileId == uploadProfileId);
                         if (docFromDatabase != null)
                         {
-                            docFromDatabase.ProfileId = profileId;
+                            docFromDatabase.ProfileId = uploadProfileId;
                             docFromDatabase.FileName = fileName;
                             docFromDatabase.FileData = uploadedFile;
                             docFromDatabase.UploadedBy = new CurrentUser().Name;
@@ -95,7 +80,7 @@ namespace Fpm.MainUI.Controllers
                         // else overwrite current file for selected profile.
                         var doc = new Document
                         {
-                            ProfileId = profileId,
+                            ProfileId = uploadProfileId,
                             FileName = fileName,
                             FileData = uploadedFile,
                             UploadedBy = new CurrentUser().Name,
@@ -106,31 +91,26 @@ namespace Fpm.MainUI.Controllers
                 }
             }
 
-            return RedirectToAction("Index", new { selectedProfile = selectedProfileId });
+            return RedirectToAction("DocumentsIndex", new { profileId = uploadProfileId });
         }
 
-        public ActionResult IsFileNameUnique(string filename, string selectedProfileId)
+        [Route("is_filename_unique")]
+        public ActionResult IsFileNameUnique(string filename, int profileId)
         {
-            if (string.IsNullOrEmpty(selectedProfileId))
-            {
-                return new HttpStatusCodeResult(400, "bad request");
-            }
-
-            var profileId = Convert.ToInt32(selectedProfileId);
-            var fileNameHelper = new FileNameHelper();
+            var isUnique = new FileNameHelper(_reader).IsUnique(filename, profileId);
 
             return new JsonResult
             {
-                Data = fileNameHelper.IsUnique(filename, profileId),
+                Data = isUnique,
                 JsonRequestBehavior = JsonRequestBehavior.AllowGet
             };
         }
 
         [HttpPost]
-        [Route("documents/delete")]
+        [Route("delete")]
         public ActionResult Delete(int id)
         {
-            Document doc = _reader.GetDocument(id);
+            Document doc = _reader.GetDocumentWithoutFileData(id);
 
             if (doc == null)
             {
@@ -151,32 +131,17 @@ namespace Fpm.MainUI.Controllers
             throw new FpmException("User does not have the right to delete document " + id);
         }
 
-        private static void AssignProfileId(DocumentsGridModel model, string profileId,
-            IList<ProfileDetails> profilesThatUserCanEdit)
+        private static DocumentsGridModel GetViewModel(int profileId)
         {
-            // If request params don't have any selected profile, use the first profile to populate the model
-            if (profilesThatUserCanEdit.Count > 0)
+            var viewModel = new DocumentsGridModel
             {
-                model.ProfileId = profileId == null
-                    ? profilesThatUserCanEdit[0].Id
-                    : int.Parse(profileId);
-            }
-        }
-
-        private void AssignProfileList(DocumentsGridModel model, IList<ProfileDetails> profilesDetails)
-        {
-            IEnumerable<SelectListItem> userProfilesForModel = profilesDetails.Select(c => new SelectListItem
-            {
-                Text = c.Name.ToString(CultureInfo.InvariantCulture),
-                Value = c.Id.ToString(CultureInfo.InvariantCulture)
-            });
-
-            model.ProfileList = userProfilesForModel;
-        }
-
-        private void GetDocumentItems(DocumentsGridModel model)
-        {
-            model.DocumentItems = _reader.GetDocuments(model.ProfileId);
+                SortBy = "Sequence",
+                SortAscending = true,
+                CurrentPageIndex = 1,
+                PageSize = 100,
+                ProfileId = profileId
+            };
+            return viewModel;
         }
     }
 }

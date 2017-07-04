@@ -2,6 +2,7 @@
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.DataSorting;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -28,7 +29,7 @@ namespace PholioVisualisation.DataConstruction
 
         public void CreateAreaListFromAreaTypeId(int profileId, int areaTypeId)
         {
-            if (areaTypeId > NeighbourAreaType.IdAddition) //TODO: need to remove this 
+            if (areaTypeId > NeighbourAreaType.IdAddition) 
             {
                 IList<Area> areas = new List<Area>
                     {

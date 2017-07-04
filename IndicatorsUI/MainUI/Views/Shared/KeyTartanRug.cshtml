@@ -1,34 +1,34 @@
 ﻿@model Profiles.MainUI.Models.PageModel
-<div class="keyContainer" id="keyTartanRug" style="display: none;">
-    <table class="keyTable" cellspacing="0">
+<div class="key-container" id="keyTartanRug" style="display: none;">
+    <table class="key-table" cellspacing="0">
         <tr>
-            <td class="keyText keyLabel"></td>
+            <td class="key-text key-label"></td>
             @if (Model.DisplayRagKey)
             {
-                <td class="keySpacer"></td>
+                <td class="key-spacer"></td>
                 <td class='better key'>
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)better.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)better.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Better
                         </div>
                     </div>
                 </td>
                 <td class='same key'>
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)same.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Similar
                         </div>
                     </div>
                 </td>
                 <td class='worse key'>
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)red.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)red.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Worse
                         </div>
                     </div>
@@ -36,76 +36,76 @@
             }
             @if (Model.DisplayBlueKey)
             {
-                <td class="keySpacer"></td>
+                <td class="key-spacer"></td>
                 <td class='bobLower key'>
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)bobLower.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobLower.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Lower
                         </div>
                     </div>
                 </td>
                 <td class='same key'>
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)same.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Similar
                         </div>
                     </div>
                 </td>
                 <td class="bobHigher key">
-                    <div class="tartanBox keyBox">
-                        <img class="tartanFill printOnly" src="@(ViewBag.ImagesUrl)bobHigher.png"
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobHigher.png"
                              alt=""/>
-                        <div class="tartanText">
+                        <div class="tartan-text">
                             Higher
                         </div>
                     </div>
                 </td>
-            }@*Show quintile legend*@<td class='grade-quintile-1 key quintileKey'>
-            <td class="keySpacer "></td>
-            <td class='grade-quintile-1 key quintileKey'>
-                <div class="tartanBox keyBox">
-                    <div class="tartanText">
+            }@*Show quintile legend*@<td class='grade-quintile-1 key quintile-key'>
+            <td class="key-spacer "></td>
+            <td class='grade-quintile-1 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
                         Low
                     </div>
                 </div>
             </td>
-            <td class='grade-quintile-2 key quintileKey'>
-                <div class="tartanBox keyBox">
-                    <div class="tartanText">
+            <td class='grade-quintile-2 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
                     </div>
                 </div>
             </td>
-            <td class='grade-quintile-3 key quintileKey'>
-                <div class="tartanBox keyBox">
-                    <div class="tartanText">
+            <td class='grade-quintile-3 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
                     </div>
                 </div>
             </td>
-            <td class='grade-quintile-4 key quintileKey'>
-                <div class="tartanBox keyBox">
-                    <div class="tartanText">
+            <td class='grade-quintile-4 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
                     </div>
                 </div>
             </td>
-            <td class='grade-quintile-5 key quintileKey'>
-                <div class="tartanBox keyBox">
-                    <div class="tartanText">
+            <td class='grade-quintile-5 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
                         High
                     </div>
                 </div>
             </td>
-            <td class="keySpacer"></td>
-            <td id="tartan-key-part" class="none key keyBoxRight" style="display: none;">
-                <div class="tartanBox keyBox">
+            <td class="key-spacer"></td>
+            <td id="tartan-key-part" class="none key key-box-right" style="display: none;">
+                <div class="tartan-box key-box">
                     Not compared
                 </div>
             </td>
-            <td id="map-key-part2" class="none key keyBoxRight" style="display: none;">
-                <div class="tartanBox keyBox">
+            <td id="map-key-part2" class="none key key-box-right" style="display: none;">
+                <div class="tartan-box key-box">
                     Not compared
                 </div>
             </td>

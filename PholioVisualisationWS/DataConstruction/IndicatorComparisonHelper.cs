@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -17,23 +18,21 @@ namespace PholioVisualisation.DataConstruction
         private IGroupDataReader groupDataReader;
 
         public IndicatorComparisonHelper(IndicatorMetadata indicatorMetadata, Grouping grouping,
-            IGroupDataReader groupDataReader, PholioReader pholioReader, IArea nationalArea)
+            IGroupDataReader groupDataReader, PholioReader pholioReader, TargetComparerProvider targetComparerProvider)
         {
             // Assign constructor parameter to instance variables
             this.indicatorMetadata = indicatorMetadata;
             this.grouping = grouping;
             this.groupDataReader = groupDataReader;
 
-            InitComparer(pholioReader, nationalArea);
+            InitComparer(pholioReader, targetComparerProvider);
         }
 
-        private void InitComparer(PholioReader pholioReader, IArea nationalArea)
+        private void InitComparer(PholioReader pholioReader, TargetComparerProvider targetComparerProvider)
         {
-            if (indicatorMetadata.HasTarget)
+            if (targetComparerProvider != null && indicatorMetadata.HasTarget)
             {
-                targetComparer = TargetComparerFactory.New(indicatorMetadata.TargetConfig);
-                new TargetComparerHelper(groupDataReader, nationalArea)
-                    .AssignExtraDataIfRequired(nationalArea, targetComparer, grouping, indicatorMetadata);
+                targetComparer = targetComparerProvider.GetTargetComparer(indicatorMetadata, grouping, TimePeriod.GetDataPoint(grouping));
             }
             else
             {
@@ -100,11 +99,7 @@ namespace PholioVisualisation.DataConstruction
 
                 if (coreDataList != null)
                 {
-                    var values = coreDataList
-                        .Where(x => x.IsValueValid)
-                        .Select(x => x.Value)
-                        .ToList();
-
+                    var values = new CoreDataSetFilter(coreDataList).SelectValidValues().ToList();
                     categoryComparer.SetDataForCategories(values);
                 }
             }

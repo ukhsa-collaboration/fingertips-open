@@ -1,49 +1,50 @@
 ﻿@model Profiles.MainUI.Models.PageModel
-<div class="keyContainer" id="key-spine-chart" style="display: none;">
-    <table id="spineTable" class="keyTable @(Model.DisplayBothKeyColorings ? "" : "key-one-triplet")" cellspacing="0">
+<div class="key-container" id="key-spine-chart" style="display: none;">
+    <table id="spine-table" class="key-table @(Model.DisplayBothKeyColorings ? "" : "key-one-triplet")" cellspacing="0">
         <tr>
-            <td class="keyText keyLabel"></td>
+            <td class="key-text key-label"></td>
             @if (Model.DisplayRagKey)
             {
-                <td class="keySpacer"></td>
-                <td class='keySpine'>
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_green_mini.png" alt=""/>
+                <td class="key-spacer"></td>
+                <td class='key-spine'>
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_green_mini.png" alt="" />
                     Better
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt=""/>
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" />
                     Similar
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_red_mini.png" alt=""/>
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_red_mini.png" alt="" />
                     Worse
                 </td>
             }
             @if (Model.DisplayBlueKey)
             {
-                <td class="keySpacer"></td>
-                <td class="keySpine">
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_darkblue_mini.png"
-                         alt=""/>
+                <td class="key-spacer"></td>
+                <td class="key-spine">
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_darkblue_mini.png"
+                         alt="" />
                     Lower
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt=""/>
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" />
                     Similar
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt=""/>
+                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt="" />
                     Higher
                 </td>
             }
-            
+
+            <td class='key-spine'>
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt="" />
+                Not Compared
+            </td>
+
             @*Show quintile legend*@
-            <td class="keySpacer"></td>
-            <td id="quintile-key" class='keySpine quintileKey' colspan="5">
+            <td class="key-spacer"></td>
+            <td id="quintile-key" class='key-spine quintile-key' colspan="5">
                 Low
-                <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile1_mini.png" alt=""/>&nbsp;
-                <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile2_mini.png" alt=""/>&nbsp;
-                <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile3_mini.png" alt=""/>&nbsp;
-                <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile4_mini.png" alt=""/>&nbsp;
-                <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_quintile5_mini.png" alt=""/>&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile1_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile2_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile3_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile4_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile5_mini.png" alt="" />&nbsp;
                 High
             </td>
-                <td class='keySpine'>
-                    <img class="keyCircle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt=""/>
-                    Not Compared
-                </td>
         </tr>
     </table>
 </div>

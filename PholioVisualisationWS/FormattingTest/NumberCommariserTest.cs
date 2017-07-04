@@ -38,5 +38,13 @@ namespace PholioVisualisation.FormattingTest
             Assert.AreEqual("1,200.01", NumberCommariser.Commarise2DP(1200.0123));
             Assert.AreEqual("1,200.012", NumberCommariser.Commarise3DP(1200.0123));
         }
+
+        [TestMethod]
+        public void CommariseFormattedValueTest()
+        {
+            Assert.AreEqual("1,200.0", NumberCommariser.CommariseFormattedValue("1200.0"));
+            Assert.AreEqual("120", NumberCommariser.CommariseFormattedValue("120"));
+            Assert.AreEqual("1,200.0123", NumberCommariser.CommariseFormattedValue("1200.0123"));
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace PholioVisualisation.DataConstruction
         /// </summary>
         public double? Value { get; set; }
 
-        public QofListSizeProvider(IGroupDataReader groupDataReader, Area area, int groupId, int dataPointOffset,
+        public QofListSizeProvider(IGroupDataReader groupDataReader, IArea area, int groupId, int dataPointOffset,
             YearType yearType)
         {
             Grouping grouping = groupDataReader.GetGroupingsByGroupIdAndIndicatorId(groupId, IndicatorId);
@@ -39,7 +39,7 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        private void SetSingleAreaValue(IGroupDataReader groupDataReader, Area area, Grouping grouping, TimePeriod period)
+        private void SetSingleAreaValue(IGroupDataReader groupDataReader, IArea area, Grouping grouping, TimePeriod period)
         {
             IList<CoreDataSet> dataList = groupDataReader.GetCoreData(grouping, period, area.Code);
             if (dataList.Count == 1)

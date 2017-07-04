@@ -64,8 +64,8 @@ namespace PholioVisualisation.DataConstruction
         public bool CanCompareSubnationalAgainstNational(int comparatorMethodId)
         {
             return
-                comparatorMethodId != ComparatorMethodId.Quintiles &&
-                comparatorMethodId != ComparatorMethodId.NoComparison;
+                comparatorMethodId != ComparatorMethodIds.Quintiles &&
+                comparatorMethodId != ComparatorMethodIds.NoComparison;
         }
 
         private void CompareAllDataAgainstTarget(GroupRoot groupRoot)

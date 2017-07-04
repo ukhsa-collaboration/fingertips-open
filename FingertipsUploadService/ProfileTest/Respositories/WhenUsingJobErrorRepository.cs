@@ -11,7 +11,6 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
     {
         private UploadJobErrorRepository _uploadJobErrorRepository;
         private Guid _guid;
-        private int _id;
 
         [TestInitialize]
         public void Init()

@@ -15,6 +15,42 @@ namespace PholioVisualisation.ServicesTest
     public class DataControllerEndPointTest
     {
         [TestMethod]
+        public void TestGetAllDataAsCsvByProfileId()
+        {
+            var url = "all_data/csv/by_profile_id?" +
+                      "parent_area_type_id=" + AreaTypeIds.GoRegion +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&profile_id=" + ProfileIds.HealthProfiles;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetAllDataAsCsvByGroupId()
+        {
+            var url = "all_data/csv/by_group_id?" +
+                      "parent_area_type_id=" + AreaTypeIds.GoRegion +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&group_id=" + GroupIds.Phof_HealthProtection;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetAllDataAsCsvByIndicatorId()
+        {
+            var url = "all_data/csv/by_indicator_id?" +
+                      "parent_area_type_id=" + AreaTypeIds.GoRegion +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&indicator_ids=" + IndicatorIds.AdultSmokingPrevalence;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetTrendMarkers()
         {
             var url = "recent_trends/for_child_areas?" +
@@ -129,6 +165,17 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
+        public void TestGetQuinaryPopulationByIndicatorId()
+        {
+            byte[] data = GetData("quinary_population?" +
+                "area_type_id=" + AreaTypeIds.GpPractice +
+                "&area_code=" + AreaCodes.Gp_MeersbrookSheffield +
+                "&profile_id=" +ProfileIds.HealthProfilesSupportingIndicators +
+                "&indicator_id" + IndicatorIds.PopulationProjection);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetQuinaryPopulationSummary()
         {
             byte[] data = GetData("quinary_population_summary?" +
@@ -175,9 +222,10 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
-        public void TestGetGroupataByIndicatorIds()
+        public void TestGetGroupDataByIndicatorIds()
         {
             byte[] data = GetData("latest_data/specific_indicators_for_child_areas?" +
+                "&profile_id=" + ProfileIds.Phof +
                 "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&restrict_to_profile_ids=" + ProfileIds.Phof +
@@ -202,6 +250,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetTrendDataByIndicatorIds()
         {
             byte[] data = GetData("trend_data/specific_indicators_for_child_areas?" +
+                "&profile_id=" + ProfileIds.Phof +
                 "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&restrict_to_profile_ids=" + ProfileIds.Phof +

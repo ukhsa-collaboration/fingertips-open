@@ -97,7 +97,6 @@ namespace Fpm.ProfileData.Repositories
                 areaDetail.IsCurrent = newAreaDetail.IsCurrent;
                 areaDetail.Postcode = newAreaDetail.Postcode;
 
-
                 transaction = CurrentSession.BeginTransaction();
 
                 CurrentSession.Save(areaDetail);
@@ -236,8 +235,6 @@ namespace Fpm.ProfileData.Repositories
             var sqlWhere = "WHERE indicatorId = " + indicatorId;
 
             var sqlFilters = filters != null ? GetSqlFromFilters(filters) : string.Empty;
-
-            Debug.WriteLine(sqlSelectCount + sqlWhere + sqlFilters);
 
             totalRows = CurrentSession.CreateSQLQuery(sqlSelectCount + sqlWhere + sqlFilters)
                  .UniqueResult<int>();

@@ -9,7 +9,15 @@ namespace PholioVisualisation.Analysis
         {
             if (data.IsValueValid)
             {
-               return (Significance)Convert.ToInt32(data.Value);
+                switch (Convert.ToInt32(data.Value))
+                {
+                    case SuicidePlanStatus.Exists:
+                        return Significance.Better;
+                    case SuicidePlanStatus.None:
+                        return Significance.Worse;
+                    default:
+                        return Significance.Same;
+                }
             }
             return Significance.None;
         }

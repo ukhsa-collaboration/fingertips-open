@@ -64,12 +64,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgeSorter.cs" />
     <Compile Include="AreaFactory.cs" />
     <Compile Include="AreaTypeFactory.cs" />
     <Compile Include="AreaTypeListProvider.cs" />
     <Compile Include="BenchmarkDataProvider.cs" />
     <Compile Include="CategoryAreaCoreDataSetProvider.cs" />
+    <Compile Include="CategoryTypeIdsExcludedForExport.cs" />
     <Compile Include="ChildAreaCounter.cs" />
     <Compile Include="ChildAreaListBuilder.cs" />
     <Compile Include="ChildAreaListForCategoryAreaBuilder.cs" />
@@ -84,11 +84,13 @@
     <Compile Include="AverageCalculatorFactory.cs" />
     <Compile Include="CountAverageCalculator.cs" />
     <Compile Include="GroupDataAtDataPointRepository.cs" />
+    <Compile Include="GroupingDifferentiator.cs" />
     <Compile Include="GroupRootComparisonManager.cs" />
     <Compile Include="GroupRootSummaryBuilder.cs" />
     <Compile Include="GroupingListProvider.cs" />
-    <Compile Include="IgnoredAreasFilterFactory.cs" />
     <Compile Include="IndicatorComparisonHelper.cs" />
+    <Compile Include="IndicatorStats.cs" />
+    <Compile Include="IndicatorStatsBuilder.cs" />
     <Compile Include="IndicatorStatsProcessor.cs" />
     <Compile Include="LimitsProcessor.cs" />
     <Compile Include="LongerLivesAreaDetails.cs" />
@@ -100,7 +102,6 @@
     <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilder.cs" />
     <Compile Include="PostcodeProvider.cs" />
-    <Compile Include="ProfileFilter.cs" />
     <Compile Include="ProfilePerIndicatorBuilder.cs" />
     <Compile Include="ProfileUrl.cs" />
     <Compile Include="RankDataList.cs" />
@@ -118,26 +119,20 @@
     <Compile Include="CcgPopulation.cs" />
     <Compile Include="ComparatorMapBuilder.cs" />
     <Compile Include="CoreDataProcessor.cs" />
-    <Compile Include="CoreDataSetFilter.cs" />
     <Compile Include="CoreDataSetListProvider.cs" />
     <Compile Include="SimpleAreaData.cs" />
     <Compile Include="SimpleCoreDataSetProvider.cs" />
     <Compile Include="CoreDataSetProviderFactory.cs" />
     <Compile Include="GroupIdProvider.cs" />
-    <Compile Include="GroupingListFilter.cs" />
     <Compile Include="GroupingListUniquifier.cs" />
-    <Compile Include="IgnoredAreasFilter.cs" />
-    <Compile Include="PholioFilter.cs" />
     <Compile Include="PracticeAreaValuesBuilder.cs" />
     <Compile Include="SingleGroupingProvider.cs" />
-    <Compile Include="SparklineRootBuilder.cs" />
     <Compile Include="SubnationalAreaAverageCalculator.cs" />
     <Compile Include="TargetComparerHelper.cs" />
+    <Compile Include="TargetComparerProvider.cs" />
     <Compile Include="TrendMarkersProvider.cs" />
-    <Compile Include="TrendMarkerWriter.cs" />
     <Compile Include="WeightedAverageCalculator.cs" />
     <Compile Include="ValueDataProcessor.cs" />
-    <Compile Include="GroupRootFilter.cs" />
     <Compile Include="DataPointOffsetCalculator.cs" />
     <Compile Include="DataProcessor.cs" />
     <Compile Include="EthnicityLabelBuilder.cs" />
@@ -153,7 +148,6 @@
     <Compile Include="GroupRootTrendBuilderQuarterly.cs" />
     <Compile Include="GroupRootTrendBuilderYearly.cs" />
     <Compile Include="ICacheable.cs" />
-    <Compile Include="AreaFilter.cs" />
     <Compile Include="IndicatorMetadataCollection.cs" />
     <Compile Include="IndicatorMetadataProvider.cs" />
     <Compile Include="ITimePeriodTextListBuilder.cs" />
@@ -168,7 +162,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QofListSizeProvider.cs" />
     <Compile Include="QuinaryPopulationBuilder.cs" />
-    <Compile Include="QuinaryPopulationSorter.cs" />
     <Compile Include="RuleAreEnoughPracticeValuesByPopulation.cs" />
     <Compile Include="RuleShouldCcgAverageBeCalculatedForGroup.cs" />
     <Compile Include="RuleShouldCcgAverageBeCalculated.cs" />
@@ -180,6 +173,10 @@
     <Compile Include="ValueWithCIsDataProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500DF1-56B2-425C-BDE4-851561897EC2}</Project>
+      <Name>DataSorting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>
       <Name>ExceptionLogger</Name>

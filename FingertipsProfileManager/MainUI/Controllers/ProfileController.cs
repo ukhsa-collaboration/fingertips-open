@@ -1,7 +1,9 @@
-﻿using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.ActionFilter;
+using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Mappers;
 using Fpm.MainUI.Models;
 using Fpm.MainUI.ViewModels;
+using Fpm.MainUI.ViewModels.Profile;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
@@ -26,8 +28,14 @@ namespace Fpm.MainUI.Controllers
 
         private string _userName;
 
-        [AuthorizedUsers]
-        public ActionResult ManageProfiles()
+        protected override void Initialize(RequestContext requestContext)
+        {
+            base.Initialize(requestContext);
+            _userName = UserDetails.CurrentUser().Name;
+        }
+
+        [AdminUsersOnly]
+        public ActionResult ProfileIndex()
         {
             var model = new ProfileGridModel
             {
@@ -42,38 +50,6 @@ namespace Fpm.MainUI.Controllers
             return View(model);
         }
 
-        [AuthorizedUsers]
-        public ActionResult ManageProfileCollections()
-        {
-            var model = new ProfileCollectionGridModel
-            {
-                SortBy = "Sequence",
-                SortAscending = true,
-                CurrentPageIndex = 1,
-                PageSize = 200
-            };
-
-            GetAllProfileCollections(model);
-
-            return View(model);
-        }
-
-        private void GetAllProfiles(ProfileGridModel model)
-        {
-            model.ProfileGrid = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
-        }
-
-        private void GetAllProfileCollections(ProfileCollectionGridModel model)
-        {
-            model.ProfileCollectionGrid = _reader.GetProfileCollections().OrderBy(x => x.CollectionName).ToList();
-        }
-
-        protected override void Initialize(RequestContext requestContext)
-        {
-            base.Initialize(requestContext);
-            _userName = UserDetails.CurrentUser().Name;
-        }
-
         public ActionResult GenericIndicator(int indicatorId)
         {
             var model = new IndicatorEdit { SelectedIndicatorId = indicatorId };
@@ -82,6 +58,8 @@ namespace Fpm.MainUI.Controllers
             return View("IndicatorEdit", model);
         }
 
+        [HttpGet]
+        [Route("profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}/ageId/{ageId}/sexId/{sexId}")]
         public ActionResult IndicatorEdit(string urlKey, int areaType, int selectedDomainNumber, int indicatorId, int ageId, int sexId)
         {
             Profile profile = GetProfile(urlKey, selectedDomainNumber, areaType);
@@ -187,7 +165,9 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
-        public ActionResult IndicatorEditSave(int? decimalPlaces, int? targetId, bool alwaysShowSpineChart, string urlKey, int areaType, int selectedDomainNumber,
+        [Route("profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}/indicator/{indicatorId}")]
+        public ActionResult IndicatorEditSave(int? decimalPlaces, int? targetId, bool alwaysShowSpineChart,
+            int disclosureControlId, string urlKey, int areaType, int selectedDomainNumber,
             int indicatorId, int valueTypeId, int ciMethodId, string ciComparatorConfidence, int polarityId,
             int unitId, int denominatorTypeId, int yearTypeId, int areaTypeId, int sexId, int ageId, int comparatorId,
             int comparatorMethodId, double comparatorConfidence, int yearRange, int selectedFrequency, int baselineYear,
@@ -205,67 +185,10 @@ namespace Fpm.MainUI.Controllers
                 comparatorConfidence,
                 yearRange, selectedFrequency, baselineYear, datapointYear, startQuarterRange, endQuarterRange,
                 startMonthRange,
-                endMonthRange, indicatorSequence, currentAgeId, currentSexId, currentAreaTypeId, decimalPlaces, targetId, alwaysShowSpineChart, profile.Id);
+                endMonthRange, indicatorSequence, currentAgeId, currentSexId, currentAreaTypeId, decimalPlaces, targetId,
+                alwaysShowSpineChart, profile.Id, disclosureControlId);
 
             return Redirect(returnUrl);
-        }
-
-        private void SaveMetadataChanges(int indicatorId, int? groupId, int valueTypeId, int ciMethodId,
-            string ciComparatorConfidence, int polarityId, int unitId, int denominatorTypeId, int yearTypeId,
-            int areaTypeId, int sexId, int ageId, int comparatorId, int comparatorMethodId, double comparatorConfidence,
-            int yearRange, int selectedFrequency, int baselineYear, int datapointYear, int baselineQuarter,
-            int dataPointQuarter, int baselineMonth, int dataPointMonth, int indicatorSequence, int currentAgeId,
-            int currentSexId, int currentAreaTypeId, int? decimalPlaces, int? targetId, bool alwaysShowSpineChart, int profileId)
-        {
-            DateTime timeOfChange = DateTime.Now;
-
-            switch (selectedFrequency)
-            {
-                case Frequencies.Annual:
-                    baselineMonth = -1;
-                    dataPointMonth = -1;
-                    baselineQuarter = -1;
-                    dataPointQuarter = -1;
-                    break;
-                case Frequencies.Quarterly:
-                    baselineMonth = -1;
-                    dataPointMonth = -1;
-                    break;
-                case Frequencies.Monthly:
-                    baselineQuarter = -1;
-                    dataPointQuarter = -1;
-                    break;
-            }
-
-            var indicatorMetadataTextChanges = SaveIndicatorMetadataTextChanges(indicatorId, groupId, timeOfChange, profileId);
-
-            _profileRepository.UpdateGroupingAndMetaData(Convert.ToInt32(groupId), indicatorId, areaTypeId, sexId, ageId,
-                comparatorId, comparatorMethodId, ciComparatorConfidence, comparatorConfidence, yearTypeId, yearRange, valueTypeId,
-                ciMethodId, polarityId, unitId, denominatorTypeId, baselineYear, datapointYear, baselineQuarter,
-                dataPointQuarter, baselineMonth, dataPointMonth, indicatorSequence, currentAgeId, currentSexId,
-                currentAreaTypeId, indicatorMetadataTextChanges, _userName, CommonUtilities.AuditType.Change.ToString(), decimalPlaces, targetId, alwaysShowSpineChart);
-        }
-
-        private string[] SaveIndicatorMetadataTextChanges(int indicatorId, int? groupId, DateTime timeOfChange, int profileId)
-        {
-            IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
-
-            string metadataTextChanges = Request.Params["userMTVChanges"];
-
-            string[] allChanges = Array.ConvertAll(Request.Params["userOtherChanges"].Split(Convert.ToChar("¬")), s => s);
-
-            //Update the Indicator Meta Data Text Values
-            if (string.IsNullOrWhiteSpace(metadataTextChanges) == false)
-            {
-                CommonUtilities.UpdateIndicatorTextValues(indicatorId, groupId, metadataTextChanges, properties,
-                    timeOfChange, _userName, profileId, _profileRepository);
-            }
-            return allChanges;
-        }
-
-        private Profile GetProfile(string urlKey, int selectedDomainNumber, int areaType)
-        {
-            return new ProfileBuilder(_profileRepository).Build(urlKey, selectedDomainNumber, areaType);
         }
 
         [HttpGet]
@@ -274,7 +197,7 @@ namespace Fpm.MainUI.Controllers
         {
             var profileViewModel = new ProfileViewModel()
             {
-                ProfileUsers = new List<ProfileUser>(),
+                ProfileUsers = new List<ProfileUser>()
             };
 
             if (HttpContext.Request.UrlReferrer != null)
@@ -297,119 +220,109 @@ namespace Fpm.MainUI.Controllers
 
             // Create new profile
             var profile = profileViewModel.ToProfileDetails();
-            profile.SetDefaultValues();
-            var userName = UserDetails.CurrentUser().Name;
+            profile.SetDefaultValues(new ExtraJsFileHelper().GetExtraJsFiles());
             int newProfileId = _profileRepository.CreateProfile(profile);
 
             // New domain
             _writer.NewGroupingMetadata(profile.DefaultDomainName, 1, newProfileId);
 
-            // Create default content items
+            CreateDefaultContentItemsForProfile(newProfileId);
+
+            return RedirectToAction("ProfileIndex");
+        }
+
+        private void CreateDefaultContentItemsForProfile(int newProfileId)
+        {
+            var userName = UserDetails.CurrentUser().Name;
             new DefaultProfileContentWriter(_writer, newProfileId, userName)
                 .CreateContentItems();
-
-            return RedirectToAction("ManageProfiles");
         }
 
         [Route("EditProfile")]
         [HttpGet]
-        public ActionResult EditProfile(int profileId, string profileKey)
+        public ActionResult EditProfile(string profileKey)
         {
-            var profileViewModel = _reader.GetProfileDetails(profileKey).ToProfileViewModel();
+            // Init view model
+            var profileDetails = _reader.GetProfileDetails(profileKey);
+            var profileViewModel = profileDetails.ToProfileViewModel();
+            AssignExtraJsFilesToViewModel(profileDetails, profileViewModel);
 
             if (HttpContext.Request.UrlReferrer != null)
             {
                 profileViewModel.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
             }
 
-            profileViewModel.SelectedPdfAreaTypes = _reader.GetAreaTypesWhichContainsPdf(profileId).ToProfileAreaTypeList();
-
-            profileViewModel.ProfileUsers = _reader.GetProfileUsers(profileId).ToProfileUserList();
+            profileViewModel.SelectedPdfAreaTypes = _reader.GetAreaTypesWhichContainsPdf(profileViewModel.Id).ToProfileAreaTypeList();
 
             // Get all dropdowns in ViewBag
-
-            ViewBag.AllUsers = _userRepository.GetAllFpmUsers().ToProfileUserList();
-
-            ViewBag.DefaultAreaTypeId = new SelectList(_reader.GetSupportedAreaTypes(), "Id", "ShortName");
-
-            ViewBag.SpineChartMinMaxLabelId = new SelectList(_reader.GetSpineChartMinMaxLabelOptions(), "Id", "Description");
-
-            ViewBag.ContactUserId = GetFpmUserList();
-
-            ViewBag.KeyColourId = new SelectList(_lookUpsRepository.GetKeyColours(), "Id", "Description");
+            var allUsers = _userRepository.GetAllFpmUsers().ToProfileUserList();
+            profileViewModel.AllUsers = new SelectList(allUsers, "Id", "Name");
 
             ViewBag.SkinId = new SelectList(_lookUpsRepository.GetSkins(), "Id", "Name");
 
-            ViewBag.DefaultFingertipsTabId = new SelectList(GetListOfFingertipsTabs(), "Value", "Text");
-
-            ViewBag.AvailableAreaTypes = _reader.GetAreaTypes(profileId).ToProfileAreaTypeList();
+            DefineNonAdminProfileProperties(profileViewModel);
 
             return View("EditProfile", profileViewModel);
+
+        }
+
+        private void AssignExtraJsFilesToViewModel(ProfileDetails profileDetails,
+            ProfileViewModel profileViewModel)
+        {
+            if (profileDetails.ExtraJsFiles != null)
+            {
+                AutoMapper.Mapper.Map(new ExtraJsFileHelper(profileDetails.ExtraJsFiles), profileViewModel);
+            }
+
+            var options = new List<object>
+            {
+                new
+                {
+                    Option = CompareAreasOption.BarChartAndFunnelPlot,
+                    Label = "Bar chart and funnel plot"
+                },
+                new
+                {
+                    Option = CompareAreasOption.BarChartOnly,
+                    Label = "Bar chart only"
+                }
+            };
+            ViewBag.CompareAreasOption = new SelectList(options, "Option", "Label");
         }
 
         [Route("EditProfile")]
         [HttpPost]
+        [MultipleButton(Name = "action", Argument = "UpdateProfile")]
         public ActionResult EditProfile(ProfileViewModel profileViewModel)
         {
-            profileViewModel.SelectedPdfAreaTypes = JsonConvert.DeserializeObject<IEnumerable<ProfileAreaType>>(Request["SelectedPdfAreaTypes"]);
-
-            profileViewModel.ProfileUsers = JsonConvert.DeserializeObject<IEnumerable<ProfileUser>>(Request["ProfileUsers"]);
-
-            var profile = profileViewModel.ToProfileDetails();
-
-            ProfileDetailsCleaner.CleanUserInput(profile);
+            var profile = GetProfileDetailsFromViewModel(profileViewModel);
 
             _profileRepository.UpdateProfile(profile);
 
-            return RedirectToAction("ManageProfiles");
+            return RedirectToAction("ProfileIndex");
         }
 
-        public ActionResult EditProfileCollection(int profileCollectionId)
+        [Route("EditProfile")]
+        [HttpPost]
+        [MultipleButton(Name = "action", Argument = "CopyProfile")]
+        public ActionResult CopyProfile(ProfileViewModel profileViewModel)
         {
-            //Get all profiles
-            IOrderedEnumerable<ProfileDetails> allProfiles = _reader.GetProfiles().OrderBy(x => x.Name);
-
-            ProfileCollection profileCollection = _reader.GetProfileCollection(profileCollectionId);
-            profileCollection.ProfileCollectionItems = new List<ProfileCollectionItem>();
-
-            profileCollection.Id = profileCollectionId;
-            IList<ProfileCollectionItem> profileCollectionItems = _reader.GetProfileCollectionItems(profileCollectionId);
-
-            foreach (ProfileDetails profile in allProfiles)
+            // Check URL key has been changed
+            var profileFromDb = _reader.GetProfileDetails(profileViewModel.UrlKey);
+            if (profileFromDb != null)
             {
-                profileCollection.ProfileCollectionItems.Add(new ProfileCollectionItem
-                {
-                    ProfileId = profile.Id,
-                    profileDetails = profile,
-                    Selected = profileCollectionItems.Any(x => x.ProfileId == profile.Id),
-                    DisplayDomains =
-                        profileCollectionItems.Where(x => x.ProfileId == profile.Id)
-                            .Select(x => x.DisplayDomains)
-                            .FirstOrDefault()
-                });
+                ModelState.AddModelError("UrlKey", "Profile has not been copied: URL key must be unique");
+                return EditProfile(profileViewModel.UrlKey);
             }
 
-            if (HttpContext.Request.UrlReferrer != null)
-                profileCollection.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
+            // Copy profile
+            var sourceProfileId = profileViewModel.Id;
+            var profile = GetProfileDetailsFromViewModel(profileViewModel);
+            var profileCopier = new ProfileDetailsCopier(_profileRepository, _writer);
+            var newProfileId = profileCopier.CreateCopy(profile);
+            profileCopier.CopyContentItems(sourceProfileId, newProfileId);
 
-            return View("EditProfileCollection", profileCollection);
-        }
-
-        public ActionResult CreateProfileCollection()
-        {
-            //Get all profiles
-            IOrderedEnumerable<ProfileDetails> allProfiles = _reader.GetProfiles().OrderBy(x => x.Name);
-            var profileCollection = new ProfileCollection { ProfileCollectionItems = new List<ProfileCollectionItem>() };
-
-            foreach (ProfileDetails profileDetails in allProfiles)
-            {
-                profileCollection.ProfileCollectionItems.Add(new ProfileCollectionItem { profileDetails = profileDetails });
-            }
-
-            if (HttpContext.Request.UrlReferrer != null)
-                profileCollection.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
-
-            return View("CreateProfileCollection", profileCollection);
+            return RedirectToAction("ProfileIndex");
         }
 
         public ActionResult SortProfilesAndFilter(string sortBy = "Id",
@@ -454,29 +367,7 @@ namespace Fpm.MainUI.Controllers
 
             model.ProfileGrid = sortedProfiles;
 
-            return View("ManageProfiles", model);
-        }
-
-        public ActionResult UpdateProfileCollection(int id, string assignedProfiles,
-            string collectionName, string collectionSkinTitle)
-        {
-            _profileRepository.UpdateProfileCollection(id, assignedProfiles,
-               collectionName.Trim(), collectionSkinTitle.Trim());
-
-            return RedirectToAction("ManageProfileCollections");
-        }
-
-        public ActionResult InsertProfileCollection(ProfileCollection profileCollection, string assignedProfiles)
-        {
-            var newProfileCollection = new ProfileCollection
-            {
-                CollectionName = profileCollection.CollectionName,
-                CollectionSkinTitle = profileCollection.CollectionSkinTitle
-            };
-
-            _profileRepository.CreateProfileCollection(newProfileCollection, assignedProfiles);
-
-            return RedirectToAction("ManageProfileCollections");
+            return View("ProfileIndex", model);
         }
 
         [HttpPost]
@@ -513,11 +404,15 @@ namespace Fpm.MainUI.Controllers
             int selectedDenominatorType, string userMTVChanges, int startYear, int endYear, int startQuarterRange,
             int endQuarterRange, int startMonthRange, int endMonthRange)
         {
-            int newIndicatorId = SaveIndicatorAs(selectedProfileId, selectedDomain, selectedAreaType, selectedSex,
+            var profileId = _reader.GetProfileDetails(selectedProfileId/*urlkey*/).Id;
+            var groupId = int.Parse(selectedDomain);
+
+            int newIndicatorId = SaveIndicatorAs(profileId, groupId, selectedAreaType, selectedSex,
                 selectedAge, selectedComparator, selectedComparatorMethod, selectedComparatorConfidence,
                 selectedYearType, selectedYearRange, selectedValueType, selectedCiMethodType, selectedCiConfidenceLevel,
                 selectedPolarityType, selectedUnitType, selectedDenominatorType, userMTVChanges, startYear, endYear,
                 startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId);
+
             var newList = new List<string>();
             newList.Add(selectedProfileId);
             newList.Add(selectedAreaType.ToString());
@@ -527,8 +422,165 @@ namespace Fpm.MainUI.Controllers
             return Json(newList);
         }
 
+        [Route("profile/AddProfileUser")]
+        [HttpPost]
+        public ActionResult AddProfileUser(int profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
+        {
+            var userId = viewModel.FpmUserId;
 
-        private int SaveIndicatorAs(string selectedProfileId, string selectedDomain, int selectedAreaType,
+            // Add user permission if profile ID valid
+            if (userId != 0)
+            {
+                if (_userRepository.GetUserGroupPermissions(profileId, userId) == null)
+                {
+                    UserGroupPermissions user = new UserGroupPermissions
+                    {
+                        UserId = userId,
+                        ProfileId = profileId
+                    };
+                    _userRepository.SaveUserGroupPermissions(user);
+                }
+            }
+
+            //Refresh the data
+            var profileUsers = _reader.GetProfileUsers(profileId).ToProfileUserList();
+            return PartialView("_UserPermissions", profileUsers);
+        }
+
+        [HttpPost]
+        [Route("profile/RemoveProfileUser")]
+        public ActionResult RemoveProfileUser(int profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
+        {
+            var userId = viewModel.FpmUserId;
+
+            // Remove user permission if user ID valid
+            if (userId != 0)
+            {
+                _userRepository.DeleteUserGroupPermissions(profileId, userId);
+            }
+
+            // Refresh the data
+            var profileUsers = _reader.GetProfileUsers(profileId).ToProfileUserList();
+            return PartialView("_UserPermissions", profileUsers);
+        }
+
+        [Route("profile/EditProfileNonAdmin")]
+        public ActionResult EditProfileNonAdmin(int profileId = ProfileIds.Undefined)
+        {
+            var user = UserDetails.CurrentUser();
+
+            if (profileId != ProfileIds.Undefined && user.HasWritePermissionsToProfile(profileId) == false)
+            {
+                profileId = ProfileIds.Undefined;
+            }
+
+            var profileIndexViewModel = new ProfileIndexViewModel
+            {
+                ProfileId = profileId,
+                ProfileViewModel = GetProfileViewModel(profileId)
+            };
+
+            // Profile list
+            profileIndexViewModel.ProfileList = new ProfileMenuHelper()
+                .GetProfilesUserHasPermissionToExcludingSpecialProfiles(user);
+
+            ViewBag.ProfileId = profileId;
+            return View("EditProfileNonAdmin", profileIndexViewModel);
+        }
+
+        [Route("profile/NonAdminProfileDetails")]
+        [HttpGet]
+        public ActionResult NonAdminProfileDetails(int profileId)
+        {
+            var profileViewModel = GetProfileViewModel(profileId);
+            return PartialView("_NonAdminProfileDetails", profileViewModel);
+        }
+
+        [Route("profile/NonAdminProfileDetails")]
+        [HttpPost]
+        public ActionResult NonAdminProfileDetails(ProfileViewModel profileViewModel)
+        {
+            var profileId = profileViewModel.Id;
+
+            CheckUserHasPermissionToEditProfile(profileId);
+
+            var profile = _profileRepository.GetProfileDetailsById(profileId);
+
+            profile.DefaultAreaTypeId = profileViewModel.DefaultAreaTypeId;
+            profile.Name = profileViewModel.Name;
+            profile.ContactUserId = profileViewModel.ContactUserId;
+            profile.DefaultFingertipsTabId = profileViewModel.DefaultFingertipsTabId;
+            profile.SpineChartMinMaxLabelId = profileViewModel.SpineChartMinMaxLabelId;
+            profile.KeyColourId = profileViewModel.KeyColourId;
+            profile.StartZeroYAxis = profileViewModel.StartZeroYAxis;
+            profile.ShowDataQuality = profileViewModel.ShowDataQuality;
+            profile.HasTrendMarkers = profileViewModel.HasTrendMarkers;
+            profile.UseTargetBenchmarkByDefault = profileViewModel.UseTargetBenchmarkByDefault;
+            profile.IsChangeFromPreviousPeriodShown = profileViewModel.IsChangeFromPreviousPeriodShown;
+
+            SetExtraJsFiles(profileViewModel, profile);
+            SetFrontPageAreaSearchAreaTypes(profileViewModel, profile);
+
+            ProfileDetailsCleaner.CleanUserInput(profile);
+
+            _profileRepository.UpdateProfileDetail(profile);
+
+            return Json(new { IsSaved = true }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult RedirectToNew(string redirectUrl, string areaType)
+        {
+            return RedirectToAction("SortPageAndFilter", "ProfilesAndIndicators",
+                new { ProfileKey = redirectUrl, SelectedAreaTypeId = areaType });
+        }
+
+
+
+        [HttpGet]
+        [Route("profile/user-profiles")]
+        public ActionResult GetUserProfiles()
+        {
+            var profiles = UserDetails.CurrentUser().GetProfilesUserHasPermissionsTo()
+                     .Where(x => x.Id != ProfileIds.ArchivedIndicators & x.Id != ProfileIds.UnassignedIndicators)
+                .OrderBy(x => x.Name)
+                .ToList();
+            return Json(profiles, JsonRequestBehavior.AllowGet);
+        }
+
+        private ProfileDetails GetProfileDetailsFromViewModel(ProfileViewModel profileViewModel)
+        {
+            profileViewModel.SelectedPdfAreaTypes =
+                JsonConvert.DeserializeObject<IEnumerable<ProfileAreaType>>(Request["SelectedPdfAreaTypes"]);
+
+            profileViewModel.ProfileUsers = _reader.GetProfileUsers(profileViewModel.Id).ToProfileUserList();
+
+            var profile = profileViewModel.ToProfileDetails();
+
+            SetExtraJsFiles(profileViewModel, profile);
+            SetFrontPageAreaSearchAreaTypes(profileViewModel, profile);
+
+            ProfileDetailsCleaner.CleanUserInput(profile);
+            return profile;
+        }
+
+        /// <summary>
+        /// Workaround so null can be set as value 
+        /// </summary>
+        private static void SetFrontPageAreaSearchAreaTypes(ProfileViewModel profileViewModel, ProfileDetails profile)
+        {
+            profile.FrontPageAreaSearchAreaTypes = profileViewModel.FrontPageAreaSearchAreaTypes == FrontPageAreaSearchOptions.NoSearchText
+                ? null
+                : profileViewModel.FrontPageAreaSearchAreaTypes;
+        }
+
+        private static void SetExtraJsFiles(ProfileViewModel profileViewModel, ProfileDetails profile)
+        {
+            var extraJsFileHelper = new ExtraJsFileHelper();
+            AutoMapper.Mapper.Map(profileViewModel, extraJsFileHelper);
+            profile.ExtraJsFiles = extraJsFileHelper.GetExtraJsFiles();
+        }
+
+        private int SaveIndicatorAs(int profileId, int groupId, int selectedAreaType,
          int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod,
          string selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType,
          int selectedCiMethodType, string selectedCiConfidenceLevel, int selectedPolarityType, int selectedUnitType,
@@ -543,12 +595,12 @@ namespace Fpm.MainUI.Controllers
 
             if (string.IsNullOrWhiteSpace(mtvText) == false)
             {
+                var indicatorMetadataTextItems = new IndicatorMetadataTextParser().Parse(mtvText);
 
-                CommonUtilities.CreateNewIndicatorTextValues(selectedDomain, mtvText, properties, nextIndicatorId,
-                    _userName, _profileRepository);
+                new IndicatorMetadataTextCreator(_profileRepository).CreateNewIndicatorTextValues(
+                    profileId, indicatorMetadataTextItems, properties, nextIndicatorId, _userName);
 
-                _profileRepository.CreateGroupingAndMetaData(_reader.GetProfileDetails(selectedProfileId).Id,
-                    Convert.ToInt32(selectedDomain),
+                _profileRepository.CreateGroupingAndMetaData(profileId, groupId,
                     nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator,
                     selectedComparatorMethod,
                     Convert.ToDouble(selectedComparatorConfidence), selectedYearType, selectedYearRange,
@@ -561,12 +613,15 @@ namespace Fpm.MainUI.Controllers
             return nextIndicatorId;
         }
 
-        public ActionResult RedirectToNew(string redirectUrl, string areaType)
+        private ProfileViewModel GetProfileViewModel(int profileId)
         {
-            return RedirectToAction("SortPageAndFilter", "ProfilesAndIndicators",
-                new { ProfileKey = redirectUrl, SelectedAreaTypeId = areaType });
+            if (profileId == ProfileIds.Undefined) return null;
+            var profileDetails = _reader.GetProfileDetailsByProfileId(profileId);
+            var profileViewModel = profileDetails.ToProfileViewModel();
+            AssignExtraJsFilesToViewModel(profileDetails, profileViewModel);
+            DefineNonAdminProfileProperties(profileViewModel);
+            return profileViewModel;
         }
-
 
         private static IEnumerable<SelectListItem> GetListOfFingertipsTabs()
         {
@@ -582,6 +637,20 @@ namespace Fpm.MainUI.Controllers
                 };
         }
 
+        private static void CheckUserHasPermissionToEditProfile(int profileId)
+        {
+            var userDetails = UserDetails.CurrentUser();
+            if (userDetails.HasWritePermissionsToProfile(profileId) == false)
+            {
+                throw new FpmException(string.Format(
+                    "{0} does not have permission to edit profile {1}", userDetails.Name, profileId));
+            }
+        }
+
+        private void GetAllProfiles(ProfileGridModel model)
+        {
+            model.ProfileGrid = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
+        }
 
         private IEnumerable<SelectListItem> GetFpmUserList()
         {
@@ -609,9 +678,80 @@ namespace Fpm.MainUI.Controllers
             base.OnActionExecuted(filterContext);
         }
 
+        private void DefineNonAdminProfileProperties(ProfileViewModel viewModel)
+        {
+            var profileId = viewModel.Id;
+            viewModel.ProfileUsers = _reader.GetProfileUsers(profileId).ToProfileUserList();
 
+            // Define drop down options
+            ViewBag.AvailableAreaTypes = _reader.GetAreaTypes(profileId).ToProfileAreaTypeList();
+            ViewBag.DefaultAreaTypeId = new SelectList(_reader.GetSupportedAreaTypes(), "Id", "ShortName");
+            ViewBag.DefaultFingertipsTabId = new SelectList(GetListOfFingertipsTabs(), "Value", "Text");
+            ViewBag.ContactUserId = GetFpmUserList();
+            ViewBag.SpineChartMinMaxLabelId = new SelectList(_reader.GetSpineChartMinMaxLabelOptions(), "Id", "Description");
+            ViewBag.KeyColourId = new SelectList(_lookUpsRepository.GetKeyColours(), "Id", "Description");
+            ViewBag.FrontPageAreaSearchAreaTypes = new FrontPageAreaSearchOptions().GetOptions(
+                viewModel.FrontPageAreaSearchAreaTypes);
+        }
 
+        private void SaveMetadataChanges(int indicatorId, int? groupId, int valueTypeId, int ciMethodId,
+            string ciComparatorConfidence, int polarityId, int unitId, int denominatorTypeId, int yearTypeId,
+            int areaTypeId, int sexId, int ageId, int comparatorId, int comparatorMethodId, double comparatorConfidence,
+            int yearRange, int selectedFrequency, int baselineYear, int datapointYear, int baselineQuarter,
+            int dataPointQuarter, int baselineMonth, int dataPointMonth, int indicatorSequence, int currentAgeId,
+            int currentSexId, int currentAreaTypeId, int? decimalPlaces, int? targetId, bool alwaysShowSpineChart,
+            int profileId, int disclosureControlId)
+        {
+            switch (selectedFrequency)
+            {
+                case Frequencies.Annual:
+                    baselineMonth = -1;
+                    dataPointMonth = -1;
+                    baselineQuarter = -1;
+                    dataPointQuarter = -1;
+                    break;
+                case Frequencies.Quarterly:
+                    baselineMonth = -1;
+                    dataPointMonth = -1;
+                    break;
+                case Frequencies.Monthly:
+                    baselineQuarter = -1;
+                    dataPointQuarter = -1;
+                    break;
+            }
 
+            var indicatorMetadataTextChanges = SaveIndicatorMetadataTextChanges(indicatorId, profileId);
 
+            _profileRepository.UpdateGroupingAndMetaData(Convert.ToInt32(groupId), indicatorId, areaTypeId, sexId, ageId,
+                comparatorId, comparatorMethodId, ciComparatorConfidence, comparatorConfidence, yearTypeId, yearRange, valueTypeId,
+                ciMethodId, polarityId, unitId, denominatorTypeId, baselineYear, datapointYear, baselineQuarter,
+                dataPointQuarter, baselineMonth, dataPointMonth, indicatorSequence, currentAgeId, currentSexId,
+                currentAreaTypeId, indicatorMetadataTextChanges, _userName, CommonUtilities.AuditType.Change.ToString(),
+                decimalPlaces, targetId, alwaysShowSpineChart, disclosureControlId);
+        }
+
+        private string[] SaveIndicatorMetadataTextChanges(int indicatorId, int profileId)
+        {
+            IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
+
+            string metadataTextChanges = Request.Params["userMTVChanges"];
+
+            string[] allChanges = Array.ConvertAll(Request.Params["userOtherChanges"].Split(Convert.ToChar("¬")), s => s);
+
+            //Update the Indicator Meta Data Text Values
+            if (string.IsNullOrWhiteSpace(metadataTextChanges) == false)
+            {
+                var textChangesByUser = new IndicatorMetadataTextParser().Parse(metadataTextChanges);
+
+                new IndicatorMetadataTextChanger(new ProfileRepository(), _reader)
+                    .UpdateIndicatorTextValues(indicatorId, textChangesByUser, properties, _userName, profileId);
+            }
+            return allChanges;
+        }
+
+        private Profile GetProfile(string urlKey, int selectedDomainNumber, int areaType)
+        {
+            return new ProfileBuilder(_profileRepository).Build(urlKey, selectedDomainNumber, areaType);
+        }
     }
 }

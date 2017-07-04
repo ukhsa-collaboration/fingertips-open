@@ -53,7 +53,7 @@ namespace IndicatorsUI.DataConstructionTest
 
             // Assert 
             var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
-            Assert.AreEqual("https://" + skin.LiveHost, host);
+            Assert.AreEqual("http://" + skin.LiveHost, host);
         }
     }
 }

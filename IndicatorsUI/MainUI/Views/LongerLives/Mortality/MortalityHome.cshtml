@@ -3,6 +3,7 @@
 @{
     Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml";
     var imagePath = ViewBag.ImagesUrl + "Mortality/";
+    var profileUrlKey = ViewBag.ProfileUrlKey;
 }
 @section headContent {
     <script src="@(Model.JsPath)vendor/google-maps-utility-library-v3-infobox/infobox.min.js"></script>
@@ -74,15 +75,15 @@
 
     <div id="home_promos" class="clearfix">
         <div class="article">
-            <h3><a href="/topic/@(ViewBag.ProfileUrlKey)/about-project">Find out about Longer Lives</a></h3>
+            <h3><a href="/topic/@profileUrlKey/about-project">Find out about Longer Lives</a></h3>
             <p>Making England's mortality data accessible to everyone.</p>
         </div>
         <div class="article">
-            <h3><a href="/topic/mortality/connect">Join the conversation</a></h3>
+            <h3><a href="/topic/@profileUrlKey/connect">Join the conversation</a></h3>
             <p>Let us know what you think about Longer Lives.</p>
         </div>
         <div class="article  last">
-            <h3><a href="topic/@ViewBag.ProfileUrlKey/health-intervention/liver">Focus on liver disease</a></h3>
+            <h3><a href="/topic/@profileUrlKey/health-intervention/liver_disease">Focus on liver disease</a></h3>
             <p>Find out what causes it and how rates can be reduced.</p>
         </div>
     </div>

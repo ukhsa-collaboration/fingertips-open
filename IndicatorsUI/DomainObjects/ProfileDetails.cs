@@ -40,10 +40,17 @@ namespace Profiles.DomainObjects
         public string AccessControlGroup { get; set; }
         public LongerLivesProfileDetails LongerLivesProfileDetails { get; set; }
         public bool IsOfficialStatistics { get; set; }
-        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public string FrontPageAreaSearchAreaTypes { get; set; }
         public bool HasAnyData { get; set; }
         public bool HasStaticReports { get; set; }
-        public string StaticReportsTimePeriods { get; set; }
+        public string StaticReportsFolders { get; set; }
+        public string StaticReportsLabel { get; set; }
+
+        /// <summary>
+        /// Whether to display the trend marker for the change between the most recent data
+        /// and the previous time period
+        /// </summary>
+        public bool IsChangeFromPreviousPeriodShown { get; set; }
 
         public bool HasDomains
         {

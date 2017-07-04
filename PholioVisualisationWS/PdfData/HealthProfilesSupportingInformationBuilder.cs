@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -63,6 +65,11 @@ namespace PholioVisualisation.PdfData
             AssignDeprivationQuintilesPopulation();
             AssignLsoaQuintiles();
 
+            // Population 
+            AssignDependencyRatio();
+            AssignEthnicMinorities();
+            AssignPopulationChange();
+
             // Page 2 bottom
             AssignLifeExpectancy();
             AssignLifeExpectancyByDeciles();
@@ -113,7 +120,7 @@ namespace PholioVisualisation.PdfData
             {
                 AssignChildAreaData = false,
                 AssignAreas = false
-            }.GetGroupData(benchmarkAreaCode,areaTypeId, profileId, supportingGroupId);
+            }.GetGroupData(benchmarkAreaCode, areaTypeId, profileId, supportingGroupId);
             groupRootSelector.SupportingGroupRoots = groupData.GroupRoots;
             indicatorMetadataCollection.AddIndicatorMetadata(groupData.IndicatorMetadata);
         }
@@ -133,34 +140,108 @@ namespace PholioVisualisation.PdfData
             groupRootSelector.MainGroupRoots = groupDataForSpineChart.GroupRoots;
         }
 
+        public void AssignPopulationChange()
+        {
+            // Find populations
+            var populationCombined = GetFormattedCoreData(
+                groupRootSelector.PopulationCombined.FirstGrouping).Value;
+
+            var populationMale = GetFormattedCoreData(
+                groupRootSelector.PopulationMale.FirstGrouping).Value;
+
+            var populationFemale = GetFormattedCoreData(
+                groupRootSelector.PopulationFemale.FirstGrouping).Value;
+
+            // Assign population counts
+            data.PopulationCountCombined =FormatPopulation(populationCombined);
+            data.PopulationCountMale = FormatPopulation(populationMale);
+            data.PopulationCountFemale = FormatPopulation(populationFemale);
+
+            // Assign population percentages
+            data.PopulationPercentageMale = NumericFormatter.Format1DP(populationMale / populationCombined * 100);
+            data.PopulationPercentageFemale = NumericFormatter.Format1DP(populationFemale / populationCombined * 100);
+
+            // Assign population changes
+            var populationProjectCombinedGrouping = groupRootSelector.PopulationProjectionCombined.FirstGrouping;
+
+            IndicatorMetadata metadata = indicatorMetadataCollection
+                .GetIndicatorMetadataById(populationProjectCombinedGrouping.IndicatorId);
+
+            data.ProjectedPopulationCombined = GetProjectPopulationFormatted(
+                populationProjectCombinedGrouping, metadata);
+
+            data.ProjectedPopulationMale = GetProjectPopulationFormatted(
+                groupRootSelector.PopulationProjectionMale.FirstGrouping, metadata);
+
+            data.ProjectedPopulationFemale = GetProjectPopulationFormatted(
+                groupRootSelector.PopulationProjectionFemale.FirstGrouping, metadata);
+        }
+
+        private string GetProjectPopulationFormatted(Grouping populationProjectCombinedGrouping, IndicatorMetadata metadata)
+        {
+            CoreDataSet coreDataSet = coreDataSetProvider.GetData(populationProjectCombinedGrouping,
+                TimePeriod.GetDataPoint(populationProjectCombinedGrouping), metadata);
+
+           return FormatPopulation(coreDataSet.Value);
+        }
+
+        private string FormatPopulation(double population)
+        {
+            return Math.Round(population/1000, MidpointRounding.AwayFromZero)
+                .ToString(CultureInfo.CurrentCulture);
+        }
+
+        public void AssignDependencyRatio()
+        {
+            Grouping grouping = groupRootSelector.DependencyRatio.FirstGrouping;
+            data.DependencyRatio = GetFormattedValue(grouping);
+        }
+
+        public void AssignEthnicMinorities()
+        {
+            data.PercentageEthnicMinoritesCombined = GetFormattedValue(
+                groupRootSelector.PercentageEthnicMinoritiesCombined.FirstGrouping);
+
+            data.PercentageEthnicMinoritesMale = GetFormattedValue(
+                groupRootSelector.PercentageEthnicMinoritiesMale.FirstGrouping);
+
+            data.PercentageEthnicMinoritesFemale = GetFormattedValue(
+                groupRootSelector.PercentageEthnicMinoritiesFemale.FirstGrouping);
+        }
+
         public void AssignLifeExpectancy()
         {
             Grouping maleGrouping = groupRootSelector.SlopeIndexOfInequalityForLifeExpectancyMale.FirstGrouping;
             Grouping femaleGrouping = groupRootSelector.SlopeIndexOfInequalityForLifeExpectancyFemale.FirstGrouping;
 
+            data.LifeExpectancyGapFemale = GetFormattedValue(femaleGrouping);
+            data.LifeExpectancyGapMale = GetFormattedValue(maleGrouping);
+        }
+
+        private string GetFormattedValue(Grouping grouping)
+        {
+            var coreDataSet = GetFormattedCoreData(grouping);
+            if (coreDataSet == null) return null;
+            return coreDataSet.ValueFormatted;
+        }
+
+        private CoreDataSet GetFormattedCoreData(Grouping grouping)
+        {
             IndicatorMetadata metadata =
-                indicatorMetadataCollection.GetIndicatorMetadataById(maleGrouping.IndicatorId);
+                indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
+
+            CoreDataSet coreDataSet = coreDataSetProvider.GetData(grouping,
+                TimePeriod.GetDataPoint(grouping), metadata);
 
             var formatter = NumericFormatterFactory.NewWithLimits(metadata, (Limits)null);
-
-            // Female
-            CoreDataSet coreDataSet = coreDataSetProvider.GetData(femaleGrouping,
-                TimePeriod.GetDataPoint(femaleGrouping), metadata);
             if (coreDataSet != null && coreDataSet.IsValueValid)
             {
                 formatter.Format(coreDataSet);
-                data.LifeExpectancyGapFemale = coreDataSet.ValueFormatted;
+                return coreDataSet;
             }
-
-            // Male
-            coreDataSet = coreDataSetProvider.GetData(maleGrouping,
-                TimePeriod.GetDataPoint(maleGrouping), metadata);
-            if (coreDataSet != null && coreDataSet.IsValueValid)
-            {
-                formatter.Format(coreDataSet);
-                data.LifeExpectancyGapMale = coreDataSet.ValueFormatted;
-            }
+            return null;
         }
+
 
         private void AssignLifeExpectancyByDeciles()
         {
@@ -193,7 +274,7 @@ namespace PholioVisualisation.PdfData
 
         private IList<XyPoint> GetXYPointsForLsoaDeprivationDeciles(GroupRoot xRoot, GroupRoot yRoot)
         {
-            const int categoryTypeId = CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010;
+            const int categoryTypeId = CategoryTypeIds.LsoaDeprivationDecilesWithinArea2015;
             var xData = GetLsoaDeprivationDecilesWithinArea(xRoot, categoryTypeId);
             var yData = GetLsoaDeprivationDecilesWithinArea(yRoot, categoryTypeId);
 
@@ -287,18 +368,34 @@ namespace PholioVisualisation.PdfData
             var chartData = new LocalAndEnglandChartDataWithDeprivation(
                 GetLocalAndEnglandChartData(groupRoot));
 
-            chartData.LocalLeastDeprived = GetDeprivationQuintileValues(grouping,
-                CategoryIds.LeastDeprivedQuintile);
-            chartData.LocalMostDeprived = GetDeprivationQuintileValues(grouping,
-                CategoryIds.MostDeprivedQuintile);
+            // IMD2010
+            var categoryTypeId = CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2010;
+            var year = 2009; // include data up to this year
+            chartData.LocalLeastDeprived = GetDeprivationQuintileValues(grouping, categoryTypeId,
+                CategoryIds.LeastDeprivedQuintile, year);
+
+            chartData.LocalMostDeprived = GetDeprivationQuintileValues(grouping, categoryTypeId,
+                CategoryIds.MostDeprivedQuintile, year);
+
+            // IMD2015
+            categoryTypeId = CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2015;
+            year = 9999; // include all remaining data
+            chartData.LocalLeastDeprived.AddRange(GetDeprivationQuintileValues(grouping, categoryTypeId,
+                CategoryIds.LeastDeprivedQuintile, year));
+
+            chartData.LocalMostDeprived.AddRange(GetDeprivationQuintileValues(grouping, categoryTypeId,
+                CategoryIds.MostDeprivedQuintile, year));
 
             return chartData;
         }
 
-        private List<double> GetDeprivationQuintileValues(Grouping grouping, int categoryId)
+        private List<double> GetDeprivationQuintileValues(Grouping grouping, int categoryTypeId, int categoryId, int lastYearToInclude)
         {
             var coreDataList = trendDataReader.GetTrendDataForSpecificCategory(grouping,
-                areaCode, CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2010, categoryId);
+                areaCode, categoryTypeId, categoryId);
+
+            // Filter for year
+            coreDataList = coreDataList.Where(x => x.Year <= lastYearToInclude).ToList();
 
             coreDataProcessor.TruncateList(coreDataList);
 

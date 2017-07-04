@@ -73,6 +73,7 @@ namespace FingertipsUploadService.Upload
             return null;
         }
 
+
         public UploadValidationFailure ValidateYear(DataRow uploadedRow, int? rowNumber)
         {
             //Do other year validation

@@ -15907,7 +15907,7 @@ function $$RAFProvider() { //rAF
  *
  * In complex applications it's possible that the dependencies between `$watch`s will result in
  * several digest iterations. However if an application needs more than the default 10 digest
- * iterations for its model to stabilize then you should investigate what is causing the model to
+ * iterations for its model to stabilize then you should investigate what is causing the viewModel to
  * continuously change during the digest.
  *
  * Increasing the TTL could have performance implications, so you should not change it without
@@ -15924,7 +15924,7 @@ function $$RAFProvider() { //rAF
  *
  * Every application has a single root {@link ng.$rootScope.Scope scope}.
  * All other scopes are descendant scopes of the root scope. Scopes provide separation
- * between the model and the view, via a mechanism for watching the model for changes.
+ * between the model and the view, via a mechanism for watching the viewModel for changes.
  * They also provide event emission/broadcast and subscription facility. See the
  * {@link guide/scope developer guide on scopes}.
  */
@@ -22095,7 +22095,7 @@ var inputType = {
    *
    * The model must always be a Date object, otherwise Angular will throw an error.
    * Invalid `Date` objects (dates whose `getTime()` is `NaN`) will be rendered as an empty string.
-   * If the model is not set to the first of the month, the next view to model update will set it
+   * If the model is not set to the first of the month, the next view to viewModel update will set it
    * to the first of the month.
    *
    * The timezone to be used to read/write the `Date` instance in the model can be defined using
@@ -26092,14 +26092,14 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
    *       <form name="myForm" ng-model-options="{ updateOn: 'blur' }">
    *         <div>
    *        <p id="inputDescription1">Without $rollbackViewValue():</p>
-   *         <input name="value1" aria-describedby="inputDescription1" ng-model="model.value1"
+   *         <input name="value1" aria-describedby="inputDescription1" ng-model="viewModel.value1"
    *                ng-keydown="setEmpty($event, 'value1')">
    *         value1: "{{ model.value1 }}"
    *         </div>
    *
    *         <div>
    *        <p id="inputDescription2">With $rollbackViewValue():</p>
-   *         <input name="value2" aria-describedby="inputDescription2" ng-model="model.value2"
+   *         <input name="value2" aria-describedby="inputDescription2" ng-model="viewModel.value2"
    *                ng-keydown="setEmpty($event, 'value2', true)">
    *         value2: "{{ model.value2 }}"
    *         </div>
@@ -26145,7 +26145,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
     // Note: we use the $$rawModelValue as $modelValue might have been
     // set to undefined during a view -> model update that found validation
     // errors. We can't parse the view here, since that could change
-    // the model although neither viewValue nor the model on the scope changed
+    // the model although neither viewValue nor the viewModel on the scope changed
     var modelValue = ctrl.$$rawModelValue;
 
     var prevValid = ctrl.$valid;
@@ -26630,7 +26630,7 @@ var NgModelController = ['$scope', '$exceptionHandler', '$attrs', '$element', '$
  * </div>
  *
  * You use this behavior by adding `ng-model-options="{ getterSetter: true }"` to an element that
- * has `ng-model` attached to it. You can also add `ng-model-options="{ getterSetter: true }"` to
+ * has `ng-model` attached to it. You can also add `ng-viewModel-options="{ getterSetter: true }"` to
  * a `<form>`, which will enable this behavior for all `<input>`s within it. See
  * {@link ng.directive:ngModelOptions `ngModelOptions`} for more.
  *
@@ -26735,7 +26735,7 @@ var DEFAULT_REGEXP = /(\s+|^)default(\s+|$)/;
  * takes place when a timer expires; this timer will be reset after another change takes place.
  *
  * Given the nature of `ngModelOptions`, the value displayed inside input fields in the view might
- * be different from the value in the actual model. This means that if you update the model you
+ * be different from the value in the actual model. This means that if you update the viewModel you
  * should also invoke {@link ngModel.NgModelController `$rollbackViewValue`} on the relevant input field in
  * order to make sure it is synchronized with the model and that any debounced action is canceled.
  *
@@ -28144,7 +28144,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  * `track by $index` can also provide a performance boost.
  * </div>
  * ```html
- *    <div ng-repeat="model in collection track by model.id">
+ *    <div ng-repeat="model in collection track by viewModel.id">
  *      {{model.name}}
  *    </div>
  * ```
@@ -28161,7 +28161,7 @@ var ngPluralizeDirective = ['$locale', '$interpolate', '$log', function($locale,
  * **Note:** `track by` must always be the last expression:
  * </div>
  * ```
- * <div ng-repeat="model in collection | orderBy: 'id' as filtered_result track by model.id">
+ * <div ng-repeat="model in collection | orderBy: 'id' as filtered_result track by viewModel.id">
  *     {{model.name}}
  * </div>
  * ```
@@ -29740,7 +29740,7 @@ var SelectController =
  *
  * <example name="select-with-non-string-options" module="nonStringSelect">
  *   <file name="index.html">
- *     <select ng-model="model.id" convert-to-number>
+ *     <select ng-model="viewModel.id" convert-to-number>
  *       <option value="0">Zero</option>
  *       <option value="1">One</option>
  *       <option value="2">Two</option>
@@ -29769,7 +29769,7 @@ var SelectController =
  *   <file name="protractor.js" type="protractor">
  *     it('should initialize to model', function() {
  *       var select = element(by.css('select'));
- *       expect(element(by.model('model.id')).$('option:checked').getText()).toEqual('Two');
+ *       expect(element(by.model('viewModel.id')).$('option:checked').getText()).toEqual('Two');
  *     });
  *   </file>
  * </example>
@@ -29948,16 +29948,16 @@ var styleDirective = valueFn({
  *         <input type="checkbox" ng-model="required" id="required" />
  *         <br>
  *         <label for="input">This input must be filled if `required` is true: </label>
- *         <input type="text" ng-model="model" id="input" name="input" ng-required="required" /><br>
+ *         <input type="text" ng-model="viewModel" id="input" name="input" ng-required="required" /><br>
  *         <hr>
  *         required error set? = <code>{{form.input.$error.required}}</code><br>
- *         model = <code>{{model}}</code>
+ *         model = <code>{{viewModel}}</code>
  *       </form>
  *     </div>
  *   </file>
  *   <file name="protractor.js" type="protractor">
        var required = element(by.binding('form.input.$error.required'));
-       var model = element(by.binding('model'));
+       var model = element(by.binding('viewModel'));
        var input = element(by.id('input'));
 
        it('should set the required error', function() {
@@ -30041,15 +30041,15 @@ var requiredDirective = function() {
  *         <input type="text" ng-model="regex" id="regex" />
  *         <br>
  *         <label for="input">This input is restricted by the current pattern: </label>
- *         <input type="text" ng-model="model" id="input" name="input" ng-pattern="regex" /><br>
+ *         <input type="text" ng-model="viewModel" id="input" name="input" ng-pattern="regex" /><br>
  *         <hr>
  *         input valid? = <code>{{form.input.$valid}}</code><br>
- *         model = <code>{{model}}</code>
+ *         model = <code>{{viewModel}}</code>
  *       </form>
  *     </div>
  *   </file>
  *   <file name="protractor.js" type="protractor">
-       var model = element(by.binding('model'));
+       var model = element(by.binding('viewModel'));
        var input = element(by.id('input'));
 
        it('should validate the input with the default pattern', function() {
@@ -30138,15 +30138,15 @@ var patternDirective = function() {
  *         <input type="number" ng-model="maxlength" id="maxlength" />
  *         <br>
  *         <label for="input">This input is restricted by the current maxlength: </label>
- *         <input type="text" ng-model="model" id="input" name="input" ng-maxlength="maxlength" /><br>
+ *         <input type="text" ng-model="viewModel" id="input" name="input" ng-maxlength="maxlength" /><br>
  *         <hr>
  *         input valid? = <code>{{form.input.$valid}}</code><br>
- *         model = <code>{{model}}</code>
+ *         model = <code>{{viewModel}}</code>
  *       </form>
  *     </div>
  *   </file>
  *   <file name="protractor.js" type="protractor">
-       var model = element(by.binding('model'));
+       var model = element(by.binding('viewModel'));
        var input = element(by.id('input'));
 
        it('should validate the input with the default maxlength', function() {
@@ -30224,15 +30224,15 @@ var maxlengthDirective = function() {
  *         <input type="number" ng-model="minlength" id="minlength" />
  *         <br>
  *         <label for="input">This input is restricted by the current minlength: </label>
- *         <input type="text" ng-model="model" id="input" name="input" ng-minlength="minlength" /><br>
+ *         <input type="text" ng-model="viewModel" id="input" name="input" ng-minlength="minlength" /><br>
  *         <hr>
  *         input valid? = <code>{{form.input.$valid}}</code><br>
- *         model = <code>{{model}}</code>
+ *         model = <code>{{viewModel}}</code>
  *       </form>
  *     </div>
  *   </file>
  *   <file name="protractor.js" type="protractor">
-       var model = element(by.binding('model'));
+       var model = element(by.binding('viewModel'));
        var input = element(by.id('input'));
 
        it('should validate the input with the default minlength', function() {

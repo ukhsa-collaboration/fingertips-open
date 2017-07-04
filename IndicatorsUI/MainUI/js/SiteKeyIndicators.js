@@ -83,15 +83,23 @@ function IndicatorFormatter(groupRoot, metadata, coreDataSet, indicatorStatsF) {
 
 function addTd(html, text, cssClass, tooltip, noteId, id) {
 
+
     var isNote = !!noteId;
 
-    if (id)
+    if (id) {
         html.push('<td ', 'id="', id, '"');
-    else
+    } else {
         html.push('<td ');
+    }
 
     if (cssClass) {
         html.push(' class="', isNote ? cssClass + ' valueNote' : cssClass, '"');
+    }
+
+    var isBootstrapTooltip = isDefined(cssClass) &&
+    cssClass.indexOf('boot-tooltip') !== -1;
+    if (isBootstrapTooltip) {
+        html.push(' data-toggle="tooltip" data-placement="top" ');
     }
 
     if (tooltip) {
@@ -140,7 +148,6 @@ function getGroupingDataCallback(obj) {
     if (isDefined(obj)) {
 
         addLoadedData(obj);
-
         try {
             groupRoots = obj;
         } catch (e) {
@@ -174,7 +181,6 @@ function showAndHidePageElements() {
     main.hide();
 
     pages.displayElements();
-    configureIndicatorMenu();
 
     menus.parentType.setVisibility();
     menus.areaType.setVisibility();
@@ -185,6 +191,8 @@ function showAndHidePageElements() {
     showMessageIfIndicatorNotAvailableForNewAreaType();
     updateNearestNeighbourElements();
     updatePreferredState();
+    showHideAreaAddress();
+    $('#no-domain-data').hide();
 
     hideSpinner();
     main.show();
@@ -205,7 +213,8 @@ function showMessageIfIndicatorNotAvailableForNewAreaType() {
         var mode = pages.getCurrent();
         var modes = PAGE_MODES;
         var shouldShowMessageForCurrentTab = mode !== modes.TARTAN &&
-            mode !== modes.AREA_SPINE && mode !== modes.DOWNLOAD && mode !== modes.POPULATION;
+            mode !== modes.AREA_SPINE && mode !== modes.DOWNLOAD &&
+            mode !== modes.POPULATION && mode !== modes.ENGLAND;
 
         if (currentIID !== previousIID && !isNotAvailableForCurrentAreaType && shouldShowMessageForCurrentTab) {
 
@@ -619,7 +628,6 @@ function setPageMode(newMode) {
     if (c !== newMode) {
         pages.setCurrent(newMode);
         ftHistory.setHistory();
-
         logEvent('TabSelected', getCurrentPageTitle(), 'UserSelection');
     }
 }
@@ -703,8 +711,7 @@ function executeWithLock(code) {
 
 function clearSpineTables() {
     // Necessary to do both so tooltips work
-    $('#singleIndicatorBody').html('');
-    $('#spineBody').html('');
+    $('#spine-body').html('');
 }
 
 function AreaAndDataSorter(order, data, areas, areaCodeToAreaHash) {
@@ -893,7 +900,7 @@ function getNationalComparator() {
 }
 
 function updatePageSelected(suffix, id) {
-    var c = 'pageSelected';
+    var c = 'page-selected';
     suffix = '#' + suffix;
     $(suffix + 'Selection > a').removeClass(c);
     $(suffix + id).addClass(c);
@@ -1047,8 +1054,8 @@ function parseValF(valF) {
 
 function toggleDataOrNot(suffix, isData) {
     new MutuallyExclusiveDisplay({
-        a: $('#' + suffix + 'Data'),
-        b: $('#' + suffix + 'NoData')
+        a: $('#' + suffix + '-data'),
+        b: $('#' + suffix + '-no-data')
     }).showA(isData);
 }
 
@@ -1096,11 +1103,11 @@ function getTrendHeader(metadata, root, areaName, clickHandler) {
 			' - ' + unit :
 			'';
 
-    return ['<div class="trendHeader"><div class="trendTitle"><a class="trendLink" title="More about this indicator" href="javascript:',
+    return ['<div class="trend-header"><div class="trend-title"><a class="trend-link" title="More about this indicator" href="javascript:',
 		clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>',
 		getIndicatorDataQualityHtml(metadata.Descriptive.DataQuality),
-		'<span class="trendArea">', areaName, '</span>', '</div>',
-		'<div class="trendUnit">', metadata.ValueType.Name, unitLabel, '</div>',
+		'<span class="trend-area">', areaName, '</span>', '</div>',
+		'<div class="trend-unit">', metadata.ValueType.Name, unitLabel, '</div>',
 		'</div>'].join('');
 }
 
@@ -1109,7 +1116,7 @@ function getSource(metadata) {
     var source = metadata.Descriptive.DataSource;
 
     return isDefined(source) && !String.isNullOrEmpty(source) ?
-		'<div class="trendSource">Source: ' + source + '</div>' :
+		'<div class="trend-source">Source: ' + source + '</div>' :
 		'';
 }
 
@@ -1124,6 +1131,7 @@ function indicatorChanged(rootIndex) {
     preferredGroupRoots[FT.model.groupId] = root;
 
     if (mode === PAGE_MODES.INDICATOR_DETAILS) {
+        // Bar chart page is special case
         displayIndicatorDetails();
     } else {
         pages.goToCurrent();
@@ -1133,14 +1141,8 @@ function indicatorChanged(rootIndex) {
 		ui.getMetadataHash()[root.IID].Descriptive.Name);
 }
 
-function showAllIndicatorsChanged(checked) {
-
-    $('#indicatorMenu').prop('disabled', checked);
-    pages.goToCurrent();
-}
-
 function showAllIndicators() {
-    return isCheckboxChecked('#indicatorSelectAll');
+    return areaTrendsState.showAll;
 }
 
 function isCheckboxChecked(id) {
@@ -1158,10 +1160,6 @@ function getSelectedIndicatorId() {
 
 function setShowAllDisabledState() {
     $('#indicatorMenu').prop('disabled', showAllIndicators());
-}
-
-function noDataForAreaType() {
-    goToTartanRugPage();
 }
 
 function getFirstGrouping(root) {
@@ -1210,7 +1208,19 @@ function getGroupAndCurrentAreaTypeKey() {
 }
 
 function setIndicatorIndex(i) {
+    // Select indicator in menu
     $('#indicatorMenu').val(i);
+}
+
+function setIndicatorIndexAndUpdateModel(i) {
+    setIndicatorIndex(i);
+
+    // Update model
+    var root = groupRoots[i];
+    var model = FT.model;
+    model.iid = root.IID;
+    model.ageId = root.Age.Id;
+    model.sexId = root.Sex.Id;
 }
 
 function getGroupAndAreaTypeKey(areaTypeId) {
@@ -1237,7 +1247,7 @@ function refreshCurrentPage2() {
         }
         pages.goToCurrent();
     } else {
-        noDataForAreaType();
+        goToTartanRugPage();
         unlock();
     }
 }
@@ -1254,15 +1264,15 @@ function initPageElements() {
     menus.parentType = new ParentTypeMenu('#parentAreaTypesMenu', model);
     menus.area = new AreaMenu('#areaMenu', model);
     menus.benchmark = new BenchmarkMenu('#comparator', model);
-
+    
     // Key heading
     var benchmark = enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY ?
 		'England' :
 		'benchmark';
-    $('.keyText').html('Compared with ' + benchmark);
+    $('.key-text').html('Compared with ' + benchmark);
 
     // Selected domain
-    $('#domain' + model.groupId).addClass('selectedDomain');
+    $('#domain' + model.groupId).addClass('selected-domain');
 
     // Benchmark target option
     $('#target-benchmark').click(function () {
@@ -1627,7 +1637,7 @@ MinMaxFinder.prototype = {
 //
 function showBarChartLegend(useTarget) {
     new MutuallyExclusiveDisplay({
-        a: $('#keyAdHoc'),
+        a: $('#key-ad-hoc'),
         b: $('#key-bar-chart')
     }).showA(useTarget);
 }
@@ -1638,69 +1648,90 @@ function showBarChartLegend(useTarget) {
 function setTargetLegendHtml(comparisonConfig, metadata) {
     if (comparisonConfig.useTarget) {
         var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
-        $('#keyAdHoc').html(
-				'<div><table class="keyTable"><tr><td class="keyText">Benchmarked against goal:</td><td class="keySpacer"></td><td>' +
+        $('#key-ad-hoc').html(
+				'<div><table class="key-table"><tr><td class="key-text">Benchmarked against goal:</td><td class="key-spacer"></td><td>' +
 				targetLegend + '</td></tr></table></div>').show();
     }
 }
 
-//
-// Get HTML for target legend
-//
-function getTargetLegendHtml(comparisonConfig, metadata) {
+function TargetLegend(metadata) {
+    var targetConfig = metadata.Target;
+    var bespokeKey = targetConfig.BespokeKey,
+    start = '<span class="target ',
+    end = '</span>';
 
-    if (comparisonConfig.useTarget) {
+    var colourClasses = targetConfig.PolarityId === PolarityIds.BlueOrangeBlue
+        ? ['bobLower', 'bobHigher']
+        : ['worse', 'better'];
 
-        var targetConfig = metadata.Target,
-			bespokeKey = targetConfig.BespokeKey,
-			start = '<span class="target ',
-			end = '</span>';
-        var worseOrBetter = targetConfig.PolarityId == PolarityIds.BlueOrangeBlue
-			? ['bobLower', 'bobHigher']
-			: ['worse', 'better'];
+    this.render = function() {
+
+        // Legend may already be defined
+        var legendHtml = targetConfig.LegendHtml;
+        if (legendHtml && !String.isNullOrEmpty(legendHtml)) {
+            return legendHtml;
+        }
 
         if (bespokeKey) {
-            // Bespoke comparison
             if (bespokeKey === 'last-year-england') {
-                return start + worseOrBetter[0] + '">&lt;previous year\'s England value' + end +
-					start + worseOrBetter[1] + '">&ge;previous year\'s England value' + end;
+                return this.renderLastYearEngland();
             }
 
             if (bespokeKey === 'nth-percentile-range') {
-
-                var lowerTargetPercentile = targetConfig.LowerLimit;
-                var upperTargetPercentile = targetConfig.UpperLimit;
-
-                // Red, amber green
-                if (targetConfig.PolarityId === 0) {    // Lower is green
-
-                    return start + worseOrBetter[0] + '">&gt;' + upperTargetPercentile + 'th-percentile of UTLAs' + end +
-						start + 'same' + '">&le;' + upperTargetPercentile + 'th to ' + '&gt;' + lowerTargetPercentile + 'th' + end +
-						start + worseOrBetter[1] + '">&le;' + lowerTargetPercentile + 'th' + end;
-                }
-
-                if (targetConfig.PolarityId === 1) {    // Upper is green
-                    return start + worseOrBetter[0] + '">&lt;' + lowerTargetPercentile + 'th-percentile of UTLAs' + end +
-					start + 'same' + '">&ge;' + lowerTargetPercentile + 'th to ' + '&lt;' + upperTargetPercentile + 'th' + end +
-					start + worseOrBetter[1] + '">&ge;' + upperTargetPercentile + 'th' + end;
-                }
+                return this.renderPercentileRange();
             }
 
+            // Unknown bespoke key
             return '';
         }
 
+        return this.renderValueComparison();
+    }
+
+    this.renderLastYearEngland = function () {
+        var viewModel = {
+            lowerColour: colourClasses[0],
+            higherColour: colourClasses[1]
+        };
+        templates.add(bespokeKey,
+            '<span class="target {{lowerColour}}">&lt;previous year\'s England value</span>' +
+            '<span class="target {{higherColour}}">&ge;previous year\'s England value</span>');
+
+        return templates.render(bespokeKey, viewModel);
+    }
+
+    this.renderPercentileRange = function () {
+        var lowerTargetPercentile = targetConfig.LowerLimit;
+        var upperTargetPercentile = targetConfig.UpperLimit;
+
+        // Red, amber green
+        if (targetConfig.PolarityId === PolarityIds.RAGLowIsGood) {
+            return start + colourClasses[0] + '">&gt;' + upperTargetPercentile + 'th-percentile of UTLAs' + end +
+                start + 'same' + '">&le;' + upperTargetPercentile + 'th to ' + '&gt;' + lowerTargetPercentile + 'th' + end +
+                start + colourClasses[1] + '">&le;' + lowerTargetPercentile + 'th' + end;
+        }
+
+        if (targetConfig.PolarityId === PolarityIds.RAGHighIsGood) {
+            return start + colourClasses[0] + '">&lt;' + lowerTargetPercentile + 'th-percentile of UTLAs' + end +
+            start + 'same' + '">&ge;' + lowerTargetPercentile + 'th to ' + '&lt;' + upperTargetPercentile + 'th' + end +
+            start + colourClasses[1] + '">&ge;' + upperTargetPercentile + 'th' + end;
+        }
+    }
+
+    this.renderValueComparison = function() {
+        
         var lowerLimit = new CommaNumber(targetConfig.LowerLimit).unrounded(),
 		upperLimit = targetConfig.UpperLimit,
 		suffix = new ValueSuffix(metadata.Unit).getShortLabel(),
 		html;
 
         // Switch colouring if low is good
-        if (targetConfig.PolarityId === 0) {
-            worseOrBetter = worseOrBetter.reverse();
+        if (targetConfig.PolarityId === PolarityIds.RAGLowIsGood) {
+            colourClasses = colourClasses.reverse();
         }
 
         // Worse
-        html = [start, worseOrBetter[0], '">&lt;', lowerLimit, suffix, end];
+        html = [start, colourClasses[0], '">&lt;', lowerLimit, suffix, end];
 
         // Same
         if (upperLimit) {
@@ -1711,9 +1742,19 @@ function getTargetLegendHtml(comparisonConfig, metadata) {
         }
 
         // Better
-        html.push(start, worseOrBetter[1], '">&ge;', upperLimit, suffix, end);
+        html.push(start, colourClasses[1], '">&ge;', upperLimit, suffix, end);
 
         return html.join('');
+    }
+}
+
+//
+// Get HTML for target legend
+//
+function getTargetLegendHtml(comparisonConfig, metadata) {
+
+    if (comparisonConfig.useTarget) {
+        return new TargetLegend(metadata).render();
     } else {
         return '';
     }
@@ -2246,7 +2287,8 @@ function initAreaElements() {
     if (!model.isNearestNeighbours()) {
         // Preferred area only if its not NN
         if (!model.areaCode /*no area code in hash*/ ||
-			areaMappings.getParentAreaCode(model.areaCode) === null /* area code from another area type that doesn't contain the child area */) {
+            areaMappings.getParentAreaCode(model.areaCode) ===
+            null /* area code from another area type that doesn't contain the child area */) {
             model.areaCode = FT.preferredAreas.getAreaCode();
         }
     }
@@ -2255,7 +2297,10 @@ function initAreaElements() {
     menus.parent.setOptions();
     menus.parentType.setOptions();
     setAreas();
-    displayAreaSearchOptions(FT.model.areaTypeId);
+    displayAreaSearchOptions(model.areaTypeId);
+
+    // Set area type ID in case (e.g user selected browser back or forward)
+    menus.areaType.setTypeId(model.areaTypeId);
 
     if (model.parentTypeId === AreaTypeIds.Country) {
         // Subnational benchmark not valid
@@ -2269,7 +2314,6 @@ function initAreaElements() {
     if (isInSearchMode()) {
         indicatorSearch.hideAreaTypesWithNoResults();
     }
-
     refreshCurrentPage();
 }
 
@@ -2410,23 +2454,6 @@ function addLoadedData(obj) {
     ui.setData(getGroupAndCurrentAreaTypeKey(), FT.model.parentCode, obj);
 }
 
-function exportExcel(parentCode) {
-
-    var model = FT.model;
-
-    setUrl(FT.url.corews + 'GetDataDownload.ashx?pid=' + model.profileId +
-		'&ati=' + model.areaTypeId +
-		getIndicatorIdArgument() + getRestrictByProfileParameter() +
-		'&tem=' + templateProfileId +
-		'&par=' + parentCode +
-		'&pds=' + enumParentDisplay +
-		'&pat=' + model.parentTypeId
-	);
-
-    logEvent('Download', 'Excel', parentCode);
-}
-
-
 function advanceIndicatorMenuClicked(step) {
     if (!FT.ajaxLock) {
         lock();
@@ -2532,18 +2559,6 @@ function getIndicatorIdArgument() {
 // Dummy for search equivalent
 function addIndicatorIdParameter() { }
 
-/* Determines whether or not the indicator menu is enabled */
-function configureIndicatorMenu() {
-
-    var menuDisabled = areaTrendsState.tabSpecificOptions &&
-		areaTrendsState.tabSpecificOptions.getOption() === VIEW_MODES.AREA &&
-		pages.isTrue('showAllAvailable') ?
-		showAllIndicators() :
-		'';
-
-    $('#indicatorMenu').prop('disabled', menuDisabled);
-}
-
 function setAreaType(areaTypeId) {
 
     var model = FT.model;
@@ -2558,7 +2573,7 @@ function setAreaType(areaTypeId) {
         ajaxMonitor.setCalls(1);
 
         getAllAreas(areaTypeId);
-
+        
         ajaxMonitor.monitor(initAreaData2);
     }
 }
@@ -2609,7 +2624,7 @@ function getSignificanceFunction(polarityId) {
 }
 
 function updateDomains() {
-    var cls = 'selectedDomain';
+    var cls = 'selected-domain';
     $('.' + cls).removeClass(cls);
     $('#domain' + FT.model.groupId).addClass(cls);
 }
@@ -2732,7 +2747,7 @@ function nearestNeighboursSelected() {
     if (!FT.ajaxLock) {
         lock();
 
-        $('#nearestNeighbours-wrapper').css('visibility', 'hidden');
+        $('#nearest-neighbour-wrapper').css('visibility', 'hidden');
 
         FT.model.nearestNeighbour = getNearestNeighbourCode();
         // We set the comparatorId to National as its only selectable option
@@ -2746,13 +2761,15 @@ function nearestNeighboursSelected() {
 
 function showAndHideNearestNeighboursMenu() {
 
-    var linksHtml = '';
     var $neighbourHeader = $('#nearest-neighbour-header');
+    var $neighbourLinks = $('#nearest-neighbour-links');
+    var $neighbourSelect = $('#nearest-neighbour-wrapper');
 
     if (FT.model.isNearestNeighbours()) {
+        // Nearest neighbours displayed
 
         var config = getNearestNeighboursConfig();
-
+               
         // Display neighbours explanation
         var headerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
             areaHash[FT.model.areaCode].Name + ' ' + nnSelectedText + '</h2></span>';
@@ -2763,26 +2780,28 @@ function showAndHideNearestNeighboursMenu() {
         viewModel.text = config.altText
             ? config.altText
             : 'nearest neighbours';
-
+        
         // More information link
-        viewModel.isLink = config.hasOwnProperty('link');
+        viewModel.isLink = config.ExtraLink.length > 0;
         if (viewModel.isLink) {
-            viewModel.link = config.link;
+            viewModel.link = config.ExtraLink;
         }
 
         // Render links
         var templateName = 'neighbours';
-        templates.add(templateName, '<a onclick="exitNearestNeighboursSelected()" class="a-link">Exit {{text}}</a>' +
+        templates.add(templateName, '<a id="exit-nearest-neighbours" onclick="exitNearestNeighboursSelected()" class="a-link">Exit {{text}}</a>' +
             '{{#isLink}}<a href="{{{link}}}" class="a-link" target="_blank">More information</a>{{/isLink}}');
-        linksHtml = templates.render(templateName, viewModel);
+        var linksHtml = templates.render(templateName, viewModel);
+
+        $neighbourLinks.html(linksHtml).show();
+        $neighbourSelect.hide();
     } else {
-        // Show neighbour link
-        $('#nearestNeighbours-wrapper').css('visibility', 'visible');
-
+        // Nearest neighbours not displayed
         $neighbourHeader.hide();
+        $neighbourLinks.hide();
+        $neighbourSelect.show();
+        $neighbourSelect.css("visibility", "visible");
     }
-
-    $('#goBack').html(linksHtml);
 }
 
 /**
@@ -2825,9 +2844,9 @@ function toggleNearestNeighboursControls(state) {
 function setNearestNeighbourLinkText() {
     var model = FT.model;
 
-    if (doesAreaTypeHaveNearestNeighbours()) {
+    var area = areaHash[model.areaCode];
+    if (doesAreaTypeHaveNearestNeighbours() && area) {
         var config = getNearestNeighboursConfig();
-        var area = areaHash[model.areaCode];
 
         var name = FT.model.areaTypeId === AreaTypeIds.CCG
             ? area.Short
@@ -2880,6 +2899,30 @@ FT.model.isNearestNeighbours = function () {
         default:
             return true;
     }
+}
+
+/**
+* Display message if there is no data in a domain
+* @class displayNoData
+*/
+function displayNoData() {
+
+    showAndHidePageElements();
+
+    // Hide current tab contents
+    pages.getContainerJq().hide();
+
+    // Show no data message
+    $('#no-domain-data').show();
+
+    // No indicators to display so hide menu
+    $('#indicator-menu-div,#tab-specific-options').hide();
+
+    unlock();
+}
+
+function areIndicatorsInDomain() {
+    return groupRoots.length > 0;
 }
 
 /**
@@ -2946,7 +2989,7 @@ var recentTrendSelected = {
     * Event handler for when a recent trend icon is selected in the area profile
     * @method fromAreaProfile
     */
-    fromAreaProfile: function (rootIndex) {
+    byGroupRoot: function (rootIndex) {
         // Go to trends page
         this._setIndicator(rootIndex);
         this._showTrend();
@@ -2986,7 +3029,7 @@ var barChart = {
             barScale.negativePixels - width :
             barScale.negativePixels;
 
-        var h = ['<div class="barBox"><img class="bar" style="width:', width,
+        var h = ['<div class="bar-box"><img class="bar" style="width:', width,
             'px;left:', left,
             'px" src="', imgUrl, img, '"/>'];
 
@@ -3026,7 +3069,7 @@ var barChart = {
 
         var html = getTrendHeader(barChartState.metadata, root, period,
             'goToMetadataPage(' + rootIndex + ')');
-        $('#indicatorDetailsHeader').html(html);
+        $('#indicator-details-header').html(html);
     }
 };
 
@@ -3042,17 +3085,62 @@ function matchBySexAgeAndIID(root, list) {
     });
 }
 
+function addOrderandPercentilesToData(coreDataList) {
+    // Hash: Key -> area code, Value -> coredataset
+    var hash = {},
+        areaOrder = [];
+
+    _.each(coreDataList, function (data) {
+        hash[data.AreaCode] = data;
+        areaOrder.push({ AreaCode: data.AreaCode, Val: data.Val, ValF: data.ValF });
+    });
+
+    areaOrder.sort(sortData).reverse();
+
+    // First, count number of areas which have a value.
+    var numAreas = 0;
+    $.each(areaOrder, function (i, coreData) {
+        if (coreData.ValF !== '-') {
+            numAreas++;
+        }
+    });
+
+    // Second, set orderFrac for each.
+    var j = 0;
+    $.each(areaOrder, function (i, coreData) {
+        var data = hash[coreData.AreaCode];
+        if (coreData.ValF === '-') {
+            data.order = -1;
+            data.orderFrac = -1;
+        }
+        else {
+            data.order = numAreas - j;
+            data.orderFrac = 1 - j / numAreas;
+            var position = numAreas + 1 - j + 1;
+            data.quartile = Math.ceil(position / (numAreas / 4));
+            data.quintile = Math.ceil(position / (numAreas / 5));
+            j++;
+        }
+    });
+
+    return hash;
+}
+
+function getIndicatorName(indicatorId) {
+    return ui.getMetadataHash()[indicatorId].Descriptive.Name;
+}
+
 var nnLinkText = '';
 var nnSelectedText = '';
 
 // UI
 var CSS_CENTER = 'center';
 var CSS_NUMERIC = 'numeric';
+var CSS_NUMERIC_WITH_TOOLTIP = 'numeric boot-tooltip';
 var EMPTY_TD_CONTENTS = '&nbsp;'; // Necessary for empty bordered TDs in IE
 var NO_DATA = '<div class="noData">-</div>';
 var VALUE_NOTE = '*';
 var MAIN = '#main';
-var allJQs = [];
 var nextUniqueId = 0;
 var GET_METADATA_SYSTEM_CONTENT = 'yes';
 var SEARCH_NO_RESULT_TOP_OFFSET = 21;
@@ -3070,3 +3158,23 @@ var correctForPolarity = true;
 var chart;
 
 $(document).ready(documentReady);
+
+function showHideAreaAddress() {
+
+    var $addressBox = $("#gp-address-placeholder");
+
+    if (FT.model.areaTypeId === AreaTypeIds.Practice && pages.getCurrent() !== PAGE_MODES.METADATA) {
+        var $address = $('#gp-address-placeholder address');
+        $address.html('&nbsp;');
+        var parameters = new ParameterBuilder().add('area_code', FT.model.areaCode);
+        ajaxGet('api/area_address',
+            parameters.build(),
+            function(result) {
+                $address.html(result.Name + ", " + getAddressText(result));
+            },
+            handleAjaxFailure);
+        $addressBox.show();
+    } else {
+        $addressBox.hide();
+    }
+}

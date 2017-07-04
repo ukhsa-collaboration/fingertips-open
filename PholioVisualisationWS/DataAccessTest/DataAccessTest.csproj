@@ -82,7 +82,7 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AreaCodeListSplitterTest.cs" />
+    <Compile Include="LongListSplitterTest.cs" />
     <Compile Include="AreasReaderTest.cs" />
     <Compile Include="AreaTypeIdSplitterTest.cs" />
     <Compile Include="ContentReaderTest.cs" />
@@ -103,7 +103,6 @@
     <Compile Include="ProfileInitialiserTest.cs" />
     <Compile Include="GroupIdStringListParserTest.cs" />
     <Compile Include="PholioTest.cs" />
-    <Compile Include="PholioIntegrityTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">

@@ -11,13 +11,14 @@ var inequalities = {};
 * @class goToInequalitiesPage
 */
 function goToInequalitiesPage() {
-    if (!groupRoots.length) {
-        // Search results empty
-        noDataForAreaType();
-    } else {
-        lock();
 
-        setPageMode(PAGE_MODES.CONTENT);
+    lock();
+
+    setPageMode(PAGE_MODES.INEQUALITIES);
+
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
+    } else {
         var ns = inequalities;
         ns.init();
         ns.selectValuesOrTrends();
@@ -1531,10 +1532,12 @@ inequalities.ViewManager = function($container) {
             '<div class="export-chart-box"><a class="export-link" href="javascript:inequalities.exportSelectedChart()">Export chart as image</a>';
 
         if (isFeatureEnabled("inequalityErrorBars")) {
-            var showHide = inequalities.state.showErrorBars ? "Hide" : "Show";
-            var errorBars = '<a id="inequalities-toggle-cis">' + showHide + " confidence intervals</a></div>";
+            var showHide = inequalities.state.showErrorBars
+                ? 'Show values' 
+                : 'Show confidence intervals';
+            var errorBars = '<a id="inequalities-toggle-cis">' + showHide + "</a></div>";
         } else {
-            errorBars = "";
+            errorBars = '';
         }
 
         $chartBox.html('<div id="inequalities-chart"></div><div id="inequalities-trend-box"></div>');
@@ -2025,14 +2028,14 @@ inequalities.state = {
     showErrorBars: false
 };
 
-pages.add(PAGE_MODES.CONTENT,
+pages.add(PAGE_MODES.INEQUALITIES,
 {
-    id: "content",
+    id: "inequalities",
     title: "Inequalities",
     icon: "inequalities",
     'goto': goToInequalitiesPage,
     gotoName: "goToInequalitiesPage",
-    needsContainer: false,
-    jqIds: ["content", ".geo-menu", "indicatorMenuDiv", "tab-specific-options", "nearest-neighbour-link"],
-    jqIdsNotInitiallyShown: ["keyAdHoc", "key-bar-chart", "inequalities-trend-box"]
+    needsContainer: true,
+    jqIds: [".geo-menu", "indicator-menu-div", "tab-specific-options", "nearest-neighbour-link"],
+    jqIdsNotInitiallyShown: ["key-ad-hoc", "key-bar-chart", "inequalities-trend-box"]
 });

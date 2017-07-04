@@ -9,13 +9,13 @@ namespace FingertipsUploadService
     public partial class FingertipsUploadService : ServiceBase
     {
         private System.Timers.Timer _timer;
-
+        private int _tickCounter;
         private Logger _logger;
         private IFusUploadRepository _fusUploadRepository;
         private CoreDataRepository _coreDataRepository;
         private LoggingRepository _loggingRepository;
         private UploadManager _uploadManager;
-
+        private int _autoUploadPoolRate = AppConfig.GetAutoUploadPoolRate();
         private bool inProgress;
 
         public FingertipsUploadService()
@@ -60,6 +60,13 @@ namespace FingertipsUploadService
 
         public void CheckJobs()
         {
+
+            _tickCounter++;
+
+            // Init
+            InitLogger();
+
+
             // Are there already jobs being processed?
             if (inProgress)
             {
@@ -67,8 +74,6 @@ namespace FingertipsUploadService
             }
             inProgress = true;
 
-            // Init
-            InitLogger();
             try
             {
                 InitDependencies();
@@ -84,6 +89,9 @@ namespace FingertipsUploadService
             // Process jobs
             try
             {
+                // Check for upload candidate created by automation
+                CheckAutoUpload();
+
                 _loggingRepository.UpdateFusCheckedJobs();
                 _uploadManager.ProcessUploadJobs();
             }
@@ -104,6 +112,16 @@ namespace FingertipsUploadService
         private void timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             CheckJobs();
+        }
+
+
+        private void CheckAutoUpload()
+        {
+            if (_tickCounter > _autoUploadPoolRate)
+            {
+                _tickCounter = 0;
+                new AutomatedUpload(_fusUploadRepository, _logger).Process();
+            }
         }
 
         private void InitDependencies()

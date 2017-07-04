@@ -2,57 +2,66 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
-using Fpm.MainUI.Models;
-using Fpm.ProfileData;
+using Fpm.MainUI.ViewModels.Areas;
 using Fpm.ProfileData.Entities.Core;
-using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Repositories;
-using Newtonsoft.Json;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("areas")]
     public class AreasController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         private CoreDataRepository _coreDataRepository;
 
-        public ActionResult ManageAreas(AreaGridModel model)
+        [Route("")]
+        public ActionResult AreasIndex(AreasIndexViewModel viewModel)
         {
-            if (model.AreaGrid != null)
+            if (viewModel.AreaGrid == null)
             {
-                return View(model);
+                viewModel = new AreasIndexViewModel();
             }
-
-            model = new AreaGridModel();
-            return View(model);
+            return View(viewModel);
         }
 
+        [Route("area-update")]
+        [AdminUsersOnly]
+        public ActionResult UpdateArea(AreaDetailViewModel model)
+        {
+            _coreDataRepository.UpdateAreaDetail(model.AreaDetails, model.InitialAreaCode, UserDetails.CurrentUser().Name);
+
+            return RedirectToAction("SearchAreas",
+                new { areaTypeId = model.SearchAreaTypeId, searchText = model.SearchText });
+        }
+
+        [Route("area-details")]
         public ActionResult ShowAreaDetails(string areaCode, string searchText, int areaTypeId)
         {
-            var model = new AreaDetail();
+            var viewModel = new AreaDetailViewModel();
 
             Area areaDetail = _coreDataRepository.GetAreaDetail(areaCode);
-            model.AreaDetails = areaDetail;
-            model.SearchAreaTypeId = areaTypeId;
-            model.SearchText = searchText;
+            viewModel.InitialAreaCode = areaCode;
+            viewModel.AreaDetails = areaDetail;
+            viewModel.SearchAreaTypeId = areaTypeId;
+            viewModel.SearchText = searchText;
 
-            return PartialView("_AreaDetail", model);
+            return PartialView("_AreaDetail", viewModel);
         }
 
+        [Route("area-search")]
         [HttpGet]
         public ActionResult SearchAreas(int areaTypeId, string searchText)
         {
-            var model = new AreaGridModel {AreaGrid = new List<Area>()};
+            var viewModel = new AreasIndexViewModel {AreaGrid = new List<Area>()};
 
-            HydrateGridFromDBLookup(model, searchText, areaTypeId);
+            HydrateGridFromDBLookup(viewModel, searchText, areaTypeId);
 
-            model.SearchAreaTypeId = areaTypeId;
-            model.SearchText = searchText;
+            viewModel.SearchAreaTypeId = areaTypeId;
+            viewModel.SearchText = searchText;
 
-            return View("ManageAreas", model);
+            return View("AreasIndex", viewModel);
         }
 
-        private void HydrateGridFromDBLookup(AreaGridModel model, string searchText, int areaTypeId)
+        private void HydrateGridFromDBLookup(AreasIndexViewModel viewModel, string searchText, int areaTypeId)
         {
             int? areaTypeIdToSearch = null;
             if (areaTypeId > 0)
@@ -62,14 +71,14 @@ namespace Fpm.MainUI.Controllers
 
             IEnumerable<Area> areas = CommonUtilities.GetAreas(searchText, areaTypeIdToSearch);
 
-            PopulateAreaGrid(model, areas);
+            PopulateAreaGrid(viewModel, areas);
         }
 
-        private static void PopulateAreaGrid(AreaGridModel model, IEnumerable<Area> areas)
+        private static void PopulateAreaGrid(AreasIndexViewModel viewModel, IEnumerable<Area> areas)
         {
             foreach (Area area in areas)
             {
-                model.AreaGrid.Add(new Area
+                viewModel.AreaGrid.Add(new Area
                 {
                     AreaCode = area.AreaCode,
                     AreaName = area.AreaName,
@@ -83,29 +92,6 @@ namespace Fpm.MainUI.Controllers
                     IsCurrent = area.IsCurrent
                 });
             }
-        }
-
-        [AuthorizedUsers]
-        public ActionResult UpdateArea(AreaDetail model, string originalAreaCode)
-        {
-            var areaDetail = new Area
-            {
-                AreaCode = model.AreaDetails.AreaCode,
-                AreaTypeId = model.AreaDetails.AreaTypeId,
-                AreaName = model.AreaDetails.AreaName,
-                AreaShortName = model.AreaDetails.AreaShortName,
-                AddressLine1 = model.AreaDetails.AddressLine1,
-                AddressLine2 = model.AreaDetails.AddressLine2,
-                AddressLine3 = model.AreaDetails.AddressLine3,
-                AddressLine4 = model.AreaDetails.AddressLine4,
-                Postcode = model.AreaDetails.Postcode,
-                IsCurrent = model.AreaDetails.IsCurrent
-            };
-
-            _coreDataRepository.UpdateAreaDetail(areaDetail, originalAreaCode, UserDetails.CurrentUser().Name);
-
-            return RedirectToAction("SearchAreas",
-                new {areaTypeId = model.SearchAreaTypeId, searchText = model.SearchText});
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)

@@ -15,15 +15,15 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void When_Value_Is_Invalid_Returns_No_Significance()
         {
-            var data = new CoreDataSet();
-            Assert.AreEqual(Significance.None, _comparer.Compare(data, null,null));
+            var data = new CoreDataSet { Value = ValueData.NullValue };
+            Assert.AreEqual(Significance.None, _comparer.Compare(data, null, null));
         }
 
         [TestMethod]
         public void When_Value_Is_Valid_Returns_Data_Value()
         {
-            var data = new CoreDataSet {Value = 3};
-            Assert.AreEqual(Significance.Better, _comparer.Compare(data, null, null));
+            var data = new CoreDataSet { Value = SuicidePlanStatus.None };
+            Assert.AreEqual(Significance.Worse, _comparer.Compare(data, null, null));
         }
     }
 }

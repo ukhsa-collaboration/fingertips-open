@@ -6,44 +6,58 @@ namespace Fpm.MainUI
     {
         public static void RegisterBundles(BundleCollection bundles)
         {
-
-            bundles.Add(new StyleBundle("~/css/bootstrap")
-               .Include("~/" + AppConfig.CssPath + "bootstrap.css")
-               .Include("~/" + AppConfig.CssPath + "bootstrap-theme.css")
-               );
+            var cssPath = "~/" + AppConfig.CssPath;
+            var jsPath = "~/" + AppConfig.JsPath;
 
             bundles.Add(new StyleBundle("~/css/site")
-               .Include("~/" + AppConfig.CssPath + "site.css")
+               .Include(cssPath + "bootstrap.css")
+               .Include(cssPath + "fingertips.css")
+               .Include(cssPath + "dashboard.css")
+               .Include(cssPath + "profile-manager.css")
                );
 
             bundles.Add(new ScriptBundle("~/js/jquery")
-                .Include("~/" + AppConfig.JsPath + "jquery-1.8.3.js")
-                .Include("~/" + AppConfig.JsPath + "jquery-ui-1.9.2.js")
-                .Include("~/" + AppConfig.JsPath + "jquery.validate.min.js")
-                .Include("~/" + AppConfig.JsPath + "jquery.validate.unobtrusive.min.js")
+                .Include(jsPath + "jquery-1.12.1.js")
+                .Include(jsPath + "jquery-ui-1.9.2.js")
+                .Include(jsPath + "jquery-migrate-1.3.0.js")
+                .Include(jsPath + "jquery.validate.min.js")
+                .Include(jsPath + "jquery.validate.unobtrusive.min.js")
                 );
-            
+
             bundles.Add(new ScriptBundle("~/js/tablesorter")
-                .Include("~/" + AppConfig.JsPath + "jquery.tablesorter.js")
-                .Include("~/" + AppConfig.JsPath + "jquery.tablesorter.widgets.js")
+                .Include(jsPath + "jquery.tablesorter.js")
+                .Include(jsPath + "jquery.tablesorter.widgets.js")
                 );
-            
+
             bundles.Add(new ScriptBundle("~/js/underscore")
-               .Include("~/" + AppConfig.JsPath + "underscore-min.js"));
+               .Include(jsPath + "underscore-min.js"));
 
             bundles.Add(new ScriptBundle("~/js/modernizr")
-              .Include("~/" + AppConfig.JsPath + "modernizr-2.6.2.min.js"));
-            
-            bundles.Add(new ScriptBundle("~/js/bootstrap")
-               .Include("~/" + AppConfig.JsPath + "bootstrap.js"));
+              .Include(jsPath + "modernizr-2.6.2.min.js"));
 
+            bundles.Add(new ScriptBundle("~/js/bootstrap")
+               .Include(jsPath + "bootstrap.js"));
 
             bundles.Add(new ScriptBundle("~/js/common")
-               .Include("~/" + AppConfig.JsPath + "included-on-all-pages.js"));
+               .Include(jsPath + "included-on-all-pages.js"));
 
-            bundles.Add(new ScriptBundle("~/bundles/profile-management")
-                .Include("~/"+ AppConfig.JsPath + "profile-management.js")
-                );
+            bundles.Add(new ScriptBundle("~/profile.js")
+                .Include(jsPath + "Profile/profile.js"));
+
+            bundles.Add(new ScriptBundle("~/content.js")
+                .Include(jsPath + "Content/content.js"));
+
+            bundles.Add(new ScriptBundle("~/areas.js")
+                .Include(jsPath + "Areas/areas.js"));
+
+            bundles.Add(new ScriptBundle("~/user.js")
+                .Include(jsPath + "User/user.js"));
+
+            bundles.Add(new ScriptBundle("~/documents.js")
+                .Include(jsPath + "Documents/documents.js"));
+
+            bundles.Add(new ScriptBundle("~/exception-log.js")
+                .Include(jsPath + "ExceptionLog/exception-log.js"));
         }
     }
 }

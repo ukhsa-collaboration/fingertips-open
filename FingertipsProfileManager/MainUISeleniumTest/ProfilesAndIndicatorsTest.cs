@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Fpm.ProfileData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -31,10 +32,10 @@ namespace Fpm.MainUISeleniumTest
             // Select profile
             var profileSelect = driver.FindElement(By.Id("selectedProfile"));
             var selectElement = new SelectElement(profileSelect);
-            selectElement.SelectByValue("diabetes");
+            selectElement.SelectByValue(UrlKeys.Hypertension);
 
             // Tick an indicator to copy
-            var tickBox = driver.FindElements(By.Name("90690_selected"));
+            var tickBox = driver.FindElements(By.Name(IndicatorIds.HypertensionPrevalence + "_selected"));
             tickBox.First().Click();
 
             // Click copy
@@ -45,8 +46,8 @@ namespace Fpm.MainUISeleniumTest
             // Check the correct profile is selected in the profile menu
             var copyProfileSelect = driver.FindElement(By.Id("selectedProfileId"));
             var copySelectElement = new SelectElement(copyProfileSelect);
-            var selectedText = copySelectElement.SelectedOption.Text;
-            Assert.AreEqual("Diabetes", selectedText);
+            var selectedProfileName = copySelectElement.SelectedOption.Text;
+            Assert.AreEqual("Hypertension", selectedProfileName, "Incorrect profile selected");
         }
     }
 }

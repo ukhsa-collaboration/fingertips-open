@@ -97,11 +97,15 @@
     <Compile Include="Entities\LookUps\DenominatorType.cs" />
     <Compile Include="Entities\LookUps\Unit.cs" />
     <Compile Include="Entities\LookUps\YearType.cs" />
+    <Compile Include="Entities\Profile\DisclosureControl.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Entities\LookUps\ComparatorMethod.cs" />
     <Compile Include="Entities\LookUps\KeyColour.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Helpers\IndicatorDisclosureControlMapper.cs" />
     <Compile Include="Helpers\Mapper.cs" />
+    <Compile Include="Repositories\AreaTypeRepository.cs" />
+    <Compile Include="Repositories\DisclosureControlRepository.cs" />
     <Compile Include="Repositories\UploadJobErrorRepository.cs" />
     <Compile Include="UploadJobRepository.cs" />
     <Compile Include="FpmException.cs" />

@@ -8,16 +8,17 @@ namespace PholioVisualisation.ServiceActions
 {
     public class SpineChartDataAction
     {
-        public List<SpineChartTableData> GetResponse(int profileId, int childAreaTypeId, IList<string> areaCodes, string benchmarkAreaCode)
+        public List<SpineChartTableData> GetResponse(SpineChartDataParameters parameters)
         {
-            ParameterCheck.GreaterThanZero("Profile ID", profileId);
-            ParameterCheck.GreaterThanZero("Child area type ID", childAreaTypeId);
-            foreach (var areaCode in areaCodes)
+            ParameterCheck.GreaterThanZero("Profile ID", parameters.ProfileId);
+            ParameterCheck.GreaterThanZero("Child area type ID", parameters.ChildAreaTypeId);
+            foreach (var areaCode in parameters.AreaCodes)
             {
                 ParameterCheck.ValidAreaCode(areaCode);
             }
 
-            return new SpineChartTableDataBuilder().GetDomainDataForProfile(profileId, childAreaTypeId, areaCodes, new List<string>{benchmarkAreaCode});
+            return new SpineChartTableDataBuilder()
+                .GetDomainDataForProfile(parameters);
         }
 
     }

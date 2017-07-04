@@ -5,6 +5,7 @@ using Fpm.ProfileData.Entities.Profile;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
+using Fpm.MainUI.ViewModels.Profile;
 
 namespace Fpm.MainUITest
 {

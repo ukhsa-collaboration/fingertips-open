@@ -85,13 +85,13 @@ namespace PholioVisualisation.Export
             int metadataRow = IndicatorMetadataRow;
             foreach (IndicatorMetadata indicatorMetadata in metadata)
             {
-                IDictionary<string, string> m = indicatorMetadata.Descriptive;
+                IDictionary<string, string> textMetadata = indicatorMetadata.Descriptive;
                 int column = 0;
-                cells[metadataRow, column++].Value = m[IndicatorMetadataTextColumnNames.Name];
+                cells[metadataRow, column++].Value = textMetadata[IndicatorMetadataTextColumnNames.Name];
 
                 // Definition may be null
                 string val;
-                if (m.TryGetValue(IndicatorMetadataTextColumnNames.Definition, out val) == false)
+                if (textMetadata.TryGetValue(IndicatorMetadataTextColumnNames.Definition, out val) == false)
                 {
                     val = string.Empty;
                 }
@@ -102,9 +102,9 @@ namespace PholioVisualisation.Export
 
                 foreach (var property in propertiesToDisplay)
                 {
-                    if (m.ContainsKey(property.ColumnName))
+                    if (textMetadata.ContainsKey(property.ColumnName))
                     {
-                        string text = m[property.ColumnName];
+                        string text = textMetadata[property.ColumnName];
 
                         if (property.IsHtml)
                         {

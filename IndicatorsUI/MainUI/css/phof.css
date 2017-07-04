@@ -1,19 +1,34 @@
 ﻿
-a.homeHeader, a.homeHeader:hover, a.homeHeader:visited {
+#banner ul {
+    float: right;
+}
+
+a.home-header, a.home-header:hover, a.home-header:visited {
     color: #333;
-}
-
-#supporting-information h1 {
-    margin-top: 17px;
-     font-size: 3.1em;
-}
-
-h1 a, h1 a:visited, h1 a:active, h1 a:hover {
-    text-decoration: none;
 }
 
 .large {
     font-size: 25px !important;
+}
+
+/*----------------------------------------
+    Domain heading on front page
+------------------------------------------*/
+
+.link-header {
+    margin: 20px 0 10px 0;
+}
+
+.link-header a, .link-header a:visited, .link-header a:active {
+    font-size: 3.1em;
+    font-weight: bold;
+    text-decoration: none;
+    color: #39836e;
+    text-decoration: none;
+}
+
+.link-header a:hover {
+    text-decoration: underline;
 }
 
 /*----------------------------------------
@@ -32,99 +47,27 @@ h1 a, h1 a:visited, h1 a:active, h1 a:hover {
 }
 
 /*----------------------------------------
+    Recent updates
+------------------------------------------*/
+#recent-updates {
+    width: 33.3%;
+    margin-top: 29px;
+}
+
+/*----------------------------------------
     PHOF domains on front page
 ------------------------------------------*/
 
-.phof-domains {
-    margin-left: -10px;
-    height:150px;
-}
-
 .phof-domains a {
-    margin:0 0px;
+    margin:0;
 }
 
-.phof-start-button {
-    background: #02ae94;
-    color: #fff;
-    /*float: left;*/
-    min-height: 50px;
-    margin: 45px 27px 0 10px;    
-    padding: 5px 80px 2px 18px;
-    position: relative;
-    width: 206px;
-}
-
-.phof-start-button h3{    
-    font-size: 1.4em;
-    margin-left: 60px;
-}
-.phof-start-button h3 a{
-    color: #fff !important;
-    text-decoration: none;
-}
-
-.phof-start-button p {    
-    color: #fff;
-    text-decoration: none;
-    font-size: 1.3em;
-    margin-left: 69px;
-    margin-top: 0;
-    margin-bottom: 0;
-    padding-left: 5px;
-}
-
-#startButton {
-    margin: 0 0 0 200px;
-}
-
-#banner ul {
-    float: right;
-}
-
-/*--------------------------------------------------------------------------------
-    FIN-1292 PHOF start button fully clickable for middle hand side column
-    (3 column layout-  left middle and right): There are different widths in css
-----------------------------------------------------------------------------------*/
 .phof-domains-middle {
     margin-top: 10px;
+    margin-left: -10px;
     height: 140px;
     text-align: center;
     max-width: 100%;
-}
-
-.phof-domains-middle a {
-    color: #ffffff !important;
-    width: 100%;
-    text-decoration: none !important;
-    font-style: normal;
-    font-size: 1.6em;
-    font-weight: bold;
-    padding: 2px 0px 2px 0;
-    display: block;
-}
-
-.phof-domains-middle a:hover {
-    text-decoration: none !important;
-    color: #ffffff !important;
-}
-
-.phof-domains-middle .btn {
-  background: #02ae94;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  font-family: Arial;
-  color: #ffffff !important;
-  font-size: 1.6em;
-  text-decoration: none;
-  max-width: 100%;
-  width: 100%;
-}
-
-.phof-domains-middle .btn:hover {
-  background: #048874;
-  text-decoration: none;
 }
 
 .phof-domains-middle p {
@@ -132,15 +75,48 @@ h1 a, h1 a:visited, h1 a:active, h1 a:hover {
     text-decoration: none;
     font-size: 0.5em;
     text-align: center;
-    margin-left: 12px;
     margin-top: 0;
     margin-bottom: 0;
 }
 
-
-/*-----------------------------------------------------------------------------------------*/
-
 #contact-us-public-health-outcomes-framework ul {
     list-style-type: none;
     line-height: 2;
+}
+
+/*----------------------------------------
+    PHOF start button on front page
+------------------------------------------*/
+.start-button {
+    padding-top: 10px;
+    margin: 0 0 60px 0; /*needed for tobacco home page*/
+}
+.start-button a {
+    color: #ffffff;
+    text-decoration: none;
+    font-style: normal;
+    font-size: 1.6em;
+    font-weight: bold;
+    padding: 0;
+}
+
+.start-button a:hover {
+    text-decoration: none !important;
+    color: #ffffff !important;
+}
+
+.start-button .btn {
+  padding-top: 10px;
+  padding-bottom: 15px;
+  background: #02ae94;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 1.6em;
+  width: 100%;
+}
+
+.start-button .btn:hover {
+  background: #048874;
+  text-decoration: none;
 }

@@ -1,0 +1,59 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
+
+<div class="row form-group" id="edit-profile-non-admin">
+    <label class="col-md-3 col-form-label">Name:</label>
+    @if (Model.IsProfileViewable)
+    {
+        <div class="col-md-3 pull-right text-right">
+            <a href="@CommonUtilities.GetTestSiteUrl(Model.UrlKey)" target="_blank">View selected profile in Fingertips</a>
+        </div>
+    }
+    <div class="col-md-4">
+        @Html.TextBoxFor(model => model.Name, new { @class = "unselected-domain" })
+        <span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Default area type:</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(m => m.DefaultAreaTypeId, null)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Profile contact:</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.ContactUserId, null)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Default Fingertips tab:</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.DefaultFingertipsTabId, null)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Spine chart min/max header label:</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.SpineChartMinMaxLabelId, null)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Colours included in legend:</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.KeyColourId, null)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">Area search on front page?</label>
+    <div class="col-md-4">
+        @Html.DropDownListFor(model => model.FrontPageAreaSearchAreaTypes, null,
+                        TooltipHelper.GetTooltipRight("Allows the user to search for areas of specific types"))
+    </div>
+</div>

@@ -43,7 +43,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorId = IndicatorIds.HIVLateDiagnosis, // an indicator with a target
                 GroupId = GroupIds.SexualAndReproductiveHealth,
                 ComparatorId = ComparatorIds.England,
-                ComparatorMethodId = ComparatorMethodId.SingleOverlappingCIs,
+                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIs,
                 AreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2011
@@ -77,7 +77,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
                 GroupId = GroupIds.LongerLives,
                 ComparatorId = ComparatorIds.England,
-                ComparatorMethodId = (int) ComparatorMethodId.SingleOverlappingCIs,
+                ComparatorMethodId = (int) ComparatorMethodIds.SingleOverlappingCIs,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2010
@@ -95,7 +95,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
                 GroupId = GroupIds.LongerLives,
                 ComparatorId = ComparatorIds.Subnational,
-                ComparatorMethodId = ComparatorMethodId.SingleOverlappingCIs,
+                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIs,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2010
@@ -127,7 +127,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
                 GroupId = GroupIds.LongerLives,
                 ComparatorId = ComparatorIds.Subnational,
-                ComparatorMethodId = ComparatorMethodId.Quintiles,
+                ComparatorMethodId = ComparatorMethodIds.Quintiles,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2010

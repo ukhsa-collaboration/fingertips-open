@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.ExceptionLogging;
 using PholioVisualisation.Formatting;
@@ -13,7 +12,12 @@ namespace PholioVisualisation.DataConstruction
     {
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         private PholioReader pholioReader = ReaderFactory.GetPholioReader();
-        private IAreasReader areasReader = ReaderFactory.GetAreasReader();
+        private TargetComparerProvider _targetComparerProvider;
+
+        public GroupDataProcessor(TargetComparerProvider targetComparerProvider)
+        {
+            _targetComparerProvider = targetComparerProvider;
+        }
 
         public void Process(GroupData data)
         {
@@ -26,8 +30,6 @@ namespace PholioVisualisation.DataConstruction
             {
                 try
                 {
-                    var england = AreaFactory.NewArea(areasReader, AreaCodes.England);
-
                     foreach (GroupRoot groupRoot in data.GroupRoots)
                     {
                         IndicatorMetadata metadata = data.GetIndicatorMetadataById(groupRoot.IndicatorId);
@@ -36,7 +38,7 @@ namespace PholioVisualisation.DataConstruction
                         new GroupRootComparisonManager
                         {
                             PholioReader = pholioReader,
-                            TargetComparer = GetTargetComparer(metadata, groupRoot, england)
+                            TargetComparer = _targetComparerProvider.GetTargetComparer(metadata, groupRoot.FirstGrouping)
                         }
                         .CompareToCalculateSignficance(groupRoot, metadata);
                         new CoreDataProcessor(null).TruncateList(groupRoot.Data);
@@ -47,25 +49,6 @@ namespace PholioVisualisation.DataConstruction
                     ExceptionLog.LogException(ex, "");
                 }
             }
-        }
-
-        private TargetComparer GetTargetComparer(IndicatorMetadata metadata, GroupRoot groupRoot, IArea england)
-        {
-            var targetComparer = TargetComparerFactory.New(metadata.TargetConfig);
-
-            // Initialise the target comparer
-            if (targetComparer as BespokeTargetPercentileRangeComparer != null)
-            {
-                new TargetComparerHelper(groupDataReader, england)
-                    .GetPercentileData(targetComparer, groupRoot.FirstGrouping, metadata);              
-            }
-            else
-            {
-                new TargetComparerHelper(groupDataReader, england)
-                    .AssignExtraDataIfRequired(england, targetComparer, groupRoot.FirstGrouping, metadata);
-            }
-
-            return targetComparer;
         }
 
         private void FormatDataAndStats(GroupRoot groupRoot, IndicatorMetadata metadata,

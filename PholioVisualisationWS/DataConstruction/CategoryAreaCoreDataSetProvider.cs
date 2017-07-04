@@ -16,5 +16,8 @@ namespace PholioVisualisation.DataConstruction
         {
             return groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, (CategoryArea)Area);
         }
+
+
+    
     }
 }

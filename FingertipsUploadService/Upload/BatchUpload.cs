@@ -11,6 +11,8 @@ namespace FingertipsUploadService.Upload
             UploadValidationFailures = new List<UploadValidationFailure>();
             DuplicateRowInDatabaseErrors = new List<DuplicateRowInDatabaseError>();
             DuplicateRowInSpreadsheetErrors = new List<DuplicateRowInSpreadsheetError>();
+            SmallNumberWarnings = new List<SmallNumberWarning>();
+            ColumnErrors = new List<string>();
         }
 
         public override string RequiredWorksheetText()

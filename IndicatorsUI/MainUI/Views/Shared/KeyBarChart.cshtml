@@ -1,12 +1,12 @@
 ﻿@using Profiles.MainUI.Models
 @model Profiles.MainUI.Models.PageModel
-<div class="keyContainer clearfix" id="key-bar-chart" style="display: none;">
-    <table class="keyTable" cellspacing="0">
+<div class="key-container clearfix" id="key-bar-chart" style="display: none;">
+    <table class="key-table" cellspacing="0">
         <tr>
-            <td class="keyText keyLabel"></td>
+            <td class="key-text key-label"></td>
             @if (Model.DisplayRagKey)
             {
-                <td class="keySpacer"></td>
+                <td class="key-spacer"></td>
                 <td class="keyBar">
                     <img class="bar keyBar" src="@(ViewBag.ImagesUrl)better.png" />
                 </td>
@@ -28,7 +28,7 @@
             }
             @if (Model.DisplayBlueKey)
             {
-                <td class="keySpacer"></td>
+                <td class="key-spacer"></td>
                 <td class="keyBar">
                     <img class="bar keyBar" src="@(ViewBag.ImagesUrl)bobLower.png" />
                 </td>
@@ -48,7 +48,7 @@
                     Higher
                 </td>
             }
-            <td class="keySpacer"></td>
+            <td class="key-spacer"></td>
             <td class='keyBar'>
                 <img class="bar keyBar" src="@(ViewBag.ImagesUrl)lightGrey.png" />
             </td>
@@ -60,8 +60,8 @@
         <tr>
             <td></td>
             @*Show quintile legend*@
-            <td class="keySpacer"></td>
-            <td class='keyBar quintileKey' colspan="7" style="display: none;">
+            <td class="key-spacer"></td>
+            <td class='keyBar quintile-key' colspan="7" style="display: none;">
                 Low
                 <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile1.png" alt="" />&nbsp;
                 <img class="bar keyBar" src="@(ViewBag.ImagesUrl)quintile2.png" alt="" />&nbsp;

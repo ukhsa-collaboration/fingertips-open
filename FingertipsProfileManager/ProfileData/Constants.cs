@@ -28,6 +28,7 @@
     public class SiteUrls
     {
         public const string TargetIndex = "/lookup-tables/targets";
+        public const string AreaTypeIndex = "/lookup-tables/area-types";
     }
 
     public class YearTypeIds
@@ -104,8 +105,9 @@
     public class IndicatorIds
     {
         public const int IDAOPI = 125;
-        public const int PeopleWhoDieAtHome = 1114;
+        public const int HypertensionPrevalence = 219;
         public const int LongTermUnemployment = 734;
+        public const int PeopleWhoDieAtHome = 1114;
         public const int ChildrenInPoverty = 10101;
         public const int Under18Conceptions = 20401;
         public const int HipFractures = 41402;
@@ -134,17 +136,13 @@
         public const int ChildrenAndYoungPeoplesHealthBenchmarkingTool = 39;
         public const int SexualHealth = 45;
         public const int Diabetes = 51;
-
-
         public const int ProfileId = 115;
-        
-
-
     }
 
     public class UrlKeys
     {
         public const string Tobacco = "tobacco-control";
+        public const string Hypertension = "hypertension";
         public const string HealthProfiles = "health-profiles";
         public const string Phof = "public-health-outcomes-framework";
         public const string SevereMentalIllness = "severe-mental-illness";
@@ -202,6 +200,17 @@
     public class IndicatorTextMetadataPropertyIds
     {
         public const int Name = 1;
+        public const int Definition = 3;
+        public const int Rationale = 4;
+        public const int Methodology = 9;
+        public const int Caveats = 17;
+        public const int Notes = 22;
+        public const int DataQuality = 25;
+    }
+
+    public class IndicatorTextMetadataColumnNames
+    {
+        public const string Name = "Name";
     }
 
     public class ComparatorIds
@@ -218,6 +227,12 @@
     public class DocumentNames
     {
         public const string DiabetesHospitalData = "Diabetes_Hospital_Data.xlsx";
+    }
+
+    public class DocumentIds
+    {
+        public const int UserGuide = 142;
+        public const int ProfileRelationships = 459;
     }
 
     public class CoreDataFilters

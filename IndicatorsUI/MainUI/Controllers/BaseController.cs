@@ -147,10 +147,12 @@ namespace Profiles.MainUI.Controllers
 
                 ViewBag.FingertipsUrl = new FingertipsUrl(appConfig, Request.Url).ProtocolAndHost;
                 PageModel.IsOfficialStatistics = details.IsOfficialStatistics;
-                PageModel.ShowAreaSearchOnProfileFrontPage = details.ShowAreaSearchOnProfileFrontPage;
+                PageModel.FrontPageAreaSearchAreaTypes = details.FrontPageAreaSearchAreaTypes;
                 PageModel.HasAnyData = details.HasAnyData;
                 PageModel.HasStaticReports = details.HasStaticReports;
-                ViewBag.StaticReportsTimePeriods = details.StaticReportsTimePeriods ?? string.Empty;
+                ViewBag.StaticReportsFolders = details.StaticReportsFolders ?? string.Empty;
+                ViewBag.StaticReportsLabel = details.StaticReportsLabel ?? "Report year";
+                ViewBag.IsChangeFromPreviousPeriodShown = details.IsChangeFromPreviousPeriodShown;
 
                 PageModel.SpineChartMinMaxLabel = new SpineChartMinMaxLabelBuilder(
                     details.SpineChartMinMaxLabel,
@@ -181,13 +183,6 @@ namespace Profiles.MainUI.Controllers
 
             ViewBag.Title = longerLivesDetails.Title;
             ViewBag.DomainsToDisplay = longerLivesDetails.DomainsToDisplay;
-
-            // Temporary to restrict access to suicide prevention before launch
-            if (details.Id == ProfileIds.SuicidePrevention &&
-                 appConfig.ShowLongerLivesSuicidePrevention == false)
-            {
-                throw new FingertipsException("Suicide prevention profile is not available");
-            }
         }
 
         protected void AssignDomainHeadings(ProfileDetails details)

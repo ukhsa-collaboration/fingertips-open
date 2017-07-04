@@ -39,6 +39,6 @@ function getPdfUrl(areaCode) {
 }
 
 download.excelExportText =
-        'Excel files for all England data are now pre-calculated every night so any data that has been uploaded or changed today will not be included.' +
+        'Data files for many profiles are now pre-built every night so any data that has been uploaded or changed today will not be included.' +
         '<br><br>Downloaded data is only available if your machine is on the PHE network.';
 

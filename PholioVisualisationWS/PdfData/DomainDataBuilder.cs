@@ -19,7 +19,7 @@ namespace PholioVisualisation.PdfData
             var dataList = new List<DomainData>();
 
             var groupIds = new GroupIdProvider(profileReader).GetGroupIds(profileId);
-            var groupMetadataList = groupDataReader.GetGroupMetadataList(groupIds);
+            var groupMetadataList = groupDataReader.GetGroupingMetadataList(groupIds);
             var groupDataRepository = new GroupDataAtDataPointRepository
             {
                 AssignAreas = false,

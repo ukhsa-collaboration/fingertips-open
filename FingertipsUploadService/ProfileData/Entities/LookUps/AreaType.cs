@@ -7,5 +7,6 @@
         public string ShortName { get; set; }
         public bool IsCurrent { get; set; }
         public bool IsSupported { get; set; }
+        public bool ShouldWarnForSmallNumbers { get; set; }
     }
 }

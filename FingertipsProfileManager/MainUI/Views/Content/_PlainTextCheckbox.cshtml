@@ -1,0 +1,17 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.ProfileData.Entities.Profile.ContentItem 
+
+@{
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+    if (isUserAdmin)
+    {
+        <div class="delete-indicators">
+            <label class="content-item-detail-label">Plain text:</label>
+            @Html.CheckBoxFor(model => model.IsPlainText)
+        </div>
+    }
+    else
+    {
+        @Html.HiddenFor(x => x.IsPlainText)
+    }
+}

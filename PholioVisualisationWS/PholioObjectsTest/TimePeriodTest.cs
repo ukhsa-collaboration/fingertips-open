@@ -103,12 +103,31 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.AreEqual(TimePoint.Undefined, yearBefore.Quarter);
         }
 
+        [TestMethod]
+        public void TestSortable()
+        {
+            Assert.AreEqual(20010000, GetPeriod(2001,TimePoint.Undefined, TimePoint.Undefined).ToSortableNumber());
+            Assert.AreEqual(20010100, GetPeriod(2001,1, TimePoint.Undefined).ToSortableNumber());
+            Assert.AreEqual(20010002, GetPeriod(2001,TimePoint.Undefined, 2).ToSortableNumber());
+            Assert.AreEqual(20010012, GetPeriod(2001,TimePoint.Undefined, 12).ToSortableNumber());
+        }
+
         private static void AssertExpectedRollingMonthlyEndPoint(int year, int month, int yearRange,
             int expectedYear, int expectedMonth)
         {
             TimePoint p = new TimePeriod { Year = year, Month = month, YearRange = yearRange }.GetRollingMonthlyEndPoint();
             Assert.AreEqual(expectedYear, p.Year);
             Assert.AreEqual(expectedMonth, p.Month);
+        }
+
+        private static TimePeriod GetPeriod(int year, int quarter, int month)
+        {
+            return new TimePeriod
+            {
+                Year = year,
+                Month = month,
+                Quarter = quarter
+            };
         }
     }
 }

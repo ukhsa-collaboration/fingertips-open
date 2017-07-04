@@ -1,0 +1,25 @@
+﻿@using System.Web.Optimization
+@model Fpm.MainUI.ViewModels.Profile.ProfileIndexViewModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Profile Manager";
+}
+
+<h2 class="subheading">Edit profile details</h2>
+
+<div class="row form-group">
+    <label class="col-md-2 col-form-label">Profile:</label>
+    <div class="col-md-8">
+        @Html.DropDownListFor(x => x.ProfileId, Model.ProfileList, new { id = "profile-menu" })
+    </div>
+</div>
+
+@*//Placeholder showing when the elements are loaded from Ajax*@
+<div id="divDetail">
+    @if (Model.ProfileViewModel != null)
+    {
+        @Html.Partial("_NonAdminProfileDetails", Model.ProfileViewModel)
+    }
+</div>
+
+@Scripts.Render("~/profile.js")

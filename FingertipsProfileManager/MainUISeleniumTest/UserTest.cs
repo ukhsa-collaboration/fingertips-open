@@ -33,7 +33,7 @@ namespace Fpm.MainUISeleniumTest
             SelectUserToEdit(driver, UserDisplayNames.UserWithNoRightsToAnything);
 
             // Check for message that explains the user has no permissions
-            var profileSubheading = driver.FindElement(By.XPath("//*[@id=\"EditUser\"]/h3"));
+            var profileSubheading = driver.FindElement(By.Id("no-permissions"));
             Assert.AreEqual("This user does not have permission to edit any profiles", profileSubheading.Text);
         }
 

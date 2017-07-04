@@ -24,15 +24,11 @@ namespace FingertipsUploadService.ProfileData
             // Must clear the session otherwise old object will be returned.
             //            CurrentSession.Clear();
 
-            return CurrentSession
-                .CreateCriteria<UploadJob>()
-                .Add(Restrictions.Or(
-                    Restrictions.Eq("Status", UploadJobStatus.NotStarted),
-                    Restrictions.Eq("Status", UploadJobStatus.ConfirmationGiven)
-                ))
-                .SetCacheMode(CacheMode.Refresh)
-                .SetCacheRegion("")
-                .List<UploadJob>();
+            var statusCodes = new List<int> { 0, 301, 311 };
+            return CurrentSession.QueryOver<UploadJob>()
+                .AndRestrictionOn(x => x.Status).
+                IsIn(statusCodes).List();
+
         }
 
         public UploadJob FindUploadJobByGuid(Guid guid)
@@ -100,6 +96,24 @@ namespace FingertipsUploadService.ProfileData
             CurrentSession
                 .CreateSQLQuery(query)
                 .ExecuteUpdate();
+        }
+
+        public void CreateNewJob(UploadJob job)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                CurrentSession.Save(job);
+                // Remove job from cache
+                CurrentSession.Flush();
+                CurrentSession.Refresh(job);
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
         }
 
     }

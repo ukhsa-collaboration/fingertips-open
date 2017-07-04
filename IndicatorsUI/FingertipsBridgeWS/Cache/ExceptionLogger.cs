@@ -30,7 +30,7 @@ namespace FingertipsBridgeWS.Cache
         {
             var logger = WebRequest.Create(AppConfiguration.CoreWsUrlForLogging +
                 "log/Exception") as HttpWebRequest;
-            logger.ContentType = "application/json";
+            logger.ContentType = "application/json; charset=utf-8";
             logger.Method = "POST";
 
             var exception = ConvertJsonToByteArray(jsonException);

@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Moq.Protected;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstructionTest
@@ -53,19 +54,6 @@ namespace PholioVisualisation.DataConstructionTest
             var coreDataSetFilter = CoreDataSetFilter(dataList);
             var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(10));
             Assert.AreEqual(Round(20), Round(calculator.Average.Value));
-        }
-
-        [TestMethod]
-        public void TestAverageMustBeValidOnFirstCoreDataSetObject()
-        {
-            var dataList = new List<CoreDataSet> {
-                new CoreDataSet{Value = -1, Count = 8, Denominator = 4},
-                new CoreDataSet{Value = 4, Count = 32, Denominator = 8}
-            };
-
-            var coreDataSetFilter = CoreDataSetFilter(dataList);
-            var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(1));
-            Assert.IsNull(calculator.Average);
         }
 
         [TestMethod]

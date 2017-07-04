@@ -7,6 +7,7 @@ using PholioVisualisation.PholioObjects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.Export;
 
 namespace Ckan.DataTransformation
 {
@@ -77,8 +78,7 @@ namespace Ckan.DataTransformation
                         var metadata = metadataCollection.GetIndicatorMetadataById(indicatorId);
 
                         Console.WriteLine("#UPLOADING: [{0}] {1} \"{2}\"",
-                            indicatorIdsAlreadyUploaded.Count, indicatorId,
-                            metadata.Descriptive[IndicatorMetadataTextColumnNames.Name]
+                            indicatorIdsAlreadyUploaded.Count, indicatorId, metadata.Name
                             );
 
                         // Create/update package

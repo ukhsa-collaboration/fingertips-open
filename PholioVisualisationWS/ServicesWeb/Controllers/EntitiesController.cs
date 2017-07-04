@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.Formatting;
@@ -300,6 +301,44 @@ namespace ServicesWeb.Controllers
             try
             {
                 return ReaderFactory.GetPholioReader().GetComparatorMethod(id);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get list of all comparators/benchmarks
+        /// </summary>
+        [HttpGet]
+        [Route("comparators")]
+        public IList<Comparator> GetComparators()
+        {
+            try
+            {
+                return ReaderFactory.GetPholioReader().GetAllComparators();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a specific comparator/benchmark
+        /// </summary>
+        /// <param name="id">Comparator ID</param>
+        [HttpGet]
+        [Route("comparator")]
+        public Comparator GetComparator(int id)
+        {
+            try
+            {
+                return ReaderFactory.GetPholioReader().GetAllComparators()
+                    .First(x => x.Id == id);
             }
             catch (Exception ex)
             {

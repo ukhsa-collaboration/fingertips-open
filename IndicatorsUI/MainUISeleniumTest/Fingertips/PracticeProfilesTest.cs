@@ -9,7 +9,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     public class PracticeProfilesTest : FingertipsBaseUnitTest
     {
         [TestMethod]
-        public void TestAllTabsLoad()
+        public void TestAllPracticeProfileTabsLoad()
         {
             GoToPracticeProfiles();
             
@@ -27,7 +27,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             waitFor.PracticeProfilesSpineChartsTabToLoad();
 
             // Check practice summary indicator table has loaded
-            var text = driver.FindElement(By.Id("spineTableBox")).Text;
+            var text = driver.FindElement(By.Id("spine-table-box")).Text;
             TestHelper.AssertTextContains(text, "deprivation");
         }
 

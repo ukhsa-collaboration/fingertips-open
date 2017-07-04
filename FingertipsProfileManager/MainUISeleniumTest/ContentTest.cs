@@ -14,11 +14,13 @@ namespace Fpm.MainUISeleniumTest
         {
             var driver = Driver;
             new NavigateTo(driver).ContentIndexPage();
-            driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(50));
+            new WaitFor(driver).ContentIndexPageToLoad();
+
             // Select option in menu
-            var profileSelect = driver.FindElement(By.Id("selectedProfile"));
+            var profileSelect = driver.FindElement(By.Id("profileId"));
             var selectElement = new SelectElement(profileSelect);
             selectElement.SelectByValue(ProfileIds.Diabetes.ToString());
+            new WaitFor(driver).ContentIndexPageToLoad();
 
             // Check the content item table contains expected
             var contentItemTable = driver.FindElement(By.ClassName("grid"));

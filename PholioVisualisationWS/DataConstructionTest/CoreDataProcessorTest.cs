@@ -27,6 +27,15 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
+        public void TestHasBeenTruncatedIsSetAfterTruncate()
+        {
+            var data = new CoreDataSet { Value = Number };
+            Assert.IsFalse(data.HasBeenTruncated);
+            TruncateData(data);
+            Assert.IsTrue(data.HasBeenTruncated);
+        }
+
+        [TestMethod]
         public void TestTruncateCount()
         {
             var data = new CoreDataSet { Count = Number };

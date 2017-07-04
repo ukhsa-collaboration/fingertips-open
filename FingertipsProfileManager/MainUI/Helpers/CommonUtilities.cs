@@ -258,6 +258,23 @@ namespace Fpm.MainUI.Helpers
             return selectListItems;
         }
 
+        public static IEnumerable<SelectListItem> GetListOfDisclosureControl()
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var disclosures = Reader.GetAllDisclosureControl();
+            foreach (var disclosure in disclosures)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = disclosure.Id.ToString(),
+                    Text = disclosure.Name
+                };
+                selectedListItems.Add(listItem);
+            }
+
+            return selectedListItems;
+        }
+
         public static ProfileDetails GetProfile(int profileId)
         {
             return Reader.GetProfileDetailsByProfileId(profileId);
@@ -328,26 +345,6 @@ namespace Fpm.MainUI.Helpers
             return items;
         }
 
-        public static void CreateNewIndicatorTextValues(string selectedDomain, string userMTVChanges,
-            IList<IndicatorMetadataTextProperty> properties, int nextIndicatorId, string userName, ProfileRepository profileRepository)
-        {
-            var items = new IndicatorMetadataTextParser().Parse(userMTVChanges);
-
-            var allPropertiesToAdd = new List<IndicatorMetadataTextProperty>();
-
-            foreach (var item in items)
-            {
-                IndicatorMetadataTextProperty property = properties.First(x => x.PropertyId == item.PropertyId);
-                property.Text = item.Text;
-                allPropertiesToAdd.Add(property);
-
-                // Save to change log 
-                profileRepository.LogPropertyChange(property.PropertyId, null, nextIndicatorId, Convert.ToInt32(selectedDomain), userName, DateTime.Now);
-            }
-
-            profileRepository.CreateIndicator(allPropertiesToAdd, nextIndicatorId);
-        }
-
         public static bool IsReadOnlyMode()
         {
             return Convert.ToBoolean(ConfigurationManager.AppSettings["IsReadOnlyMode"]);
@@ -394,92 +391,6 @@ namespace Fpm.MainUI.Helpers
             var profiles = UserDetails.CurrentUser().GetProfilesUserHasPermissionsTo();
 
             return GetOrderedListOfProfilesWithSpecificProfileSelected(profiles, urlKey);
-        }
-
-
-
-
-        public static void UpdateIndicatorTextValues(int indicatorId, int? groupId, string userMTVChanges,
-            IList<IndicatorMetadataTextProperty> properties, DateTime timeOfChange, string userName, int? profileId, ProfileRepository profileRepository)
-        {
-            var items = new IndicatorMetadataTextParser().Parse(userMTVChanges);
-
-            foreach (var item in items)
-            {
-                IndicatorMetadataTextProperty property = properties.First(x => x.PropertyId == item.PropertyId);
-
-                // Get properties + existing values
-                IndicatorText indicatorText = Reader.GetIndicatorTextValues(indicatorId,
-                        new List<IndicatorMetadataTextProperty> { property },
-                        profileId).First();
-
-                // Figure out whether to update generic or specific
-                int? profileIdForProperty = null;
-                if ((item.IsOverridden || indicatorText.HasSpecificValue()) && groupId.HasValue)
-                {
-                    profileIdForProperty = profileId;
-                }
-
-                // Text that is being replaced
-                string oldText;
-                if (item.IsOverridden)
-                {
-                    // The user is overriding the generic value for the first time
-                    oldText = null;
-                }
-                else if (indicatorText.HasSpecificValue())
-                {
-                    // The user is modifying an existing specific value
-                    oldText = indicatorText.ValueSpecific;
-                }
-                else
-                {
-                    // User has changed the generic value
-                    oldText = indicatorText.ValueGeneric;
-                }
-
-                // Save to change log 
-                profileRepository.LogPropertyChange(property.PropertyId, oldText, indicatorId, profileIdForProperty, userName,
-                                              timeOfChange);
-
-                var indicatorAlreadyOverridden = profileRepository.DoesOverriddenIndicatorMetaDataRecordAlreadyExist(indicatorId, profileId);
-
-                var text = item.Text;
-                if (indicatorAlreadyOverridden && indicatorText.HasSpecificValue())
-                {
-                    if (text == indicatorText.ValueSpecific || text == indicatorText.ValueGeneric)
-                    {
-                        text = null;
-                    }
-                    profileRepository.UpdateProperty(property, text, indicatorId, profileIdForProperty);
-                }
-                else
-                {
-                    if (!indicatorAlreadyOverridden && item.IsOverridden)
-                    {
-                        profileRepository.CreateNewOverriddenIndicator(property, text, indicatorId, profileId);
-                    }
-                    else
-                    {
-                        if (text == indicatorText.ValueSpecific || text == indicatorText.ValueGeneric)
-                        {
-                            text = null;
-                        }
-                        profileRepository.UpdateProperty(property, text, indicatorId, profileIdForProperty);
-                    }
-                }
-            }
-
-            RemoveEmptyOverrides(indicatorId, groupId, properties, profileRepository);
-        }
-
-        public static void RemoveEmptyOverrides(int indicatorId, int? profileId, IList<IndicatorMetadataTextProperty> properties, ProfileRepository profileRepository)
-        {
-            //Clean-up - Remove any overridden Indicator Metadata records where all text property fields are null
-            if (!Reader.GetIndicatorTextValues(indicatorId, properties, profileId).ToList().Any(x => x.HasSpecificValue()))
-            {
-                profileRepository.DeleteOverriddenMetaDataTextValues(indicatorId, (int)profileId);
-            }
         }
 
         public static IEnumerable<Area> GetAreas(string searchText, int? areaTypeId)
@@ -552,10 +463,10 @@ namespace Fpm.MainUI.Helpers
 
         public static IEnumerable<SelectListItem> GetDistinctExceptionServers()
         {
-            var exceptionServers = Reader.GetDistinctExceptionServers().ToList();
+            var exceptionServers = new ExceptionsRepository().GetDistinctExceptionServers().ToList();
             exceptionServers.Add(ExceptionOptions.AllServers);
 
-            return exceptionServers.Select(x => new SelectListItem { Text = x, Value = x, }).ToList();
+            return exceptionServers.Select(x => new SelectListItem { Text = x, Value = x }).ToList();
         }
 
         public static HtmlString GetContentItem(string contentKey, int profileId)

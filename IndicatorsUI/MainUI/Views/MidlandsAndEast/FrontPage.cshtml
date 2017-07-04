@@ -21,12 +21,10 @@
         </div>
         <div class="col-md-4">
             @* User Guide *@
-            @*            @Html.Partial("_UserGuide")*@
+                        @Html.Partial("_UserGuide")
             @* Latest News *@
-            @if (AppConfig.Instance.ShowLongerLivesSuicidePrevention)
-            {
-                @Html.Partial("_LatestNews")
-            }
+
+            @Html.Partial("_LatestNews")
         </div>
         @* About the profiles *@
         <div id="about-fingertips" class="col-md-8">

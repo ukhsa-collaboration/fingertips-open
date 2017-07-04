@@ -16,19 +16,19 @@ namespace FingertipsDataExtractionTool
     class Program : IProgram
     {
         private ILogger _logger;
-        private IExcelFileDeleter _excelFileDeleter;
-        private IExcelFileGenerator _excelFileGenerator;
-        private IPracticeProfilesExcelFileGenerator _practiceProfilesExcelFileGenerator;
+        private IFileDeleter _fileDeleter;
+        private IDataFileGenerator _dataFileGenerator;
+        private IPracticePopulationFileGenerator _practicePopulationFileGenerator;
         private IBulkCoreDataSetAverageCalculator _bulkCoreDataSetAverageCalculator;
 
-        public Program(ILogger logger, IExcelFileDeleter excelFileDeleter,
-            IExcelFileGenerator excelFileGenerator, IPracticeProfilesExcelFileGenerator practiceProfilesExcelFileGenerator,
+        public Program(ILogger logger, IFileDeleter fileDeleter,
+            IDataFileGenerator dataFileGenerator, IPracticePopulationFileGenerator practicePopulationFileGenerator,
             IBulkCoreDataSetAverageCalculator bulkCoreDataSetAverageCalculator)
         {
             _logger = logger;
-            _excelFileDeleter = excelFileDeleter;
-            _excelFileGenerator = excelFileGenerator;
-            _practiceProfilesExcelFileGenerator = practiceProfilesExcelFileGenerator;
+            _fileDeleter = fileDeleter;
+            _dataFileGenerator = dataFileGenerator;
+            _practicePopulationFileGenerator = practicePopulationFileGenerator;
             _bulkCoreDataSetAverageCalculator = bulkCoreDataSetAverageCalculator;
         }
 
@@ -63,7 +63,7 @@ namespace FingertipsDataExtractionTool
             {
                 case "1":
                 case "excel":
-                    GenerateExcelFiles();
+                    GenerateCsvFiles();
                     break;
                 case "2":
                 case "coredataset":
@@ -87,18 +87,18 @@ namespace FingertipsDataExtractionTool
             _logger.Info("---FDET STARTED---");
             Console.Clear();
             Console.WriteLine("Please select from the following options");
-            Console.WriteLine("1- Generate Excel files");
+            Console.WriteLine("1- Generate CSV files");
             Console.WriteLine("2- Calculate CoreDataSet Averages");
             Console.WriteLine("3- Exit");
         }
 
-        private void GenerateExcelFiles()
+        private void GenerateCsvFiles()
         {
             try
             {
-                _excelFileDeleter.DeleteAllExistingFiles();
-                _excelFileGenerator.Generate();
-                _practiceProfilesExcelFileGenerator.Generate();
+                _fileDeleter.DeleteAllExistingFiles();
+                _dataFileGenerator.Generate();
+                _practicePopulationFileGenerator.Generate();
             }
             catch (Exception ex)
             {

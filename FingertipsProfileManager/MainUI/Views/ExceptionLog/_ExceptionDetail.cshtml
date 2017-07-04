@@ -1,5 +1,6 @@
-﻿@model Fpm.ProfileData.Entities.Profile.ExceptionLog
-<div id="exceptionDetail" style="display: none;">
+﻿@model Fpm.ProfileData.Entities.Exceptions.ExceptionLog
+
+<div id="exception-detail" style="display: none;">
     <h2>Exception Detail</h2>
 
     <div>
@@ -36,7 +37,7 @@
 
 <p id="exception-detail-buttons">
     <input class="small-button" id="Close" onclick="lightbox.hide()" value="Close" />
-    <a href="/exceptionlog/@Model.Id">View full screen</a>
+    <a href="/exceptions/exception/@Model.Id">View full screen</a>
 </p>
 
 

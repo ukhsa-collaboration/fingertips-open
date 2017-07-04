@@ -11,12 +11,14 @@ using System.Web.Mvc;
 
 namespace Fpm.MainUI.Controllers
 {
+    [AdminUsersOnly]
+    [RoutePrefix("user")]
     public class UserController : Controller
     {
         private UserRepository _userRepository;
         private readonly ProfilesReader _profilesReader = ReaderFactory.GetProfilesReader();
 
-        [AuthorizedUsers]
+        [Route("user-index")]
         public ActionResult UserIndex()
         {
             var model = new UserGridModel();
@@ -28,6 +30,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpGet]
+        [Route("user-edit")]
         public ActionResult EditUser(int userId)
         {
             EditUserViewModel viewModel = new EditUserViewModel();
@@ -39,33 +42,42 @@ namespace Fpm.MainUI.Controllers
             viewModel.DisplayName = fpmUser.DisplayName;
             viewModel.FpmUserId = fpmUser.Id;
             viewModel.IsAdministrator = fpmUser.IsAdministrator;
-
-            // Return URL
-            if (HttpContext.Request.UrlReferrer != null)
-            {
-                viewModel.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
-            }
+            viewModel.IsMemberOfFpmSecurityGroup = userDetails.IsMemberOfFpmSecurityGroup;
 
             ViewBag.ProfilesUserHasPermissionTo = userDetails.GetProfilesUserHasPermissionsTo();
 
             // Profile drop down
-            var profileList = _profilesReader.GetProfiles().OrderBy(x => x.Name);
-            viewModel.ProfileId = profileList.First().Id;
-            ViewBag.ProfileId = new SelectList(profileList, "Id", "Name");
+            viewModel.ProfileList = new ProfileMenuHelper().GetAllProfiles(_profilesReader);
 
             return View("EditUser", viewModel);
         }
 
+        [Route("user-create")]
         public ActionResult CreateUser()
         {
             var user = new FpmUser();
-            if (HttpContext.Request.UrlReferrer != null) user.ReturnUrl = HttpContext.Request.UrlReferrer.ToString();
-
             return View("CreateUser", user);
         }
 
         [HttpPost]
+        [Route("user-insert")]
         [ValidateInput(false)]
+        public ActionResult InsertUser(FpmUser user)
+        {
+            if (!TryUpdateModel(user))
+            {
+                ViewBag.updateError = "Update Failure";
+                return View("CreateUser", user);
+            }
+
+            _userRepository.CreateUserItem(user, UserDetails.CurrentUser().Name);
+
+            return RedirectToAction("UserIndex");
+        }
+
+        [HttpPost]
+        [ValidateInput(false)]
+        [Route("user-edit")]
         [MultipleButton(Name = "action", Argument = "UpdateUser")]
         public ActionResult UpdateUser(EditUserViewModel viewModel)
         {
@@ -84,23 +96,9 @@ namespace Fpm.MainUI.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        public ActionResult InsertUser(FpmUser user)
-        {
-            if (!TryUpdateModel(user))
-            {
-                ViewBag.updateError = "Update Failure";
-                return View("CreateUser", user);
-            }
-
-            _userRepository.CreateUserItem(user, UserDetails.CurrentUser().Name);
-
-            return RedirectToAction("UserIndex");
-        }
-
-        [HttpPost]
-        [ValidateInput(false)]
-        [MultipleButton(Name = "action", Argument = "AddProfile")]
-        public ActionResult AddProfile(string profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
+        [Route("user-edit")]
+        [MultipleButton(Name = "action", Argument = "AddProfilePermissionToUser")]
+        public ActionResult AddProfilePermissionToUser(string profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
         {
             // Add user permission if profile ID valid
             int profileIdInt;
@@ -118,8 +116,9 @@ namespace Fpm.MainUI.Controllers
 
         [HttpPost]
         [ValidateInput(false)]
-        [MultipleButton(Name = "action", Argument = "RemoveProfile")]
-        public ActionResult RemoveProfile(string profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
+        [Route("user-edit")]
+        [MultipleButton(Name = "action", Argument = "RemoveProfilePermissionFromUser")]
+        public ActionResult RemoveProfilePermissionFromUser(string profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
         {
             var userId = viewModel.FpmUserId;
 
@@ -134,14 +133,35 @@ namespace Fpm.MainUI.Controllers
             return Redirect(Request.RawUrl);
         }
 
+        [HttpPost]
+        [ValidateInput(false)]
+        [Route("user-edit")]
+        [MultipleButton(Name = "action", Argument = "RemoveAllProfilePermissionsFromUser")]
+        public ActionResult RemoveAllProfilePermissionsFromUser(string profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
+        {
+            var userId = viewModel.FpmUserId;
+
+            // Remove all user permissions
+            var userDetails = UserDetails.NewUserFromUserId(userId);
+            var profiles = userDetails.GetProfilesUserHasPermissionsTo();
+            foreach (var profile in profiles)
+            {
+                _userRepository.DeleteUserGroupPermissions(profile.Id, userId);
+            }
+
+            // Stay on user edit page.
+            return Redirect(Request.RawUrl);
+        }
+
         [HttpGet]
+        [Route("users")]
         public ActionResult GetAllUsers()
         {
             var allUsers = _userRepository.GetAllFpmUsers().OrderBy(x => x.UserName);
             return Json(allUsers, JsonRequestBehavior.AllowGet);
-
         }
 
+        [Route("user-audit")]
         public ActionResult GetUserAudit(IEnumerable<int> jdata)
         {
             var auditLog = _userRepository.GetUserAudit(jdata.ToList());
@@ -165,6 +185,5 @@ namespace Fpm.MainUI.Controllers
 
             base.OnActionExecuted(filterContext);
         }
-
     }
 }

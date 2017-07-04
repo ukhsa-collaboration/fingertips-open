@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Linq;
 using System.Web;
@@ -108,6 +110,35 @@ namespace Fpm.MainUI.Helpers
             {
                 FpmUser user = FpmUser;
                 return user.Id == FpmUserIds.Doris;
+            }
+        }
+
+        public bool IsMemberOfFpmSecurityGroup
+        {
+            get
+            {
+                try
+                {
+                    var accessControlGroup = "Global.Fingertips.FingertipsProfileManager";
+                    PrincipalContext principalContext = new PrincipalContext(ContextType.Domain);
+
+                    GroupPrincipal groupPrincipal = GroupPrincipal
+                        .FindByIdentity(principalContext, accessControlGroup);
+
+                    UserPrincipal userPrincipal = UserPrincipal.FindByIdentity(principalContext, Name);
+                    if (userPrincipal == null)
+                    {
+                        // User name not found
+                        return false;
+                    }
+
+                    return userPrincipal.IsMemberOf(groupPrincipal);
+                }
+                catch (Exception AppDomainUnloadedException)
+                {
+                    // Sometimes security check cannot be made so give benefit of the doubt
+                    return true;
+                }
             }
         }
 

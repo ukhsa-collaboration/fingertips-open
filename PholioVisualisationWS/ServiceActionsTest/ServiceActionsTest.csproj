@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="AreasOfAreaTypeActionTest.cs" />
     <Compile Include="AreaTypesActionTest.cs" />
+    <Compile Include="BoxPlotPointListBuilderTest.cs" />
     <Compile Include="PartitionDataForAllAgesBuilderTest.cs" />
     <Compile Include="PartitionDataForAllCategoriesBuilderTest.cs" />
     <Compile Include="PartitionDataForAllSexesBuilderTest.cs" />

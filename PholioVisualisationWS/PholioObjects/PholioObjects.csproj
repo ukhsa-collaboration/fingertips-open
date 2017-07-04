@@ -73,6 +73,7 @@
     <Compile Include="CategoryAreaType.cs" />
     <Compile Include="CategoryType.cs" />
     <Compile Include="ChildAreasForPdfs.cs" />
+    <Compile Include="Comparator.cs" />
     <Compile Include="ComparatorConfidence.cs" />
     <Compile Include="ComparatorMethod.cs" />
     <Compile Include="ComparatorSignificance.cs" />
@@ -80,12 +81,10 @@
     <Compile Include="GroupRootSummary.cs" />
     <Compile Include="IArea.cs" />
     <Compile Include="IAreaType.cs" />
-
     <Compile Include="IInequalitiesTrendOptions.cs" />
     <Compile Include="InequalitiesTrendOption.cs" />
     <Compile Include="InequalitiesTrendPoint.cs" />
     <Compile Include="InequalitiesTrendRoot.cs" />
-
     <Compile Include="INamedObject.cs" />
     <Compile Include="KeyMessageOverride.cs" />
     <Compile Include="NearByAreas.cs" />
@@ -105,6 +104,8 @@
     <Compile Include="ProfileConfig.cs" />
     <Compile Include="ProfilePerIndicator.cs" />
     <Compile Include="Sex.cs" />
+    <Compile Include="SSRSReport.cs" />
+    <Compile Include="SSRSReportsProfileMapping.cs" />
     <Compile Include="TargetConfig.cs" />
     <Compile Include="TimeRange.cs" />
     <Compile Include="TrendMarkerResult.cs" />
@@ -113,7 +114,7 @@
     <Compile Include="ConfidenceIntervalMethod.cs" />
     <Compile Include="FingertipsException.cs" />
     <Compile Include="Group.cs" />
-    <Compile Include="Comparator.cs" />
+    <Compile Include="ComparatorDetails.cs" />
     <Compile Include="ComparatorMap.cs" />
     <Compile Include="CoreDataTimeFilter.cs" />
     <Compile Include="GroupingMetadata.cs" />
@@ -129,10 +130,6 @@
     <Compile Include="ParentDisplay.cs" />
     <Compile Include="QuinaryPopulation.cs" />
     <Compile Include="QuinaryPopulationValue.cs" />
-    <Compile Include="SparklineArea.cs" />
-    <Compile Include="SparklineTimePoint.cs" />
-    <Compile Include="SparklineRoot.cs" />
-    <Compile Include="SparklineStats.cs" />
     <Compile Include="TimePeriod.cs" />
     <Compile Include="RootBase.cs" />
     <Compile Include="GroupRoot.cs" />

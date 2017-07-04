@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
 
 namespace Fpm.MainUISeleniumTest
 {
@@ -20,9 +21,9 @@ namespace Fpm.MainUISeleniumTest
         {
             var checkBoxIds = new List<string> { "StartZeroYAxis","IsLive","HasOwnFrontPage",
                 "ShowDataQuality", "IsNational", "AreIndicatorsExcludedFromSearch", "IsProfileViewable",
-                "ShouldBuildExcel", "HasTrendMarkers", "UseTargetBenchmarkByDefault", "ShowAreaSearchOnProfileFrontPage",
+                "ShouldBuildExcel", "HasTrendMarkers", "UseTargetBenchmarkByDefault",
                 "HasAnyData", "HasStaticReports"};
-            var startingStates = new Dictionary<string,bool>();
+            var startingStates = new Dictionary<string, bool>();
 
             LoadProfilesPage();
 
@@ -39,7 +40,7 @@ namespace Fpm.MainUISeleniumTest
             }
 
             // Save profile
-            Driver.FindElement(By.Id("update_profile")).Click();
+            Driver.FindElement(By.Id("update-profile")).Click();
             waitFor.ProfilesPageToLoad();
 
             // Click first profile link again
@@ -53,6 +54,34 @@ namespace Fpm.MainUISeleniumTest
                 Assert.AreNotEqual(startingStates[checkBoxId], checkbox.Selected,
                     "Flag has not changed for: " + checkBoxId);
             }
+        }
+
+        [TestMethod]
+        public void TestAddRemoveUserToProfile()
+        {
+            LoadProfilesPage();
+            ClickFirstProfileLink();
+            waitFor.EditProfilePageToLoad();
+
+            // Define elements
+            SelectElement userMenu = new SelectElement(Driver.FindElement(By.Id("userId")));
+            var userList = Driver.FindElement(By.Id("user-listing"));
+
+            // Select first user
+            userMenu.SelectByIndex(1);
+            var name = userMenu.Options[1].Text;
+
+            // Remove user
+            Driver.FindElement(By.Id("RemoveBtn")).Click();
+            waitFor.ElementToNotContainText(userList, name);
+
+            // Add
+            Driver.FindElement(By.Id("AddBtn")).Click();
+            waitFor.ElementToContainText(userList, name);
+
+            // Remove
+            Driver.FindElement(By.Id("RemoveBtn")).Click();
+            waitFor.ElementToNotContainText(userList, name);
         }
 
         private void ClickFirstProfileLink()

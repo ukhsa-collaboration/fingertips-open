@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.Exceptions">
+
+  <!-- Exception Log class -->
+  <class name="ExceptionLog" table="t_exceptions">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Application" column="application"/>
+    <property name="Date" column="date"/>
+    <property name="UserName" column="user_name"/>
+    <property name="Message" column="message"/>
+    <property name="StackTrace" column="stack_trace"/>
+    <property name="Type" column="type"/>
+    <property name="Url" column="url"/>
+    <property name="Server" column="server"/>
+  </class>
+
+</hibernate-mapping>

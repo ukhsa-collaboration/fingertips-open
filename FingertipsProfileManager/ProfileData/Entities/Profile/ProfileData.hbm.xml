@@ -46,10 +46,12 @@
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
     <property name="UseTargetBenchmarkByDefault" column="use_target_benchmark_by_default"/>
-    <property name="ShowAreaSearchOnProfileFrontPage" column="show_area_search_on_profile_front_page"/>
+    <property name="FrontPageAreaSearchAreaTypes" column="front_page_area_search_area_types"/>
     <property name="HasAnyData" column="has_any_data"/>
     <property name="HasStaticReports" column="has_static_reports"/>
-    <property name="StaticReportsTimePeriods" column="static_reports_time_periods"/>
+    <property name="StaticReportsFolders" column="static_reports_folders"/>
+    <property name="StaticReportsLabel" column="static_reports_label"/>
+    <property name="IsChangeFromPreviousPeriodShown" column="is_change_from_previous_period_shown"/>
     
     <property name="LeadProfileForCollectionIds" column="lead_profile_for_collection_ids"/>
   </class>
@@ -96,6 +98,8 @@
     <property name="PolarityId" column="polarityid"/>
   </class>
 
+  
+  
   <!-- IndicatorMetadata class -->
   <class name="IndicatorMetadata" table="IndicatorMetadata">
 
@@ -113,6 +117,7 @@
     <property name="TargetId" column="targetid"/>
     <property name="DateEntered" column="DateEnteredInPHOLIO"/>
     <property name="AlwaysShowSpineChart" column="alwaysshowspinechart"/>
+    <property name="DisclosureControlId" column="disclosurecontrolid"/>
   </class>
 
   <!-- IndicatorMetadataTextProperty class -->
@@ -142,13 +147,19 @@
     <property name="ProfileId" column="profileid"/>
     <property name="Name" column="[1_name]"/>
     <property name="NameLong" column="[2_namelong]" />
-    <property name="Definition" column="[3_Definition]" />
-    <property name="Rationale" column="[4_Rationale]" />
+    <property name="Definition" type="StringClob">
+      <column name="[3_Definition]" sql-type="text"/>
+    </property>
+    <property name="Rationale" type="StringClob">
+      <column name="[4_Rationale]" sql-type="text"/>
+    </property>
     <property name="Policy" column="[5_Policy]" />
     <property name="DataSource" column="[6_DataSource]" />
     <property name="Producer" column="[7_Producer]" />
     <property name="IndSourceLink" column="[8_IndSourceLink]" />
-    <property name="IndMethod" column="[9_IndMethod]" />
+    <property name="IndMethod" type="StringClob">
+      <column name="[9_IndMethod]" sql-type="text"/>
+    </property>
     <property name="StandardPop" column="[10_StandardPop]" />
     <property name="CIMethod" column="[11_CIMethod]" />
     <property name="CountSource" column="[12_CountSource]" />
@@ -156,12 +167,16 @@
     <property name="DenomSource" column="[14_DenomSource]" />
     <property name="DenomDefinition" column="[15_DenomDefinition]" />
     <property name="DiscControl" column="[16_DiscControl]" />
-    <property name="Caveats" column="[17_Caveats]" />
+    <property name="Caveats" type="StringClob">
+      <column name="[17_Caveats]" sql-type="text"/>
+    </property>
     <property name="Copyright" column="[18_Copyright]" />
     <property name="Reuse" column="[19_Reuse]" />
     <property name="Links" column="[20_Links]" />
     <property name="RefNum" column="[21_RefNum]" />
-    <property name="Notes" column="[22_Notes]" />
+    <property name="Notes" type="StringClob">
+      <column name="[22_Notes]" sql-type="text"/>
+    </property>
     <property name="Frequency" column="[23_Frequency]" />
     <property name="Rounding" column="[24_Rounding]" />
     <property name="DataQuality" column="[25_DataQuality]" />
@@ -195,7 +210,7 @@
     <property name="ContentKey" column="contentkey"/>
     <property name="Description" column="description"/>
     <property name="Content" column="content" type="StringClob"/>
-    <property name="PlainTextContent" column="plaintextcontent"/>
+    <property name="IsPlainText" column="plaintextcontent"/>
   </class>
   
   <!-- ContentAudit class -->
@@ -210,21 +225,6 @@
     <property name="ToContent" column="tocontent" type="StringClob"/>
     <property name="UserName" column="username"/>
     <property name="Timestamp" column="timestamp"/>
-  </class>
-
-  <!-- Exception Log class -->
-  <class name="ExceptionLog" table="t_exceptions">
-    <id name="Id" column="id" type="int" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-    <property name="Application" column="application"/>
-    <property name="Date" column="date"/>
-    <property name="UserName" column="user_name"/>
-    <property name="Message" column="message"/>
-    <property name="StackTrace" column="stack_trace"/>
-    <property name="Type" column="type"/>
-    <property name="Url" column="url"/>
-    <property name="Server" column="server"/>
   </class>
 
   <!-- ProfileCollection class -->
@@ -262,6 +262,7 @@
     <property name="BespokeTargetKey" column="bespoketargetkey"/>
     <property name="PolarityId" column="polarityid"/>
     <property name="Description" column="description"/>
+    <property name="LegendHtml" column="legendhtml"/>
   </class>
 
   <!-- TargetConfigAudit -->
@@ -295,6 +296,17 @@
     <property name="Name" column="name" />
     <property name="ShortName" column="shortname" />
   </class>
+
+  <!--DisclosureControl-->
+  <class name="DisclosureControl" table="L_DisclosureControl">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="Description" column="description"/>
+  </class>
+
 
   <!-- Document class-->
   <class name="Document" table="FPM_Document">

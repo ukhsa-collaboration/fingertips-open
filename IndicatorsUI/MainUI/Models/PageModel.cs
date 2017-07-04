@@ -76,7 +76,7 @@ namespace Profiles.MainUI.Models
         public bool DisplayProfileTitle { get; set; }
 
         public bool HasExclusiveSkin { get; set; }
-        public bool ShowAreaSearchOnProfileFrontPage { get; set; }
+        public string FrontPageAreaSearchAreaTypes { get; set; }
         public bool HasAnyData { get; set; }
         public bool HasStaticReports { get; set; }
         public int ProfileId { get; set; }

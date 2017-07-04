@@ -7,8 +7,8 @@ using System.Web;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.ExceptionLogging;
 using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
 using PholioVisualisation.RequestParameters;
-using PholioVisualisation.Services.HttpHandlers;
 
 namespace PholioVisualisation.Services
 {
@@ -20,8 +20,7 @@ namespace PholioVisualisation.Services
     {
         private HttpContextBase Context { get; set; }
 
-        // Other possible key is "pp"
-        private const string QuinaryPopulationKey = "qp";
+        public const string DownloadedFileName = "PublicHealthEngland-Data";
 
         public DataDownloadBespoke(HttpContextBase context)
         {
@@ -46,11 +45,12 @@ namespace PholioVisualisation.Services
                 }
                 else
                 {
-                    PracticeProfileDataBuilder builder = new PracticeProfileDataBuilder(UsePopulationData(parameters))
+                    // Get population data
+                    PracticeProfileDataBuilder builder = new PracticeProfileDataBuilder()
                     {
                         AreaCode = parameters.AreaCode,
                         GroupIds = parameters.GroupIds,
-                        AreaTypeId = parameters.AreaTypeId
+                        ParentAreaTypeId = parameters.AreaTypeId
                     };
 
                     var workBook = builder.BuildWorkbook();
@@ -63,7 +63,7 @@ namespace PholioVisualisation.Services
 
                 var response = Context.Response;
                 ExportHelper.SetResponseAsExcelFile(response, 
-                    GetDataDownload.DownloadedFileName + "." + fileInfo.FileExtension);
+                    DownloadedFileName + "." + fileInfo.FileExtension);
                 response.BinaryWrite(bytes);
             }
             catch (Exception ex)
@@ -73,12 +73,6 @@ namespace PholioVisualisation.Services
             }
 
             Context.Response.Flush();
-        }
-
-        private static bool UsePopulationData(DataDownloadBespokeParameters parameters)
-        {
-            return parameters.ProfileKey.Equals(QuinaryPopulationKey,
-                    StringComparison.InvariantCultureIgnoreCase);
         }
     }
 }

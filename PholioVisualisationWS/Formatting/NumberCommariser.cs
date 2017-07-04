@@ -26,5 +26,15 @@ namespace PholioVisualisation.Formatting
         {
             return string.Format("{0:#,###0.000}", d);
         }
+
+        public static string CommariseFormattedValue(string s)
+        {
+            if (s.IndexOf('.') > -1)
+            {
+                var bits = s.Split('.');
+                return Commarise0DP(double.Parse(bits[0])) + '.' + bits[1];
+            }
+            return Commarise0DP(double.Parse(s));
+        }
     }
 }

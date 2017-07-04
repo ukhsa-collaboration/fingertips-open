@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 using ServicesWeb.Controllers;
@@ -44,12 +45,22 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         {
             var codes = new List<string> { AreaCodes.CountyUa_Cumbria, AreaCodes.CountyUa_Leicestershire };
 
-            var areas = new AreasController().GetAreasOfAreaType(
-                area_codes: string.Join(",", codes));
+            var areas = new AreasController().GetAreasOfAreaType(string.Join(",", codes));
 
             // Assert
             Assert.AreEqual(2, areas.Count);
             Assert.IsNotNull(areas.FirstOrDefault(x => x.Code == AreaCodes.CountyUa_Cumbria));
+        }
+
+        [TestMethod]
+        public void TestGetChildAreasWithAddressesAsCsv()
+        {
+            var addresses = new AreasController().GetChildAreasWithAddressesAsCsv(
+                AreaCodes.Ccg_Barnet, AreaTypeIds.GpPractice);
+
+            // Assert
+            var text = addresses.Content.ReadAsStringAsync().Result;
+            Assert.IsTrue(text.Contains("Barnet"));
         }
 
     }

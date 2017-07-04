@@ -21,6 +21,6 @@ namespace PholioVisualisation.PdfData
         public double? Percentile75 { get; set; }
 
         public Dictionary<string, CoreDataSet> AreaData = new Dictionary<string, CoreDataSet>();
-
+        public Dictionary<string, TrendMarkerResult> AreaRecentTrends = new Dictionary<string, TrendMarkerResult>();
     }
 }

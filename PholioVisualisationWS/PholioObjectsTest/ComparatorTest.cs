@@ -21,7 +21,7 @@ namespace PholioVisualisation.PholioObjectsTest
         public void TestAreNotEqual()
         {
             // AreaTypeId different
-            Comparator c = new Comparator
+            ComparatorDetails c = new ComparatorDetails
             {
                 Area = new Area
                 {
@@ -34,7 +34,7 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.AreNotEqual(GetComparator(), c);
 
             // Area code different
-            c = new Comparator
+            c = new ComparatorDetails
             {
                 Area = new Area
                 {
@@ -47,7 +47,7 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.AreNotEqual(GetComparator(), c);
 
             // ComparatorId different
-            c = new Comparator
+            c = new ComparatorDetails
             {
                 Area = new Area
                 {
@@ -60,9 +60,9 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.AreNotEqual(GetComparator(), c);
         }
 
-        private static Comparator GetComparator()
+        private static ComparatorDetails GetComparator()
         {
-            return new Comparator
+            return new ComparatorDetails
                  {
                      Area = new Area
                          {

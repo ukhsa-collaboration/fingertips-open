@@ -57,7 +57,7 @@ function displayPopulationInfo() {
     var practicePopulation = PP.data.currentPracticePopulation;
     if (state.isAnyPopulation()) {
         
-        $('#practiceLabel').html(getPracticeLabel());
+        $('#practice-label').html(getPracticeLabel());
         
         updateEthnicity(practicePopulation)
         updateDeprivationTable(practicePopulation);
@@ -232,7 +232,7 @@ var populationState = {
     displayPageElements : function() {
         showAndHidePageElements();
         
-        var populationInfo = $('#populationInfo');
+        var populationInfo = $('#population-info');
         if (populationState.isAnyPopulation()) {
             populationInfo.show();
         } else {
@@ -299,7 +299,7 @@ function updateFurtherInfo(adhocValues) {
     value = isDefined(recommend) ?  recommend.ValF + '%' : null
     rows.push({name:'% of patients that would recommend their practice',val:value,iid:347});
     
-    $('#furtherInfoTable').html(templates.render('furtherInfo', {rows:rows}));
+    $('#further-info-table').html(templates.render('furtherInfo', {rows:rows}));
 };
 
 function updateRegisteredPersons(practiceParentName) {
@@ -332,7 +332,7 @@ function updateRegisteredPersons(practiceParentName) {
             average:true
     });
     
-    $('#popTable').html(templates.render('furtherInfo', {rows:rows}));
+    $('#pop-table').html(templates.render('furtherInfo', {rows:rows}));
 };
 
 function getSelectedPractice() {
@@ -410,7 +410,7 @@ function displayPopulationChart() {
         } else {
             populationChart = new Highcharts.Chart({
                     chart: {
-                        renderTo: 'populationChart',
+                        renderTo: 'population-chart',
                         defaultSeriesType: 'line',      
                         margin:[40,55,50,55] /* margins must be set explicitly to avoid labels being positioned outside visible chart area */
                     },
@@ -553,6 +553,6 @@ PopulationNumber.prototype = {
 var NO_DATA = '<div class="noData">-</div>';
 var populationChart;
 
-templates.add('furtherInfo', '{{#rows}}<tr><td class="header info">{{#iid}}<div class="fl infoTooltip" onclick="showMetadata(populationGroupId,{{iid}})"></div>{{/iid}}{{name}}</td><td>{{val}}{{^val}}' +
+templates.add('furtherInfo', '{{#rows}}<tr><td class="header info">{{#iid}}<div class="fl info-tooltip" onclick="showMetadata(populationGroupId,{{iid}})"></div>{{/iid}}{{name}}</td><td>{{val}}{{^val}}' +
         NO_DATA + '{{/val}}{{#average}} <span class="averageLabel">(average)</span>{{/average}}</td></tr>{{/rows}}');
 

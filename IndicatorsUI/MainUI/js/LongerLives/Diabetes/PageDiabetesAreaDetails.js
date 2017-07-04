@@ -20,6 +20,7 @@
     if (model.profileId === ProfileIds.HealthChecks) {
         loaded.areaDetailsForDiseaseAndDeath.fetchDataByAjax({ groupId: GroupIds.HealthChecks.DiseaseAndDeath });
     }
+
     getIndicatorMetadata(groupId);
     getSpecificGroupRoots(groupId, model.areaTypeId);
     getDecileData(model);
@@ -567,6 +568,9 @@ function getGroupId() {
             break;
         case ProfileIds.Suicide:
             groupId = { groupId: GroupIds.Suicide.SuicideData };
+            break;
+        case ProfileIds.LAScorecard:
+            groupId = { groupId: GroupIds.LAScorecard.DrugTreatment };
             break;
     }
     return groupId;

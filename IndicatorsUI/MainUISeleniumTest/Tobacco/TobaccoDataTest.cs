@@ -9,7 +9,14 @@ namespace IndicatorsUI.MainUISeleniumTest.Tobacco
         public const string UrlKey = ProfileUrlKeys.Tobacco;
 
         [TestMethod]
-        public void TestAllTabsLoad()
+        public void TestTobaccoHomePage()
+        {
+            navigateTo.HomePage();
+            waitFor.FingertipsProfileFrontPageToLoad();
+        }
+
+        [TestMethod]
+        public void TestTobaccoAllTabsLoad()
         {
             navigateTo.FingertipsDataForProfile(UrlKey);
             FingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast(driver);

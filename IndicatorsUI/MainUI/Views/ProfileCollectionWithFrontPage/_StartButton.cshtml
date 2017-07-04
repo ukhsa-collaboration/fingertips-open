@@ -1,28 +1,13 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Models
+﻿@using Profiles.MainUI.Models
 @model PageModel
 @if (Model.HasAnyData)
 {
-    if (Model.DefaultFingertipsTabId == -1)
+    // Set target url
+    string href = "/profile-group/" + Model.ProfileCollections.First().UrlKey +"/profile/" + ViewBag.ProfileUrlKey+ "/data";
+    if (Model.DefaultFingertipsTabId != -1)
     {
-        <div class="start-button">
-            <div class="btn">
-                <a href="/profile-group/@Model.ProfileCollections.First().UrlKey/profile/@ViewBag.ProfileUrlKey/data" title="START Go to the data">
-                    START
-                    <p>Go to the data</p>
-                </a>
-            </div>
-        </div>
+        href += "#page/" + Model.DefaultFingertipsTabId;
     }
-    else
-    {
-        <div class="start-button">
-            <div class="btn">
-                <a href="/profile-group/@Model.ProfileCollections.First().UrlKey/profile/@ViewBag.ProfileUrlKey/data#page/@Model.DefaultFingertipsTabId">
-                    START
-                    <p>Go to the data</p>
-                </a>
-            </div>
-        </div>
-    }
+
+    @Html.Partial("~/Views/Shared/_StartButtonForHref.cshtml", href)
 }

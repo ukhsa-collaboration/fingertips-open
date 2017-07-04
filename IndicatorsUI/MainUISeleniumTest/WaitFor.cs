@@ -115,17 +115,17 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void FingertipsSpineChartToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("singleAreaTable"));
+            ExpectedElementToBeVisible(By.Id("single-area-table"));
         }
 
         public void FingertipsTartanRugToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("leftTartanTable"));
+            ExpectedElementToBeVisible(By.Id("left-tartan-table"));
         }
 
         public void FingertipsBarChartTableToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("indicatorDetailsTable"));
+            ExpectedElementToBeVisible(By.Id("indicator-details-table"));
         }
 
         public void FingertipsScatterPlotChartToLoad()
@@ -140,7 +140,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void FingertipsNearestNeighboursMenuToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("goBack"));
+            ExpectedElementToBeVisible(By.Id("nearest-neighbour-links"));
         }
 
         public void FingertipsNearestNeighboursTartunRugToLoad()
@@ -169,7 +169,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void PhofCompareAreasTableToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("indicatorDetailsTable"));
+            ExpectedElementToBeVisible(By.Id("indicator-details-table"));
         }
 
         public void PhofInequalitiesFilters()
@@ -189,7 +189,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void PracticeProfilesSpineChartsTabToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("spineTableBox"));
+            ExpectedElementToBeVisible(By.Id("spine-table-box"));
         }
 
         public void MortalityAreaDetailRankingToLoad()

@@ -26,15 +26,15 @@ var tooltipManager = new function () {
     // Make an element trigger a tooltip
     this.initElement = function (id) {
 
-        var jq = $('#' + id);
+        var $element = $('#' + id);
 
-        jq.mouseenter(function (e) {
+        $element.mouseenter(function (e) {
             manager.show(e);
         });
-        jq.mouseleave(function (e) {
+        $element.mouseleave(function (e) {
             manager.hide();
         });
-        jq.mousemove(function (e) {
+        $element.mousemove(function (e) {
             manager.move(e);
         });
     };

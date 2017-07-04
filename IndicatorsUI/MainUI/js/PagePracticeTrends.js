@@ -329,10 +329,10 @@ function adjustLimitsForNationalValue(limits, nationalDataList) {
 }
 
 templates.add('trends', '<div class="small-trend-box">\
-<table class="borderedTable">\
+<table class="bordered-table">\
 <thead><tr><th colspan="4" class="indicator">\
 <div class="indicator">{{name}}\
-<div class="infoTooltip" onclick="showMetadata({{groupId}},{{iid}},this)"></div></div></th></tr>\
+<div class="info-tooltip" onclick="showMetadata({{groupId}},{{iid}},this)"></div></div></th></tr>\
 <tr><th>Period</th><th>{{practice}}</th>\
 <th>{{benchmark}}</th><th>England</th></tr></thead>\
 </tbody>{{#rows}}<tr><td>{{0}}</td><td>{{& 1}}</td>\

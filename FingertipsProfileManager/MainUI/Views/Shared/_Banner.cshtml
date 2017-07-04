@@ -5,32 +5,56 @@
     </a>
 </div>
 <div id="header" class="clearfix">
-    @Html.Partial("_FAQ")
     @if (UserDetails.CurrentUser().IsAdministrator)
     {
-        <div class="standardWidth clearfix">
-                <small>@FusStatus.Message() <a href="http://londevapppor01.phe.gov.uk:1234/fingertips-logs/fus.txt" target="_blank">FUS log</a></small>
-                <ul style="float: right;">
-                    <li class="site-link"><a href="/profilemanager">Profiles</a></li>
-                    <li class="site-link"><a href="/user">Users</a></li>
-                    <li class="site-link"><a href="/ProfileCollectionManager">Profile collections</a></li>
-                    <li class="site-link"><a href="/ExceptionLog">Exceptions</a></li>
-                    <li class="site-link"><a href="/admin">Admin</a></li>
-                </ul>
-            </div>
+        <nav class="standardWidth clearfix">
+            <small>@FusStatus.Message() <a href="http://londevapppor01.phe.gov.uk:1234/fingertips-logs/fus.txt" target="_blank">FUS log</a></small>
+            <ul style="float: right;">
+                <li class="site-link">@Html.ActionLink("Profiles", "ProfileIndex", "Profile")</li>
+                <li class="site-link">@Html.ActionLink("Users", "UserIndex", "User")</li>
+                <li class="site-link">@Html.ActionLink("Profile collections", "ProfileCollectionsIndex", "ProfileCollections")</li>
+                <li class="site-link">@Html.ActionLink("Exceptions", "ExceptionIndex", "ExceptionLog")</li>
+                <li class="site-link">@Html.ActionLink("Admin", "Admin", "Admin")</li>
+            </ul>
+        </nav>
     }
-    <div id="site-links-box" class="standardWidth clearfix">
+    <nav id="site-links-box" class="standardWidth clearfix">
         <span id="app-title">Fingertips Profile Manager</span>
-        <ul style="float:right;">
-            <li class="site-link"><a href="/">Profiles & indicators</a></li>
+        <ul style="float: right;">
+            <li class="site-link">@Html.ActionLink("Profiles", "EditProfileNonAdmin", "Profile", new { profileId = ViewBag.ProfileId }, new { })</li>
+            <li class="site-link">@Html.ActionLink("Indicators", "Index", "ProfilesAndIndicators", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link"><a href="/upload">Upload data</a></li>
-            <li class="site-link"><a href="/documents">Documents</a></li>
-            <li class="site-link"><a href="/content">Content</a></li>
-            <li class="site-link"><a href="/lookup-tables">Lookup tables</a></li>
-            <li class="site-link"><a href="/ManageAreas">Areas</a></li>
-            <li class="site-link"><a href="#" id="faq-link">FAQs</a></li>
+            <li class="site-link">@Html.ActionLink("Documents", "DocumentsIndex", "Documents", new { profileId = ViewBag.ProfileId }, new { })</li>
+            <li class="site-link">@Html.ActionLink("Content", "ContentIndex", "Content", new { profileId = ViewBag.ProfileId }, new { })</li>
+            <li class="site-link">@Html.ActionLink("Look up tables", "Index", "LookUpTables")</li>
+            <li class="site-link">@Html.ActionLink("Areas", "AreasIndex", "Areas")</li>
+            <li class="dropdown site-link">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Supporting information<span class="caret"></span></a>
+                <ul id="submenu" class="dropdown-menu">
+                    <li class="site-link">
+                        @Html.ActionLink("Introduction to FPM", "ViewContentItemInOwnPage", "Content",
+                            new {contentItemId = 75}, new {})
+                    </li>
+                    <li class="site-link">
+                        <a href="https://testprofiles.phe.org.uk/documents/Introduction_to_using_PHOLIO.docx">Introduction to PHOLIO</a>
+                    </li>
+                    <li class="site-link">
+                        <a href="https://testprofiles.phe.org.uk/dashboard/deployed-fingertips.html">List of Fingertips sites</a>
+                    </li>
+                    <li class="site-link">@Html.ActionLink("Profile Relationships", "ProfileRelationships", "EmbeddedContent")</li>
+                    <li class="site-link">
+                        <a href="https://docs.google.com/spreadsheets/d/19W8WOTwVjlbGfG45J3UaR1qC860e2cbiqagViYMd3Gg/edit#gid=1329678678">
+                            Web analytics
+                        </a>
+                    </li>
+                    <li class="site-link">
+                        <a href="/reports">Reports</a>
+                    </li>
+                </ul>
+            </li>
+            
         </ul>
-    </div>
+    </nav>
     @if (CommonUtilities.IsReadOnlyMode())
     {
         <div class="right-read-only">

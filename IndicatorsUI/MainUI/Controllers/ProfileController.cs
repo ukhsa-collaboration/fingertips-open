@@ -22,7 +22,6 @@ namespace Profiles.MainUI.Controllers
         /// <summary>
         /// Front page of site.
         /// </summary>
-        /// <returns></returns>
         [CheckUserCanAccessSkin]
         public ActionResult FrontPage()
         {

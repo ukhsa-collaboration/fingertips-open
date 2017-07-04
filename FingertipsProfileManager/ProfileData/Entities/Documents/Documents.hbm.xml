@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.Documents">
+
+    <sql-query name="GetDocumentContent">
+SELECT [FileData]
+  FROM [FPM_Document]
+  where id = :documentId
+  </sql-query>
+
+
+</hibernate-mapping>

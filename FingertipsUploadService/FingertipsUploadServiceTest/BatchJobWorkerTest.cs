@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using NLog;
 using System;
 using System.Collections.Generic;
+using FingertipsUploadService.ProfileData;
 
 namespace FingertipsUploadServiceTest
 {

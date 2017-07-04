@@ -12,17 +12,19 @@
     <script src="@(Model.JsPath)SiteKeyIndicators.js" type="text/javascript"></script>
 }
 <div class="full-width title-divider"></div>
-<div class="standardWidth clearfix">
+<div class="standard-width clearfix">
 
-    <ul class="link-list">
-        <li class="site-link">
-            <a id="back-to-search" href="#">Back to search</a>
-        </li>
-    </ul>
+    <div class="row col-md-12">
+        <ul class="breadcrumbs">
+            <li class="site-link">
+                <a id="back-to-search" href="#">Back to search</a>
+            </li>
+        </ul>
+   </div>
 
     <h2>Profiles for @ViewBag.PlaceName</h2>
 
-    <div id="area-results-box" class="standardWidth clearfix">
+    <div id="area-results-box" class="standard-width clearfix">
         <p id="no-data-message" style="display: none;">No data is available for this area</p>
     </div>
 
@@ -38,6 +40,7 @@
     FT.version = '@ViewBag.JavaScriptVersion';
     FT.config.hasAnyData = @JsHelper.GetJsBool(Model.HasAnyData);
     FT.config.hasStaticReports = @JsHelper.GetJsBool(Model.HasStaticReports);
+    FT.config.frontPageAreaSearchAreaTypes = [@Model.FrontPageAreaSearchAreaTypes];
 
     // Local state
     state = {

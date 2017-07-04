@@ -6,8 +6,6 @@ namespace Fpm.MainUI.Helpers
 
     public class FileNameHelper
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-       
         public enum Uniqueness
         {
             NotUnique,
@@ -15,10 +13,17 @@ namespace Fpm.MainUI.Helpers
             Unique
         }
 
+        private readonly ProfilesReader _reader;
+
+        public FileNameHelper(ProfilesReader reader)
+        {
+            _reader = reader;
+        }
+
         public Uniqueness IsUnique(string filename, int profileId)
         {
             var fileNameUniqueness = Uniqueness.NotUnique;
-            var docs = _reader.GetDocuments(filename);
+            var docs = _reader.GetDocumentsWithoutFileData(filename);
 
             if (docs.Count > 0)
             {

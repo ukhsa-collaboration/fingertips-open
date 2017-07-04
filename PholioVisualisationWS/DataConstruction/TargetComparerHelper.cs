@@ -5,39 +5,40 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
 {
-    public class TargetComparerHelper
+    public class TargetComparerDataAssigner
     {
         private IGroupDataReader groupDataReader;
-        private IArea nationalArea;
 
-        public TargetComparerHelper(IGroupDataReader groupDataReader, IArea nationalArea)
+        public TargetComparerDataAssigner(IGroupDataReader groupDataReader)
         {
             this.groupDataReader = groupDataReader;
-            this.nationalArea = nationalArea;
         }
 
-        public void AssignExtraDataIfRequired(IArea parentArea, TargetComparer targetComparer, Grouping grouping, IndicatorMetadata indicatorMetadata)
+        public void AssignExtraDataIfRequired(IArea england, TargetComparer targetComparer, Grouping grouping, 
+            IndicatorMetadata indicatorMetadata, TimePeriod timePeriod)
         {
             var bespokeComparer = targetComparer as BespokeTargetPreviousYearEnglandValueComparer;
             if (bespokeComparer != null)
             {
                 // Assign the previous year's England data
-                var previousYear = TimePeriod.GetDataPoint(grouping).GetTimePeriodForYearBefore();
+                var previousYear = timePeriod.GetTimePeriodForYearBefore();
                 bespokeComparer.BenchmarkData =
                     new BenchmarkDataProvider(groupDataReader)
                         .GetBenchmarkData(grouping, previousYear,
-                            null /*would need average calculator with previous year's data*/, nationalArea);
+                            null /*would need average calculator with previous year's data*/, england);
             }
 
             var bespokeTargetPreviousYearEnglandValueComparer = targetComparer as BespokeTargetPercentileRangeComparer;
             if (bespokeTargetPreviousYearEnglandValueComparer != null)
             {
                 //Get the Upper and Lower Benchmark ranges
-                new TargetComparerHelper(groupDataReader, parentArea).GetPercentileData(targetComparer, grouping, indicatorMetadata);
+                new TargetComparerDataAssigner(groupDataReader)
+                    .AssignBenchmarkPercentileDataToTargetComparer(targetComparer, grouping, indicatorMetadata, timePeriod);
             }
         }
 
-        public void GetPercentileData(TargetComparer targetComparer, Grouping grouping, IndicatorMetadata indicatorMetadata)
+        public void AssignBenchmarkPercentileDataToTargetComparer(TargetComparer targetComparer, Grouping grouping, 
+            IndicatorMetadata indicatorMetadata, TimePeriod timePeriod)
         {
             var bespokeComparer = targetComparer as BespokeTargetPercentileRangeComparer;
             if (bespokeComparer != null)
@@ -47,15 +48,15 @@ namespace PholioVisualisation.DataConstruction
                 {
                     AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
                 };
-                var utlaValues = groupDataReader.GetCoreDataForAllAreasOfType(utlaGrouping, TimePeriod.GetDataPoint(utlaGrouping));
+                var utlaValues = groupDataReader.GetCoreDataForAllAreasOfType(utlaGrouping, timePeriod);
 
                 var percentileCalculator = new BespokeTargetPercentileRangeCalculator(utlaValues.Where(x => x.IsValueValid).Select(x => x.Value).ToList());
 
                 bespokeComparer.LowerTargetPercentileBenchmarkData =
-                    new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetLowerTargetPercentile()) };
+                    new CoreDataSet { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetLowerTargetPercentile()) };
 
                 bespokeComparer.UpperTargetPercentileBenchmarkData =
-                    new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetUpperTargetPercentile()) };
+                    new CoreDataSet { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetUpperTargetPercentile()) };
             }
         }
 

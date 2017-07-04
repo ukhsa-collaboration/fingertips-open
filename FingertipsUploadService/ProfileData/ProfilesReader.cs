@@ -40,7 +40,7 @@ namespace FingertipsUploadService.ProfileData
             return q.List<UserGroupPermissions>();
         }
 
-        public IndicatorMetadata GetIndicatorMetadata(int indicatorId)
+        public virtual IndicatorMetadata GetIndicatorMetadata(int indicatorId)
         {
             IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
             q.SetParameter("indicatorId", indicatorId);

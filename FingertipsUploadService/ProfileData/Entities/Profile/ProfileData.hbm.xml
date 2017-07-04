@@ -52,6 +52,19 @@
     <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
     <property name="TargetId" column="targetid"/>
     <property name="DateEntered" column="DateEnteredInPHOLIO"/>
+    <property name="DisclosureControlId" column="disclosurecontrolid"/>
+  </class>
+
+  <!--DisclosureControl-->
+  <class name="DisclosureControl" table="L_DisclosureControl">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="name"/>
+    <property name="Description" column="description"/>
+    <property name="Formula" column="formula"/>
+
   </class>
 
   <!-- Category class -->

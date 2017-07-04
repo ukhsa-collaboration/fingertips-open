@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.Net;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -24,6 +25,13 @@ namespace PholioVisualisation.ServicesTest
         public static void AssertDataContainsString(byte[] data, string s)
         {
             Assert.IsTrue(GetDataString(data).Contains(s));
+        }
+
+        public static byte[] GetData(string path)
+        {
+            var url = BaseUrl + "api/" + path;
+            Debug.WriteLine(url);
+            return new WebClient().DownloadData(url);
         }
 
         public static string GetDataString(byte[] data)

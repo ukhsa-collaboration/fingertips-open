@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData.Entities.Core;
+﻿using Fpm.ProfileData.Entities.Core;
 using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.ProfileData
 {
@@ -42,6 +42,20 @@ namespace Fpm.ProfileData
             IQuery q = CurrentSession.CreateQuery("from ProfileCollection pc where pc.id = :collectionId");
             q.SetParameter("collectionId", collectionId);
             return q.UniqueResult<ProfileCollection>();
+        }
+
+        public int GetProfileIdFromUrlKey(string urlKey)
+        {
+            IQuery q = CurrentSession.CreateQuery("select p.Id from ProfileDetails p where p.UrlKey = :urlKey");
+            q.SetParameter("urlKey", urlKey);
+            return q.UniqueResult<int>();
+        }
+
+        public string GetProfileUrlKeyFromId(int profileId)
+        {
+            IQuery q = CurrentSession.CreateQuery("select p.UrlKey from ProfileDetails p where p.Id = :id");
+            q.SetParameter("id", profileId);
+            return q.UniqueResult<string>();
         }
 
         public ProfileDetails GetProfileDetails(string urlKey)
@@ -181,7 +195,7 @@ namespace Fpm.ProfileData
             // Integer parameter required
             if (profileId.HasValue == false)
             {
-                profileId = -1;
+                profileId = ProfileIds.Undefined;
             }
 
             IQuery q = CurrentSession.GetNamedQuery("GetIndicatorMetadataTextValues");
@@ -215,8 +229,8 @@ namespace Fpm.ProfileData
         private static List<IndicatorText> HydrateIndicatorTextList(IList<IndicatorMetadataTextProperty> properties, IList results)
         {
             IList<object> genericResults = (IList<object>)results[0];
-            IList<object> specificResults = (results.Count == 2)
-                ? (IList<object>)results[1]
+            IList<object> specificResults = results.Count > 1
+                ? (IList<object>)results[1] // first overwritten metadata
                 : null;
 
             List<IndicatorText> indicatorTextList = new List<IndicatorText>();
@@ -314,6 +328,12 @@ namespace Fpm.ProfileData
             return q.List<string>();
         }
 
+        public virtual IList<DisclosureControl> GetAllDisclosureControl()
+        {
+            return CurrentSession.CreateCriteria<DisclosureControl>()
+                .List<DisclosureControl>();
+        }
+
         public virtual IList<TargetConfig> GetAllTargets()
         {
             return CurrentSession.CreateCriteria<TargetConfig>()
@@ -325,6 +345,7 @@ namespace Fpm.ProfileData
             return CurrentSession.CreateCriteria<TargetConfig>()
                 .Add(Restrictions.Eq("Id", targetId))
                 .UniqueResult<TargetConfig>();
+
         }
 
         public virtual IList<Category> GetCategoriesByCategoryTypeId(int categoryTypeId)
@@ -449,7 +470,6 @@ namespace Fpm.ProfileData
             return q.List<CoreDataSetArchive>();
         }
 
-
         public IList<TimePeriod> GetCoreDataSetTimePeriods(GroupingPlusName groupingPlusNames)
         {
             const string query = "select distinct d.Year, d.Quarter, d.Month from CoreDataSet d, Area a" +
@@ -551,42 +571,6 @@ namespace Fpm.ProfileData
             return q.List<ProfileCollectionItem>();
         }
 
-        public IList<ExceptionLog> GetExceptionsByServer(int exceptionDays, string exceptionServer)
-        {
-            DateTime initDate = DateTime.Today.AddDays(exceptionDays * -1);
-
-            IQuery q = CurrentSession.CreateQuery(
-                "from ExceptionLog e where e.Date > :initDate and e.Server = :exceptionServer order by e.Date desc");
-            q.SetParameter("initDate", initDate);
-            q.SetParameter("exceptionServer", exceptionServer);
-            return q.List<ExceptionLog>();
-        }
-
-        public IList<ExceptionLog> GetExceptionsForAllServers(int exceptionDays)
-        {
-            DateTime initDate = DateTime.Today.AddDays(exceptionDays * -1);
-
-            IQuery q = CurrentSession.CreateQuery(
-                "from ExceptionLog el where el.Date > :initDate order by el.Id desc");
-            q.SetParameter("initDate", initDate);
-            return q.List<ExceptionLog>();
-        }
-
-        public ExceptionLog GetException(int exceptionId)
-        {
-            IQuery q = CurrentSession.CreateQuery("from ExceptionLog el where el.Id = :exceptionId");
-            q.SetParameter("exceptionId", exceptionId);
-            var exception = q.UniqueResult<ExceptionLog>();
-            return exception;
-        }
-
-        public IEnumerable<string> GetDistinctExceptionServers()
-        {
-            IQuery q = CurrentSession.CreateQuery("select distinct el.Server from ExceptionLog el order by el.Server");
-            return q.List<string>();
-        }
-
-
         public IndicatorMetadataTextValue GetMetadataTextValueForAnIndicatorById(int indicatorId, int profileId)
         {
             return CurrentSession.CreateCriteria<IndicatorMetadataTextValue>()
@@ -595,37 +579,55 @@ namespace Fpm.ProfileData
                 .UniqueResult<IndicatorMetadataTextValue>();
         }
 
-        public IList<Document> GetDocuments(int profileId)
+        public IList<Document> GetDocumentsWithoutFileData(int profileId)
         {
-            return CurrentSession.CreateCriteria<Document>()
-                    .Add(Restrictions.Eq("ProfileId", profileId))
-                    .List<Document>();
+            ProjectionList projectionList = GetDocumentProjectionListWithoutFileData();
+
+            var documents = CurrentSession.QueryOver<Document>()
+            .Where(x => x.ProfileId == profileId)
+            .Select(projectionList)
+            .TransformUsing(Transformers.AliasToBean<Document>())
+            .List<Document>();
+
+            return documents;
         }
 
-        public Document GetDocument(int id)
+        public Document GetDocumentWithoutFileData(int id)
         {
-            Document documentTypeCast = null; // used for transforming object[] to DocumentType via Transform
+            ProjectionList projectionList = GetDocumentProjectionListWithoutFileData();
+
             var doc = CurrentSession.QueryOver<Document>()
             .Where(d => d.Id == id)
-            .Select(
-                    Projections.Property<Document>(d => d.Id).WithAlias(() => documentTypeCast.Id),
-                    Projections.Property<Document>(d => d.ProfileId).WithAlias(() => documentTypeCast.ProfileId),
-                    Projections.Property<Document>(d => d.FileName).WithAlias(() => documentTypeCast.FileName),
-                    Projections.Property<Document>(d => d.FileData).WithAlias(() => documentTypeCast.FileData),
-                    Projections.Property<Document>(d => d.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn),
-                    Projections.Property<Document>(d => d.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy)
-            )
+            .Select(projectionList)
             .TransformUsing(Transformers.AliasToBean<Document>())
             .SingleOrDefault<Document>();
 
             return doc;
         }
 
-        public IList<Document> GetDocuments(string fileName)
+        public IList<Document> GetDocumentsWithoutFileData(string fileName)
         {
-            return CurrentSession.CreateCriteria<Document>()
-                .Add(Restrictions.Eq("FileName", fileName))
+            ProjectionList projectionList = GetDocumentProjectionListWithoutFileData();
+
+            var documents = CurrentSession.QueryOver<Document>()
+                .Where(x => x.FileName == fileName)
+                .Select(projectionList)
+                .TransformUsing(Transformers.AliasToBean<Document>())
                 .List<Document>();
+
+            return documents;
+        }
+
+        private ProjectionList GetDocumentProjectionListWithoutFileData()
+        {
+            Document documentTypeCast = null;
+
+            return Projections.ProjectionList()
+                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
+                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
+                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
+                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
+                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
         }
 
         public IEnumerable<SpineChartMinMaxLabel> GetSpineChartMinMaxLabelOptions()

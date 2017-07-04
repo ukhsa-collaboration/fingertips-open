@@ -23,8 +23,8 @@ namespace PholioVisualisation.DataConstruction
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId);
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetParentAreaTypeIdsUsedForChildAreaType(int childAreaTypeId);
-        IList<int> GetCategoryTypeIdsUsedInProfile(int profileId);
-        IList<int> GetCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
+        IList<int> GetCategoryTypeIdsForExport();
+        IList<int> GetParentCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetCategoryTypeIdsUsedForChildAreaType(int childAreaTypeId);
     }
 
@@ -149,15 +149,16 @@ namespace PholioVisualisation.DataConstruction
             return parentAreaTypeIds;
         }
 
-        public IList<int> GetCategoryTypeIdsUsedInProfile(int profileId)
+        public IList<int> GetCategoryTypeIdsForExport()
         {
-            var parentAreaGroups = areasReader.GetParentAreaGroupsForProfile(profileId)
-                .Where(x => x.CategoryTypeId != null);
-
-            return SelectDistinctCategoryTypeIds(parentAreaGroups);
+            return areasReader
+                .GetAllCategoryTypes()
+                .Where(x => CategoryTypeIdsExcludedForExport.Ids.Contains(x.Id) == false)
+                .Select(x => x.Id)
+                .ToList();
         }
 
-        public IList<int> GetCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId)
+        public IList<int> GetParentCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId)
         {
             var parentAreaGroups = areasReader.GetParentAreaGroupsForProfile(profileId)
                 .Where(x => x.CategoryTypeId != null && x.ChildAreaTypeId == childAreaTypeId);

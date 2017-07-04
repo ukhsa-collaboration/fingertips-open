@@ -38,24 +38,8 @@ namespace FingertipsUploadService.Helpers
             return sb.ToString();
         }
 
-        public static UploadJobError GetSimplePermissionError(Guid jobGuid, List<string> listOfErrors, bool doesIndicatorsExist)
-        {
-            var message = doesIndicatorsExist
-                ? listOfErrors.FirstOrDefault() + " does not have permission"
-                : listOfErrors.FirstOrDefault() + "does not exist";
-
-            var error = new UploadJobError
-            {
-                JobGuid = jobGuid,
-                ErrorType = UploadJobErrorType.PermissionError,
-                ErrorText = message
-            };
-            return error;
-        }
-
         public static UploadJobError GetBatchPermissionError(Guid jobGuid, List<string> listOfErrors, bool doesAllIndicatorsExist)
         {
-            // var doesIndicatorExist = listOfErrors.Contains(X500DistinguishedName
             var error = new UploadJobError
             {
                 JobGuid = jobGuid,
@@ -66,6 +50,19 @@ namespace FingertipsUploadService.Helpers
 
                 ErrorJson = new JavaScriptSerializer().Serialize(listOfErrors.Take(1000))
             };
+            return error;
+        }
+
+        public static UploadJobError GetSmallNumberWarning(UploadJob job, List<SmallNumberWarning> warnings)
+        {
+            var error = new UploadJobError
+            {
+                JobGuid = job.Guid,
+                ErrorType = UploadJobErrorType.SmallNumberWarning,
+                ErrorText = "Found small number",
+                ErrorJson = new JavaScriptSerializer().Serialize(warnings.Take(1000))
+            };
+
             return error;
         }
 
@@ -115,14 +112,15 @@ namespace FingertipsUploadService.Helpers
 
         public static UploadJobError GetWorkSheetNameValidationError(UploadJob job)
         {
-            const string simpleWorksheetName = @" ""Pholio"" worksheet.";
-            const string batchWorksheetName = @" ""IndicatorDetails"" and ""PholioData"" worksheets.";
-            var simpleOrBatchText = job.JobType == UploadJobType.Simple ? simpleWorksheetName : batchWorksheetName;
-            var errorText = new StringBuilder();
-            errorText.Append("The uploaded spreadsheet must contain");
-            errorText.Append(simpleOrBatchText);
             var error = CreateError(job.Guid, UploadJobErrorType.WorkSheetValidationError,
-                errorText.ToString(), null);
+                "The uploaded spreadsheet must contain \"PHOLIO\" worksheet.", null);
+            return error;
+        }
+
+        public static UploadJobError GetColumnNameValidatoinError(UploadJob job, List<string> columnNames)
+        {
+            var errorText = "Wrong or missing column";
+            var error = CreateError(job.Guid, UploadJobErrorType.WrongColumnError, errorText, new JavaScriptSerializer().Serialize(columnNames));
             return error;
         }
 

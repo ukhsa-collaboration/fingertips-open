@@ -34,7 +34,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             new WaitFor(driver).FingertipsNearestNeighboursMenuToLoad();
 
             // Check the back button text
-            var exitNearestNeighboursText = driver.FindElement(By.Id("goBack")).Text;
+            var exitNearestNeighboursText = driver.FindElement(By.Id("nearest-neighbour-links")).Text;
             TestHelper.AssertTextContains(exitNearestNeighboursText, "Exit nearest neighbours");
             TestHelper.AssertTextContains(exitNearestNeighboursText, "More information");
 
@@ -84,7 +84,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
 
         private void ClickExitNearestNeighboursLink()
         {
-            driver.FindElement(By.Id("goBack")).Click();
+            driver.FindElement(By.Id("exit-nearest-neighbours")).Click();
         }
     }
 }

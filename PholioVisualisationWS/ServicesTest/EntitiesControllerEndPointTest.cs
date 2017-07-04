@@ -83,7 +83,22 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetComparatorMethod()
         {
             byte[] data = DataControllerEndPointTest.GetData("comparator_method?id=" +
-                ComparatorMethodId.SingleOverlappingCIs);
+                ComparatorMethodIds.SingleOverlappingCIs);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetComparators()
+        {
+            byte[] data = DataControllerEndPointTest.GetData("comparators");
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetComparator()
+        {
+            byte[] data = DataControllerEndPointTest.GetData("comparator?id=" +
+                ComparatorIds.Subnational);
             TestHelper.IsData(data);
         }
 

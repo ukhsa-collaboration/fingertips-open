@@ -6,7 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
+using PholioVisualisation.DataAccess;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
+using ServicesWeb.Helpers;
 
 namespace ServicesWeb.Controllers
 {
@@ -33,7 +38,7 @@ namespace ServicesWeb.Controllers
                 nameValues.Add(IndicatorMetadataParameters.ParameterIncludeDefinition, include_definition);
                 nameValues.Add(IndicatorMetadataParameters.ParameterIncludeSystemContent, include_system_content);
 
-                // Redundant parameter
+                // Redundant Parameter
                 nameValues.Add(ParameterNames.GroupIds, string.Empty);
 
                 var parameters = new IndicatorMetadataParameters(nameValues);
@@ -67,6 +72,32 @@ namespace ServicesWeb.Controllers
                 // Redundant parameters
                 nameValues.Add(DataParameters.ParameterIndicatorIds, string.Empty);
                 nameValues.Add(ParameterNames.RestrictToProfileId, string.Empty);
+
+                var parameters = new IndicatorMetadataParameters(nameValues);
+                return new JsonBuilderIndicatorMetadata(parameters).GetIndicatorMetadatas();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets indicator metadata for all the indicators available
+        /// </summary>
+        /// <param name="include_definition">Whether to include the indicator definition in response [yes/no - no is default]</param>
+        /// <param name="include_system_content">Whether to include system content in response [yes/no - no is default]</param>
+        [HttpGet]
+        [Route("indicator_metadata/all")]
+        public Dictionary<int, IndicatorMetadata> GetAllIndicatorMetadata(string include_definition = "",
+            string include_system_content = "")
+        {
+            try
+            {
+                NameValueCollection nameValues = new NameValueCollection();
+                nameValues.Add(IndicatorMetadataParameters.ParameterIncludeDefinition, include_definition);
+                nameValues.Add(IndicatorMetadataParameters.ParameterIncludeSystemContent, include_system_content);
 
                 var parameters = new IndicatorMetadataParameters(nameValues);
                 return new JsonBuilderIndicatorMetadata(parameters).GetIndicatorMetadatas();
@@ -128,6 +159,164 @@ namespace ServicesWeb.Controllers
                 Log(ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets a CSV file of metadata for the specified indicators.
+        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// </summary>
+        /// <param name="indicator_ids">Comma-separated list of indicator IDs</param>
+        /// <param name="profile_id">Profile ID [optional]</param>
+        [HttpGet]
+        [Route("indicator_metadata/csv/by_indicator_id")]
+        public HttpResponseMessage GetIndicatorMetadataFileForIndicatorList(string indicator_ids, int? profile_id = null)
+        {
+            try
+            {
+                var indicatorIds = new IntListStringParser(indicator_ids).IntList;
+
+                var fileBuilder = GetIndicatorMetadataFileBuilder();
+                var fileContent = fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, profile_id);
+
+                if (fileContent != null)
+                {
+                    var filename = SingleEntityFileNamer.IndicatorMetadataFilenameForUser;
+                    return FileResponseBuilder.NewMessage(fileContent, filename);
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets a CSV file of metadata for all the indicators in the specified profile group    
+        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// </summary>
+        /// <param name="group_id">Profile group ID</param>
+        [HttpGet]
+        [Route("indicator_metadata/csv/by_group_id")]
+        public HttpResponseMessage GetIndicatorMetadataFileByProfileGroup(int group_id)
+        {
+            try
+            {
+                var groupingMetadata = ReaderFactory.GetGroupDataReader()
+                    .GetGroupingMetadataList(new List<int> { group_id })
+                    .FirstOrDefault();
+
+                if (groupingMetadata != null)
+                {
+                    var fileContent = GetIndicatorMetadataFileBuilder()
+                        .GetFileForGroups(new List<int> { group_id });
+                    if (fileContent != null)
+                    {
+                        var filename = new SingleEntityFileNamer(groupingMetadata.Name).MetadataFileName;
+                        return FileResponseBuilder.NewMessage(fileContent, filename);
+                    }
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets a CSV file of metadata for all the indicators in the specified profile    
+        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// </summary>
+        /// <param name="profile_id">Profile ID</param>
+        [HttpGet]
+        [Route("indicator_metadata/csv/by_profile_id")]
+        public HttpResponseMessage GetIndicatorMetadataFileByProfile(int profile_id)
+        {
+            try
+            {
+                var filename = SingleEntityFileNamer.GetProfileMetadataFileNameForUser(profile_id);
+                var fileManager = new ExportFileManager(filename);
+
+                // Check whether file is already cached
+                byte[] content = fileManager.TryGetFile();
+                if (content != null)
+                {
+                    return FileResponseBuilder.NewMessage(content, filename);
+                }
+
+                // Create new file
+                var groupIds = new GroupIdProvider(ReaderFactory.GetProfileReader()).GetGroupIds(profile_id);
+                var fileContent = GetIndicatorMetadataFileBuilder()
+                    .GetFileForGroups(groupIds);
+                if (fileContent != null)
+                {
+                    // Save file to cache
+                    fileManager.SaveFile(fileContent);
+                    return FileResponseBuilder.NewMessage(fileContent, filename);
+                }
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets a CSV file of metadata for all the indicators available
+        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// </summary>
+        [HttpGet]
+        [Route("indicator_metadata/csv/all")]
+        public HttpResponseMessage GetIndicatorMetadataFileForAllIndicators()
+        {
+            try
+            {
+                var filename = SingleEntityFileNamer.GetAllMetadataFileNameForUser();
+                var fileManager = new ExportFileManager(filename);
+
+                // Check whether file is already cached
+                byte[] content = fileManager.TryGetFile();
+                if (content != null)
+                {
+                    return FileResponseBuilder.NewMessage(content, filename);
+                }
+
+                var indicatorIds = ReaderFactory.GetGroupDataReader().GetAllIndicators();
+
+                var fileBuilder = GetIndicatorMetadataFileBuilder();
+                var fileContent = fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, null);
+
+                if (fileContent != null)
+                {
+                    // Save file to cache
+                    fileManager.SaveFile(fileContent);
+                    return FileResponseBuilder.NewMessage(fileContent, filename);
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Build this way until have DI framework
+        /// </summary>
+        private IndicatorMetadataFileBuilder GetIndicatorMetadataFileBuilder()
+        {
+            var groupingProvider = new GroupingListProvider(ReaderFactory.GetGroupDataReader(),
+                ReaderFactory.GetProfileReader());
+            return new IndicatorMetadataFileBuilder(IndicatorMetadataProvider.Instance, groupingProvider);
         }
     }
 }

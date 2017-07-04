@@ -29,14 +29,19 @@ namespace PholioVisualisation.Export
             return dataList;
         }
 
-        public List<CoreDataSet> GetDataListForArea(CategoryIdAndAreaCode area)
+        public List<CoreDataSet> GetDataListForArea(CoreDataSet coreData)
         {
             List<CoreDataSet> dataList = new List<CoreDataSet>();
 
             foreach (var subnationalDataList in _multipleAreaDataLists)
             {
                 var data = subnationalDataList
-                    .FirstOrDefault(x => x != null && (x.AreaCode == area.AreaCode || x.CategoryId == area.CategoryId));
+                    .FirstOrDefault(x => 
+                    x.AreaCode == coreData.AreaCode && 
+                    x.CategoryTypeId == coreData.CategoryTypeId &&
+                    x.CategoryId == coreData.CategoryId &&
+                    x.AgeId == coreData.AgeId &&
+                    x.SexId == coreData.SexId);
                 dataList.Add(data ?? CoreDataSet.GetNullObject());
             }
             return dataList;

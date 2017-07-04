@@ -12,7 +12,9 @@
     <property name="IndicatorId" column="indicatorid"/>
     <property name="GroupId" column="groupid"/>
     <property name="PropertyId" column="propertyid"/>
-    <property name="OldText" column="oldtext"/>
+    <property name="OldText" type="StringClob">
+      <column name="oldText" sql-type="text"/>
+    </property>
     <property name="Timestamp" column="timestamp"/>
     <property name="UserName" column="[user]"/>
   </class>

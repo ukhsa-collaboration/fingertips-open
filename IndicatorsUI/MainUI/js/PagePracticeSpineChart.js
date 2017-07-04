@@ -135,7 +135,7 @@ function addSpineChartHeader(h) {
     addTh(h, 'England<br>Value', CSS_VAL);
     addTh(h, 'England<br>Lowest', CSS_VAL);
     addTh(h, '<div class="fl w100" style="position:relative;height:20px;">' + 
-'<div id="info-spinechart" class="infoTooltip" onclick="showSpineInfo()" title="More information about these charts"></div></div><div style="float:left;width:100%;clear:both;">England Range</div>', 'range');
+'<div id="info-spinechart" class="info-tooltip" onclick="showSpineInfo()" title="More information about these charts"></div></div><div style="float:left;width:100%;clear:both;">England Range</div>', 'range');
     addTh(h, 'England<br>Highest', CSS_VAL);
 
     h.push('<tr></thead>');
@@ -321,7 +321,7 @@ function getBenchmarkImage() {
 };
 
 function setBenchmarkImage() {
-    $('#benchmarkImg').attr('src', FT.url.img + getBenchmarkImage());
+    $('#benchmark-img').attr('src', FT.url.img + getBenchmarkImage());
 };
 
 var spineChartState = {
@@ -419,7 +419,7 @@ function createSpineChartTable(sid, nationalSubgroupData,metadata) {
     var tableId = spineChartState.getTableId(sid);
     
     var h = [];
-    h.push('<table id="', tableId,'" class="spineTable borderedTable" cellspacing="0">');
+    h.push('<table id="', tableId,'" class="spine-table bordered-table" cellspacing="0">');
     addSpineChartHeader(h);
     h.push('<tbody>');
     
@@ -508,7 +508,7 @@ function createSpineChartTable(sid, nationalSubgroupData,metadata) {
     
     h.push('</tbody></table>');
     
-    $('#spineTableBox').append(h.join(''));
+    $('#spine-table-box').append(h.join(''));
     spineChartState.addSubgroup(sid);
     
     return formatItems;

@@ -11,7 +11,7 @@ namespace PholioVisualisation.KeyMessages
             @"In Year 6, {{ObesePercent}}% ({{ObeseCount}}) of children are classified as obese{{SignificanceText}}";
 
         private const string Sentence2Template =
-            @"The rate of alcohol-specific hospital stays among those under 18 was {{NoOfStays}}{{SignificanceText}} This represents {{StaysPerYear}} stays per year.";
+            @"The rate of alcohol-specific hospital stays among those under 18 is {{NoOfStays}}{{SignificanceText}} This represents {{StaysPerYear}} stays per year.";
 
         private const string Sentence3Template =
             @"Levels of {{Options}} are {{BetterOrWorse}} than the England average.";
@@ -51,7 +51,7 @@ namespace PholioVisualisation.KeyMessages
 
                 var sentenceData = new Dictionary<string, string>
                 {
-                    {"NoOfStays", NumberCommariser.Commarise1DP(data.Under18AlcoholSpecificHospitalStays.Value)},
+                    {"NoOfStays", NumberCommariser.Commarise0DP(data.Under18AlcoholSpecificHospitalStays.Value)},
                     {"SignificanceText", significanceText},
                     {"StaysPerYear", data.Under18AlcoholSpecificHospitalStaysPerYear}
                 };

@@ -23,7 +23,7 @@ namespace PholioVisualisation.CkanTest.DataTransformation
                 .Returns(new List<int>{
                     AreaTypeIds.CountyAndUnitaryAuthority,
                     AreaTypeIds.DistrictAndUnitaryAuthority});
-            areaTypeListProvider.Setup(x => x.GetCategoryTypeIdsUsedInProfile(ProfileId))
+            areaTypeListProvider.Setup(x => x.GetCategoryTypeIdsForExport())
                 .Returns(new List<int>{CategoryTypeIds.EthnicGroups5});
 
             var parameters = new ProfileParameters(areaTypeListProvider.Object, ProfileId,

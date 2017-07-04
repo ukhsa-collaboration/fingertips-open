@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace PholioVisualisation.RequestParameters
 {
@@ -34,13 +35,18 @@ namespace PholioVisualisation.RequestParameters
         {
             get
             {
-                return GroupIds.Count > 0 || IndicatorIds.Count > 0;
+                return true;
             }
         }
 
         public bool UseIndicatorIds
         {
-            get { return IndicatorIds.Count > 0; }
+            get { return IndicatorIds.Any(); }
+        }
+
+        public bool UseGroupIds
+        {
+            get { return GroupIds.Any(); }
         }
     }
 }

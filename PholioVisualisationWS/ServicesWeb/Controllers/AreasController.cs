@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.ServiceActions;
 using PholioVisualisation.Services;
 using ServicesWeb.Common;
+using ServicesWeb.Helpers;
 
 namespace ServicesWeb.Controllers
 {
@@ -51,7 +56,7 @@ namespace ServicesWeb.Controllers
         ///     Get a list of area types
         /// </summary>
         /// <remarks>
-        /// If the profile_ids parameter is omitted then all defined area types will be returned.
+        /// If the profile_ids Parameter is omitted then all defined area types will be returned.
         /// </remarks>
         /// <param name="profile_ids">List of profile IDs</param>
         [HttpGet]
@@ -80,7 +85,8 @@ namespace ServicesWeb.Controllers
         /// <param name="template_profile_id">ID of the profile to use as template if accessing search results</param>
         [HttpGet]
         [Route("area_types/parent_area_types")]
-        public IList<IAreaType> GetAreaTypesWithParentAreaTypes(int profile_id = ProfileIds.Undefined, int? template_profile_id = null)
+        public IList<IAreaType> GetAreaTypesWithParentAreaTypes(int profile_id = ProfileIds.Undefined,
+            int? template_profile_id = null)
         {
             try
             {
@@ -137,6 +143,41 @@ namespace ServicesWeb.Controllers
             try
             {
                 return new ChildAreasWithAddressesBuilder().Build(parent_area_code, area_type_id);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///     Gets a list of areas and their addresses within a parent area as a CSV file. 
+        /// GP practices are currently the only areas for which addresses are defined.
+        /// </summary>
+        /// <param name="parent_area_code">Parent area code</param>
+        /// <param name="area_type_id">Area type ID</param>
+        [HttpGet]
+        [Route("area_addresses/csv/by_parent_area_code")]
+        public HttpResponseMessage GetChildAreasWithAddressesAsCsv(string parent_area_code, int area_type_id)
+        {
+            try
+            {
+                var cacheFilename = CacheFileNamer.GetAddressFileName(parent_area_code,area_type_id);
+                var fileManager = new ExportFileManager(cacheFilename);
+
+                // Check whether file is already cached
+                var content = fileManager.TryGetFile();
+                if (content == null)
+                {
+                    content = new AddressFileBuilder(ReaderFactory.GetAreasReader())
+                        .GetAddressFile(area_type_id, parent_area_code);
+
+                    fileManager.SaveFile(content);
+                }
+
+                var userFileName = new SingleEntityFileNamer(parent_area_code).AddressesFileName;
+                return FileResponseBuilder.NewMessage(content, userFileName);
             }
             catch (Exception ex)
             {

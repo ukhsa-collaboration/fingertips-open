@@ -92,13 +92,13 @@ namespace PholioVisualisation.DataConstructionTest
             };
 
             var comparatorMap = new ComparatorMap();
-            comparatorMap.Add(new Comparator
+            comparatorMap.Add(new ComparatorDetails
             {
                 Area = AreaFactory.NewArea(areasReader, AreaCodes.Gor_EastOfEngland),
                 ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 ComparatorId = ComparatorIds.Subnational
             });
-            comparatorMap.Add(new Comparator
+            comparatorMap.Add(new ComparatorDetails
             {
                 Area = AreaFactory.NewArea(areasReader, AreaCodes.England),
                 ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,

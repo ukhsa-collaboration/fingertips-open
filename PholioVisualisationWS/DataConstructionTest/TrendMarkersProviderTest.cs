@@ -19,18 +19,21 @@ namespace PholioVisualisation.DataConstructionTest
         public void Test_Trend_Result_Provided_For_Every_Area()
         {
             // Arrange
-            var areaCode1 = AreaCodes.CountyUa_Leicestershire;
-            var areaCode2 = AreaCodes.CountyUa_Bexley;
-
-            var mockTrendReader = new Mock<ITrendDataReader>();
-            mockTrendReader.Setup(x => x.GetTrendData(It.IsAny<Grouping>(), It.IsAny<string>()))
-                .Returns(new List<CoreDataSet> { });
+            const string areaCode1 = AreaCodes.CountyUa_Leicestershire;
+            const string areaCode2 = AreaCodes.CountyUa_Bexley;
 
             var areas = new List<IArea>
             {
                 new Area { Code = areaCode1},
                 new Area { Code = areaCode2}
             };
+
+            var dictionary = new Dictionary<string, IList<CoreDataSet>>();
+            dictionary.Add(areaCode1, new List<CoreDataSet>());
+            dictionary.Add(areaCode2, new List<CoreDataSet>());
+            var mockTrendReader = new Mock<ITrendDataReader>();
+            mockTrendReader.Setup(x => x.GetTrendDataForMultipleAreas(It.IsAny<Grouping>(), It.IsAny<string[]>()))
+                .Returns(dictionary);
 
             var indicatorMetadata = new IndicatorMetadata
             {

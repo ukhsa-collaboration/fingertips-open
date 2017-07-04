@@ -18,6 +18,17 @@
   </class>
 
 
+  <!-- Comparator class -->
+  <class name="Comparator" table="l_comparators">
+
+    <id name="Id" column="comparatorid" type="int" unsaved-value="-1">
+    </id>
+
+    <property name="Name" column="comparator"/>
+
+  </class>
+
+
   <!-- Polarity class -->
   <class name="Polarity" table="l_polarity">
 
@@ -27,7 +38,7 @@
     <property name="Name" column="polarity"/>
 
   </class>
-  
+
   <!-- ParentAreaGroup class -->
   <class name="ParentAreaGroup" table="ws_profileparentareaoptions">
 
@@ -91,6 +102,7 @@
     <property name="BespokeTargetKey" column="bespoketargetkey"/>
     <property name="PolarityId" column="polarityid"/>
     <property name="Description" column="description"/>
+    <property name="LegendHtml" column="legendhtml"/>
 
   </class>
 
@@ -298,7 +310,7 @@
     <property name="ShowLabelOnLeftOfValue" column="showlabelonleftofvalue"/>
 
   </class>
-  
+
   <!-- Year Type class -->
   <class name="YearType" table="l_yeartypes">
 
@@ -309,7 +321,7 @@
     <property name="Name" column="yeartype"/>
 
   </class>
-  
+
   <!-- Value Type class -->
   <class name="ValueType" table="l_valuetypes">
 
@@ -410,7 +422,7 @@
     <property name="Name" column="groupname"/>
     <property name="Sequence" column="sequence"/>
     <property name="ProfileId" column="profileid"/>
-    
+
   </class>
 
 
@@ -436,7 +448,7 @@
     <property name="Sequence" column="sequence"/>
   </class>
 
-  
+
   <!-- ExceptionLog class -->
   <class name="ExceptionForStorage" table="t_exceptions">
     <id name="Id" column="id" type="Int32" unsaved-value="-1">
@@ -489,7 +501,7 @@
       <key column="categorytypeid"  not-null="true"/>
       <one-to-many class="Category" />
     </set>
-    
+
   </class>
 
   <!-- Category -->
@@ -525,7 +537,7 @@
     </id>
     <property name="ChimatWayResourceId" column="ChimatWayResourceId"/>
   </class>
-  
+
 
   <!-- ProfilePdf-->
   <class name="ProfilePdf" table="ui_profilepdfs">
@@ -534,7 +546,7 @@
       <key-property name="AreaTypeId" column="areatypeid" type="int" />
     </composite-id>
   </class>
-  
+
   <!-- NeighbourMapping -->
   <class name="AreaCodeNeighbourMapping" table="l_areacodeneighbourmapping">
     <id name="Id" column="Id" type="Int32" unsaved-value="-1">
@@ -544,8 +556,28 @@
     <property name="Position" column="position" />
     <property name="NeighbourAreaCode" column="NeighbourAreaCode" />
     <property name="NeighbourTypeId" column="NeighbourTypeId" />
-  </class> 
-  
+  </class>
+
+
+  <!-- SSRSReport -->
+  <class name="SSRSReport" table="ssrs_reports">
+    <id name="Id" column="Id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="name" />
+    <property name="Parameters" column="parameters" />
+  </class>
+
+  <!-- SSRSReport Mapping -->
+  <class name="SSRSReportsProfileMapping" table="SSRS_ReportsProfileMapping">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="ReportId" column="reportid" />
+    <property name="ProfileId" column="profileid" />
+  </class>
+
   <!-- Get Nearby Practices by calling stored procedure  -->
   <sql-query name="GetNearbyGpPractice_SP">
     <query-param name="easting" type="string"/>
@@ -567,7 +599,7 @@
   <sql-query name="SelectIndicatorsChangedWithPreviousDays">
     exec usp_select_indicators_changed_with_previous_days :days
   </sql-query>
-  
+
   <!-- SQL Queries -->
   <sql-query name="GetCoreDataSetCount">
     SELECT COUNT(*)
@@ -611,7 +643,7 @@
     FROM dbo.l_areas t1
     INNER JOIN dbo.L_AreaMapping t2 ON t1.AreaCode = t2.ParentLevelGeographyCode
     INNER JOIN dbo.l_areas t3 on t3.AreaCode = t2.ChildLevelGeographyCode
-    WHERE t1.areatypeid in (:childAreaTypeId) AND t3.iscurrent = 1
+    WHERE t1.areatypeid in (:parentAreaTypeIds) AND t3.areatypeid in (:childAreaTypeIds) AND t3.iscurrent = 1
   </sql-query>
 
   <sql-query name="GetParents">
@@ -620,12 +652,6 @@
     INNER JOIN dbo.L_AreaMapping t2 ON t1.AreaCode = t2.ParentLevelGeographyCode
     INNER JOIN dbo.l_areas t3 on t3.AreaCode = t2.ChildLevelGeographyCode
     WHERE t3.areacode = :childAreaCode AND t3.iscurrent = 1
-  </sql-query>
-
-  <sql-query name="GetQuinaryPopulationLabels">
-    SELECT Age
-    FROM dbo.L_Ages
-    WHERE (AgeID BETWEEN 4 AND 19) OR (AgeID IN (28,21,281,282))
   </sql-query>
 
   <sql-query name="GetChildAreaCount">
@@ -683,6 +709,13 @@
     LEFT JOIN UI_SiteSkins skn ON uip.skin_id = skn.id
     WHERE IndicatorID IN (:indicatorIds) AND AreaTypeID = :areaTypeId
     ORDER BY uip.name
+  </sql-query>
+
+  <sql-query name="GetExceededOverriddenIndicatorMetadataTextValues">
+    SELECT [IndicatorID],[ProfileId],count([1_Name])
+    FROM [IndicatorMetadataTextValues]
+    group by IndicatorID, profileid
+    having count([1_Name]) > 1
   </sql-query>
 
 </hibernate-mapping>

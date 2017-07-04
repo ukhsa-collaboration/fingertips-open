@@ -21,7 +21,10 @@ namespace PholioVisualisation.FormattingTest
         public void TestFactoryMethod()
         {
             Assert.IsTrue(NumericFormatterFactory.NewWithLimits(GetMetadata(), null) is ProportionFormatter);
-            Assert.IsFalse(NumericFormatterFactory.NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.CrudeRate }, new IndicatorStatsPercentiles { Max = 1 }) is ProportionFormatter);
+            Assert.IsFalse(NumericFormatterFactory.NewWithLimits(new IndicatorMetadata
+            {
+                ValueTypeId = (int)ValueTypeId.CrudeRate
+            }, new IndicatorStatsPercentiles { Max = 1 }) is ProportionFormatter);
         }
 
         [TestMethod]
@@ -31,8 +34,33 @@ namespace PholioVisualisation.FormattingTest
             IndicatorStatsPercentilesFormatted stats = formatter.FormatStats(null);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Min);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Max);
+            Assert.AreEqual(NumericFormatter.NoValue, stats.Median);
+            Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile5);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile25);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile75);
+            Assert.AreEqual(NumericFormatter.NoValue, stats.Percentile95);
+        }
+
+        /// <summary>
+        /// Only want formatting to happen once. Otherwise may get formatting of truncated values.
+        /// </summary>
+        [TestMethod]
+        public void TestCanOnlyFormatOnce()
+        {
+            CoreDataSet data = new CoreDataSet
+            {
+                Value = 1
+            };
+
+            // Format first time
+            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            formatter.Format(data);
+            Assert.AreEqual("1.0", data.ValueFormatted);
+
+            // Once formatted then cannot be reformatted
+            data.Value = 2;
+            formatter.Format(data);
+            Assert.AreEqual("1.0", data.ValueFormatted);
         }
 
         [TestMethod]
@@ -65,8 +93,10 @@ namespace PholioVisualisation.FormattingTest
             {
                 Min = 0.111,
                 Max = 0.111,
+                Percentile5 = 0,
                 Percentile25 = 0,
-                Percentile75 = 0
+                Percentile75 = 0,
+                Percentile95 = 0,
             };
 
             NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
@@ -186,8 +216,11 @@ namespace PholioVisualisation.FormattingTest
             {
                 Min = 45.11,
                 Max = 89.34,
+                Median = 63,
+                Percentile5 = 52.765,
                 Percentile25 = 54,
-                Percentile75 = 75.88888
+                Percentile75 = 75.88888,
+                Percentile95 = 81
             };
 
             NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.Proportion }, statsPercentiles);
@@ -195,8 +228,11 @@ namespace PholioVisualisation.FormattingTest
 
             Assert.AreEqual("45.1", statsFormatted.Min);
             Assert.AreEqual("89.3", statsFormatted.Max);
+            Assert.AreEqual("63.0", statsFormatted.Median);
+            Assert.AreEqual("52.8", statsFormatted.Percentile5);
             Assert.AreEqual("54.0", statsFormatted.Percentile25);
             Assert.AreEqual("75.9", statsFormatted.Percentile75);
+            Assert.AreEqual("81.0", statsFormatted.Percentile95);
         }
 
         [TestMethod]
@@ -262,19 +298,6 @@ namespace PholioVisualisation.FormattingTest
             AssertValueAsExpected(statsPercentiles, "2.43", 2.432154729525536);
         }
 
-        private static void AssertValueAsExpected(IndicatorStatsPercentiles statsPercentiles, string expected, double val)
-        {
-
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
-
-            CoreDataSet data = new CoreDataSet
-            {
-                Value = val
-            };
-            formatter.Format(data);
-            Assert.AreEqual(expected, data.ValueFormatted);
-        }
-
         [TestMethod]
         public void TestFormatProportionsCloseTo100()
         {
@@ -288,6 +311,19 @@ namespace PholioVisualisation.FormattingTest
             AssertValueAsExpected(statsPercentiles, "100", 99.9999999);
             AssertValueAsExpected(statsPercentiles, "100", 99.95);
             AssertValueAsExpected(statsPercentiles, "99.9", 99.94);
+        }
+
+        private static void AssertValueAsExpected(IndicatorStatsPercentiles statsPercentiles, string expected, double val)
+        {
+
+            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+
+            CoreDataSet data = new CoreDataSet
+            {
+                Value = val
+            };
+            formatter.Format(data);
+            Assert.AreEqual(expected, data.ValueFormatted);
         }
     }
 }

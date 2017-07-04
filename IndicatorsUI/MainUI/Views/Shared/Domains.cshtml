@@ -9,13 +9,13 @@
 {
     var width = Math.Round(99.0 / headings.Count, 2);
     // NOTE - this is a table so that the domains never wrap onto a second line
-    <div id="domainBox" class="clearfix">
+    <div id="domain-box" class="clearfix">
         <table>
             <tbody>
                 <tr>
                     @foreach (var c in headings)
                     {
-                        <td id="domain@(c.GroupId)" class="domainOption" style="width:@(width)%;" onclick="domainClicked(@(c.GroupId))">
+                        <td id="domain@(c.GroupId)" class="domain-option" style="width:@(width)%;" onclick="domainClicked(@(c.GroupId))">
                             @c.SubHeading
                         </td>
                     }

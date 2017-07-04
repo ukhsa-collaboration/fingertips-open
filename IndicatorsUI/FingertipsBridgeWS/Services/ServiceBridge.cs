@@ -9,7 +9,7 @@ namespace FingertipsBridgeWS.Services
 {
     public class ServiceBridge
     {
-        public const string ContentTypeJson = "application/json";
+        public const string ContentTypeJson = "application/json; charset=utf-8";
 
         private JsonWebCache webCache;
         private bool isResponseOk = true;

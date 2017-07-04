@@ -80,12 +80,10 @@
     <Compile Include="CkanTestDIRegistry.cs" />
     <Compile Include="Exceptions\CkanErrorFinderTest.cs" />
     <Compile Include="IntegrationTests\CkanApiIntegrationTest.cs" />
-    <Compile Include="DataTransformation\CkanFileNamerTest.cs" />
     <Compile Include="DataTransformation\CkanFrequencyTest.cs" />
     <Compile Include="CkanTestHelper.cs" />
     <Compile Include="DataTransformation\CkanResourceUploaderTest.cs" />
     <Compile Include="DataTransformation\CsvWriterTest.cs" />
-    <Compile Include="DataTransformation\LookUpManagerTest.cs" />
     <Compile Include="DataTransformation\PackageIdProviderTest.cs" />
     <Compile Include="IntegrationTests\CkanGroupValidationTest.cs" />
     <Compile Include="Model\CkanGroupTest.cs" />

@@ -5,6 +5,18 @@ namespace PholioVisualisation.DataConstruction
 {
     public class AreaFactory
     {
+        private IAreasReader _areasReader;
+
+        public AreaFactory(IAreasReader areasReader)
+        {
+            _areasReader = areasReader;
+        }
+
+        public IArea NewArea(string areaCode)
+        {
+            return NewArea(_areasReader, areaCode);
+        }
+
         public static IArea NewArea(IAreasReader areasReader, string areaCode)
         {
             if (areaCode == null)

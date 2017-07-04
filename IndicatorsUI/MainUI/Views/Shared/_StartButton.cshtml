@@ -1,27 +1,22 @@
-﻿@using Profiles.MainUI.Models
+﻿@using Profiles.DomainObjects
+@using Profiles.MainUI.Models
 @model PageModel
 @if (Model.HasAnyData)
 {
-    if (Model.DefaultFingertipsTabId == -1)
+    var urlKey = ViewBag.ProfileUrlKey;
+    string href;
+    if (Model.ProfileId == ProfileIds.Phof)
     {
-        <div class="start-button">
-            <div class="btn">
-                <a href="/profile/@ViewBag.ProfileUrlKey/data" title="START Go to the data">
-                    START
-                    <p>Go to the data</p>
-                </a>
-            </div>
-        </div>
+        href = string.Format("/{0}#gid/{1}", urlKey, GroupIds.Phof_OverarchingIndicators);
+    }
+    else if (Model.DefaultFingertipsTabId == -1)
+    {
+        href = string.Format("/profile/{0}/data", urlKey);
     }
     else
     {
-        <div class="start-button">
-            <div class="btn">
-                <a href="/profile/@ViewBag.ProfileUrlKey/data#page/@Model.DefaultFingertipsTabId" title="START Go to the data">
-                    START
-                    <p>Go to the data</p>
-                </a>
-            </div>
-        </div>
+        href = string.Format("/profile/{0}/data#page/{1}", urlKey, Model.DefaultFingertipsTabId);
     }
+
+    @Html.Partial("_StartButtonForHref", href)
 }

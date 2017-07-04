@@ -21,18 +21,7 @@
 }
 
 #spinner {
-    width: 100%;
-    height: 214px;
-}
-
-#spinnerLabel {
-    top: 75px;
-    left:315px
-}
-
-img.spinner {
-    top: 40px;
-    left: 315px;
+    margin: 58px 0;
 }
 
 
@@ -42,7 +31,7 @@ img.spinner {
 
 table.area-search-results {
     border-collapse: collapse;
-    margin: 0 0 18px 11px;
+    margin: 0 0 18px 1px;
     float: left;
     clear: both;
 }
@@ -74,6 +63,11 @@ table.area-search-results {
     font-size: 18px;
     float: left;
     clear: both;
+}
+
+
+#area-results-box .tab-options div {
+    padding-left: 0;
 }
 
 ul#no-matches-found {

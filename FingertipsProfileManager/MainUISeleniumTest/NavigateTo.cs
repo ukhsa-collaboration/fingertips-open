@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using Fpm.MainUI.Helpers;
 
 namespace Fpm.MainUISeleniumTest
@@ -29,14 +24,19 @@ namespace Fpm.MainUISeleniumTest
             GoToUrl("profilemanager");
         }
 
+        public void ProfilesForNonAdminPage()
+        {
+            GoToUrl("profile/EditProfileNonAdmin");
+        }
+
         public void ContentIndexPage()
         {
-            GoToUrl("content");
+            GoToUrl("content/content-index");
         }
 
         public void UserIndexPage()
         {
-            GoToUrl("user");
+            GoToUrl("user/user-index");
         }
 
         public void GoToUrl(string relativeUrl)

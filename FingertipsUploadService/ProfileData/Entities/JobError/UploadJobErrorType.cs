@@ -7,6 +7,8 @@ namespace FingertipsUploadService.ProfileData.Entities.JobError
         WorkSheetValidationError = 40002,
         DuplicateRowInSpreadsheetError = 40003,
         DuplicateRowInDatabaseError = 40004,
-        ValidationFailureError = 40005
+        ValidationFailureError = 40005,
+        SmallNumberWarning = 40006,
+        WrongColumnError = 40007
     }
 }

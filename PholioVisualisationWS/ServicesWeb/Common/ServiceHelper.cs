@@ -2,6 +2,11 @@
 {
     public class ServiceHelper
     {
+        public static bool ParseYesOrNo(string yesOrNoString)
+        {
+            return ParseYesOrNo(yesOrNoString, false);
+        }
+
         public static bool ParseYesOrNo(string yesOrNoString, bool defaultBool)
         {
             if (string.IsNullOrWhiteSpace(yesOrNoString))

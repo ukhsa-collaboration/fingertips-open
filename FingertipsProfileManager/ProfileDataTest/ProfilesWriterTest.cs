@@ -308,7 +308,7 @@ namespace Fpm.ProfileDataTest
             var writer = ReaderFactory.GetProfilesWriter();
 
             // get copy from database
-            var docFromDb = reader.GetDocuments(ProfileIds.Diabetes).First();
+            var docFromDb = reader.GetDocumentsWithoutFileData(ProfileIds.Diabetes).First();
            
             // clone and update fields 
             var docToUpdate = new Document
@@ -325,9 +325,8 @@ namespace Fpm.ProfileDataTest
             writer.UpdateDocument(docToUpdate);
 
             // get cloned copy from datas
-            var updatedDoc = reader.GetDocument(docToUpdate.Id);
+            var updatedDoc = reader.GetDocumentWithoutFileData(docToUpdate.Id);
 
-            Assert.AreNotEqual(updatedDoc.FileData, docFromDb.FileData);
             Assert.AreNotEqual(updatedDoc.UploadedOn, docFromDb.UploadedOn);
         }
 

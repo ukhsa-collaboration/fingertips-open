@@ -1,0 +1,53 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
+
+<h3>Tabs</h3>
+
+<div class="row form-group">
+    <label class="col-md-1 col-form-label">Map</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsMapTab)
+    </div>
+
+    <label class="col-md-1 col-form-label">England</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsEnglandTab)
+    </div>
+
+    <label class="col-md-1 col-form-label">Population</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsPopulationTab)
+    </div>
+
+    <label class="col-md-1 col-form-label">Inequalities</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsInequalitiesTab)
+    </div>
+</div>
+
+<div class="row form-group">
+    <label class="col-md-1 col-form-label">Compare indicators</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsScatterPlotTab,
+            TooltipHelper.GetTooltipRight("Scatter plot for comparing two indicators"))
+    </div>
+
+    <label class="col-md-1 col-form-label">Box plot</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsBoxPlotTab)
+    </div>
+
+    <label class="col-md-1 col-form-label">Reports</label>
+    <div class="col-md-1">
+        @Html.CheckBoxFor(model => model.IsReportsTab,
+            TooltipHelper.GetTooltipRight("SSRS reports tab [work in progress]"))
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-1 col-form-label">Compare areas</label>
+        <div class="col-md-3">
+            @Html.DropDownListFor(m => m.CompareAreasOption, null)
+        </div>
+    </div>
+
+</div>

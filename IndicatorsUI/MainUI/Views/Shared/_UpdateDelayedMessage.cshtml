@@ -1,10 +1,8 @@
 ﻿@model Profiles.MainUI.Models.PageModel
 @if (Model.IsOfficialStatistics && ViewBag.ShowUpdateDelayedMessage)
 {
-    <div id="note-box" class="col-md-12">
-        <div class="alert alert-info fade in">
-            <a href="#" class="close" data-dismiss="alert">&times;</a>
-            <strong>Note!</strong> Today's update has been delayed for technical reasons. We hope to publish it shortly.
-        </div>
+    <div id="update-delayed" class="alert alert-info col-md-12">
+        <a href="#" class="close" data-dismiss="alert">&times;</a>
+        Today's update has been delayed for technical reasons.<br>We hope to publish it shortly.
     </div>
 }

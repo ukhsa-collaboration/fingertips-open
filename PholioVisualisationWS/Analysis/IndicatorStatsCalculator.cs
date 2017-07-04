@@ -23,8 +23,11 @@ namespace PholioVisualisation.Analysis
                            {
                                Min = Min,
                                Max = Max,
+                               Median = CalculatePercentile(0.5),
+                               Percentile5 = CalculatePercentile(0.05),
                                Percentile25 = CalculatePercentile(0.25),
-                               Percentile75 = CalculatePercentile(0.75)
+                               Percentile75 = CalculatePercentile(0.75),
+                               Percentile95 = CalculatePercentile(0.95)
                            };
             }
             return null;

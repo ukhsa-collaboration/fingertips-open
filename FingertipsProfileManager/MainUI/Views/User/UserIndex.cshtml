@@ -1,56 +1,57 @@
-﻿@using Fpm.MainUI
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
 @model Fpm.MainUI.Models.UserGridModel
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
 @{
     ViewBag.Title = "FPM - User Manager";
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
-<script src="@(AppConfig.JsPath)user-management.js" type="text/javascript"></script>
+@Scripts.Render("~/user.js")
 
 <div class="standardWidth">
-    @using (Html.BeginForm("ReloadUserItems", "User", FormMethod.Get, new { id = "UserManagementForm" }))
-    {
-        <h2 class="subheading">Users of FPM</h2>
+
+    <h2 class="subheading">Users of FPM</h2>
 
     <div class="button-box clearfix">
         <input type="button" value="New User" onclick="location.href='@Url.Action("CreateUser", "User")    '" />
         <input type="button" id="audit_history" value="Show History" />
     </div>
 
-        if (Model.UserGrid.Any())
-        {
-        <table class="grid sortable" id="userTable">
-            <thead>
-                <tr>
-                    <th class="header">User Name</th>
-                    <th class="header">Display Name</th>
-                    <th class="header">Is Administrator</th>
-                    <th>Select @Html.CheckBox("select-all", false, new { @class = "select-all-check-box" })
-                    </th>
-                </tr>
-            </thead>
-            @foreach (var item in Model.UserGrid)
+    @if (Model.UserGrid.Any())
+    {
+    <table class="grid sortable" id="userTable">
+        <thead>
+            <tr>
+                <th class="header">User Name</th>
+                <th class="header">Display Name</th>
+                <th class="header">Is Administrator</th>
+                <th>
+                    Select @Html.CheckBox("select-all", false, new { @class = "select-all-check-box" })
+                </th>
+            </tr>
+        </thead>
+        @foreach (var item in Model.UserGrid)
             {
-                <tr>
-                    <td class="left">
-                       @item.UserName.ToLower()
-                    </td>
-                    <td class="left">
-                        @Html.ActionLink(item.DisplayName, "EditUser", new { userId = item.Id }, new { @class = "user-link" })
-                    </td>
-                    <td class="left">
-                        @Html.Label(item.IsAdministrator ? "Yes" : "No" )
-                    </td>
-                    <td class="center">@Html.CheckBox(item.Id + "_selected", false, new { @class = "indicator-check-box", @value = item.Id })
-                    </td>
-                </tr>
-            }
-        </table>
+            <tr>
+                <td class="left">
+                    @item.UserName.ToLower()
+                </td>
+                <td class="left">
+                    @Html.ActionLink(item.DisplayName, "EditUser", new { userId = item.Id }, new { @class = "user-link" })
+                </td>
+                <td class="left">
+                    @Html.Label(item.IsAdministrator ? "Yes" : "No")
+                </td>
+                <td class="center">
+                    @Html.CheckBox(item.Id + "_selected", false, new { @class = "indicator-check-box", @value = item.Id })
+            </td>
+        </tr>
         }
-        else
-        {
-        <label>No users have been created.</label> 
-        }
+    </table>
+    }
+    else
+    {
+    <label>No users have been created.</label>
     }
 </div>
 

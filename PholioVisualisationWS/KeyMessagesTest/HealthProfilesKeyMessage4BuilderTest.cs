@@ -823,9 +823,7 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Same,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
-                    AdultExcessWinterDeathsSig = Significance.Better,
+                    AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
                 }
@@ -846,8 +844,6 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -870,8 +866,6 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
                     AdultLongTermUnemploymentSig = Significance.Worse,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -891,10 +885,8 @@ namespace PholioVisualisation.KeyMessagesTest
                 data = new KeyMessageData
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
-                    AdultViolentCrimeSig = Significance.Worse,
+                    AdultViolentCrimeSig = Significance.Better,
                     AdultLongTermUnemploymentSig = Significance.Worse,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Worse,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -902,7 +894,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Worse);
             Assert.AreEqual(
-                "Rates of statutory homelessness, violent crime, long term unemployment and new cases of malignant melanoma are worse than average.",
+                "Rates of statutory homelessness and long term unemployment are worse than average.",
                 sentence);
         }
 
@@ -916,8 +908,6 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Better,
                     AdultViolentCrimeSig = Significance.Better,
                     AdultLongTermUnemploymentSig = Significance.Better,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -943,8 +933,6 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
                     AdultLongTermUnemploymentSig = Significance.Worse,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Worse,
                     AdultExcessWinterDeathsSig = Significance.Worse,
                     AdultUnder75MortalityRateCvdSig = Significance.Worse,
                     AdultUnder75MortalityRateCancerSig = Significance.Worse,
@@ -966,9 +954,7 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Better,
                     AdultViolentCrimeSig = Significance.Same,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Same,
-                    AdultExcessWinterDeathsSig = Significance.Worse,
+                    AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Worse,
                     AdultUnder75MortalityRateCancerSig = Significance.Worse,
                 }
@@ -987,10 +973,8 @@ namespace PholioVisualisation.KeyMessagesTest
                 data = new KeyMessageData
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
-                    AdultViolentCrimeSig = Significance.Worse,
+                    AdultViolentCrimeSig = Significance.Same,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -1010,11 +994,9 @@ namespace PholioVisualisation.KeyMessagesTest
             {
                 data = new KeyMessageData
                 {
-                    AdultStatutoryHomelessnessSig = Significance.Worse,
+                    AdultStatutoryHomelessnessSig = Significance.Same,
                     AdultViolentCrimeSig = Significance.Same,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -1022,7 +1004,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Better);
             Assert.AreEqual(
-                "Rates of deaths from drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
+                "Rates of excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
                 sentence);
         }
 
@@ -1036,8 +1018,6 @@ namespace PholioVisualisation.KeyMessagesTest
                     AdultStatutoryHomelessnessSig = Significance.Same,
                     AdultViolentCrimeSig = Significance.Same,
                     AdultLongTermUnemploymentSig = Significance.Same,
-                    AdultIncidenceOfMalignantMelanomaSig = Significance.Same,
-                    AdultDrugMisuseSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -1045,7 +1025,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Better);
             Assert.AreEqual(
-                "Rates of deaths from drug misuse, excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
+                "Rates of excess winter deaths, early deaths from cardiovascular diseases and early deaths from cancer are better than average.",
                 sentence);
         }
 

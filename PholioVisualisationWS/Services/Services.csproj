@@ -110,7 +110,6 @@
     <Compile Include="JsonBuilderGroupRoots.cs" />
     <Compile Include="DataDownloadBespoke.cs" />
     <Compile Include="ExportHelper.cs" />
-    <Compile Include="HttpHandlers\GetDataDownload.cs" />
     <Compile Include="HttpHandlers\GetData.cs" />
     <Compile Include="HttpHandlers\GetTrendDataBySearch.cs" />
     <Compile Include="JsonBuilderAreaAddress.cs" />
@@ -135,6 +134,10 @@
     <Compile Include="JsonBuilderTrendDataBySearch.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>
       <Name>ExceptionLogger</Name>

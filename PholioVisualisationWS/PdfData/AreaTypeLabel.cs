@@ -13,7 +13,7 @@ namespace PholioVisualisation.PdfData
     public class AreaTypeLabel
     {
         public const string County = "County";
-        public const string UnitaryAuthority = "Unitary Authority";
+        public const string UnitaryAuthority = "Unitary authority";
         public const string District = "District";
 
         public static string GetLabelFromAreaCode(string areaCode)

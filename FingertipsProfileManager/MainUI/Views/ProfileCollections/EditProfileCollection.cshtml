@@ -1,0 +1,60 @@
+﻿@model Fpm.ProfileData.Entities.Profile.ProfileCollection
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Edit Profile Collection";
+}
+@Html.Partial("_ProfileCollectionIncludes")
+
+<div class="standardWidth container">
+
+    <div class="row col-md-12">
+        <h2 class="subheading">Edit profile collection</h2>
+    </div>
+
+    @using (Html.BeginForm("UpdateProfileCollection", "ProfileCollections", FormMethod.Post, new {id = "UpdateProfileCollection"}))
+    {
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.ReturnUrl)
+        @Html.Hidden("assignedProfiles", new {id = "assignedProfiles", name = "assignedProfiles"})
+
+        @Html.Partial("_ProfileCollectionDetails")
+
+        <div class="row col-md-12">
+            <input class="btn btn-primary" id="update_profile_collection" type="button" value="Update"/>
+            <input class="btn btn-secondary" id="cancel_profile" type="button" onclick="location.href = '@Model.ReturnUrl'" value="Cancel"/>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8 text-right">
+                <input id="toggle-unchecked-display" class="btn btn-primary" type="button" value="Show/hide included"/>
+            </div>
+            <div class="col-md-8">
+                <table class="grid sortable">
+                    <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>Select</th>
+                        <th>Display Domains?</th>
+                    </tr>
+                    </thead>
+                    @foreach (var profile in Model.ProfileCollectionItems)
+                    {
+                        <tr>
+                            <td class="left">
+                                @Html.ActionLink(profile.profileDetails.Name, "EditProfile", "Profile", new {profileKey = profile.profileDetails.UrlKey}, new {})
+                            </td>
+                            <td class="center">
+                                @Html.CheckBox(profile.ProfileId + "_assigned", profile.Selected,
+                                    new {@class = "selectable-check-box", @value = profile.ProfileId})
+                            </td>
+                            <td class="center">
+                                @Html.CheckBox(profile.ProfileId + "_display_domains", profile.DisplayDomains,
+                                    new {id = profile.ProfileId + "_display_domains", @class = "display-domains-check-box", @value = profile.DisplayDomains})
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        </div>
+    }
+</div>

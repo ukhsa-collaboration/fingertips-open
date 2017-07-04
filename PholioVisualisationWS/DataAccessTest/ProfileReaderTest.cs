@@ -49,10 +49,12 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
-        public void TestCanPdfBeGenerated()
+        public void TestGetProfilePdfs()
         {
-            Assert.IsTrue(Reader().CanPdfBeGenerated(ProfileIds.Phof, AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsFalse(Reader().CanPdfBeGenerated(ProfileIds.Phof, AreaTypeIds.Ccg));
+            var areaTypes = Reader().GetProfilePdfs(ProfileIds.Phof);
+
+            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority));
+            Assert.IsNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority));
         }
 
         [TestMethod]

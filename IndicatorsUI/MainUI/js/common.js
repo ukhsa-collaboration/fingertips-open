@@ -41,7 +41,7 @@ function ajaxGet(service, parameters, successFunction) {
             refreshed after an update */
             data: parameters + '&v=' + FT.version,
             cache: true,
-            contentType: 'application/json',
+            contentType: 'application/json; charset=utf-8',
             success: function (data) {
                 ajaxCache[key] = data;
                 successFunction(data);
@@ -170,7 +170,7 @@ function logError(xhr) {
         type: 'POST',
         url: FT.url.bridge + 'log/exception?' + parameters,
         cache: false,
-        contentType: 'application/json'
+        contentType: 'application/json; charset=utf-8'
     };
 
     $.ajax(ajaxConfig);

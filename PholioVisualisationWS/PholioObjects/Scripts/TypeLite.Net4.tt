@@ -1,0 +1,35 @@
+﻿<#@ template debug="false" hostspecific="True" language="C#" #>
+<#@ assembly name="$(TargetDir)TypeLite.dll" #>
+<#@ assembly name="$(TargetDir)TypeLite.Net4.dll" #>
+<#@ assembly name="$(TargetDir)$(TargetFileName)" #>
+
+<#@ import namespace="TypeLite" #> 
+<#@ import namespace="TypeLite.Net4" #> 
+<#@output extension=".d.ts"#>
+
+ <#@include file="C:\fingertips\PholioVisualisationWS\PholioObjects\Scripts\Manager.ttinclude"#>
+<# var manager = Manager.Create(Host, GenerationEnvironment); #>
+
+<# var ts = TypeScript.Definitions()
+			.For<PholioVisualisation.PholioObjects.Age>()
+			.For<PholioVisualisation.PholioObjects.Grouping>()
+			.For<PholioVisualisation.PholioObjects.GroupingMetadata>()
+			.For<PholioVisualisation.PholioObjects.GroupRoot>()
+			.For<PholioVisualisation.PholioObjects.RootBase>()
+			.For<PholioVisualisation.PholioObjects.CoreDataSet>()
+			.For<PholioVisualisation.PholioObjects.TrendRoot>()
+			.For<PholioVisualisation.PholioObjects.Age>()
+			.For<PholioVisualisation.PholioObjects.Sex>()
+			.For<PholioVisualisation.PholioObjects.Area>()
+			.For<PholioVisualisation.PholioObjects.Unit>()
+			.For<PholioVisualisation.PholioObjects.IndicatorMetadata>()
+			.For<PholioVisualisation.PholioObjects.IndicatorStatsPercentiles>();
+		
+#>
+
+<#= ts.Generate(TsGeneratorOutput.Properties) #>
+
+<# manager.StartNewFile("Enums.ts"); #>
+<#= ts.Generate(TsGeneratorOutput.Enums) #>
+<# manager.EndBlock(); #>
+<# manager.Process(true); #>

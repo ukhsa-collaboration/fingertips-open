@@ -67,7 +67,8 @@ namespace Fpm.ProfileData.Repositories
 
                 var newUserId = (int)CurrentSession.Save(user);
 
-                LogUserChange(newUserId, user.UserName, DateTime.Now, "NewTarget User Created", loggedInUser, user.DisplayName, user.IsAdministrator);
+                LogUserChange(newUserId, user.UserName, DateTime.Now, "User created", loggedInUser, 
+                    user.DisplayName, user.IsAdministrator);
 
                 transaction.Commit();
 
@@ -88,7 +89,8 @@ namespace Fpm.ProfileData.Repositories
 
                 CurrentSession.Update(user);
 
-                LogUserChange(user.Id, user.UserName, DateTime.Now, "User Updated", loggedInUser, user.DisplayName, user.IsAdministrator);
+                LogUserChange(user.Id, user.UserName, DateTime.Now, "User updated", loggedInUser, 
+                    user.DisplayName, user.IsAdministrator);
 
                 transaction.Commit();
 
@@ -132,11 +134,11 @@ namespace Fpm.ProfileData.Repositories
 
         public UserGroupPermissions GetUserGroupPermissions(int profileId,int userId)
         {
-            UserGroupPermissions ugGroupPermissions = null;
+            UserGroupPermissions userGroupPermissions = null;
             try
             {
-                ugGroupPermissions =   CurrentSession.QueryOver<UserGroupPermissions>()
-                    .Where(ugp => ugp.ProfileId == profileId && ugp.UserId == userId)
+                userGroupPermissions =   CurrentSession.QueryOver<UserGroupPermissions>()
+                    .Where(x => x.ProfileId == profileId && x.UserId == userId)
                     .SingleOrDefault();
 
             }
@@ -145,7 +147,7 @@ namespace Fpm.ProfileData.Repositories
                 HandleException(exception);
             }
 
-            return ugGroupPermissions;
+            return userGroupPermissions;
 
         }
     }

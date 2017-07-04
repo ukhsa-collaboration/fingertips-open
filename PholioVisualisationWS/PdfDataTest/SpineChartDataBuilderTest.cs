@@ -12,11 +12,41 @@ namespace PholioVisualisation.PdfDataTest
     [TestClass]
     public class SpineChartDataBuilderTest
     {
+        // Data for testing
         private IList<SpineChartTableData> spineChartTableDataList;
+        private IList<SpineChartTableData> noRecentTrendsSpineChartTableDataList;
+
+        // Constants
         private const string AreaCode1 = AreaCodes.CountyUa_Manchester;
         private const string AreaCode2 = AreaCodes.CountyUa_Cumbria;
         private IList<string> areaCodes = new List<string> { AreaCode1, AreaCode2 };
         private IList<string> benchmarkAreaCodes = new[] { AreaCodes.England, AreaCodes.Gor_EastMidlands };
+
+        [TestMethod]
+        public void TestGetResponse_RecentTrendsAreSet()
+        {
+            foreach (var spineChartTableData in Data())
+            {
+                foreach (var row in spineChartTableData.IndicatorData)
+                {
+                    Assert.IsNotNull(row.AreaRecentTrends);
+                    Assert.IsTrue(row.AreaRecentTrends.Keys.Any());
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestGetResponse_RecentTrendsAreNotSet()
+        {
+            foreach (var spineChartTableData in DataNoRecentTrends())
+            {
+                foreach (var row in spineChartTableData.IndicatorData)
+                {
+                    Assert.IsNotNull(row.AreaRecentTrends);
+                    Assert.IsFalse(row.AreaRecentTrends.Keys.Any());
+                }
+            }
+        }
 
         [TestMethod]
         public void TestGetResponse_DomainTitlesAreSet()
@@ -321,8 +351,15 @@ namespace PholioVisualisation.PdfDataTest
             var practiceCode = AreaCodes.Gp_Sawston;
             var ccgCode = AreaCodes.Ccg_CambridgeshirePeterborough;
 
-            var data = new SpineChartTableDataBuilder().GetDomainDataForProfile(ProfileIds.PracticeProfiles,
-                    AreaTypeIds.GpPractice, new List<string> { practiceCode, ccgCode }, new List<string> { AreaCodes.England });
+            var parameters = new SpineChartDataParameters
+            {
+                ProfileId = ProfileIds.PracticeProfiles,
+                ChildAreaTypeId = AreaTypeIds.GpPractice,
+                AreaCodes = new List<string> { practiceCode, ccgCode },
+                BenchmarkAreaCodes = new List<string> { AreaCodes.England }
+            };
+
+            var data = new SpineChartTableDataBuilder().GetDomainDataForProfile(parameters);
 
             foreach (var spineChartTableData in data)
             {
@@ -388,12 +425,18 @@ namespace PholioVisualisation.PdfDataTest
         [TestMethod]
         public void TestGetResponse_DomainsAreInCorrectOrder()
         {
-            var profileId = ProfileIds.SexualHealth;
-            spineChartTableDataList = new SpineChartTableDataBuilder().GetDomainDataForProfile(
-                profileId, AreaTypeIds.CountyAndUnitaryAuthority, areaCodes, benchmarkAreaCodes);
+            var parameters = new SpineChartDataParameters
+            {
+                ProfileId = ProfileIds.SexualHealth,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaCodes = areaCodes,
+                BenchmarkAreaCodes = benchmarkAreaCodes
+            };
 
-            var groupIds = ReaderFactory.GetProfileReader().GetProfile(profileId).GroupIds;
-            var groupingMetadataList = ReaderFactory.GetGroupDataReader().GetGroupMetadataList(groupIds);
+            spineChartTableDataList = new SpineChartTableDataBuilder().GetDomainDataForProfile(parameters);
+
+            var groupIds = ReaderFactory.GetProfileReader().GetProfile(parameters.ProfileId).GroupIds;
+            var groupingMetadataList = ReaderFactory.GetGroupDataReader().GetGroupingMetadataList(groupIds);
 
             for (var i = 0; i < spineChartTableDataList.Count; i++)
             {
@@ -476,11 +519,39 @@ namespace PholioVisualisation.PdfDataTest
             // All tests are read only so only need to create once
             while (spineChartTableDataList == null)
             {
-                spineChartTableDataList = new SpineChartTableDataBuilder().GetDomainDataForProfile(
-                    ProfileIds.Phof, AreaTypeIds.CountyAndUnitaryAuthority, areaCodes, benchmarkAreaCodes);
+                var parameters = new SpineChartDataParameters
+                {
+                    ProfileId = ProfileIds.Phof,
+                    ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                    AreaCodes = areaCodes,
+                    BenchmarkAreaCodes = benchmarkAreaCodes,
+                    IncludeRecentTrends = true
+                };
+
+                spineChartTableDataList = new SpineChartTableDataBuilder()
+                    .GetDomainDataForProfile(parameters);
             }
 
             return spineChartTableDataList;
+        }
+
+        private IList<SpineChartTableData> DataNoRecentTrends()
+        {
+            // All tests are read only so only need to create once
+            while (noRecentTrendsSpineChartTableDataList == null)
+            {
+                var parameters = new SpineChartDataParameters
+                {
+                    ProfileId = ProfileIds.Amr,
+                    ChildAreaTypeId = AreaTypeIds.Ccg,
+                    AreaCodes = new List<string> { AreaCodes.Ccg_Barnet },
+                    BenchmarkAreaCodes = new List<string> { AreaCodes.England }
+                };
+
+                noRecentTrendsSpineChartTableDataList = new SpineChartTableDataBuilder().GetDomainDataForProfile(parameters);
+            }
+
+            return noRecentTrendsSpineChartTableDataList;
         }
     }
 }

@@ -54,6 +54,12 @@ namespace Fpm.MainUI
         {
             get { return angularAppPath ?? (angularAppPath = GetPath("AngularApps")); }
         }
+
+        public static string GetPholioWs()
+        {
+            return GetAppSetting("CoreWsUrl");
+        }
+
         private static string GetPath(string folderName)
         {
             string version = GetAppSetting("JavaScriptVersionFolder");

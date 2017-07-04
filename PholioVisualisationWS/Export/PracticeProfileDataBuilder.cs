@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 using SpreadsheetGear;
 
@@ -25,21 +26,18 @@ namespace PholioVisualisation.Export
         // Must be set before BuildWorkbook called
         public List<int> GroupIds { get; set; }
         public string AreaCode { get; set; }
-        public int AreaTypeId { get; set; }
-
-        private bool usePopulationData;
+        public int ParentAreaTypeId { get; set; }
 
         /// <summary>
         /// Creates instance to export population data.
         /// </summary>
-        public PracticeProfileDataBuilder(bool usePopulationData)
+        public PracticeProfileDataBuilder()
         {
-            this.usePopulationData = usePopulationData;
         }
 
         public override IWorkbook BuildWorkbook()
         {
-            writer = new PracticeProfileDataWriter(AreaTypeId);
+            writer = new PracticeProfileDataWriter(ParentAreaTypeId);
 
             CheckParameters();
 
@@ -55,14 +53,14 @@ namespace PholioVisualisation.Export
             writer.AddParentsToPracticeSheet(practiceCodeToParentMap, false);
             IEnumerable<Area> parentAreas = GetUniqueAreaCodesOfValues(practiceCodeToParentMap);
             parentAreas = from a in parentAreas orderby a.Name select a;
-            writer.AddAreaNamesCodestoParentAreaSheet(parentAreas, AreaTypeId);
+            writer.AddAreaNamesCodestoParentAreaSheet(parentAreas, ParentAreaTypeId);
 
             coreDataSetProviderFactory = new CoreDataSetProviderFactory
             {
                 CcgPopulationProvider = new CcgPopulationProvider(pholioReader)
             };
          
-            metadataList = usePopulationData ? AddPopulationData(area, parentAreas) : AddTopicData(area, parentAreas);               
+            metadataList = AddPopulationData(area, parentAreas);               
 
             writer.AddIndicatorMetadata(metadataList);
             AddPracticeAddresses(area, practiceCodes);
@@ -81,13 +79,13 @@ namespace PholioVisualisation.Export
                 .GetIndicatorMetadataCollection(grouping)
                 .IndicatorMetadata;
 
-            IEnumerable<int> ageIds = QuinaryPopulationSorter.GetAgeIdsToOver95();
+            IList<int> ageIds = QuinaryPopulationSorter.GetAgeIdsToOver95();
             IEnumerable<int> sexIds = new[] { SexIds.Male, SexIds.Female };
 
             var metadata = metadataList.First(); // Why First??
             IList<TimePeriod> timePeriods = grouping.GetTimePeriodIterator(metadata.YearType).TimePeriods;
             var periodLabels = GetPeriodLabels(metadata, timePeriods);
-            AddPopulationTitles(sexIds, periodLabels);
+            AddPopulationTitles(sexIds, ageIds, periodLabels);
 
             foreach (TimePeriod timePeriod in timePeriods)
             {
@@ -149,15 +147,15 @@ namespace PholioVisualisation.Export
                 throw new ArgumentException("AreaCode is not set");
             }
 
-            if (AreaTypeId == -1)
+            if (ParentAreaTypeId == -1)
             {
                 throw new ArgumentException("AreaTypeId is not set");
             }
         }
 
-        private void AddPopulationTitles(IEnumerable<int> sexIds, IList<string> periodLabels)
+        private void AddPopulationTitles(IEnumerable<int> sexIds, IList<int> ageIds, IList<string> periodLabels)
         {
-            IList<string> populationLabels = ReaderFactory.GetPholioReader().GetQuinaryPopulationLabels();
+            IList<string> populationLabels = ReaderFactory.GetPholioReader().GetQuinaryPopulationLabels(ageIds);
 
             PholioLabelReader labelReader = new PholioLabelReader();
             IList<string> sexLabels = sexIds.Select(labelReader.LookUpSexLabel).ToList();
@@ -247,7 +245,7 @@ namespace PholioVisualisation.Export
             {
                 // Add all Areas
                 practiceCodeToParentMap =
-                    areasReader.GetParentsFromChildAreaIdAndParentAreaTypeId(AreaTypeId, AreaTypeIds.GpPractice);
+                    areasReader.GetParentsFromChildAreaIdAndParentAreaTypeId(ParentAreaTypeId, AreaTypeIds.GpPractice);
             }
             else if (area.IsGpPractice)
             {

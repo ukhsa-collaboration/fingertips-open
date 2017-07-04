@@ -193,12 +193,6 @@ function initSearchElements() {
     });
 }
 
-function initFaqLink() {
-    $('#faq-link').click(function () {
-        lightbox.show($('#faq-content').html(), 50, 100, 800);
-    });
-}
-
 function submitForm(name) {
     $('#' + name + 'Form').submit();
 }
@@ -230,6 +224,27 @@ $(document).ready(function () {
     // Init Bootstrap tooltips
     $('[data-toggle="tooltip"]').tooltip();
 
-    initFaqLink();
+    $('.sortHeader').click(function () {
+        loading();
+    });
+
+    $('.sortDesc').click(function () {
+        loading();
+    });
+
+    $('.sortAsc').click(function () {
+        loading();
+    });
+
+    $('.show-spinner').click(function () {
+        loading();
+    });
+
+    $('.select-all-check-box').click(function () {
+        $('.selectable-check-box').attr('checked', $(this).is(':checked'));
+    });
 });
 
+function popupwindow(url, title, w, h) {
+    return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
+}

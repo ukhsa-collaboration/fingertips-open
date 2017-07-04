@@ -502,7 +502,7 @@ describe('getTargetLegendHtml', function () {
         useTarget: true,
     };
 
-    var metaData = {
+    var metadata = {
         Target: {
             BespokeKey: 'test',
             LowerLimit: 10,
@@ -523,79 +523,79 @@ describe('getTargetLegendHtml', function () {
 
 
     it('should return empty for invalid BespokeKey', function () {
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toEqual('');
     });
 
     it('should return LowerRed for nth-percentile-range BeSpokeKey and Polarity 1', function () {
-        metaData.Target.PolarityId = 1;
-        metaData.Target.BespokeKey = nthPercentile;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 1;
+        metadata.Target.BespokeKey = nthPercentile;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain(expectedLowerRed);
     });
 
     it('should return HigherGreen for nth-percentile-range BeSpokeKey and Polarity 1', function () {
-        metaData.Target.PolarityId = 1;
-        metaData.Target.BespokeKey = nthPercentile;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 1;
+        metadata.Target.BespokeKey = nthPercentile;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain(expectedHigherGreen);
     });
 
 
     it('should return expectedLowerGreen for nth-percentile-range BeSpokeKey and Polarity 0', function () {
-        metaData.Target.PolarityId = 0;
-        metaData.Target.BespokeKey = nthPercentile;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 0;
+        metadata.Target.BespokeKey = nthPercentile;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain(expectedLowerGreen);
     });
 
     it('should return HigherGreen for nth-percentile-range BeSpokeKey and Polarity 0', function () {
-        metaData.Target.PolarityId = 0;
-        metaData.Target.BespokeKey = nthPercentile;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 0;
+        metadata.Target.BespokeKey = nthPercentile;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain(expectedHigherRed);
     });
 
     it('should return ValidValue for null BespokeKey', function () {
-        metaData.Target.PolarityId = 0;
-        metaData.Target.BespokeKey = lastYearEngland;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 0;
+        metadata.Target.BespokeKey = lastYearEngland;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain('previous year\'s England value');
     });
 
     it('should result contain better for last-year-england BespokeKey', function () {
-        metaData.Target.PolarityId = 0;
-        metaData.Target.BespokeKey = lastYearEngland;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 0;
+        metadata.Target.BespokeKey = lastYearEngland;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain('target better');
     });
 
     it('should result contain bobHigher for last-year-england BespokeKey and Polarity 99', function () {
-        metaData.Target.PolarityId = PolarityIds.BlueOrangeBlue;
-        metaData.Target.BespokeKey = lastYearEngland;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = PolarityIds.BlueOrangeBlue;
+        metadata.Target.BespokeKey = lastYearEngland;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain('target bobHigher');
     });
 
     it('should return empty for no target', function () {
         compareConfig.useTarget = false;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toEqual('');
     });
 
     it('should return LowerGreen for no BespokeKey and Polarity 0', function () {
-        metaData.Target.BespokeKey = null;
+        metadata.Target.BespokeKey = null;
         compareConfig.useTarget = true;
-        metaData.Target.PolarityId = 0;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 0;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain('<span class="target better">&lt;10</span');
     });
 
     it('should return LowerRed for no BespokeKey and Polarity 1', function () {
-        metaData.Target.BespokeKey = null;
+        metadata.Target.BespokeKey = null;
         compareConfig.useTarget = true;
-        metaData.Target.PolarityId = 1;
-        var result = getTargetLegendHtml(compareConfig, metaData);
+        metadata.Target.PolarityId = 1;
+        var result = getTargetLegendHtml(compareConfig, metadata);
         expect(result).toContain(expectedLowerRed);
     });
 });

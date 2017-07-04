@@ -65,7 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AreaCodeListSplitter.cs" />
+    <Compile Include="LongListSplitter.cs" />
     <Compile Include="AreasReader.cs" />
     <Compile Include="AreaTypeIdSplitter.cs" />
     <Compile Include="BaseDataAccess.cs" />
@@ -94,6 +94,7 @@
     <Compile Include="Repositories\IRepositoryBase.cs" />
     <Compile Include="Repositories\NHibernateSessionFactory.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
+    <Compile Include="Repositories\SSRSReportRepository.cs" />
     <Compile Include="StringListParser.cs" />
     <Compile Include="TestReader.cs" />
     <Compile Include="TrendDataReader.cs" />

@@ -74,10 +74,11 @@
     <Compile Include="DuplicateRowInSpreadsheetError.cs" />
     <Compile Include="IBatchWorksheetDataProcessor.cs" />
     <Compile Include="IWorksheetNameValidator.cs" />
-    <Compile Include="ISimpleWorkSheetDataProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SimpleWorkSheetDataProcessor.cs" />
     <Compile Include="SimpleUpload.cs" />
+    <Compile Include="SmallNumberChecker.cs" />
+    <Compile Include="SmallNumberFormulaHelper.cs" />
+    <Compile Include="SmallNumberWarning.cs" />
     <Compile Include="UploadColumnIndexes.cs" />
     <Compile Include="UploadDataSchema.cs" />
     <Compile Include="WorksheetNameValidator.cs" />

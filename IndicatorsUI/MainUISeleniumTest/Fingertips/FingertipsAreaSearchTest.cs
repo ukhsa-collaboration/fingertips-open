@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using Profiles.DomainObjects;
 
-namespace IndicatorsUI.MainUISeleniumTest
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
     [TestClass]
     public class FingertipsAreaSearchTest : FingertipsBaseUnitTest
@@ -17,6 +17,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         {
             base.TestInitialize();
 
+            // Health profiles because area search is displayed on introduction page
             OpenProfilePage(ProfileUrlKeys.HealthProfiles);
         }
 

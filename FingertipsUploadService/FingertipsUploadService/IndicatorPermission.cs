@@ -14,8 +14,6 @@ namespace FingertipsUploadService
         private List<string> noneExistingIndicators = new List<string>();
         private List<string> indicatorsWithoutPermission = new List<string>();
 
-
-
         public bool Check(List<int> indicators, UploadJob job, UploadJobErrorRepository errorRepository)
         {
 
@@ -25,9 +23,7 @@ namespace FingertipsUploadService
             // Check if all indicator exist
             if (noneExistingIndicators.Count > 0)
             {
-                var error = job.JobType == UploadJobType.Simple
-                    ? ErrorBuilder.GetSimplePermissionError(job.Guid, noneExistingIndicators, false)
-                    : ErrorBuilder.GetBatchPermissionError(job.Guid, noneExistingIndicators, false);
+                var error = ErrorBuilder.GetBatchPermissionError(job.Guid, noneExistingIndicators, false);
                 errorRepository.Log(error);
                 return false;
             }
@@ -35,9 +31,7 @@ namespace FingertipsUploadService
             // Check permissions
             if (indicatorsWithoutPermission.Count > 0)
             {
-                var error = job.JobType == UploadJobType.Simple
-                    ? ErrorBuilder.GetSimplePermissionError(job.Guid, indicatorsWithoutPermission, true)
-                    : ErrorBuilder.GetBatchPermissionError(job.Guid, indicatorsWithoutPermission, true);
+                var error = ErrorBuilder.GetBatchPermissionError(job.Guid, indicatorsWithoutPermission, true);
                 errorRepository.Log(error);
                 return false;
             }

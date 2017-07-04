@@ -42,6 +42,9 @@ namespace FingertipsDataExtractionTool.AverageCalculator
                 areas.AddRange(categoryAreas);
             }
 
+            // England
+            areas.Add(_areasReader.GetAreaFromCode(AreaCodes.England));
+
             return areas;
         }
     }

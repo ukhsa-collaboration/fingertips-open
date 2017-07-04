@@ -62,7 +62,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AgeSorterTest.cs" />
     <Compile Include="AreaDataBuilderTest.cs" />
     <Compile Include="AreaRankBuilderTest.cs" />
     <Compile Include="AreaTypeFactoryTest.cs" />
@@ -81,25 +80,19 @@
     <Compile Include="LimitsBuilderTest.cs" />
     <Compile Include="NearestNeighbourAreaListBuilderTest.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilderTest.cs" />
+    <Compile Include="PholioIntegrityTest.cs" />
     <Compile Include="PostcodeProviderTest.cs" />
-    <Compile Include="ProfileFilterTest.cs" />
     <Compile Include="ProfileUrlTest.cs" />
-    <Compile Include="QuinaryPopulationSorterTest.cs" />
     <Compile Include="SingleGroupingProviderTest.cs" />
     <Compile Include="GroupingListUniquifierTest.cs" />
     <Compile Include="GroupIdProviderTest.cs" />
     <Compile Include="CoreDataSetListProviderTest.cs" />
-    <Compile Include="CoreDataSetFilterTest.cs" />
-    <Compile Include="GroupRootFilterTest.cs" />
     <Compile Include="PracticeAreaValuesBuilderTest.cs" />
-    <Compile Include="GroupingListFilterTest.cs" />
-    <Compile Include="IgnoredAreasFilterTest.cs" />
     <Compile Include="CoreDataSetProviderFactoryTest.cs" />
     <Compile Include="SimpleCoreDataSetProviderTest.cs" />
     <Compile Include="CcgPopulationProviderTest.cs" />
     <Compile Include="CcgCoreDataSetProviderTest.cs" />
     <Compile Include="ShapeCoreDataSetProviderTest.cs" />
-    <Compile Include="IgnoredAreasFilterFactoryTest.cs" />
     <Compile Include="AreaTypesWithParentAreaTypesBuilderTest.cs" />
     <Compile Include="AverageCalculatorFactoryTest.cs" />
     <Compile Include="NullAverageCalculatorTest.cs" />
@@ -129,7 +122,6 @@
     <Compile Include="GroupDataTest.cs" />
     <Compile Include="GroupMetadataBuilderTest.cs" />
     <Compile Include="GroupRootBuilderTest.cs" />
-    <Compile Include="AreaFilterTest.cs" />
     <Compile Include="IndicatorMetadataCollectionTest.cs" />
     <Compile Include="IndicatorMetadataRepositoryTest.cs" />
     <Compile Include="MapCoordinateConverterTest.cs" />
@@ -158,6 +150,10 @@
     <ProjectReference Include="..\DataConstruction\DataConstruction.csproj">
       <Project>{A9FD008C-07B0-49BF-87B2-BC1A39242282}</Project>
       <Name>DataConstruction</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
     </ProjectReference>
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>

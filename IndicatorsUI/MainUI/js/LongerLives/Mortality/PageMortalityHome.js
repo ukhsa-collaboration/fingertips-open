@@ -118,8 +118,7 @@ function getPolygonColourFunction(root, parentValue) {
 
     var ragColors = [c.worse, c.better];
 
-    if (polarityId === 0) {
-        // High is good
+    if (polarityId === PolarityIds.RAGLowIsGood) {
         ragColors.reverse();
     }
 

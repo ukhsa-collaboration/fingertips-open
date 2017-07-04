@@ -6,7 +6,6 @@ namespace Fpm.ProfileData.Entities.Profile
     {
         public int Id { get; set; }
 
-        [Required]
         [Display(Name = "Lower limit")]
         public double? LowerLimit { get; set; }
 
@@ -14,6 +13,10 @@ namespace Fpm.ProfileData.Entities.Profile
         public double? UpperLimit { get; set; }
 
         public string BespokeTargetKey { get; set; }
+
+        [Display(Name = "Legend HTML (optional)")]
+        [StringLength(300)]
+        public string LegendHtml { get; set; }
 
         [Display(Name = "Polarity")]
         public int PolarityId { get; set; }

@@ -35,6 +35,11 @@ namespace Profiles.DataAccess
             }
         }
 
+        public string WebProxy
+        {
+            get { return GetAppSetting("WebProxy"); }
+        }
+
         public bool IsContentCachedInMemory
         {
             get { return ParseBool("IsContentCachedInMemory"); }
@@ -230,11 +235,6 @@ namespace Profiles.DataAccess
         public bool ShowUpdateDelayedMessage
         {
             get { return ParseBool("ShowUpdateDelayedMessage"); }
-        }
-
-        public bool ShowLongerLivesSuicidePrevention
-        {
-            get { return ParseBool("ShowLongerLivesSuicidePrevention"); }
         }
 
         public string EnsureUrlEndsWithForwardSlash(string url)

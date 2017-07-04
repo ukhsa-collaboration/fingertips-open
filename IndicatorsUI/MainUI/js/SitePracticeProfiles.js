@@ -152,9 +152,9 @@ function getLabelSeries() {
 function showBox(id) {
 
     id = id.toLowerCase();
-    var pageSelected = 'pageSelected';
+    var pageSelected = 'page-selected';
     $('.pageBox').hide();
-    $('.' + 'pageSelected').removeClass(pageSelected);
+    $('.' + pageSelected).removeClass(pageSelected);
     $('#page-' + id).addClass(pageSelected);
     $('#' + id + 'Box').show();
 };
@@ -910,7 +910,9 @@ PP.model = {
 
             var s = this;
             s.mode = parseInt(v['mod'], 10);
-            s.year = v['pyr'];
+
+            if (v['pyr']) s.year = v['pyr'];
+
             s.parentAreaType = parseInt(v['pat'], 10);
             s.parentCode = s._parseVal(v['par']);
             s.practiceCode = s._parseVal(v['are']);
@@ -1019,7 +1021,7 @@ function setAreaType(id) {
     $('#areaTypeSelected').html(label);
     $('#areaTypeUnselected').html(label);
     $('#parentBoxLabel').html(label + ':');
-    $('#benchmarkParentOption').html(label);
+    $('#benchmark-parent-option').html(label);
 
     setBenchmarkImage();
 
@@ -1127,26 +1129,36 @@ function exportData() {
     // Determine area code
     var val = parseInt($('input[name=g1]:checked').val(), 10);
     switch (val) {
-        case 0:
-            var code = PP.model.practiceCode;
-            break;
         case 1:
-            code = PP.model.parentCode;
+            var parentAreaCode = PP.model.parentCode;
             break;
         default:
-            code = NATIONAL_CODE;
+            parentAreaCode = NATIONAL_CODE;
     }
 
-    var sid = $('#exportSubgroupMenu').val();
-    var args = sid === 'pop' ?
-        '&pro=qp&gid=' + populationGroupId :
-        '&pro=pp&gid=' + sid;
+    var groupId = $('#exportSubgroupMenu').val();
 
     lightbox.hide();
 
-    setUrl(FT.url.corews + 'GetData.ashx?s=db&are=' + code + '&ati=' + PP.model.parentAreaType + args);
 
-    logEvent('Download', 'Excel', 'AreaCode=' + code + args);
+    if (groupId === 'pop') {
+        // Population data
+        var url = FT.url.corews + 'GetData.ashx?s=db&are=' + parentAreaCode + '&ati=' + PP.model.parentAreaType +
+            '&pro=qp&gid=' + populationGroupId;
+
+    } else {
+
+        var parameters = new ParameterBuilder()
+            .add('parent_area_code', parentAreaCode)
+            .add('parent_area_type_id', PP.model.parentAreaType)
+            .add('group_id', groupId)
+            .add('child_area_type_id', AreaTypeIds.Practice);
+
+        url = FT.url.corews + 'api/all_data/csv/by_group_id?' + parameters.build();
+    }
+    setUrl(url);
+
+    logEvent('Download', 'Excel', 'AreaCode=' + parentAreaCode);
 };
 
 function downloadPdf() {
@@ -1252,7 +1264,7 @@ function initYears() {
 
     templates.add('years', '<table cellspacing="0">\
 <tr><td onclick="yearClicked({{first}})" class="firstYearLine"></td>{{#middleYears}}<td class="yearLine" onclick="yearClicked({{year}})"></td>{{/middleYears}}<td class="lastYearLine" onclick="yearClicked({{last}})"></td></tr>\
-<tr><td id="timeline" colspan="{{yearCount}}">TIMELINE<div id="info-timeline" class="infoTooltip" onclick="getHelpText(\'timeline\',200,lightbox.leftForMiddle(410),410)" title="More information about this timeline"></div></td></tr></table>');
+<tr><td id="timeline" colspan="{{yearCount}}">TIMELINE<div id="info-timeline" class="info-tooltip" onclick="getHelpText(\'timeline\',200,lightbox.leftForMiddle(410),410)" title="More information about this timeline"></div></td></tr></table>');
 
     var middleYears = [];
     for (var year = earliestYear + 1; year < latestYear; year++) {
@@ -1467,9 +1479,6 @@ templates.add('export', "<div id='popupTitle'><h2>Export Data</h2></div> \
 <tr><td>\
 {{#isParent}}<input type='radio' name='g1' value='1' {{^isPractice}}checked='checked'{{/isPractice}}></td><td>All practices in {{parent}}{{/isParent}}\
 {{^isParent}}</td><td class='noDataText'>No {{parent}} selected{{/isParent}}\
-</td></tr><tr><td>\
-{{#isPractice}}<input type='radio' name='g1' value='0' checked></td><td>{{practice}}{{/isPractice}} \
-{{^isPractice}}</td><td class='noDataText'>No single practice selected{{/isPractice}} \
 </td></tr></table>\
 <div class='fl w100' style='padding:15px;padding-left:130px;clear:left;'>\
 <input type='button' class='exportBtn' onclick='exportData()' value='Export' />\

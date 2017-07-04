@@ -83,12 +83,8 @@ namespace PholioVisualisation.KeyMessages
         public Significance AdultStatutoryHomelessnessSig { get; set; }
         public Significance AdultViolentCrimeSig { get; set; }
         public Significance AdultLongTermUnemploymentSig { get; set; }
-        public Significance AdultIncidenceOfMalignantMelanomaSig { get; set; }
-        public Significance AdultDrugMisuseSig { get; set; }
         public Significance AdultExcessWinterDeathsSig { get; set; }        
         public Significance AdultUnder75MortalityRateCvdSig { get; set; }
         public Significance AdultUnder75MortalityRateCancerSig { get; set; }
-
-     
     }
 }

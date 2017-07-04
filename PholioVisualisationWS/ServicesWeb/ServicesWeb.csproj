@@ -139,13 +139,16 @@
     <Compile Include="Controllers\NonPublicServicesController.cs" />
     <Compile Include="Controllers\PdfReportingController.cs" />
     <Compile Include="Controllers\ProfilesController.cs" />
+    <Compile Include="Controllers\SSRSReportController.cs" />
     <Compile Include="Controllers\StaticReportsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\FileResponseBuilder.cs" />
     <Compile Include="Helpers\MiniProfilerWriter.cs" />
     <Compile Include="Helpers\SignificanceCollection.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
+    <Compile Include="Models\SSRSReportViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -153,13 +156,15 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Analysis\Analysis.csproj">
       <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
       <Name>Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288f7-5950-49db-8642-63587cb8146e}</Project>
@@ -176,6 +181,10 @@
     <ProjectReference Include="..\DIResolver\DIResolver.csproj">
       <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
       <Name>DIResolver</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Export\Export.csproj">
+      <Project>{85526825-84fb-4ead-a98a-16ece3cce8ca}</Project>
+      <Name>Export</Name>
     </ProjectReference>
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>

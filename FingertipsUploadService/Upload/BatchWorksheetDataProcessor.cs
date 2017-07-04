@@ -1,5 +1,6 @@
 ﻿using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Job;
+using FingertipsUploadService.ProfileData.Entities.Profile;
 using FingertipsUploadService.ProfileData.Helpers;
 using FingertipsUploadService.ProfileData.Repositories;
 using NLog;
@@ -29,8 +30,9 @@ namespace FingertipsUploadService.Upload
 
         public BatchUpload Validate(DataTable indicators, BatchUpload batchUpload)
         {
-            var allowedData = new AllowedData(_profilesReader);
+            GetDistinctIndicators(indicators);
 
+            var allowedData = new AllowedData(_profilesReader);
             // Validate spreadsheet data
             ValidateSpreadsheetRows(indicators, allowedData, batchUpload);
 
@@ -44,8 +46,6 @@ namespace FingertipsUploadService.Upload
                         UploadJobType.Batch);
             }
 
-            GetDistinctIndicators(indicators);
-
             return batchUpload;
         }
 
@@ -54,16 +54,20 @@ namespace FingertipsUploadService.Upload
             batchUpload.ColumnsCount = batchData.Columns.Count;
             batchUpload.TotalDataRows = batchData.Rows.Count;
 
-            //TODO FIN-841 check columns are all present
+            var smallNumberChecker = new SmallNumberChecker(_profilesReader,
+                new DisclosureControlRepository(), new AreaTypeRepository());
 
             for (int i = 0; i < batchData.Rows.Count; i++)
             {
-                DataRow row = batchData.Rows[i];
+                var row = batchData.Rows[i];
 
-                List<UploadValidationFailure> validationFailures = ValidateUploadedRow(row, i, allowedData);
+                var validationFailures = ValidateUploadedRow(row, i, allowedData);
+
+                smallNumberChecker.Check(row, i, batchUpload);
+
                 if (validationFailures.Count == 0)
                 {
-                    UploadDataModel upload = new BatchRowParser(row).GetUploadDataModel();
+                    var upload = new BatchRowParser(row).GetUploadDataModel();
                     upload.RowNumber = i + 2;
 
                     batchUpload.DataToUpload.Add(upload);
@@ -82,6 +86,7 @@ namespace FingertipsUploadService.Upload
 
             var duv = new DataUploadValidation();
             Exception dataConversionException;
+
             var validationFailures = new List<UploadValidationFailure>();
 
             //Validate the IndicatorID
@@ -251,6 +256,9 @@ namespace FingertipsUploadService.Upload
                 validationFailures.Add(new UploadValidationFailure(rowNumber, columnName, "Invalid " + columnName,
                     dataConversionException.Message));
             }
+
+
+
 
             //Validate the Value
             columnName = UploadColumnNames.Value;

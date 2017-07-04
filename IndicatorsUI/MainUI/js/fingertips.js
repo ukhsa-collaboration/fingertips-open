@@ -41,14 +41,15 @@ var PAGE_MODES = {
     AREA_SPINE: 1,
     INDICATOR_DETAILS: 3,
     AREA_TRENDS: 4,
-    INEQUALITIES_80_20: 5,
     METADATA: 6,
-    CONTENT: 7,
+    INEQUALITIES: 7,
     MAP: 8,
     DOWNLOAD: 9,
     SCATTER_PLOT: 10,
     ENGLAND: 11,
-    POPULATION: 12
+    POPULATION: 12,
+    REPORTS: 13,
+    BOX_PLOT: 14
 };
 
 /**
@@ -152,7 +153,7 @@ function AreaTypes(areaTypesArray, areaTypesHash) {
 }
 
 function addTd(html, text, cssClass, tooltip) {
-
+    
     html.push('<td');
 
     if (cssClass) {
@@ -181,8 +182,8 @@ function addTh(html, text, cssClass, tooltip) {
 };
 
 function setPageSelected(selectionBoxId, selectedId) {
-    var p = 'pageSelected';
-    $(selectionBoxId).find('.pageSelector').removeClass(p);
+    var p = 'page-selected';
+    $(selectionBoxId).find('.page-selector').removeClass(p);
     $(selectedId).addClass(p);
 };
 
@@ -304,7 +305,7 @@ var pages = (function () {
     tabsSelector = '#tabs',
     jqIdsNotInitiallyShown = 'jqIdsNotInitiallyShown',
     elementManager = new ElementManager(),
-    tabTemplate = '{{#pages}}<div id="page-{{id}}" onclick="executeWithLock({{gotoName}});" class="pageSelector page">\
+    tabTemplate = '{{#pages}}<div id="page-{{id}}" onclick="executeWithLock({{gotoName}});" class="page-selector page">\
 <div class="pageIcon page-{{#icon}}{{icon}}{{/icon}}{{^icon}}{{id}}{{/icon}}">&nbsp;</div>\
 <span>{{{title}}}</span></div>{{/pages}}',
     onResize = function () {
@@ -456,15 +457,12 @@ var pages = (function () {
                     page.jqIds.push(containerId);
 
                     main.prepend('<div id="' + containerId +
-                            '" class="standardWidth clearfix" style="display:none;"></div>');
+                            '" class="standard-width clearfix" style="display:none;"></div>');
                 } else {
                     // Use ID already specified
                     page.containerId = page.id;
                 }
             });
-
-            // Hide all keys by default to deal with ad hoc display (e.g. on maps)
-            allJQs.push([$('.keyContainer')]);
 
             // Set default page
             this.setCurrent(this.getDefault());
@@ -613,7 +611,7 @@ FT.model = {
         this.update();
 
         // Must set up area options before page can be refreshed
-        initAreaData2();
+        initAreaData();
         updateDomains();
     },
 
@@ -646,7 +644,7 @@ FT.model = {
 
             // Area code
             prop = pairs['are'];
-            if (prop) m.areaCode = prop;
+            m.areaCode = !!prop ? prop : null;
 
             // Indicator Id
             prop = pairs['iid'];
@@ -729,6 +727,7 @@ function getAreaValues(root, model, code) {
             ).add('group_id', model.groupId
             ).add('area_type_id', model.areaTypeId
             ).add('parent_area_code', parentCode
+            ).add('profile_id', model.profileId
             ).add('comparator_id', comparatorId
             ).add('indicator_id', root.IID
             ).add('sex_id', root.Sex.Id
@@ -783,22 +782,6 @@ function getProfileIds(profileId) {
     return [restrictSearchProfileId
         ? restrictSearchProfileId
         : profileId];
-}
-
-//
-// note: Use getProfileIds instead
-//
-function getRestrictByProfileParameter() {
-
-    var parameter = '&res=';
-
-    if (profileCollectionIdList.length) {
-        return parameter + profileCollectionIdList;
-    }
-
-    return isDefined(restrictSearchProfileId) ?
-        parameter + restrictSearchProfileId :
-        '';
 }
 
 /**Add an AJAX parameter of all the relevant profile ids.
@@ -1515,6 +1498,9 @@ function exportChartAsImage(chart) {
         chart.exportChart({ type: 'image/png' }, {});
     }
 };
+function getComparatorId() {
+    return comparatorId;
+}
 
 // Constants
 var REGIONAL_COMPARATOR_ID = 1;
@@ -1524,121 +1510,6 @@ var NOT_APPLICABLE = 'n/a';
 var NATIONAL_CODE = 'E92000001';
 var SEARCH_NO_RESULT_TOP_OFFSET = 0;
 var SEARCH_NO_RESULT_LEFT_OFFSET = 0;
-
-/**
-* Enum of PHOLIO area type IDs.
-* @class AreaTypeIds
-*/
-var AreaTypeIds = {
-    District: 1,
-    Region: 6,
-    Practice: 7,
-    County: 9,
-    AcuteTrust: 14,
-    Country: 15,
-    UnitaryAuthority: 16,
-    GpShape: 18,
-    CCG: 19,
-    DeprivationDecile: 23,
-    Subregion: 46,
-    DistrictUA: 101,
-    CountyUA: 102,
-    PheCentres2013: 103,
-    PheCentres2015: 104,
-    OnsClusterGroup: 110,
-    AcuteTrusts: 118
-};
-
-/**
-* Enum of PHOLIO category type IDs.
-* @class CategoryTypeIds
-*/
-var CategoryTypeIds = {
-    DeprivationDecileCountyUA2015: 39,
-    DeprivationDecileDistrictUA2015: 40,
-    HealthProfilesSSILimit: 5,
-    DeprivationDecileCCG2010: 11,
-    DeprivationDecileGp2015: 38
-};
-
-/**
-* Enum of PHOLIO value type IDs.
-* @class ValueTypeIds
-*/
-var ValueTypeIds = {
-    IndirectlyStandardisedRate: 4,
-    Ratio: 6,
-    Count: 7,
-    LifeExpectancy: 11
-};
-
-/**
-* Enum of PHOLIO comparator method IDs.
-* @class ComparatorMethodIds
-*/
-var ComparatorMethodIds = {
-    SuicidePlan : 14,
-    Quintiles : 15
-};
-
-/**
-* Enum of PHOLIO polarity IDs.
-* @class PolarityIds
-*/
-var PolarityIds = {
-    RAGLowIsGood: 0,
-    RAGHighIsGood: 1,
-    Quintiles: 15,
-    BlueOrangeBlue: 99
-}
-
-/**
-* Enum of PHOLIO sex IDs.
-* @class SexIds
-*/
-var SexIds = {
-    Male: 1,
-    Female: 2,
-    Person: 4
-};
-
-/**
-* Enum of PHOLIO age IDs.
-* @class AgeIds
-*/
-var AgeIds = {
-    AllAges: 1
-};
-
-
-/**
-* Enum of PHOLIO profile IDs.
-* @class ProfileIds
-*/
-var ProfileIds = {
-    SearchResults: 13,
-    PracticeProfiles: 20,
-    Mortality: 22,
-    HealthProfiles: 26,
-    CommunityMentalHealth: 50,
-    Diabetes: 51,
-    Liver: 55,
-    Hypertension: 67,
-    Cancer: 71,
-    DrugsAndAlcohol: 75,
-    HealthChecks: 77,
-    ChildHealth: 105,
-    ChiMatWAY: 94,
-    Phof: 19,
-    Suicide: 73
-};
-
-var TrendMarkerValue = {
-    Up: 1,
-    Down: 2,
-    NoChange: 3,
-    CannotCalculate: 4
-};
 
 // Application state
 var isSpinnerDisplayed = true;

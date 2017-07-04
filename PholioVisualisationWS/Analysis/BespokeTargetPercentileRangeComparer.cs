@@ -4,9 +4,6 @@ namespace PholioVisualisation.Analysis
 {
     public class BespokeTargetPercentileRangeComparer : TargetComparer
     {
-        /// <summary>
-        /// The nth Percentile for UTLAs
-        /// </summary>
         public CoreDataSet BenchmarkData { get; set; }
         public CoreDataSet LowerTargetPercentileBenchmarkData { get; set; }
         public CoreDataSet UpperTargetPercentileBenchmarkData { get; set; }
@@ -39,14 +36,14 @@ namespace PholioVisualisation.Analysis
                 return Significance.None;
             }
 
-            if (Config.PolarityId == 1)
+            if (Config.PolarityId == PolarityIds.RagHighIsGood)
             {
                 return data.Value < LowerTargetPercentileBenchmarkData.Value
                     ? Significance.Worse
                     : (data.Value >= UpperTargetPercentileBenchmarkData.Value ? Significance.Better : Significance.Same);
             }
 
-            if (Config.PolarityId == 0)
+            if (Config.PolarityId == PolarityIds.RagLowIsGood)
             {
                 return data.Value < LowerTargetPercentileBenchmarkData.Value
                     ? Significance.Better

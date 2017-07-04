@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -42,14 +43,14 @@ namespace PholioVisualisation.DataConstruction
 
         private void AddRegionAndChildAreas(IList<string> childAreaCodes, ComparatorMap comparatorMap)
         {
-            Comparator regionalComparator = comparatorMap.GetSubnationalComparator();
-            if (regionalComparator != null)
+            ComparatorDetails regionalComparatorDetails = comparatorMap.GetSubnationalComparator();
+            if (regionalComparatorDetails != null)
             {
                 areaCodes.AddRange(childAreaCodes);
 
                 if (ExcludeComparators == false)
                 {
-                    areaCodes.Add(regionalComparator.Area.Code);
+                    areaCodes.Add(regionalComparatorDetails.Area.Code);
                 }
             }
         }
@@ -75,10 +76,10 @@ namespace PholioVisualisation.DataConstruction
         {
             if (ExcludeComparators == false)
             {
-                Comparator nationalComparator = comparatorMap.GetNationalComparator();
-                if (nationalComparator != null)
+                ComparatorDetails nationalComparatorDetails = comparatorMap.GetNationalComparator();
+                if (nationalComparatorDetails != null)
                 {
-                    areaCodes.Add(nationalComparator.Area.Code);
+                    areaCodes.Add(nationalComparatorDetails.Area.Code);
                 }
             }
         }

@@ -62,12 +62,16 @@ namespace PholioVisualisation.ServiceActions
             var timePeriods = _grouping.GetTimePeriodIterator(_indicatorMetadata.YearType).TimePeriods;
             foreach (var timePeriod in timePeriods)
             {
-                IList<CoreDataSet> dataList = _groupDataReader.GetAllCategoryDataWithinParentArea(areaCode,
-                indicatorId, sexId, ageId, timePeriod).Where(x => x.CategoryTypeId == categoryTypeId).ToList();
+                IList<CoreDataSet> dataList = _groupDataReader
+                    .GetAllCategoryDataWithinParentArea(areaCode, indicatorId, sexId, ageId, timePeriod)
+                    .Where(x => x.CategoryTypeId == categoryTypeId).ToList();
                 dictionaryBuilder.AddDataForNextTimePeriod(dataList);
 
                 // Get coredata for selected area
-                var coreDataSetForSelectedArea = _groupDataReader.GetCoreData(_grouping, timePeriod, areaCode).Where(x => x.CategoryTypeId == -1).ToList();
+                var coreDataSetForSelectedArea = _groupDataReader
+                    .GetCoreData(_grouping, timePeriod, areaCode)
+                    .Where(x => x.CategoryTypeId == CategoryTypeIds.Undefined)
+                    .ToList();
                 if (coreDataSetForSelectedArea.Any())
                 {
                     areaAverage.Add(coreDataSetForSelectedArea.First());
@@ -91,7 +95,6 @@ namespace PholioVisualisation.ServiceActions
                     }
                 }
             }
-
 
             // Format category data
             FormatData(allData);

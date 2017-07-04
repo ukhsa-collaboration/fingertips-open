@@ -42,13 +42,13 @@ function getSecondaryData() {
 }
 
 function selectIndicator(rootIndex, indicatorId) {
-    
+
     if (!FT.ajaxLock) {
         lock();
 
         var model = MT.model;
 
-        selectedRootIndex = rootIndex;   
+        selectedRootIndex = rootIndex;
         model.indicatorId = indicatorId;
         model.sexId = groupRoots[selectedRootIndex].Sex.Id;
 
@@ -70,14 +70,14 @@ function selectIndicator(rootIndex, indicatorId) {
 }
 
 function displayIndicatorSelected(index) {
-    var $selectedCause = $('#'+ index + '-iid-' + MT.model.indicatorId);
+    var $selectedCause = $('#' + index + '-iid-' + MT.model.indicatorId);
     var cssClass = 'active';
     $('.causes li').removeClass(cssClass);
     $selectedCause.addClass(cssClass);
 }
 
 function isAnyIndicatorData() {
-   
+
     var parentCode = MT.model.parentCode;
 
     var modelExtensions = (!MT.model.areaCode)
@@ -89,8 +89,8 @@ function isAnyIndicatorData() {
     var ranks = data.Ranks[parentCode];
     return !!ranks[selectedRootIndex];
 
-   
-   
+
+
 }
 
 function selectDomain(groupId) {
@@ -109,7 +109,7 @@ function selectDomain(groupId) {
 
         getGroupRoots(model);
         getIndicatorMetadata(groupId, GET_METADATA_DEFINITION, GET_METADATA_SYSTEM_CONTENT);
-        loaded.areaDetails.fetchDataByAjax({areaCode: model.parentCode});
+        loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
 
         if (model.areaCode) {
             loaded.areaDetails.fetchDataByAjax({ areaCode: model.areaCode });
@@ -158,7 +158,7 @@ function displayMapLegend(root) {
 }
 
 function displayPage() {
-   
+
     var model = MT.model;
 
     initMap();
@@ -199,21 +199,23 @@ function displayPage() {
 
 function getPolygonColourFunction(root) {
 
-    var c = colours,
-        noComparison = c.noComparison,
-        polarityId = root.PolarityId,
-        getColourFromSignificance = function (colourList, sig) {
-            return sig
-               ? colourList[sig - 1]
-               : noComparison;
-        };
+    var c = colours;
+    var noComparison = c.noComparison;
+    var polarityId = root.PolarityId;
+    var getColourFromSignificance = function (colourList, sig) {
+        return sig
+           ? colourList[sig - 1]
+           : noComparison;
+    };
 
+    // Quintiles
     if (useQuintiles(root.ComparatorMethodId)) {
         return function (sig) {
             return getColourFromSignificance(quintileColors, sig);
         };
     }
 
+    // No comparison
     if (polarityId === -1) {
         return function () { return noComparison; };
     }
@@ -221,9 +223,8 @@ function getPolygonColourFunction(root) {
     var ragColors;
     if (polarityId === PolarityIds.BlueOrangeBlue) {
         ragColors = [c.bobLower, c.bobSimilar, c.bobHigher];
-    } else if (polarityId === PolarityIds.RAGLowIsGood) {
-        ragColors = [c.better, c.sameWorse, c.worse];
     } else {
+        // Do no need to consider RAG polarity because it is handled in the web services
         ragColors = [c.worse, c.sameWorse, c.better];
     }
 
@@ -235,7 +236,7 @@ function getPolygonColourFunction(root) {
 function showInfoBox() {
 
     var model = MT.model;
-    
+
     if (model.profileId === ProfileIds.HealthChecks) {
         ajaxMonitor.setCalls(4);
 
@@ -274,9 +275,9 @@ CallOutBox.getPopUpHtml = function () {
                 profileId: SupportingProfileId,
                 groupId: SupportingGroupId
             });
-        
+
         var rank = supportingAreaData.Ranks[NATIONAL_CODE][0].AreaRank;
-        
+
         var content = CallOutBox.getCausePopUpHtml(ranks, areaDetails, rank);
     } else {
         content = templates.render('nodatafound', {
@@ -379,11 +380,12 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank)
 
     var hideSupportingData = indicatorId === IndicatorIds.SuicidePlan;
 
+    // Whether or not to show the man next to the top indicators
     var showMan = profileId !== ProfileIds.Suicide;
 
     var viewModel = {
-        showMan : showMan,
-        hideSupportingData : hideSupportingData,
+        showMan: showMan,
+        hideSupportingData: hideSupportingData,
         rankingHtml: CallOutBox.getRankingHtml(ranks[index], indicatorId),
         nameofplace: areaDetails.Area.Name,
         indirectlyStandardisedRate: new CommaNumber(data.Count).rounded(),

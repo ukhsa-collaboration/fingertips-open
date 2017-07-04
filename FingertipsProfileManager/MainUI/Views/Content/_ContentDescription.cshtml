@@ -1,0 +1,8 @@
+﻿@model Fpm.ProfileData.Entities.Profile.ContentItem
+<div class="row form-group form-horizontal">
+    <label class="col-lg-2 control-label">Description:</label>
+    <div class="col-lg-10">
+        @Html.TextBoxFor(model => model.Description, new { @class = "form-control" })
+        <span class="field-validation-valid" data-valmsg-for="Description" data-valmsg-replace="true"></span>
+    </div>
+</div>

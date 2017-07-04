@@ -49,7 +49,6 @@ namespace Fpm.MainUI.Controllers
 
                 foreach (var grouping in groupings)
                 {
-                    Debug.WriteLine(grouping.GroupId);
                     var domainIndicators = new DomainIndicatorsSearchResult();
 
                     domainIndicators.GroupId = grouping.GroupId;

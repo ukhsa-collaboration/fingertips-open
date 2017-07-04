@@ -27,10 +27,9 @@ namespace PholioVisualisation.DataAccess
         {
         }
 
-        public IList<string> GetQuinaryPopulationLabels()
+        public IList<string> GetQuinaryPopulationLabels(IList<int> ageIds)
         {
-            IQuery q = CurrentSession.GetNamedQuery("GetQuinaryPopulationLabels");
-            IList<string> labels = q.List().Cast<string>().ToList();
+            var labels = GetAgesByIds(ageIds).Select(x => x.Name);
 
             // Sort labels
             var sortMap = new Dictionary<int, string>();
@@ -117,6 +116,12 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<ComparatorMethod>();
         }
 
+        public virtual IList<Comparator> GetAllComparators()
+        {
+            return CurrentSession.CreateCriteria<Comparator>()
+                .List<Comparator>();
+        }
+
         public virtual Age GetAgeById(int ageId)
         {
             return GetAgesByIds(new List<int>{ageId}).First();
@@ -187,6 +192,12 @@ namespace PholioVisualisation.DataAccess
             }
 
             return result;
+        }
+        
+        public IList<object> GetExceededOverriddenIndicatorMetadataTextValues()
+        {
+            var q = CurrentSession.GetNamedQuery("GetExceededOverriddenIndicatorMetadataTextValues");
+            return q.List<object>();
         }
     }
 }

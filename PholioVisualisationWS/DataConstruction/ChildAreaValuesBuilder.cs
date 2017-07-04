@@ -2,6 +2,7 @@
 using System.Linq;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -18,6 +19,7 @@ namespace PholioVisualisation.DataConstruction
         private IndicatorComparerFactory indicatorComparerFactory;
         private IArea parentArea;
         private IProfileReader profileReader;
+        private TargetComparerProvider _targetComparerProvider;
 
         public ChildAreaValuesBuilder(IndicatorComparerFactory indicatorComparerFactory,
             IGroupDataReader groupDataReader, IAreasReader areasReader, IProfileReader profileReader)
@@ -26,6 +28,8 @@ namespace PholioVisualisation.DataConstruction
             this.indicatorComparerFactory = indicatorComparerFactory;
             this.areasReader = areasReader;
             this.profileReader = profileReader;
+
+            _targetComparerProvider = new TargetComparerProvider(groupDataReader,areasReader);
         }
 
         public int ComparatorId { get; set; }
@@ -79,9 +83,7 @@ namespace PholioVisualisation.DataConstruction
         private void PerformComparisons(IList<CoreDataSet> dataList)
         {
             IndicatorComparer comparer = indicatorComparerFactory.New(Grouping);
-            TargetComparer targetComparer = TargetComparerFactory.New(IndicatorMetadata.TargetConfig);
-            new TargetComparerHelper(groupDataReader, parentArea)
-                    .AssignExtraDataIfRequired(parentArea, targetComparer, Grouping, IndicatorMetadata);
+            TargetComparer targetComparer = _targetComparerProvider.GetTargetComparer(IndicatorMetadata, Grouping);
 
             CoreDataSet benchmarkData = null;
             ICategoryComparer categoryComparer = null;

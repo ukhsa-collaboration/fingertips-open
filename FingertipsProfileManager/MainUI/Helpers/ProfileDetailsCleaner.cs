@@ -15,9 +15,6 @@ namespace Fpm.MainUI.Helpers
             profileDetails.AreasIgnoredEverywhere =
                 CleanAreasString(profileDetails.AreasIgnoredEverywhere);
 
-            profileDetails.ExtraJsFiles =
-                CleanAreasString(profileDetails.ExtraJsFiles);
-
             profileDetails.ExtraCssFiles =
                 CleanAreasString(profileDetails.ExtraCssFiles);
         }

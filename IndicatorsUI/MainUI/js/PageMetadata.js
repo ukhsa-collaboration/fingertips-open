@@ -7,6 +7,35 @@
 
 var metadata = {};
 
+function goToMetadataPage(rootIndex) {
+
+    lock();
+
+    setPageMode(PAGE_MODES.METADATA);
+
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
+    } else {
+
+        // Establish indicator
+        if (!isDefined(rootIndex)) {
+            rootIndex = getIndicatorIndex();
+        }
+        setIndicatorIndexAndUpdateModel(rootIndex);
+
+        ajaxMonitor.setCalls(2);
+
+        getIndicatorMetadata(FT.model.groupId);
+        getMetadataProperties();
+
+        ajaxMonitor.monitor(displayFingertipsMetadata);
+
+        if ($(window).scrollTop() > 300) {
+            $(window).scrollTop(0);
+        }
+    }
+};
+
 function displayMetadata(indicatorMetadata, root) {
 
     var metadata = getMetadataHtml(indicatorMetadata, root);
@@ -116,31 +145,6 @@ function getMetadataProperties() {
     }
 }
 
-function goToMetadataPage(rootIndex) {
-    if (!groupRoots.length) {
-        // Search results empty
-        noDataForAreaType();
-    } else {
-
-        lock();
-
-        setPageMode(PAGE_MODES.METADATA);
-
-        // Establish indicator
-        if (!isDefined(rootIndex)) {
-            rootIndex = getIndicatorIndex();
-        }
-        setIndicatorIndex(rootIndex);
-
-        ajaxMonitor.setCalls(2);
-
-        getIndicatorMetadata(FT.model.groupId);
-        getMetadataProperties();
-
-        ajaxMonitor.monitor(displayFingertipsMetadata);
-    }
-};
-
 function getMetadataHtml(indicatorMetadata, root) {
 
     var propertyIndex, text, ageId, sexId, benchmarkingMethodId, benchmarkingSigLevel;
@@ -245,7 +249,7 @@ function getMetadataHtml(indicatorMetadata, root) {
     }
 
     return {
-        html: templates.render('metadata', { rows: rows }),
+        html: templates.render('metadata', { rows: rows, iid: FT.model.iid }),
         labelArgs: labelArgs
     };
 }
@@ -255,7 +259,9 @@ function getLabelSpan(id) {
 }
 
 templates.add('metadata',
-    '<div id="definitionTable"><h2>Indicator Definitions and Supporting Information</h2><table class="borderedTable" cellspacing="0">{{#rows}}<tr><td class="header">{{0}}</td><td>{{{1}}}</td></tr>{{/rows}}</table></div>');
+    '<div id="definition-table"><h2>Indicator Definitions and Supporting Information</h2><table class="bordered-table" cellspacing="0">' +
+    '<tr><td class="header">Indicator ID</td><td>{{iid}}</td></tr>' +
+    '{{#rows}}<tr><td class="header">{{0}}</td><td>{{{1}}}</td></tr>{{/rows}}</table></div>');
 
 pages.add(PAGE_MODES.METADATA, {
     id: 'metadata',
@@ -263,5 +269,5 @@ pages.add(PAGE_MODES.METADATA, {
     goto: goToMetadataPage,
     gotoName: 'goToMetadataPage',
     needsContainer: true,
-    jqIds: ['indicatorMenuDiv', 'areaTypeBox']
+    jqIds: ['indicator-menu-div', 'areaTypeBox']
 });

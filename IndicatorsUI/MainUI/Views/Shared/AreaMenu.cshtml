@@ -2,20 +2,22 @@
     <li>
         <select id="areaMenu">
             <option />
-        </select>     
+        </select>
         <input id="area-search-text" class="search-watermark" value="Find a place or postcode" title="Find a place or postcode" />
-        <div id="area-search-link-box" style="display: none;"><span style="display: none;">Search not available</span><a id="area-search-link" onclick="searchOptionClicked();">Search for an area</a></div>
+        <div id="area-search-link-box" style="display: none;">
+            <span style="display: none;">Search not available</span><a id="area-search-link" onclick="searchOptionClicked();">Search for an area</a>
+        </div>
         <ul id="no-matches-found" class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all"
             tabindex="0" style="display: none;">
             <li class="ui-menu-item" role="presentation">
                 <span id="ui-id-2" class="ui-corner-all" tabindex="-1"><i>No matches found</i></span>
             </li>
-        </ul> 
+        </ul>
     </li>
     <li>
         <ul class="inner-menu">
-            <li class="area-next-back"><input class="menu-next" type="button" onclick=" advanceAreaMenuClicked(1) " /></li>
-            <li class="area-next-back"><input class="menu-prev" type="button" onclick=" advanceAreaMenuClicked(-1) " /></li>
+            <li class="area-next-back"><input class="menu-next" type="button" onclick="advanceAreaMenuClicked(1);" /></li>
+            <li class="area-next-back"><input class="menu-prev" type="button" onclick="advanceAreaMenuClicked(-1);" /></li>
             <li class="heading">Area</li>
         </ul>
     </li>

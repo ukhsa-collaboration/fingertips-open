@@ -23,6 +23,9 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public int PolarityId { get; set; }
 
+        [JsonProperty]
+        public string LegendHtml { get; set; }
+
         [JsonIgnore]
         public string Description { get; set; }
     }

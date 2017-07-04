@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F90E6631-DB1A-4CC1-B648-8FD3EBAED8DE}"
 	ProjectSection(SolutionItems) = preProject
@@ -82,11 +82,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServicesWebTest", "Services
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "6 Ckan", "6 Ckan", "{31664D2D-76EA-4046-A40D-D999F44F021F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 PDF Support", "4 PDF Support", "{2C9E15A3-2468-4A70-A9A9-7C80E9A6FAE1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 Reporting", "4 Reporting", "{2C9E15A3-2468-4A70-A9A9-7C80E9A6FAE1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 Search", "3 Search", "{ECB4571D-4C65-48DD-AFCB-A6A6C93DDB45}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 Services", "1 Services", "{0E5BB44A-94AD-4B66-B9B4-5E07D59D630D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 Web Services", "1 Web Services", "{0E5BB44A-94AD-4B66-B9B4-5E07D59D630D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 Excel export", "5 Excel export", "{2722978C-4F20-479E-B31D-C69B9F77CAF3}"
 EndProject
@@ -100,9 +100,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DIResolver", "DIResolver\DI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FingertipsDataExtractionToolTest", "FingertipsDataExtractionToolTest\FingertipsDataExtractionToolTest.csproj", "{318AC2BF-8B87-4260-8D9D-F55E85E51929}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataHelpers", "DataHelpers\DataHelpers.csproj", "{24500DF1-56B2-425C-BDE4-851561897EC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSorting", "DataHelpers\DataSorting.csproj", "{24500DF1-56B2-425C-BDE4-851561897EC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataHelpersTest", "DataHelpersTest\DataHelpersTest.csproj", "{E925A8BA-2873-4516-AA28-5D352B81E889}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataSortingTest", "DataHelpersTest\DataSortingTest.csproj", "{E925A8BA-2873-4516-AA28-5D352B81E889}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

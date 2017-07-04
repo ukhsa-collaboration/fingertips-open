@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Ckan.Model;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
 using PholioVisualisation.PholioObjects;
 
 namespace Ckan.DataTransformation
@@ -16,8 +18,7 @@ namespace Ckan.DataTransformation
         public CkanResource GetUnsavedResource(string packageId, IndicatorMetadata indicatorMetadata,
             IList<CkanCoreDataSet> dataList)
         {
-            IDictionary<string, string> descriptive = indicatorMetadata.Descriptive;
-            var indicatorName = descriptive[IndicatorMetadataTextColumnNames.Name];
+            var indicatorName = indicatorMetadata.Name;
 
             // Add metadata resource
             var resource = new CkanResource();
@@ -28,7 +29,7 @@ namespace Ckan.DataTransformation
 
             // Add file to resource
             byte[] fileContents = GetCoreDataFileAsBytes(dataList);
-            var fileNamer = new CkanFileNamer(indicatorName);
+            var fileNamer = new SingleEntityFileNamer(indicatorName);
             resource.File = new CkanResourceFile
             {
                 FileName = fileNamer.DataFileName,
@@ -53,42 +54,7 @@ namespace Ckan.DataTransformation
             {
                 var coreDataSet = data.Data;
 
-                string categoryTypeId = coreDataSet.CategoryTypeId != -1
-                    ? lookUpManager.GetCategoryTypeName(coreDataSet.CategoryTypeId)
-                    : "";
-
-                string categoryId = coreDataSet.CategoryId != -1
-                    ? lookUpManager.GetCategoryName(coreDataSet.CategoryTypeId, coreDataSet.CategoryId)
-                    : "";
-
-                var val = coreDataSet.IsValueValid
-                    ? coreDataSet.Value.ToString()
-                    : "";
-
-                string lowerCI;
-                string upperCI;
-                if (coreDataSet.AreCIsValid)
-                {
-                    lowerCI = coreDataSet.LowerCI.ToString();
-                    upperCI = coreDataSet.UpperCI.ToString();
-                }
-                else
-                {
-                    lowerCI = string.Empty;
-                    upperCI = string.Empty;
-                }
-
-                var count = coreDataSet.IsCountValid
-                    ? coreDataSet.Count.ToString()
-                    : "";
-
-                var denominator = coreDataSet.IsDenominatorValid
-                    ? coreDataSet.Denominator.ToString()
-                    : "";
-
-                var valueNote = coreDataSet.ValueNoteId > 0
-                    ? lookUpManager.GetValueNoteText(coreDataSet.ValueNoteId)
-                    : "";
+                var formatter = new CoreDataSetExportFormatter(lookUpManager, coreDataSet);
 
                 var areaCode = coreDataSet.AreaCode;
                 csvWriter.AddLine(
@@ -97,15 +63,15 @@ namespace Ckan.DataTransformation
                     lookUpManager.GetAreaTypeName(areaCode),
                     lookUpManager.GetSexName(coreDataSet.SexId),
                     lookUpManager.GetAgeName(coreDataSet.AgeId),
-                    categoryTypeId,
-                    categoryId,
+                    formatter.CategoryType,
+                    formatter.Category,
                     data.TimePeriodString,
-                    val,
-                    lowerCI,
-                    upperCI,
-                    count,
-                    denominator,
-                    valueNote);
+                    formatter.Value,
+                    formatter.LowerCI,
+                    formatter.UpperCI,
+                    formatter.Count,
+                    formatter.Denominator,
+                    formatter.ValueNote);
             }
 
             byte[] bytes = csvWriter.WriteAsBytes();

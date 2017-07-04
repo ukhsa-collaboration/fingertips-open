@@ -17,16 +17,16 @@ namespace Profiles.DataAccess
         private readonly string _accessTokenSecret;
         private readonly string _consumerKey;
         private readonly string _consumerSecret;
-        private readonly string _screenName;
+        private readonly string _handle;
 
-        public TwitterPullService(string consumerKey, string consumerSecret, string accessToken, string accessTokenSecret,
-            string twitterHandle)
+        public TwitterPullService(string consumerKey, string consumerSecret, 
+            string accessToken, string accessTokenSecret, string twitterHandle)
         {
             _consumerKey = consumerKey;
             _accessToken = accessToken;
             _accessTokenSecret = accessTokenSecret;
             _consumerSecret = consumerSecret;
-            _screenName = twitterHandle;
+            _handle = twitterHandle;
         }
 
 
@@ -51,7 +51,6 @@ namespace Profiles.DataAccess
 
             // message api details
             string resourceUrl = "https://api.twitter.com/1.1/statuses/user_timeline.json";
-            string screenName = _screenName;
             // create oauth signature
             string baseFormat = "oauth_consumer_key={0}&oauth_nonce={1}&oauth_signature_method={2}" +
                                 "&oauth_timestamp={3}&oauth_token={4}&oauth_version={5}&screen_name={6}";
@@ -63,7 +62,7 @@ namespace Profiles.DataAccess
                 oauthTimestamp,
                 oauthToken,
                 oauthVersion,
-                Uri.EscapeDataString(screenName)
+                Uri.EscapeDataString(_handle)
                 );
 
             baseString = string.Concat("GET&", Uri.EscapeDataString(resourceUrl), "&", Uri.EscapeDataString(baseString));
@@ -96,29 +95,30 @@ namespace Profiles.DataAccess
 
             ServicePointManager.Expect100Continue = false;
 
-            string postBody = "screen_name=" + Uri.EscapeDataString(screenName); 
+            string postBody = "screen_name=" + Uri.EscapeDataString(_handle);
             resourceUrl += "?" + postBody;
             var request = (HttpWebRequest)WebRequest.Create(resourceUrl);
             request.Headers.Add("Authorization", authHeader);
             request.Method = "GET";
             request.ContentType = "application/x-www-form-urlencoded";
-
-            WebResponse response = request.GetResponse();
-            string responseData = new StreamReader(response.GetResponseStream()).ReadToEnd();
-            response.Close();
+            request.Proxy = new WebProxy(AppConfig.Instance.WebProxy);
 
             var tweets = new List<Tweet>();
             try
             {
-                JArray jsonDatArray = JArray.Parse(responseData);
-                if (jsonDatArray != null)
+                WebResponse response = request.GetResponse();
+                string responseData = new StreamReader(response.GetResponseStream()).ReadToEnd();
+                response.Close();
+
+                JArray jsonArray = JArray.Parse(responseData);
+                if (jsonArray != null)
                 {
                     for (int i = 0; i < noOfTweets; i++)
                     {
                         tweets.Add(new Tweet
                         {
-                            Text = jsonDatArray[i]["text"].ToString(),
-                            CreatedDate = TimeAgo(StringToDateTime(jsonDatArray[i]["created_at"].ToString()))
+                            Text = jsonArray[i]["text"].ToString(),
+                            CreatedDate = TimeAgo(StringToDateTime(jsonArray[i]["created_at"].ToString()))
                         });
                     }
                 }

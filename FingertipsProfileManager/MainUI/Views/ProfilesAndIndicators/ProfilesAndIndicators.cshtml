@@ -61,7 +61,7 @@
             {
                 <b>Area:</b>
                 @Html.DropDownListFor(model => model.Profile.SelectedAreaType, Model.AreaTypeList,
-                    new { Id = "SelectedAreaTypeId", Name = "SelectedAreaTypeId", style = "width: 150px;" })
+                    new { Id = "SelectedAreaTypeId", Name = "SelectedAreaTypeId", style = "max-width: 200px;" })
             }
             @Html.Hidden("sortBy", Model.SortBy)
             @Html.Hidden("ascending", Model.SortAscending)

@@ -64,5 +64,26 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
             // Clean up
             File.Delete(filePath);
         }
+
+        [TestMethod]
+        public void TestIsStaticReportAvailable_Returns_True()
+        {
+            // Arrange: create file
+            var filePath = Path.Combine(profileDirectoryPath, FileName);
+            File.WriteAllText(filePath, string.Empty);
+
+            // Assert file exists
+            Assert.IsTrue(new StaticReportsController().IsStaticReportAvailable(ProfileDirectoryName, FileName));
+
+            // Clean up
+            File.Delete(filePath);
+        }
+
+        [TestMethod]
+        public void TestIsStaticReportAvailable_Returns_False()
+        {
+            // Assert file does not exist
+            Assert.IsFalse(new StaticReportsController().IsStaticReportAvailable(ProfileDirectoryName, FileName));
+        }
     }
 }

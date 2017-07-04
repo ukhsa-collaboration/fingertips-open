@@ -59,9 +59,17 @@ namespace Profiles.DataConstruction
         {
             get
             {
-                return _environment == FingertipsEnvironment.Development ?
-                    "http://" :
-                    "https://";
+                switch (_environment)
+                {
+                    case FingertipsEnvironment.Testing:
+                        return "https://";
+                    case FingertipsEnvironment.Live:
+                        /* DF - live used to be https but users preferentially directed to http
+                         * to mitigate PHE network caching, especially of error pages  */
+                        return "http://";
+                    default:
+                        return "http://";
+                }
             }
         }
 

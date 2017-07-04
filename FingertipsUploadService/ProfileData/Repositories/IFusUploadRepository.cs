@@ -7,5 +7,6 @@ namespace FingertipsUploadService.ProfileData.Repositories
     {
         IEnumerable<UploadJob> GetNotStartedOrConfirmationGivenUploadJobs();
         void UpdateJob(UploadJob uploadJob);
+        void CreateNewJob(UploadJob job);
     }
 }

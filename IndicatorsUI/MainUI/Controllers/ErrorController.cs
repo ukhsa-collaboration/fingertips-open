@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Routing;
-using System.Web.Mvc;
-using Profiles.DataAccess;
+﻿using Profiles.DataAccess;
 using Profiles.MainUI.Helpers;
 using Profiles.MainUI.Models;
 using Profiles.MainUI.Skins;
+using System;
+using System.Net;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Profiles.MainUI.Controllers
 {
@@ -77,6 +75,11 @@ namespace Profiles.MainUI.Controllers
             return View(ViewName, errorPageModel);
         }
 
+        public ActionResult BrowserNotSupported()
+        {
+            return View("BrowserNotSupported");
+        }
+
 
         public static ActionResult InvokeHttp404(HttpContextBase httpContext)
         {
@@ -90,6 +93,5 @@ namespace Profiles.MainUI.Controllers
 
             return new EmptyResult();
         }
-
     }
 }

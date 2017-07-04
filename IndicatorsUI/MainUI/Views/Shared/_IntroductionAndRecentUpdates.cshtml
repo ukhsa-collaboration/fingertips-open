@@ -3,31 +3,36 @@
 @using Profiles.MainUI.Models
 @model PageModel
 @{
-    // Recent updates content
-    HtmlString recentUpdates = ContentProvider.GetContent(ContentKeys.RecentUpdates, Model.ProfileId);
+    // Recent updates content (fails frequently on live for unknown reason)
+    HtmlString recentUpdates = ContentProvider.GetRecentUpdates(Model.ProfileId);
     var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
-    var areUpdates = recentUpdates != null && recentUpdates.ToString().Length > 0;
+    var areUpdates = recentUpdates.ToString().Length > 0;
 }
 
 <div id="introduction" class="container">
     <div class="row">
         <div class="col-md-8">
             @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
-            @ContentProvider.GetContent(ContentKeys.Introduction, Model.ProfileId)
+            @ContentProvider.GetIntroduction(Model.ProfileId)
         </div>
         @if (Model.IsTwitterAccount)
         {
             @Html.Partial("_TwitterBox")
         }
-        <div id="recent-updates" class="col-md-4">
-            @Html.Partial("_StartButton")
-            @if (areUpdates)
+        <div class="col-md-4">
+            <div id="intro-sidebar">
+                @Html.Partial("_StartButton")
+                @ContentProvider.GetContent(ContentKeys.IntroductionSidebar, Model.ProfileId)
+            </div>
+            <div id="recent-updates">
+                @if (areUpdates)
             {
-                <h2>Recent updates</h2>
-                <div class="@updatesCssClass">
-                    @recentUpdates
-                </div>
-            }
+                    <h2>Recent updates</h2>
+                    <div class="@updatesCssClass">
+                        @recentUpdates
+                    </div>
+                }
+            </div>
         </div>
     </div>
 </div>

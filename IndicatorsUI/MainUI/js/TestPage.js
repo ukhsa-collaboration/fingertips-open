@@ -14,7 +14,7 @@ function documentReady() {
             type: 'POST',
             url: FT.url.bridge + 'log/exception?' + parameters,
             cache: false,
-            contentType: 'application/json'
+            contentType: 'application/json; charset=utf-8'
         };
 
         $.ajax(ajaxConfig);

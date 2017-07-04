@@ -4,6 +4,7 @@ using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.DataSorting;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -62,7 +63,6 @@ namespace PholioVisualisation.DataConstruction
         public TrendRoot BuildTrendRoot(ComparatorMap comparatorMap, GroupRoot root,
             ITrendDataReader trendReader, IList<string> childAreaCodes)
         {
-
             Init();
 
             TrendRoot trendRoot = new TrendRoot(root);
@@ -80,7 +80,6 @@ namespace PholioVisualisation.DataConstruction
                 if (categoryArea != null)
                 {
                     var categoryTypeId = categoryArea.CategoryTypeId;
-                    //TODO: we we don't have data for trends calculate on the fly
                     var categoryAreaDataList = trendReader.GetTrendDataForSpecificCategory(Grouping,
                         AreaCodes.England, categoryTypeId, categoryArea.CategoryId);
                     comparatorIdToComparatorTrendData.Add(comparator.ComparatorId, categoryAreaDataList);
@@ -114,6 +113,8 @@ namespace PholioVisualisation.DataConstruction
                 IList<TrendDataPoint> trendDataPoints = new List<TrendDataPoint>();
                 foreach (var timePeriod in periods)
                 {
+                    targetComparer = new TargetComparerProvider(groupDataReader, areasReader)
+                        .GetTargetComparer(IndicatorMetadata, Grouping, timePeriod);
 
                     var coreDataSet = GetDataAtSpecificTimePeriod(dataList, timePeriod)
                                     ?? CoreDataSet.GetNullObject(areaCode);
@@ -164,8 +165,6 @@ namespace PholioVisualisation.DataConstruction
         private void Init()
         {
             comparer = NewIndicatorComparer();
-            targetComparer = TargetComparerFactory.New(IndicatorMetadata.TargetConfig);
-            // Note: TargetComparerHelper.AssignExtraDataIfRequired called in GroupDataProcessor
         }
 
         private IndicatorComparer NewIndicatorComparer()
@@ -254,31 +253,6 @@ namespace PholioVisualisation.DataConstruction
             // Compare against target
             if (targetComparer != null)
             {
-                if (targetComparer as BespokeTargetPreviousYearEnglandValueComparer != null)
-                {
-                    var bespokeComparer = targetComparer as BespokeTargetPreviousYearEnglandValueComparer;
-
-                    // Assign benchmark data to bespoke comparator
-                    var comparatorTrendData = comparatorIdToComparatorTrendData[ComparatorIds.England];
-                    bespokeComparer.BenchmarkData = GetDataAtSpecificTimePeriod(comparatorTrendData, period.GetTimePeriodForYearBefore());
-                }
-                else
-                {
-                    if (targetComparer as BespokeTargetPercentileRangeComparer != null)
-                    {
-                        var bespokeComparer = targetComparer as BespokeTargetPercentileRangeComparer;
-
-                        var nationalValues = groupDataReader.GetCoreDataForAllAreasOfType(grouping, period);
-                        var percentileCalculator = new BespokeTargetPercentileRangeCalculator(nationalValues.Where(x => x.IsValueValid).Select(x => x.Value).ToList());
-
-                        bespokeComparer.LowerTargetPercentileBenchmarkData =
-                            new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetLowerTargetPercentile()) };
-
-                        bespokeComparer.UpperTargetPercentileBenchmarkData =
-                            new CoreDataSet() { Value = percentileCalculator.GetPercentileValue(bespokeComparer.GetUpperTargetPercentile()) };
-                    }
-                }
-
                 sig.Add(ComparatorIds.Target, targetComparer.CompareAgainstTarget(data));
             }
 

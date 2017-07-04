@@ -60,7 +60,7 @@ namespace Profiles.MainUI.Helpers
         private static void CallLogService(string jsonException, string serviceAction)
         {
             var logger = WebRequest.Create(AppConfig.Instance.CoreWsUrlForLogging + "log/" + serviceAction) as HttpWebRequest;
-            logger.ContentType = "application/json";
+            logger.ContentType = "application/json; charset=utf-8";
             logger.Method = "POST";
 
             var exception = ConvertJsonToByteArray(jsonException);

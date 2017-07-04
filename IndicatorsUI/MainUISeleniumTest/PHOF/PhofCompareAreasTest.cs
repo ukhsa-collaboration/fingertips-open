@@ -41,12 +41,12 @@ namespace IndicatorsUI.MainUISeleniumTest.PHOF
 
         private string GetColumnData()
         {
-            var noOfRows = driver.FindElements(By.XPath("//*[@id='indicatorDetailsTable']/tbody/tr")).Count;
+            var noOfRows = driver.FindElements(By.XPath("//*[@id='indicator-details-table']/tbody/tr")).Count;
             var columnData = new List<string>();
             for (var i = 0; i < noOfRows; i++)
             {
                 var rowNo = i + 1;
-                var data = driver.FindElement(By.XPath("//*[@id='indicatorDetailsTable']/tbody/tr[" + rowNo + "]/td[" + Area + "]"));
+                var data = driver.FindElement(By.XPath("//*[@id='indicator-details-table']/tbody/tr[" + rowNo + "]/td[" + Area + "]"));
                 columnData.Add(data.Text);
             }
             return string.Concat(columnData);
@@ -54,7 +54,7 @@ namespace IndicatorsUI.MainUISeleniumTest.PHOF
 
         private void SortBy(int column)
         {
-            var xpath = "//*[@id='indicatorDetailsTable']/thead/tr/th[" + column + "]/a";
+            var xpath = "//*[@id='indicator-details-table']/thead/tr/th[" + column + "]/a";
             var valueSortButton = driver.FindElement(By.XPath(xpath));
             valueSortButton.Click();
             waitFor.AjaxLockToBeUnlocked();

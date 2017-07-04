@@ -7,12 +7,12 @@ namespace PholioVisualisation.PholioObjects
 {
     public class ComparatorMap
     {
-        private List<Comparator> comparators = new List<Comparator>();
+        private List<ComparatorDetails> comparators = new List<ComparatorDetails>();
 
         public ComparatorMap LimitByParentArea(ParentArea parentArea)
         {
             ComparatorMap map = new ComparatorMap();
-            IEnumerable<Comparator> result = comparators.Where(c => c.ChildAreaTypeId == parentArea.ChildAreaTypeId &&
+            IEnumerable<ComparatorDetails> result = comparators.Where(c => c.ChildAreaTypeId == parentArea.ChildAreaTypeId &&
                 c.Area.Code == parentArea.AreaCode);
             foreach (var comparator in result)
             {
@@ -21,15 +21,15 @@ namespace PholioVisualisation.PholioObjects
             return map;
         }
 
-        public void Add(Comparator comparator)
+        public void Add(ComparatorDetails comparatorDetails)
         {
-            if (comparator != null)
+            if (comparatorDetails != null)
             {
-                comparators.Add(comparator);
+                comparators.Add(comparatorDetails);
             }
         }
 
-        public IEnumerable<Comparator> Comparators
+        public IEnumerable<ComparatorDetails> Comparators
         {
             get { return comparators.AsReadOnly(); }
         }
@@ -39,9 +39,9 @@ namespace PholioVisualisation.PholioObjects
             get { return comparators.Count; }
         }
 
-        public Comparator GetComparatorById(int id, int areaTypeId)
+        public ComparatorDetails GetComparatorById(int id, int areaTypeId)
         {
-            IEnumerable<Comparator> result = comparators.Where(c => c.ComparatorId == id && c.ChildAreaTypeId == areaTypeId);
+            IEnumerable<ComparatorDetails> result = comparators.Where(c => c.ComparatorId == id && c.ChildAreaTypeId == areaTypeId);
             if (result.Count() > 1)
             {
                 throw new FingertipsException("More than 1 comparator with same ID where only 1 expected.");
@@ -49,9 +49,9 @@ namespace PholioVisualisation.PholioObjects
             return result.FirstOrDefault();
         }
 
-        public Comparator GetComparatorById(int id)
+        public ComparatorDetails GetComparatorById(int id)
         {
-            IEnumerable<Comparator> result = comparators.Where(c => c.ComparatorId == id);
+            IEnumerable<ComparatorDetails> result = comparators.Where(c => c.ComparatorId == id);
             if (result.Count() > 1)
             {
                 throw new FingertipsException("More than 1 comparator with same ID where only 1 expected.");
@@ -59,19 +59,19 @@ namespace PholioVisualisation.PholioObjects
             return result.FirstOrDefault();
         }
 
-        public Comparator GetSubnationalComparator()
+        public ComparatorDetails GetSubnationalComparator()
         {
             return GetComparatorById(ComparatorIds.Subnational);
         }
 
-        public Comparator GetRegionalComparatorByRegion(ParentArea parentArea)
+        public ComparatorDetails GetRegionalComparatorByRegion(ParentArea parentArea)
         {
             return comparators.FirstOrDefault(comparator => comparator.ComparatorId == ComparatorIds.Subnational &&
                                                             comparator.Area.Code == parentArea.AreaCode &&
                                                             comparator.ChildAreaTypeId == parentArea.ChildAreaTypeId);
         }
 
-        public Comparator GetNationalComparator()
+        public ComparatorDetails GetNationalComparator()
         {
             return comparators.FirstOrDefault(comparator => comparator.ComparatorId == ComparatorIds.England);
         }

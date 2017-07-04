@@ -29,83 +29,57 @@ namespace FingertipsUploadService
                 var batchUpload = ToBatchUpload(job);
                 _jobStatus = new StatusHelper(_jobRepository, _logger);
 
+
                 _logger.Info("Job ID {0} current status is {1} ", job.Guid, job.Status);
 
-                // If user wants to override duplications 
-                if (job.Status == UploadJobStatus.ConfirmationGiven)
+                var originalStatus = job.Status;
+                _jobStatus.InProgress(job);
+
+                // Initial check file is OK
+                if (originalStatus == UploadJobStatus.NotStarted)
+                {
+                    if (IsWorksheetNameValid(job, nameValidator, fileReader) == false) return;
+                }
+
+                // Parse table
+                var batchDataTable = GetBatchData(fileReader);
+
+                // Check the column names
+                if (ValidateColumnNames(job, batchUpload, batchDataTable) == false) return;
+                // Sanitize the data
+                SanitizeDataTable(fileReader, batchDataTable);
+
+                // Save the total number of rows in file
+                WorkerHelper.UpdateNumberOfRowsInFile(job, batchDataTable, _jobRepository);
+
+
+                // Do all validation
+                UpdateJobProgress(job, ProgressStage.ValidatingData);
+                processor.Validate(batchDataTable, batchUpload);
+
+                // If we have a new job
+                if (originalStatus == UploadJobStatus.NotStarted)
+                {
+                    if (DoesUserHavePermissionForAllIndicators(job, processor) == false) return;
+                    if (AreAnySmallNumbers(job, batchUpload)) return;
+                    if (AreAnyValidationFailures(job, batchUpload)) return;
+                }
+
+                // Duplicate rows have not been accepted
+                if (originalStatus != UploadJobStatus.ConfirmationGiven)
                 {
                     _jobStatus.InProgress(job);
-
-                    // Read indicators in datatable
-                    var batchDataTable = GetBatchData(fileReader);
-
-                    SanitizeDataTable(fileReader, batchDataTable);
-
-                    // Save the total number of rows in file
-                    WorkerHelper.UpdateNumberOfRowsInFile(job, batchDataTable, _jobRepository, true);
-
-                    //Perform validation once again to get the list 
-                    // of duplicate rows in database
-                    processor.Validate(batchDataTable, batchUpload);
-
-                    // Remove duplications in file
-                    CheckDuplicateRowsInWorksheet(job, batchUpload, ref batchDataTable);
-
-                    // Archive rows
-                    processor.ArchiveDuplicates(batchUpload.DuplicateRowInDatabaseErrors, job);
-
-                    // Upload data to core data set
-                    UploadDataToCoreDataSet(job, processor, batchDataTable);
+                    if (AreAnyDuplicateRowsInDatabase(job, batchUpload)) return;
                 }
-                else // If we have a new job
-                {
-                    _jobStatus.InProgress(job);
 
-                    // Get worksheets from file
-                    var worksheets = fileReader.GetWorksheets();
+                // Remove duplications in file
+                CheckDuplicateRowsInWorksheet(job, batchUpload, ref batchDataTable);
 
-                    UpdateJobProgress(job, ProgressStage.ValidatingWorksheets);
+                // Archive rows
+                processor.ArchiveDuplicates(batchUpload.DuplicateRowInDatabaseErrors, job);
 
-                    // Check worksheet names are correct
-                    var worksheetsOk = CheckWorksheets(job, nameValidator, worksheets);
-                    if (!worksheetsOk) return;
-
-                    var batchDataTable = GetBatchData(fileReader);
-
-                    SanitizeDataTable(fileReader, batchDataTable);
-
-                    // Save the total number of rows in file
-                    WorkerHelper.UpdateNumberOfRowsInFile(job, batchDataTable, _jobRepository, true);
-
-                    UpdateJobProgress(job, ProgressStage.ValidatingData);
-
-                    processor.Validate(batchDataTable, batchUpload);
-
-                    var indicatorIdsInBatch = processor.GetIndicatorIdsInBatch();
-
-                    UpdateJobProgress(job, ProgressStage.CheckingPermission);
-
-                    // Check user permission for indicators
-                    var permissionsOk = CheckPermission(job, indicatorIdsInBatch);
-                    if (!permissionsOk) return;
-
-                    UpdateJobProgress(job, ProgressStage.CheckingDuplicationInFile);
-
-                    // Check for duplications in file
-                    CheckDuplicateRowsInWorksheet(job, batchUpload, ref batchDataTable);
-
-                    // Check validation errors
-                    var validationOk = CheckValidationFailures(job, batchUpload);
-                    if (!validationOk) return;
-
-                    UpdateJobProgress(job, ProgressStage.CheckingDuplicationInDb);
-
-                    // Check for duplications database rows
-                    var haveDuplicates = CheckDuplicateRowsInDatabase(job, batchUpload);
-                    if (haveDuplicates) return;
-
-                    UploadDataToCoreDataSet(job, processor, batchDataTable);
-                }
+                // Upload data to core data set
+                UploadDataToCoreDataSet(job, processor, batchDataTable);
             }
             catch (Exception ex)
             {
@@ -113,6 +87,7 @@ namespace FingertipsUploadService
                 _logger.Error(ex);
             }
         }
+
 
         /// <summary>
         /// Replace missing values with defaults for Excel file only. This is done on parsing for CSV file.
@@ -125,8 +100,10 @@ namespace FingertipsUploadService
             }
         }
 
-        private bool CheckDuplicateRowsInDatabase(UploadJob job, BatchUpload batchUpload)
+        private bool AreAnyDuplicateRowsInDatabase(UploadJob job, BatchUpload batchUpload)
         {
+            UpdateJobProgress(job, ProgressStage.CheckingDuplicationInDb);
+
             if (batchUpload.DuplicateRowInDatabaseErrors.Count <= 0) return false;
 
             _jobStatus.ConfirmationAwaited(job);
@@ -139,16 +116,28 @@ namespace FingertipsUploadService
             return true;
         }
 
-        private bool CheckValidationFailures(UploadJob job, BatchUpload batchUpload)
+        private bool AreAnySmallNumbers(UploadJob job, BatchUpload batchUpload)
         {
-            if (batchUpload.UploadValidationFailures.Count <= 0) return true;
+            if (batchUpload.SmallNumberWarnings.Count <= 0) return false;
+
+            _jobStatus.SmallNumbersFound(job);
+            var warning = ErrorBuilder.GetSmallNumberWarning(job, batchUpload.SmallNumberWarnings);
+            _jobErrorRepository.Log(warning);
+            _logger.Info("Job ID {0}, Small number cound in row", job.Guid);
+
+            return true;
+        }
+
+        private bool AreAnyValidationFailures(UploadJob job, BatchUpload batchUpload)
+        {
+            if (batchUpload.UploadValidationFailures.Count <= 0) return false;
 
             _jobStatus.FailedValidation(job);
 
             var error = ErrorBuilder.GetConversionError(job.Guid, batchUpload.UploadValidationFailures);
             _jobErrorRepository.Log(error);
             _logger.Info("Job ID {0}, Data type conversion errors occurred ", job.Guid);
-            return false;
+            return true;
         }
 
         private void CheckDuplicateRowsInWorksheet(UploadJob job, BatchUpload batchUpload, ref DataTable batchDataTable)
@@ -162,8 +151,10 @@ namespace FingertipsUploadService
             }
         }
 
-        private bool CheckPermission(UploadJob job, List<int> indicatorIdsInBatch)
+        private bool DoesUserHavePermissionForAllIndicators(UploadJob job, IBatchWorksheetDataProcessor processor)
         {
+            var indicatorIdsInBatch = processor.GetIndicatorIdsInBatch();
+            UpdateJobProgress(job, ProgressStage.CheckingPermission);
             var hasPermission = new IndicatorPermission().Check(indicatorIdsInBatch, job, _jobErrorRepository);
             if (hasPermission) return true;
             _jobStatus.FailedValidation(job);
@@ -172,8 +163,11 @@ namespace FingertipsUploadService
             return false;
         }
 
-        private bool CheckWorksheets(UploadJob job, IWorksheetNameValidator nameValidator, List<string> worksheets)
+        private bool IsWorksheetNameValid(UploadJob job, IWorksheetNameValidator nameValidator, IUploadFileReader fileReader)
         {
+            var worksheets = fileReader.GetWorksheets();
+            UpdateJobProgress(job, ProgressStage.ValidatingWorksheets);
+
             if (nameValidator.ValidateBatch(worksheets)) return true;
 
             _jobStatus.FailedValidation(job);
@@ -183,6 +177,34 @@ namespace FingertipsUploadService
             _logger.Info("Job ID {0} doesn't have required worksheets", job.Guid);
             _logger.Info("Job ID {0} status changed to {1} ", job.Guid, job.Status);
             return false;
+        }
+
+
+        private bool ValidateColumnNames(UploadJob job, BatchUpload batchUpload, DataTable batchDataTable)
+        {
+            // Createm empty datatable 
+            var areColumnNamesValid = true;
+            var emptyCorrectDataTable = new UploadDataSchema().CreateEmptyTable();
+            var wrongColumns = new List<string>();
+            for (var i = 0; i < emptyCorrectDataTable.Columns.Count; i++)
+            {
+                if (batchDataTable.Columns[i].ColumnName.ToLower() !=
+                    emptyCorrectDataTable.Columns[i].ColumnName.ToLower())
+                {
+                    _jobStatus.ColumnNameValidationFailed(job);
+                    var wrongColumnName = batchDataTable.Columns[i].ColumnName;
+                    wrongColumns.Add("Invalid column name " + wrongColumnName);
+                    _logger.Error("{0} Column does not exist or column order is wrong", wrongColumnName);
+                }
+            }
+
+            if (wrongColumns.Count > 0)
+            {
+                var error = ErrorBuilder.GetColumnNameValidatoinError(job, wrongColumns);
+                _jobErrorRepository.Log(error);
+                areColumnNamesValid = false;
+            }
+            return areColumnNamesValid;
         }
 
         private void UpdateJobProgress(UploadJob job, ProgressStage stage)
@@ -225,7 +247,8 @@ namespace FingertipsUploadService
                 DuplicateRowInDatabaseErrors = new List<DuplicateRowInDatabaseError>(),
                 DuplicateRowInSpreadsheetErrors = new List<DuplicateRowInSpreadsheetError>(),
                 ExcelDataSheets = new List<UploadExcelSheet>(),
-                UploadValidationFailures = new List<UploadValidationFailure>()
+                UploadValidationFailures = new List<UploadValidationFailure>(),
+                ColumnErrors = new List<string>()
             };
             return batchUpload;
         }

@@ -1,14 +1,14 @@
 ﻿@using System.Web.Optimization
 @using Fpm.MainUI
 
-@model Fpm.MainUI.ViewModels.ProfileViewModel
+@model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
 
 @{
     Layout = "~/Views/Shared/_LayoutPage.cshtml"; 
     ViewBag.Title = "FPM - Create Profile";
 }
 
-@Scripts.Render("~/bundles/profile-management")
+@Scripts.Render("~/profile.js")
 
 <div class="standardWidth">
     <h2 class="subheading">Profile details</h2>
@@ -66,8 +66,6 @@
         <input class="medium-button" id="CancelBtn" type="button" onclick="location.href='@Model.ReturnUrl    '" value="Cancel" />
     </div>
 
-    @Html.Partial("_UserPermissions", Model.ProfileUsers)
-        
     @Html.HiddenFor(x => x.Id)
     @Html.HiddenFor(x => x.ReturnUrl)
     @Html.HiddenFor(m => m.ProfileUsers,"")

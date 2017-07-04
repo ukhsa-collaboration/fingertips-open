@@ -1,8 +1,4 @@
-﻿
-
-
-
-namespace FingertipsUploadService
+﻿namespace FingertipsUploadService
 {
     public static class AutoMapperConfig
     {

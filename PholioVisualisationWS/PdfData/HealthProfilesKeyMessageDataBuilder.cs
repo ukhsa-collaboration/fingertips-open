@@ -75,8 +75,6 @@ namespace PholioVisualisation.PdfData
             AssignAdultStatutoryHomelessnessSig();
             AssignAdultViolentCrimeSig();
             AssignAdultLongTermUnemploymentSig();
-            AssignAdultIncidenceOfMalignantMelanomaSig();
-            AssignAdultDrugMisuseSig();
             AssignAdultExcessWinterDeathsSig();
             AssignAdultUnder75MortalityRateCvdSig();
             AssignAdultUnder75MortalityRateCancerSig();
@@ -330,7 +328,7 @@ namespace PholioVisualisation.PdfData
             {
                 if (coreDataSet.IsValueValid)
                 {
-                    keyMessageData.AdultSelfHarmAdmissions = NumberCommariser.Commarise1DP(coreDataSet.Value);
+                    keyMessageData.AdultSelfHarmAdmissions = NumberCommariser.Commarise0DP(coreDataSet.Value);
                 }
 
                 if (coreDataSet.IsCountValid)
@@ -450,17 +448,6 @@ namespace PholioVisualisation.PdfData
         {
             keyMessageData.AdultLongTermUnemploymentSig =
                 GetSignificanceOnly(groupRootSelector.AdultLongTermUnemployment);
-        }
-
-        public void AssignAdultIncidenceOfMalignantMelanomaSig()
-        {
-            keyMessageData.AdultIncidenceOfMalignantMelanomaSig =
-                GetSignificanceOnly(groupRootSelector.AdultIncidenceOfMalignantMelanoma);
-        }
-
-        public void AssignAdultDrugMisuseSig()
-        {
-            keyMessageData.AdultDrugMisuseSig = GetSignificanceOnly(groupRootSelector.AdultDrugMisuse);
         }
 
         public void AssignAdultExcessWinterDeathsSig()

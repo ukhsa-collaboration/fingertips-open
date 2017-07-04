@@ -2,17 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
 {
     public class GroupRootBuilder
     {
+        // set required: Automatically implemented properties must define both get and set accessors
         private IList<GroupRoot> GroupRoots { get; set; }
         private GroupRoot root;
-
-        private PholioReader pholioReader = ReaderFactory.GetPholioReader();
 
         public GroupRootBuilder()
         {

@@ -13,6 +13,9 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
     var html = ['<tr>'],
         comparisonConfig = new ComparisonConfig(groupRoot, metadata);
 
+    var unit = !!metadata ? metadata.Unit : null;
+    var valueDisplayer = new ValueDisplayer(unit);
+
     // Indicator name
     var indicatorText = formatter.getIndicatorName() + getIndicatorDataQualityHtml(formatter.getDataQuality());
     var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
@@ -51,7 +54,7 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
             var regionalDataInfo = new CoreDataSetInfo(regionalData);
             columnNumber = columnNumber + 1;
             id = 'apc_' + rowNumber + '_' + columnNumber;
-            addTd(html, new ValueDisplayer().byDataInfo(regionalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, regionalDataInfo.getNoteId(), id);
+            addTd(html, valueDisplayer.byDataInfo(regionalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, regionalDataInfo.getNoteId(), id);
         }
     }
 
@@ -60,21 +63,30 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
         var nationalDataInfo = new CoreDataSetInfo(nationalData);
         columnNumber = columnNumber + 1;
         id = 'apc_' + rowNumber + '_' + columnNumber;
-        addTd(html, new ValueDisplayer().byDataInfo(nationalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, nationalDataInfo.getNoteId(), id);
+        addTd(html, valueDisplayer.byDataInfo(nationalDataInfo, { noCommas: 'y' }), CSS_NUMERIC, null, nationalDataInfo.getNoteId(), id);
     }
 
     // Min, spine chart, max
     var spine = getSpineChartHtml(rowNumber, groupRoot, coreDataSet, stats, benchmarkData, metadata, comparisonConfig, haveRequiredValues);
 
     if (spine === NO_SPINE_DATA || spine === INSUFFICIENT_DATA) {
+        // No data
         var min = NO_DATA,
-            max = NO_DATA;
+            max = NO_DATA,
+            minPolarity = null,
+            maxPolarity = null;
     } else {
+        // Data available
         min = formatter.getMin();
         max = formatter.getMax();
+        minPolarity = polarityToText(groupRoot.PolarityId, true);
+        maxPolarity = polarityToText(groupRoot.PolarityId, false);
     }
-    addTd(html, min, CSS_NUMERIC);
+    
+    // Min
+    addTd(html, min, CSS_NUMERIC_WITH_TOOLTIP, minPolarity);
 
+    // Spine chart
     if (areaProfileState.isAreaIgnored) {
         if (rowNumber === 1) {
             // Use first row to display an explanation why spine charts are not displayed for the area
@@ -91,7 +103,8 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
         addTd(html, spine, 'spine250');
     }
 
-    addTd(html, max, CSS_NUMERIC);
+    // Max
+    addTd(html, max, CSS_NUMERIC_WITH_TOOLTIP, maxPolarity);
 
     html.push('</tr>');
 
@@ -124,7 +137,7 @@ function renderIndicatorCell(rootIndex, indicatorText, targetLegend) {
 }
 
 function renderTrendCell(rootIndex, innerContent) {    
-    templates.add('spineTrendCell', '<td id="spine-trend_{{rootIndex}}" onclick="recentTrendSelected.fromAreaProfile({{rootIndex}})" class="cursor-pointer center" >{{{innerContent}}}</td>');
+    templates.add('spineTrendCell', '<td id="spine-trend_{{rootIndex}}" onclick="recentTrendSelected.byGroupRoot({{rootIndex}})" class="cursor-pointer center" >{{{innerContent}}}</td>');
     var html = templates.render('spineTrendCell',
     {
         rootIndex: rootIndex,
@@ -136,14 +149,13 @@ function renderTrendCell(rootIndex, innerContent) {
 
 function goToAreaProfilePage(areaCode) {
 
-    if (!groupRoots.length) {
-        // Search results empty
-        noDataForAreaType();
+    FT.menus.area.setCode(areaCode);
+
+    setPageMode(PAGE_MODES.AREA_SPINE);
+
+    if (!areIndicatorsInDomain()) {
+        displayNoData();
     } else {
-
-        FT.menus.area.setCode(areaCode);
-
-        setPageMode(PAGE_MODES.AREA_SPINE);
 
         ajaxMonitor.setCalls(3);
 
@@ -281,7 +293,7 @@ function getIndicatorStats() {
             ).add('parent_area_code', parentAreaCode);
 
         addProfileOrIndicatorsParameters(parameters);
-        addRestrictToProfilesIdsParameter(parameters)
+        addRestrictToProfilesIdsParameter(parameters);
 
         ajaxGet('api/indicator_statistics', parameters.build(), getIndicatorStatsCallback);
     }
@@ -341,6 +353,8 @@ function setAreaProfileHtml(areaCode) {
         row += 1;
     }
 
+    // Enable tooltip
+    $('[data-toggle="tooltip"]').tooltip();
     setAreaHeadings(area, benchmark);
 }
 
@@ -370,7 +384,7 @@ var areaProfileState = {
 function setIgnoreMessage(area, benchmark) {
     if (areaProfileState.isAreaIgnored) {
         areaProfileState.ignoreMessage = '<td style="position:relative;display:block;height:23px;">' +
-            NO_DATA + '<div id="noSpineBox"><p style="padding:5px;">Due to its small population <i>' +
+            NO_DATA + '<div id="no-spine-box"><p style="padding:5px;">Due to its small population <i>' +
             area.Name + '</i> is not used to determine the lowest, highest and percentile values required for the spine charts. However the area value is included in the <i>' +
             benchmark.Name + '</i> average.</p></div></td>';
     }
@@ -483,15 +497,25 @@ AreaTooltipProvider.prototype = {
     }
 }
 
+function polarityToText(polarity, isForLowest) {    
+    var txt;
+    if (polarity === 0 || polarity === 1) {
+        txt = isForLowest ? 'Worst' : 'Best';
+    } else {
+        txt = isForLowest ? 'Lowest' : 'Highest';
+    }
+    return txt;
+}
 
-var ID_SINGLE_AREA_TABLE = 'singleAreaTable';
+
+var ID_SINGLE_AREA_TABLE = 'single-area-table';
 var NO_SPINE_DATA = '<div class="noSpine">-</div>';
 var INSUFFICIENT_DATA = '<div class="noSpine">Insufficient number of values for a spine chart</div>';
 
 templates.add('areaProfile',
     '<div style="height:50px;"><div style="width:500px; float:left;padding-top:20px;">' + showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') + '</div><div style="float:right;"> <img src="{{spineChartImage}}"></div></div>' +
-    '<table id="' + ID_SINGLE_AREA_TABLE + '" class="borderedTable" style="table-layout: auto;" cellspacing="0" cellpadding="0"><thead>\
-<tr><th id="spineIndicatorHeader" rowspan="2">Indicator</th><th id="spinePeriodHeader" rowspan="2">Period</th><th style="position: relative;" class="numericHeader areaName topRow" colspan="{{trendColSpan}}">-</th>\
+    '<table id="' + ID_SINGLE_AREA_TABLE + '" class="bordered-table" style="table-layout: auto;" cellspacing="0" cellpadding="0"><thead>\
+<tr><th id="spine-indicator-header" rowspan="2">Indicator</th><th id="spine-period-header" rowspan="2">Period</th><th style="position: relative;" class="numericHeader areaName topRow" colspan="{{trendColSpan}}">-</th>\
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader topRow parent-area-type">{{parentType}}</th>{{/isNotNN}}<th class="numericHeader topRow">England</th>\
 {{/isNationalAndRegional}}<th colspan="{{colSpan}}" class="numericHeader topRow" style="width: 390px;">-</th></tr><tr>\
 {{#trendHeaderIfEnabled}} <th class="numericHeader">Recent Trend</th> {{/trendHeaderIfEnabled}}\
@@ -499,7 +523,7 @@ templates.add('areaProfile',
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader">Value</th>{{/isNotNN}}{{/isNationalAndRegional}}\
 <th class="numericHeader">Value</th><th class="numericHeader">{{lowest}}</th>\
 <th class="spine250">Range</th><th class="numericHeader">{{highest}}</th></tr></thead>\
-<tbody id="spineBody"><tr><td></td></tr></tbody></table>');
+<tbody id="spine-body"><tr><td></td></tr></tbody></table>');
 
 pages.add(PAGE_MODES.AREA_SPINE, {
     id: 'areas',
@@ -511,4 +535,3 @@ pages.add(PAGE_MODES.AREA_SPINE, {
         'spineRangeKeyContainer', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box']
 });
-

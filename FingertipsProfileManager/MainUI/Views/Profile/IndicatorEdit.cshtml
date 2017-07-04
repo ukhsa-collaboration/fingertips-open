@@ -185,78 +185,85 @@
                 }
             </div>
         </div>
-        <div id="tabs-2">
-            <div>
-                @if (doesUserHaveWritePermission && doesProfileOwnIndicator == false)
-                {
-                    <p class="warning">This metadata can only be changed in the profile (@ownerProfileName) that owns this indicator</p>
-                }
-                <label class="associated-detail-label">
-                    Value Type
-                </label>
+    <div id="tabs-2">
+        <div>
+            @if (doesUserHaveWritePermission && doesProfileOwnIndicator == false)
+            {
+                <p class="warning">This metadata can only be changed in the profile (@ownerProfileName) that owns this indicator</p>
+            }
+            <label class="associated-detail-label">
+                Value Type
+            </label>
 
-                @Html.DropDownListFor(x => x.IndicatorMetadata.ValueTypeId, (SelectList) ViewBag.ValueTypeId, 
-                new { @Name = "valueTypeId", @Id = "valueTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    CI Method
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.CIMethodId, (SelectList) ViewBag.CIMethodId,
-                new { @Name = "CIMethodID", @Id = "CIMethodID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    CI Confidence Level
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.ConfidenceLevel, CommonUtilities.GetListOfCiConfidenceLevels(),
-                new { @Name = "CIComparatorConfidence", @Id = "CIComparatorConfidence", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    Unit
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.UnitId, (SelectList) ViewBag.UnitId,
-                new { @Name = "UnitId", @Id = "UnitId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    Denominator
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.DenominatorTypeId, (SelectList) ViewBag.DenominatorTypeId,
-                new { @Name = "DenominatorTypeID", @Id = "DenominatorTypeID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    Year Type
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.YearTypeId, (SelectList) ViewBag.YearTypeId,
-                new { @Name = "YearTypeId", @Id = "YearTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    Decimal places to display
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.DecimalPlacesDisplayed, CommonUtilities.GetListOfDecimalPlaces(),
-                    new { @Name = "DecimalPlaces", @Id = "DecimalPlaces", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    Goal
-                </label>
-                @Html.DropDownListFor(x => x.IndicatorMetadata.TargetId, CommonUtilities.GetListOfTargets(),
-                    new {@Name = "TargetId", @Id = "TargetId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
-            </div>
-            <div>
-                <label class="associated-detail-label">
-                    <small>Spine chart displayed even if < 75% of values are valid</small>
-                </label>
-                @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowSpineChart, 
-                    new { @Name = "ShouldAlwaysShowSpineChart", @Id = "ShouldAlwaysShowSpineChart" })
-                @Html.Hidden("AlwaysShowSpineChart")
-            </div>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.ValueTypeId, (SelectList) ViewBag.ValueTypeId,
+                new {@Name = "valueTypeId", @Id = "valueTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
         </div>
+        <div>
+            <label class="associated-detail-label">
+                CI Method
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.CIMethodId, (SelectList) ViewBag.CIMethodId,
+                new {@Name = "CIMethodID", @Id = "CIMethodID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                CI Confidence Level
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.ConfidenceLevel, CommonUtilities.GetListOfCiConfidenceLevels(),
+                new {@Name = "CIComparatorConfidence", @Id = "CIComparatorConfidence", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                Unit
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.UnitId, (SelectList) ViewBag.UnitId,
+                new {@Name = "UnitId", @Id = "UnitId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                Denominator
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.DenominatorTypeId, (SelectList) ViewBag.DenominatorTypeId,
+                new {@Name = "DenominatorTypeID", @Id = "DenominatorTypeID", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                Year Type
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.YearTypeId, (SelectList) ViewBag.YearTypeId,
+                new {@Name = "YearTypeId", @Id = "YearTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                Decimal places to display
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.DecimalPlacesDisplayed, CommonUtilities.GetListOfDecimalPlaces(),
+                new {@Name = "DecimalPlaces", @Id = "DecimalPlaces", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                Goal
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.TargetId, CommonUtilities.GetListOfTargets(),
+                new {@Name = "TargetId", @Id = "TargetId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                <small>Spine chart displayed even<br>if < 75% of values are valid</small>
+            </label>
+            @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowSpineChart,
+                new {@Name = "ShouldAlwaysShowSpineChart", @Id = "ShouldAlwaysShowSpineChart"})
+            @Html.Hidden("AlwaysShowSpineChart")
+        </div>
+        <div>
+            <label class="associated-detail-label">
+                <small>Warn about small numbers<br>when uploading data</small>
+            </label>
+            @Html.DropDownListFor(x => x.IndicatorMetadata.DisclosureControlId, CommonUtilities.GetListOfDisclosureControl(),
+                new { @Name = "DisclosureControlId", @Id = "DisclosureControlId", @class = "create-indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+        </div>
+    </div>
         <div id="tabs-3">
             <div style="display: none;">
                 <label class="associated-detail-label">

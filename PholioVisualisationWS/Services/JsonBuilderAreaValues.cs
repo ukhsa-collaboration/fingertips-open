@@ -53,7 +53,7 @@ namespace PholioVisualisation.Services
                 ParentAreaCode = _parameters.ParentAreaCode,
                 DataPointOffset = _parameters.DataPointOffset,
                 ComparatorId = _parameters.ComparatorId,
-                RestrictToProfileId = GetProfileId()
+                RestrictToProfileId = profileId
             };
 
             return builder.Build(grouping);

@@ -10,6 +10,34 @@ namespace PholioVisualisation.DataAccessTest
     public class GroupDataReaderTest
     {
         [TestMethod]
+        public void TestGetDataIncludingInequalities()
+        {
+            var grouping = new Grouping
+            {
+                IndicatorId = IndicatorIds.PopulationEating5aDay
+            };
+
+            var timePeriod = new TimePeriod()
+            {
+                Year = 2015,
+                YearRange = 1
+            };
+
+            // Act: get all the data
+            var dataList = GroupDataReader().GetDataIncludingInequalities(
+                grouping, timePeriod, new List<int>(), AreaCodes.England);
+
+            // Assert: ethnicity data found
+            Assert.IsTrue(dataList.Any(x => x.CategoryTypeId == CategoryTypeIds.EthnicGroups7));
+
+            // Assert: age data found
+            Assert.IsTrue(dataList.Any(x => x.AgeId == AgeIds.From35To39));
+
+            // Assert: sex data found
+            Assert.IsTrue(dataList.Any(x => x.SexId == SexIds.Female));
+        }
+
+        [TestMethod]
         public void TestGetLsoaQuintilesWithinParentArea()
         {
             var quintiles = GroupDataReader().GetCategoriesWithinParentArea(
@@ -121,17 +149,17 @@ namespace PholioVisualisation.DataAccessTest
                 reader.GetIndicatorMetadataTextProperties());
 
             Assert.AreEqual(IndicatorIds.ExcessWinterDeaths,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                metadataList.FirstOrDefault(x => x.Name.ToLower()
                     .Contains("winter deaths")).IndicatorId
                 );
 
             Assert.AreEqual(IndicatorIds.OverallPrematureDeaths,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                metadataList.FirstOrDefault(x => x.Name.ToLower()
                     .Contains("overall premature deaths")).IndicatorId
                 );
 
             Assert.AreEqual(IndicatorIds.DeathsFromLungCancer,
-                metadataList.FirstOrDefault(x => x.Descriptive[IndicatorMetadataTextColumnNames.Name].ToLower()
+                metadataList.FirstOrDefault(x => x.Name.ToLower()
                     .Contains("lung cancer")).IndicatorId
                 );
         }
@@ -676,7 +704,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetGroupMetadata()
         {
-            IList<GroupingMetadata> list = GroupDataReader().GetGroupMetadataList(
+            IList<GroupingMetadata> list = GroupDataReader().GetGroupingMetadataList(
                 new List<int>
                 {
                     GroupIds.Phof_HealthProtection,
@@ -688,7 +716,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetGroupMetadataOrderedBySequence()
         {
-            IList<GroupingMetadata> list = GroupDataReader().GetGroupMetadataList(new List<int>
+            IList<GroupingMetadata> list = GroupDataReader().GetGroupingMetadataList(new List<int>
             {
                 2000001,
                 2000002,

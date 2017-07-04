@@ -10,6 +10,11 @@ namespace PholioVisualisation.Analysis
     {
         private IList<double> bounds;
 
+        public ICategoryComparer NewInstance()
+        {
+            return new QuintilesComparer(); 
+        }
+
         public override Significance Compare(CoreDataSet data, CoreDataSet comparator, IndicatorMetadata metadata)
         {
             throw new FingertipsException("Use GetCategory instead of Compare for QuintilesComparer");

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Web.Http;
 
 namespace ServicesWeb
@@ -15,7 +16,7 @@ namespace ServicesWeb
                name: "DefaultApi",
                routeTemplate: "",
                defaults: new { id = RouteParameter.Optional }
-           );
+            );
 
             // Remove XML as default response type
             var appXmlType = config.Formatters.XmlFormatter.SupportedMediaTypes.FirstOrDefault(t => t.MediaType == "application/xml");

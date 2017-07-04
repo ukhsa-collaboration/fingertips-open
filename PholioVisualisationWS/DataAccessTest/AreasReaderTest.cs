@@ -11,6 +11,16 @@ namespace PholioVisualisation.DataAccessTest
     public class AreasReaderTest
     {
         [TestMethod]
+        public void TestGetParentAreasFromChildAreaId()
+        {
+            var map = Reader().GetParentAreasFromChildAreaId(
+                AreaTypeIds.GoRegion, AreaTypeIds.CountyAndUnitaryAuthority);
+
+            // Assert: about 150 LAs
+            Assert.IsTrue(map.Keys.Count > 140 && map.Keys.Count < 160);
+        }
+
+        [TestMethod]
         public void TestGetParentAreaGroup()
         {
             IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Undefined);
@@ -303,20 +313,6 @@ namespace PholioVisualisation.DataAccessTest
             areas = reader.GetParentCodesFromChildAreaId(AreaTypeIds.Pct);
             Assert.IsTrue(areas.Count > 8 && areas.Count < 20);
             Assert.IsTrue(areas.Contains(AreaCodes.Sha_EastOfEngland));
-        }
-
-        [TestMethod]
-        public void TestGetParentAreaCodeForProfile()
-        {
-            IAreasReader reader = ReaderFactory.GetAreasReader();
-
-            // Codes expected
-            IList<string> codes = reader.GetProfileParentAreaCodes(ProfileIds.SubstanceMisuse, AreaTypeIds.GoRegion);
-            Assert.AreEqual(3, codes.Count(), "Expected 3 parent areas for a midlands and east profile");
-
-            // No codes expected
-            codes = reader.GetProfileParentAreaCodes(ProfileIds.Phof, AreaTypeIds.Sha);
-            Assert.AreEqual(0, codes.Count());
         }
 
         [TestMethod]

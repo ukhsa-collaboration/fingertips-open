@@ -37,8 +37,8 @@ namespace Fpm.MainUITest.Helpers
         public void TestIsOverriddenParsedCorrectly()
         {
             var items = new IndicatorMetadataTextParser().Parse(Join("2", "a", "3o", "b"));
-            Assert.IsFalse(items[0].IsOverridden);
-            Assert.IsTrue(items[1].IsOverridden);
+            Assert.IsFalse(items[0].IsBeingOverriddenForFirstTime);
+            Assert.IsTrue(items[1].IsBeingOverriddenForFirstTime);
         }
 
         private static string Join(params string[] items)

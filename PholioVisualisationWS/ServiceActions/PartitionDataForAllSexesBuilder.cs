@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataConstruction;
-using PholioVisualisation.DataHelpers;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.ServiceActions
@@ -96,9 +96,6 @@ namespace PholioVisualisation.ServiceActions
 
         protected override void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> categoryDataList)
         {
-            var area = AreaFactory.NewArea(_areasReader, areaCode);
-            var nationalArea = GetNationalArea(area);
-
             var personsData = categoryDataList.FirstOrDefault(x => x.SexId == SexIds.Persons);
 
             if (personsData == null && _indicatorMetadata.HasTarget == false)
@@ -112,8 +109,9 @@ namespace PholioVisualisation.ServiceActions
             else
             {
                 // Calculate significance (is data for persons or there is a target)
+                var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
                 var indicatorComparisonHelper = new IndicatorComparisonHelper(_indicatorMetadata,
-                    _grouping, _groupDataReader, _pholioReader, nationalArea);
+                    _grouping, _groupDataReader, _pholioReader, targetComparerProvider);
                 foreach (var coreDataSet in categoryDataList)
                 {
                     coreDataSet.SignificanceAgainstOneBenchmark =

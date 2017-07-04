@@ -23,12 +23,6 @@ namespace FingertipsUploadService.Upload
                     lastIndicatorId = row.IndicatorId;
                 }
 
-                if (jobType == UploadJobType.Simple)
-                {
-                    row.CategoryId = -1;
-                    row.CategoryTypeId = -1;
-                }
-
                 var duplicates = repository.GetDuplicateCoreDataSetForAnIndicator(row);
 
                 if (duplicates.Count > 0)

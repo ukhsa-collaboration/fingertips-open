@@ -39,8 +39,11 @@ namespace PholioVisualisation.Formatting
             {
                 Min = NoValue,
                 Max = NoValue,
+                Median = NoValue,
+                Percentile5 = NoValue,
                 Percentile25 = NoValue,
-                Percentile75 = NoValue
+                Percentile75 = NoValue,
+                Percentile95 = NoValue
             };
         }
 

@@ -27,7 +27,7 @@ namespace PholioVisualisation.DataConstruction
 
         private void AddSubnationalComparator(ParentArea parentArea)
         {
-            ComparatorMap.Add(new Comparator
+            ComparatorMap.Add(new ComparatorDetails
             {
                 ComparatorId = ComparatorIds.Subnational,
                 ChildAreaTypeId = parentArea.ChildAreaTypeId,
@@ -37,7 +37,7 @@ namespace PholioVisualisation.DataConstruction
 
         private void AddNationalComparator(int areaTypeId)
         {
-            ComparatorMap.Add(new Comparator
+            ComparatorMap.Add(new ComparatorDetails
             {
                 ComparatorId = ComparatorIds.England,
                 ChildAreaTypeId = areaTypeId,

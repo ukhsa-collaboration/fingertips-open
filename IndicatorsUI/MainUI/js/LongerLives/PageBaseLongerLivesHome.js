@@ -264,24 +264,14 @@ function colourCodePopup() {
     }
 }
 
-function switchPolarity(sig) {
-    if (sig === 3) {
-        return 1;
-    }
-    if (sig === 1) {
-        return 3;
-    }
-    return sig;
-}
-
 function removeSelectedDisease(mapInfoRight) {
     mapInfoRight.removeClass('stat_cancer stat_heart stat_liver stat_lung');
 }
 
 colours = {
     better: '#7CD540',
-    sameBetter: '#FDEE21',
-    sameWorse: '#FB9A02',
+    sameBetter: '#FDEE21', // yellow
+    sameWorse: '#FB9A02', // orange
     worse: '#BC1E2C',
     noComparison: '#c9c9c9',
     bobHigher: '#BED2FF',
@@ -894,5 +884,4 @@ var info_Empty;
 var info_Deprivation;
 var calloutBoxPixelOffset = null;
 activeInfoArea = null;
-
 

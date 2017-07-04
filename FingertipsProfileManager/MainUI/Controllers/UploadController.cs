@@ -4,6 +4,7 @@ using Fpm.ProfileData.Entities.Job;
 using Fpm.ProfileData.Repositories;
 using Microsoft.Ajax.Utilities;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -72,7 +73,8 @@ namespace Fpm.MainUI.Controllers
             {
                 InProgress = jobs.Count(x => x.Status == UploadJobStatus.InProgress),
                 InQueue = jobs.Count(x => x.Status == UploadJobStatus.NotStart),
-                AwaitingConfomation = jobs.Count(x => x.Status == UploadJobStatus.ConfirmationAwaited),
+                AwaitingConfomation = GetNumberOfConfirmationAwaitingJobs(jobs),
+
                 Jobs = jobs
             };
 
@@ -201,6 +203,15 @@ namespace Fpm.MainUI.Controllers
             }
 
             return wasFileSaved;
+        }
+
+        private int GetNumberOfConfirmationAwaitingJobs(IEnumerable<UploadJob> jobs)
+        {
+            var totalJobsAwaitingConfirmation = jobs.Count(x => x.Status == UploadJobStatus.ConfirmationAwaited);
+
+            var totalJobsAwaitingForSmallNumberConfirmation = jobs.Count(x => x.Status == UploadJobStatus.SmallNumberWarningConfirmationAwaited);
+
+            return totalJobsAwaitingConfirmation + totalJobsAwaitingForSmallNumberConfirmation;
         }
 
         private static void EnsureUploadDirectoryExists()

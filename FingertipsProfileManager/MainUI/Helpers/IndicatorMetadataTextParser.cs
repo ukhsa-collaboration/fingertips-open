@@ -26,7 +26,7 @@ namespace Fpm.MainUI.Helpers
                 if (idString.EndsWith("o"))
                 {
                     idString = idString.TrimEnd('o');
-                    item.IsOverridden = true;
+                    item.IsBeingOverriddenForFirstTime = true;
                 }
 
                 item.PropertyId = Int32.Parse(idString);

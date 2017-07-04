@@ -12,7 +12,7 @@ namespace PholioVisualisation.Formatting
 
         public override void Format(ValueData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedValue == false)
             {
                 data.ValueFormatted = FormatValue(data.Value);
             }
@@ -20,7 +20,7 @@ namespace PholioVisualisation.Formatting
 
         public override void FormatConfidenceIntervals(ValueWithCIsData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedCIs == false)
             {
                 data.UpperCIF = NoValue;
                 data.LowerCIF = NoValue;
@@ -38,9 +38,9 @@ namespace PholioVisualisation.Formatting
 
             switch (Convert.ToInt32(val))
             {
-                case 1:
+                case SuicidePlanStatus.Exists:
                     return "Suicide prevention plan exists";
-                case 2:
+                case SuicidePlanStatus.InDevelopment:
                     return "Suicide prevention plan is in development";
                 default:
                     return "No suicide prevention plan";

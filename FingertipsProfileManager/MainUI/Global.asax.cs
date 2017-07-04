@@ -4,10 +4,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using DIResolver;
 using Fpm.MainUI.Controllers;
 using Fpm.MainUI.Helpers;
-using Fpm.MainUI.Routes;
 
 namespace Fpm.MainUI
 {
@@ -24,8 +22,6 @@ namespace Fpm.MainUI
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
             AutoMapperConfig.RegisterMappings();
-
-            IoC.Register();
         }
 
         private static void RegisterGlobalFilters(GlobalFilterCollection filters)

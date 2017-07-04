@@ -6,13 +6,17 @@ namespace PholioVisualisation.Formatting
 {
     public class HtmlCleaner
     {
-        private Regex htmlRemover = new Regex(@"<[^>]+>");
+        private Regex htmlRemover = new Regex(@"<[A-z /]+>");
         private Regex linkFinder = new Regex(@"<a[^>]+>[^<]+</a>", RegexOptions.IgnoreCase);
         private Regex hrefFinder = new Regex(".*href=[\"']([^\"']+)");
 
         public virtual string RemoveHtml(string text)
         {
             text = TransformLinks(text);
+
+            // Remove non-breaking spaces
+            text = text.Replace("&nbsp;", "");
+
             text = HttpUtility.HtmlDecode(text);
             return htmlRemover.Replace(text, string.Empty).Trim();
         }

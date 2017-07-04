@@ -64,6 +64,7 @@
     <Compile Include="AreaDetailsAction.cs" />
     <Compile Include="AreasOfAreaTypeAction.cs" />
     <Compile Include="AreaTypesAction.cs" />
+    <Compile Include="BoxPlotPointListBuilder.cs" />
     <Compile Include="ChildAreasForPdfsAction.cs" />
     <Compile Include="PartitionData.cs" />
     <Compile Include="PartitionDataBuilderBase.cs" />
@@ -98,9 +99,9 @@
       <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
       <Name>DataConstruction</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataHelpers\DataHelpers.csproj">
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
       <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
-      <Name>DataHelpers</Name>
+      <Name>DataSorting</Name>
     </ProjectReference>
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>

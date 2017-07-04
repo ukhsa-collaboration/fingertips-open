@@ -38,13 +38,6 @@ namespace Fpm.ProfileData.Repositories
                 .List<KeyColour>();
         }
 
-        public IEnumerable<AreaType> GetAreaTypes()
-        {
-            return CurrentSession.QueryOver<AreaType>()
-                .OrderBy(x => x.Name).Asc
-                .List();
-        }
-
         public IEnumerable<Sex> GetSexes()
         {
             return CurrentSession.QueryOver<Sex>()

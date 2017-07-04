@@ -1,0 +1,10 @@
+﻿@model Fpm.MainUI.ViewModels.EmbeddedContent.EmbeddedHtmlPage
+
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+<div>
+    <h2 class="subheading">Profile Relationships</h2>
+    <iframe width="1150" height="900" frameborder="0" 
+            src="@Url.Action("EmbeddedPage", "EmbeddedContent", new {documentId = Model.DocumentId})">
+    </iframe>
+</div>
+

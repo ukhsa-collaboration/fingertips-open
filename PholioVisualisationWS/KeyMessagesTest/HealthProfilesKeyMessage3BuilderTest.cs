@@ -139,7 +139,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence2();
             Assert.AreEqual(
-                "The rate of alcohol-specific hospital stays among those under 18 was 20.0*, better than the average for England. This represents 10,001 stays per year.",
+                "The rate of alcohol-specific hospital stays among those under 18 is 20*, better than the average for England. This represents 10,001 stays per year.",
                 sentence);
         }
 
@@ -158,7 +158,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence2();
             Assert.AreEqual(
-                "The rate of alcohol-specific hospital stays among those under 18 was 20.0*, worse than the average for England. This represents 10,001 stays per year.",
+                "The rate of alcohol-specific hospital stays among those under 18 is 20*, worse than the average for England. This represents 10,001 stays per year.",
                 sentence);
         }
 
@@ -177,7 +177,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence2();
             Assert.AreEqual(
-                "The rate of alcohol-specific hospital stays among those under 18 was 20.0*. This represents 10,001 stays per year.",
+                "The rate of alcohol-specific hospital stays among those under 18 is 20*. This represents 10,001 stays per year.",
                 sentence);
         }
 
@@ -196,7 +196,7 @@ namespace PholioVisualisation.KeyMessagesTest
 
             var sentence = builder.GetSentence2();
             Assert.AreEqual(
-                "The rate of alcohol-specific hospital stays among those under 18 was 20.0*. This represents 10,001 stays per year.",
+                "The rate of alcohol-specific hospital stays among those under 18 is 20*. This represents 10,001 stays per year.",
                 sentence);
         }
 

@@ -66,38 +66,52 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressStringifier.cs" />
-    <Compile Include="BaseExcelFileInfo.cs" />
-    <Compile Include="CategoryAreaDataWriter.cs" />
+    <Compile Include="CategoryComparisonDifferentiator.cs" />
+    <Compile Include="CategoryComparisonManager.cs" />
+    <Compile Include="CoreDataSetExportFormatter.cs" />
+    <Compile Include="DataFileBuilder.cs" />
+    <Compile Include="ExportAreaHelper.cs" />
+    <Compile Include="File\BaseExcelFileInfo.cs" />
     <Compile Include="ColumnHeader.cs" />
-    <Compile Include="ColumnIndexes.cs" />
     <Compile Include="CoreDataCollector.cs" />
     <Compile Include="CoverSheet.cs" />
     <Compile Include="ExcelFileBuilder.cs" />
     <Compile Include="ExcelFileWriter.cs" />
     <Compile Include="ExcelHelper.cs" />
     <Compile Include="ExportDIRegistry.cs" />
-    <Compile Include="GroupRootUniqueKey.cs" />
-    <Compile Include="ParentDataWriter.cs" />
-    <Compile Include="CategoryIdAndAreaCode.cs" />
-    <Compile Include="RowLabels.cs" />
-    <Compile Include="SearchResultsFileInfo.cs" />
+    <Compile Include="File\ExportFileManager.cs" />
+    <Compile Include="File\FileBuilder.cs" />
+    <Compile Include="File\CacheFileNamer.cs" />
+    <Compile Include="IndicatorExportParameters.cs" />
+    <Compile Include="IndicatorIdListProvider.cs" />
+    <Compile Include="IndicatorMetadataFileBuilder.cs" />
+    <Compile Include="LookUpManager.cs" />
+    <Compile Include="MultipleCoreDataCollector.cs" />
+    <Compile Include="MultipleIndicatorMetadataFileWriter.cs" />
+    <Compile Include="File\SingleEntityFileNamer.cs" />
+    <Compile Include="AddressFileBuilder.cs" />
+    <Compile Include="SignificanceFormatter.cs" />
+    <Compile Include="SingleIndicatorFileWriter.cs" />
+    <Compile Include="SingleIndicatorMetadataFileWriter.cs" />
+    <Compile Include="CoreDataDifferentiator.cs" />
+    <Compile Include="File\SearchResultsFileInfo.cs" />
     <Compile Include="SheetNamer.cs" />
     <Compile Include="PracticeProfileDataBuilder.cs" />
     <Compile Include="PracticeProfileDataWriter.cs" />
-    <Compile Include="PracticeProfileFileInfo.cs" />
-    <Compile Include="ProfileDataBuilder.cs" />
+    <Compile Include="File\PracticeProfileFileInfo.cs" />
     <Compile Include="ExcelDataWriter.cs" />
-    <Compile Include="ProfileFileInfo.cs" />
-    <Compile Include="ProfileDataWriter.cs" />
+    <Compile Include="File\ProfileFileInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SubnationalAreaDataWriter.cs" />
-    <Compile Include="TrendMarkerWriter.cs" />
     <Compile Include="WorksheetInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Analysis\Analysis.csproj">
       <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
       <Name>Analysis</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+      <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
+      <Name>DataSorting</Name>
     </ProjectReference>
     <ProjectReference Include="..\ExceptionLogger\ExceptionLogger.csproj">
       <Project>{924288F7-5950-49DB-8642-63587CB8146E}</Project>

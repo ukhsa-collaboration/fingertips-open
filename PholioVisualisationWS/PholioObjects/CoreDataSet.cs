@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
-    public class CoreDataSet : ValueWithCIsData
+  public class CoreDataSet : ValueWithCIsData
     {
         private double? countPerYear;
         public const int NoValueNote = 0;

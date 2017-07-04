@@ -3,216 +3,315 @@
 ------------------------------------------------------------ */
 
 #indicator-not-in-area {
-    margin: 20px 50px;
-    font-size: 16px;    
+	margin: 20px 50px;
+	font-size: 16px;    
 }
 
 #indicator-not-in-area-ok {
-    width:200px; 
-    margin-left:200px; 
-    margin-top:10px; 
-    padding-top:10px; 
-    padding-bottom:10px;
-    font-size: 16px;
-    cursor: pointer;
+	width:200px; 
+	margin-left:200px; 
+	margin-top:10px; 
+	padding-top:10px; 
+	padding-bottom:10px;
+	font-size: 16px;
+	cursor: pointer;
 }
 
 /* ------------------------------------------------------------
 	Domain options
 ------------------------------------------------------------ */
-#domainBox
+#domain-box
 {
-    width: 1000px;
-    margin: 0 auto;
-    padding: 3px 0 0 0;
+	width: 1000px;
+	margin: 0 auto;
+	padding: 3px 0 0 0;
 }
 
-    #domainBox table {
-    width:100%;
-        border-collapse: collapse;
-    }
+	#domain-box table {
+	width:100%;
+		border-collapse: collapse;
+	}
 
-.domainOption
+.domain-option
 {
-    text-align: center;
-    cursor: pointer;
-    color: #0b0c0c;
-    text-decoration: none;
-    border-left: 2px solid transparent;
-    padding: 5px 0 3px 0;
-    font-size: 1.2em;
-    vertical-align: top;
+	text-align: center;
+	cursor: pointer;
+	color: #0b0c0c;
+	text-decoration: none;
+	border-left: 2px solid transparent;
+	padding: 5px 0 3px 0;
+	font-size: 1.2em;
+	vertical-align: top;
 }
 
 .clickable
 {
-    cursor: pointer;
+	cursor: pointer;
 }
 
-.domainOption:hover, a.pageSelector:hover, a.start:hover
+.domain-option:hover, a.page-selector:hover, a.start:hover
 {
-    text-decoration: underline;
+	text-decoration: underline;
 }
-.selectedDomain, .selectedDomain:hover
+.selected-domain, .selected-domain:hover
 {
-    background-color: #0b0c0c;
-    text-decoration: none;
-    color: white;
+	background-color: #0b0c0c;
+	text-decoration: none;
+	color: white;
 }
- a.pageSelected, a.pageSelected:visited, a.pageSelected:hover, a.pageSelected:active
+ a.page-selected, a.page-selected:visited, a.page-selected:hover, a.page-selected:active
 {
-    background-color: #181784;
-    color: white;
+	background-color: #181784;
+	color: white;
 }
 
 /* ------------------------------------------------------------
 	Tartan rug
 ------------------------------------------------------------ */
-
-div.tartanText {
-    font-size: 12px;
-}
-
-#leftTartanBox {
-    float: left;
-    clear: left;
-    padding-top: 27px;
-}
-
-#leftTartanTable {
-    border-right: none;
-    table-layout: fixed;
-    float: left;
-}
-
-.scroll-pane {
-    overflow: hidden;
-    float: left;
-    position: relative;
-}
-
-.scrollbar {
-    padding: 0 0 0 0;
-    margin: 0 2px 0 2px;
-    float: left;
-    clear: both;
-    height: 27px;
-    border: none;
-}
-
-    .scrollbar table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-.tartanDivider {
-    padding-top: 3px;
-    padding-bottom: 3px;
-    padding-left: 50px;
-    background-image: url(../images/comparatorBg.gif);
-    font-size: 12px;
-    font-style: italic;
-    font-weight: bold;
-    letter-spacing: 3px;
-}
-
-.dividerBox {
-    overflow: visible;
-    z-index: 10;
-    width: 800px;
-    position: relative;
-}
-
-.dividerText {
-    position: absolute;
-    z-index: 10;
-    width: 800px;
-    color: #555;
-    top: 0;
-    height: 18px;
-}
-
-#leftTartanTable td.tartanDivider {
-    border-right: none;
-}
-
-#tartanScrollBox {
-    width: 10000px; /*need to be bigger if more areas*/
-    overflow: hidden;
-    float: left;
-}
-
-    #tartanScrollBox table {
-        border-left: none;
-        table-layout: fixed;
-        width: auto;
-    }
-
-    #tartanScrollBox .scrollbar table {
-        width: inherit;
-    }
-
-    #tartanScrollBox td.tartanDivider {
-        border-left: none;
-    }
-
-    #tartanScrollBox th.rugIndicator,
-    #tartanScrollBox .rugPeriod {
-        color: white;
-    }
-
-    #tartanScrollBox td.rugIndicator {
-        color: white;
-        border-top-color: white;
-        border-bottom-color: white;
-    }
-
-th.comparatorHeader
-{
-    background-image: url(../images/comparatorBg.gif);
-}
-
- #tartanTableBox
-{
+#rug-container {
     width: 100%;
 }
 
-th.rugIndicator, td.rugIndicator
-{
-    width: 224px;
+div.tartan-box {
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+    position: relative;
+    height: 23px;
 }
 
-th.rugIndicator
-{
-    font-weight: bold;
+div.tartan-text {
+    width: 100%;
+    margin-top: 4px;
+    z-index: 3;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+th.rug-period {
     vertical-align: bottom;
-    text-align: left;
-    height: 230px;
 }
-th.rugIndicator div
+
+.scroll-place {
+    background: #aaa;
+    height: 3px;
+}
+
+.rug-scroll-left, .rug-scroll-right {
+    height: 20px;
+    width: 50%;
+    background-color: #aaa;
+    background-repeat: no-repeat;
+    background-position: 50% 5px;
+    border-top: 2px solid white;
+}
+
+    .rug-scroll-left:hover, .rug-scroll-right:hover {
+        background-color: #666;
+    }
+
+.rug-scroll-left {
+    background-image: url('../images/back2.png');
+    border-right: 2px solid white;
+}
+
+.rug-scroll-right {
+    background-image: url('../images/forward2.png');
+}
+
+.tartan-text span {
+    font-style: normal;
+    font-size: 1.4em;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    margin-top: -3px;
+    cursor: default;
+}
+
+    .tartan-text span.value-note-symbol {
+        font-size: 1.2em;
+        margin-top: 1px;
+    }
+
+.tartan-text .noData {
+    cursor: default;
+}
+
+div.tartan-text {
+	font-size: 12px;
+}
+
+#left-tartan-box {
+	float: left;
+	clear: left;
+	padding-top: 27px;
+}
+
+#left-tartan-table {
+	border-right: none;
+	table-layout: fixed;
+	float: left;
+}
+
+.scroll-pane {
+	overflow: hidden;
+	float: left;
+	position: relative;
+}
+
+.scrollbar {
+	padding: 0 0 0 0;
+	margin: 0 2px 0 2px;
+	float: left;
+	clear: both;
+	height: 27px;
+	border: none;
+}
+
+	.scrollbar table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+.tartan-divider {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	padding-left: 50px;
+	background-image: url(../images/comparatorBg.gif);
+	font-size: 12px;
+	font-style: italic;
+	font-weight: bold;
+	letter-spacing: 3px;
+}
+
+.divider-box {
+	overflow: visible;
+	z-index: 10;
+	width: 800px;
+	position: relative;
+}
+
+.divider-text {
+	position: absolute;
+	z-index: 10;
+	width: 800px;
+	color: #555;
+	top: 0;
+	height: 18px;
+}
+
+#left-tartan-table td.tartan-divider {
+	border-right: none;
+}
+
+#tartan-scroll-box {
+	width: 10000px; /*need to be bigger if more areas*/
+	overflow: hidden;
+	float: left;
+}
+
+	#tartan-scroll-box table {
+		border-left: none;
+		table-layout: fixed;
+		width: auto;
+	}
+
+	#tartan-scroll-box .scrollbar table {
+		width: inherit;
+	}
+
+	#tartan-scroll-box td.tartan-divider {
+		border-left: none;
+	}
+
+	#tartan-scroll-box th.rug-indicator,
+	#tartan-scroll-box .rug-period {
+		color: white;
+	}
+
+	#tartan-scroll-box td.rug-indicator {
+		color: white;
+		border-top-color: white;
+		border-bottom-color: white;
+	}
+
+    
+.tartan-export-chart-box {
+    color: #450AA3;
+}
+
+.tartan-export-chart-box .export-link {
+    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+    padding: 5px 30px;
+    text-decoration: none;
+}
+
+.tartan-trend {
+    margin-left: 12px;
+}
+
+.tartan-value-and-trend {
+    text-align: center;
+}
+
+.tartan-value-and-trend img {
+    border: 0;
+    vertical-align: top;
+    margin-top: 3px;
+}
+
+th.comparator-header
 {
-    float: left;
-    padding-left: 70px;
-    width: 100px;
+	background-image: url(../images/comparatorBg.gif);
 }
-td.rugIndicator div
+
+ #tartan-table-box
 {
-    width: 220px;
-    padding: 0 2px 0 2px;
+	width: 100%;
 }
 
-th.rugPeriod, td.rugPeriod
+table
 {
-    width: 58px;
+    border-collapse: separate !important;
 }
 
-#tartanScrollBox .rugIndicator {
-    visibility: hidden;
+th.rug-indicator, td.rug-indicator
+{
+	width: 224px;
+}
+
+th.rug-indicator
+{
+	font-weight: bold;
+	vertical-align: bottom;
+	text-align: left;
+	height: 230px;
+}
+th.rug-indicator div
+{
+	float: left;
+	padding-left: 70px;
+	width: 100px;
+}
+td.rug-indicator div
+{
+	width: 220px;
+	padding: 0 2px 0 2px;
+}
+
+th.rug-period, td.rug-period
+{
+	width: 58px;
+}
+
+#tartan-scroll-box .rug-indicator {
+	visibility: hidden;
 }
 
 
-.floatThead-table, .floatThead-table th.rugPeriod:last-of-type, .floatThead-table th.sortHeader:last-of-type, .floatThead-table th.rugPeriod:nth-last-child(2) {
-    border: none;
+.floatThead-table, .floatThead-table th.rug-period:last-of-type, .floatThead-table th.sortHeader:last-of-type, .floatThead-table th.rug-period:nth-last-child(2) {
+	border: none;
 }
 
 
@@ -220,27 +319,27 @@ th.rugPeriod, td.rugPeriod
 	Other tabs
 ------------------------------------------------------------ */
 
-#singleAreaTable
+#single-area-table
 {
-    float: left;
-    clear: left;
-    margin-top: 8px;
+	float: left;
+	clear: left;
+	margin-top: 8px;
 }
 #indicators-container, #download-container
 {
-    width: 1000px;
+	width: 1000px;
 }
-#spineIndicatorHeader 
+#spine-indicator-header 
 {
-     width: 339px;
+	 width: 339px;
 }
 
-#spinePeriodHeader {
-    width: 80px;
+#spine-period-header {
+	width: 80px;
 }
 
-.hide .barBox {
-    display: none;
+.hide .bar-box {
+	display: none;
 }
 
 
@@ -249,38 +348,38 @@ th.rugPeriod, td.rugPeriod
 ------------------------------------------------------------ */
 
 .indicator-data-quality-container {
-    display: inline-block;
-    position: relative;
-    height: 17px;
-    top: 1px;
+	display: inline-block;
+	position: relative;
+	height: 17px;
+	top: 1px;
 }
 
 .data-quality-table div {
-    height: 12px;
+	height: 12px;
 }
 
 .data-quality-table .label {
-    padding-left: 4px;
+	padding-left: 4px;
 }
 
 .data-quality-table td.label {
-    padding-left: 2px;
+	padding-left: 2px;
 }
 
 .data-quality-table .legendText {
-    font-style: italic;
-    text-align: right;
+	font-style: italic;
+	text-align: right;
 }
 
 .data-quality-table{
-    font-size: 11px;
-    color: #777;
-    margin: 0 0 0 30px;
+	font-size: 11px;
+	color: #777;
+	margin: 0 0 0 30px;
 }
 
 #data-quality-key {
-    margin-top: 9px;
-    clear: left;
+	margin-top: 9px;
+	clear: left;
 }
 
 /* ------------------------------------------------------------
@@ -288,267 +387,241 @@ th.rugPeriod, td.rugPeriod
 ------------------------------------------------------------ */
 
 IMG.keyBar {
-    position: relative !important;
-    width: 20px;
-    height: 11px !important;
-    background: #ddd;
-    border-radius: 2px;
+	position: relative !important;
+	width: 20px;
+	height: 11px !important;
+	background: #ddd;
+	border-radius: 2px;
+	margin-bottom: 3px;
 }
 
 TD.keyBar {
-    width: 20px;
-    padding: 2px 1px 0 5px;
+	width: 20px;
+	padding: 2px 1px 0 5px;
 }
 
-IMG.keyCircle {
-    position: relative;
-    top: 1px;
+IMG.key-circle {
+	position: relative;
+	top: 1px;
+	margin-bottom: 4px;
 }
 
-td.keySpine {
-    padding: 0 3px 0 3px;
-    vertical-align: middle;
+td.key-spine {
+	padding: 0 3px 0 3px;
+	vertical-align: middle;
 }
 
-div.keySpineText {
-    display: block;
-    height: 18px;
-    line-height: 18px;
-    float: left;
-    padding-left: 2px;
+div.key-spine-text {
+	display: block;
+	height: 18px;
+	line-height: 18px;
+	float: left;
+	padding-left: 2px;
 }
 
-.keyCircleBox {
-    float: left;
-    padding-top: 3px;
+.key-label {
+	font-style: italic;
+	text-align: right;
+}
+.key-container {
+	float: left;
+	margin: 10px 0 0 0;
 }
 
-.keyLabel {
-    font-style: italic;
-    text-align: right;
-}
-.keyContainer {
-    float: left;
-    margin: 10px 0 0 0;
-}
-
-#keyAdHoc, #key-spine-chart, #key-bar-chart {
-    position: relative;
+#key-ad-hoc, #key-spine-chart, #key-bar-chart {
+	position: relative;
 }
 
 #key-spine-chart .data-quality-table {
-    margin-left: 40px;
-    margin-right: 0;
+	margin-left: 40px;
+	margin-right: 0;
 }
 
-div.keyBox, div.keyBoxNone
+div.key-box
 {
-    height: 20px;
-    line-height: 20px;
-    width: 45px;
-    vertical-align: middle;
+	height: 20px;
+	line-height: 20px;
+	width: 45px;
+	vertical-align: middle;
 }
-td.keyBoxRight
+td.key-box-right
 {
-    border-right: 1px solid #eee;
+	border-right: 1px solid #eee;
 }
-td.keyBoxRight div
+td.key-box-right div
 {
-    width: auto;
-    padding-left: 3px;
-    padding-right: 3px;
+	width: auto;
+	padding-left: 3px;
+	padding-right: 3px;
 }
-.keyTable, .notComparedkeyTable
+.key-table
 {
-    font-size: 11px;
-    color: #777;
-}
-
-.notComparedkeyTable {
-    margin:6px auto 0 auto;
-}
-
-.keyTable
-{
-    float: left;
+	font-size: 11px;
+	color: #777;
+	float: left;
 }
 
 #map-key-part2 div {
-    background: #c9c9c9;
+	background: #c9c9c9;
 }
-.keyBox .tartanText
+.key-box .tartan-text
 {
-    margin-top: 0;
-    font-size: 11px;
+	margin-top: 0;
+	font-size: 11px;
 }
-.keySpacer 
+.key-spacer 
 {
  width:15px;   
 }
 
-.key .tartanText {
-    width: 45px;
+.key .tartan-text {
+	width: 45px;
 }
 
 #value-note-legend {
-    float: right;
-    font-size: 11px;
-    color: #777;
-    text-align: right;
-    margin-top:8px;
+	float: right;
+	font-size: 11px;
+	color: #777;
+	text-align: right;
+	margin-top:8px;
 }
 
-#spineTable, #barTable {
-    float: left;
+#spine-table, #barTable {
+	float: left;
 }
 
-#spineTable td.quintileKey, .keyBar.quintileKey {
-     padding-top: 6px;
+#spine-table td.quintile-key, .keyBar.quintile-key {
+	 padding-top: 6px;
 }
 
 /* ------------------------------------------------------------
 	Trends
 ------------------------------------------------------------ */
-.trendTitle {
-    float: left;
-    font-weight: bold;
-    font-size: 1.3em;
-    text-align: left;
+.trend-title {
+	float: left;
+	font-weight: bold;
+	font-size: 1.3em;
+	text-align: left;
 }
-.trendTitle a {
-    margin-right: 20px;
-}
-
-.trendUnit {
-    padding: 6px 0 0 0;
-    float: right;
-    font-size: 11px;
+.trend-title a {
+	margin-right: 20px;
 }
 
-.trendArea {
-    font-size: 11px;
-    padding-top: 6px;
+.trend-unit {
+	padding: 6px 0 0 0;
+	float: right;
+	font-size: 11px;
+}
+
+.trend-area, .benchmark-name {
+	font-size: 11px;
+	padding-top: 6px;
 }
 
 td.coloured {
-    background: #a8a8cc;
-    color: White;
+	background: #a8a8cc;
+	color: White;
 }
 
 .light {
-    background: #cfcfe2;
+	background: #cfcfe2;
 }
 
-#areaTrendsContainer {
-    width: 100%;
-    float: left;
-    clear: left;
-}
-
-.trendContainer {
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    margin-top: 6px;
-    margin-bottom: 20px;
-    float: left;
+.trend-container {
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	margin-top: 6px;
+	margin-bottom: 20px;
+	float: left;
 }
 
 .trendChart {
-    width: 400px;
-    height: 300px;
-    float: left;
+	width: 400px;
+	height: 300px;
+	float: left;
 }
 
-.trendHeader, .multiTrendHeader {
-    float: left;
-    clear: both;
+.trend-header, .multi-trend-header {
+	float: left;
+	clear: both;
 }
 
-.multiTrendHeader {
-    padding: 30px 0 0 0;
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    font-weight: bold;
+.multi-trend-header {
+	padding: 30px 0 0 0;
+	width: 98%;
+	margin-left: 1%;
+	margin-right: 1%;
+	font-weight: bold;
 }
 
-.trendHeader {
-    padding: 20px 0 5px 0;
-    border-bottom: 5px solid #0b0c0c;
-    width: 100%;
-    font-weight: bold;
+.trend-header {
+	padding: 20px 0 5px 0;
+	border-bottom: 5px solid #0b0c0c;
+	width: 100%;
+	font-weight: bold;
 }
 
 .trendPeriod {
-    width: 85px;
+	width: 85px;
 }
 
-.trendPeriodWide {
-    width: 120px;
+.trend-period-wide {
+	width: 120px;
 }
 
 .trendTableBox {
-    float: right;
-    width: 520px;
-}
-
-.trendTableBoxWide {
-    float: right;
-    width: 535px;
+	float: right;
+	width: 520px;
 }
 
 .trendSig {
-    width: 40px;
+	width: 40px;
 }
 
-.trendSource {
-    width: 100%;
-    text-align: left;
-    float: right;
-    font-style: italic;
-    font-size: 11px;
-    overflow-wrap: break-word
+.trend-source {
+	width: 100%;
+	text-align: left;
+	float: right;
+	font-style: italic;
+	font-size: 11px;
+	overflow-wrap: break-word
 }
 
-#trendHelper {
-    border-style: dotted;
-    border-width: thin;
-    border-color: #aaa;
-    background-color: white;
-    z-index: 5;
-    position: absolute;
-    font-style: italic;
-    padding: 0 3px 0 3px;
+#trend-helper {
+	border-style: dotted;
+	border-width: thin;
+	border-color: #aaa;
+	background-color: white;
+	z-index: 5;
+	position: absolute;
+	font-style: italic;
+	padding: 0 3px 0 3px;
 }
 
-a.trendLink, a.trendLink:visited, a.trendLink:active {
-    color: Black;
-    text-decoration: none;
+a.trend-link, a.trend-link:visited, a.trend-link:active {
+	color: Black;
+	text-decoration: none;
 }
 
-    a.trendLink:hover {
-        color: Black;
-        text-decoration: underline;
-    }
+	a.trend-link:hover {
+		color: Black;
+		text-decoration: underline;
+	}
 
 td span.value-note-symbol {
-    width: 100%;
-    text-align: center;
-    display: block;
-    cursor: default;
+	width: 100%;
+	text-align: center;
+	display: block;
+	cursor: default;
 }
 
 td span.unit {
-    color: #777;
-}
-
-#trendsBox {
-     display:inline-block; overflow:hidden; text-align: left; margin-left:3%;
+	color: #777;
 }
 
 #trend-sort-multi-charts {
-    float: left;
+	float: left;
 }
 
 /* ------------------------------------------------------------
@@ -557,174 +630,226 @@ td span.unit {
 
 #target-benchmark-box {
     position: absolute;
-    right: 2px;
-    top: 29px;
-    font-size: 11px;
-    z-index: 1;
+    top: 28px;
+    right: 25px;
+	font-size: 11px;
+	z-index: 1;
 }
 #target-benchmark-box .label {
-    padding-left: 2px;
+	padding-left: 2px;
+}
+
+
+/* ------------------------------------------------------------
+	Indicator select all
+------------------------------------------------------------ */
+#view-options #indicator-menu-div {
+    clear: both;
+}
+
+#indicatorSelectAll {
+    float: left;
+    height: 20px;
+    line-height: 20px;
+}
+
+#indicator-select-all-td {
+    font-weight: bold;
+    font-size: 11px;
+    vertical-align: middle;
+    margin-left: 5px;
+}
+
+ .indicator-row {
+    list-style: none;
+    float: left;
+    width: 830px;
+}
+
+.indicator-row li {
+    display: inline-block;
+    float: right;
 }
 
 /* ------------------------------------------------------------
-    Trends
+	Trends
 ------------------------------------------------------------ */
 .target-label {
-    display: block;
-    float: left;
-    padding-top: 2px;
-    padding-right: 3px;
+	display: block;
+	float: left;
+	padding-top: 2px;
+	padding-right: 3px;
 }
 
 .target-legend {
-    margin-bottom: 3px;
-    float: left;
-    width: 370px;
+	margin-bottom: 3px;
+	float: left;
+	width: 370px;
 }
 
-#singleAreaTable THEAD 
+#single-area-table THEAD 
 {
-     padding: 1px 1px 3px 1px;   
-}
-
-#searchResultText 
-{
-    padding-left:10px;
+	 padding: 1px 1px 3px 1px;   
 }
 
 #main h2 {
-    padding-bottom:10px;
+	padding-bottom:10px;
 }
 
 /* ------------------------------------------------------------
-    Inequalities
+	Inequalities
 ------------------------------------------------------------ */
 #inequalities-chart-box {
-    float: left;
-    width: 75%;
-    margin-bottom: 50px;
+	float: left;
+	width: 75%;
+	margin-bottom: 50px;
 }
 #inequalities-chart-box p.no-data {
-    text-align: center;
-    padding: 150px 0 150px 34%; /* no data */
+	text-align: center;
+	padding: 150px 0 150px 34%; /* no data */
 }
 #inequalities-partition-menu {
-    margin-top: -6px;
-    margin-right: 10px;
-    width: 20%;
-    float: right;
+	margin-top: -6px;
+	margin-right: 10px;
+	width: 20%;
+	float: right;
 }
 #inequalities-partition-menu p {
-    padding: 5px;
-    margin: 0;
+	padding: 5px;
+	margin: 0;
 }
 #inequalities-partition-menu a {
-    display: block;
-    width: 100%;
-    float: left;
-    clear: both;
-    padding: 5px;
+	display: block;
+	width: 100%;
+	float: left;
+	clear: both;
+	padding: 5px;
+	text-decoration: none;
+}
+#inequalities-partition-menu a:hover {
+	text-decoration: underline;
 }
 #inequalities-partition-menu a.selected {
-    background-color: #02ae94;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
-    cursor: default;
+	background-color: #02ae94;
+	font-weight: bold;
+	color: white;
+	text-decoration: none;
+	cursor: default;
 }
 
 #inequalities-trend-switch {
-    padding-right: 60px;   
+	padding-right: 60px;   
 }
 
 #inequalities-trend-filters {
-    float: right;
-    width: 220px;
+	float: right;
+	width: 220px;
 }
 
 #inequalities-trend-filters > div:first-child{
-    font-size: 17px;
-    line-height: 1.3em;
+	font-size: 17px;
+	line-height: 1.3em;
 }
 
 #inequalities-trend-filters hr {
-    height: 1px;
-    width: 96%;
-    display: block;
-    background-color: lightgray;
-    padding-left: 30px;
-    border: 0;
+	height: 1px;
+	width: 96%;
+	display: block;
+	background-color: lightgray;
+	padding-left: 30px;
+	border: 0;
 }
 
 .trend-options-filter {
-    line-height: 1.5em;
-    padding-left: 16px;
+	line-height: 1.5em;
+	padding-left: 16px;
 }
 
 .trend-option {
-    line-height: 1.5em;
+	line-height: 1.5em;
 }
 
 .trend-option input{
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .trend-option a{
-    padding-left: 4px;
+	padding-left: 4px;
 }
 
 #inequalities-trend-filters .england-option{
-    border-top: 1px solid green;
-    border-bottom: 1px solid green;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    
+	border-top: 1px solid green;
+	border-bottom: 1px solid green;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	
 }
 
 #inequalities-trend-chart {
-    float: left;
-    width: 400px;   
+	float: left;
+	width: 400px;   
 }
 
 /* ------------------------------------------------------------
 	Scatter tab
 ------------------------------------------------------------ */
 #scatter-container {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 
 #scatterplot-filters {
-    position:relative; 
-    bottom:400px; 
-    left:700px;
-    width: 300px;
+	position:relative; 
+	bottom:400px; 
+	left:700px;
+	width: 300px;
 }
 
-    #scatterplot-filters input {
-        margin-top: 9px;
-        margin-right: 2px;
-        top: 2px;
-        position: relative;
-    }
+	#scatterplot-filters input {
+		margin-top: 9px;
+		margin-right: 2px;
+		top: 2px;
+		position: relative;
+	}
+
+#scatter-plot-gp-chart {
+    min-height: 540px;
+}
 
 #scatter-plot-chart-box-wrapper {
-    padding-top:50px;
+	padding-top:25px;
+}
+#supporting-indicators-wrapper {
+	width: 900px;
 }
 
-#supportingIndicatorsWrapper {
-    width: 900px;
+#supporting-indicators-wrapper .supporting-indicators {
+	float: left;
+	padding-top: 5px;
 }
 
-#supportingIndicatorsWrapper .supportingIndicators {
+#supporting-indicators-wrapper .supporting-indicators-menu {
+	float: left;
+	width: 700px;
+}
+
+#scatter-key-box {
+    position: relative;
     float: left;
-    margin-left: 40px;
-    padding-top: 5px;
+    margin-top: 0;
+    top: 15px;
+    padding-left:15px;
+    left: 100px;
+}
+#scatter-key-table TD {
+    background: #fff;
+    line-height: 12px;
+    padding: 0 12px 3px 5px;
 }
 
-#supportingIndicatorsWrapper .supportingIndicatorsMenu {
-    float: left;
-    width: 700px;
+#scatter-key-table img {
+    position: relative;
+    top: -2px;
 }
 
 /* ------------------------------------------------------------
@@ -732,428 +857,908 @@ td span.unit {
 ------------------------------------------------------------ */
 
 #content {
-    padding-bottom: 50px;
+	padding-bottom: 50px;
 }
 
 #content h2 {
-    padding: 15px 0 20px 60px;
+	padding: 15px 0 20px 60px;
 }
 
 #content h3 {
-    padding: 20px 0 5px 0;
+	padding: 20px 0 5px 0;
 }
  #content ul {
-    list-style: disc;
-    list-style-position: outside;
-    font-size:15px;
-    padding: 10px 0;
+	list-style: disc;
+	list-style-position: outside;
+	font-size:15px;
+	padding: 10px 0;
 }
  #content li {
-    padding: 1px 0;
-    margin-top: 7px;
-    margin-bottom: 7px;
-    margin-left: 18px;
+	padding: 1px 0;
+	margin-top: 7px;
+	margin-bottom: 7px;
+	margin-left: 18px;
 }
 #content p {
-    margin: 3px 0;
-    font-size: 17px;
-    line-height: 1.3em;
+	margin: 3px 0;
+	font-size: 17px;
+	line-height: 1.3em;
+}
+.a-link {
+	text-align: right;
+	color: #1f0aa1 !important;
 }
 
-.a-link {
-      text-align: right;
-      color: #1f0aa1 !important;
+/* ------------------------------------------------------------
+	Tabs and view menus
+------------------------------------------------------------ */
+
+#tabs, #view-options {
+    width: 1000px;
+    margin: 0 auto;
+    padding: 0;
 }
+
+#tabs {
+    background: none;
+    border: none;
+    margin-top: 6px;
+}
+
+#view-options {
+    background: #eee;
+}
+
+#view-options .row {
+    padding: 7px;
+}
+
 
 /* ------------------------------------------------------------
 	Nearest neighbours
 ------------------------------------------------------------ */
 
-#nearestNeighbours-wrapper {
-    position: relative;
-    top: 44px;
-    left: 451px;
-    z-index: 5;
-    width: 400px;
+#nearest-neighbour-wrapper {
+	position: absolute;
+	top: 22px;
+	left: 28px;
+	z-index: 5;
+	width: 400px;
 }
 
-#goBack a {
-    text-decoration: none;
-    margin-right: 50px;
+#nearest-neighbour-links a {
+	text-decoration: none;
+	margin-right: 50px;
+}
+
+#nearest-neighbour-links a:hover, #nearest-neighbour-link:hover {
+	text-decoration: underline;
 }
 
 #nearest-neighbour-header a {
-    text-decoration: none;
+	text-decoration: none;
 }
 
 .nearest-neighbours-show {
-    display: none;
+	display: none;
 }
 
 #nearest-neighbour-link {
-    display: none;
+	display: none;
 }
 
-#indicatorDetailsHeader .trendHeader {
-    padding-top: 10px !important;
+#indicator-details-header .trend-header {
+	padding-top: 10px !important;
 }
 
 .nearest-neighbour-selected-area {
-       font-size: 14.2px;
+	   font-size: 14.2px;
 }
 
 .nearest-neighbour-selected-area h2{
-    display: inline-block;
+	display: inline-block;
 }
 
 /*----------------------------------------
-    Chart & table export
+	Chart & table export
 ------------------------------------------*/
 .export-chart-box {
-    height: 16px;
+	height: 16px;
 	margin-bottom: 8px;
-    margin-top:5px;
-    color: #450AA3;
+	margin-top:5px;
+	color: #450AA3;
 }
 
 .export-chart-box select {
-    width: 80px;
+	width: 80px;
 }
 
 .white-background {
-    background-color: #ffffff;
+	background-color: #ffffff;
 }
 
 .tab-options div.export-chart-box {
-    padding-top: 6px;
-    float:left;
+	padding-top: 6px;
+	float:left;
 }
 
 .export-chart-box .export-link, .tab-options .export-chart-box a {
-    text-decoration: none;
-    color: #1F0AA1;
-    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
-    padding: 5px 27px;
+	text-decoration: none;
+	color: #1F0AA1;
+	background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+	padding: 5px 27px;
 }
 
 .export-chart-box a.show-ci {
-    text-decoration: none;
-    color: #1F0AA1;    
+	text-decoration: none;
+	color: #1F0AA1;    
 }
+
+/* ------------------------------------------------------------
+	Box plot legend
+------------------------------------------------------------ */
+
+.box-plot-legend-img {
+
+    background: #FFF url(../images/box-plot-legend.png) right center no-repeat;
+    width: 143px;
+    height: 296px;
+    text-decoration: none;
+    border: 1px solid lightgrey;
+    float: right;
+    margin-top: 10px;
+}
+
+/* ------------------------------------------------------------
+	Box plot Data Table
+------------------------------------------------------------ */
+.box-plot-table {
+    font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    margin: 30px auto 30px auto;
+}
+
+.x-axis, .x-axis-year, .numeric-name {
+    font-size: 11px;
+    font-style: normal;
+}
+
+.box-plot-header {
+    background-color: #f9f9f9;
+}
+
+.x-axis{
+    min-width: 39px;
+}
+
+.x-axis-year{
+    text-align: right;
+}
+
+.box-plot-table .table{
+    min-width: 35% !important;
+    width:auto;
+    table-layout:auto !important;
+}
+
+#tbl-boxplot-data {
+    border-width: 0px !important;
+    margin: 0 auto;
+}
+
+.table thead th {
+    border-bottom: 1px solid #eceeef;
+}
+
 
 /* ------------------------------------------------------------
 	Trend marker legend
 ------------------------------------------------------------ */
 #trend-marker-legend table {
-    margin-top: 15px;
+	margin-top: 15px;
 }
 
 #trend-marker-legend img {
-    padding-left: 15px;
-    padding-right: 2px;
+	padding-left: 15px;
+	padding-right: 2px;
 }
 
 .trend-info {
-    margin-left: 0;
-    padding-left: 0!important;
-    cursor: pointer;
+	margin-left: 0;
+	padding-left: 0!important;
+	cursor: pointer;
 }
 
-.trendContainer .trend-marker {
-    float:left;
-    color:#333;
-    font-weight:bold;
-    margin-left: 60px;
-    margin-bottom: 5px;
+.trend-container .trend-marker {
+	float:left;
+	color:#333;
+	font-weight:bold;
+	margin-left: 60px;
+	margin-bottom: 5px;
 }
 
-.trendContainer .trend-marker img {
-    margin-left: 5px;
-    vertical-align: middle;
+.trend-container .trend-marker img {
+	margin-left: 5px;
+	vertical-align: middle;
 }
 
 /*----------------------------------------
-    Lightbox
+	Area search
 ------------------------------------------*/
-
-#infoBox h2 {
-    padding: 3px 0 12px 9px;
+#area-search-link:hover {
+    text-decoration: underline;
 }
 
 /*----------------------------------------
-    Profiles per indicators
+	Profiles per indicators
 ------------------------------------------*/
 
 #profiles-for-indicators {
-    padding: 5px;
-    padding-bottom: 10px;
+	padding: 5px;
+	padding-bottom: 10px;
 }
 
 #profiles-for-indicators h2 {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 #profiles-for-indicators table {
-    border-collapse: collapse;
-    margin-top: 10px;
+	border-collapse: collapse;
+	margin-top: 10px;
 }
 
 #profiles-for-indicators .label {
-    font-weight: bold;
-    margin-top: 10px;
+	font-weight: bold;
+	margin-top: 10px;
 }
 
 #indicator-list-lbl {
-    font-size: 14px;
-    font-weight: bold;
+	font-size: 14px;
+	font-weight: bold;
 }
 
 #indicator-list {
-    width: 800px;
+	width: 800px;
 }
 
 #profiles-for-selected-indicator {
-    padding-bottom: 10px;
+	padding-bottom: 10px;
 }
 
 #profiles-for-selected-indicator ul {
-    list-style-type: none;
+	list-style-type: none;
 }
 
 #profiles-for-selected-indicator ul li {
-    padding: 3px 0;
+	padding: 3px 0;
 }
 
 #profiles-for-selected-indicator a {
-    color: #1f0aa1;
-    text-decoration: none;
+	color: #1f0aa1;
+	text-decoration: none;
 }
 
 /*----------------------------------------
-    Definitions
+	Definitions
 ------------------------------------------*/
-#definitionTable
+#definition-table
 {
-    font-size: 17px;
-    line-height: 1.5;
+	font-size: 17px;
+	line-height: 1.5;
+	float: left;
+	width: 90%;
+	margin-left: 5%;
+	margin-top: 10px;
+	clear: both;
+	overflow: hidden;
+}
+#definition-table H3
+{
+	padding-bottom: 6px;
+	padding-left: 3px;
+}
+#definition-table TD
+{
+	padding: 2px 3px 2px 3px;
+}
+#definition-table TABLE
+{
+	width: 100%;
+}
+#definition-table LI
+{
+	margin-left: 23px;
+}
+#definition-table .header
+{
+	font-size: 12px;
+	background: #fafafa;
+	padding-top: 2px;
+}
+#definition-table P
+{
+	margin: 3px 0 3px 0;
+}
+
+/*----------------------------------------
+	Population
+------------------------------------------*/
+
+#population-chart {
     float: left;
-    width: 90%;
-    margin-left: 5%;
-    margin-top: 10px;
     clear: both;
-    overflow: hidden;
+    width: 600px;
+    height: 600px;
 }
-#definitionTable H3
-{
-    padding-bottom: 6px;
-    padding-left: 3px;
-}
-#definitionTable TD
-{
-    padding: 2px 3px 2px 3px;
-}
-#definitionTable TABLE
-{
-    width: 100%;
-}
-#definitionTable LI
-{
-    margin-left: 23px;
-}
-#definitionTable .header
-{
-    font-size: 12px;
-    background: #fafafa;
-    padding-top: 2px;
-}
-#definitionTable P
-{
-    margin: 3px 0 3px 0;
-}
-
-/*----------------------------------------
-    Population
-------------------------------------------*/
-.margin200 {
-    width: 200px;
-    height: 10px;
-}
-.NoPopulationData {
-    width: 300px;
-    height: 300px;
-    line-height: 300px;
+.no-population-data {
+	width: 300px;
+	height: 300px;
+	line-height: 300px;
 }
 .export-chart-box {
-    height: 16px;
-    margin-top:10px;
-    color: #450AA3;
+	height: 16px;
+	margin-top:10px;
+	color: #450AA3;
 }
 
 .export-chart-box a.export-link {
-    text-decoration: none;
-    color: #1F0AA1;
-    background: #FFF url(../images/save-image-icon.png) left center no-repeat;
-    padding: 5px 30px;
-    text-decoration: none;
+	color: #1F0AA1;
+	background: #FFF url(../images/save-image-icon.png) left center no-repeat;
+	padding: 5px 30px;
 }
-#populationInfo, #populationTableBox {
-    width: 355px;
-    float: left;
-    margin-top: 6px;
+.export-chart-box a {
+	text-decoration: none;
 }
-#practicePopInfo {
-    width: 100%;
-    height: 270px;
-    float: left;
+.export-chart-box a:hover {
+	text-decoration: underline !important;
+}
+#population-info, #population-table-box {
+	width: 355px;
+	float: left;
+	margin-top: 6px;
+}
+#practice-pop-info {
+	width: 100%;
+	height: 270px;
+	float: left;
 }
 .popLabel {
-    width: 100%;
-    float: left;
-    text-align: center;
-    font-size: 14px;
+	width: 100%;
+	float: left;
+	text-align: center;
+	font-size: 14px;
 }
 
-#practiceLabel {
-    margin: 12px 0 6px 0;
+#practice-label {
+	margin: 12px 0 6px 0;
 }
-#populationInfo #decileKey {
-    width: 100%;
+#population-info #decileKey {
+	width: 100%;
 }
 .decile1 {
-    background: #C00000;
-    color: White;
+	background: #C00000;
+	color: White;
 }
 
 .decile2 {
-    background: #BB1809;
-    color: White;
+	background: #BB1809;
+	color: White;
 }
 
 .decile3 {
-    background: #B52F12;
-    color: White;
+	background: #B52F12;
+	color: White;
 }
 
 .decile4 {
-    background: #B1451B;
-    color: White;
+	background: #B1451B;
+	color: White;
 }
 
 .decile5 {
-    background: #AB5E24;
-    color: White;
+	background: #AB5E24;
+	color: White;
 }
 
 .decile6 {
-    background: #A6742D;
-    color: White;
+	background: #A6742D;
+	color: White;
 }
 
 .decile7 {
-    background: #A18C36;
+	background: #A18C36;
 }
 
 .decile8 {
-    background: #9CA33F;
+	background: #9CA33F;
 }
 
 .decile9 {
-    background: #97B947;
+	background: #97B947;
 }
 
 .decile10 {
-    background: #92D050;
+	background: #92D050;
 }
 
 #decileKey TD {
-    height: 9px;
-    width: 30px;
-    border: 1px solid white;
-    border-top: 2px solid white;
-    border-bottom: none;
+	height: 9px;
+	width: 30px;
+	border: 1px solid white;
+	border-top: 2px solid white;
+	border-bottom: none;
 }
 
 DIV.decile {
-    float: left;
-    font-weight: bold;
-    border-radius: 2px;
-    text-align: center;
-    padding: 1px 0 1px 0;
-    width: 24px;
-    margin: 3px 0 0 0;
+	float: left;
+	font-weight: bold;
+	border-radius: 2px;
+	text-align: center;
+	padding: 1px 0 1px 0;
+	width: 24px;
+	margin: 3px 0 0 0;
 }
 
 DIV.decileSpacer {
-    float: left;
-    height: 10px;
-    width: 4px;
+	float: left;
+	height: 10px;
+	width: 4px;
 }
-#deprivationTable, #ethnicityTable {
-    margin-top: 15px;
+#deprivation-table, #ethnicity-table {
+	margin-top: 15px;
 }
 #deprivation {
-    text-align: center;
+	text-align: center;
 }
 .deprivationLabel {
-    font-size: 10px;
-    line-height: 10px;
-    color: #666;
-    margin-bottom: 3px;
+	font-size: 10px;
+	line-height: 10px;
+	color: #666;
+	margin-bottom: 3px;
 }
 .right-tooltip-icon {
-    position: absolute;
-    top: 0;
-    right: 0;
+	position: absolute;
+	top: 0;
+	right: 0;
 }
-DIV.infoTooltip {
-    margin: 0 auto 0 auto;
-    height: 16px;
-    width: 16px;
-    background-image: url(../images/info3.png);
-    cursor: pointer;
-}
-
-DIV.infoTooltip:hover {
-    background-image: url(../images/info3-hover.png);
+DIV.info-tooltip {
+	margin: 0 auto 0 auto;
+	height: 16px;
+	width: 16px;
+	background-image: url(../images/info3.png);
+	cursor: pointer;
 }
 
-#furtherInfoTable TD.information {
-    width: 200px;
-}
-#popTable TD.information {
-    width: 250px
+DIV.info-tooltip:hover {
+	background-image: url(../images/info3-hover.png);
 }
 
-#popTable td.header, #furtherInfoTable td.header {
-    background: #fafafa; 
-    vertical-align: bottom;
-    padding: 3px 3px 3px 0;
-    vertical-align: top;
-    text-align: right;
+#further-info-table TD.information {
+	width: 200px;
+}
+#pop-table TD.information {
+	width: 250px
+}
+
+#pop-table td.header, #further-info-table td.header {
+	background: #fafafa; 
+	vertical-align: bottom;
+	padding: 3px 3px 3px 0;
+	vertical-align: top;
+	text-align: right;
 } 
 .popLabel {
+	width: 100%;
+	float: left;
+	text-align: center;
+	font-size: 14px;
+}
+
+#practice-label {
+	margin: 12px 0 6px 0;
+}
+#population-info, #population-table-box {
+	width: 355px;
+	float: left;
+	margin-top: 45px;
+}
+
+#population-info {
+	margin-top: 15px;
+}
+
+#population-info TABLE, #pop-table {
+	width: 100%;
+}
+.averageLabel {
+	font-size: 9px;
+}
+
+/* ------------------------------------------------------------
+	Menus
+------------------------------------------------------------ */
+ul.menu {
+    list-style: none;
+    width: 350px;
+}
+
+ul.inner-menu {
+    list-style: none;
+    float: right;
+    width: 80px;
+}
+
+#indicator-menu-div ul.inner-menu {
+    width: 100px;
+}
+
+ul.menu li {
+    display: inline-block;
+    float: right;
+}
+
+ul.menu .heading {
+    padding-top: 2px;
+    padding-right: 3px;
+}
+
+ul.menu select {
+    width: 200px;
+}
+
+ul.right-menu {
+    width: 240px;
+    float: right;
+}
+ul.left-menu {
+    width: 300px;
+}
+    #benchmark-box select {
+        width: 150px;
+    }
+
+#indicatorMenu {
+    width: 550px;
+}
+
+/* ------------------------------------------------------------
+	Bar chart
+------------------------------------------------------------ */
+TH.bar {
+    text-align: left;
+    width: 240px;
+    vertical-align: top;
+    border-left: none;
+}
+
+TD.bar {
+    border-top: 2px solid white;
+    border-bottom: 2px solid white;
+}
+
+TD.bar-first {
+    border-top: 2px solid #eee;
+}
+
+TD.bar-last {
+    border-bottom: 2px solid #eee;
+}
+
+.bar-box {
+    position: relative;
+    width: 100%;
+    height: 17px;
+}
+
+IMG.bar {
+    top: 0;
+    left: 0;
+    height: 17px;
+    position: absolute;
+    background: #C9C9C9;
+    border: none;
+}
+
+.error, .errorMid {
+    top: 2px;
+    position: absolute;
+    width: 1px;
+    height: 11px;
+    line-height: 0;
+}
+
+.errorMid {
+    height: 2px;
+    top: 7px;
+}
+
+/* ------------------------------------------------------------
+	Bar chart and funnel plot, Box Plot
+------------------------------------------------------------ */
+#indicator-details-data {
+    width: 100%;
+}
+
+#indicator-details-table {
+    width: 100%;
+    float: left;
+    clear: both;
+}
+
+#indicator-details-no-data, #funnel-plot-no-data, #box-plot-no-data {
+    margin: 120px 0 100px 0;
+}
+
+#indicator-details-no-data, #box-plot-no-data {
+    float: left;
+    margin-left: 345px;
+    font-style: italic;
+}
+
+div.noData, div.no-data-300 {
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+}
+
+div.no-data-300 {
+    margin-top: 150px;
+    margin-bottom: 150px;
+}
+
+#funnel-plot-box {
+    float: left;
+}
+
+#funnel-plot, #funnel-plot-box {
+    width: 400px;
+}
+
+#indicator-details-box {
+    width: 600px;
+    float: right;
+}
+
+#indicator-details-header {
+    background: #eee;
+    width: 100%;
+    font-weight: bold;
+    text-align: right;
+}
+
+.highcharts-button .highcharts-contextbutton .highcharts-button-normal, .highcharts-button, .highcharts-credits {
+    display: none;
+}
+
+/* ------------------------------------------------------------
+	Sparkline view options
+------------------------------------------------------------ */
+#sparkline-views {
+    float: right;
+}
+
+#view0, #view1 {
+    text-decoration: none;
+    display: block;
+    width: 28px;
+    height: 28px;
+    float: right;
+}
+
+#view0 {
+    background-image: url(../images/oneAreaOff.png);
+}
+
+#view1 {
+    margin-left: 5px;
+    background-image: url(../images/multiAreaOff.png);
+}
+
+#view0.selected, #view0:hover {
+    background-image: url(../images/oneArea.png);
+}
+
+#view1.selected, #view1:hover {
+    background-image: url(../images/multiArea.png);
+}
+
+/* ------------------------------------------------------------
+	Sparkline view options
+------------------------------------------------------------ */
+div.sparkline-indicator {
+    width: 240px;
+}
+
+img.sparkline-indicator {
+    /*To improve layout on rendering*/
+    height: 140px;
+    width: 240px;
+}
+/* Sparkline navigation elements */
+div.sparkline-indicator, img.sparkline-area {
+    border: 3px solid white;
+}
+
+    div.sparkline-indicator:hover, img.sparkline-area:hover {
+        border: 3px solid #bbb;
+    }
+
+.sparkline-box {
     width: 100%;
     float: left;
     text-align: center;
-    font-size: 14px;
 }
 
-#practiceLabel {
-    margin: 12px 0 6px 0;
-}
-#populationInfo, #populationTableBox {
-    width: 355px;
-    float: left;
-    margin-top: 6px;
+/* ------------------------------------------------------------
+	Menu previous & next buttons
+------------------------------------------------------------ */
+.menu-prev, .menu-next {
+    height: 22px;
+    width: 22px;
+    background-image: url(../images/left-right-arrows.png);
+    background-repeat: no-repeat;
+    border: 1px solid #ddd;
+    position: relative;
 }
 
-#populationInfo {
-    margin-top: 15px;
+.menu-prev {
+    background-position: 6px 3px;
+    left: 2px;
 }
 
-#populationInfo TABLE, #popTable {
+.menu-next {
+    background-position: -16px 3px;
+    left: -2px;
+}
+
+    .menu-prev:hover, .menu-next:hover {
+        background-color: white;
+    } 
+    
+/* ------------------------------------------------------------
+	Spine charts
+------------------------------------------------------------ */
+#single-area-table th div {
+    line-height: 1.1em;
+}
+
+.noSpine {
+    height: 23px;
+    line-height: 23px;
     width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 11px;
 }
-.averageLabel {
-    font-size: 9px;
+
+.q1, .q2, .q4, .spine {
+    height: 23px;
+    float: left;
 }
+
+.spine {
+    overflow: hidden;
+    padding: 0 0 0 0;
+}
+
+.spine250 {
+    width: 274px; /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
+    position: relative;
+}
+
+.average250 {
+    width: 2px;
+    left: 136px; /*half spine250 width - 1(i.e. half average bar width)*/
+    position: absolute;
+    height: 23px;
+}
+
+.marker {
+    position: absolute;
+    top: 2px;
+}
+
+/* ------------------------------------------------------------
+	Download tab
+------------------------------------------------------------ */
+#download-container {
+    color: #666;
+    padding: 60px 0 120px 0;
+}
+
+#download-container h2 {
+    padding: 0;
+    color: #555;
+}
+
+#download-container a {
+    font-size: 16px;
+    color: #2e3191;
+    margin: 6px 0;
+    background-repeat: no-repeat;
+    display: block;
+    text-decoration: none;
+}
+
+#pdf-download-text a {
+    font-size: 20px;
+}
+
+#download-container h3 {
+    margin:20px 0 0 0 ;
+}
+
+#download-container a:hover {
+    text-decoration: underline;
+}
+
+#download-container p {
+    line-height: 1.4em;
+    width: 80%;
+    margin: 0;
+}
+
+#excel-box {
+    border-right: 2px solid #eee
+}
+
+#download-container img{
+    height: 300px;
+    border: 2px solid #eee;
+    float: right;
+}
+
+#pdf-download-text {
+    padding-left: 40px;
+}
+
+#pdf-download-text p {
+    margin-bottom: 20px;
+}
+
+.noLeft {
+    border-left: 0 none #fff;
+}
+
+/* ------------------------------------------------------------
+	England tab
+------------------------------------------------------------ */
+#england-container table {
+    margin-top: 10px;
+    width: 80%;
+}
+
+#england-container table tr th:first-child {
+    width: 50%;
+}
+
+#england-container table tr td {
+    padding: 2px;
+}
+
+.table-hover tbody tr:hover td {
+    color: #000;
+    background: #D7EBE8;
+}
+
+.table-hover tbody tr:hover td a {
+    color: #2e3191;
+}
+
+/* ------------------------------------------------------------
+	Reports tab
+------------------------------------------------------------ */
+#reports-container table tr td {
+    font-size: 17px;
+}
+#reports-container table tr td.format {
+   width:90px;
+   text-align: center;
+}
+#reports-container table tr td:first-child {
+   width:300px;
+}
+
+
+
+

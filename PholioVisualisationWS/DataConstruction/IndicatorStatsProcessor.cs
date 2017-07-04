@@ -14,6 +14,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 statsPercentiles.Max = RoundStats(statsPercentiles.Max);
                 statsPercentiles.Min = RoundStats(statsPercentiles.Min);
+                statsPercentiles.Median = RoundStats(statsPercentiles.Median);
                 statsPercentiles.Percentile25 = RoundStats(statsPercentiles.Percentile25);
                 statsPercentiles.Percentile75 = RoundStats(statsPercentiles.Percentile75);
             }

@@ -50,11 +50,13 @@ function setGlobalGroupIds() {
 function getSupportingDataValues(prevAndRiskRootIndex) {
     var root = supportingGroupRoots[prevAndRiskRootIndex];
     var groupId = selectedSupportingGroupId;
+    var model = MT.model;
 
     var parameters = new ParameterBuilder(
     ).add('group_id', groupId
-    ).add('area_type_id', MT.model.areaTypeId
-    ).add('parent_area_code', MT.model.parentCode
+    ).add('area_type_id', model.areaTypeId
+    ).add('parent_area_code', model.parentCode
+    ).add('profile_id', model.profileId
     ).add('comparator_id', -1
     ).add('indicator_id', root.IID
     ).add('sex_id', root.Sex.Id
@@ -62,7 +64,7 @@ function getSupportingDataValues(prevAndRiskRootIndex) {
 
     ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(),
         function (obj) {
-            loaded.supportingDataValues[MT.model.areaTypeId] = obj;
+            loaded.supportingDataValues[model.areaTypeId] = obj;
             ajaxMonitor.callCompleted();
         });
 };
@@ -327,27 +329,33 @@ function switchAreas(parentAreaTypeId) {
 
 function createExportLinks() {
     var model = MT.model;
-    var serviceUrl = 'GetDataDownload.ashx?pid=' + model.profileId +
-        '&ati=' + model.areaTypeId +
-        '&tem=' + model.profileId +
-        '&pds=0';
 
-    var exportLink = '<a href="' + FT.url.corews + serviceUrl;
+    var parameters = new ParameterBuilder(
+        ).add('profile_id', model.profileId
+        ).add('child_area_type_id', model.areaTypeId);
 
-    // National data download link
-    if (model.areaTypeId !== AreaTypeIds.Practice/*TODO FIN-300 temporarily exclude practices*/) {
-        $('#download_data_for_england').html(exportLink + '&pat=15&par=' + NATIONAL_CODE +
-            '" class="external_link" target="_blank">Download ' + profileTitle + ' data for England</a>');
-    } else {
-        //TODO see jira FIN-300, not working for practices, link temporarily hidden
-        $('#download_data_for_england').hide();
-    }
+    // Via core so saves as HTML
+    var exportLink = '<a href="/api/all_data/csv/by_profile_id?';
 
-    // Download practice data within parent area
+    // National data download link (not for practices)
+    var $link = $('#download_data_for_england');
     if (model.areaTypeId === AreaTypeIds.Practice) {
-        $('#download_data_for_ccg').html(exportLink + '&pat=' + model.parentAreaType + '&par=' + model.parentCode +
+        // Hide national link
+        $link.hide();
+
+        // Download practice data within parent area
+        parameters.add('parent_area_type_id', model.parentAreaType);
+        parameters.add('parent_area_code', model.parentCode);
+        $('#download_data_for_ccg').html(exportLink + parameters.build() +
             '" class="external_link" target="_blank">Download ' + profileTitle + ' data for '
             + loaded.addresses[MT.model.parentCode].Name + '</a>');
+
+    } else {
+        // Download national data
+        parameters.add('parent_area_type_id', AreaTypeIds.Country);
+        parameters.add('parent_area_code', NATIONAL_CODE);
+        $link.html(exportLink + parameters.build() +
+            '" class="external_link" target="_blank">Download ' + profileTitle + ' data for England</a>');
     }
 }
 
@@ -658,7 +666,7 @@ function getNewRowsWithCoreData() {
             // Assign supporting data
             var supportingData = null;
             if (isSupportingData) {
-                var coreData = _.find(supportingDataList, function(data) { return data.AreaCode === areaCode });
+                var coreData = _.find(supportingDataList, function (data) { return data.AreaCode === areaCode });
                 if (new CoreDataSetInfo(coreData).isValue()) {
                     supportingData = coreData;
                 }
@@ -1097,7 +1105,7 @@ function changeNumberOrder() {
 }
 
 function goToPracticeProfiles() {
-    var url = 'http://fingertips.phe.org.uk/profile/general-practice/data#mod,2,pyr,2013,pat,19,par,' +
+    var url = 'http://fingertips.phe.org.uk/profile/general-practice/data#mod,2,pat,19,par,' +
         MT.model.parentCode + ',are,-,sid1,2000005,ind1,-,sid2,-,ind2,-';
     window.open(url);
 }
@@ -1212,6 +1220,82 @@ function getDeprivationColumnHeader() {
         : AreaTypeIds.Country;
 
     return getDeprivationLabel('Deprivation', parentAreaType);
+}
+
+/**
+* Retrieves and manages area values data.
+* @class AreaValuesDataManager
+*/
+function AreaValuesDataManager() {
+
+    var data = {};
+    var _this = this;
+
+    /**
+    * Data is only publically accessible for debugging.
+    * @property data
+    */
+    _this.data = data;
+
+    var getDataKey = function (modelForKey, root) {
+        return getKey(modelForKey.parentCode, root.IID, root.Sex.Id, root.Age.Id);
+    }
+
+    var setData = function (modelForKey, root, newData) {
+        var key = getDataKey(modelForKey, root);
+        data[key] = newData;
+    };
+
+    var getDataFromModel = function (modelForKey, root) {
+        var key = getDataKey(modelForKey, root);
+        return data[key];
+    }
+
+    var getModel = function (alternativeModel) {
+        var modelCopy = _.clone(MT.model);
+        $.extend(modelCopy, alternativeModel);
+        return modelCopy;
+    }
+
+    /**
+    * Gets complex data object that was retrieved by AJAX
+    * @method getData
+    */
+    _this.getData = function (root, alternativeModel) {
+        var modelForKey = getModel(alternativeModel);
+        return getDataFromModel(modelForKey, root);
+    };
+
+    /**
+	* Fetches data by AJAX.
+	* @method fetchDataByAjax
+	*/
+    _this.fetchDataByAjax = function (root, alternativeModel) {
+
+        var modelCopy = getModel(alternativeModel);
+
+        if (!getDataFromModel(modelCopy, root)) {
+
+            var parameters = new ParameterBuilder(
+                ).add('group_id', modelCopy.groupId
+                ).add('area_type_id', modelCopy.areaTypeId
+                ).add('parent_area_code', modelCopy.parentCode
+                ).add('profile_id', modelCopy.profileId
+                ).add('comparator_id', -1
+                ).add('indicator_id', root.IID
+                ).add('sex_id', root.Sex.Id
+                ).add('age_id', root.Age.Id);
+
+            ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(), function (obj) {
+                setData(modelCopy, root, obj);
+                ajaxMonitor.callCompleted();
+            });
+
+        } else {
+            // Do not need to load data
+            ajaxMonitor.callCompleted();
+        }
+    }
 }
 
 templates.add('causes',

@@ -15,7 +15,7 @@ namespace Fpm.MainUITest.Helpers
             ProfileId = ProfileIds.Diabetes,
             FileName = "A.doc",
             FileData = new byte[] { 0x5, 0x6, 0x7, 0x8, 0x9 },
-            UploadedBy = "Doris",
+            UploadedBy = UserNames.Doris,
             UploadedOn = DateTime.Now
         };
 
@@ -24,14 +24,14 @@ namespace Fpm.MainUITest.Helpers
             ProfileId = ProfileIds.HealthProfiles,
             FileName = "B.doc",
             FileData = new byte[] { 0x5, 0x6, 0x7, 0x8, 0x9 },
-            UploadedBy = "Doris",
+            UploadedBy = UserNames.Doris,
             UploadedOn = DateTime.Now
         };
 
         [TestMethod]
         public void TestFileNameUniqueness()
         {                       
-            var fileNameHelper = new FileNameHelper();
+            var fileNameHelper = new FileNameHelper(ReaderFactory.GetProfilesReader());
               
             // Check for override
             var overrideUniqueness = fileNameHelper.IsUnique(docA.FileName, docA.ProfileId);

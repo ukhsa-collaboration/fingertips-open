@@ -1,11 +1,15 @@
-﻿@using Profiles.MainUI.Helpers
-@using Profiles.MainUI.Models
+﻿@using Profiles.MainUI.Models
 @model PageModel
-@* Page specific data *@
-
-@{ var tab = new ContentTab(Model); }
-<div id="content" style="display: none;" class="standardWidth clearfix">
-    <div class="clearfix fl">
-        @ContentProvider.GetContent(tab.ContentKey, Model.ProfileId)
+@{
+    var files = (IList<string>)ViewBag.ExtraJsFiles;
+}
+@if (files.Contains("PageMapNew.js"))
+{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos&sensor=false" type="text/javascript"></script>
+    <div id="map-container" class="standard-width clearfix">
+        <div id="app_map">
+            <div app-root></div><button id='TestButton' onclick='callAngularEvent();'></button>
+        </div>
     </div>
-</div>
+}
+<div id="no-domain-data" class="tall-central-message" style="display: none;">No indicators for current area type</div>

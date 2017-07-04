@@ -1,0 +1,110 @@
+.googleMapNg {
+	position: relative;
+	background-color: #fff;
+    border: 1px solid #CCC;
+	width: 470px;
+	height: 600px;
+	float: left;
+	margin-bottom: 10px;
+}
+#floating-panel {
+  position: absolute;
+  margin-top: 80px;
+  z-index: 5;
+  padding-left: 10px;
+}
+#wrapper{
+	position:relative;
+}
+.leaflet-right .leaflet-control {
+	clear: none;
+}
+.layerControl p {
+	margin-left: 5px;
+}
+.layerControl div.basemap {
+	margin: 3px 0;
+	padding-right: 3px;
+}
+.layerControl div.basemap:hover,
+.layerControl div.opacity:hover {
+	background-color: rgba(220,220,220,.7);
+}
+.layerControl div:hover span {
+	border: 1px solid #666;
+}
+.layerControl div.selected span {
+	border: 1px solid #66F;
+}
+.layerControl div span {
+	border: 1px solid #CCC;
+	width: 70px;
+	height: 30px;
+	background: url(/images/basemaps.jpg) no-repeat;
+	display: inline-block;
+	vertical-align: middle;
+}
+.layerControl div.basemap span{
+	margin: 0 5px;
+}
+.layerControl div.None span {
+	background: #FFF;
+}
+.layerControl div.Topographic span {
+	background-position: 0px 0px;
+}
+.layerControl div.Streets span {
+	background-position: -6px -113px;
+}
+.layerControl div.NationalGeographic span {
+	background-position: 0px -192px;
+}
+.layerControl div.Oceans span {
+	background-position: -6px -278px;
+}
+.layerControl div.Gray span {
+	background-position: -7px -383px;
+}
+.layerControl div.DarkGray span {
+	background-position: -13px -645px;
+}
+.layerControl div.Imagery span {
+	background-position: -50px -480px;
+}
+.layerControl div.ShadedRelief span {
+	background-position: -2px -538px;
+}
+.layerControl div#opacity {
+	margin-left: 5px;
+}
+.layerControl div.opacity {
+	display: inline-block;
+	width: 34px;
+	text-align: center;
+}
+.layerControl div.opacity span {
+	border: 1px solid #CCC;
+	display: inline-block;
+	width: 30px;
+	height: 25px;
+}
+.layerControl div.opacity:hover span,
+.layerControl div.opacity.selected span {
+	border-color: #666;
+}
+
+.layerControl div.opacity label {
+	font-size: .65em;
+}
+.layerControl div.opacity span {
+	background: url(/images/opacity.jpg) no-repeat;    
+}
+.layerControl input {
+	display: none;
+}
+
+.layerControl > label {
+    display: block;
+    height: 100%;
+    width: 100%;
+}

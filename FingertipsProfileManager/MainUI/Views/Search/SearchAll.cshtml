@@ -1,7 +1,6 @@
 ﻿@using Fpm.MainUI
 @using Fpm.MainUI.Helpers
 @using Fpm.ProfileData
-@using Fpm.Upload
 @model List<Fpm.MainUI.Models.DomainIndicatorsSearchResult>
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
 @{
@@ -11,11 +10,11 @@
     string searchedFor;
     if (wasTextSearch)
     {
-        searchedFor = @Request.QueryString["searchTerm"];
+        searchedFor = Request.QueryString["searchTerm"];
     }
     else
     {
-        searchedFor = @Request.QueryString["IndicatorId"];
+        searchedFor = Request.QueryString["IndicatorId"];
     }
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
@@ -69,29 +68,44 @@
                 </thead>
                 <tbody>
 
-                    @foreach (var domainIndicatorsSearchResult in Model)
+                    @foreach (var searchResult in Model)
                     {
                         TimePeriodReader timePeriodReader = new TimePeriodReader();
-                        foreach (var indicatorName in domainIndicatorsSearchResult.Indicators)
+                        foreach (var indicatorName in searchResult.Indicators)
                         {
+                            var areaTypeId = indicatorName.AreaTypeId;
+                            var ageId = indicatorName.AgeId;
+                            var indicatorId = indicatorName.IndicatorId;
+
                             <tr>
                                 <td class="left">
                                     @indicatorName.IndicatorId
                                 </td>
                                 <td class="left">
-                                    @domainIndicatorsSearchResult.ProfileName
+                                    @Html.ActionLink(searchResult.ProfileName, "SortPageAndFilter", "ProfilesAndIndicators",
+                                        new { profileKey = searchResult.UrlKey, SelectedAreaTypeId = areaTypeId }, new { })
                                 </td>
                                 <td class="left">
-                                    @domainIndicatorsSearchResult.GroupName
+                                    @Html.ActionLink(searchResult.GroupName, "SortPageAndFilter", "ProfilesAndIndicators",
+                                        new
+                                        {
+                                            profileKey = searchResult.UrlKey, domainSequence = searchResult.SequenceId,
+                                            SelectedAreaTypeId = areaTypeId
+                                        }, new { })
+
                                 </td>
                                 <td class="left">
-                                    <a class="edit-link" href="@(CommonUtilities.GetIndicatorUrl(indicatorName.IndicatorId, indicatorName.AgeId, indicatorName.SexId, domainIndicatorsSearchResult.UrlKey, indicatorName.AreaTypeId, domainIndicatorsSearchResult.SequenceId))">@indicatorName.IndicatorName</a>
+                                    @{
+                                        var url = CommonUtilities.GetIndicatorUrl(indicatorId, ageId,
+                                            indicatorName.SexId, searchResult.UrlKey, areaTypeId, searchResult.SequenceId);
+                                    }
+                                    <a class="edit-link" href="@url">@indicatorName.IndicatorName</a>
                                 </td>
                                 <td class="left">
                                     @indicatorName.Sex
                                 </td>
                                 <td class="left">
-                                    @indicatorName.Age (@indicatorName.AgeId)
+                                    @indicatorName.Age (@ageId)
                                 </td>
                                 <td class="left">
                                     @timePeriodReader.GetPeriodString(TimePeriod.GetBaseline(indicatorName), indicatorName.YearTypeId)
@@ -103,39 +117,66 @@
                                     @indicatorName.AreaType
                                 </td>
                                 <td class="center">
-                                    @Html.CheckBox(indicatorName.IndicatorId + "_selected", false, new
-                                    {
-                                        @class = "indicator-check-box",
-                                        @value = indicatorName.IndicatorId,
-                                        id = domainIndicatorsSearchResult.UrlKey + '~' + domainIndicatorsSearchResult.GroupId + '~' + 
-                                             indicatorName.IndicatorId + '~' + indicatorName.AreaTypeId + '~' + indicatorName.SexId + '~' +
-                                             indicatorName.AgeId
-                                    })
+                                    @{
+                                        var id = searchResult.UrlKey + '~' + searchResult.GroupId + '~' +
+                                                 indicatorId + '~' + areaTypeId +
+                                                 '~' + indicatorName.SexId + '~' + ageId;
+                                        var props = new Dictionary<string, object>
+                                        {
+                                            {"class", "indicator-check-box"},
+                                            {"value", indicatorId},
+                                            {"id", id}
+                                        };
+                                        TooltipHelper.AddTooltipRight(props, "Select to copy the indicator from this profile domain");
+                                    }
+                                    @Html.CheckBox(indicatorId + "_selected", false, props)
                                 </td>
-                                 <td class="center">
-                                    <input type="button" class="view-indicator-data-btn" id="view-data-@indicatorName.IndicatorId " value="View Data"  indicatorname="@indicatorName.IndicatorName" />
+                                <td class="center">
+                                    <input type="button" class="view-indicator-data-btn" id="view-data-@indicatorId " value="View Data" indicatorname="@indicatorName.IndicatorName" />
                                 </td>
                             </tr>
-                        }
-                    }
+                                            }
+                                        }
                 </tbody>
             </table>
 
-            <div>
-                <b>Profile</b>
-                @Html.DropDownList("selectedProfileId", (IEnumerable<SelectListItem>)ViewBag.listOfProfiles, new { @Id = "selectedProfileId", @Name = "selectedProfileId", @class = "create-indicator-dropdown dropdown-selected" })
-                <b>Domain</b>
-                @Html.DropDownList("selectedDomainId", (IEnumerable<SelectListItem>)ViewBag.ListOfDomains, new { @Id = "selectedDomainId", @Name = "selectedDomainId", @class = "create-indicator-dropdown dropdown-selected" })
-                <b>
-                    <input style="display: inline" type="submit" id="copy_multiple_indicators" value="Copy Selected Indicators" />
-                </b>
+            <div class="container">
+
+                <h3>Copy selected indicators to another profile</h3>
+
+                <div class="form-group row">
+                        <div class="col-md-1 control-label">
+                            Profile
+                        </div>
+                        <div class="col-md-10">
+                            @Html.DropDownList("selectedProfileId", (IEnumerable<SelectListItem>)ViewBag.listOfProfiles,
+                            new { @Id = "selectedProfileId", @Name = "selectedProfileId", @class = "create-indicator-dropdown dropdown-selected" })
+                        </div>
+                    </div>
+
+                <div class="form-group row">
+                    <div class="col-md-1 control-label">
+                        Domain
+                    </div>
+                    <div class="col-md-10">
+                        @Html.DropDownList("selectedDomainId", (IEnumerable<SelectListItem>)ViewBag.ListOfDomains,
+                                new { @Id = "selectedDomainId", @Name = "selectedDomainId", @class = "create-indicator-dropdown dropdown-selected" })
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-10 col-md-offset-1">
+                            <input class="btn btn-primary" type="submit" id="copy_multiple_indicators" value="Copy Selected Indicators" />
+                    </div>
+                </div>
+
             </div>
-        }
-        else
-        {
-            <b>No indicators were found for "@searchedFor"</b>
-        }
-    }
+                                        }
+                                        else
+                                        {
+                                            <b>No indicators were found for "@searchedFor"</b>
+                                            }
+                                        }
 </div>
 
 <div class="a-modal">

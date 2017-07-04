@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.Report">
+
+  <class name="Report" table="SSRS_Reports">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="Name" column="name" />    
+    <property name="Parameters" column="parameters" />
+  </class>
+
+  <class name="ReportsProfileMapping" table="SSRS_ReportsProfileMapping">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="ReportId" column="reportid" />
+    <property name="ProfileId" column="profileid" />    
+  </class>
+</hibernate-mapping>

@@ -1,0 +1,33 @@
+﻿@model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
+
+@using (Html.BeginForm("EditProfile", "Profile", FormMethod.Post, new { id = "frmProfile" }))
+{
+    @Html.Partial("_NonAdminProfileOtherComponents")
+    @Html.Partial("_NonAdminProfileCheckboxes")
+    @Html.Partial("_FingertipsTabOptions")
+
+    <div class="row col-md-12">
+        <input class="btn btn-primary" id="update-profile" type="button" value="Update" onclick="SaveProfileDetail()" />
+        <input class="btn btn-secondary" id="cancel_profile" type="button" value="Cancel" onclick="CancelProfileUpdate()" />
+    </div>
+
+    <div id="alert-success" class="row col-md-12" style="display: none;">
+        <div class="alert alert-success alert-dismissable">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+            <strong>Success!</strong> Record has been updated successfully
+        </div>
+    </div>
+
+    <div class="row col-md-12">
+        <h2 class="subheading ">Users with permission to edit this profile</h2>
+    </div>
+
+    <div id="user-listing" class="row">
+        @Html.Partial("_UserPermissions", Model.ProfileUsers)
+    </div>
+
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.ReturnUrl)
+    @Html.Hidden("ProfileUsers", Model.ProfileUsers)
+}
+

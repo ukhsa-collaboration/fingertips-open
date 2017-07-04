@@ -101,15 +101,23 @@ namespace PholioVisualisation.DataConstruction
                                         int significance;
                                         if (comparer is ICategoryComparer)
                                         {
-                                            var d = new ChildAreaValuesBuilder(indicatorComparerFactory,
+                                            var childDataList = new ChildAreaValuesBuilder(indicatorComparerFactory,
                                                 groupDataReader, areasReader, profileReader)
                                             {
                                                 ParentAreaCode = comparatorAreaCode,
                                                 AreaTypeId = AreaTypeId,
                                                 ComparatorId = grouping.ComparatorId
                                             }.Build(grouping);
-                                            var coreData = d.First(x => x.AreaCode.Equals(area.Code));
-                                            significance = coreData.Significance.Values.First();
+                                            var coreData = childDataList
+                                                .FirstOrDefault(x => x.AreaCode.Equals(area.Code));
+                                            if (coreData != null)
+                                            {
+                                                significance = coreData.Significance.Values.First();
+                                            }
+                                            else
+                                            {
+                                                significance = (int)Significance.None;
+                                            }
                                         }
                                         else
                                         {

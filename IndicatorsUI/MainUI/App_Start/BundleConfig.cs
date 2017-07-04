@@ -1,6 +1,6 @@
-﻿using Profiles.DataAccess;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Web.Optimization;
+using Profiles.DataAccess;
 
 namespace Profiles.MainUI
 {
@@ -10,9 +10,10 @@ namespace Profiles.MainUI
         public static void RegisterBundles(BundleCollection bundles)
         {
             var appConfig = AppConfig.Instance;
-            string staticPath = "~/" + appConfig.JavaScriptVersionFolder;
+            var staticPath = "~/" + appConfig.JavaScriptVersionFolder;
             var jsPath = staticPath + "js/";
             var cssPath = staticPath + "css/";
+            var tsPath = staticPath + "ts/";
 
             // Add scripts
             AddScripts(bundles, jsPath, "js-fingertips", GetJsFingertips());
@@ -22,10 +23,31 @@ namespace Profiles.MainUI
             AddScripts(bundles, jsPath, "js-fingertips-maps", GetJsFingertipsMaps());
             AddScripts(bundles, jsPath, "js-area-search", GetJsAreaSearch());
 
+            //Add TranspiledFiles
+            AddScripts(bundles, tsPath, "ts-file", GetTranspiledFiles());
+
+            // Add styles
+            AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
+            AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
+            AddStyles(bundles, cssPath, "css-area-search", new[] {"AreaSearch/area-search.css"});
+
             // Add styles
             AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
             AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
             AddStyles(bundles, cssPath, "css-area-search", new[] { "AreaSearch/area-search.css" });
+
+            //Add TranspiledFiles
+            AddScripts(bundles, tsPath, "ts-file", GetTranspiledFiles());
+
+        }
+
+        private static string[] GetTranspiledFiles()
+        {
+            var tsFiles = new[]
+            {
+                "inline.bundle.js", "polyfills.bundle.js", "styles.bundle.js", "vendor.bundle.js", "main.bundle.js"
+            };
+            return tsFiles;
         }
 
         private static string[] GetJsPracticeProfiles()
@@ -54,21 +76,19 @@ namespace Profiles.MainUI
         private static void AddEnvironmentFiles(List<string> jsFiles)
         {
             if (AppConfig.Instance.IsEnvironmentTest)
-            {
                 jsFiles.Add("EnvironmentTest.js");
-            }
         }
 
         private static string[] GetJsLongerLives()
         {
             var jsFiles = new[]
             {
-                "vendor/jquery-legacy/jquery.min.js",
+                "vendor/jquery/jquery.min.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
                 "vendor/modernizr/modernizr.js",
-                "longer-lives-min.js",
                 "vendor/underscore/underscore-min.js",
                 "vendor/hogan.js/hogan.min.js",
+                "pholio-constants.js",
                 "common.js",
                 "fingertips.js",
                 "LongerLives/SiteBaseLongerLives.js"
@@ -98,7 +118,6 @@ namespace Profiles.MainUI
                 "jquery-ui-1.10.1.css",
                 "core-allpages.css",
                 "chosen/chosen.min.css"
-                
             };
             return cssFiles;
         }
@@ -107,9 +126,8 @@ namespace Profiles.MainUI
         {
             var jsFiles = new[]
             {
-
-                "vendor/jquery-legacy/jquery.min.js",
-                "vendor/tether/tether.js",
+                "vendor/jquery/jquery.min.js",
+                "vendor/tether/tether.min.js",
                 "vendor/bootstrap/bootstrap.min.js",
                 "vendor/chosen/chosen.jquery.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
@@ -118,12 +136,14 @@ namespace Profiles.MainUI
                 "vendor/highcharts/exporting.js",
                 "vendor/underscore/underscore-min.js",
                 "vendor/hogan.js/hogan.min.js",
+                "pholio-constants.js",
                 "common.js",
                 "tooltip.js",
                 "TooltipRecentTrends.js",
                 "spineChart.js",
                 "vendor/jquery.floatThead/jquery.floatThead.min.js",
                 "vendor/js-cookie/js.cookie.js"
+                
             };
             return jsFiles;
         }
@@ -133,7 +153,8 @@ namespace Profiles.MainUI
         {
             var jsFiles = new[]
             {
-                "fingertips.js"
+                "fingertips.js",
+                "fingertipsGlobal.js"
             };
             return jsFiles;
         }
@@ -152,10 +173,8 @@ namespace Profiles.MainUI
 
         private static string[] PrependUrlPath(string[] files, string preceedingPath)
         {
-            for (int i = 0; i < files.Length; i++)
-            {
+            for (var i = 0; i < files.Length; i++)
                 files[i] = preceedingPath + files[i];
-            }
 
             return files;
         }

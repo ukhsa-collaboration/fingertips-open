@@ -32,5 +32,13 @@ namespace PholioVisualisation.ServicesTest
             byte[] data = DataControllerEndPointTest.GetData("profiles");
             TestHelper.IsData(data);
         }
+
+        [TestMethod]
+        public void TestGetAreaTypesWithPdfs()
+        {
+            byte[] data = DataControllerEndPointTest.GetData("profile/area_types_with_pdfs?" +
+                "profile_id=" + ProfileIds.PhysicalActivity);
+            TestHelper.IsData(data);
+        }
     }
 }

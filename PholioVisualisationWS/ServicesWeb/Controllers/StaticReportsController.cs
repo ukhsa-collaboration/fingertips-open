@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.PholioObjects;
+using ServicesWeb.Helpers;
 
 namespace ServicesWeb.Controllers
 {
@@ -26,16 +27,20 @@ namespace ServicesWeb.Controllers
             {
                 var filePath = GetFilePath(profile_key, file_name, time_period);
 
-                // To avoid System.UnauthorizedAccessException
+                // To avoid System.UnauthorizedAccessException when reading file
                 File.SetAttributes(filePath, FileAttributes.Normal);
+                var bytes = File.ReadAllBytes(filePath);
 
-                HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-                SetFileContent(filePath, result);
-                result.Content.Headers.ContentType =
-                    new MediaTypeHeaderValue("application/octet-stream");
-                SetFilename(file_name, result);
+                var responseBuilder = new FileResponseBuilder();
+                responseBuilder.SetFileContent(bytes);
+                responseBuilder.SetFilename(file_name);
 
-                return result;
+                return responseBuilder.Message;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                throw new FingertipsException("Static report cannot be downloaded." +
+                    " Assign full control permissions to static_reports_live_a/b directory for fingertips_web_user.", ex);
             }
             catch (Exception ex)
             {
@@ -44,18 +49,27 @@ namespace ServicesWeb.Controllers
             }
         }
 
-        private static void SetFileContent(string filePath, HttpResponseMessage result)
+        /// <summary>
+        /// Whether or not a static document is available
+        /// </summary>
+        /// <param name="profile_key">Profile URL key</param>
+        /// <param name="file_name">Name of the file</param>
+        /// <param name="time_period">The time period the file is associated with (optional)</param>
+        /// <returns>Whether or not a static document is available</returns>
+        [HttpGet]
+        [Route("api/static-reports/exists")]
+        public bool IsStaticReportAvailable(string profile_key, string file_name, string time_period = null)
         {
-            var bytes = File.ReadAllBytes(filePath);
-            result.Content = new ByteArrayContent(bytes);
-        }
-
-        private static void SetFilename(string file_name, HttpResponseMessage result)
-        {
-            result.Content.Headers.ContentDisposition = new ContentDispositionHeaderValue("attachment")
+            try
             {
-                FileName = file_name
-            };
+                var filePath = GetFilePath(profile_key, file_name, time_period);
+                return File.Exists(filePath);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
         }
 
         private static string GetFilePath(string profile_key, string file_name, string time_period)

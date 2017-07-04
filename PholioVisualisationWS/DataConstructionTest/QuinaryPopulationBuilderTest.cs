@@ -22,7 +22,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = SupportingGroupId
             };
-            builder.Build();
+            builder.BuildPopulationAndSummary();
             CheckPopulationValues(builder.Values);
             Assert.IsNotNull(builder.EthnicityText);
         }
@@ -36,7 +36,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = SupportingGroupId
             };
-            builder.Build();
+            builder.BuildPopulationAndSummary();
             CheckPopulationValues(builder.Values);
             Assert.IsNull(builder.EthnicityText);
         }
@@ -50,7 +50,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = SupportingGroupId
             };
-            builder.Build();
+            builder.BuildPopulationAndSummary();
             CheckPopulationValues(builder.Values);
             Assert.IsNull(builder.EthnicityText);
         }
@@ -64,7 +64,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = PopulationGroupId
             };
-            builder.BuildPopulation(AreaCodes.Ccg_AireDaleWharfdaleAndCraven,AreaTypeIds.Ccg);
+            builder.BuildPopulationOnly(AreaCodes.Ccg_AireDaleWharfdaleAndCraven,AreaTypeIds.Ccg);
             CheckPopulationValues(builder.Values);
         }
 
@@ -77,22 +77,24 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = PopulationGroupId
             };
-            builder.BuildPopulation(AreaCodes.England,AreaTypeIds.Ccg);
+            builder.BuildPopulationOnly(AreaCodes.England,AreaTypeIds.Ccg);
             CheckPopulationValues(builder.Values);
         }
 
         [TestMethod]
         public void TestPracticePopulation()
         {
+            var areaCode = AreaCodes.Gp_MeersbrookSheffield;
             QuinaryPopulationBuilder builder = new QuinaryPopulationBuilder
             {
-                AreaCode = AreaCodes.Gp_AdamHouseSandiacre,
+                AreaCode = areaCode,
                 DataPointOffset = 0,
                 GroupId = PopulationGroupId
             };
-            builder.BuildPopulation(AreaCodes.Gp_AdamHouseSandiacre,AreaTypeIds.GpPractice);
+            builder.BuildPopulationOnly(areaCode, AreaTypeIds.GpPractice);
             CheckPopulationValues(builder.Values);
         }
+
         private static void CheckPopulationValues(Dictionary<int, IEnumerable<double>> values)
         {
             foreach (var sexId in new[] { SexIds.Male, SexIds.Female })

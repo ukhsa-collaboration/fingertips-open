@@ -71,6 +71,58 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.SlopeIndexOfInequalityForLifeExpectancy, SexIds.Female); }
         }
 
+
+        public GroupRoot PercentageEthnicMinoritiesCombined
+        {
+            get { return GetGroupRoot(IndicatorIds.PercentageEthnicMinorities, SexIds.Persons); }
+        }
+
+        public GroupRoot PercentageEthnicMinoritiesMale
+        {
+            get { return GetGroupRoot(IndicatorIds.PercentageEthnicMinorities, SexIds.Male); }
+        }
+
+        public GroupRoot PercentageEthnicMinoritiesFemale
+        {
+            get { return GetGroupRoot(IndicatorIds.PercentageEthnicMinorities, SexIds.Female); }
+        }
+
+
+        public GroupRoot PopulationCombined
+        {
+            get { return GetGroupRoot(IndicatorIds.OnsMidYearPopulationEstimates, SexIds.Persons); }
+        }
+
+        public GroupRoot PopulationMale
+        {
+            get { return GetGroupRoot(IndicatorIds.OnsMidYearPopulationEstimates, SexIds.Male); }
+        }
+
+        public GroupRoot PopulationFemale
+        {
+            get { return GetGroupRoot(IndicatorIds.OnsMidYearPopulationEstimates, SexIds.Female); }
+        }
+
+        public GroupRoot PopulationProjectionCombined
+        {
+            get { return GetGroupRoot(IndicatorIds.PopulationProjection, SexIds.Persons); }
+        }
+
+        public GroupRoot PopulationProjectionMale
+        {
+            get { return GetGroupRoot(IndicatorIds.PopulationProjection, SexIds.Male); }
+        }
+
+        public GroupRoot PopulationProjectionFemale
+        {
+            get { return GetGroupRoot(IndicatorIds.PopulationProjection, SexIds.Female); }
+        }
+
+        public GroupRoot DependencyRatio
+        {
+            get { return GetGroupRoot(IndicatorIds.DependencyRatio); }
+        }
+
         public GroupRoot ObesityYear6
         {
             get { return GetGroupRoot(IndicatorIds.ObesityYear6); }
@@ -171,16 +223,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.LongTermUnemployment); }
         }
 
-        public GroupRoot AdultIncidenceOfMalignantMelanoma
-        {
-            get { return GetGroupRoot(IndicatorIds.IncidenceOfMalignantMelanoma2); }
-        }
-
-        public GroupRoot AdultDrugMisuse
-        {
-            get { return GetGroupRoot(IndicatorIds.AdultDrugMisuse2); }
-        }
-
         public GroupRoot AdultExcessWinterDeaths
         {
             get { return GetGroupRoot(IndicatorIds.ExcessWinterDeaths); }
@@ -239,7 +281,8 @@ namespace PholioVisualisation.PdfData
             }
             catch (InvalidOperationException)
             {
-                throw new FingertipsException("Indicator could not be found: " + indicatorId);
+                throw new FingertipsException("Indicator could not be found: " + indicatorId +
+                    " [SexId="+ sexId + "]");
             }
         }
 

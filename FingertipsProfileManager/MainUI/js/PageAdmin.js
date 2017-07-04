@@ -48,7 +48,7 @@ $(document).ready(function() {
 
         $.ajax({
             type: 'post',
-            url: '/admin/deleteindicator',
+            url: '/admin/delete-indicator',
             data: {
                 indicatorIds:indicatorIds
             },
@@ -75,7 +75,7 @@ $(document).ready(function() {
 
         $.ajax({
             type: 'post',
-            url: '/admin/ChangeIndicatorOwner',
+            url: '/admin/change-indicator-owner',
             data: {
                 indicatorId: indicatorId,
                 newOwnerProfileId: newOwnerProfileId

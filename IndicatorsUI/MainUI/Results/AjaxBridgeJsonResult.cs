@@ -18,7 +18,7 @@ namespace Profiles.MainUI.Results
         public override void ExecuteResult(ControllerContext context)
         {
             HttpResponseBase response = context.HttpContext.Response;
-            response.ContentType = "application/json";
+            response.ContentType = "application/json; charset=utf-8";
             response.BinaryWrite(jsonBytes);
         }
     }

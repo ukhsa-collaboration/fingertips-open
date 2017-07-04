@@ -11,27 +11,16 @@ namespace PholioVisualisation.Formatting
         private string formatString;
         private int decimalPlacesToDisplay;
 
-        internal FixedDecimalPlaceFormatter(int decimalPlacesToDisplay) :
+        public FixedDecimalPlaceFormatter(int decimalPlacesToDisplay) :
             base(null, null)
         {
             this.decimalPlacesToDisplay = decimalPlacesToDisplay;
             SetFormatString();
         }
 
-        private void SetFormatString()
-        {
-            StringBuilder sb = new StringBuilder("{0:0.");
-            for (int i = 0; i < decimalPlacesToDisplay; i++)
-            {
-                sb.Append("0");
-            }
-            sb.Append("}");
-            formatString = sb.ToString();
-        }
-
         public override void Format(ValueData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedValue == false)
             {
                 data.ValueFormatted = FormatNumber(data.Value);
             }
@@ -39,7 +28,7 @@ namespace PholioVisualisation.Formatting
 
         public override void FormatConfidenceIntervals(ValueWithCIsData data)
         {
-            if (data != null)
+            if (data != null && data.HasFormattedCIs == false)
             {
                 data.UpperCIF = FormatNumber(data.UpperCI);
                 data.LowerCIF = FormatNumber(data.LowerCI);
@@ -56,9 +45,23 @@ namespace PholioVisualisation.Formatting
             {
                 Min = FormatNumber(stats.Min),
                 Max = FormatNumber(stats.Max),
+                Median = FormatNumber(stats.Median),
+                Percentile5 = FormatNumber(stats.Percentile5),
                 Percentile25 = FormatNumber(stats.Percentile25),
-                Percentile75 = FormatNumber(stats.Percentile75)
+                Percentile75 = FormatNumber(stats.Percentile75),
+                Percentile95 = FormatNumber(stats.Percentile95)
             };
+        }
+
+        private void SetFormatString()
+        {
+            StringBuilder sb = new StringBuilder("{0:0.");
+            for (int i = 0; i < decimalPlacesToDisplay; i++)
+            {
+                sb.Append("0");
+            }
+            sb.Append("}");
+            formatString = sb.ToString();
         }
 
         private string FormatNumber(double val)

@@ -61,11 +61,11 @@ $(document).ready(function () {
 
     $saveButton.click(function () {
         updateShowSpineChartValue();
-       if(checkFieldLength()) {
+        if (checkFieldLength()) {
             if (checkMandatoryFields()) {
                 loading();
                 $('.create-indicator-dropdown').removeAttr('disabled');
-                $('.indicator-text').removeAttr('disabled');                                              
+                $('.indicator-text').removeAttr('disabled');
                 $('form#IndicatorEditForm').submit();
                 configurePermissions();
             } else {
@@ -459,7 +459,7 @@ function dropdownFocus(e) {
 }
 
 function dropdownChanged(e) {
-    
+
     var $menu = $(e);
     var startDropdownValue = $menu.attr('start-dropdown-value');
 
@@ -502,7 +502,7 @@ function checkIsReadOnly() {
 };
 
 function textKeyDown(e) {
-    
+
     if (!isSaveRed) {
         saveRequired();
     }
@@ -673,21 +673,25 @@ function reloadDomains($selectedProfile) {
 }
 
 function checkFieldLength() {
-    var v1 = $('#v1').val(),
-        v2 = $('#v2').val(),
-        v25 = $('#v25').val(),
-        err = true;
-    if (v1.length > 255) {
-        showSimpleMessagePopUp('Indicator name cannot be more than 255 characters');
-        err = false;
-    } else if (v2.length > 500) {
-        showSimpleMessagePopUp('Indicator full name cannot be more than 500 characters');
-        err = false;
-    } else if (v25.length > 1) {
-        showSimpleMessagePopUp('Data Quality cannot be more than 1 character');
-        err = false;
+
+    var properties = [
+        [1, 'Indicator name', 255],
+        [2, 'Indicator full name', 500],
+        [25, 'Data Quality', 1]
+    ];
+
+    for (var i in properties) {
+        var property = properties[i];
+        var id = property[0];
+        var maxLength = property[2];
+        if ($('#v' + id).val().length > maxLength) {
+            var propertyName = property[1];
+            showSimpleMessagePopUp(propertyName + ' cannot be more than ' + maxLength + ' characters');
+            return false;
+        }
     }
-    return err;
+
+    return true;
 }
 
 function configureSaveButton() {
@@ -726,12 +730,12 @@ function clearOverride(e) {
 
     // add override link
     var parent = jq.parent();
-     
+
     var overrideLink = '<a id="override' + propertyIdNumber +
         '" title="Override this metadata" href="javascript:override('
         + propertyIdNumber + ')">Override</a>';
     parent.prepend(overrideLink);
-   
+
     // add changes to changes array
     changes[propertyIdNumber] = encodeURI($property.val());
     setuserMTVChanges();
@@ -751,7 +755,7 @@ function loadDefaultTextMetadata() {
 
     // Indicator ID will not be defined if new indicator is being created
     if (!_.isUndefined(selectedIndicatorId)) {
-        $.get('/indicator/metadata/' + selectedIndicatorId, function(data) {
+        $.get('/indicator/metadata/' + selectedIndicatorId, function (data) {
             indicatorDefaultMetadata = data;
         });
     }
@@ -760,9 +764,9 @@ function loadDefaultTextMetadata() {
 function updateShowSpineChartValue() {
     var $showSpineChart = $('#ShouldAlwaysShowSpineChart');
     var isChecked = $showSpineChart.is(':checked');
-    if (isChecked) {                
+    if (isChecked) {
         $('#AlwaysShowSpineChart').val(true);
-    } else {        
+    } else {
         $('#AlwaysShowSpineChart').val(false);
     }
 }

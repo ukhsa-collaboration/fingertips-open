@@ -4,7 +4,7 @@ using System.Web.Routing;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class AuthorizedUsersAttribute : AuthorizeAttribute
+    public class AdminUsersOnly : AuthorizeAttribute
     {
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {

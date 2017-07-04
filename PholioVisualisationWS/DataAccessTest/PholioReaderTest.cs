@@ -13,13 +13,24 @@ namespace PholioVisualisation.DataAccessTest
     {
 
         [TestMethod]
+        public void TestGetComparators()
+        {
+            var comparators = Reader().GetAllComparators();
+            Assert.IsNotNull(comparators.First(x => x.Id == ComparatorIds.England));
+        }
+
+        [TestMethod]
         public void TestGetQuinaryPopulationLabels()
         {
-            IList<string> labels = Reader().GetQuinaryPopulationLabels();
-            Assert.AreEqual(20, labels.Count);
-            Assert.AreEqual("0-4", labels.First());
-            Assert.AreEqual("45-49", labels[9]);
-            Assert.AreEqual("95+", labels.Last());
+            IList<string> labels = Reader().GetQuinaryPopulationLabels(new List<int>
+            {
+                AgeIds.From0To4,
+                AgeIds.From45To49,
+                AgeIds.Over95
+            });
+            Assert.AreEqual("0-4", labels[0]);
+            Assert.AreEqual("45-49", labels[1]);
+            Assert.AreEqual("95+", labels[2]);
         }
 
         [TestMethod]
@@ -153,7 +164,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestAllGetAllComparatorMethods()
         {
             var methods = Reader().GetAllComparatorMethods();
-            Assert.IsTrue(methods.Select(x => x.Id).Contains(ComparatorMethodId.Quintiles));
+            Assert.IsTrue(methods.Select(x => x.Id).Contains(ComparatorMethodIds.Quintiles));
         }
 
         [TestMethod]
@@ -167,8 +178,8 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetComparatorConfidence()
         {
             PholioReader reader = Reader();
-            var comparatorConfidence = reader.GetComparatorConfidence(ComparatorMethodId.SpcForProportions, 95);
-            Assert.AreEqual(ComparatorMethodId.SpcForProportions, comparatorConfidence.ComparatorMethodId);
+            var comparatorConfidence = reader.GetComparatorConfidence(ComparatorMethodIds.SpcForProportions, 95);
+            Assert.AreEqual(ComparatorMethodIds.SpcForProportions, comparatorConfidence.ComparatorMethodId);
             Assert.AreEqual(95, comparatorConfidence.ConfidenceValue);
             Assert.AreEqual(1.96, comparatorConfidence.ConfidenceVariable);
         }

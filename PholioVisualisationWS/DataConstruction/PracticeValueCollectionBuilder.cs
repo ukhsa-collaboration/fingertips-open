@@ -107,7 +107,7 @@ namespace PholioVisualisation.DataConstruction
 
         private string GetTitle(IndicatorMetadata metadata)
         {
-            var name = metadata.Descriptive[IndicatorMetadataTextColumnNames.Name];
+            var name = metadata.Name;
 
             string unitLabel = metadata.Unit.Label;
             if (string.IsNullOrWhiteSpace(unitLabel) == false)

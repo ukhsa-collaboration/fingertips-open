@@ -25,6 +25,28 @@ namespace PholioVisualisation.FormattingTest
             Assert.IsFalse(NumericFormatterFactory.NewWithLimits(GetMetadata(-1), null) is FixedDecimalPlaceFormatter);
         }
 
+        /// <summary>
+        /// Only want formatting to happen once. Otherwise may get formatting of truncated values.
+        /// </summary>
+        [TestMethod]
+        public void TestCanOnlyFormatOnce()
+        {
+            CoreDataSet data = new CoreDataSet
+            {
+                Value = 1
+            };
+
+            // Format first time
+            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(0), null);
+            formatter.Format(data);
+            Assert.AreEqual("1", data.ValueFormatted);
+
+            // Once formatted then cannot be reformatted
+            data.Value = 2;
+            formatter.Format(data);
+            Assert.AreEqual("1", data.ValueFormatted);
+        }
+
         [TestMethod]
         public void TestFormat()
         {
@@ -62,15 +84,21 @@ namespace PholioVisualisation.FormattingTest
             {
                 Min = 1.111111,
                 Max = 2.222222,
+                Median = 3.33333,
+                Percentile5 = 4.4444444,
                 Percentile25 = 6.666666,
-                Percentile75 = 7.777777
+                Percentile75 = 7.777777,
+                Percentile95 = 5.555555
             };
             var statsF = formatter.FormatStats(stats);
 
             Assert.AreEqual("1.1", statsF.Min);
             Assert.AreEqual("2.2", statsF.Max);
+            Assert.AreEqual("3.3", statsF.Median);
+            Assert.AreEqual("4.4", statsF.Percentile5);
             Assert.AreEqual("6.7", statsF.Percentile25);
             Assert.AreEqual("7.8", statsF.Percentile75);
+            Assert.AreEqual("5.6", statsF.Percentile95);
         }
 
         [TestMethod]

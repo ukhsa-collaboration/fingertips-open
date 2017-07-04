@@ -13,6 +13,8 @@ namespace FingertipsUploadService.Upload
         public List<UploadValidationFailure> UploadValidationFailures { get; set; }
         public List<DuplicateRowInDatabaseError> DuplicateRowInDatabaseErrors { get; set; }
         public List<DuplicateRowInSpreadsheetError> DuplicateRowInSpreadsheetErrors { get; set; }
+        public List<SmallNumberWarning> SmallNumberWarnings { get; set; }
+        public List<string> ColumnErrors { get; set; }
         public bool DuplicateUploadErrorsExist { get; set; }
         public int ColumnsCount { get; set; }
         public int TotalDataRows { get; set; }

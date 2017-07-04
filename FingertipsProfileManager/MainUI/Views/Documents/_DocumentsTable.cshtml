@@ -1,0 +1,49 @@
+﻿@using Fpm.MainUI
+
+@{
+    var documents = ViewBag.DocumentItems;
+}
+
+@if (documents != null)
+{
+    if (documents.Count > 0)
+    {
+        <table class="grid sortable">
+            <thead>
+                <tr>
+                    <th class="header">Date uploaded</th>
+                    <th class="header">File name</th>
+                    <th class="header">Content URL</th>
+                    <th class="header">Download</th>
+                    <th class="header">Delete</th>
+                </tr>
+            </thead>
+            @foreach (var doc in documents)
+                    {
+                        var path = "documents/" + doc.FileName;
+                <tr>
+                    <td class="left">
+                        @doc.UploadedOn.ToShortDateString()
+                    </td>
+                    <td class="left">
+                        @doc.FileName
+                    </td>
+                    <td class="left">
+                        /@path
+                    </td>
+                    <td>
+                        <a href="@AppConfig.DefaultTestUrl@path" target="_blank"
+                           title="Download @doc.FileName from the test site">Download</a>
+                    </td>
+                    <td>
+                        <a href="" class="document-delete" documentId="@doc.Id" title="Delete @doc.FileName from the test site">Delete</a>
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+    else
+    {
+        <div class="document-message">No documents have been uploaded yet for this profile</div>
+    }
+}
