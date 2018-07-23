@@ -8,7 +8,8 @@ namespace PholioVisualisation.Analysis
 {
     public class QuintilesComparer : IndicatorComparer, ICategoryComparer
     {
-        private IList<double> bounds;
+        private IList<double> _bounds;
+        private int _binCount = 5;
 
         public ICategoryComparer NewInstance()
         {
@@ -17,28 +18,28 @@ namespace PholioVisualisation.Analysis
 
         public override Significance Compare(CoreDataSet data, CoreDataSet comparator, IndicatorMetadata metadata)
         {
-            throw new FingertipsException("Use GetCategory instead of Compare for QuintilesComparer");
+            throw new FingertipsException("Use GetCategory instead of Compare for " + GetType().Name);
         }
 
         public void SetDataForCategories(IList<double> validValues)
         {
-            if (validValues != null && validValues.Count >= 5)
+            if (validValues != null && validValues.Count >= _binCount)
             {
-                bounds = new QuintilesCalculator(validValues).Bounds;
+                _bounds = new QuintilesCalculator(validValues).Bounds;
             }
         }
 
         public int GetCategory(CoreDataSet data)
         {
-            if (bounds == null || data == null || data.IsValueValid == false)
+            if (_bounds == null || data == null || data.IsValueValid == false)
             {
                 return 0;
             }
 
             int boundsIndex = 1;
-            while (boundsIndex <= 5)
+            while (boundsIndex <= _binCount)
             {
-                if (data.Value <= bounds[boundsIndex])
+                if (data.Value <= _bounds[boundsIndex])
                 {
                     return boundsIndex;
                 }

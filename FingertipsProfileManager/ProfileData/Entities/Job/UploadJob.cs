@@ -35,5 +35,7 @@ namespace Fpm.ProfileData.Entities.Job
         public ProgressStage ProgressStage { get; set; }
         public int TotalRowsCommitted { get; set; }
         public int TotalSmallNumberWarnings { get; set; }
+        public bool IsSmallNumberOverrideApplied { get; set; }
+        public bool IsDuplicateOverrideApplied { get; set; }
     }
 }

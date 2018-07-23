@@ -14,8 +14,8 @@ namespace PholioVisualisation.PholioObjectsTest
             {
                 Value = 2,
                 ValueFormatted = "2",
-                LowerCIF = "1",
-                UpperCIF = "3",
+                LowerCI95F = "1",
+                UpperCI95F = "3",
                 ValueNoteId = 4
             };
 

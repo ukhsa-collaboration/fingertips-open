@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
     public class AreaRank
     {
         [JsonProperty]
-        public Area Area { get; set; }
+        public IArea Area { get; set; }
 
         [JsonProperty(PropertyName = "Val")]
         public double Value { get; set; }
@@ -25,5 +21,8 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonProperty]
         public double? Denom { get; set; }
+
+        [JsonProperty]
+        public ValueNote ValueNote { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace PholioVisualisation.ExportTest
     [TestClass]
     public class ExcelFileWriterTest
     {
-        private string filepath = Path.Combine(ApplicationConfiguration.ExportFileDirectory, "1.xlsx");
+        private string filepath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, "1.xlsx");
 
         [TestCleanup]
         public void CalledAfterEachTest()
@@ -45,7 +45,7 @@ namespace PholioVisualisation.ExportTest
 
         private static void EnsureExportDirectoryExists()
         {
-            string exportFileDirectory = ApplicationConfiguration.ExportFileDirectory;
+            string exportFileDirectory = ApplicationConfiguration.Instance.ExportFileDirectory;
             if (Directory.Exists(exportFileDirectory) == false)
             {
                 Directory.CreateDirectory(exportFileDirectory);

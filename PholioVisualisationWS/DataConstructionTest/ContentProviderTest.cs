@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
@@ -19,13 +20,13 @@ namespace PholioVisualisation.DataConstructionTest
         private const string ContentWithHtmlRemoved = "html-removed";
 
         private Mock<HtmlCleaner> _htmlCleaner;
-        private Mock<IContentReader> _contentReader;
+        private Mock<IContentItemRepository> _repository;
 
         [TestInitialize]
         public void TestInitialize()
         {
                _htmlCleaner = new Mock<HtmlCleaner>(MockBehavior.Strict);
-               _contentReader = new Mock<IContentReader>(MockBehavior.Strict);
+               _repository = new Mock<IContentItemRepository>(MockBehavior.Strict);
         }
 
         [TestMethod]
@@ -41,11 +42,11 @@ namespace PholioVisualisation.DataConstructionTest
             _htmlCleaner.Setup(x => x.RemoveHtml(ContentWithHtml))
                 .Returns(ContentWithHtmlRemoved);
 
-            _contentReader.Setup(x => x.GetContentForProfile(ProfileId, ContentKey))
+            _repository.Setup(x => x.GetContentForProfile(ProfileId, ContentKey))
                 .Returns(htmlContentItem);
 
             // Act
-            var content = new ContentProvider(_contentReader.Object, _htmlCleaner.Object)
+            var content = new ContentProvider(_repository.Object, _htmlCleaner.Object)
                 .GetContentWithHtmlRemoved(ProfileId, ContentKey);
 
             // Assert
@@ -57,11 +58,11 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetContentWithHtmlRemoved_Returns_Empty_String_If_Content_Item_Is_Null()
         {
             // Arrange
-            _contentReader.Setup(x => x.GetContentForProfile(ProfileId, ContentKey))
+            _repository.Setup(x => x.GetContentForProfile(ProfileId, ContentKey))
                 .Returns((ContentItem)null);
 
             // Act
-            var content = new ContentProvider(_contentReader.Object, _htmlCleaner.Object)
+            var content = new ContentProvider(_repository.Object, _htmlCleaner.Object)
                 .GetContentWithHtmlRemoved(ProfileId, ContentKey);
 
             // Assert
@@ -71,7 +72,7 @@ namespace PholioVisualisation.DataConstructionTest
 
         private void VerifyAll()
         {
-            _contentReader.VerifyAll();
+            _repository.VerifyAll();
             _htmlCleaner.VerifyAll();
         }
     }

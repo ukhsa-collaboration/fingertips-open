@@ -5,7 +5,8 @@
 {
     var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
     <table id="lookup-table" class="grid sortable">
-        @Html.Partial("_TableHeader", new List<string> { "ID", "Short name", "Long name", "Selectable", "Searchable", "Warn for small numbers" })
+        @Html.Partial("_TableHeader", new List<string> { "ID", "Short name", "Long name", "Component Area Types", "Selectable",
+            "Searchable", "Warn for small numbers" })
         <tbody>
             @foreach (var areaType in Model.AreaTypes)
             {
@@ -14,17 +15,18 @@
                 var shouldWarnForSmallNumbers = areaType.ShouldWarnForSmallNumbers ? "yes" : "no";
                 <tr>
                     <td>
-                        @if (UserDetails.CurrentUser().IsAdministrator)
+                        @if (isAdministrator)
                         {
-                            @Html.ActionLink(areaType.Id.ToString(), "EditAreaType", new {areaTypeId = areaType.Id})
+                            @Html.ActionLink(areaType.Id.ToString(), "EditAreaType", new { areaTypeId = areaType.Id })
                         }
                         else
                         {
                             @areaType.Id
                         }
                     </td>
-                    <td>@areaType.ShortName</td>
-                    <td>@areaType.Name</td>
+                    <td class="left">@areaType.ShortName</td>
+                    <td class="left">@areaType.Name</td>
+                    <td>@(areaType.GetComponentAreaTypesAsString())</td>
                     <td>@(isSupported)</td>
                     <td>@(isSearchable)</td>
                     <td>@(shouldWarnForSmallNumbers)</td>

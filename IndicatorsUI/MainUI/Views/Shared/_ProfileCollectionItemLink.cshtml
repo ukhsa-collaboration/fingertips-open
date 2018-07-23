@@ -1,4 +1,4 @@
-﻿@model Profiles.DomainObjects.ProfileCollectionItem
+﻿@model IndicatorsUI.DomainObjects.ProfileCollectionItem
 @{
     var details = Model.ProfileDetails;
     var fingertipsUrl = ViewBag.FingertipsUrl;
@@ -10,24 +10,24 @@
     var protocol = Model.ExternalUrl.Contains(".info") ? "http://"
         : ViewBag.Protocol;
 
-    <a class="title" href="@(protocol)@Model.ExternalUrl">@details.Title</a>
+    <a class="title" href="@(protocol)@Model.ExternalUrl">@details.DisplayTitle</a>
 }
 else if (Model.IsBeingDisplayedOnCollectionFrontPage)
 {
     
     // When displayed on profile collection's own front page
-    <a class="title" href="@(fingertipsUrl)/profile-group/@Model.ParentCollection.UrlKey/profile/@details.ProfileUrlKey">@details.Title</a>
+    <a class="title" href="@(fingertipsUrl)/profile-group/@Model.ParentCollection.UrlKey/profile/@details.ProfileUrlKey">@details.DisplayTitle</a>
 }
 else if (details.HasOwnFrontPage)
 {
-    <a class="title" href="@(fingertipsUrl)/profile/@details.ProfileUrlKey">@details.Title</a>
+    <a class="title" href="@(fingertipsUrl)/profile/@details.ProfileUrlKey">@details.DisplayTitle</a>
 }
 else if (details.ProfileCollectionIds.Any())
 {
     // When displayed on front page of site
-    <a class="title" href="@(fingertipsUrl)/profile-group/@details.ProfileUrlKey">@details.Title</a>
+    <a class="title" href="@(fingertipsUrl)/profile-group/@details.ProfileUrlKey">@details.DisplayTitle</a>
 }
 else
 {
-    <a class="title" href="@(fingertipsUrl)/@details.ProfileUrlKey">@details.Title</a>
+    <a class="title" href="@(fingertipsUrl)/@details.ProfileUrlKey">@details.DisplayTitle</a>
 }

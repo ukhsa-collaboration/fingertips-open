@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewAreaType()
         {
-            var id = AreaTypeIds.Ccg;
+            var id = AreaTypeIds.CcgsPreApr2017;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), new ParentAreaGroup { ParentAreaTypeId = id });
             Assert.AreEqual(id, areaType.Id);
         }
@@ -50,7 +50,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewAreaTypeFromStandardAreaTypeId()
         {
-            var areaTypeId = AreaTypeIds.Ccg;
+            var areaTypeId = AreaTypeIds.CcgsPreApr2017;
             var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), areaTypeId);
             Assert.AreEqual(areaTypeId, areaType.Id);
         }

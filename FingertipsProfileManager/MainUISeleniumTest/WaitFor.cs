@@ -1,8 +1,8 @@
-﻿using OpenQA.Selenium;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Fpm.MainUISeleniumTest
 {
@@ -32,8 +32,8 @@ namespace Fpm.MainUISeleniumTest
 
         public void ProfilesPageToLoad()
         {
-            SeleniumHelper.WaitForExpectedElement(driver,
-                By.ClassName("grid"));
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Id("tbl-profiles"));
         }
 
         public void ProfilesForNonAdminToLoad()
@@ -52,6 +52,35 @@ namespace Fpm.MainUISeleniumTest
         {
             SeleniumHelper.WaitForExpectedElement(driver,
                 By.Id("profileId"));
+        }
+
+        public void ReportsIndexPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver, By.Name("newReportButton"));
+        }
+
+        public void LookupTablesPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.ClassName("link-options"));
+        }
+
+        public void CategoriesPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("edit"));
+        }
+
+        public void EditCategoryPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("save"));
+        }
+
+        public void IFrameToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("tinymce"));
         }
 
         /// <summary>

@@ -1,15 +1,22 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Helpers
-@using Profiles.MainUI.Models
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
+@using System.Web.Optimization
 @model PageModel
 @{
-    // Recent updates content (fails frequently on live for unknown reason)
+    // Recent updates content
     HtmlString recentUpdates = ContentProvider.GetRecentUpdates(Model.ProfileId);
     var updatesCssClass = recentUpdates.ToString().Length > 700 ? "scrollable-box" : "";
     var areUpdates = recentUpdates.ToString().Length > 0;
 }
-
+@Html.Partial("_GoogleMaps")
+@Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/js-angular")
 <div id="introduction" class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <ft-map></ft-map> @* For practice profiles area search*@
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-8">
             @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
@@ -26,13 +33,13 @@
             </div>
             <div id="recent-updates">
                 @if (areUpdates)
-            {
+                {
                     <h2>Recent updates</h2>
                     <div class="@updatesCssClass">
                         @recentUpdates
                     </div>
                 }
             </div>
-        </div>
+        </div>        
     </div>
 </div>

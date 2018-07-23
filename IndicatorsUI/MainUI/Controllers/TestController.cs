@@ -1,13 +1,15 @@
 ﻿
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class TestController : Controller
     {
         protected AppConfig appConfig = AppConfig.Instance;
+
+        [Route("test")]
         public ActionResult Index()
         {
             ViewBag.BridgeServicesUrl = appConfig.BridgeWsUrl;
@@ -16,6 +18,7 @@ namespace Profiles.MainUI.Controllers
             return View();
         }
 
+        [Route("test/{page}")]
         public ActionResult TestPage(string page)
         {
             string viewName = null;
@@ -45,6 +48,7 @@ namespace Profiles.MainUI.Controllers
             return View(viewName);
         }
 
+        [Route("test/error")]
         public void TestError()
         {
             throw new FingertipsException("This exception was deliberately thrown in a test");

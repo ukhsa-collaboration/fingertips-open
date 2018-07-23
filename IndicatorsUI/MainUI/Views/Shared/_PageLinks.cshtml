@@ -1,21 +1,24 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Helpers
-@using Profiles.MainUI.Models
+﻿@using System.Configuration
+@using IndicatorsUI.DataAccess
+@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
 @model PageModel
 
 @{
     var profileId = Model.ProfileId;
     var profileUrlKey = ViewBag.ProfileUrlKey;
+    var isSiteFrontPage = Model.PageType == PageType.SiteFrontPage;
 }
 
-@if (Model.PageType != PageType.SiteFrontPage)
+@if (isSiteFrontPage == false)
 {
     @Html.Partial("_Breadcrumbs")
 }
 
 <ul style="float: right;">
 
-    @if (Model.PageType == PageType.SiteFrontPage)
+    @if (isSiteFrontPage)
     {
         // These links are only displayed on the Fingertips front page
         <li class="site-link">
@@ -26,28 +29,26 @@
     else
     {
         @*Profile specific pages - TODO add these in the database and editable in FPM*@
-    if (profileId == ProfileIds.SexualHealth)
+    switch (profileId)
     {
-        <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
-    }
-    else if (profileId == ProfileIds.LiverDisease)
-    {
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+        case ProfileIds.Tobacco:
+        case ProfileIds.Phof:
+        case ProfileIds.LiverDisease:
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
-    }
-    else if (profileId == ProfileIds.HealthProfiles)
-    {
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
-    }
-    else if (profileId == ProfileIds.LocalAlcoholProfiles)
-    {
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.QuarterlyData, profileId).Link)</li>
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.AdditionalDataAndReports, profileId).Link)</li>
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
-    }
-    else if (profileId == ProfileIds.WiderDeterminantsOfHealth)
-    {
-        <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherResources, profileId).Link)</li>
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            break;
+        case ProfileIds.HealthProfiles:
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            break;
+        case ProfileIds.LocalAlcoholProfiles:
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherResources, profileId).Link)</li>
+            break;
+        case ProfileIds.SexualHealth:
+            <li class="site-link"><a href="/documents/SRH Profiles_calendar.docx">Tool Updates</a></li>
+            break;
+        case ProfileIds.WiderDeterminantsOfHealth:
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInformation, profileId).Link)</li>
+                break;
         }
     }
 
@@ -60,13 +61,20 @@
     </li>
 
     @*Contact us*@
-    @if (profileId == ProfileIds.HealthProfiles)
+    @if (isSiteFrontPage == false && (
+                profileId == ProfileIds.HealthProfiles || profileId == ProfileIds.Tobacco || profileId == ProfileIds.Phof))
     {
+        // Profiles with their own contact us pages
         <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.ContactUs, profileId).Link)</li>
     }
     else
     {
-        var subject = Model.PageType == PageType.SiteFrontPage ? "General enquiry" : profileUrlKey;
+        var subject = isSiteFrontPage ? "General enquiry" : profileUrlKey;
         <li class="site-link">@(new ContactUs("profilefeedback@phe.gov.uk", subject).Link)</li>
+    }
+
+    @if (AppConfig.Instance.IsFeatureActive("userAccountEnabled"))
+    {
+        @Html.Partial("_YourAccountMenu")
     }
 </ul>

@@ -81,7 +81,7 @@ namespace Fpm.MainUITest.Helpers
         public void TestGetOrderedListOfDomainsWithGroupId_When_Valid_Profile()
         {
             var selectListItem = new SelectListItem {Value = UrlKeys.Phof};
-            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), selectListItem, new ProfileRepository());
+            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), selectListItem, new ProfileRepository(NHibernateSessionFactory.GetSession()));
 
             // Assert: expected number of domains
             Assert.AreEqual(6, domainList.Count());
@@ -90,7 +90,7 @@ namespace Fpm.MainUITest.Helpers
         [TestMethod]
         public void TestGetOrderedListOfDomainsWithGroupId_When_Profile_Is_Null()
         {
-            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), null, new ProfileRepository());
+            var domainList = CommonUtilities.GetOrderedListOfDomainsWithGroupId(new ProfileMembers(), null, new ProfileRepository(NHibernateSessionFactory.GetSession()));
 
             // Assert
             Assert.AreEqual(0, domainList.Count());

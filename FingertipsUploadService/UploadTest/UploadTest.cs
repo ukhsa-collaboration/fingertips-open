@@ -37,7 +37,7 @@ namespace FingertipsUploadService.UploadTest
         [TestMethod]
         public void TestArchiveCoreData()
         {
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
             batchUpload.DuplicateRowInDatabaseErrors.Add(new DuplicateRowInDatabaseError
             {
                 AgeId = AgeIds.AllAges,
@@ -78,10 +78,10 @@ namespace FingertipsUploadService.UploadTest
 
         }
 
-        public IList<CoreDataSetArchive> ArchivedRecords(BatchUpload batchUpload)
+        public IList<CoreDataSetArchive> ArchivedRecords(UploadJobAnalysis uploadJobAnalysis)
         {
             return ReaderFactory.GetProfilesReader().GetCoreDataArchiveForIndicatorIds(
-                batchUpload.DuplicateRowInDatabaseErrors.Select(x => x.IndicatorId).ToList());
+                uploadJobAnalysis.DuplicateRowInDatabaseErrors.Select(x => x.IndicatorId).ToList());
         }
 
         private static CoreDataSet GetRecordToInsert()
@@ -99,8 +99,8 @@ namespace FingertipsUploadService.UploadTest
                 AreaCode = AreaCodes.CountyUa_Cambridgeshire,
                 Count = val,
                 Value = val,
-                LowerCi = val,
-                UpperCi = val,
+                //                LowerCi = val,
+                //                UpperCi = val,
                 Denominator = 0,
                 Denominator_2 = 0,
                 ValueNoteId = 0,

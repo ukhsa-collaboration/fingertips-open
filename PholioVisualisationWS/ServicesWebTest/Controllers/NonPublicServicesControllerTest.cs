@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Controllers;
+using PholioVisualisation.ServicesWeb.Controllers;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {
@@ -18,17 +18,18 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         }
 
         [TestMethod]
-        public void TestGetChimatResourceId()
+        public void TestGetIndicatorsByAreaTypeForIndicatorList()
         {
-            var id = new NonPublicServicesController().GetChimatResourceId(AreaCodes.CountyUa_Cumbria, 105);
-            Assert.AreEqual(ChimatResourceIds.Cumbria, id);
+            var ids = new NonPublicServicesController().GetIndicatorsByAreaTypeForIndicatorList("-1");
+            Assert.IsNotNull(ids);
         }
 
         [TestMethod]
-        public void TestGetChimatWayResourceId()
+        public void TestGetGroupDataAtDataPointForIndicatorList()
         {
-            var id = new NonPublicServicesController().GetChimatResourceId(AreaCodes.CountyUa_Cumbria, 94);
-            Assert.AreEqual(ChimatWayResourceIds.Cumbria, id);
+            var ids = new NonPublicServicesController().GetGroupDataAtDataPointForIndicatorList("-1",
+                AreaTypeIds.CountyAndUnitaryAuthority, AreaCodes.England);
+            Assert.IsNotNull(ids);
         }
     }
 }

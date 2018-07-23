@@ -16,7 +16,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areaCode = AreaCodes.Ccg_Barnet;
 
             var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.Diabetes, GroupIds.Diabetes_PrevalenceAndRisk, AreaTypeIds.Ccg, areaCode);
+                .GetAreaDetails(ProfileIds.DiabetesLongerLives, GroupIds.Diabetes_PrevalenceAndRisk, AreaTypeIds.CcgsPreApr2017, areaCode);
 
             var significances = areaDetails.Significances[AreaCodes.England];
             foreach (var significance in significances)
@@ -37,16 +37,33 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.IsNotNull(areaDetails);
         }
 
-        //profile_id=51&group_id=1938132700&area_code=cat-2-9&child_area_type_id=102
         [TestMethod]
-        public void TestGetAreaDetails_DiabetesPrevalenceAndRiskForEnglandDecile()
+        public void TestGetAreaDetails_DiabetesPrevalenceAndRisk_For_Deprivation_Decile()
         {
 
             var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.Diabetes, GroupIds.Diabetes_TreatmentTargets,
+                .GetAreaDetails(ProfileIds.DiabetesLongerLives, GroupIds.Diabetes_TreatmentTargets,
                 AreaTypeIds.CountyAndUnitaryAuthority, "cat-2-9");
 
             Assert.IsNotNull(areaDetails);
+        }
+
+        [TestMethod]
+        public void TestGetAreaDetails_Public_Health_Dashboard_Nearest_Neighbours()
+        {
+            var areaDetails = new LongerLivesAreaDetailsBuilder()
+                .GetAreaDetails(ProfileIds.PublicHealthDashboardLongerLives, 
+                GroupIds.PublicHealthDashboardLongerLives_SummaryRank,
+                AreaTypeIds.CountyAndUnitaryAuthority, 
+                NearestNeighbourArea.CreateAreaCode(NearestNeighbourTypeIds.Cipfa, AreaCodes.CountyUa_Cambridgeshire)
+                );
+
+            // Assert: details defined
+            Assert.IsNotNull(areaDetails);
+
+            // Assert: area ranks defined
+            var areaRankGroupings = areaDetails.Ranks[AreaCodes.England];
+            Assert.IsNotNull(areaRankGroupings[0].AreaRank, "AreaRank is not defined");
         }
 
         [TestMethod]
@@ -56,7 +73,8 @@ namespace PholioVisualisation.DataConstructionTest
             var areaCode = AreaCodes.Gp_Addingham;
 
             var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.LongerLivesDiabetesSupportingIndicators, GroupIds.DiabetesSupportingIndicators_ValuesAtTopOfPage, AreaTypeIds.GpPractice, areaCode);
+                .GetAreaDetails(ProfileIds.LongerLivesDiabetesSupportingIndicators, 
+                GroupIds.DiabetesSupportingIndicators_ValuesAtTopOfPage, AreaTypeIds.GpPractice, areaCode);
         }
 
         [TestMethod]
@@ -97,12 +115,11 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_Ccg()
         {
             var areaCode = AreaCodes.Ccg_Barnet;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.Ccg);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CcgsPreApr2017);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
-            Assert.IsNull(areaDetails.Decile, "Decile should not be defined");
+            Assert.IsNotNull(areaDetails.Decile, "Decile should be defined");
             Assert.IsNotNull(areaDetails.Significances);
-            Assert.AreEqual(2, areaDetails.Benchmarks.Count,
-                "Both England and ONS clsuter should be available as benchmarks");
+            Assert.AreEqual(2, areaDetails.Benchmarks.Count);
         }
 
         [TestMethod]
@@ -166,7 +183,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areaCode = AreaCodes.England;
             var areaDetails = new LongerLivesAreaDetailsBuilder()
                 .GetAreaDetails(ProfileIds.HyperTension, groupId,
-                    AreaTypeIds.Ccg, areaCode);
+                    AreaTypeIds.CcgsPreApr2017, areaCode);
 
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
         }

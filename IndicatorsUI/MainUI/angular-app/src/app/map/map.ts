@@ -20,7 +20,3 @@ declare namespace geoBoundry{
         features: Feature[];
     }
 }
-
-
-
-

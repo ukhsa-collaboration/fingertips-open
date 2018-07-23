@@ -99,10 +99,19 @@ namespace FingertipsDataExtractionTool.AverageCalculator
         {
             groupings = groupings.OrderBy(x => x.IndicatorId);
 
-            // Filter to indicator IDs that have changed in recent days
-            var indicatorIds = _indicatorMetadataRepository
-                .GetIndicatorsForWhichDataHasChangedInPreviousDays(config.DaysToCheckForChangedIndicators);
-            groupings = new GroupingListFilter(groupings).SelectForIndicatorIds(indicatorIds);
+            // No filtering required if doing all indicators
+            if (config.CalculateAveragesWhetherOrNotIndicatorsHaveChanged == false)
+            {
+                // Get indicator IDs that have changed in recent days
+                var date = DateTime.Now.Date.AddDays(-config.DaysToCheckForChangedIndicators);
+                var indicatorIds = _indicatorMetadataRepository
+                    .GetIndicatorsDeletedSinceDate(date).ToList();
+                indicatorIds.AddRange(_indicatorMetadataRepository.GetIndicatorsUploadedSinceDate(date));
+                indicatorIds = indicatorIds.Distinct().ToList();
+
+                // Only use groupings for indicators that have changed
+                groupings = new GroupingListFilter(groupings).SelectForIndicatorIds(indicatorIds);
+            }
 
             // Filter to start at a certain indicator
             var indicatorIdToStartFrom = config.IndicatorIdToStartFrom;

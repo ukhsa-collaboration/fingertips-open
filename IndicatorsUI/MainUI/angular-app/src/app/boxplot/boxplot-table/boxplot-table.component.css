@@ -1,0 +1,28 @@
+.boxplot-table {
+    margin: 30px auto;
+}
+
+.boxplot-table table {
+    font-size: 13px;
+    min-width: 35% !important;
+    width: auto;
+    table-layout: auto !important;
+    border-width: 0 !important;
+    margin: 0 auto;
+}
+
+.boxplot-table th {
+    font-size: 11px;
+    text-align: right;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eceeef;
+}
+
+.boxplot-table tr th:first-child {
+    min-width: 39px;
+}
+
+.boxplot-table tr td:first-child {
+    font-size: 11px;
+    font-style: normal;
+}

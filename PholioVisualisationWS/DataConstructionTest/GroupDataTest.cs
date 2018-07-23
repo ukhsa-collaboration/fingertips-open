@@ -19,7 +19,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             List<Grouping> grouping = new List<Grouping>{
                 new Grouping { IndicatorId = IndicatorIds.LifeExpectancyAtBirth},
-                new Grouping { IndicatorId = IndicatorIds.IncidenceOfMalignantMelanoma}
+                new Grouping { IndicatorId = IndicatorIds.Aged0To4Years}
             };
 
             GroupData data = new GroupData();

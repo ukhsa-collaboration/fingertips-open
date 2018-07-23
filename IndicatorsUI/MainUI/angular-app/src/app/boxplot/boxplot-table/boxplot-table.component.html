@@ -1,0 +1,42 @@
+<div class="boxplot-table">
+    <table *ngIf="boxplotData" class="bordered-table table-hover table ">
+        <thead>
+            <tr>
+                <th></th>
+                <th *ngFor="let period of boxplotData.periods ">
+                    {{period}}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Minimum</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.Min}}</td>
+            </tr>
+            <tr>
+                <td>5th Percentile</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.P5}}</td>
+            </tr>
+            <tr>
+                <td>25th Percentile</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.P25}}</td>
+            </tr>
+            <tr>
+                <td>Median</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.Median}}</td>
+            </tr>
+            <tr>
+                <td>75th Percentile</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.P75}}</td>
+            </tr>
+            <tr>
+                <td>95th Percentile</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.P95}}</td>
+            </tr>
+            <tr>
+                <td>Maximum</td>
+                <td *ngFor="let stats of boxplotData.statsFormatted " class="numeric ">{{stats.Max}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

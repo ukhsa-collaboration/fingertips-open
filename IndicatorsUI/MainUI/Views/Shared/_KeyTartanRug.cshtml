@@ -1,0 +1,114 @@
+﻿@model IndicatorsUI.MainUI.Models.PageModel
+<div class="key-container" id="keyTartanRug" style="display: none;">
+    <table class="key-table" cellspacing="0">
+        <tr>
+            <td class="key-text key-label"></td>
+            @if (Model.DisplayRagKey)
+            {
+                <td class="key-spacer"></td>
+                <td class='better key'>
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)better.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Better
+                        </div>
+                    </div>
+                </td>
+                <td class='same key'>
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Similar
+                        </div>
+                    </div>
+                </td>
+                <td class='worse key'>
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)red.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Worse
+                        </div>
+                    </div>
+                </td>
+            }
+            @if (Model.DisplayBlueKey)
+            {
+                <td class="key-spacer"></td>
+                <td class='bobLower key'>
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobLower.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Lower
+                        </div>
+                    </div>
+                </td>
+                <td class='same key'>
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Similar
+                        </div>
+                    </div>
+                </td>
+                <td class="bobHigher key">
+                    <div class="tartan-box key-box">
+                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobHigher.png"
+                             alt=""/>
+                        <div class="tartan-text">
+                            Higher
+                        </div>
+                    </div>
+                </td>
+            }@*Show quintile legend*@<td class='grade-quintile-1 key quintile-key'>
+            <td class="key-spacer "></td>
+            <td class='grade-quintile-1 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
+                        Low
+                    </div>
+                </div>
+            </td>
+            <td class='grade-quintile-2 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
+                    </div>
+                </div>
+            </td>
+            <td class='grade-quintile-3 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
+                    </div>
+                </div>
+            </td>
+            <td class='grade-quintile-4 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
+                    </div>
+                </div>
+            </td>
+            <td class='grade-quintile-5 key quintile-key'>
+                <div class="tartan-box key-box">
+                    <div class="tartan-text">
+                        High
+                    </div>
+                </div>
+            </td>
+            <td class="key-spacer"></td>
+            <td id="tartan-key-part" class="none key key-box-right" style="display: none;">
+                <div class="tartan-box key-box">
+                    Not compared
+                </div>
+            </td>
+            <td id="map-key-part2" class="none key key-box-right" style="display: none;">
+                <div class="tartan-box key-box">
+                    Not compared
+                </div>
+            </td>
+        </tr>
+    </table>
+</div>

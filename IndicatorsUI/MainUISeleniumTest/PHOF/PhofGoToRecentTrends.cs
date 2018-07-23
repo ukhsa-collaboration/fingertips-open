@@ -1,14 +1,14 @@
-﻿using IndicatorsUI.MainUISeleniumTest.Phof;
+﻿using IndicatorsUI.MainUISeleniumTest.Fingertips;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
-namespace IndicatorsUI.MainUISeleniumTest.PHOF
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     /// <summary>
     /// Tests clicking a recent trend icon navigates to the trend tab
     /// </summary>
     [TestClass]
-    public class PhofGoToRecentTrends : PhofBaseUnitTest
+    public class PhofGoToRecentTrends : FingertipsBaseUnitTest
     {
         [TestMethod]
         public void TartanRugToTrendsPageTest()

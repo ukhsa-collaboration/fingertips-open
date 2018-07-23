@@ -1,4 +1,5 @@
-﻿using FingertipsUploadService.ProfileData;
+﻿using System;
+using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Entities.Profile;
 using FingertipsUploadService.Upload;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -14,15 +15,13 @@ namespace FingertipsUploadService.UploadTest
         [TestMethod]
         public void TestRowIsValidIfCategoryColumnsAreNotPresent()
         {
-            var dataUploadValidation = new DataUploadValidation();
-
-            var table = GetBatchPholioDataTableWithoutCategoryColumns();
+            var table = GetEmptyDataTable();
 
             table.Rows.Add(1, 2000, 1, -1, -1, AgeIds.AllAges, SexIds.Persons, AreaCodes.CountyUa_Cambridgeshire,
-                1, 1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue);
+                1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue);
 
-            var uploadError = dataUploadValidation.ValidateCategoryTypeIdAndCategoryId(
-                GetFirstRow(table), 1, new List<Category>());
+            var rowValidator = new DataRowValidator(GetFirstRow(table), 1);
+            var uploadError = rowValidator.ValidateCategoryTypeIdAndCategoryId(new List<Category>());
 
             Assert.IsNull(uploadError, "The data was not valid");
         }
@@ -33,15 +32,13 @@ namespace FingertipsUploadService.UploadTest
         [TestMethod]
         public void TestRowIsValidIfCategoryColumnsArePresentButEmpty()
         {
-            var dataUploadValidation = new DataUploadValidation();
-
-            var table = GetBatchPholioDataTableWithCategoryColumns();
+            var table = GetEmptyDataTable();
 
             table.Rows.Add(1, 2000, 1, -1, -1, AgeIds.AllAges, SexIds.Persons, AreaCodes.CountyUa_Cambridgeshire,
-                1, 1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue, null, null);
+                1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue, null, null);
 
-            var uploadError = dataUploadValidation.ValidateCategoryTypeIdAndCategoryId(
-                GetFirstRow(table), 1, new List<Category>());
+            var dataUploadValidation = new DataRowValidator(GetFirstRow(table), 1);
+            var uploadError = dataUploadValidation.ValidateCategoryTypeIdAndCategoryId(new List<Category>());
 
             Assert.IsNull(uploadError, "The data was not valid");
         }
@@ -49,15 +46,15 @@ namespace FingertipsUploadService.UploadTest
         [TestMethod]
         public void TestRowIsNotValidIfCategoryValuesAreNotValid()
         {
-            var dataUploadValidation = new DataUploadValidation();
 
-            var table = GetBatchPholioDataTableWithCategoryColumns();
+            var table = GetEmptyDataTable();
 
             table.Rows.Add(1, 2000, 1, -1, -1, AgeIds.AllAges, SexIds.Persons, AreaCodes.CountyUa_Cambridgeshire,
-                1, 1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue, 1, 2);
+                1, 1, 1, 1, 1, 1, 1, 1, ValueNoteIds.ThereIsDataQualityIssueWithThisValue, 1, 2);
 
-            var uploadError = dataUploadValidation.ValidateCategoryTypeIdAndCategoryId(
-                GetFirstRow(table), 1, new List<Category>{new Category
+            var rowValidator = new DataRowValidator(GetFirstRow(table), 1);
+            var uploadError = rowValidator.ValidateCategoryTypeIdAndCategoryId(
+                new List<Category>{new Category
                 {
                     CategoryTypeId = 1,
                     CategoryId = 3
@@ -69,22 +66,42 @@ namespace FingertipsUploadService.UploadTest
         [TestMethod]
         public void TestRowIsValidIfCategoryValuesAreValid()
         {
-            var dataUploadValidation = new DataUploadValidation();
+            var table = GetTableWithValidRow();
 
-            var table = GetBatchPholioDataTableWithCategoryColumns();
-
-            table.Rows.Add(1, 2000, 1, -1, -1, AgeIds.AllAges, SexIds.Persons,
-                AreaCodes.CountyUa_Cambridgeshire, 1, 1, 1, 1, 1, 1, 1,
-                ValueNoteIds.ThereIsDataQualityIssueWithThisValue, 1, 2);
-
-            var uploadError = dataUploadValidation.ValidateCategoryTypeIdAndCategoryId(
-                GetFirstRow(table), 1, new List<Category>{new Category
+            var rowValidator = new DataRowValidator(GetFirstRow(table), 1);
+            var uploadError = rowValidator.ValidateCategoryTypeIdAndCategoryId(
+                new List<Category>{new Category
                 {
                     CategoryTypeId = 1,
                     CategoryId = 2
                 }});
 
             Assert.IsNull(uploadError, "The data should be valid");
+        }
+
+        [TestMethod]
+        public void TestRowIsNotValidIfValueNoteIs506()
+        {
+            var rowValidator = new DataRowValidator(GetFirstRow(GetTableWithValidRow()), 1);
+            var uploadError = rowValidator.ValidateValueNoteId(
+                ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips,
+                GetAllowedData().ValueNoteIds);
+            Assert.IsNotNull(uploadError, "Value note 506 should not be allowed");
+        }
+
+        [TestMethod]
+        public void TestRowIsValidIfValueNoteIsNoNote()
+        {
+            var rowValidator = new DataRowValidator(GetFirstRow(GetTableWithValidRow()), 1);
+            var uploadError = rowValidator.ValidateValueNoteId( ValueNoteIds.NoNote, 
+                GetAllowedData().ValueNoteIds);
+            Assert.IsNull(uploadError, "Value note not allowed");
+        }
+
+        private static AllowedData GetAllowedData()
+        {
+            var allowedData = new AllowedData(ReaderFactory.GetProfilesReader());
+            return allowedData;
         }
 
         private static DataRow GetFirstRow(DataTable table)
@@ -94,34 +111,20 @@ namespace FingertipsUploadService.UploadTest
             return rows.First();
         }
 
-        private static DataTable GetBatchPholioDataTableWithoutCategoryColumns()
+        private DataTable GetTableWithValidRow()
         {
-            DataTable table = new DataTable();
-            table.Columns.Add(UploadColumnNames.IndicatorId, typeof(int));
-            table.Columns.Add(UploadColumnNames.Year, typeof(int));
-            table.Columns.Add(UploadColumnNames.YearRange, typeof(int));
-            table.Columns.Add(UploadColumnNames.Quarter, typeof(int));
-            table.Columns.Add(UploadColumnNames.Month, typeof(int));
-            table.Columns.Add(UploadColumnNames.AgeId, typeof(int));
-            table.Columns.Add(UploadColumnNames.SexId, typeof(int));
-            table.Columns.Add(UploadColumnNames.AreaCode, typeof(string));
-            table.Columns.Add(UploadColumnNames.Count, typeof(double));
-            table.Columns.Add(UploadColumnNames.Value, typeof(double));
-            table.Columns.Add(UploadColumnNames.ExpectedValue, typeof(double));
-            table.Columns.Add(UploadColumnNames.LowerCI, typeof(double));
-            table.Columns.Add(UploadColumnNames.UpperCI, typeof(double));
-            table.Columns.Add(UploadColumnNames.Denominator, typeof(double));
-            table.Columns.Add(UploadColumnNames.Denominator2, typeof(double));
-            table.Columns.Add(UploadColumnNames.ValueNoteId, typeof(int));
+            var table = GetEmptyDataTable();
+
+            table.Rows.Add(1, 2000, 1, -1, -1, AgeIds.AllAges, SexIds.Persons,
+                AreaCodes.CountyUa_Cambridgeshire, 1, 1, 1, 1, 1, 1, 
+                ValueNoteIds.ThereIsDataQualityIssueWithThisValue, 1, 2);
+
             return table;
         }
 
-        private static DataTable GetBatchPholioDataTableWithCategoryColumns()
+        private static DataTable GetEmptyDataTable()
         {
-            DataTable table = GetBatchPholioDataTableWithoutCategoryColumns();
-            table.Columns.Add(UploadColumnNames.CategoryTypeId, typeof(int));
-            table.Columns.Add(UploadColumnNames.CategoryId, typeof(int));
-            return table;
+            return UploadDataSchema.CreateEmptyTable();
         }
     }
 }

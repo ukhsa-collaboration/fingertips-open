@@ -4,7 +4,7 @@ namespace PholioVisualisation.PholioObjects
 {
     public class ValueData
     {
-        public const int NullValue = -1;
+        public const double NullValue = -1.0;
 
         [JsonProperty(PropertyName = "Val")]
         public double Value { get; set; }

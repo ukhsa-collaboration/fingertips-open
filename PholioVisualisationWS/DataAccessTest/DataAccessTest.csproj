@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.DataAccessTest</RootNamespace>
     <AssemblyName>PholioVisualisation.DataAccessTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
@@ -37,42 +37,44 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net">
       <HintPath>..\..\3rdPartyLibraries\log4net-1.12.0\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Moq, Version=4.5.29.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.5.29\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Moq, Version=4.7.145.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.7.145\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
@@ -85,33 +87,33 @@
     <Compile Include="LongListSplitterTest.cs" />
     <Compile Include="AreasReaderTest.cs" />
     <Compile Include="AreaTypeIdSplitterTest.cs" />
-    <Compile Include="ContentReaderTest.cs" />
-    <Compile Include="DataAccessDiRegistryTest.cs" />
-    <Compile Include="IntListStringParserTest.cs" />
     <Compile Include="PholioReaderTest.cs" />
     <Compile Include="PracticeReaderTest.cs" />
     <Compile Include="GroupDataReaderTest.cs" />
     <Compile Include="PholioLabelReaderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegionToChildAreasHashBuilderTest.cs" />
+    <Compile Include="Repositories\CoreDataAuditRepositoryTest.cs" />
     <Compile Include="Repositories\CoreDataRepositoryTest.cs" />
+    <Compile Include="Repositories\DatabaseLogRepositoryTest.cs" />
+    <Compile Include="Repositories\ContentItemRepositoryTest.cs" />
+    <Compile Include="Repositories\FpmDocumentRepositoryTest.cs" />
+    <Compile Include="Repositories\FpmIndicatorMetadataTextValueRepositoryTest.cs" />
+    <Compile Include="Repositories\FpmUserRepositoryTest.cs" />
     <Compile Include="Repositories\IndicatorMetadataRepositoryTest.cs" />
+    <Compile Include="Repositories\MonthlyReleaseRepositoryTest.cs" />
+    <Compile Include="Repositories\AreaTypeComponentRepositoryTest.cs" />
+    <Compile Include="Repositories\UserFeedbackRepositoryTest.cs" />
     <Compile Include="TrendDataReaderTest.cs" />
     <Compile Include="ProfileReaderTest.cs" />
-    <Compile Include="StringListParserTest.cs" />
     <Compile Include="IgnoredAreaCodesInitialiserTest.cs" />
     <Compile Include="ProfileInitialiserTest.cs" />
-    <Compile Include="GroupIdStringListParserTest.cs" />
     <Compile Include="PholioTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataAccess\DataAccess.csproj">
       <Project>{93FCCE58-31AF-467D-ADC2-3067BEA82E7D}</Project>
       <Name>DataAccess</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DIResolver\DIResolver.csproj">
-      <Project>{638184fb-b8ca-43bd-a136-6737a417ef5a}</Project>
-      <Name>DIResolver</Name>
     </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>

@@ -1,0 +1,3 @@
+IndicatorID,YEAR,yearrange,quarter,moNth,Ageid,SexId,AreaCode,COUNT,value,LoWerCI95,UpperCi95,Denominator,denominator_2,Valuenoteid,CategoryTypeid,Categoryid
+91491,2030,1,-1,-1,44,1,E92000001,-1,35.3,34.9,35.7,56704,-1,0,-1,-1
+91491,2030,1,-1,-1,44,2,E92000001,-1,23.4,23,23.7,60357,-1,0,-1,-1

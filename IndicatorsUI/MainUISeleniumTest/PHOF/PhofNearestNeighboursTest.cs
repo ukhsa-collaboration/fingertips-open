@@ -1,10 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using IndicatorsUI.MainUISeleniumTest.Fingertips;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
 namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
-    public class PhofNearestNeighboursTest : PhofBaseUnitTest
+    public class PhofNearestNeighboursTest : FingertipsBaseUnitTest
     {
         const int ExtraColumns = 3;
         /// <summary>

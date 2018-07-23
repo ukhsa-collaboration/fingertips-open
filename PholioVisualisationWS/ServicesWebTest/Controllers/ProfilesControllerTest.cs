@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Controllers;
+using PholioVisualisation.ServicesWeb.Controllers;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {
@@ -21,10 +21,9 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         [TestMethod]
         public void TestGetAreaTypesWithPdfsForProfile()
         {
-            var areaTypes = new ProfilesController().GetAreaTypesWithPdfsForProfile(ProfileIds.Phof);
+            var areaTypes = new ProfilesController().GetAreaTypesWithPdfsForProfile(ProfileIds.PracticeProfiles);
 
-            // Assert: PHOF one has PDFs for county/UA
-            Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthority, areaTypes.First().Id);
+            Assert.AreEqual(AreaTypeIds.GpPractice, areaTypes.First().Id);
         }
     }
 }

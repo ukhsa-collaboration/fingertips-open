@@ -1,22 +1,22 @@
-﻿using System;
+﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
+using PholioVisualisation.Parsers;
+using PholioVisualisation.PholioObjects;
+using PholioVisualisation.RequestParameters;
+using PholioVisualisation.ServiceActions;
+using PholioVisualisation.Services;
+using PholioVisualisation.ServicesWeb.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using PholioVisualisation.DataAccess;
-using PholioVisualisation.DataConstruction;
-using PholioVisualisation.DataSorting;
-using PholioVisualisation.Export;
-using PholioVisualisation.Export.File;
-using PholioVisualisation.PholioObjects;
-using PholioVisualisation.RequestParameters;
-using PholioVisualisation.ServiceActions;
-using PholioVisualisation.Services;
-using ServicesWeb.Common;
-using ServicesWeb.Helpers;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     [RoutePrefix("api")]
     public class AreasController : BaseController
@@ -58,7 +58,7 @@ namespace ServicesWeb.Controllers
         /// <remarks>
         /// If the profile_ids Parameter is omitted then all defined area types will be returned.
         /// </remarks>
-        /// <param name="profile_ids">List of profile IDs</param>
+        /// <param name="profile_ids">List of profile IDs [optional]</param>
         [HttpGet]
         [Route("area_types")]
         public IList<AreaType> GetAreaTypes(string profile_ids = null)
@@ -118,11 +118,8 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                NameValueCollection nameValues = new NameValueCollection();
-                nameValues.Add(ParameterNames.AreaCode, area_code);
-
-                var parameters = new AreaAddressParameters(nameValues);
-                return new JsonBuilderAreaAddress(parameters).GetAreaAddress();
+                return new AreaAddressProvider(ReaderFactory.GetAreasReader())
+                    .GetAreaAddress(area_code);
             }
             catch (Exception ex)
             {
@@ -163,7 +160,7 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                var cacheFilename = CacheFileNamer.GetAddressFileName(parent_area_code,area_type_id);
+                var cacheFilename = CacheFileNamer.GetAddressFileName(parent_area_code, area_type_id);
                 var fileManager = new ExportFileManager(cacheFilename);
 
                 // Check whether file is already cached
@@ -191,8 +188,8 @@ namespace ServicesWeb.Controllers
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="profile_id">Profile ID</param>
-        /// <param name="template_profile_id">Template profile ID (optional)</param>
-        /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] (optional)</param>
+        /// <param name="template_profile_id">Template profile ID [optional]</param>
+        /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] [optional]</param>
         [HttpGet]
         [Route("areas/by_area_type")]
         public IList<IArea> GetAreasOfAreaType(int area_type_id, int profile_id = ProfileIds.Undefined,
@@ -218,7 +215,7 @@ namespace ServicesWeb.Controllers
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="parent_area_code">Parent area code</param>
-        /// <param name="profile_id">Profile ID (optional)</param>
+        /// <param name="profile_id">Profile ID [optional]</param>
         [HttpGet]
         [Route("areas/by_parent_area_code")]
         public IList<IArea> GetAreasOfAreaType(int area_type_id, string parent_area_code, int profile_id = ProfileIds.Undefined)
@@ -287,16 +284,21 @@ namespace ServicesWeb.Controllers
         /// <summary>
         /// Gets a dictionary of parent area code to a list of child area codes
         /// </summary>
-        /// <param name="profile_id">Profile ID</param>
-        /// <param name="child_area_type_id">Child area type ID</param>
-        /// <param name="parent_area_type_id">Parent area type ID</param>
-        /// <param name="nearest_neighbour_code">Nearest neighbour code (optional)</param>
-        /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] (optional)</param>
+        /// <remarks>
+        /// Can be used to either get all child areas of a type mapped to parents of a specific type or nearest neighbours of a specific area
+        /// (i) /api/parent_to_child_areas?child_area_type_id=102&parent_area_type_id=6
+        /// (ii) /api/parent_to_child_areas?nearest_neighbour_code=nn-1-E10000014
+        /// </remarks>
+        /// <param name="child_area_type_id">Child area type ID [optional]</param>
+        /// <param name="parent_area_type_id">Parent area type ID [optional]</param>
+        /// <param name="profile_id">Profile ID for filtering of certain areas [optional]</param>
+        /// <param name="nearest_neighbour_code">Nearest neighbour code [optional]</param>
+        /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] [optional]</param>
         [HttpGet]
         [Route("parent_to_child_areas")]
-        public Dictionary<string, IEnumerable<string>> GetParentToChildAreaMapping(int profile_id,
-            int child_area_type_id, int parent_area_type_id, string nearest_neighbour_code = null,
-            string retrieve_ignored_areas = null)
+        public Dictionary<string, IEnumerable<string>> GetParentToChildAreaMapping(
+            int child_area_type_id = -1, int parent_area_type_id = -1, int profile_id = -1,
+            string nearest_neighbour_code = null, string retrieve_ignored_areas = null)
         {
             try
             {

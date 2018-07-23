@@ -17,8 +17,15 @@ namespace PholioVisualisation.PdfData
         public IList<XyPoint> LifeExpectancyFemaleByDeprivationDecile { get; set; }
         public IList<XyPoint> LifeExpectancyFemaleLineOfBestFit { get; set; }
 
-        // Page 2: map at top of page
-        public Dictionary<string, int> LsoaQuintiles { get; set; }
+        /// <summary>
+        /// Page 2: map at top of page. LSOA quintiles.
+        /// </summary>
+        public Dictionary<string, int> LsoaQuintilesWithinLocalArea { get; set; }
+
+        /// <summary>
+        /// Page 2: map at top of page. LSOA quintiles.
+        /// </summary>
+        public Dictionary<string, int> LsoaQuintilesWithinEngland { get; set; }
 
         // Page 2: column charts at top of page
         public IList<CoreDataSet> DeprivationQuintilesPopulationLocal { get; set; }

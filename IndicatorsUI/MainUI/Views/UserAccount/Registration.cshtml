@@ -1,0 +1,106 @@
+﻿@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@model IndicatorsUI.MainUI.Models.UserAccess.RegisterViewModel
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForUserAccount")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row col-md-12">
+        <div id="div-content">
+            <div>
+                <h2>Sign up</h2>
+                <div role="note" aria-label="Information" class="application-notice info-notice">
+                    <p>If you have already registered please <a href="/user-account/login" class="a-link">Sign in</a>. If you have not yet registered, please do so by providing your details on the registration form. Fields marked <i class="fa fa-asterisk" aria-hidden="true"></i><span> are mandatory.</span></p>
+                    <p>We will never share your email or any other personal data with anyone else.</p>
+                 </div>
+            </div>
+            <div>
+                @using (Html.BeginForm("SubmitRegistration", "UserAccount", FormMethod.Post, new { id = "frm-register" }))
+                {
+                    @Html.ValidationSummary(true, "", new { @class = "error-message" })
+                    Html.EnableClientValidation(true);
+
+                    <div class="form-group">
+                        <label class="form-label-bold" for="email">
+                            <span class="form-label-bold">Email Address <i class="fa fa-asterisk" aria-hidden="true"></i></span>
+                        </label>
+                        @Html.TextBoxFor(s => s.UserName, new {@class = "form-control", id = "email"})
+                        @Html.ValidationMessageFor(m => m.UserName, "", new {@class = "error-message"})
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold" for="pwd">
+                            <span class="form-label-bold">Password <i class="fa fa-asterisk" aria-hidden="true"></i></span>
+                            <span class="form-hint">At least 8 characters and a minimum of 1 numeric character [0-9]</span>
+                        </label>
+                        @Html.PasswordFor(s => s.Password, new { @class = "form-control", id = "pwd" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "error-message" })
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold" for="confirm-pwd">
+                            <span class="form-label-bold">Confirm Password <i class="fa fa-asterisk" aria-hidden="true"></i></span>
+                            <span class="form-hint"></span>
+                        </label>
+                        @Html.PasswordFor(s => s.ConfirmPassword, new { @class = "form-control", id = "confirm-pwd" })
+                        @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "error-message" })
+                    </div>
+                    <div class="form-group">
+                        <label for="first-name">
+                            <span class="form-label-bold">First Name <i class="fa fa-asterisk" aria-hidden="true"></i></span>
+                            <span class="form-hint"></span>
+                        </label>
+                        @Html.TextBoxFor(s => s.FirstName, new { @class = "form-control", id = "first-name", maxlength = 25 })
+                        @Html.ValidationMessageFor(m => m.FirstName, "", new { @class = "error-message" })
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold" for="last-name">
+                            <span class="form-label-bold">Last Name <i class="fa fa-asterisk" aria-hidden="true"></i></span>
+                            <span class="form-hint"></span>
+                        </label>
+                        @Html.TextBoxFor(s => s.LastName, new { @class = "form-control", id = "last-name", maxlength = 25 })
+                        @Html.ValidationMessageFor(m => m.LastName, "", new { @class = "error-message" })
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold" for="job-title">
+                            <span class="form-label-bold">Job Title</span>
+                            <span class="form-hint"></span>
+                            <span class="error-message"></span>
+                        </label>
+                        @Html.TextBoxFor(s => s.JobTitle, new { @class = "form-control", id = "job-name" })
+                        @Html.ValidationMessageFor(m => m.JobTitle, "", new { @class = "error-message" })
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold" for="organisation">
+                            <span class="form-label-bold">Organisation</span>
+                            <span class="form-hint"></span>
+                            <span class="error-message"></span>
+                        </label>
+                        <select class="form-control" name="OrganisationId">
+                            <option value="">Please select your organisation</option>
+                            <option value="1">Public Health England</option>
+                            <option value="2">Department of Health</option>
+                            <option value="3">Other Government Departments and Agencies</option>
+                            <option value="4">Local Authority</option>
+                            <option value="5">NHS</option>
+                            <option value="6">Private company</option>
+                            <option value="7">Member of the public</option>
+                            <option value="8">Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button class="btn btn-lg btn-primary" id="btn-register" type="button">Submit</button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    $('#btn-register').click(function () {
+        $('#frm-register').submit();
+
+        // Prevent repeated clicks
+        $('button').prop('disabled', true);
+    })
+</script>

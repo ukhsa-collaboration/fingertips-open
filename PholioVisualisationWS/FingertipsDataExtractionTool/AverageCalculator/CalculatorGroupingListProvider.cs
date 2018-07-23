@@ -21,11 +21,11 @@ namespace FingertipsDataExtractionTool.AverageCalculator
         {
             var groupingList = new List<Grouping>();
 
-            var indicators = _groupReader.GetAllIndicators();
+            var indicatorIds = _groupReader.GetAllIndicatorIds();
 
-            foreach (var indicator in indicators)
+            foreach (var indicatorId in indicatorIds)
             {
-                var groupedGroupings = _groupReader.GetGroupingsByIndicatorId(indicator).GroupBy(x => new
+                var groupedGroupings = _groupReader.GetGroupingsByIndicatorId(indicatorId).GroupBy(x => new
                 {
                     x.AreaTypeId, x.Sex, x.Age
                 });

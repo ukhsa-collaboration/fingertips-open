@@ -1,5 +1,4 @@
 ﻿using FingertipsUploadService.ProfileData;
-using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Entities.JobError;
 using FingertipsUploadService.Upload;
 using System;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Script.Serialization;
+using UploadJob = FingertipsUploadService.ProfileData.Entities.Job.UploadJob;
 
 namespace FingertipsUploadService.Helpers
 {
@@ -117,7 +117,7 @@ namespace FingertipsUploadService.Helpers
             return error;
         }
 
-        public static UploadJobError GetColumnNameValidatoinError(UploadJob job, List<string> columnNames)
+        public static UploadJobError GetColumnNameValidationError(UploadJob job, List<string> columnNames)
         {
             var errorText = "Wrong or missing column";
             var error = CreateError(job.Guid, UploadJobErrorType.WrongColumnError, errorText, new JavaScriptSerializer().Serialize(columnNames));

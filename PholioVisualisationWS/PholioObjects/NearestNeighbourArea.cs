@@ -11,6 +11,8 @@ namespace PholioVisualisation.PholioObjects
 
         public IList<AreaCodeNeighbourMapping> Neighbours { get; set; }
 
+        private int? _sequence;
+
         private NearestNeighbourArea()
         {
         }
@@ -53,6 +55,14 @@ namespace PholioVisualisation.PholioObjects
             return NearestNeighbourAreaCodePrefix + neighbourTypeId + "-" + neighbourAreaCode;
         }
 
+        /// <summary>
+        /// e.g. returns "E10000014" from "nn-1-E10000014"
+        /// </summary>
+        public static string GetAreaCodeFromNeighbourAreaCode(string neighbourAreaCode)
+        {
+            return neighbourAreaCode.Split('-')[2];
+        }
+
         [JsonProperty]
         public virtual int NeighbourTypeId { get; internal set; }
 
@@ -62,8 +72,20 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public virtual string Code { get; internal set; }
 
-        [JsonIgnore]
-        public virtual int? Sequence { get { return 0; } }
+        [JsonProperty]
+        public virtual int? Sequence
+        {
+            get { return _sequence; }
+            set { _sequence = value; }
+        }
+
+        /// <summary>
+        /// Whether or not Sequence should be serialised to JSON.
+        /// </summary>
+        public bool ShouldSerializeSequence()
+        {
+            return _sequence.HasValue;
+        }
 
         [JsonProperty(PropertyName = "Short")]
         public string ShortName { get; set; }
@@ -74,7 +96,10 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public int AreaTypeId
         {
-            get { throw new NotImplementedException();}
+            get
+            {
+                return NearestNeighbourAreaType.GetAreaTypeIdFromNearestNeighbourTypeId(NeighbourTypeId);
+            }
         }
 
         [JsonIgnore]
@@ -109,6 +134,11 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         public bool IsGpPractice
+        {
+            get { return false; }
+        }
+
+        public bool IsOnsClusterGroup
         {
             get { return false; }
         }

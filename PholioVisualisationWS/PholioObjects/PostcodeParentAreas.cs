@@ -13,11 +13,6 @@
         public string AreaCode6 { get; set; }
 
         /// <summary>
-        /// CCG
-        /// </summary>
-        public string AreaCode19 { get; set; }
-
-        /// <summary>
         /// Subregion
         /// </summary>
         public string AreaCode46 { get; set; }
@@ -41,6 +36,11 @@
         /// PHE Centres 2015
         /// </summary>
         public string AreaCode104 { get; set; }
+
+        /// <summary>
+        /// CCG Pre Apr 2017
+        /// </summary>
+        public string AreaCode153 { get; set; }
 
         public int PlaceTypeWeighting
         {

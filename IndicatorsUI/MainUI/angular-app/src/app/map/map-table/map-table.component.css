@@ -1,0 +1,64 @@
+table {
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 0;
+    border-collapse: separate;
+    background-color: transparent;
+}
+
+
+/* Table header */
+
+th {
+    font-weight: normal;
+    text-align: right;
+    padding-right: 10px;
+    background-color: #EEEEEE;
+    cursor: pointer;
+}
+
+tr th:first-child {
+    text-align: left;
+    padding-left: 10px;
+}
+
+
+/* Table body */
+
+td {
+    font-weight: normal;
+    color: #999;
+    padding-right: 10px;
+    text-align: right;
+}
+
+td.value-note-symbol {
+    width: 100%;
+    text-align: center;
+    display: block;
+    cursor: default;
+}
+
+tr td:first-child {
+    padding-left: 5px;
+    border-left-width: 5px;
+    border-left-style: solid;
+    text-align: left;
+}
+
+tr.hover td:first-child {
+    border-left-style: solid;
+}
+
+tr.selected td {
+    background-color: aliceblue;
+    font-weight: bold;
+    font-style: italic;
+    cursor: pointer;
+    border: 1px solid gainsboro;
+}
+
+.rowHover {
+    background-color: lavender;
+    cursor: pointer;
+}

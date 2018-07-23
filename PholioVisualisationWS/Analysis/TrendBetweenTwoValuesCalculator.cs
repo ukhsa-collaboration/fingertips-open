@@ -42,7 +42,7 @@ namespace PholioVisualisation.Analysis
         private bool IsDataValid(CoreDataSet coreDataSet)
         {
             return coreDataSet != null &&
-                   coreDataSet.IsValueValid && coreDataSet.AreCIsValid;
+                   coreDataSet.IsValueValid && coreDataSet.Are95CIsValid;
         }
 
         private TrendMarker GetTrendMarker(CoreDataSet mostRecentData, CoreDataSet previousData)

@@ -1,0 +1,18 @@
+﻿@using IndicatorsUI.MainUI.Models
+@{
+    var labels = SearchLabels.New(ViewBag.DefaultAreaType);
+}
+<div class="home_search clearfix">
+</div>
+<div class="home-search-nav-map">
+    <h1>See how your local authority compares</h1>
+    <div>Find your local authority</div>
+    <form>
+        <label for="search_text" class="visuallyhidden">Search</label>
+        <input type="text" class="search-watermark" id="search_text" name="search_text"
+               value="@labels.Watermark" title="@labels.Watermark"/>
+        <input type="submit" class="button visuallyhidden" value="Search"/>
+    </form>
+    <div style="margin-top: 20px;">Or select the map below</div>
+</div>
+@Html.Partial("_SearchNoMatches")

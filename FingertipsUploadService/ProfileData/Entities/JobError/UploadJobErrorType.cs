@@ -9,6 +9,7 @@ namespace FingertipsUploadService.ProfileData.Entities.JobError
         DuplicateRowInDatabaseError = 40004,
         ValidationFailureError = 40005,
         SmallNumberWarning = 40006,
-        WrongColumnError = 40007
+        WrongColumnError = 40007,
+        UnexpectedError = 40008
     }
 }

@@ -150,7 +150,7 @@ namespace PholioVisualisation.DataConstruction
                 metadata = metadataRepo.GetIndicatorMetadata(QofListSizeProvider.IndicatorId);
                 ListSize = new ValueData { Value = val.Value };
 
-                var formatter = NumericFormatterFactory.New(metadata, _groupDataReader);
+                var formatter = new NumericFormatterFactory(_groupDataReader).New(metadata);
                 formatter.Format(ListSize);
             }
         }

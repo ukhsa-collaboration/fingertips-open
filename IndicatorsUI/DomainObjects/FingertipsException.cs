@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class FingertipsException : Exception
     {

@@ -7,21 +7,13 @@
 }
 
 .container {
-    max-width: 1030px;
+    max-width: 1030px !important;
 }
 
-.navbar-fixed-top {
-    top: 0;
-}
-.navbar-fixed-bottom, .navbar-fixed-top {
-    position: fixed;
-    right: 0;
-    left: 0;
-    z-index: 1030;
-}
 .navbar {
     position: relative;
-    padding: 0 1rem;
+    padding: 0 1rem !important;
+    margin-bottom: 0 !important;
 }
 
 a, a:visited, a:active, a:hover {
@@ -29,7 +21,35 @@ a, a:visited, a:active, a:hover {
     text-decoration: underline;
 }
 
+a.btn-primary {
+    color: #ffffff;
+    text-decoration: none;
+}
+
 /********************************************Bootstrap End*************************************************/
+
+.clearfix:before,
+.clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+/*
+ * For IE 6/7 only
+ * Include this rule to trigger hasLayout and contain floats.
+ */
+
+.clearfix {
+    *zoom: 1;
+}
+
+.pointer {
+    cursor: pointer;
+}
 
 #playbutton-video span.playbutton {
     position: absolute;
@@ -68,30 +88,29 @@ background: url(../images/logos/phe-white-48.png) no-repeat;
 .data-column li {
     margin-bottom: 10px;
     line-height: 1.3rem;
-    font-size: 1rem;
     list-style: none;
     float: left;
     width: 100%;
 }
 
-.data-column li a, #playbutton-video a {
+a.title {
     color: #39836E;
+    font-size: 17px;
     text-decoration: none;
     font-weight: bold;
 }
 
-.data-column li a:hover, #playbutton-video a:hover{
+a.title:hover{
     text-decoration: underline;
 }
 
-#playbutton-video a, #latest-news a {
-    font-size: 14px;
+#latest-news a {
     color: #39836E;
     text-decoration: none;
     font-weight: bold;
 }
 
-#playbutton-video a:hover, #latest-news a:hover{
+#latest-news a:hover{
     text-decoration: underline;
 }
 
@@ -105,11 +124,27 @@ background: url(../images/logos/phe-white-48.png) no-repeat;
     column-count: 2;
 }
 
-.margin-top-10 {
+.margin-top-20 {
     margin-top: 20px;
     padding-top: 20px;
     clear: both;
 }
+
+.margin-top-10 {
+    margin-top: 10px;
+    padding-top: 10px;
+    clear: both;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+    clear: both;
+}
+
+#site-link h1 {
+        margin:0 0 3px 0;
+    }
+
 
 
 @media (min-width: 0) and (max-width: 500px) {
@@ -136,8 +171,8 @@ background: url(../images/logos/phe-white-48.png) no-repeat;
 
 body
 {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 14px;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: 14px !important;
     line-height: 1.3 !important;
     color: #333;
 }
@@ -147,7 +182,6 @@ body
     margin: 0 0 0 0;
     border: none;
     outline: none;
-   /* max-width: 100%; */
 }
 
 /*<!--fixing images on IE-->*/
@@ -163,9 +197,8 @@ img
 
 h1
 {
-    font-weight: bold;
-    font-size: 2.9375rem;
-    /*margin-left: 10px;*/
+    font-weight: bold !important;
+    font-size: 47px !important;
 }
 h2
 {
@@ -216,6 +249,11 @@ select[disabled]
     color: white;
 }
 
+.domain-dropdown-div, .domain-dropdown-div #domain-dropdown {
+    font-size: 24px;
+    padding: 6px 0 6px 0;
+}
+
 select
 {
     font-size: 15px;
@@ -261,16 +299,87 @@ th.pLink, th.rotate, th.comparator-header
 {
     float: right;
     margin-bottom: 12px;
+    margin-right: 10px;
 }
 #search-button {
     background-position: 0 3px;
 }
 
 /*----------------------------------------
+    Footer Feedback
+------------------------------------------*/
+#footer-feedback-form-divder {
+    background-color: #0BB090;
+    height: 4px;
+}
+
+#footer-feedback-error-summary {
+    padding-top: 30px;
+}
+
+#footer-feedback-form {
+    margin-top: 40px;
+    background-color: white;
+    display: none;
+    font-size: 17px;
+}
+
+#footer-feedback-form .title {
+    margin: 35px 0 3px 0 !important;
+    padding: 0 0 3px 0;
+    font-weight: bold !important;
+    font-size: 1.6875rem;
+}
+
+
+#footer-feedback-form a {
+    text-decoration: underline;
+    float: right;
+    color: #0BB090;
+    margin-top: 10px;
+    font-size: 18px;
+}
+
+#send-feedback-btn {
+    background-color: #02ae94;
+    color: #ffffff;
+    margin-right: 2px;
+    text-decoration: none;
+    height: 30px;
+    cursor: pointer;
+    position: relative;
+    font-weight: bold;
+    padding: 6px 10px 10px 10px;
+    line-height: 0.95em;
+    font-size: 14px;
+}
+
+#footer-feedback {
+    margin-top: 40px;
+    background-color: white;
+}
+
+#feedback-message {
+    background-color: #0BB090;
+    text-align: center;
+    padding: 4px 0;
+}
+
+#feedback-message a {
+    color: #ffffff;
+    text-decoration: underline;
+
+}
+
+#feedback-footer-divider {
+    background-color: #0BB090;
+    height: 5px;
+}
+/*----------------------------------------
     Footer
 ------------------------------------------*/
 #footer {
-    margin-top:40px;
+    margin-top:0;
     background: #dfe0e2;
     font-size: 16px;
     line-height: 1.4em;
@@ -319,6 +428,11 @@ th.pLink, th.rotate, th.comparator-header
 
         .footer_links ul li {
             padding: 0 0 23px;
+        }
+
+        .footer_links a.title {
+            font-size: 13px;
+            font-weight: normal;
         }
 
 #footer_copyright {
@@ -384,7 +498,6 @@ th.pLink, th.rotate, th.comparator-header
 #site-link H1
 {
     float:left;
-    /*width: 75%;*/
 }
 
 .title-divider {
@@ -402,7 +515,7 @@ LI.site-link, li.breadcrumb-separator
     list-style: none;
     list-style-type: none;
 }
-LI.site-link A, LI.site-link A:active, LI.site-link A:visited
+LI.site-link > A, LI.site-link > A:active, LI.site-link > A:visited
 {
     text-decoration: none;
     padding-top: 5px;
@@ -410,7 +523,7 @@ LI.site-link A, LI.site-link A:active, LI.site-link A:visited
     margin-left:30px;
     color:#4b5053;
 }
-LI.site-link A:hover
+LI.site-link > A:hover
 {
     text-decoration: underline;
 }
@@ -442,6 +555,35 @@ li.breadcrumb-separator, .breadcrumbs LI.site-link A,
     margin-bottom: 0;
 }
 
+
+/*----------------------------------------
+  Account menu
+------------------------------------------*/
+
+#your-account {
+    margin: 3px 0 0 0;
+    float: left;
+}
+
+#your-account-button {
+    padding: 2px 0 0 0;
+    font-size: 14px;
+}
+
+.dropdown-menu a {
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    color: #333 !important; 
+    white-space: nowrap;
+}
+
+.dropdown-menu  a:hover {
+    background: #f0f0f0;
+}
+
 /*----------------------------------------
     PHE Banner 
 ------------------------------------------*/
@@ -449,8 +591,6 @@ li.breadcrumb-separator, .breadcrumbs LI.site-link A,
 #phe-banner {
     background:black;
     height:48px;
-    /*margin: 0 auto 0 auto;
-    width: 1000px;*/
 }
 
 #phe-banner a {
@@ -459,8 +599,7 @@ li.breadcrumb-separator, .breadcrumbs LI.site-link A,
     width:260px;
     display:block;
     text-decoration:none;
-    /*width: 1000px;
-    margin: 0 auto 0 auto;*/
+    margin-left: 0;
 }
 #phe-banner span {
     color:white;
@@ -485,7 +624,7 @@ li.breadcrumb-separator, .breadcrumbs LI.site-link A,
 ------------------------------------------*/
 
 p, #introduction p, #recent-updates p {
-    font-size: 1.0625rem !important;
+    font-size: 17px !important;
 }
 
 /*----------------------------------------
@@ -563,3 +702,49 @@ p, #introduction p, #recent-updates p {
 #gp-address-placeholder {
     margin-left: 6.5rem;
 }
+
+/*----------------------------------------
+    Lightbox
+------------------------------------------*/
+
+#lightBox
+{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #000;
+    height: 1000px;
+    width: 100%;
+    opacity: 0.50; /*IE9, etc*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
+    filter: alpha(opacity=50); /*IE6-7*/
+    z-index: 1;
+}
+#infoBox
+{
+    position: absolute;
+    background: white;
+    border: 5px solid #eee;
+    padding: 6px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+#infoBox h1
+{
+    width: 100%;
+    text-align: center;
+    color: #333;
+}
+#infoBox .close
+{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 16px;
+    width: 16px;
+    background-image: url(../images/close2.png);
+    cursor: pointer;
+}
+

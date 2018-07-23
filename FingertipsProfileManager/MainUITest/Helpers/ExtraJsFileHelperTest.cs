@@ -27,7 +27,7 @@ namespace Fpm.MainUITest.Helpers
         {
             var helper = new ExtraJsFileHelper();
 
-            Assert.AreEqual("PageTartanRug.js,+map,PageAreaTrends.js,PageBarChartAndFunnelPlot.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js", 
+            Assert.AreEqual("PageTartanRug.js,PageMap.js,PageAreaTrends.js,PageBarChartAndFunnelPlot.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js", 
                 helper.GetExtraJsFiles());
         }
 

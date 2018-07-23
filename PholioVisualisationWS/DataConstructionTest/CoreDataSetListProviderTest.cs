@@ -62,6 +62,27 @@ namespace PholioVisualisation.DataConstructionTest
             reader.VerifyAll();
         }
 
+        [TestMethod]
+        public void TestWhenAreaIsNearestNeighbourArea()
+        {
+            var areaCode = AreaCodes.CountyUa_Cumbria;
+
+            var nearestNeighbourArea = NearestNeighbourArea.New(NearestNeighbourTypeIds.Cipfa, areaCode);
+
+            var reader = Reader();
+            reader.Setup(x => x.GetCoreDataListForChildrenOfNearestNeighbourArea(
+                    It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), nearestNeighbourArea))
+                .Returns(new List<CoreDataSet>());
+
+            reader.Setup(x => x.GetCoreData(
+                    It.IsAny<Grouping>(), It.IsAny<TimePeriod>(), areaCode))
+                .Returns(new List<CoreDataSet>());
+
+            GetChildAreaData(reader, nearestNeighbourArea);
+
+            reader.VerifyAll();
+        }
+
         private static Mock<GroupDataReader> Reader()
         {
             var reader = new Mock<GroupDataReader>(MockBehavior.Strict);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,8 +22,15 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestGetAreaType()
         {
-            var id = AreaTypeIds.Ccg;
+            var id = AreaTypeIds.CcgsPreApr2017;
             Assert.AreEqual(id, repo.GetAreaType(id).Id);
+        }
+
+        [TestMethod]
+        public void TestGetAreaTypeWithComponents()
+        {
+            var id = AreaTypeIds.CountyAndUnitaryAuthority;
+            Assert.AreEqual(2, repo.GetAreaType(id).ComponentAreaTypes.Count);
         }
 
         [TestMethod]
@@ -46,6 +54,49 @@ namespace Fpm.ProfileDataTest
             Assert.AreEqual(newName, repo.GetAreaType(id).Name);
         }
 
+        [TestMethod]
+        public void TestSaveAreaType_Replace_Components()
+        {
+            var id = AreaTypeIds.CountyQuintile;
+            var areaType = repo.GetAreaType(id);
+
+            // Act: Save components
+            SetComponentAreaTypesString(areaType, "1,2");
+
+            // Act: Replace components
+            areaType = repo.GetAreaType(id);
+            SetComponentAreaTypesString(areaType, "2,3");
+
+            // Assert: Component as expected
+            var components = repo.GetAreaType(id).ComponentAreaTypes;
+            Assert.AreEqual(2, components.ElementAt(0).ComponentAreaTypeId);
+            Assert.AreEqual(3, components.ElementAt(1).ComponentAreaTypeId);
+        }
+
+        [TestMethod]
+        public void TestSaveAreaType_Remove_Components()
+        {
+            var id = AreaTypeIds.CountyQuintile;
+            var areaType = repo.GetAreaType(id);
+
+            // Act: Save components
+            SetComponentAreaTypesString(areaType, "1,2");
+
+            // Act: Remove components
+            areaType = repo.GetAreaType(id);
+            SetComponentAreaTypesString(areaType, "");
+
+            // Assert: Component as expected
+            Assert.AreEqual(0, repo.GetAreaType(id).ComponentAreaTypes.Count);
+
+        }
+
+        private void SetComponentAreaTypesString(AreaType areaType, string areaTypes)
+        {
+            areaType.ComponentAreaTypesString = areaTypes;
+            areaType.ParseComponentAreaTypesString();
+            repo.SaveAreaType(areaType);
+        }
     }
 }
 

@@ -23,6 +23,9 @@
         CheckingPermission = 203,
         CheckingDuplicationInFile = 204,
         CheckingDuplicationInDb = 205,
-        WritingToDb = 206
+        WritingToDb = 206,
+        ValidationIsDone = 207,
+        SmallNumberCheckIsDone = 208
+
     }
 }

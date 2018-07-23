@@ -15,7 +15,7 @@ namespace PholioVisualisation.Export.File
         public byte[] TryGetFile()
         {
             // Check whether file is already cached
-            if (ApplicationConfiguration.UseFileCache)
+            if (ApplicationConfiguration.Instance.UseFileCache)
             {
                 var filePath = GetFilePath();
                 if (System.IO.File.Exists(filePath))
@@ -31,7 +31,7 @@ namespace PholioVisualisation.Export.File
         public byte[] SaveFile(byte[] content)
         {
             // Check whether file is already cached
-            if (ApplicationConfiguration.UseFileCache)
+            if (ApplicationConfiguration.Instance.UseFileCache)
             {
                 var filePath = GetFilePath();
                 System.IO.File.WriteAllBytes(filePath, content);
@@ -42,7 +42,7 @@ namespace PholioVisualisation.Export.File
 
         private string GetFilePath()
         {
-            var filePath = Path.Combine(ApplicationConfiguration.ExportFileDirectory, _fileName);
+            var filePath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, _fileName);
             return filePath;
         }
     }

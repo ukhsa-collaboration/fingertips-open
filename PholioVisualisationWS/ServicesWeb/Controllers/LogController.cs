@@ -8,7 +8,7 @@ using System.Web.Script.Serialization;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     public class LogController : BaseController
     {

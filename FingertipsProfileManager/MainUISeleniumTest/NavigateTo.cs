@@ -1,5 +1,5 @@
-﻿using OpenQA.Selenium;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
+using OpenQA.Selenium;
 
 namespace Fpm.MainUISeleniumTest
 {
@@ -34,9 +34,24 @@ namespace Fpm.MainUISeleniumTest
             GoToUrl("content/content-index");
         }
 
+        public void ReportsIndexPage()
+        {
+            GoToUrl("reports");
+        }
+
         public void UserIndexPage()
         {
             GoToUrl("user/user-index");
+        }
+
+        public void LookupTablesPage()
+        {
+            GoToUrl("lookup-tables");
+        }
+
+        public void CategoriesPage()
+        {
+            GoToUrl("lookup-tables/categories");
         }
 
         public void GoToUrl(string relativeUrl)

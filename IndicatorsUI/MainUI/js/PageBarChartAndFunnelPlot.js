@@ -875,10 +875,10 @@ templates.add('indicators',
     '<div id="indicator-details-data" style="display: none;"><div style="float:none; clear: both; width:100%;"><div id="indicator-details-header"></div>\
     <div id="funnel-plot-box">' +
     showExportChartLink('barChartState.chart') +
-    '<div id="funnel-plot" style="display: none;"></div><div id="funnel-plot-no-data" style="" class="noData">Funnel plot is<br>not available</div></div>\
+    '<div id="funnel-plot" style="display: none;"></div><div id="funnel-plot-no-data" style="" class="no-indicator-data">Funnel plot is<br>not available</div></div>\
     <div id="indicator-details-box">' +
     showExportTableLink('indicator-details-box', 'CompareAreasTable') +
-    '<table id="indicator-details-table" class="bordered-table" cellspacing="0"><thead><tr><th style="width: 200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th><th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th><th class="bar">&nbsp;</th><th title="Lower confidence interval">Lower<br>CI</th><th title="Upper confidence interval">Upper<br>CI</th></tr></thead><tbody></tbody></table><br><div id="indicator-details-source"></div></div></div></div><div id="indicator-details-no-data">No Data</div>');
+    '<table id="indicator-details-table" class="bordered-table" cellspacing="0"><thead><tr><th style="width: 200px;">Area<a class="columnSort" href="javascript:sortIndicatorDetailsByArea();" title="Sort alphabetically by area"></a></th><th style="border-right: none;"><div class="center">Value</div><a class="columnSort" href="javascript:sortIndicatorDetailsByValue();" title="Sort by values"></a></th><th class="bar">&nbsp;</th><th title="Lower confidence interval">Lower<br>CI</th><th title="Upper confidence interval">Upper<br>CI</th></tr></thead><tbody></tbody></table><br><div id="indicator-details-source"></div></div></div></div><div id="indicator-details-no-data" class="no-indicator-data">No Data</div>');
 
 pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     id: 'indicators',

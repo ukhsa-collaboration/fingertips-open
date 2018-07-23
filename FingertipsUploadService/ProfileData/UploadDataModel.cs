@@ -7,5 +7,6 @@ namespace FingertipsUploadService.ProfileData
         public int RowNumber { get; set; }
 
         public bool DuplicateExists { get; set; }
+
     }
 }

@@ -6,51 +6,54 @@ namespace PholioVisualisation.Analysis
 {
     public abstract class ValueCategoriesCalculator
     {
-        private List<double> values;
+        /// <summary>
+        /// List of sorted valid values
+        /// </summary>
+        private List<double> _values;
 
         protected ValueCategoriesCalculator(IEnumerable<double> validvalues)
         {
             if (validvalues != null)
             {
-                values = validvalues.ToList();
-                values.Sort();
+                _values = validvalues.ToList();
+                _values.Sort();
             }
         }
 
         protected bool AreEnoughValuesToCalculatePercentiles
         {
-            get { return values != null && values.Count > 3; }
+            get { return _values != null && _values.Count > 3; }
         }
 
         protected bool AreAnyValues
         {
-            get { return values != null && values.Any(); }
+            get { return _values != null && _values.Any(); }
         }
 
         protected double Min
         {
-            get { return values.Min<double>(); }
+            get { return _values.Min<double>(); }
         }
 
         protected double Max
         {
-            get { return values.Max<double>(); }
+            get { return _values.Max<double>(); }
         }
 
         protected double CalculatePercentile(double percentileFraction)
         {
-            int count = values.Count;
+            int count = _values.Count;
             double n = (Convert.ToDouble(count) - 1) * percentileFraction + 1;
 
             // Is Min
-            if (n == 1d) return values[0];
+            if (n == 1d) return _values[0];
 
             // Is Max
-            if (n == count) return values[count - 1];
+            if (n == count) return _values[count - 1];
 
             int k = (int)n;
             double d = n - k;
-            var percentile = values[k - 1] + d * (values[k] - values[k - 1]);
+            var percentile = _values[k - 1] + d * (_values[k] - _values[k - 1]);
 
             // Correct for double calculation artifacts, e.g. 30.8 returned as 30.8000000000000000006
             return Math.Round(percentile, 10, MidpointRounding.AwayFromZero);

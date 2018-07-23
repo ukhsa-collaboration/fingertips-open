@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 
 namespace FingertipsUploadService.FpmFileReader
 {
-    public interface IUploadFileReader
+    public interface IUploadFileReader : IDisposable
     {
         List<string> GetWorksheets();
-        DataTable GetBatchData();
+        DataTable ReadData();
     }
 }

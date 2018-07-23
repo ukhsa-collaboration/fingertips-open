@@ -6,7 +6,13 @@ using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class ProfileDetailsCopier
+    public interface IProfileDetailsCopier
+    {
+        int CreateCopy(ProfileDetails sourceProfile);
+        void CopyContentItems(int sourceProfileId, int newProfileId);
+    }
+
+    public class ProfileDetailsCopier : IProfileDetailsCopier
     {
         private ProfileRepository _profileRepository;
         private ProfilesWriter _profilesWriter;

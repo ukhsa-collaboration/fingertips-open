@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Models;
 
 namespace IndicatorsUI.MainUITest.Models
 {

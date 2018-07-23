@@ -19,48 +19,78 @@ namespace PholioVisualisation.ServiceActions
         protected Grouping _grouping;
         protected IndicatorMetadata _indicatorMetadata;
         private IArea _nationalArea;
+        protected IndicatorMetadataSpecialCase _specialCase;
 
         protected void InitMetadata(Grouping grouping)
         {
             _indicatorMetadata = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(grouping);
+
+            _specialCase = _indicatorMetadata.HasSpecialCases
+                ? new IndicatorMetadataSpecialCase(_indicatorMetadata.SpecialCases)
+                : null;
         }
 
         protected void FormatData(IList<CoreDataSet> dataList)
         {
-            NumericFormatter formatter = NumericFormatterFactory.New(_indicatorMetadata, _groupDataReader);
+            NumericFormatter formatter = new NumericFormatterFactory(_groupDataReader).New(_indicatorMetadata);
             new CoreDataProcessor(formatter).FormatAndTruncateList(dataList);
         }
 
-        protected virtual void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> categoryDataList)
+        protected virtual void CalculateSignificances(string areaCode, TimePeriod timePeriod, 
+            IList<CoreDataSet> dataList)
         {
+            // Get benchmark data
             var area = AreaFactory.NewArea(_areasReader, areaCode);
-            var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
+            var benchmarkData = GetBenchmarkData(timePeriod, area);
 
+            // Get special case benchmark data
+            CoreDataSet specialCaseBenchmarkData = null;
+            if (_indicatorMetadata.HasSpecialCases)
+            {
+                specialCaseBenchmarkData = GetSpecialCaseBenchmarkData(timePeriod, area);
+            }
+
+            // Assign significances to data
+            var indicatorComparisonHelper = GetIndicatorComparisonHelper();
+            foreach (CoreDataSet coreDataSet in dataList)
+            {
+                CoreDataSet benchmarkmarkDataToCompare;
+                if (specialCaseBenchmarkData != null && 
+                    _specialCase.ShouldUseForSpecificCategoryTypeId() &&
+                    coreDataSet.CategoryTypeId == _specialCase.CategoryTypeId)
+                {
+                    benchmarkmarkDataToCompare = specialCaseBenchmarkData;
+                }
+                else
+                {
+                    benchmarkmarkDataToCompare = benchmarkData;
+                }
+                coreDataSet.SignificanceAgainstOneBenchmark =
+                    indicatorComparisonHelper.GetSignificance(coreDataSet, benchmarkmarkDataToCompare);
+            }
+        }
+
+        protected virtual CoreDataSet GetSpecialCaseBenchmarkData(TimePeriod timePeriod,
+            IArea area)
+        {
+            return null;
+        }
+
+        private IndicatorComparisonHelper GetIndicatorComparisonHelper()
+        {
+            var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
             var indicatorComparisonHelper = new IndicatorComparisonHelper(_indicatorMetadata,
                 _grouping, _groupDataReader, _pholioReader, targetComparerProvider);
+            return indicatorComparisonHelper;
+        }
 
-            // Set benchmark data
+        protected virtual CoreDataSet GetBenchmarkData(TimePeriod timePeriod, IArea area)
+        {
             var benchmarkDataProvider = new BenchmarkDataProvider(_groupDataReader);
             AverageCalculator averageCalculator = null; // Assume parent value is in database
             CoreDataSet benchmarkData = benchmarkDataProvider.GetBenchmarkData(_grouping, timePeriod,
                 averageCalculator, area);
-
-            foreach (CoreDataSet coreDataSet in categoryDataList)
-            {
-                coreDataSet.SignificanceAgainstOneBenchmark =
-                    (int) indicatorComparisonHelper.GetSignificance(coreDataSet, benchmarkData);
-            }
-        }
-
-        protected IArea GetNationalArea(IArea area)
-        {
-            if (_nationalArea == null)
-            {
-                _nationalArea = area.IsCountry
-                    ? area
-                    : AreaFactory.NewArea(_areasReader, AreaCodes.England);
-            }
-            return _nationalArea;
+            return benchmarkData;
         }
 
         protected IList<string> GetTimePeriodStrings(IList<TimePeriod> timePeriods)
@@ -74,8 +104,8 @@ namespace PholioVisualisation.ServiceActions
             IList<TimePeriod> timePeriods)
         {
             int earliestIndexRemoved = dictionaryBuilder.RemoveEarlyEmptyYears();
-            return earliestIndexRemoved > -1 
-                ? timePeriods.Skip(earliestIndexRemoved + 1).ToList() 
+            return earliestIndexRemoved > -1
+                ? timePeriods.Skip(earliestIndexRemoved + 1).ToList()
                 : timePeriods;
         }
 

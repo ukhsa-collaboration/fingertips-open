@@ -50,8 +50,9 @@ a.home-header, a.home-header:hover, a.home-header:visited {
     Recent updates
 ------------------------------------------*/
 #recent-updates {
-    width: 33.3%;
-    margin-top: 29px;
+    width: 100%;
+    margin-top: 5px;
+    padding-bottom: 100px;
 }
 
 /*----------------------------------------

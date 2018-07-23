@@ -97,6 +97,8 @@ function displayPage() {
             similarVerdict = getVerdictAndRank(grade, decileRank, decileRanks, overallIndex);
             similarVerdictColor = '<img src="' + imgUrl + 'Mortality/grade-' + grade + '.png" />';
         } else {
+            var onsClusterCode = getOnsCodeForArea(area.Code);
+
             // ONS judgement and rank
             var onsRanks = areaDetails.Ranks[onsClusterCode];
             var areaOnsRank = onsRanks[overallIndex].AreaRank;
@@ -184,6 +186,7 @@ function displayPage() {
                 i == ROOT_INDEXES.OVERALL_STROKE) {
                 imageSize = '75px;';
             } else {
+                // Liver / injuries
                 imageSize = '125px;';
             }
 
@@ -193,7 +196,7 @@ function displayPage() {
 
         // Show table element before HTML rendered to prevent IE8 difficulties
         var $aboutOnsGroup = $('.aboutONSGroup');
-        if (model.areaTypeId == AreaTypeIds.CountyUA) {
+        if (model.areaTypeId === AreaTypeIds.CountyUA) {
             $aboutOnsGroup.hide();
             $('.aboutDecileGroup').show();
             $('.area-bracket').html('Socioeconomic deprivation bracket');
@@ -382,12 +385,20 @@ function getBars(rankInfo, overallMax, area, isOverall) {
 function showSimilarAreas() {
     if (!FT.ajaxLock) {
         lock();
+        var model = MT.model;
 
-        MT.model.parentCode = MT.model.areaTypeId === AreaTypeIds.CountyUA
-            ? getSimilarAreaCode()
-            : OnsClusterCode;
-
-        initPage();
+        if (model.areaTypeId === AreaTypeIds.CountyUA) {
+            model.parentCode = loaded.areaDetails.getData().Decile.Code;
+            initPage();
+        } else {
+            // District & UA
+            ajaxMonitor.setCalls(1);
+            getOnsClusterCode(model);
+            ajaxMonitor.monitor(function() {
+                model.parentCode = getOnsCodeForArea(MT.model.areaCode);
+                initPage();
+            });
+        }
 
         logEvent(AnalyticsCategories.DETAILS, AnalyticsAction.SIMILAR_AREAS);
     }
@@ -674,7 +685,7 @@ function pageContent(model) {
         '</table>' +
         '<ul class="more_info clearfix no-print" >' +
         '<li><a href="javascript:MT.nav.rankings();">View full rankings</a></li>' +
-        '<li class="last"><a href="http://www.phoutcomes.info/public-health-outcomes-framework#gid/1000044" class="external_link" target="_blank">View more data at phoutcomes.info</a></li>' +
+        '<li class="last"><a href="https://fingertips.phe.org.uk/profile/public-health-outcomes-framework/data#gid/1000044" class="external_link" target="_blank">View more data at phoutcomes.info</a></li>' +
         '</ul>';
 
     templates.add('page-content', pageContentTempl);

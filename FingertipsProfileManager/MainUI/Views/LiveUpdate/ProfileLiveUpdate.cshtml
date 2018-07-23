@@ -1,0 +1,85 @@
+﻿@using Fpm.MainUI
+@model Fpm.MainUI.ViewModels.ProfilesAndIndicators.ProfileIndicatorMetadataTextValues
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Live Updates";
+    var indicatorlist = Model.IndicatorMetadataTextValues;
+}
+
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
+<script src="@(AppConfig.JsPath)LiveUpdate/live-update.js" type="text/javascript"></script>
+
+<div class="standardWidth">
+    <h2 class="subheading col-md-12">Update live site</h2>
+    
+    @using (Html.BeginForm())
+    {
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2">Profile ID</label>
+            <div class="col-lg-6">@Model.ProfileId</div>
+            <div class="col-lg-1">
+                <label>Target </label>
+            </div>
+            <div id="target-url" class="col-lg-2">
+                @ViewBag.TargetUrl
+            </div>
+        </div>
+
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2">Profile name</label>
+            <div class="col-lg-6">@Model.ProfileName</div>
+            <div class="col-lg-1">
+                <label>Source </label>
+            </div>
+            <div id="source-url" class="col-lg-2">
+                @ViewBag.SourceUrl
+            </div>
+        </div>
+
+        <div class="row form-group form-horizontal">
+            <div class="col-lg-8"></div>
+            <div class="col-lg-4">
+                <button type="button" id="replace-all-indicator-metadata-and-groupings-live" class="btn btn-primary" onclick="replaceAllIndicatorMetadataAndGroupings(@Model.ProfileId)"
+                        title="Click to replace indicator metadata and groupings on live for the indicator list displayed below">Replace all indicator metadata and groupings</button>
+            </div>
+        </div>
+
+        <div id="error-message" class="alert-danger">
+        </div>
+
+        <div class="table-responsive">
+            <table id="live-update-table" class="grid sortable max-width">
+                <thead>
+                <tr>
+                    <th class="header col-xs-1">Id</th>
+                    <th class="header col-xs-6">Indicator Name</th>
+                    <th class="sorter-false col-xs-2">Groupings</th>
+                    <th class="sorter-false col-xs-2">Indicator metadata</th>
+                    <th class="sorter-false col-xs-1">Core data</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var indicator in indicatorlist)
+                {
+                    <tr>
+                        <td>@indicator.IndicatorId</td>
+                        <td>@indicator.Name</td>
+                        <td id="td-replace-groupings-live-@indicator.IndicatorId">
+                            <a id="replace-groupings-live-@indicator.IndicatorId" class="edit-link" indicatorId="@indicator.IndicatorId" onclick="replaceGroupingsLive(@Model.ProfileId, @indicator.IndicatorId)" 
+                               title="Click to replace groupings on live for @indicator.Name">Replace groupings</a>
+                        </td>
+                        <td id="td-replace-indicator-metadata-textvalues-live-@indicator.IndicatorId">
+                            <a id="replace-indicator-metadata-textvalues-live-@indicator.IndicatorId" class="edit-link" onclick="replaceIndicatorMetadataTextValuesLive(@indicator.IndicatorId)" 
+                               title="Click to replace metadata on live for @indicator.Name">Replace metadata</a>
+                        </td>
+                        <td id="td-replace-indicator-coredataset-live-@indicator.IndicatorId">
+                            <a id="replace-indicator-coredataset-live-@indicator.IndicatorId" class="edit-link" onclick="replaceCoreDataSetLive(@indicator.IndicatorId)"
+                               title="Click to replace coredata on live for @indicator.Name">Replace data</a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>

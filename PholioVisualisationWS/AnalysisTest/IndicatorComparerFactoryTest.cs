@@ -67,6 +67,13 @@ namespace PholioVisualisation.AnalysisTest
         }
 
         [TestMethod]
+        public void TestNewQuartilesComparer()
+        {
+            var comparer = New(ComparatorMethodIds.Quartiles, 0);
+            Assert.IsTrue(comparer is QuartilesComparer);
+        }
+
+        [TestMethod]
         public void TestNewSingleOverlappingCIsComparer()
         {
             var comparer = New(ComparatorMethodIds.SingleOverlappingCIs, 0);

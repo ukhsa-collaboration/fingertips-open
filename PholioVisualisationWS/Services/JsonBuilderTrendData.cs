@@ -2,35 +2,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Newtonsoft.Json;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderTrendData : JsonBuilderBase
+    public class JsonBuilderTrendData 
     {
         private TrendDataParameters _parameters;
-
-        public JsonBuilderTrendData(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new TrendDataParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
 
         public JsonBuilderTrendData(TrendDataParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var trendRoots = GetTrendData();
-            return JsonConvert.SerializeObject(trendRoots);
         }
 
         public IList<TrendRoot> GetTrendData()

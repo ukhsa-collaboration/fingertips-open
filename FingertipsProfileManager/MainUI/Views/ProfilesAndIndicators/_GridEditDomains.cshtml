@@ -1,4 +1,5 @@
-﻿@using Fpm.MainUI.Models
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.MainUI.Models
 @model IndicatorGridModel
 
 <div id="editDomains" style="display: none;">
@@ -28,10 +29,13 @@
             @Html.HiddenFor(x => x.Profile.Id)
         </div>
         <div class="clearfix">
-            <input id="reorderUp" type="button" class="medium-button" value="Move Up" />
-            <input id="reorderDown" type="button" class="medium-button" value="Move Down" />
             <input id="addDomain" type="button" class="medium-button" value="New Domain" />
-            <input id="DeleteDomain" type="button" class="auto-width-button" value="Delete Domain"/>
+            @if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+            {
+                <input id="DeleteDomain" type="button" class="auto-width-button" value="Delete Domain"/>
+                <input id="reorderUp" type="button" class="medium-button" value="Move Up"/>
+                <input id="reorderDown" type="button" class="medium-button" value="Move Down"/>
+            }
         </div>
 
         <div class="space-top">

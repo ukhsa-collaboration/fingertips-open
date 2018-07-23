@@ -27,28 +27,28 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var data = new ValueWithCIsData
             {
-                UpperCI = 2.222222222,
-                LowerCI = Number
+                UpperCI95 = 2.222222222,
+                LowerCI95 = Number
             };
             DataProcessor().FormatAndTruncate(data);
-            Assert.AreEqual("1.11", data.LowerCIF);
-            Assert.AreEqual("2.22", data.UpperCIF);
+            Assert.AreEqual("1.11", data.LowerCI95F);
+            Assert.AreEqual("2.22", data.UpperCI95F);
         }
 
         [TestMethod]
         public void TestTruncateLowerCI()
         {
-            var data = new ValueWithCIsData { LowerCI = Number };
+            var data = new ValueWithCIsData { LowerCI95 = Number };
             TruncateData(data);
-            Assert.AreEqual(TruncatedNumber, data.LowerCI);
+            Assert.AreEqual(TruncatedNumber, data.LowerCI95);
         }
 
         [TestMethod]
         public void TestTruncateUpperCI()
         {
-            var data = new ValueWithCIsData { UpperCI = Number };
+            var data = new ValueWithCIsData { UpperCI95 = Number };
             TruncateData(data);
-            Assert.AreEqual(TruncatedNumber, data.UpperCI);
+            Assert.AreEqual(TruncatedNumber, data.UpperCI95);
         }
 
         [TestMethod]

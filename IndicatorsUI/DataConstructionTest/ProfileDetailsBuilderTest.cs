@@ -3,8 +3,8 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataConstructionTest
 {

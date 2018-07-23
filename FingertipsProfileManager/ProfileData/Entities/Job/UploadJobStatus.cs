@@ -3,13 +3,16 @@ namespace Fpm.ProfileData.Entities.Job
 {
     public enum UploadJobStatus
     {
-        NotStart = 0,
+        NotStarted = 0,
         InProgress = 200,
-        ConfirmationAwaited = 300,
-        ConfirmationGiven = 301,
-        ConfirmationRefused = 302,
+        OverrideDatabaseDuplicatesConfirmationAwaited = 300,
+        OverrideDatabaseDuplicatesConfirmationGiven = 301,
+        OverrideDatabaseDuplicatesConfirmationRefused = 302,
         SmallNumberWarningConfirmationAwaited = 310,
+        SmallNumberWarningConfirmationGiven = 311,
+        SmallNumberWarningConfirmationRefused = 312,
         FailedValidation = 400,
+        UnexpectedError = 500,
         SuccessfulUpload = 1000,
     }
 

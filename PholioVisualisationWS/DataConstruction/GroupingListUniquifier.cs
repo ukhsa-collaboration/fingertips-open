@@ -2,47 +2,73 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
 {
     public class GroupingListUniquifier
     {
-        private IEnumerable<Grouping> groupings;
-        private List<string> ids;
-        private List<Grouping> uniqueGroupings;
+        private readonly IEnumerable<Grouping> _groupings;
+        private List<Grouping> _uniqueGroupings;
 
         public GroupingListUniquifier(IEnumerable<Grouping> groupings)
         {
-            this.groupings = groupings;
+            _groupings = groupings;
         }
 
         public IList<Grouping> GetUniqueGroupings()
         {
-            Reset();
+            _uniqueGroupings = new List<Grouping>();
 
-            foreach (Grouping grouping in groupings)
+            var idToGroupings = GetMapOfUniqueIdToGroupings();
+
+            // Create unique groupings
+            foreach (var idToGrouping in idToGroupings)
             {
-                string idString = GetGroupingIdString(grouping);
-                if (GroupingIsUniqueSoFar(idString))
+                var groupings = idToGrouping.Value;
+                var grouping = groupings.First();
+                _uniqueGroupings.Add(grouping);
+
+                if (groupings.Count > 1)
                 {
-                    uniqueGroupings.Add(grouping);
-                    ids.Add(idString);
+                    var sortedGroupings = new GroupingSorter(groupings)
+                        .SortByDataPointTimePeriodMostRecentFirst().ToList();
+
+                    // Use overall earliest timepoint
+                    var earliestGrouping = sortedGroupings.Last();
+                    grouping.BaselineYear = earliestGrouping.BaselineYear;
+                    grouping.BaselineQuarter = earliestGrouping.BaselineQuarter;
+                    grouping.BaselineMonth = earliestGrouping.BaselineMonth;
+
+                    // Use overall latest timepoint
+                    var latestGrouping = sortedGroupings.First();
+                    grouping.DataPointYear = latestGrouping.DataPointYear;
+                    grouping.DataPointQuarter = latestGrouping.DataPointQuarter;
+                    grouping.DataPointMonth = latestGrouping.DataPointMonth;
+
+                    // Use most popular polarity
+                    grouping.PolarityId = new GroupingSorter(groupings).GetMostCommonPolarityId();
                 }
             }
 
-            return uniqueGroupings;
+            return _uniqueGroupings;
         }
 
-        private void Reset()
+        private Dictionary<string, List<Grouping>> GetMapOfUniqueIdToGroupings()
         {
-            ids = new List<string>();
-            uniqueGroupings = new List<Grouping>();
-        }
+            var idToGroupings = new Dictionary<string, List<Grouping>>();
+            foreach (Grouping grouping in _groupings)
+            {
+                string idString = GetGroupingIdString(grouping);
+                if (idToGroupings.ContainsKey(idString) == false)
+                {
+                    idToGroupings[idString] = new List<Grouping>();
+                }
 
-        private bool GroupingIsUniqueSoFar(string idString)
-        {
-            return ids.Contains(idString) == false;
+                idToGroupings[idString].Add(grouping);
+            }
+            return idToGroupings;
         }
 
         private static string GetGroupingIdString(Grouping grouping)
@@ -57,6 +83,8 @@ namespace PholioVisualisation.DataConstruction
             sb.Append(grouping.ComparatorId);
             sb.Append("-");
             sb.Append(grouping.AreaTypeId);
+            sb.Append("-");
+            sb.Append(grouping.YearRange);
             return sb.ToString();
         }
 

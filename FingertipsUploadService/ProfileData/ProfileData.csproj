@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FingertipsUploadService.ProfileData</RootNamespace>
     <AssemblyName>FingertipsUploadService.ProfileData</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,16 +35,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
@@ -76,7 +72,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CoreDataSetSchema.cs" />
+    <Compile Include="AutoMapperConfig.cs" />
     <Compile Include="DuplicateRowInDatabaseError.cs" />
     <Compile Include="Entities\Core\CoreDataSetDuplicateResponse.cs" />
     <Compile Include="Entities\JobError\UploadJobErrorType.cs" />
@@ -91,7 +87,6 @@
     <Compile Include="Entities\Core\Area.cs" />
     <Compile Include="Entities\Profile\Category.cs" />
     <Compile Include="Entities\LookUps\CategoryType.cs" />
-    <Compile Include="Entities\Logging\UploadAudit.cs" />
     <Compile Include="Entities\LookUps\Comparator.cs" />
     <Compile Include="Entities\LookUps\ConfidenceIntervalMethod.cs" />
     <Compile Include="Entities\LookUps\DenominatorType.cs" />
@@ -103,7 +98,6 @@
     <Compile Include="Entities\LookUps\KeyColour.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Helpers\IndicatorDisclosureControlMapper.cs" />
-    <Compile Include="Helpers\Mapper.cs" />
     <Compile Include="Repositories\AreaTypeRepository.cs" />
     <Compile Include="Repositories\DisclosureControlRepository.cs" />
     <Compile Include="Repositories\UploadJobErrorRepository.cs" />
@@ -152,6 +146,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,9 +1,7 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.DataAccess
 {
@@ -32,6 +30,9 @@ namespace PholioVisualisation.DataAccess
             GroupIds = new List<int>(groupIds);
         }
 
+        [JsonProperty]
+        public IList<GroupingMetadata> GroupMetadata { get; set; }
+
         /// <summary>
         /// i.e. is not search results, or other kind of ad hoc profile.
         /// </summary>
@@ -40,7 +41,5 @@ namespace PholioVisualisation.DataAccess
         {
             get { return Id != ProfileIds.Search; }
         }
-
-
     }
 }

@@ -82,11 +82,11 @@
                                     @indicatorName.IndicatorId
                                 </td>
                                 <td class="left">
-                                    @Html.ActionLink(searchResult.ProfileName, "SortPageAndFilter", "ProfilesAndIndicators",
+                                    @Html.ActionLink(searchResult.ProfileName, "ListIndicatorsInProfileSpecific", "ProfilesAndIndicators",
                                         new { profileKey = searchResult.UrlKey, SelectedAreaTypeId = areaTypeId }, new { })
                                 </td>
                                 <td class="left">
-                                    @Html.ActionLink(searchResult.GroupName, "SortPageAndFilter", "ProfilesAndIndicators",
+                                    @Html.ActionLink(searchResult.GroupName, "ListIndicatorsInProfileSpecific", "ProfilesAndIndicators",
                                         new
                                         {
                                             profileKey = searchResult.UrlKey, domainSequence = searchResult.SequenceId,

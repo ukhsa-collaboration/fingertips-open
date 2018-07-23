@@ -1,17 +1,26 @@
 ﻿using AutoMapper;
-using Profiles.DomainObjects;
+using IndicatorsUI.MainUI.Configuration;
 
-namespace Profiles.MainUI
+namespace IndicatorsUI.MainUI
 {
     public class AutoMapperConfig
     {
+        private static bool _hasBeenInitialized;
+
         public static void RegisterMappings()
         {
-            Mapper.Initialize(cfg =>
+            if (_hasBeenInitialized == false)
             {
-            //  cfg.CreateMap<CoreDataSet, CoreDataSetArchive>();
-            });
-            Mapper.Configuration.CompileMappings();
+                Mapper.Initialize(cfg =>
+                {
+                    cfg.AddProfile(new IndicatorListMappingProfile());
+                });
+                Mapper.Configuration.CompileMappings();
+
+                _hasBeenInitialized = true;
+            }
         }
     }
+
+
 }

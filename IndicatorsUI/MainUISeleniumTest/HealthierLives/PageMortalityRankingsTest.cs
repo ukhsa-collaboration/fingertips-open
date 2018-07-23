@@ -168,6 +168,7 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
         private void WaitForElementsToRefresh()
         {
             WaitFor.ThreadWait(0.1);
+            waitFor.AjaxLockToBeUnlocked();
             waitFor.PageToFinishLoading();
         }
     }

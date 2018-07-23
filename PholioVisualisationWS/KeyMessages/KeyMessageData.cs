@@ -13,7 +13,7 @@ namespace PholioVisualisation.KeyMessages
          */
 
         // 1.0
-        public SignificanceCounter SpineChartSignificances { get; set; }
+        public ISignificanceCounter SpineChartSignificances { get; set; }
 
         // 1.2
         public CoreDataSet Deprivation { get; set; }
@@ -53,11 +53,6 @@ namespace PholioVisualisation.KeyMessages
          * Key message 4
          */
 
-        // 4.1
-        public string ObesityAdultsYear { get; set; }
-        public string ObesityAdultsPercentage { get; set; }
-        public string ObesityAdultsCount { get; set; }
-        public Significance ObesityAdultsSignificance { get; set; }
         // 4.2
         public double? AdultAlcoholAdmissions { get; set; }
         public double? AdultAlcoholAdmissionsPerYear { get; set; }
@@ -66,11 +61,8 @@ namespace PholioVisualisation.KeyMessages
         public string AdultSelfHarmAdmissions { get; set; }
         public string AdultSelfHarmAdmissionsPerYear { get; set; }
         public Significance AdultSelfHarmAdmissionsSignificance { get; set; }
-        // 4.4
-        public double? AdultSmokingRelatedDeaths { get; set; }
-        public double? AdultSmokingRelatedDeathsPerYear { get; set; }
         // 4.5 
-        public Significance AdultSmokingRelatedDeathsSignificance { get; set; }
+        public Significance AdultSmokingInRoutineAndManualOccupationsSignificance { get; set; }
         public Significance AdultExcessWeightSignificance { get; set; }        
         public Significance AdultSmokingPrevalenceSignificance { get; set; }
         public Significance AdultPhysicalActivitySignificance { get; set; }
@@ -82,7 +74,7 @@ namespace PholioVisualisation.KeyMessages
         // 4.7
         public Significance AdultStatutoryHomelessnessSig { get; set; }
         public Significance AdultViolentCrimeSig { get; set; }
-        public Significance AdultLongTermUnemploymentSig { get; set; }
+        public Significance PeopleInEmploymentSig { get; set; }
         public Significance AdultExcessWinterDeathsSig { get; set; }        
         public Significance AdultUnder75MortalityRateCvdSig { get; set; }
         public Significance AdultUnder75MortalityRateCancerSig { get; set; }

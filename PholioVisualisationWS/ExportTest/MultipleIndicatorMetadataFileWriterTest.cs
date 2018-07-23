@@ -26,7 +26,7 @@ namespace PholioVisualisation.ExportTest
                 _indicatorMetadataProvider.GetIndicatorMetadata(new List<int>
                 {
                     IndicatorIds.ExcessWinterDeaths, IndicatorIds.GcseAchievement
-                }), _properties);
+                }), Polarities(2), _properties);
 
             Assert.IsTrue(file.Length > 0);
         }
@@ -37,7 +37,7 @@ namespace PholioVisualisation.ExportTest
             var metadata = GetIndicatorMetadata();
 
             var content = new MultipleIndicatorMetadataFileWriter()
-                .GetMetadataFileAsBytes(new List<IndicatorMetadata> { metadata},
+                .GetMetadataFileAsBytes(new List<IndicatorMetadata> { metadata}, Polarities(1),
                 new List<IndicatorMetadataTextProperty>());
 
             var csvContent = Encoding.UTF8.GetString(content);
@@ -54,7 +54,7 @@ namespace PholioVisualisation.ExportTest
             var metadata = GetIndicatorMetadata();
 
             var content = new MultipleIndicatorMetadataFileWriter()
-                .GetMetadataFileAsBytes(new List<IndicatorMetadata> { metadata },
+                .GetMetadataFileAsBytes(new List<IndicatorMetadata> { metadata }, Polarities(1),
                 new List<IndicatorMetadataTextProperty> {new IndicatorMetadataTextProperty()
                 {
                     ColumnName = "IndicatorNameColumnName",
@@ -65,6 +65,21 @@ namespace PholioVisualisation.ExportTest
 
             Assert.IsTrue(csvContent.Contains("IndicatorNameDisplayName"));
             Assert.IsTrue(csvContent.Contains("IndicatorNameValue"));
+        }
+
+        private static IList<Polarity> Polarities(int count)
+        {
+            var polarities =  new List<Polarity>();
+
+            for (int i = 0; i < count; i++)
+            {
+                polarities.Add(new Polarity
+                {
+                    Id = 1,
+                    Name = "a"
+                });
+            }
+            return polarities;
         }
 
         private static IndicatorMetadata GetIndicatorMetadata()

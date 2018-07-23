@@ -1,6 +1,6 @@
 ﻿using OpenQA.Selenium;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUISeleniumTest
 {
@@ -27,12 +27,6 @@ namespace IndicatorsUI.MainUISeleniumTest
         {
             GoToUrl("profile/" + profileUrlKey);
             waitFor.FingertipsProfileFrontPageToLoad();
-        }
-
-        public void FingertipsDataForPracticeProfiles(string profileUrlKey)
-        {
-            GoToUrl("profile/" + profileUrlKey + "/data");
-            waitFor.GoogleMapToLoad();
         }
 
         public void JavaScriptTestPage(string testPage)

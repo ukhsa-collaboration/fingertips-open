@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
@@ -94,28 +94,6 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
                 AssertPageDoesNotContainUndefined(tabId);
             }
         }
-
-        [TestMethod]
-        public void TestScatterPlotSupportingIndicatorCanBeSelected()
-        {
-            // Navidate to scatter plot
-            navigateTo.FingertipsDataForProfile(ProfileUrlKeys.HealthProfiles);
-            SelectTab("page-scatter");
-            waitFor.FingertipsScatterPlotChartToLoad();
-
-            //Set supporting indicator
-            var menu = driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single"));
-            menu.Click();
-            var searchText = driver.FindElement(By.CssSelector("div.chosen-search input"));
-            searchText.SendKeys("gcse");
-            searchText.SendKeys(Keys.Return);
-            waitFor.AjaxLockToBeUnlocked();
-
-            // Assert: selected indicator is selected
-            var selectedSupportinIndicator = driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single span"));
-            TestHelper.AssertTextContains(selectedSupportinIndicator.Text, "gcse");
-        }
-
         public void CheckAllTabsLoadForProfile(string urlKey)
         {
             navigateTo.FingertipsDataForProfile(urlKey);

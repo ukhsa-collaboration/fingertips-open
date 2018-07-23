@@ -9,14 +9,17 @@ namespace PholioVisualisation.DataAccessTest
     [TestClass]
     public class GroupDataReaderTest
     {
+        private IGroupDataReader _groupDataReader;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _groupDataReader = ReaderFactory.GetGroupDataReader();
+        }
+
         [TestMethod]
         public void TestGetDataIncludingInequalities()
         {
-            var grouping = new Grouping
-            {
-                IndicatorId = IndicatorIds.PopulationEating5aDay
-            };
-
             var timePeriod = new TimePeriod()
             {
                 Year = 2015,
@@ -24,26 +27,57 @@ namespace PholioVisualisation.DataAccessTest
             };
 
             // Act: get all the data
-            var dataList = GroupDataReader().GetDataIncludingInequalities(
-                grouping, timePeriod, new List<int>(), AreaCodes.England);
+            var dataList = _groupDataReader.GetDataIncludingInequalities(
+                IndicatorIds.Under16Conceptions, timePeriod, new List<int>(), AreaCodes.England);
 
             // Assert: ethnicity data found
             Assert.IsTrue(dataList.Any(x => x.CategoryTypeId == CategoryTypeIds.EthnicGroups7));
 
             // Assert: age data found
-            Assert.IsTrue(dataList.Any(x => x.AgeId == AgeIds.From35To39));
+            Assert.IsTrue(dataList.Any(x => x.AgeId == AgeIds.Under16));
 
             // Assert: sex data found
             Assert.IsTrue(dataList.Any(x => x.SexId == SexIds.Female));
         }
 
         [TestMethod]
-        public void TestGetLsoaQuintilesWithinParentArea()
+        public void TestGetLsoaQuintilesInEngland()
         {
-            var quintiles = GroupDataReader().GetCategoriesWithinParentArea(
-                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, AreaCodes.CountyUa_Cambridgeshire,
-                AreaTypeIds.Lsoa);
-            Assert.IsTrue(quintiles.Count > 300 && quintiles.Count < 400);
+            var quintiles = _groupDataReader.GetCategoriesWithinParentArea(
+                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2015, AreaCodes.CountyUa_Cambridgeshire,
+                AreaTypeIds.Lsoa, AreaTypeIds.Country);
+            var count = quintiles.Count;
+            Assert.IsTrue(count > 300 && count < 400, count + " quintiles");
+        }
+
+        [TestMethod]
+        public void TestGetLsoaQuintilesInLocalArea()
+        {
+            var quintiles = _groupDataReader.GetCategoriesWithinParentArea(
+                CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2015, AreaCodes.DistrictUa_Mansfield,
+                AreaTypeIds.Lsoa, AreaTypeIds.District);
+            var count = quintiles.Count;
+            Assert.IsTrue(count > 50 && count < 100, count + " quintiles");
+        }
+
+        [TestMethod]
+        public void GetAvailableDataByIndicatorIdAndAreaTypeId_For_One_Indicator()
+        {
+            var indicatorId = IndicatorIds.Aged0To4Years;
+            var data = _groupDataReader.GetAvailableDataByIndicatorIdAndAreaTypeId(indicatorId, null);
+
+            // Assert: only data for one indicator is found
+            Assert.AreEqual(data.Count, data.Select(x => x.IndicatorId == indicatorId).Count());
+        }
+
+        [TestMethod]
+        public void GetAvailableDataByIndicatorIdAndAreaTypeId_For_One_Area_Type()
+        {
+            var areaTypeId = AreaTypeIds.GoRegion;
+            var data = _groupDataReader.GetAvailableDataByIndicatorIdAndAreaTypeId(null, areaTypeId);
+
+            // Assert: only data for one area type is found
+            Assert.AreEqual(data.Count, data.Select(x => x.AreaTypeId == areaTypeId).Count());
         }
 
         [TestMethod]
@@ -59,14 +93,14 @@ namespace PholioVisualisation.DataAccessTest
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
             };
 
-            int count = GroupDataReader().GetCoreDataCountAtDataPoint(grouping);
+            int count = _groupDataReader.GetCoreDataCountAtDataPoint(grouping);
             Assert.IsTrue(count > 100);
         }
 
         [TestMethod]
         public void TestGetGroupingsByIndicatorIdsAndAreaType()
         {
-            IList<Grouping> groupings = GroupDataReader().GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(
                 new List<int> { GroupIds.Phof_WiderDeterminantsOfHealth },
                 new List<int> { IndicatorIds.IDACI, IndicatorIds.ChildrenInLowIncomeFamilies },
                 AreaTypeIds.CountyAndUnitaryAuthority);
@@ -76,7 +110,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGroupingComparatorTargetIdIsReadFromDatabase()
         {
-            IList<Grouping> groupings = GroupDataReader().GetGroupingsByGroupId(
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupId(
                 GroupIds.HealthProfiles_OurCommunities);
             Assert.AreEqual(TargetIds.Undefined, groupings.First().ComparatorTargetId);
         }
@@ -85,21 +119,21 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetCoreDataLimits()
         {
             Limits limits =
-                GroupDataReader().GetCoreDataLimitsByIndicatorId(IndicatorIds.LifeExpectancyMsoaBasedEstimate);
+                _groupDataReader.GetCoreDataLimitsByIndicatorId(IndicatorIds.LifeExpectancyMsoaBasedEstimate);
             Assert.IsTrue(limits.Max > limits.Min);
         }
 
         [TestMethod]
         public void TestGetCoreDataLimits_WhereNoData()
         {
-            Limits limits = GroupDataReader().GetCoreDataLimitsByIndicatorId(IndicatorIds.IndicatorHasNoData);
+            Limits limits = _groupDataReader.GetCoreDataLimitsByIndicatorId(IndicatorIds.IndicatorHasNoData);
             Assert.IsNull(limits);
         }
 
         [TestMethod]
         public void TestGetCoreDataLimitsByIndicatorIdAndAreaTypeId()
         {
-            Limits limits = GroupDataReader().GetCoreDataLimitsByIndicatorIdAndAreaTypeId(
+            Limits limits = _groupDataReader.GetCoreDataLimitsByIndicatorIdAndAreaTypeId(
                 IndicatorIds.LifeExpectancyMsoaBasedEstimate, AreaTypeIds.GpPractice);
             Assert.IsTrue(limits.Max > limits.Min);
         }
@@ -107,7 +141,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataLimitsByIndicatorIdAndAreaTypeId_WhereNoData()
         {
-            Limits limits = GroupDataReader().GetCoreDataLimitsByIndicatorIdAndAreaTypeId(
+            Limits limits = _groupDataReader.GetCoreDataLimitsByIndicatorIdAndAreaTypeId(
                 IndicatorIds.IndicatorHasNoData, AreaTypeIds.GpPractice);
             Assert.IsNull(limits);
         }
@@ -115,7 +149,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataLimitsByIndicatorIdAndAreaTypeIdAndParentAreaCode()
         {
-            Limits limits = GroupDataReader().GetCoreDataLimitsByIndicatorIdAndAreaTypeIdAndParentAreaCode(
+            Limits limits = _groupDataReader.GetCoreDataLimitsByIndicatorIdAndAreaTypeIdAndParentAreaCode(
                 IndicatorIds.LifeExpectancyMsoaBasedEstimate, AreaTypeIds.GpPractice, AreaCodes.Ccg_Barnet);
             Assert.IsTrue(limits.Max > limits.Min);
         }
@@ -123,14 +157,13 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorMetadataByGroupingList()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var groupings = new List<Grouping>
             {
                 new Grouping {IndicatorId = IndicatorIds.StatutoryHomelessness},
                 new Grouping {IndicatorId = IndicatorIds.SyphilisDiagnosis}
             };
-            IList<IndicatorMetadata> metadataList = reader.GetIndicatorMetadata(groupings,
-                reader.GetIndicatorMetadataTextProperties());
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetIndicatorMetadata(groupings,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
             Assert.AreEqual(2, metadataList.Count);
             AssertIndicatorMetadataIsOk(metadataList[0]);
         }
@@ -138,15 +171,14 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorMetadataByGroupingTextPropertiesAssignedToCorrectIndicatorMetadataObject()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var groupings = new List<Grouping>
             {
                 new Grouping {IndicatorId = IndicatorIds.ExcessWinterDeaths},
                 new Grouping {IndicatorId = IndicatorIds.DeathsFromLungCancer},
                 new Grouping {IndicatorId = IndicatorIds.OverallPrematureDeaths}
             };
-            IList<IndicatorMetadata> metadataList = reader.GetIndicatorMetadata(groupings,
-                reader.GetIndicatorMetadataTextProperties());
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetIndicatorMetadata(groupings,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.AreEqual(IndicatorIds.ExcessWinterDeaths,
                 metadataList.FirstOrDefault(x => x.Name.ToLower()
@@ -167,10 +199,9 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorMetadataByGrouping()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IndicatorMetadata metadata = reader.GetIndicatorMetadata(
+            IndicatorMetadata metadata = _groupDataReader.GetIndicatorMetadata(
                 new Grouping { IndicatorId = IndicatorIds.SmokingAtTimeOfDelivery },
-                reader.GetIndicatorMetadataTextProperties());
+                _groupDataReader.GetIndicatorMetadataTextProperties());
             AssertIndicatorMetadataIsOk(metadata);
         }
 
@@ -178,9 +209,8 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetIndicatorMetadataByIndicatorId()
         {
             var indicatorId = IndicatorIds.ObesityYear6;
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IndicatorMetadata metadata = reader.GetIndicatorMetadata(indicatorId,
-                reader.GetIndicatorMetadataTextProperties());
+            IndicatorMetadata metadata = _groupDataReader.GetIndicatorMetadata(indicatorId,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
             Assert.AreEqual(indicatorId, metadata.IndicatorId);
             AssertIndicatorMetadataIsOk(metadata);
         }
@@ -189,16 +219,15 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetIndicatorMetaDataContainsIndicatorContent()
         {
             // Assert Indicator Metadata for an expected diabetes indicator is present
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IList<IndicatorMetadata> metadataList = reader.GetGroupSpecificIndicatorMetadataTextValues(
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetGroupSpecificIndicatorMetadataTextValues(
                 new List<Grouping> { new Grouping { GroupId = GroupIds.Diabetes_TreatmentTargets } },
-                reader.GetIndicatorMetadataTextProperties());
+                _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.IsTrue(metadataList.Any());
 
             const int indicatorId = IndicatorIds.Population;
-            IndicatorMetadata genericMetadata = reader.GetIndicatorMetadata(indicatorId,
-                reader.GetIndicatorMetadataTextProperties());
+            IndicatorMetadata genericMetadata = _groupDataReader.GetIndicatorMetadata(indicatorId,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.IsNotNull(genericMetadata.Descriptive[IndicatorMetadataTextColumnNames.IndicatorContent]);
         }
@@ -208,7 +237,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             // Assert Indicator Metadata contains a field that is defined as SystemContent.
             IList<IndicatorMetadataTextProperty> properties =
-                GroupDataReader().GetIndicatorMetadataTextProperties();
+                _groupDataReader.GetIndicatorMetadataTextProperties();
 
             var systemContentProperties = properties.Where(x => x.IsSystemContent).ToList();
 
@@ -218,12 +247,11 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorMetadataByIndicatorIdList()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IList<IndicatorMetadata> metadata = reader.GetIndicatorMetadata(
+            IList<IndicatorMetadata> metadata = _groupDataReader.GetIndicatorMetadata(
                 new List<int> {
                     IndicatorIds.KilledAndSeriouslyInjuredOnRoads,
                     IndicatorIds.ObesityYear6 },
-                reader.GetIndicatorMetadataTextProperties()
+                _groupDataReader.GetIndicatorMetadataTextProperties()
                 );
 
             // Check metadata is as expected
@@ -232,25 +260,15 @@ namespace PholioVisualisation.DataAccessTest
             AssertIndicatorMetadataIsOk(metadata[1]);
         }
 
-        private static void AssertIndicatorMetadataIsOk(IndicatorMetadata metadata)
-        {
-            Assert.IsNotNull(metadata.ValueType);
-            Assert.IsNotNull(metadata.Unit);
-
-            Assert.IsNotNull(metadata.Descriptive);
-            Assert.IsTrue(metadata.Descriptive.Count > 0);
-        }
-
         [TestMethod]
         public void TestIndicatorMetadataHasTargetDefined()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var groupings = new List<Grouping>
             {
                 new Grouping {IndicatorId = IndicatorIds.HIVLateDiagnosis}
             };
-            IList<IndicatorMetadata> metadataList = reader.GetIndicatorMetadata(groupings,
-                reader.GetIndicatorMetadataTextProperties());
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetIndicatorMetadata(groupings,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
             Assert.IsNotNull(metadataList.First().TargetConfig);
         }
 
@@ -258,10 +276,9 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetGroupSpecificIndicatorMetadataTextValues()
         {
             // Assert group specific metadata is found
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IList<IndicatorMetadata> metadataList = reader.GetGroupSpecificIndicatorMetadataTextValues(
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetGroupSpecificIndicatorMetadataTextValues(
                 new List<Grouping> { new Grouping { GroupId = GroupIds.HealthProfiles_OurCommunities } },
-                reader.GetIndicatorMetadataTextProperties());
+                _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.IsTrue(metadataList.Any());
 
@@ -271,8 +288,8 @@ namespace PholioVisualisation.DataAccessTest
             IndicatorMetadata specificMetadata =
                 (from m in metadataList where m.IndicatorId == indicatorId select m).First();
 
-            IndicatorMetadata genericMetadata = reader.GetIndicatorMetadata(indicatorId,
-                reader.GetIndicatorMetadataTextProperties());
+            IndicatorMetadata genericMetadata = _groupDataReader.GetIndicatorMetadata(indicatorId,
+                _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.AreNotEqual(genericMetadata.Descriptive[IndicatorMetadataTextColumnNames.Name],
                 specificMetadata.Descriptive[IndicatorMetadataTextColumnNames.Name]);
@@ -282,9 +299,8 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetGroupSpecificIndicatorMetadataTextValuesWhereNoGroupings()
         {
             // Assert group specific metadata is found
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            IList<IndicatorMetadata> metadataList = reader.GetGroupSpecificIndicatorMetadataTextValues(
-                new List<Grouping>(), reader.GetIndicatorMetadataTextProperties());
+            IList<IndicatorMetadata> metadataList = _groupDataReader.GetGroupSpecificIndicatorMetadataTextValues(
+                new List<Grouping>(), _groupDataReader.GetIndicatorMetadataTextProperties());
 
             Assert.AreEqual(0, metadataList.Count);
         }
@@ -293,7 +309,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetIndicatorMetadataTextProperties()
         {
             IList<IndicatorMetadataTextProperty> properties =
-                GroupDataReader().GetIndicatorMetadataTextProperties();
+                _groupDataReader.GetIndicatorMetadataTextProperties();
 
             Assert.IsTrue(properties.Count > 20);
             foreach (IndicatorMetadataTextProperty indicatorMetadataTextProperty in properties)
@@ -311,15 +327,15 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetCoreDataNoAreaCodeNoData()
         {
             Grouping grouping = GetTestGrouping();
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(grouping, TimePeriod.GetDataPoint(grouping));
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping));
             Assert.AreEqual(0, data.Count);
         }
 
         [TestMethod]
-        public void TestGetCoreDataNoAreaCodeOneDataRecord()
+        public void TestGetCoreDataOneDataRecord()
         {
             Grouping grouping = GetTestGrouping();
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.Gor_EastOfEngland);
             Assert.AreEqual(1, data.Count);
         }
@@ -329,7 +345,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             CategoryArea categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileGp2015, 1);
 
-            CoreDataSet data = GroupDataReader()
+            CoreDataSet data = _groupDataReader
                 .GetCoreDataForCategoryArea(SmokingPrevalenceGrouping(),
                     new TimePeriod { Month = -1, Quarter = -1, Year = 2000, YearRange = 1 },
                     categoryArea);
@@ -341,7 +357,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             CategoryArea categoryArea = CategoryArea.New(CategoryTypeIds.DeprivationDecileGp2010, 1);
 
-            CoreDataSet data = GroupDataReader()
+            CoreDataSet data = _groupDataReader
                 .GetCoreDataForCategoryArea(SmokingPrevalenceGrouping(),
                     new TimePeriod { Month = -1, Quarter = -1, Year = 2010, YearRange = 1 }, categoryArea);
 
@@ -355,7 +371,7 @@ namespace PholioVisualisation.DataAccessTest
             var ageId = AgeIds.AllAges;
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
-            var dataList = GroupDataReader()
+            var dataList = _groupDataReader
                 .GetAllCategoryDataWithinParentArea(AreaCodes.England,
                     indicatorId,
                     sexId,
@@ -375,23 +391,12 @@ namespace PholioVisualisation.DataAccessTest
             }
         }
 
-        private static Grouping SmokingPrevalenceGrouping()
-        {
-            var grouping = new Grouping
-            {
-                IndicatorId = IndicatorIds.AdultSmokingPrevalence,
-                SexId = SexIds.Persons,
-                AgeId = AgeIds.Over18
-            };
-            return grouping;
-        }
-
 
         [TestMethod]
         public void TestGetCoreDataTwoAreas()
         {
             Grouping grouping = GetTestGrouping();
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.CountyUa_Bedfordshire,
                 AreaCodes.CountyUa_Cambridgeshire);
             Assert.AreEqual(2, data.Count);
@@ -405,7 +410,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             Grouping grouping = GetTestGrouping();
             grouping.DataPointYear = -1;
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.Gor_EastOfEngland);
             Assert.AreEqual(0, data.Count);
         }
@@ -415,7 +420,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             Grouping grouping = GetTestGrouping();
             grouping.IndicatorId = -1;
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.Gor_EastOfEngland);
             Assert.AreEqual(0, data.Count);
         }
@@ -423,14 +428,13 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataByIndicatorIdAndAreaCode()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreData(IndicatorIds.QofPoints, "J83045");
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(IndicatorIds.QofPoints, "J83045");
             Assert.IsTrue(data.Count > 1);
         }
 
         [TestMethod]
         public void TestGetCoreDataForCategory()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var grouping = new Grouping
             {
                 IndicatorId = IndicatorIds.PercentageOfPeoplePerDeprivationQuintile,
@@ -443,7 +447,7 @@ namespace PholioVisualisation.DataAccessTest
             };
 
             // Act: read core data
-            CoreDataSet data = reader.GetCoreDataForCategory(grouping, TimePeriod.GetDataPoint(grouping),
+            CoreDataSet data = _groupDataReader.GetCoreDataForCategory(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.CountyUa_CentralBedfordshire, CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, CategoryIds.LeastDeprivedQuintile);
 
             // Assert
@@ -453,7 +457,6 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataMonthlyOneArea()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
             var grouping = new Grouping
             {
                 IndicatorId = IndicatorIds.PercentageLivingInEachDeprivationQuintile,
@@ -464,7 +467,7 @@ namespace PholioVisualisation.DataAccessTest
                 SexId = SexIds.Persons,
                 AgeId = AgeIds.From16To64
             };
-            IList<CoreDataSet> data = reader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
+            IList<CoreDataSet> data = _groupDataReader.GetCoreData(grouping, TimePeriod.GetDataPoint(grouping),
                 AreaCodes.CountyUa_CentralBedfordshire);
             Assert.AreEqual(1, data.Count);
 
@@ -480,31 +483,16 @@ namespace PholioVisualisation.DataAccessTest
             Assert.AreEqual(grouping.SexId, data.SexId);
         }
 
-        private static Grouping GetTestGrouping()
-        {
-            return new Grouping
-            {
-                IndicatorId = IndicatorIds.YoungPeopleInTreatmentNotRetainedForMoreThan12Weeks,
-                DataPointYear = 2008,
-                DataPointQuarter = -1,
-                YearRange = 1,
-                DataPointMonth = -1,
-                SexId = SexIds.Persons,
-                AgeId = 180
-            };
-        }
-
         [TestMethod]
         public void TestGetGroupDataByGroupIdAndAreaTypeId()
         {
-            IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
             IList<Grouping> groupings102 =
-                groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
+                _groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
                 GroupIds.Phof_HealthProtection,
                 AreaTypeIds.CountyAndUnitaryAuthority);
 
             IList<Grouping> groupings101 =
-                groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
+                _groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
                 GroupIds.Phof_HealthProtection,
                 AreaTypeIds.DistrictAndUnitaryAuthority);
 
@@ -519,8 +507,7 @@ namespace PholioVisualisation.DataAccessTest
             var ageId = AgeIds.Under16;
             var indicatorId = IndicatorIds.ChildrenInLowIncomeFamilies;
 
-            IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-            IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIdIndicatorIdAgeId(
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupIdIndicatorIdAgeId(
                 GroupIds.Phof_WiderDeterminantsOfHealth,
                 AreaTypeIds.CountyAndUnitaryAuthority,
                 indicatorId, ageId
@@ -541,8 +528,7 @@ namespace PholioVisualisation.DataAccessTest
             var indicatorId = IndicatorIds.ChildrenInLowIncomeFamilies;
             var sexId = SexIds.Persons;
 
-            IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-            IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIdIndicatorIdSexId(
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupIdIndicatorIdSexId(
                 GroupIds.Phof_WiderDeterminantsOfHealth,
                 AreaTypeIds.CountyAndUnitaryAuthority,
                 indicatorId, sexId);
@@ -567,25 +553,25 @@ namespace PholioVisualisation.DataAccessTest
                 IndicatorIds.AdultPhysicalActivity,
                 IndicatorIds.DeprivationScoreIMD2010
             };
-            IList<Grouping> groupingsFiltered = GroupDataReader().GetGroupingsByIndicatorIds(indicatorIds, groupIds);
+            IList<Grouping> groupingsFiltered = _groupDataReader.GetGroupingsByIndicatorIds(indicatorIds, groupIds);
             Assert.IsTrue(groupingsFiltered.Count() >= 3);
         }
 
         [TestMethod]
-        public void TestGetGroupDataByIndicatorsFindsMostRecentYear()
+        public void TestGetGroupDataByIndicators_Most_Recent_First()
         {
             IProfileReader reader = ReaderFactory.GetProfileReader();
             IList<int> groupIds = reader.GetGroupIdsFromAllProfiles();
 
-            var indicatorIds = new List<int> { IndicatorIds.AdultDrugMisuse };
-            IList<Grouping> groupings = GroupDataReader().GetGroupingsByIndicatorIds(indicatorIds, groupIds);
-            Assert.AreEqual(2011, groupings[0].DataPointYear);
+            var indicatorIds = new List<int> { IndicatorIds.AdultUnder75MortalityRateCancer };
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByIndicatorIds(indicatorIds, groupIds);
+            Assert.IsTrue(groupings.First().DataPointYear > groupings.Last().DataPointYear);
         }
 
         [TestMethod]
         public void TestGetIndicatorIdsByGroup()
         {
-            IList<int> indicatorIds = GroupDataReader().GetIndicatorIdsByGroupIdAndAreaTypeId(
+            IList<int> indicatorIds = _groupDataReader.GetIndicatorIdsByGroupIdAndAreaTypeId(
                 GroupIds.Phof_HealthProtection,
                 AreaTypeIds.CountyAndUnitaryAuthority);
             Assert.IsTrue(indicatorIds.Count > 20 && indicatorIds.Count < 30,
@@ -596,14 +582,12 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorIdsByGroupOrderedBySequence()
         {
-            IGroupDataReader groupDataReader = GroupDataReader();
-
-            IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
+            IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupIdAndAreaTypeId(
                 GroupIds.HealthProfiles_OurCommunities, AreaTypeIds.CountyAndUnitaryAuthority);
 
             IList<int> sequencedIds = (from g in groupings orderby g.Sequence select g.IndicatorId).Distinct().ToList();
 
-            IList<int> indicatorIds = groupDataReader.GetIndicatorIdsByGroupIdAndAreaTypeId(
+            IList<int> indicatorIds = _groupDataReader.GetIndicatorIdsByGroupIdAndAreaTypeId(
                 GroupIds.HealthProfiles_OurCommunities, AreaTypeIds.CountyAndUnitaryAuthority);
 
             for (int i = 0; i < indicatorIds.Count - 1; i++)
@@ -615,7 +599,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataForAllAges()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataForAllAges(
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataForAllAges(
                 IndicatorIds.QuinaryPopulations,
                 new TimePeriod { Year = 2014, YearRange = 1 },
                 AreaCodes.Gp_Burnham,
@@ -627,7 +611,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataForAllSexes()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataForAllSexes(
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataForAllSexes(
                 IndicatorIds.LifeExpectancyAtBirth,
                 new TimePeriod { Year = 2010, YearRange = 3 },
                 AreaCodes.England,
@@ -639,7 +623,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetGroupDataByIndicatorId()
         {
-            Grouping grouping = GroupDataReader().GetGroupingsByGroupIdAndIndicatorId(
+            Grouping grouping = _groupDataReader.GetGroupingsByGroupIdAndIndicatorId(
                 GroupIds.Phof_HealthProtection,
                 IndicatorIds.TreatmentCompletionForTB);
             Assert.AreEqual(IndicatorIds.TreatmentCompletionForTB, grouping.IndicatorId);
@@ -653,7 +637,7 @@ namespace PholioVisualisation.DataAccessTest
             int sexId = SexIds.Persons;
             int ageId = AgeIds.Over60;
 
-            Grouping grouping = GroupDataReader().GetGroupings(groupId, IndicatorIds.IDAOPI2, areaTypeId,
+            Grouping grouping = _groupDataReader.GetGroupings(groupId, IndicatorIds.IDAOPI2, areaTypeId,
                 sexId, ageId).FirstOrDefault();
 
             Assert.AreEqual(IndicatorIds.IDAOPI2, grouping.IndicatorId);
@@ -670,7 +654,7 @@ namespace PholioVisualisation.DataAccessTest
             int sexId = SexIds.Persons;
             int ageId = AgeIds.Over60;
 
-            Grouping grouping = GroupDataReader().GetGroupings(groupId, IndicatorIds.IDAOPI2,
+            Grouping grouping = _groupDataReader.GetGroupings(groupId, IndicatorIds.IDAOPI2,
                 sexId, ageId).FirstOrDefault();
 
             Assert.AreEqual(IndicatorIds.IDAOPI2, grouping.IndicatorId);
@@ -687,7 +671,7 @@ namespace PholioVisualisation.DataAccessTest
             int sexId = SexIds.Persons;
 
             Grouping grouping =
-                GroupDataReader().GetGroupingsWithoutAgeId(groupId, IndicatorIds.IDAOPI2, areaTypeId, sexId).FirstOrDefault();
+                _groupDataReader.GetGroupingsWithoutAgeId(groupId, IndicatorIds.IDAOPI2, areaTypeId, sexId).FirstOrDefault();
 
             Assert.AreEqual(IndicatorIds.IDAOPI2, grouping.IndicatorId);
             Assert.AreEqual(sexId, grouping.SexId);
@@ -695,16 +679,10 @@ namespace PholioVisualisation.DataAccessTest
             Assert.AreEqual(areaTypeId, grouping.AreaTypeId);
         }
 
-        private static IGroupDataReader GroupDataReader()
-        {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            return reader;
-        }
-
         [TestMethod]
         public void TestGetGroupMetadata()
         {
-            IList<GroupingMetadata> list = GroupDataReader().GetGroupingMetadataList(
+            IList<GroupingMetadata> list = _groupDataReader.GetGroupingMetadataList(
                 new List<int>
                 {
                     GroupIds.Phof_HealthProtection,
@@ -716,7 +694,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetGroupMetadataOrderedBySequence()
         {
-            IList<GroupingMetadata> list = GroupDataReader().GetGroupingMetadataList(new List<int>
+            IList<GroupingMetadata> list = _groupDataReader.GetGroupingMetadataList(new List<int>
             {
                 2000001,
                 2000002,
@@ -738,7 +716,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetDistinctGroupingAreaTypeIds()
         {
-            IList<int> areaTypeIds = GroupDataReader().GetDistinctGroupingAreaTypeIds(
+            IList<int> areaTypeIds = _groupDataReader.GetDistinctGroupingAreaTypeIds(
                 new List<int> {
                     GroupIds.Phof_HealthProtection,
                     GroupIds.Phof_WiderDeterminantsOfHealth
@@ -750,26 +728,46 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetDistinctGroupingAreaTypeIds_WhereNoGroupIds()
         {
-            IList<int> areaTypeIds = GroupDataReader().GetDistinctGroupingAreaTypeIds(new List<int>());
+            IList<int> areaTypeIds = _groupDataReader.GetDistinctGroupingAreaTypeIds(new List<int>());
 
             Assert.IsFalse(areaTypeIds.Any());
         }
 
         [TestMethod]
-        public void TestGetCoreDataListForChildrenOfArea()
+        public void TestGetCoreDataListForChildrenOfArea_For_CCG()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataListForChildrenOfArea(
-                new Grouping
-                {
-                    AgeId = AgeIds.From45To49,
-                    SexId = SexIds.Male,
-                    IndicatorId = IndicatorIds.QuinaryPopulations,
-                    AreaTypeId = AreaTypeIds.GpPractice
-                },
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForChildrenOfArea(
+                 PracticeGrouping(),
                 new TimePeriod { Year = 2010, YearRange = 1 },
                 AreaCodes.Ccg_Chiltern);
 
             Assert.IsTrue(data.Count > 20 && data.Count < 50);
+        }
+
+        [TestMethod]
+        public void TestGetCoreDataListForChildrenOfArea_For_CountyUA_In_England()
+        {
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForChildrenOfArea(
+                CountyUaGrouping(),
+                new TimePeriod { Year = 2010, YearRange = 3 },
+                AreaCodes.England);
+
+            Assert.IsTrue(data.Count > 150 && data.Count < 155);
+        }
+
+        [TestMethod]
+        public void TestGetCoreDataListForChildrenOfArea_For_DistrictUA_In_England()
+        {
+            var grouping = CountyUaGrouping();
+            grouping.AreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority;
+
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForChildrenOfArea(
+                grouping,
+                new TimePeriod { Year = 2010, YearRange = 3 },
+                AreaCodes.England);
+
+            Assert.IsTrue(data.Count > 320 && data.Count < 340,
+                "Only " + data.Count + " were found");
         }
 
         [TestMethod]
@@ -778,34 +776,37 @@ namespace PholioVisualisation.DataAccessTest
             CategoryArea categoryArea = CategoryArea.New(
                 CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1);
 
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataListForChildrenOfCategoryArea(
-                new Grouping
-                {
-                    AgeId = AgeIds.Under75,
-                    SexId = SexIds.Persons,
-                    IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                    AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
-                },
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForChildrenOfCategoryArea(
+                CountyUaGrouping(),
                 new TimePeriod { Year = 2010, YearRange = 3 },
                 categoryArea);
 
             // Decile contains 152/10 areas
-            Assert.IsTrue(data.Count > 10 && data.Count < 20);
+            Assert.IsTrue(data.Count > 10 && data.Count < 20, "Unexpected number of data: " + data.Count);
+        }
+
+        [TestMethod]
+        public void TestGetCoreDataListForChildrenOfNearestNeighbourArea()
+        {
+            NearestNeighbourArea neighbourArea = NearestNeighbourArea.New(NearestNeighbourTypeIds.Cipfa,
+                AreaCodes.CountyUa_Cumbria);
+
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForChildrenOfNearestNeighbourArea(
+                CountyUaGrouping(),
+                new TimePeriod { Year = 2010, YearRange = 3 },
+                neighbourArea);
+
+            // Assert: 15 neighbours
+            Assert.AreEqual(15, data.Count);
         }
 
         [TestMethod]
         public void TestGetCoreDataListForAllCategoryAreasOfCategoryAreaType()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                new Grouping
-                {
-                    AgeId = AgeIds.Under75,
-                    SexId = SexIds.Persons,
-                    IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                    AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
-                },
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
+                CountyUaGrouping(),
                 new TimePeriod { Year = 2010, YearRange = 3 },
-                CategoryTypeIds.DeprivationDecileCountyAndUA2010,
+                CategoryTypeIds.DeprivationDecileCountyAndUA2015,
                 AreaCodes.England);
 
             Assert.AreEqual(10, data.Count, "Expected 10 areas in decile");
@@ -814,8 +815,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void GetCoreDataForAllAreasOfType()
         {
-            IList<CoreDataSet> data = GroupDataReader().GetCoreDataForAllAreasOfType(
-                new Grouping { AgeId = 12, SexId = SexIds.Male, IndicatorId = 337, AreaTypeId = 7 },
+            IList<CoreDataSet> data = _groupDataReader.GetCoreDataForAllAreasOfType(PracticeGrouping(),
                 new TimePeriod { Year = 2010, YearRange = 1 });
 
             Assert.IsTrue(data.Count > 7000 && data.Count < 9000);
@@ -824,13 +824,10 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void GetCoreDataValuesForAllAreasOfType()
         {
-            var reader = Reader();
-
             // Test with and without ignored area codes
             foreach (var ignoredAreaCodes in new[] { new List<string>(), new List<string> { "F82025" } })
             {
-                IList<double> data = reader.GetOrderedCoreDataValidValuesForAllAreasOfType(
-                    new Grouping { AgeId = 12, SexId = SexIds.Male, IndicatorId = 337, AreaTypeId = 7 },
+                IList<double> data = _groupDataReader.GetOrderedCoreDataValidValuesForAllAreasOfType(PracticeGrouping(),
                     new TimePeriod { Year = 2010, YearRange = 1 }, ignoredAreaCodes);
 
                 Assert.IsTrue(data.Count > 7000 && data.Count < 9000);
@@ -838,26 +835,35 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
+        public void GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId()
+        {
+            var groupings = _groupDataReader.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(
+                AreaTypeIds.CountyAndUnitaryAuthority, IndicatorIds.LifeExpectancyAtBirth,
+                SexIds.Male, AgeIds.AllAges);
+            Assert.IsTrue(groupings.Any());
+        }
+
+        [TestMethod]
         public void GetAllAgeIdsForIndicatorTest()
         {
-            var ageIds = Reader().GetAllAgeIdsForIndicator(IndicatorIds.AdultPhysicalActivity);
+            var ageIds = _groupDataReader.GetAllAgeIdsForIndicator(IndicatorIds.AdultPhysicalActivity);
             Assert.IsTrue(ageIds.Count > 1);
-            Assert.IsTrue(ageIds.Contains(AgeIds.Over65));
+            Assert.IsTrue(ageIds.Contains(AgeIds.Over85));
         }
 
         [TestMethod]
         public void GetGroupingsByGroupIdAndIndicatorIdTest()
         {
-            var groupings = Reader()
-                .GetGroupingsByIndicatorId(IndicatorIds.MortalityRateFromCausesConsideredPreventable);
+            var groupings = _groupDataReader
+                .GetGroupingsByIndicatorId(IndicatorIds.Aged0To4Years);
             Assert.IsTrue(groupings.Count > 0);
         }
 
         [TestMethod]
         public void When_Grouping_Read_Then_Age_And_Sex_Populated()
         {
-            var groupings = Reader()
-                .GetGroupingsByIndicatorId(IndicatorIds.MortalityRateFromCausesConsideredPreventable);
+            var groupings = _groupDataReader
+                .GetGroupingsByIndicatorId(IndicatorIds.GcseAchievement);
 
             // Assert
             var grouping = groupings.First();
@@ -868,14 +874,128 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void GetAllIndicators()
         {
-            var indicators = GroupDataReader().GetAllIndicators();
+            var indicators = _groupDataReader.GetAllIndicatorIds();
             Assert.IsTrue(indicators.Count > 1);
         }
 
-        private static IGroupDataReader Reader()
+        [TestMethod]
+        public void TestGetCoreDataForIndicatorId()
         {
-            IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
-            return reader;
+            var coreDataSets = _groupDataReader.GetCoreDataForIndicatorId(IndicatorIds.Population);
+            Assert.IsTrue(coreDataSets.Count > 1);
+
+            var coreDataSet = coreDataSets.First();
+            Assert.IsNotNull(coreDataSet.AgeId);
+            Assert.IsNotNull(coreDataSet.SexId);
+        }
+
+        [TestMethod]
+        public void TestGetIndicatorMetadataTextValues()
+        {
+            var indicatorMetadataTextValues = _groupDataReader.GetIndicatorMetadataTextValues(IndicatorIds.Population);
+            Assert.IsTrue(indicatorMetadataTextValues.Count > 0);
+        }
+
+        [TestMethod]
+        public void TestGetGroupingsByGroupIdsAndIndicatorId()
+        {
+            IList<int> groupIds = new List<int>();
+            groupIds.Add(GroupIds.CommonMentalHealthDisorders_Prevalence);
+            groupIds.Add(GroupIds.CommonMentalHealthDisorders_RiskAndRelatedFactors);
+            groupIds.Add(GroupIds.CommonMentalHealthDisorders_Services);
+            groupIds.Add(GroupIds.CommonMentalHealthDisorders_QualityAndOutcomes);
+            groupIds.Add(GroupIds.CommonMentalHealthDisorders_Finance);
+
+            var groupings = _groupDataReader.GetGroupingsByGroupIdsAndIndicatorId(groupIds.ToList(), IndicatorIds.IDAOPI2);
+            Assert.IsTrue(groupings.Count > 0);
+
+            var grouping = groupings.First();
+            Assert.IsNotNull(grouping.Age);
+            Assert.IsNotNull(grouping.Sex);
+        }
+
+        [TestMethod]
+        public void GetIndicatorMetadataTextValues()
+        {
+            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
+            var indicatorMetadataTextValues = _groupDataReader.GetIndicatorMetadataTextValues(indicatorId);
+
+            Assert.IsTrue(indicatorMetadataTextValues.Count > 0);
+        }
+
+        [TestMethod]
+        public void TestGetGroupings()
+        {
+            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
+            var groupIds = new List<int> { GroupIds.Phof_SupportingInformation };
+            var groupings = _groupDataReader.GetGroupingsByGroupIdsAndIndicatorId(groupIds, indicatorId);
+
+            Assert.IsTrue(groupings.Count > 0);
+        }
+
+        [TestMethod]
+        public void TestGetCoreDataSets()
+        {
+            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
+            var coreDataSets = _groupDataReader.GetCoreDataForIndicatorId(indicatorId);
+
+            Assert.IsTrue(coreDataSets.Count > 0);
+        }
+
+        private Grouping CountyUaGrouping()
+        {
+            return new Grouping
+            {
+                AgeId = AgeIds.Under75,
+                SexId = SexIds.Persons,
+                IndicatorId = IndicatorIds.OverallPrematureDeaths,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+            };
+        }
+
+        private Grouping PracticeGrouping()
+        {
+            return new Grouping
+            {
+                AgeId = AgeIds.From45To49,
+                SexId = SexIds.Male,
+                IndicatorId = IndicatorIds.QuinaryPopulations,
+                AreaTypeId = AreaTypeIds.GpPractice
+            };
+        }
+
+        private static Grouping SmokingPrevalenceGrouping()
+        {
+            var grouping = new Grouping
+            {
+                IndicatorId = IndicatorIds.AdultSmokingPrevalence,
+                SexId = SexIds.Persons,
+                AgeId = AgeIds.Over18
+            };
+            return grouping;
+        }
+
+        private static void AssertIndicatorMetadataIsOk(IndicatorMetadata metadata)
+        {
+            Assert.IsNotNull(metadata.ValueType);
+            Assert.IsNotNull(metadata.Unit);
+
+            Assert.IsNotNull(metadata.Descriptive);
+            Assert.IsTrue(metadata.Descriptive.Count > 0);
+        }
+
+        private static Grouping GetTestGrouping()
+        {
+            return new Grouping
+            {
+                IndicatorId = IndicatorIds.AdultSmokingPrevalence2,
+                DataPointYear = 2016,
+                DataPointQuarter = -1,
+                YearRange = 1,
+                DataPointMonth = -1,
+                SexId = SexIds.Persons,
+                AgeId = AgeIds.Over18
+            };
         }
     }
 }

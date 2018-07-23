@@ -7,20 +7,24 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.KeyMessages
 {
-    public class SignificanceCounter
+
+    public interface ISignificanceCounter
     {
-        public int Red { get; private set; }
-        public int Amber { get; private set; }
-        public int Green { get; private set; }
+        int Red { get; set; }
+        int Amber { get; set; }
+        int Green { get; set; }
+        double GetProportionGreen();
+        double GetProportionAmber();
+        double GetProportionRed();
+    }
 
-        private double totalRedAmberGreen;
+    public class SignificanceCounter : ISignificanceCounter
+    {
+        public int Red { get; set; }
+        public int Amber { get; set; }
+        public int Green { get; set; }
 
-        /// <summary>
-        /// For Mock object creation
-        /// </summary>
-        public SignificanceCounter()
-        {                
-        }
+        private readonly double _totalRedAmberGreen;
 
         public SignificanceCounter(IEnumerable<Significance> significances)
         {
@@ -43,26 +47,22 @@ namespace PholioVisualisation.KeyMessages
                 }
             }
 
-            totalRedAmberGreen = (double) (Red + Amber + Green);
+            _totalRedAmberGreen = Red + Amber + Green;
         }
 
-        
-        public virtual double ProportionGreen
+        public double GetProportionGreen()
         {
-            get { return Green / totalRedAmberGreen; }
-            internal set { } // internal for testing
+            return Green / _totalRedAmberGreen;
         }
 
-        public virtual double ProportionRed
+        public double GetProportionRed()
         {
-            get { return Red / totalRedAmberGreen; }
-            internal set { } // internal for testing
+            return Red / _totalRedAmberGreen;
         }
 
-        public virtual double ProportionAmber
+        public double GetProportionAmber()
         {
-            get { return Amber / totalRedAmberGreen; }
-            internal set { } // internal for testing
+            return Amber / _totalRedAmberGreen;
         }
     }
 }

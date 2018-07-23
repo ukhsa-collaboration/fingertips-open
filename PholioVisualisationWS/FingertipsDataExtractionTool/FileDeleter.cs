@@ -26,7 +26,7 @@ namespace FingertipsDataExtractionTool
         {
             _logger.Info("Deleting existing files");
 
-            var exportDirectoryInfo = new DirectoryInfo(ApplicationConfiguration.ExportFileDirectory);
+            var exportDirectoryInfo = new DirectoryInfo(ApplicationConfiguration.Instance.ExportFileDirectory);
             foreach (var file in exportDirectoryInfo.GetFiles())
             {
                 file.Delete();

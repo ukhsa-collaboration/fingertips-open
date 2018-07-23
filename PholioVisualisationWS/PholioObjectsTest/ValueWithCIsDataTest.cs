@@ -13,8 +13,8 @@ namespace PholioVisualisation.PholioObjectsTest
             var data = ValueWithCIsData.Parse("1,2,3");
 
             Assert.AreEqual(1, data.Value);
-            Assert.AreEqual(2, data.LowerCI);
-            Assert.AreEqual(3, data.UpperCI);
+            Assert.AreEqual(2, data.LowerCI95);
+            Assert.AreEqual(3, data.UpperCI95);
         }
 
         [TestMethod]
@@ -23,8 +23,8 @@ namespace PholioVisualisation.PholioObjectsTest
             var data = ValueWithCIsData.Parse("-,-,-");
 
             Assert.AreEqual(ValueData.NullValue, data.Value);
-            Assert.AreEqual(ValueData.NullValue, data.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, data.UpperCI);
+            Assert.IsNull(data.LowerCI95);
+            Assert.IsNull(data.UpperCI95);
         }
 
         [TestMethod]
@@ -33,8 +33,8 @@ namespace PholioVisualisation.PholioObjectsTest
             var data = ValueWithCIsData.Parse(",,");
 
             Assert.AreEqual(ValueData.NullValue, data.Value);
-            Assert.AreEqual(ValueData.NullValue, data.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, data.UpperCI);
+            Assert.IsNull(data.LowerCI95);
+            Assert.IsNull(data.UpperCI95);
         }
 
         [TestMethod]
@@ -43,18 +43,18 @@ namespace PholioVisualisation.PholioObjectsTest
             var data = ValueWithCIsData.Parse("1,-,-");
 
             Assert.AreEqual(1, data.Value);
-            Assert.AreEqual(ValueData.NullValue, data.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, data.UpperCI);
+            Assert.IsNull(data.LowerCI95);
+            Assert.IsNull(data.UpperCI95);
         }
 
         [TestMethod]
-        public void TestParse_NoCIsRepresentedAsEmptyString()
+        public void TestParse_NoCIsRepresentedAsNull()
         {
             var data = ValueWithCIsData.Parse("1,,");
 
             Assert.AreEqual(1, data.Value);
-            Assert.AreEqual(ValueData.NullValue, data.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, data.UpperCI);
+            Assert.IsNull(data.LowerCI95);
+            Assert.IsNull(data.UpperCI95);
         }
 
         [TestMethod]
@@ -62,10 +62,10 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = 1
+                LowerCI95 = 1
             };
 
-            Assert.IsFalse(data.ShouldSerializeLowerCIF());
+            Assert.IsFalse(data.ShouldSerializeLowerCI95F());
         }
 
 
@@ -74,20 +74,21 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = 1,
-                LowerCIF = "1"
+                LowerCI95 = 1,
+                LowerCI95F = "1",
+                UpperCI95 = 1,
+                UpperCI95F = "1"
             };
 
-            Assert.IsTrue(data.ShouldSerializeLowerCIF());
+            Assert.IsTrue(data.ShouldSerializeLowerCI95F());
         }
-
 
         [TestMethod]
         public void TestShouldLowerCISerialiseTrue()
         {
-            var data = new CoreDataSet { LowerCI = 1 };
+            var data = new CoreDataSet { LowerCI95 = 1, UpperCI95 = 2};
 
-            Assert.IsTrue(data.ShouldSerializeLowerCI());
+            Assert.IsTrue(data.ShouldSerializeLowerCI95());
         }
 
         [TestMethod]
@@ -95,10 +96,10 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                UpperCI = 1
+                UpperCI95 = 1
             };
 
-            Assert.IsFalse(data.ShouldSerializeUpperCIF());
+            Assert.IsFalse(data.ShouldSerializeUpperCI95F());
         }
 
         [TestMethod]
@@ -106,12 +107,12 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = ValueData.NullValue,
-                UpperCI = ValueData.NullValue,
-                UpperCIF = "1"
+                LowerCI95 = 1,
+                UpperCI95 = null,
+                UpperCI95F = "1"
             };
 
-            Assert.IsFalse(data.ShouldSerializeUpperCIF());
+            Assert.IsFalse(data.ShouldSerializeUpperCI95F());
         }
 
         [TestMethod]
@@ -119,31 +120,20 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                UpperCI = 1,
-                UpperCIF = "1"
+                LowerCI95 = 1,
+                UpperCI95 = 1,
+                UpperCI95F = "1"
             };
 
-            Assert.IsTrue(data.ShouldSerializeUpperCIF());
-        }
-
-        [TestMethod]
-        public void TestShouldUpperCISerialiseFalse_IfBothCIsMinusOne()
-        {
-            var data = new CoreDataSet
-            {
-                LowerCI = -1,
-                UpperCI = -1
-            };
-
-            Assert.IsFalse(data.ShouldSerializeUpperCI());
+            Assert.IsTrue(data.ShouldSerializeUpperCI95F());
         }
 
         [TestMethod]
         public void TestShouldUpperCISerialiseTrue()
         {
-            var data = new CoreDataSet { UpperCI = 1 };
+            var data = new CoreDataSet { UpperCI95 = 1, LowerCI95 = 2};
 
-            Assert.IsTrue(data.ShouldSerializeUpperCI());
+            Assert.IsTrue(data.ShouldSerializeUpperCI95());
         }
 
         [TestMethod]
@@ -151,11 +141,11 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = -1,
-                UpperCI = 1
+                LowerCI95 = -1,
+                UpperCI95 = 1
             };
 
-            Assert.IsTrue(data.AreCIsValid);
+            Assert.IsTrue(data.Are95CIsValid);
         }
 
         [TestMethod]
@@ -163,11 +153,11 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = 1,
-                UpperCI = 1
+                LowerCI95 = 1,
+                UpperCI95 = 1
             };
 
-            Assert.IsTrue(data.AreCIsValid);
+            Assert.IsTrue(data.Are95CIsValid);
         }
 
         [TestMethod]
@@ -175,11 +165,11 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = -1,
-                UpperCI = 1
+                LowerCI95 = -1,
+                UpperCI95 = 1
             };
 
-            Assert.IsTrue(data.AreCIsValid);
+            Assert.IsTrue(data.Are95CIsValid);
         }
 
         [TestMethod]
@@ -187,11 +177,11 @@ namespace PholioVisualisation.PholioObjectsTest
         {
             var data = new CoreDataSet
             {
-                LowerCI = 1,
-                UpperCI = -1
+                LowerCI95 = 1,
+                UpperCI95 = -1
             };
 
-            Assert.IsTrue(data.AreCIsValid);
+            Assert.IsTrue(data.Are95CIsValid);
         }
     }
 }

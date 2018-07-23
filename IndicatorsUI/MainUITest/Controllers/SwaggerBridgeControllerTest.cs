@@ -4,9 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace IndicatorsUI.MainUITest
+namespace IndicatorsUI.MainUITest.Controllers
 {
     [TestClass]
     public class SwaggerBridgeControllerTest

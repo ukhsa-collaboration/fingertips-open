@@ -1,0 +1,39 @@
+﻿@using IndicatorsUI.MainUI.Models
+<div class="key-container" id="keyInequality" style="display: none; text-align: center;">
+    <div class="fl" style="width:200px;">&nbsp;
+    </div>
+    <div class="fl">
+        <table class="key-table" cellspacing="0">
+            <tr>
+                <td class='keySparkWide'>
+                    <div class="sparkKeyLine fl" style="background: red;">
+                        &nbsp;</div>
+                    <div class="key-spine-text">
+                        Most Deprived 20%</div>
+                </td>
+                <td class='keySpark'>
+                    <div class="sparkKeyLine fl" style="background: #5555E6;">
+                        &nbsp;</div>
+                    <div class="key-spine-text">
+                       Other 80%</div>
+                </td>
+                <td class='keySpark' style="width:140px;">
+                    <div class="sparkKeyLine fl" style="background:url(@(ViewBag.ImagesUrl)average_blue_line.gif);">
+                        &nbsp;
+                    </div>
+                    <div class="key-spine-text">
+                        Area Average
+                    </div>
+                </td>
+                <td class='keySparkWide'>
+                    <div class="fl sparkKeyRange">
+                        &nbsp;</div>
+                    <div class="key-spine-text">
+                        Inequality Gap
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+

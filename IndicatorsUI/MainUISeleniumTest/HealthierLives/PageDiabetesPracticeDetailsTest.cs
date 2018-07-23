@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
@@ -51,8 +51,8 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             var parameters = new HashParameters();
             parameters.AddAreaCode(AreaCodes.GpPracticeThatchedHouseMedicalCentre);
             parameters.AddParentAreaCode(AreaCodes.CcgWalthamForest);
-            parameters.AddParentAreaTypeId(AreaTypeIds.CCG);
-            parameters.AddAreaTypeId(AreaTypeIds.CCG);
+            parameters.AddParentAreaTypeId(AreaTypeIds.CcgPreApr2017);
+            parameters.AddAreaTypeId(AreaTypeIds.CcgPreApr2017);
             return parameters.HashParameterString;
         }
     }

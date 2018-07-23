@@ -22,7 +22,7 @@ namespace PholioVisualisation.PdfData
         {
             benchmarkDataProvider = new BenchmarkDataProvider(groupDataReader);
             Grouping grouping = groupRoot.FirstGrouping;
-            formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+            formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
             timePeriod = TimePeriod.GetDataPoint(grouping);
 
             SetMetadata(metadata, groupRoot);

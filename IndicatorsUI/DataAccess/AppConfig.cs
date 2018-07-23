@@ -1,26 +1,72 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.Globalization;
-using Profiles.DomainObjects;
+using System.Linq;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
-    public class AppConfig
+    public interface IAppConfig
+    {
+        string BridgeCacheConnectionString { get; }
+        string WebProxy { get; }
+        bool IsContentCachedInMemory { get; }
+        bool IsAccessControlToProfiles { get; }
+        bool IsIndicatorSearchAvailable { get; }
+        bool IsEnvironmentLive { get; }
+        bool IsEnvironmentTest { get; }
+        string Environment { get; }
+        bool UseMinifiedJavaScript { get; }
+        bool UseGoogleAnalytics { get; }
+        bool UseDatabaseCaching { get; }
+        bool UseInMemoryCaching { get; }
+        string LongerLivesFrontPageProfileKey { get; }
+        string ExceptionLogFilePath { get; }
+        string SkinOverride { get; }
+        string ApplicationName { get; }
+        bool IsSkinOverride { get; }
+        string BridgeWsUrl { get; }
+        string DomainUrl { get; }
+        string NotifyApikey { get; }
+        string StaticContentUrl { get; }
+        string JavaScriptVersionFolder { get; }
+        string CoreWsUrlForAjaxBridge { get; }
+        string CoreWsUrlForLogging { get; }
+        string CoreWsUrl { get; }
+        string PdfUrl { get; }
+        IList<string> ActiveFeatures { get; }
+        bool ShowUpdateDelayedMessage { get; }
+
+        /// <summary>
+        /// Check whether a particular feature is active.
+        /// </summary>
+        bool IsFeatureActive(string featureSwitch);
+
+        string EnsureUrlEndsWithForwardSlash(string url);
+    }
+
+    public class AppConfig : IAppConfig
     {
         public static NameValueCollection AppSettings
         {
             get { return ConfigurationManager.AppSettings; }
         }
 
-        private NameValueCollection appSettings;
+        private NameValueCollection _appSettings;
 
         public static AppConfig Instance = new AppConfig(AppSettings);
 
+        /// <summary>
+        /// List of active features that can be switched on and off
+        /// </summary>
+        private IList<string> _featureFlags;
+
         public AppConfig(NameValueCollection appSettings)
         {
-            this.appSettings = appSettings;
+            _appSettings = appSettings;
         }
 
         public string BridgeCacheConnectionString
@@ -58,7 +104,7 @@ namespace Profiles.DataAccess
                 return ParseBool("IsIndicatorSearchAvailable", true);
             }
         }
-        
+
         public bool IsEnvironmentLive
         {
             get
@@ -95,11 +141,6 @@ namespace Profiles.DataAccess
             get { return ParseBool("UseGoogleAnalytics"); }
         }
 
-        public bool ShowCancer
-        {
-            get { return ParseBool("ShowCancer"); }
-        }
-
         public bool UseDatabaseCaching
         {
             get { return ParseBool("UseDatabaseCaching"); }
@@ -108,6 +149,11 @@ namespace Profiles.DataAccess
         public bool UseInMemoryCaching
         {
             get { return ParseBool("UseInMemoryCaching"); }
+        }
+
+        public string LongerLivesFrontPageProfileKey
+        {
+            get { return GetAppSetting("LongerLivesFrontPageProfileKey"); }
         }
 
         public string ExceptionLogFilePath
@@ -138,6 +184,22 @@ namespace Profiles.DataAccess
             get
             {
                 return GetAppSetting("BridgeWsUrl");
+            }
+        }
+
+        public string DomainUrl
+        {
+            get
+            {
+                return GetAppSetting("DomainUrl");
+            }
+        }
+
+        public string NotifyApikey
+        {
+            get
+            {
+                return GetAppSetting("NotifyApikey");
             }
         }
 
@@ -227,9 +289,24 @@ namespace Profiles.DataAccess
             }
         }
 
-        public string FeatureSwitch
+        /// <summary>
+        /// Check whether a particular feature is active.
+        /// </summary>
+        public bool IsFeatureActive(string featureSwitch)
         {
-            get { return GetAppSetting("FeatureSwitch"); }
+            return ActiveFeatures.Contains(featureSwitch);
+        }
+
+        public IList<string> ActiveFeatures
+        {
+            get
+            {
+                if (_featureFlags == null)
+                {
+                    _featureFlags = ParseCommaSeparatedStringArray("ActiveFeatures");
+                }
+                return _featureFlags;
+            }
         }
 
         public bool ShowUpdateDelayedMessage
@@ -239,10 +316,10 @@ namespace Profiles.DataAccess
 
         public string EnsureUrlEndsWithForwardSlash(string url)
         {
-             return url.TrimEnd('/') + "/";
+            return url.TrimEnd('/') + "/";
         }
 
-        
+
         /// <summary>
         /// Parses "true" or "false". If the setting is not defined then it will default to false.
         /// </summary>
@@ -258,9 +335,21 @@ namespace Profiles.DataAccess
             return bool.Parse(key);
         }
 
+        private IList<string> ParseCommaSeparatedStringArray(string key)
+        {
+            var configValue = GetAppSetting(key);
+
+            if (string.IsNullOrWhiteSpace(configValue))
+            {
+                return new List<string>();
+            }
+
+            return configValue.Split(',');
+        }
+
         private string GetAppSetting(string key)
         {
-            return appSettings[key];
+            return _appSettings[key];
         }
     }
 }

@@ -1,13 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
+using System;
+using System.Collections.Generic;
+using System.EnterpriseServices.Internal;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Web.Mvc;
+using System.Web.Routing;
+using Newtonsoft.Json;
 
 namespace Fpm.MainUI.Controllers
 {
@@ -28,15 +34,10 @@ namespace Fpm.MainUI.Controllers
                 PageSize = 100
             };
 
-            GetAllProfiles(model);
-
-            if (profileId != ProfileIds.Undefined)
-            {
-                model.ProfileId = profileId;
-                ViewBag.ProfileId = profileId;
-            }
-
-            GetContentItems(model);
+            model.ProfileList = ProfileMenuHelper.GetProfileListForCurrentUser();
+            model.ProfileId = profileId;
+            ViewBag.ProfileId = profileId;
+            model.ContentItems = _reader.GetProfileContentItems(profileId);
             return View(model);
         }
 
@@ -44,15 +45,15 @@ namespace Fpm.MainUI.Controllers
         public ActionResult EditContentItem(string contentId, int profileId)
         {
             var contentItem = _reader.GetContentItem(Convert.ToInt32(contentId));
-            contentItem.ProfileName = _reader.GetProfiles().FirstOrDefault(x => x.Id == profileId).Name;
             ViewBag.ProfileId = profileId;
+            ViewBag.ProfileName = _reader.GetProfileDetailsByProfileId(profileId).Name;
             return View("EditContentItem", contentItem);
         }
 
         [Route("create-content-item")]
         public ActionResult CreateContentItem(int selectedProfile)
         {
-            var content = new ContentItem ();
+            var content = new ContentItem();
             content.ProfileId = selectedProfile;
             ViewBag.ProfileId = selectedProfile;
             return View(content);
@@ -65,12 +66,20 @@ namespace Fpm.MainUI.Controllers
         {
             if (!TryUpdateModel(contentItem))
             {
-                ViewBag.updateError = "Update Failure";
+                ViewBag.UpdateError = "Update Failure";
+                return View("CreateContentItem", contentItem);
+            }
+
+            var keyExist = _reader.GetContentItem(contentItem.ContentKey, contentItem.ProfileId);
+            if (keyExist != null)
+            {
+                ViewBag.UpdateError = GetDuplicateContentKeyMessage(contentItem);
+                ViewBag.ProfileId = contentItem.ProfileId;
                 return View("CreateContentItem", contentItem);
             }
 
             var content = contentItem.IsPlainText ? formatPlainText(contentItem.Content) : contentItem.Content;
-            var newContentItem = _writer.NewContentItem(contentItem.ProfileId, 
+            var newContentItem = _writer.NewContentItem(contentItem.ProfileId,
                 contentItem.ContentKey, contentItem.Description, contentItem.IsPlainText, content);
             AuditContentChange(newContentItem, "CREATED");
 
@@ -98,11 +107,26 @@ namespace Fpm.MainUI.Controllers
                 newContentItem.Content = formatPlainText(contentItem.Content);
             }
 
+            var existingContent = _reader.GetContentItem(contentItem.ContentKey, contentItem.ProfileId);
+            if (existingContent != null && existingContent.Id != newContentItem.Id)
+            {
+                ViewBag.UpdateError = GetDuplicateContentKeyMessage(contentItem);
+                ViewBag.ProfileName = contentItem.ProfileId;
+                ViewBag.ProfileName = _reader.GetProfileDetailsByProfileId(contentItem.ProfileId).Name;
+
+                return View("EditContentItem", contentItem);
+            }
+
             _writer.UpdateContentItem(newContentItem);
 
             AuditContentChange(newContentItem, contentItem.Content);
 
             return RedirectToAction("ContentIndex", new { profileId = contentItem.ProfileId });
+        }
+
+        private static string GetDuplicateContentKeyMessage(ContentItem contentItem)
+        {
+            return string.Format("That content key '{0}' has already been used for this profile", contentItem.ContentKey);
         }
 
         [Route("delete-content-item")]
@@ -129,6 +153,53 @@ namespace Fpm.MainUI.Controllers
             });
         }
 
+        [HttpPost]
+        [Route("publish-content-item")]
+        public async Task<ActionResult> PublishContentItem(IList<int> contentIds)
+        {
+            // Read the live update key from the configuration
+            string liveUpdateKey = AppConfig.GetLiveUpdateKey();
+
+            // Read the api url from the configuration
+            string apiUrl = AppConfig.GetLiveSiteWsUrl();
+            apiUrl = apiUrl + "api/contents";
+
+            // Get the content item(s) to be published
+            IList<ContentItem> contentItems = _reader.GetContentItems(contentIds);
+
+            // Setup the http client object and post asynchronously to the web api method
+            // to publish the document on live server
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(apiUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Serialise and add the live update key and content item(s) to the multi part form data content
+                using (var formData = new MultipartFormDataContent())
+                {
+                    formData.Add(new StringContent(JsonConvert.SerializeObject(liveUpdateKey)), "LiveUpdateKey");
+
+                    formData.Add(new StringContent(JsonConvert.SerializeObject(contentItems)), "content-items");
+
+                    // Post asynchronously the request to the web api method
+                    HttpResponseMessage response = await client.PostAsync(apiUrl, formData);
+
+                    // If the publishing of the document succeeded then return a json result
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return new JsonResult
+                        {
+                            Data = "Success",
+                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                        };
+                    }
+                }
+            }
+
+            throw new FpmException("Publishing live failed for the content(s)");
+        }
+
         [Route("view-in-own-page")]
         public ActionResult ViewContentItemInOwnPage(int contentItemId)
         {
@@ -140,11 +211,6 @@ namespace Fpm.MainUI.Controllers
             }
 
             return View(contentItem);
-        }
-
-        private void GetContentItems(ContentGridModel profiles)
-        {
-            profiles.ContentItems = _reader.GetProfileContentItems(profiles.ProfileId);
         }
 
         private string formatPlainText(string content)
@@ -166,23 +232,6 @@ namespace Fpm.MainUI.Controllers
                 UserName = UserDetails.CurrentUser().Name,
                 Timestamp = DateTime.Now
             });
-        }
-
-        private void GetAllProfiles(ContentGridModel model)
-        {
-            var profiles = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
-            var allProfiles = profiles.Select(c => new SelectListItem
-            {
-                Text = c.Name.ToString(CultureInfo.InvariantCulture),
-                Value = c.Id.ToString(CultureInfo.InvariantCulture)
-            });
-
-            model.ProfileList = allProfiles;
-            var firstOrDefault = model.ProfileList.FirstOrDefault();
-            if (firstOrDefault != null)
-            {
-                model.ProfileId = Convert.ToInt32(firstOrDefault.Value);
-            }
         }
     }
 }

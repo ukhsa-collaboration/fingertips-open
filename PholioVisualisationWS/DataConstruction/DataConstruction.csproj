@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.DataConstruction</RootNamespace>
     <AssemblyName>PholioVisualisation.DataConstruction</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,24 +35,16 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,6 +59,7 @@
     <Compile Include="AreaFactory.cs" />
     <Compile Include="AreaTypeFactory.cs" />
     <Compile Include="AreaTypeListProvider.cs" />
+    <Compile Include="AuditProvider.cs" />
     <Compile Include="BenchmarkDataProvider.cs" />
     <Compile Include="CategoryAreaCoreDataSetProvider.cs" />
     <Compile Include="CategoryTypeIdsExcludedForExport.cs" />
@@ -75,7 +68,8 @@
     <Compile Include="ChildAreaListForCategoryAreaBuilder.cs" />
     <Compile Include="ChildAreasWithAddressesBuilder.cs" />
     <Compile Include="ContentProvider.cs" />
-    <Compile Include="DataConstructionDIRegistry.cs" />
+    <Compile Include="CoreDataSetValidator.cs" />
+    <Compile Include="DateChangeHelper.cs" />
     <Compile Include="FilterChildAreaListProvider.cs" />
     <Compile Include="FullAreaData.cs" />
     <Compile Include="GpDeprivationDecileCoreDataSetProvider.cs" />
@@ -84,17 +78,21 @@
     <Compile Include="AverageCalculatorFactory.cs" />
     <Compile Include="CountAverageCalculator.cs" />
     <Compile Include="GroupDataAtDataPointRepository.cs" />
+    <Compile Include="GroupDataBuilderByIndicatorList.cs" />
     <Compile Include="GroupingDifferentiator.cs" />
+    <Compile Include="GroupingValidator.cs" />
     <Compile Include="GroupRootComparisonManager.cs" />
     <Compile Include="GroupRootSummaryBuilder.cs" />
     <Compile Include="GroupingListProvider.cs" />
     <Compile Include="IndicatorComparisonHelper.cs" />
+    <Compile Include="IndicatorMetadataSpecialCase.cs" />
     <Compile Include="IndicatorStats.cs" />
     <Compile Include="IndicatorStatsBuilder.cs" />
     <Compile Include="IndicatorStatsProcessor.cs" />
     <Compile Include="LimitsProcessor.cs" />
     <Compile Include="LongerLivesAreaDetails.cs" />
     <Compile Include="LongerLivesAreaDetailsBuilder.cs" />
+    <Compile Include="MonthlyReleaseHelper.cs" />
     <Compile Include="NearbyAreasBuilder.cs" />
     <Compile Include="NearestNeighbourAreaListBuilder.cs" />
     <Compile Include="NullAverageCalculator.cs" />
@@ -102,11 +100,11 @@
     <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilder.cs" />
     <Compile Include="PostcodeProvider.cs" />
+    <Compile Include="ProfileIdListProvider.cs" />
     <Compile Include="ProfilePerIndicatorBuilder.cs" />
     <Compile Include="ProfileUrl.cs" />
     <Compile Include="RankDataList.cs" />
     <Compile Include="ShapeCoreDataSetProvider.cs" />
-    <Compile Include="AreaHelper.cs" />
     <Compile Include="AreaListProvider.cs" />
     <Compile Include="CoreDataSetProvider.cs" />
     <Compile Include="CcgCoreDataSetProvider.cs" />
@@ -173,7 +171,7 @@
     <Compile Include="ValueWithCIsDataProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+    <ProjectReference Include="..\DataSorting\DataSorting.csproj">
       <Project>{24500DF1-56B2-425C-BDE4-851561897EC2}</Project>
       <Name>DataSorting</Name>
     </ProjectReference>
@@ -193,6 +191,10 @@
       <Project>{EE646860-6872-48B7-B67F-B2D717953139}</Project>
       <Name>Formatting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Parsers\Parsers.csproj">
+      <Project>{B01455EA-2060-4176-99A2-C4EF7908193F}</Project>
+      <Name>Parsers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>
       <Name>PholioObjects</Name>
@@ -200,6 +202,10 @@
     <ProjectReference Include="..\RequestParameters\RequestParameters.csproj">
       <Project>{99D1ECEB-E3A8-40A2-83C5-7FF9304B472E}</Project>
       <Name>RequestParameters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserData\UserData.csproj">
+      <Project>{f8a2d703-7140-4ac7-80cd-2b81dec1770f}</Project>
+      <Name>UserData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

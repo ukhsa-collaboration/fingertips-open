@@ -1,0 +1,40 @@
+﻿@using IndicatorsUI.DataAccess
+@using IndicatorsUI.MainUI.Helpers
+@model IndicatorsUI.MainUI.Models.PageModel
+@{
+    var unit = "<span class='unit arial'>%</span>";
+    var labels = QuartilesLabelHelper.GetLabels();
+    var i = 0;
+}
+<b>Key for summary rank indicators</b>
+<table id="quartiles-detailed-key">
+    <thead>
+        <tr>
+            <th>Group</th>
+            <th>Definition</th>
+            <th>Label</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><img src="@(ViewBag.ImagesUrl)Mortality/grade-0.png" />1st quartile</td>
+            <td>Lowest 25@(Html.Raw(unit)) of LAs (low rank is good)</td>
+            <td>@Html.Raw(labels[i++])</td>
+        </tr>
+        <tr>
+            <td><img src="@(ViewBag.ImagesUrl)Mortality/grade-1.png" />2nd quartile</td>
+            <td>LAs with values that lie between 25@(Html.Raw(unit)) and 50@(Html.Raw(unit)) in the rankings</td>
+            <td>@Html.Raw(labels[i++])</td>
+        </tr>
+        <tr>
+            <td><img src="@(ViewBag.ImagesUrl)Mortality/grade-2.png" />3rd quartile</td>
+            <td>LAs with values that lie between 50@(Html.Raw(unit)) and 75@(Html.Raw(unit)) in the rankings</td>
+            <td>@Html.Raw(labels[i++])</td>
+        </tr>
+        <tr>
+            <td><img src="@(ViewBag.ImagesUrl)Mortality/grade-3.png" />4th quartile</td>
+            <td>Highest 25@(Html.Raw(unit)) of LAs</td>
+            <td>@Html.Raw(labels[i++])</td>
+        </tr>
+    </tbody>
+</table>

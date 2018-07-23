@@ -1,7 +1,6 @@
 ﻿
 using System.Collections.Generic;
 using System.Web;
-using Newtonsoft.Json;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.SearchQuerying;

@@ -13,6 +13,19 @@ namespace PholioVisualisation.ServiceActions
             string areaCode, int indicatorId, int ageId, int areaTypeId)
         {
             InitGrouping(profileId, areaTypeId, indicatorId, ageId);
+            if (_grouping == null)
+            {
+                // No inequalitity data available
+                return new PartitionDataForAllSexes
+                {
+                    AreaCode = areaCode,
+                    IndicatorId = indicatorId,
+                    AgeId = ageId,
+                    Sexes = new List<Sex>(),
+                    Data = new List<CoreDataSet>()
+                };
+            }
+
             InitMetadata(_grouping);
 
             var timePeriod = TimePeriod.GetDataPoint(_grouping);
@@ -94,14 +107,14 @@ namespace PholioVisualisation.ServiceActions
             _grouping = groupingProvider.GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndAgeId(profileId, areaTypeId, indicatorId, ageId);
         }
 
-        protected override void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> categoryDataList)
+        protected override void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> dataList)
         {
-            var personsData = categoryDataList.FirstOrDefault(x => x.SexId == SexIds.Persons);
+            var personsData = dataList.FirstOrDefault(x => x.SexId == SexIds.Persons);
 
             if (personsData == null && _indicatorMetadata.HasTarget == false)
             {
                 // Do not calculate significance
-                foreach (var coreDataSet in categoryDataList)
+                foreach (var coreDataSet in dataList)
                 {
                     coreDataSet.SignificanceAgainstOneBenchmark = (int)Significance.None;
                 }
@@ -112,7 +125,7 @@ namespace PholioVisualisation.ServiceActions
                 var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
                 var indicatorComparisonHelper = new IndicatorComparisonHelper(_indicatorMetadata,
                     _grouping, _groupDataReader, _pholioReader, targetComparerProvider);
-                foreach (var coreDataSet in categoryDataList)
+                foreach (var coreDataSet in dataList)
                 {
                     coreDataSet.SignificanceAgainstOneBenchmark =
                         indicatorComparisonHelper.GetSignificance(coreDataSet, personsData);

@@ -86,8 +86,6 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
                 Username = @"phe\farrukh",
                 Filename = "Fake.xls",
                 DateCreated = DateTime.Now,
-                JobType = UploadJobType.Batch,
-                TotalRows = 0,
                 Status = UploadJobStatus.NotStarted
             };
             return newJob;

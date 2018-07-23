@@ -1,0 +1,33 @@
+﻿@using IndicatorsUI.MainUI.Models;
+@model PageModel
+<div class="container">
+    <div class="row">
+        <div id="" class="col-md-12 clearfix">
+            @Html.Partial("_PageLinks")
+        </div>
+        <div id="site-link" class="col-md-12 clearfix">
+            @{
+                // Define title
+                string title;
+                if (ViewBag.IndicatorListName != null)
+                {
+                    title = ViewBag.IndicatorListName;
+                }
+                else
+                {
+                    var pageTitle = Model.PageTitle;
+                    var isPageTitleDefined = string.IsNullOrEmpty(pageTitle) == false;
+
+                    title = Model.DisplayProfileTitle && isPageTitleDefined
+                        ? pageTitle
+                        : Model.Skin.Title;
+                }
+
+                // Size of title
+                var fontSize = TitleFont.GetSize(title, Model.ProfileId);
+            }
+            <h1 style="@fontSize">@Html.Raw(title)</h1>
+            @Html.Partial("_SearchBox")
+        </div>
+    </div>
+</div>

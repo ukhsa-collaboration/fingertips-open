@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.ServiceActions</RootNamespace>
     <AssemblyName>PholioVisualisation.ServiceActions</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -34,25 +34,18 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.2.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.2.2\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -61,11 +54,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionHelper.cs" />
+    <Compile Include="AreaAddressProvider.cs" />
     <Compile Include="AreaDetailsAction.cs" />
     <Compile Include="AreasOfAreaTypeAction.cs" />
     <Compile Include="AreaTypesAction.cs" />
     <Compile Include="BoxPlotPointListBuilder.cs" />
     <Compile Include="ChildAreasForPdfsAction.cs" />
+    <Compile Include="DeploymentStatus.cs" />
+    <Compile Include="DeploymentStatusProvider.cs" />
+    <Compile Include="IndicatorSearchAction.cs" />
+    <Compile Include="IndicatorsWithDataByAreaTypeBuilder.cs" />
     <Compile Include="PartitionData.cs" />
     <Compile Include="PartitionDataBuilderBase.cs" />
     <Compile Include="PartitionDataForAllAges.cs" />
@@ -99,7 +97,7 @@
       <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
       <Name>DataConstruction</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+    <ProjectReference Include="..\DataSorting\DataSorting.csproj">
       <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
       <Name>DataSorting</Name>
     </ProjectReference>
@@ -111,6 +109,10 @@
       <Project>{b7dac9ea-b25d-4800-9ba2-4d01570306d7}</Project>
       <Name>KeyMessages</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Parsers\Parsers.csproj">
+      <Project>{B01455EA-2060-4176-99A2-C4EF7908193F}</Project>
+      <Name>Parsers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PdfData\PdfData.csproj">
       <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
       <Name>PdfData</Name>
@@ -118,6 +120,10 @@
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
       <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SearchQuerying\SearchQuerying.csproj">
+      <Project>{618bcebb-2d74-4146-bf59-53a58e006a8c}</Project>
+      <Name>SearchQuerying</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -2,12 +2,12 @@
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Results;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Results;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class AjaxBridgeController : Controller
     {
@@ -15,20 +15,27 @@ namespace Profiles.MainUI.Controllers
 
         private readonly DateTime _startTime = DateTime.Now;
 
+        /// <summary>
+        /// General proxy bridge for API calls 
+        /// </summary>
         [HttpGet]
-        public JsonResult Data(string serviceAction1, string serviceAction2 = "", string serviceAction3 = "")
+        public JsonResult ApiPath(string serviceAction1, string serviceAction2 = "", string serviceAction3 = "")
         {
             var request = HttpContext.Request;
             var ajaxUrl = new AjaxUrl(request);
             var serviceParameters = ajaxUrl.ServiceParameters;
 
             byte[] json;
-            if (serviceParameters.Contains("no_cache=true") || serviceAction2 == "csv")
+            if (serviceParameters.Contains("no_cache") ||
+                serviceAction2 == "csv")
             {
+                // Must provide uncached responeses
                 json = GetJsonFromWebServices(ajaxUrl.WebServicesUrl);
+                CachePolicyHelper.SetNoCaching(HttpContext.Response.Cache);
             }
             else
             {
+                // Check caches for response
                 var serviceKey = serviceAction1 + serviceAction2 + serviceAction3;
                 json = _jsonCache.GetJson(serviceKey, serviceParameters);
 
@@ -41,13 +48,18 @@ namespace Profiles.MainUI.Controllers
                         CacheJson(json, serviceKey, serviceParameters, request);
                     }
                 }
-            }
 
-            SetPublicCacheIfLive();
+                // Response is cacheable
+                SetCachePolicyForCacheableResponse();
+            }
 
             return new AjaxBridgeJsonResult(json);
         }
 
+        /// <summary>
+        /// General logging action
+        /// </summary>
+        [Route("log/{serviceAction}")]
         [HttpPost]
         public void Log(string serviceAction)
         {
@@ -57,7 +69,7 @@ namespace Profiles.MainUI.Controllers
                     ExceptionLogger.LogClientSideException(Request.Params["errorMessage"]);
                     break;
                 case "export":
-                    ExceptionLogger.LogExport(Request.Params["areaCode"], 
+                    ExceptionLogger.LogExport(Request.Params["areaCode"],
                         Request.Params["profileId"], Request.Params["downloadType"]);
                     break;
             }
@@ -70,12 +82,10 @@ namespace Profiles.MainUI.Controllers
             return json;
         }
 
-        private void SetPublicCacheIfLive()
+        private void SetCachePolicyForCacheableResponse()
         {
-            if (AppConfig.Instance.IsEnvironmentLive)
-            {
-                CachePolicyHelper.CacheForOneMonth(HttpContext.Response.Cache);
-            }
+            // No caching for API calls in any context
+            CachePolicyHelper.SetNoCaching(HttpContext.Response.Cache);
         }
 
         private void CacheJson(byte[] json, string serviceAction, string serviceParameters, HttpRequestBase request)

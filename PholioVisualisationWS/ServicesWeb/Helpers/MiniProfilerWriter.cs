@@ -3,9 +3,14 @@ using System.IO;
 using System.Text;
 using StackExchange.Profiling;
 
-namespace ServicesWeb.Helpers
+namespace PholioVisualisation.ServicesWeb.Helpers
 {
-    public class MiniProfilerWriter
+    public interface IMiniProfilerWriter
+    {
+        void Write(MiniProfiler miniProfiler);
+    }
+
+    public class MiniProfilerWriter : IMiniProfilerWriter
     {
         public void Write(MiniProfiler miniProfiler)
         {

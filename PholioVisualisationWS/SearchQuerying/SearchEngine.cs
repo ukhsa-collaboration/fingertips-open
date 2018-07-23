@@ -20,7 +20,7 @@ namespace PholioVisualisation.SearchQuerying
                 foreach (string fieldName in fieldNames)
                 {
                     var query = new WildcardQuery(new Term(fieldName, queryTerm));
-                    masterQuery.Add(query, searchUserInput.BooleanCombinationLogic);
+                    masterQuery.Add(query, BooleanClause.Occur.SHOULD);
                 }
             }
             return masterQuery;
@@ -28,7 +28,7 @@ namespace PholioVisualisation.SearchQuerying
 
         protected static Directory GetIndexDirectory(string type)
         {
-            string path = Path.Combine(ApplicationConfiguration.SearchIndexDirectory, type);
+            string path = Path.Combine(ApplicationConfiguration.Instance.SearchIndexDirectory, type);
             return FSDirectory.Open(new DirectoryInfo(path));
         }
     }

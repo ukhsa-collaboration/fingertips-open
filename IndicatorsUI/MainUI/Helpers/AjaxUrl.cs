@@ -1,7 +1,7 @@
 ﻿using System.Web;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class AjaxUrl
     {

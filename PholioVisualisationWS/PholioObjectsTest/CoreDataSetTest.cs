@@ -45,13 +45,6 @@ namespace PholioVisualisation.PholioObjectsTest
         }
 
         [TestMethod]
-        public void TestShouldDenominator2Serialise()
-        {
-            Assert.IsFalse(new CoreDataSet { Denominator2 = ValueData.NullValue }.ShouldSerializeDenominator2());
-            Assert.IsTrue(new CoreDataSet { Denominator2 = 1 }.ShouldSerializeDenominator2());
-        }
-
-        [TestMethod]
         public void TestCountDividedByYearRange()
         {
             Assert.AreEqual(0.5, new CoreDataSet { Count = 1, YearRange = 2}.CountPerYear);

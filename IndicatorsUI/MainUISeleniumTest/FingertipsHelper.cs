@@ -76,6 +76,14 @@ namespace IndicatorsUI.MainUISeleniumTest
             WaitForAjaxLock(driver);
         }
 
+        public static void SearchForPractice(IWebDriver driver, string text)
+        {
+            var id = By.Id(FingertipsIds.GpPracticeSearchText);
+            var searchText = driver.FindElement(id);
+            searchText.SendKeys(text);
+            new WaitFor(driver).ExpectedElementToBeVisible(By.TagName(FingertipsIds.GpPracticeAutoComplete));
+        }
+
         public static void LeaveAreaSearchMode(IWebDriver driver)
         {
             var searchLink = driver.FindElement(By.Id(FingertipsIds.AreaSearchLink));
@@ -103,7 +111,7 @@ namespace IndicatorsUI.MainUISeleniumTest
             trendsButton.Click();
         }
 
-        public static void SelectLatestInequalityValues(IWebDriver driver)
+        public static void SelectInequalitiesLatestValues(IWebDriver driver)
         {
             var trendsButton = driver.FindElement(By.Id(FingertipsIds.InequalitiesLatestValues));
             trendsButton.Click();

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
+using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export.File;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.Export
 {
@@ -11,10 +13,13 @@ namespace PholioVisualisation.Export
         private CsvWriter _csvWriter = new CsvWriter();
         private string _fileName;
         private ExportFileManager _exportFileManager;
-
         private LookUpManager _lookUpManager;
         private TrendMarkerLabelProvider _trendMarkerLabelProvider;
         private SignificanceFormatter _significanceFormatter;
+        private IndicatorExportParameters _parameters;
+        private DateChangeHelper _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository());
+        private ProfileConfig _profileConfig;
+        private readonly Dictionary<int, IndicatorDateChange> _indicatorDataChanges = new Dictionary<int, IndicatorDateChange>();
 
         public SingleIndicatorFileWriter(int indicatorId, IndicatorExportParameters parameters)
         {
@@ -23,6 +28,9 @@ namespace PholioVisualisation.Export
                 parameters.ParentAreaTypeId,
                 parameters.ChildAreaTypeId,
                 parameters.ProfileId);
+
+            _parameters = parameters;
+            _profileConfig = ReaderFactory.GetProfileReader().GetProfileConfig(_parameters.ProfileId);
         }
 
         public void Init(LookUpManager lookUpManager, TrendMarkerLabelProvider trendMarkerLabelProvider,
@@ -35,8 +43,7 @@ namespace PholioVisualisation.Export
 
         public byte[] TryLoadFile()
         {
-            var useFileCache = ApplicationConfiguration.UseFileCache;
-            if (useFileCache)
+            if (UseFileCache)
             {
                 // try load indicator file if caching
                 _exportFileManager = new ExportFileManager(_fileName);
@@ -48,8 +55,7 @@ namespace PholioVisualisation.Export
         public byte[] GetFileContent()
         {
             var contents = _csvWriter.WriteAsBytes();
-            var useFileCache = ApplicationConfiguration.UseFileCache;
-            if (useFileCache)
+            if (UseFileCache)
             {
                 _exportFileManager.SaveFile(contents);
             }
@@ -59,7 +65,7 @@ namespace PholioVisualisation.Export
 
         public void WriteData(IndicatorMetadata indicatorMetadata, CoreDataSet data, string timePeriod,
             IArea parentArea, TrendMarkerResult trendMarkerResult, Significance comparedToEnglandSignificance,
-            Significance comparedToSubnationalParentSignificance, int? sortableTimePeriod = null)
+            Significance comparedToSubnationalParentSignificance, int? sortableTimePeriod)
         {
             var formatter = new CoreDataSetExportFormatter(_lookUpManager, data);
             var areaCode = data.AreaCode;
@@ -83,8 +89,10 @@ namespace PholioVisualisation.Export
                 formatter.Category,
                 timePeriod,
                 formatter.Value,
-                formatter.LowerCI,
-                formatter.UpperCI,
+                formatter.LowerCI95,
+                formatter.UpperCI95,
+                formatter.LowerCI99_8,
+                formatter.UpperCI99_8,
                 formatter.Count,
                 formatter.Denominator,
                 formatter.ValueNote,
@@ -99,7 +107,34 @@ namespace PholioVisualisation.Export
                 items.Add(sortableTimePeriod);
             }
 
+
+            // Data Changes   
+            if (_profileConfig != null)
+            {
+                var datachange = GetDataChange(indicatorMetadata);
+                var dataChangeText = datachange.HasDataChangedRecently ? "New data" : "";
+                items.Add(dataChangeText);
+            }
             _csvWriter.AddLine(items.ToArray());
+        }
+
+        private bool UseFileCache
+        {
+            get
+            {
+                return ApplicationConfiguration.Instance.UseFileCache;
+            }
+        }
+
+        private IndicatorDateChange GetDataChange(IndicatorMetadata metadata)
+        {
+            if (!_indicatorDataChanges.ContainsKey(metadata.IndicatorId))
+            {
+                var dataChange = _dateChangeHelper.AssignDateChange(metadata, _profileConfig.NewDataTimeSpanInDays);
+                _indicatorDataChanges.Add(metadata.IndicatorId, dataChange);
+                return dataChange;
+            }
+            return _indicatorDataChanges[metadata.IndicatorId];
         }
     }
 }

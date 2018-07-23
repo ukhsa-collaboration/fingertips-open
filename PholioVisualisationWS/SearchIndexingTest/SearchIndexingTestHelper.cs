@@ -14,7 +14,8 @@ namespace PholioVisualisation.SearchIndexingTest
     {
         public static void GivenNoExistingIndexFiles(string indexDirectoryName)
         {
-            var directoryPath = Path.Combine(ApplicationConfiguration.SearchIndexDirectory, indexDirectoryName);
+            var directoryPath = Path.Combine(
+                ApplicationConfiguration.Instance.SearchIndexDirectory, indexDirectoryName);
             if (Directory.Exists(directoryPath))
             {
                 Directory.Delete(directoryPath, true);
@@ -25,7 +26,7 @@ namespace PholioVisualisation.SearchIndexingTest
         {
             indexBuilder.BuildIndexes();
 
-            var path = Path.Combine(ApplicationConfiguration.SearchIndexDirectory, folder);
+            var path = Path.Combine(ApplicationConfiguration.Instance.SearchIndexDirectory, folder);
             Assert.IsTrue(Directory.Exists(path));
         }
     }

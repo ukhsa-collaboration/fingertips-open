@@ -55,7 +55,7 @@
                 <p class="confirm-sub-title">
                 </p>
                 <div id="new_indicator_button">
-                    <a id="new_indicators" class="medium-button" href="/ProfilesAndIndicators">OK</a>
+                    <a id="new_indicators" class="medium-button" href="/">OK</a>
                 </div>
             </div>
         </h4>
@@ -63,7 +63,7 @@
 </div>
 <div id="tabs" class="standardWidth indicator-edit">
     <div class="button-panel">
-        <a class="small-button" id="Home" href="/ProfilesAndIndicators">Cancel</a>
+        <a class="small-button" id="Home" href="/">Cancel</a>
         <a class="save-new-indicator small-button" id="save" href="#" style="display: block;">
             Save
         </a>
@@ -100,12 +100,13 @@
                     <td>
                         @if (textProperty.IsMandatory)
                         {
-                            <textarea id="v@(propertyId)" rows="2" onfocus=" textEnter(this) " onblur=" textOut(this) " onkeydown=" textKeyDown(this) " class="indicator-text mandatory-input @(isHtmlAllowed ? "html-allowed" : "")"></textarea>
+                            <textarea id="v@(propertyId)" rows="2" onfocus="textEnter(this)" onblur="textOut(this)" onkeydown="textKeyDown(this)" class="indicator-text mandatory-input @(isHtmlAllowed ? "html-allowed" : "")"></textarea>
                         }
                         else
                         {
                             <textarea id="v@(propertyId)" rows="2" onfocus="textEnter(this)" onblur="textOut(this)" onkeydown="textKeyDown(this)" class="indicator-text @(isHtmlAllowed ? "html-allowed" : "")"></textarea>
                         }
+                    </td>
                     <td class="property-attributes">
                         @if (textProperty.IsSearchable)
                         {
@@ -116,64 +117,64 @@
                             <span title="This property can be displayed as either HTML or plain text">HTML</span>
                         }
                     </td>
-                    </td>
                 </tr>
             }
         </table>
     </div>
-    <div id="tabs-2">
-        <div>
-            <label class="associated-detail-label">
-                Value Type
-            </label>
-            @Html.DropDownList("selectedValueType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                CI Method
-            </label>
-            @Html.DropDownList("selectedCIMethodType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                CI Confidence Level
-            </label>
-            @Html.DropDownList("selectedCIConfidenceLevel", CommonUtilities.GetListOfCiConfidenceLevels(), new { @Name = "selectedCIConfidenceLevel", @class = "create-indicator-dropdown dropdown-selected validate-required" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                Unit
-            </label>
-            @Html.DropDownList("selectedUnitType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                Denominator
-            </label>
-            @Html.DropDownList("selectedDenominatorType", null, "Please select...",
-            new { @class = "create-indicator-dropdown dropdown-not-selected" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                Year Type
-            </label>
-            @Html.DropDownList("selectedYearType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                Decimal places to display
-            </label>
-            @Html.DropDownList("selectedDecimalPlaces", CommonUtilities.GetListOfDecimalPlaces(),
-                new { @class = "create-indicator-dropdown ignore-validation" })
-        </div>
-        <div>
-            <label class="associated-detail-label">
-                Target
-            </label>
-            @Html.DropDownList("selectedTargetId", CommonUtilities.GetListOfTargets(),
-                    new { @class = "create-indicator-dropdown ignore-validation" })
-        </div>
+<div id="tabs-2">
+    <div>
+        <label class="associated-detail-label">
+            Value Type
+        </label>
+        @Html.DropDownList("selectedValueType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
     </div>
+    <div>
+        <label class="associated-detail-label">
+            CI Method
+        </label>
+        @Html.DropDownList("selectedCIMethodType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Unit
+        </label>
+        @Html.DropDownList("selectedUnitType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Denominator
+        </label>
+        @Html.DropDownList("selectedDenominatorType", null, "Please select...",
+            new { @class = "create-indicator-dropdown dropdown-not-selected" })
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Year Type
+        </label>
+        @Html.DropDownList("selectedYearType", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Decimal places to display
+        </label>
+        @Html.DropDownList("selectedDecimalPlaces", CommonUtilities.GetListOfDecimalPlaces(),
+            new { @class = "create-indicator-dropdown ignore-validation" })
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Target
+        </label>
+        @Html.DropDownList("selectedTargetId", CommonUtilities.GetListOfTargets(),
+            new {@class = "create-indicator-dropdown ignore-validation"})
+    </div>
+    <div>
+        <label class="associated-detail-label">
+            Latest Change Timestamp Override
+        </label>
+        @Html.TextBox("latestChangeTimestamp",null, new {@class= "dropdown-selected timestamp-override create-indicator-dropdown" })
+    </div>
+</div>
+
     <div id="tabs-3">
         <div>
             <label class="associated-detail-label">

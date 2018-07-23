@@ -4,10 +4,10 @@ using System.IO;
 using System.Text;
 using System.Web;
 using System.Web.Http;
-using ServicesWeb.Helpers;
-using StackExchange.Profiling;
+using System.Web.Mvc;
+using PholioVisualisation.ServicesWeb.Models;
 
-namespace ServicesWeb
+namespace PholioVisualisation.ServicesWeb
 {
     public class WebApiApplication : HttpApplication
     {
@@ -18,11 +18,21 @@ namespace ServicesWeb
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
             AutoMapperConfig.RegisterMappings();
+
+            // To avoid "Self referencing loop detected" error when serialising entity framework objects
+            HttpConfiguration config = GlobalConfiguration.Configuration;
+            config.Formatters.JsonFormatter
+                        .SerializerSettings
+                        .ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        }
+
+        protected void Application_PreSendRequestHeaders()
+        {
+            // Prevents IIS from including server name and version in response headers
+            Response.Headers.Remove("Server");
         }
 
         // Uncomment these two methods to enable Mini Profiler
-
-
         protected void Application_BeginRequest()
         {
             // need to start one here in order to render out the UI

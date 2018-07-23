@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class RedirectController : Controller
     {

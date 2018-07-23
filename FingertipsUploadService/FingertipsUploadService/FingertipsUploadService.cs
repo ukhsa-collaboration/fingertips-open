@@ -129,7 +129,7 @@ namespace FingertipsUploadService
             _fusUploadRepository = new UploadJobRepository();
             _coreDataRepository = new CoreDataRepository();
             _loggingRepository = new LoggingRepository();
-            _uploadManager = new UploadManager(_fusUploadRepository, _coreDataRepository, _loggingRepository);
+            _uploadManager = new UploadManager(_fusUploadRepository, _coreDataRepository);
         }
 
         private void CleanUpDependencies()

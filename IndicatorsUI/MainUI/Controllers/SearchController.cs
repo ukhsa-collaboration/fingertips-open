@@ -3,23 +3,75 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.Mvc;
-using Profiles.DataConstruction;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Helpers;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Models;
+using IndicatorsUI.UserAccess.UserList.IRepository;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class SearchController : BaseController
     {
-        public const string TitleSelectedIndicators = "Selected Indicators";
         public const string TitleSearchResults = "Search Results";
 
         private const string UrlKey = "search";
         private const string DataView = "Data";
 
-        [CheckUserCanAccessSkin] 
+        private IIndicatorListRepository _indicatorListRepository;
+
+        public SearchController(IIndicatorListRepository indicatorListRepository,
+            IAppConfig appConfig) : base(appConfig)
+
+        {
+            _indicatorListRepository = indicatorListRepository;
+        }
+
+        [Route("search/{searchText}")]
         public ActionResult Data(string searchText = null)
+        {
+            InitSearch(searchText);
+            return View(GetViewName(), PageModel);
+        }
+
+        [Route("view/{searchText?}")]
+        public ActionResult ViewSearchText(string searchText = null)
+        {
+            InitSearch(searchText);
+            return View(GetViewName(), PageModel);
+        }
+
+        [Route("indicator-list/view/{listId}")]
+        public ActionResult ViewIndicatorList(string listId)
+        {
+            InitSearch(null);
+            PageModel.PageType = PageType.IndicatorListDataPage;
+
+            ViewBag.IndicatorListName = _indicatorListRepository.GetListNameByPublicId(listId);
+            ViewBag.IndicatorListPublicId = listId;
+            ((IList<string>)ViewBag.ExtraJsFiles).Add("js-indicator-list-view");
+
+            return View(DataView, PageModel);
+        }
+
+        /// <summary>
+        /// This included to demonstrate that a list of indicators can be displayed by including the
+        /// IDs in the URL.
+        /// </summary>
+        /// <param name="indicatorList">Comma-separated list of indicator IDs</param>
+        [Route("indicators/{indicatorList}")]
+        public ActionResult SelectedIndicators(string indicatorList = "")
+        {
+            InitPageModel();
+            ConfigureWithProfile(new ProfileDetailsBuilder(UrlKey).Build());
+            PageModel.PageTitle = "Selected Data";
+            ViewData["indicatorIds"] = indicatorList;
+            ViewBag.SearchText = string.Empty;
+            PageModel.PageType = PageType.IndicatorSearchResultsDataPage;
+            return View(GetViewName(), PageModel);
+        }
+
+        private void InitSearch(string searchText)
         {
             InitPageModel();
             ConfigureWithProfile(new ProfileDetailsBuilder(UrlKey).Build());
@@ -30,7 +82,7 @@ namespace Profiles.MainUI.Controllers
             ViewBag.DefaultAreaType = templateProfile.DefaultAreaType;
             ViewBag.EnumParentDisplay = templateProfile.EnumParentDisplay;
             ViewBag.ExtraJsFiles = templateProfile.ExtraJavaScriptFiles
-                .Concat((IList<string>)ViewBag.ExtraJsFiles)
+                .Concat((IList<string>) ViewBag.ExtraJsFiles)
                 .ToList();
             ViewBag.ExtraCssFiles = templateProfile.ExtraCssFiles;
 
@@ -42,60 +94,19 @@ namespace Profiles.MainUI.Controllers
             PageModel.DefaultFingertipsTabId = templateProfile.DefaultFingertipsTabId;
             PageModel.IgnoredSpineChartAreas = templateProfile.AreasToIgnoreForSpineCharts;
 
-            //Check to see if there's a profileCollection added for the current skin. Restrict the search to just the profiles of this ProfileCollection if there is.
-            GetProfileCollection();
-            var searchableProfiles =
-                PageModel.ProfileCollections.SelectMany(x => x.ProfileCollectionItems)
-                    .Select(c => c.ProfileId)
-                    .ToArray();
-
-            PageModel.ProfileCollectionIdList = searchableProfiles;
+            // Profile used to provide configuration details for the search
             PageModel.TemplateProfileId = templateProfile.Id;
 
-            return View(GetViewName(), PageModel);
+            PageModel.PageType = PageType.IndicatorSearchResultsDataPage;
         }
 
         private string GetViewName()
         {
             // Search is not available on test sites to limit access to indicators on controlled sites
-            var viewName = appConfig.IsIndicatorSearchAvailable
+            var viewName = _appConfig.IsIndicatorSearchAvailable
                 ? DataView
                 : "SearchNotAvailable";
             return viewName;
-        }
-
-        private void GetProfileCollection()
-        {
-            //get a list of ProfileCollections for this skin
-            var skinProfileCollection = ProfileCollectionProvider.GetSkinProfileCollections(PageModel.Skin.Id);
-
-            foreach (var pc in skinProfileCollection)
-            {
-                var profileCollection = ProfileCollectionProvider.GetProfileCollection(pc.ProfileCollectionId);
-
-                profileCollection.ProfileCollectionItems = ProfileCollectionProvider.GetProfileCollectionItems(profileCollection.Id);
-                foreach (var pci in profileCollection.ProfileCollectionItems)
-                {
-                    pci.ProfileDetails = new ProfileDetailsBuilder(pci.ProfileId).Build();
-                }
-                PageModel.ProfileCollections.Add(profileCollection);
-            }
-        }
-
-        /// <summary>
-        /// This included to demonstrate that a list of indicators can be displayed by including the
-        /// IDs in the URL.
-        /// </summary>
-        /// <param name="indicatorList">Comma-separated list of indicator IDs</param>
-        [CheckUserCanAccessSkin] 
-        public ActionResult SelectedIndicators(string indicatorList = "")
-        {
-            InitPageModel();
-            ConfigureWithProfile(new ProfileDetailsBuilder(UrlKey).Build());
-            PageModel.PageTitle = "Selected Data";
-            ViewData["indicatorIds"] = indicatorList;
-            ViewBag.SearchText = string.Empty;
-            return View(GetViewName(), PageModel);
         }
     }
 }

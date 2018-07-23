@@ -49,6 +49,7 @@
         public const int HipFractures = 41402;
         public const int ObesityYear6 = 90323;
         public const int LifeExpectancyAtBirth = 90366;
+        public const int GeneralHealthExcellent = 91491;
         public const int MrsaBloodstreamInfections = 91317;
         public const int IndicatorThatDoesNotExist = 1234567;
     }
@@ -56,6 +57,7 @@
     public class AgeIds
     {
         public const int AllAges = 1;
+        public const int Aged15 = 44;
         public const int Years10To11 = 201;
         public const int LessThan16 = 169;
     }
@@ -105,6 +107,16 @@
     public class SkinIds
     {
         public const int Core = 2;
+    }
+
+    public class UserIds
+    {
+        public const int Doris = 11;
+    }
+
+    public class UserNames
+    {
+        public const string Doris = @"phe\doris.hain";
     }
 
     public class CoreDataFilters

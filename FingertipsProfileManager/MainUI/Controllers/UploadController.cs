@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Mime;
 using System.Web;
 using System.Web.Mvc;
+using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Controllers
 {
@@ -25,29 +26,16 @@ namespace Fpm.MainUI.Controllers
         /// </summary>
         public ActionResult Index()
         {
-            const string simpleTemplateRelativePath = "/upload-templates/simple-indicator-upload-template.xlsx";
-            const string batchTemplateRelativePath = "/upload-templates/batch-indicator-upload-template.xlsx";
+            const string batchTemplateRelativePath = "/upload-templates/indicator-upload-template.xlsx";
 
             var viewModel = new UploadIndexViewModel
             {
-                SimpleTemplateUrl = simpleTemplateRelativePath,
                 BatchTemplateUrl = batchTemplateRelativePath,
-                SimpleLastUpdated = AppConfig.LastUpdatedDateSimpleTemplate,
                 BatchLastUpdated = AppConfig.LastUpdatedDateBatchTemplate,
                 User = UserDetails.CurrentUser()
             };
 
             return View(viewModel);
-        }
-
-        /// <summary>
-        /// Upload simple file
-        /// </summary>
-        [HttpPost]
-        public ActionResult UploadSimpleFile(HttpPostedFileBase indicatorDataFile)
-        {
-            var response = SaveFile(UploadJobType.Simple);
-            return Content(response ? "ok" : "fail");
         }
 
         /// <summary>
@@ -68,15 +56,37 @@ namespace Fpm.MainUI.Controllers
         public ActionResult CurrentUserJobProgress(int userId)
         {
             var jobs = _fpmUploadRepository.GetJobsForCurrentUser(userId);
-
             var response = new UploadProgressViewModel
             {
                 InProgress = jobs.Count(x => x.Status == UploadJobStatus.InProgress),
-                InQueue = jobs.Count(x => x.Status == UploadJobStatus.NotStart),
+                InQueue = jobs.Count(x => x.Status == UploadJobStatus.NotStarted),
                 AwaitingConfomation = GetNumberOfConfirmationAwaitingJobs(jobs),
 
                 Jobs = jobs
             };
+
+            return Json(response, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public ActionResult GetAllActiveJobProgress()
+        {
+            var jobs = _fpmUploadRepository.GetAllJobsProgress();
+            var fpmUsers = new UserRepository().GetAllFpmUsers();
+
+            var response = new List<UploadQueueViewModel>();
+
+            foreach (var uploadJob in jobs)
+            {
+                response.Add(new UploadQueueViewModel
+                {
+                    DateCreatedF = uploadJob.DateCreatedF,
+                    Filename = uploadJob.OriginalFile,
+                    Username = fpmUsers.FirstOrDefault(x => x.Id == uploadJob.UserId).DisplayName,
+                    StatusText = UploadHelper.GetTextFromStatusCodeForActiveJobs(uploadJob.Status),
+                    Status = uploadJob.Status
+                });
+            }
 
             return Json(response, JsonRequestBehavior.AllowGet);
         }
@@ -105,7 +115,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         /// <summary>
-        /// Change the job starts from ConfirmationAwaited to ConfirmationGiven
+        /// Change the job starts from OverrideDatabaseDuplicatesConfirmationAwaited to OverrideDatabaseDuplicatesConfirmationGiven
         /// </summary>
         [HttpGet]
         public ActionResult ChangeStatus(string guid, int actionCode)
@@ -120,6 +130,11 @@ namespace Fpm.MainUI.Controllers
             var jobGuid = Guid.Parse(guid);
             var uploadJob = _fpmUploadRepository.GetJob(jobGuid);
             uploadJob.Status = (UploadJobStatus)actionCode;
+
+            if (actionCode == (int)UploadJobStatus.SmallNumberWarningConfirmationGiven)
+            {
+                uploadJob.IsSmallNumberOverrideApplied = true;
+            }
 
             var isUpdated = _fpmUploadRepository.UpdateJob(uploadJob);
             var response = new { Success = isUpdated ? "true" : "false", Message = "" };
@@ -189,7 +204,7 @@ namespace Fpm.MainUI.Controllers
                     Guid = guid,
                     Filename = actualFileName,
                     JobType = jobType,
-                    Status = UploadJobStatus.NotStart,
+                    Status = UploadJobStatus.NotStarted,
                     UserId = UserDetails.CurrentUser().Id
                 };
 
@@ -207,7 +222,7 @@ namespace Fpm.MainUI.Controllers
 
         private int GetNumberOfConfirmationAwaitingJobs(IEnumerable<UploadJob> jobs)
         {
-            var totalJobsAwaitingConfirmation = jobs.Count(x => x.Status == UploadJobStatus.ConfirmationAwaited);
+            var totalJobsAwaitingConfirmation = jobs.Count(x => x.Status == UploadJobStatus.OverrideDatabaseDuplicatesConfirmationAwaited);
 
             var totalJobsAwaitingForSmallNumberConfirmation = jobs.Count(x => x.Status == UploadJobStatus.SmallNumberWarningConfirmationAwaited);
 
@@ -224,7 +239,7 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _coreDataRepository = new CoreDataRepository();
+            _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
             _loggingRepository = new LoggingRepository();
             base.OnActionExecuting(filterContext);
         }

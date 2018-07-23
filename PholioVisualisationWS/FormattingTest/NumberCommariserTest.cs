@@ -46,5 +46,11 @@ namespace PholioVisualisation.FormattingTest
             Assert.AreEqual("120", NumberCommariser.CommariseFormattedValue("120"));
             Assert.AreEqual("1,200.0123", NumberCommariser.CommariseFormattedValue("1200.0123"));
         }
+
+        [TestMethod]
+        public void CommariseFormattedValue_Returns_No_Data_Unchanged()
+        {
+            Assert.AreEqual("-", NumberCommariser.CommariseFormattedValue("-"));
+        }
     }
 }

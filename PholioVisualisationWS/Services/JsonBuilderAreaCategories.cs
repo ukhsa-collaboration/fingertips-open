@@ -14,27 +14,13 @@ namespace PholioVisualisation.Services
     /// factors such as sex, age, time period or if they do are an
     /// intrinsic property of the category.
     /// </summary>
-    public class JsonBuilderAreaCategories : JsonBuilderBase
+    public class JsonBuilderAreaCategories 
     {
         private AreaCategoriesParameters _parameters;
-
-        public JsonBuilderAreaCategories(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new AreaCategoriesParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
 
         public JsonBuilderAreaCategories(AreaCategoriesParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var filteredMap = GetAreaCodeToCategoryIdMap();
-            return JsonConvert.SerializeObject(filteredMap);
         }
 
         public Dictionary<string, int> GetAreaCodeToCategoryIdMap()

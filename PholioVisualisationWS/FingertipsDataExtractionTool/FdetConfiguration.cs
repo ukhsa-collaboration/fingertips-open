@@ -14,9 +14,19 @@ namespace FingertipsDataExtractionTool
             get { return ParseInt("IndicatorIdToStartFrom"); }
         }
 
+        public static bool CalculateAveragesWhetherOrNotIndicatorsHaveChanged
+        {
+            get { return ParseBool("CalculateAveragesWhetherOrNotIndicatorsHaveChanged"); }
+        }
+
         private static int ParseInt(string s)
         {
             return int.Parse(ConfigurationManager.AppSettings[s]);
+        }
+
+        private static bool ParseBool(string s)
+        {
+            return bool.Parse(ConfigurationManager.AppSettings[s]);
         }
     }
 }

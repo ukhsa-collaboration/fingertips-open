@@ -13,7 +13,7 @@ namespace PholioVisualisation.FingertipsDataExtractionToolTest.AverageCalculator
     [TestClass]
     public class ParentAreaProviderTest
     {
-        private const int ChildAreaTypeId = AreaTypeIds.Ccg;
+        private const int ChildAreaTypeId = AreaTypeIds.CcgsPreApr2017;
         private const int ParentAreaTypeId = AreaTypeIds.GoRegion;
         private const int CategoryTypeId = CategoryTypeIds.EthnicGroups5;
         private const int CategoryId = CategoryIds.EthnicityAsian;

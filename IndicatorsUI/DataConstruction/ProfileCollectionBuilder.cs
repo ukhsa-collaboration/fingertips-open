@@ -3,10 +3,10 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataConstruction
+namespace IndicatorsUI.DataConstruction
 {
     public interface IProfileCollectionBuilder
     {
@@ -16,9 +16,9 @@ namespace Profiles.DataConstruction
     public class ProfileCollectionBuilder : IProfileCollectionBuilder
     {
         private ProfileReader profileReader;
-        private AppConfig config;
+        private IAppConfig config;
 
-        public ProfileCollectionBuilder(ProfileReader profileReader, AppConfig config)
+        public ProfileCollectionBuilder(ProfileReader profileReader, IAppConfig config)
         {
             this.profileReader = profileReader;
             this.config = config;

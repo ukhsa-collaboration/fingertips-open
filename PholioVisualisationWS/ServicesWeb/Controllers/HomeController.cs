@@ -4,7 +4,7 @@ using System.Text;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     public class HomeController : ApiController
     {

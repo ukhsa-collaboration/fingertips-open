@@ -1,0 +1,37 @@
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
+@model PageModel
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForContentPage")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+@*            @if (User.Identity.IsAuthenticated)*@
+@*            {*@
+@*                <!--My Indicator List-->*@
+@*//                Commented out to prevent circular loop error on staging*@
+@*$1$                @Html.Action("GetTopIndicatorList", "IndicatorList")#1#*@
+@*            }*@
+            @Html.Partial("_ProfileCollectionLinks", Model.HighlightedProfileCollection)
+            <!--All Profiles-->
+            @Html.Partial("_ProfileCollectionLinks", Model.NationalProfileCollection)
+            @* About the profiles *@
+            <div id="about-fingertips">
+                @ContentProvider.GetContent("front-page-about-the-profiles", ProfileIds.Populations)
+            </div>
+        </div>
+        <div class="col-md-4">
+            @* User Guide *@
+            @Html.Partial("_UserGuide")
+            @* Latest News *@
+
+            @Html.Partial("_LatestNews")
+        </div>
+    </div>
+</div>

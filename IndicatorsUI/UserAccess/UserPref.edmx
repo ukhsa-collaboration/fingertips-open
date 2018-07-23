@@ -1,0 +1,271 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="FINGERTIPS_USERSModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AspNetUsers">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="FirstName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="LastName" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="JobTitle" Type="nvarchar(max)" />
+          <Property Name="HasUserValidatedEmailAccount" Type="bit" Nullable="false" />
+          <Property Name="OrganisationId" Type="int" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="false" />
+          <Property Name="Salt" Type="nvarchar(max)" />
+          <Property Name="Email" Type="nvarchar" MaxLength="256" />
+          <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
+          <Property Name="PasswordHash" Type="nvarchar(max)" />
+          <Property Name="SecurityStamp" Type="nvarchar(max)" />
+          <Property Name="PhoneNumber" Type="nvarchar(max)" />
+          <Property Name="PhoneNumberConfirmed" Type="bit" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="datetime" />
+          <Property Name="LockoutEnabled" Type="bit" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="UserName" Type="nvarchar" MaxLength="256" Nullable="false" />
+          <Property Name="AccessTokenResetPassword" Type="nvarchar(max)" />
+          <Property Name="TempGuid" Type="uniqueidentifier" />
+        </EntityType>
+        <EntityType Name="IndicatorList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ListName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="false" />
+          <Property Name="PublicId" Type="nchar" MaxLength="10" />
+        </EntityType>
+        <EntityType Name="IndicatorListItem">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ListId" Type="int" Nullable="false" />
+          <Property Name="IndicatorId" Type="int" Nullable="false" />
+          <Property Name="SexId" Type="int" Nullable="false" />
+          <Property Name="AgeId" Type="int" Nullable="false" />
+          <Property Name="Sequence" Type="int" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_IndicatorList_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUsers" Multiplicity="1" />
+          <End Role="IndicatorList" Type="Self.IndicatorList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorList">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_IndicatorListItem_IndicatorList">
+          <End Role="IndicatorList" Type="Self.IndicatorList" Multiplicity="1" />
+          <End Role="IndicatorListItem" Type="Self.IndicatorListItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IndicatorList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorListItem">
+              <PropertyRef Name="ListId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FINGERTIPS_USERSModelStoreContainer">
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IndicatorList" EntityType="Self.IndicatorList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="IndicatorListItem" EntityType="Self.IndicatorListItem" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_IndicatorList_AspNetUsers" Association="Self.FK_IndicatorList_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="IndicatorList" EntitySet="IndicatorList" />
+          </AssociationSet>
+          <AssociationSet Name="FK_IndicatorListItem_IndicatorList" Association="Self.FK_IndicatorListItem_IndicatorList">
+            <End Role="IndicatorList" EntitySet="IndicatorList" />
+            <End Role="IndicatorListItem" EntitySet="IndicatorListItem" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="FINGERTIPS_USERSModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AspNetUser">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="FirstName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="LastName" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="JobTitle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="HasUserValidatedEmailAccount" Type="Boolean" Nullable="false" />
+          <Property Name="OrganisationId" Type="Int32" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Email" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="EmailConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="PasswordHash" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="SecurityStamp" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumber" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PhoneNumberConfirmed" Type="Boolean" Nullable="false" />
+          <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="LockoutEndDateUtc" Type="DateTime" Precision="3" />
+          <Property Name="LockoutEnabled" Type="Boolean" Nullable="false" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="UserName" Type="String" MaxLength="256" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AccessTokenResetPassword" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="TempGuid" Type="Guid" />
+          <NavigationProperty Name="IndicatorLists" Relationship="Self.FK_IndicatorList_AspNetUsers" FromRole="AspNetUsers" ToRole="IndicatorList" />
+        </EntityType>
+        <EntityType Name="IndicatorList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ListName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="AspNetUser" Relationship="Self.FK_IndicatorList_AspNetUsers" FromRole="IndicatorList" ToRole="AspNetUsers" />
+          <NavigationProperty Name="IndicatorListItems" Relationship="Self.FK_IndicatorListItem_IndicatorList" FromRole="IndicatorList" ToRole="IndicatorListItem" />
+          <Property Name="PublicId" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+        </EntityType>
+        <EntityType Name="IndicatorListItem">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ListId" Type="Int32" Nullable="false" />
+          <Property Name="IndicatorId" Type="Int32" Nullable="false" />
+          <Property Name="SexId" Type="Int32" Nullable="false" />
+          <Property Name="AgeId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="IndicatorList" Relationship="Self.FK_IndicatorListItem_IndicatorList" FromRole="IndicatorListItem" ToRole="IndicatorList" />
+          <Property Name="Sequence" Type="Int32" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_IndicatorList_AspNetUsers">
+          <End Role="AspNetUsers" Type="Self.AspNetUser" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="IndicatorList" Type="Self.IndicatorList" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AspNetUsers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorList">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_IndicatorListItem_IndicatorList">
+          <End Role="IndicatorList" Type="Self.IndicatorList" Multiplicity="1" >
+            <OnDelete Action="Cascade" />
+          </End>
+          <End Role="IndicatorListItem" Type="Self.IndicatorListItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="IndicatorList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="IndicatorListItem">
+              <PropertyRef Name="ListId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="FINGERTIPS_USERSEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUser" />
+          <EntitySet Name="IndicatorLists" EntityType="Self.IndicatorList" />
+          <EntitySet Name="IndicatorListItems" EntityType="Self.IndicatorListItem" />
+          <AssociationSet Name="FK_IndicatorList_AspNetUsers" Association="Self.FK_IndicatorList_AspNetUsers">
+            <End Role="AspNetUsers" EntitySet="AspNetUsers" />
+            <End Role="IndicatorList" EntitySet="IndicatorLists" />
+          </AssociationSet>
+          <AssociationSet Name="FK_IndicatorListItem_IndicatorList" Association="Self.FK_IndicatorListItem_IndicatorList">
+            <End Role="IndicatorList" EntitySet="IndicatorLists" />
+            <End Role="IndicatorListItem" EntitySet="IndicatorListItems" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="FINGERTIPS_USERSModelStoreContainer" CdmEntityContainer="FINGERTIPS_USERSEntities">
+          <EntitySetMapping Name="AspNetUsers">
+            <EntityTypeMapping TypeName="FINGERTIPS_USERSModel.AspNetUser">
+              <MappingFragment StoreEntitySet="AspNetUsers">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="FirstName" ColumnName="FirstName" />
+                <ScalarProperty Name="LastName" ColumnName="LastName" />
+                <ScalarProperty Name="JobTitle" ColumnName="JobTitle" />
+                <ScalarProperty Name="HasUserValidatedEmailAccount" ColumnName="HasUserValidatedEmailAccount" />
+                <ScalarProperty Name="OrganisationId" ColumnName="OrganisationId" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="EmailConfirmed" ColumnName="EmailConfirmed" />
+                <ScalarProperty Name="PasswordHash" ColumnName="PasswordHash" />
+                <ScalarProperty Name="SecurityStamp" ColumnName="SecurityStamp" />
+                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
+                <ScalarProperty Name="PhoneNumberConfirmed" ColumnName="PhoneNumberConfirmed" />
+                <ScalarProperty Name="TwoFactorEnabled" ColumnName="TwoFactorEnabled" />
+                <ScalarProperty Name="LockoutEndDateUtc" ColumnName="LockoutEndDateUtc" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="UserName" ColumnName="UserName" />
+                <ScalarProperty Name="AccessTokenResetPassword" ColumnName="AccessTokenResetPassword" />
+                <ScalarProperty Name="TempGuid" ColumnName="TempGuid" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IndicatorLists">
+            <EntityTypeMapping TypeName="FINGERTIPS_USERSModel.IndicatorList">
+              <MappingFragment StoreEntitySet="IndicatorList">
+                <ScalarProperty Name="PublicId" ColumnName="PublicId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ListName" ColumnName="ListName" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="IndicatorListItems">
+            <EntityTypeMapping TypeName="FINGERTIPS_USERSModel.IndicatorListItem">
+              <MappingFragment StoreEntitySet="IndicatorListItem">
+                <ScalarProperty Name="Sequence" ColumnName="Sequence" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ListId" ColumnName="ListId" />
+                <ScalarProperty Name="IndicatorId" ColumnName="IndicatorId" />
+                <ScalarProperty Name="SexId" ColumnName="SexId" />
+                <ScalarProperty Name="AgeId" ColumnName="AgeId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

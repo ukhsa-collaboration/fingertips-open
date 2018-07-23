@@ -1,5 +1,5 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Models
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Models
 @model PageModel
 @{
     var profileKey = ViewBag.ProfileUrlKey;
@@ -79,5 +79,15 @@
                 @contentItem.Description
             </a>
         </li>
+    }
+    else if (pageType == PageType.IndicatorListDataPage)
+    {
+        if (User.Identity.IsAuthenticated)
+         {
+             <li class="breadcrumb-separator">></li>
+             <li class="site-link">
+                 @Html.ActionLink("Your indicator lists", "Index", "IndicatorList")
+             </li>
+         }
     }
 </ul>

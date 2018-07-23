@@ -2,9 +2,9 @@
 using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataConstructionTest
 {

@@ -27,6 +27,13 @@ namespace Fpm.ProfileDataTest
             MostRecentIsFirst(audits.First().Timestamp, audits.Last().Timestamp);
         }
 
+        [TestMethod]
+        public void TestGetAllTargets()
+        {
+            var targets = ReaderFactory.GetProfilesReader().GetAllTargets();
+            Assert.IsTrue(targets.Any());
+        }
+
         public static void MostRecentIsFirst(DateTime first, DateTime last)
         {
             Assert.AreEqual(1, first.CompareTo(last));

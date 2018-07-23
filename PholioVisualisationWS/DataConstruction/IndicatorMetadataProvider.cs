@@ -181,7 +181,7 @@ namespace PholioVisualisation.DataConstruction
         {
             foreach (var indicatorMetadata in indicatorMetadataList)
             {
-                var baseUrl = "href=\"" + ApplicationConfiguration.UrlUI + @"/documents";
+                var baseUrl = "href=\"" + ApplicationConfiguration.Instance.UrlUI + @"/documents";
                 var description = indicatorMetadata.Descriptive;
                 var searchString = @"href=""documents";
                 foreach (var item in description.Keys.ToList())

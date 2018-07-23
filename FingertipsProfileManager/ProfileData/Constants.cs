@@ -54,15 +54,17 @@
         public const int Country = 15;
         public const int UnitaryAuthority = 16;
         public const int Shape = 18;
-        public const int Ccg = 19;
         public const int MentalHealthTrust = 20;
+        public const int CountyAndUnitaryAuthorityDeprivationDecile = 23;
         public const int AmbulanceTrust = 41;
         public const int PheCentreObsolete = 43;
         public const int Subregion = 46;
         public const int PheCentreFrom2013 = 48;
         public const int PheCentreFrom2015 = 49;
         public const int PheCentreFrom2013To2015 = 50;
-        public const int CountyAndUnitaryAuthorityDeprivationDecile = 23;
+        public const int CcgUnchangedApr2017 = 51;
+        public const int CcgNewApr2017 = 52;
+        public const int CcgSupercededApr2017 = 53;
         public const int DistrictAndUnitaryAuthority = 101;
         public const int CountyAndUnitaryAuthority = 102;
         public const int PheCentresFrom2013To2015 = 103;
@@ -73,6 +75,8 @@
         public const int CombinedMentalHealthAndAcuteTrust = 117;
         public const int AcuteTrustsIncludingCombinedMentalHealthTrusts = 118;
         public const int MentalHealthTrustsIncludingCombinedAcuteTrusts = 119;
+        public const int CcgsPostApr2017 = 152;
+        public const int CcgsPreApr2017 = 153;
     }
 
     public class AreaCodes
@@ -92,7 +96,6 @@
 
     public class GroupIds
     {
-        public const int SubstanceMisuse = 1000009;
         public const int TobaccoControlProfiles_KeyIndicators = 1938132885;
         public const int PhofWiderDeterminantsOfHealth = 1000041;
         public const int GpProfileSupportingIndicators = 1200006;
@@ -104,7 +107,7 @@
 
     public class IndicatorIds
     {
-        public const int IDAOPI = 125;
+        public const int Undefined = -1;
         public const int HypertensionPrevalence = 219;
         public const int LongTermUnemployment = 734;
         public const int PeopleWhoDieAtHome = 1114;
@@ -185,13 +188,6 @@
         public const int EthnicGroups7Categories = 4;
     }
 
-    public class CategoryIds
-    {
-        public const int Undefined = -1;
-        public const int Mixed = 2;
-        public const int Black = 4;
-    }
-
     public class SkinIds
     {
         public const int Core = 2;
@@ -224,15 +220,16 @@
         public const int NationalAndSubnational = 999;
     }
 
-    public class DocumentNames
-    {
-        public const string DiabetesHospitalData = "Diabetes_Hospital_Data.xlsx";
-    }
-
     public class DocumentIds
     {
         public const int UserGuide = 142;
         public const int ProfileRelationships = 459;
+    }
+
+    public class DisclosureControlIds
+    {
+        public const int NoSmallNumberChecking = -1;
+        public const int FlagCountsBetween1And5 = 1;
     }
 
     public class CoreDataFilters
@@ -245,10 +242,23 @@
         public const string Year = "[Year]";
         public const string Month = "[Month]";
         public const string Quarter = "[Quarter]";
+        public const string AreaCode = "AreaCode";
     }
 
     public class DatabaseLogIds
     {
         public const int FusCheckedJobs = 2;
+    }
+
+    public class TabIds
+    {
+        public const int TartanRug = 0;
+        public const int AreaProfile = 1;
+        public const int CompareAreas = 3;
+        public const int Trends = 4;
+        public const int Inequalities = 7;
+        public const int Map = 8;
+        public const int ScatterPlot = 10;
+        public const int Reports = 13;
     }
 }

@@ -1,5 +1,6 @@
-﻿@using Profiles.MainUI.Helpers
-@model Profiles.MainUI.Models.PageModel
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@model IndicatorsUI.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml";
 }
@@ -11,22 +12,52 @@
 }
 
 <div id="content">
-    <div class="home_intro clearfix">
+    <div id="home-intro-@Model.ProfileId" class="home-intro clearfix">
         @ContentProvider.GetContent("home-header", Model.ProfileId)
     </div>
 
-    @Html.Partial("_SearchArea")
+    @{
+        bool showPublicHealthDashboardSearchArea = false;
+        bool showExtraInfo = true;
+        if (Model.ProfileId == ProfileIds.PublicHealthDashboard && (ViewBag.MapNoData == null))
+        {
+            showPublicHealthDashboardSearchArea = true;
+            showExtraInfo = false;
+        }
+        <script type="text/javascript">
+            //<![CDATA[
+            MT.config.showMapWithNoData =  @Json.Encode(showExtraInfo);
+             //]]</script>
+
+    }
+
+
+    @if (showPublicHealthDashboardSearchArea)
+    {
+        @Html.Partial("_SearchAreaPublicHealthDashboard")
+
+    }
+    else
+    {
+        @Html.Partial("_SearchArea")
+
+    }
     <div id="map">
         <div class="map-overlays">
-            @Html.Partial("_AreaAndMapZoomSelector")
+            @{
+                if (showExtraInfo)
+                {
+                    @Html.Partial("_AreaAndMapZoomSelector")
 
-            @Html.Partial("_MapHelp")
+                    @Html.Partial("_MapHelp")
 
-            @Html.Partial("Diabetes/_DiabetesDataFilter")
-            
-            @Html.Partial("Diabetes/_MapLegend")
-            
-            @Html.Partial("_ViewSimliar")
+                    @Html.Partial("Diabetes/_DiabetesDataFilter")
+
+                    @Html.Partial("Diabetes/_MapLegend")
+
+                    @Html.Partial("_ViewSimilar")
+                }
+            }
         </div>
 
         <div class="map-canvas" id="gmap">

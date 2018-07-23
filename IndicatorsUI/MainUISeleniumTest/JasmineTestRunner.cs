@@ -25,12 +25,6 @@ namespace IndicatorsUI.MainUISeleniumTest
             CheckTestPage("diabetes-rankings");
         }
 
-        [TestMethod]
-        public void TestPracticeProfiles()
-        {
-            CheckTestPage("practice-profiles");
-        }
-
         private void CheckTestPage(string testPage)
         {
             navigateTo.JavaScriptTestPage(testPage);

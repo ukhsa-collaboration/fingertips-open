@@ -1,5 +1,5 @@
 ﻿/*
-* CSS that is common amongst all Fingertips profiles except Practice Profiles
+* CSS that is common amongst all Fingertips profiles
 */
 a {
     cursor: pointer;
@@ -131,6 +131,11 @@ div.close {
     font-style: italic;
 }
 
+.tooltipValueNote-spine-chart {
+    margin-top: 10px;
+}
+
+
 #tooltipQualifier {
     clear: left;
     float: left;
@@ -175,13 +180,17 @@ td.header {
     text-align: left;
 }
 
-td.pLink, td.search-area-type, a.pLink {
+button.pLink, td.pLink, td.search-area-type, a.pLink {
     color: #1f0aa1;
     cursor: pointer;
     text-decoration: none;
 }
 
-    td.search-area-type:hover, a.pLink:hover {
+button.pLink {
+    background: none;
+}
+
+    td.search-area-type:hover, a.pLink:hover, button.pLink:hover {
         text-decoration: underline;
     }
 
@@ -468,20 +477,11 @@ span.target {
     font-size: 14px;
 }
 
-.target-label {
-    font-size: 11px;
-    color: #777;
-    font-style: italic;
-}
-
 #trends-container .target-box {
     width: 100%;
     text-align: right;
 }
 
-.target .unit {
-    color: #333;
-}
 .worse .unit {
     color: white;
 }
@@ -532,6 +532,9 @@ td.none {
 
 #indicator-profile-origin-link {
     padding: 10px 0;
+}
+
+#indicator-profile-origin-link a {
     color: #1f0aa1;
 }
 
@@ -666,6 +669,14 @@ div.page span
 .full-width {
     width: 100%;
     clear: both;
+}
+
+.width-10 {
+    width: 10%;
+}
+
+.width-90 {
+    width: 90%;
 }
 
 .grey {

@@ -11,6 +11,20 @@ namespace PholioVisualisation.DataAccessTest
     public class AreasReaderTest
     {
         [TestMethod]
+        public void TestGetAreaCodesThatDoNotExist_Where_Code_Does_Not_Exist()
+        {
+            var codes = Reader().GetAreaCodesThatDoNotExist(new List<string> {"zzz"});
+            Assert.IsTrue(codes.Any());
+        }
+
+        [TestMethod]
+        public void TestGetAreaCodesThatDoNotExist_Where_Code_Exists()
+        {
+            var codes = Reader().GetAreaCodesThatDoNotExist(new List<string> { AreaCodes.England });
+            Assert.IsFalse(codes.Any());
+        }
+
+        [TestMethod]
         public void TestGetParentAreasFromChildAreaId()
         {
             var map = Reader().GetParentAreasFromChildAreaId(
@@ -18,6 +32,15 @@ namespace PholioVisualisation.DataAccessTest
 
             // Assert: about 150 LAs
             Assert.IsTrue(map.Keys.Count > 140 && map.Keys.Count < 160);
+        }
+
+        [TestMethod]
+        public void TestGetParentAreasForGpChildAreaId()
+        {
+            var map = Reader().GetParentAreasFromChildAreaId(
+                AreaTypeIds.CcgsPreApr2017, AreaTypeIds.GpPractice);
+
+            Assert.IsTrue(map.Keys.Any());
         }
 
         [TestMethod]
@@ -126,11 +149,6 @@ namespace PholioVisualisation.DataAccessTest
             Assert.Fail();
         }
 
-        private static IAreasReader Reader()
-        {
-            return ReaderFactory.GetAreasReader();
-        }
-
         [TestMethod]
         public void TestGetAreasFromCodes()
         {
@@ -168,7 +186,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetAreaType()
         {
-            var id = AreaTypeIds.Ccg;
+            var id = AreaTypeIds.CcgsPreApr2017;
             IAreasReader reader = ReaderFactory.GetAreasReader();
             var areaType = reader.GetAreaType(id);
             Assert.AreEqual(id, areaType.Id);
@@ -197,8 +215,8 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<AreaAddress> areas = reader.GetAreaWithAddressByAreaTypeId(AreaTypeIds.GpPractice);
-            Assert.IsTrue(areas.Count > 7500);
-            Assert.AreEqual("TS10 1TZ", (from a in areas where a.Code == "A81015" select a.Postcode).First());
+            Assert.IsTrue(areas.Count > 7000, "Less than expected areas: " + areas.Count);
+            Assert.AreEqual("TS10 1TZ", areas.First(x => x.Code == "A81015").Postcode);
         }
 
         [TestMethod]
@@ -285,7 +303,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetChildAreas()
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
-            IList<IArea> areas = reader.GetChildAreas(AreaCodes.Sha_EastOfEngland, 2);
+            IList<IArea> areas = reader.GetChildAreas(AreaCodes.Sha_EastOfEngland, AreaTypeIds.Pct);
             Assert.AreEqual(13, areas.Count);
             Assert.AreEqual(AreaCodes.Pct_Bedfordshire, areas[0].Code);
         }
@@ -429,7 +447,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             List<IArea> areasWithNhsNotUppercase = new List<IArea>();
 
-            var ccgs = ReaderFactory.GetAreasReader().GetAreasByAreaTypeId(AreaTypeIds.Ccg);
+            var ccgs = ReaderFactory.GetAreasReader().GetAreasByAreaTypeId(AreaTypeIds.CcgsPreApr2017);
             foreach (var ccg in ccgs)
             {
                 if (ccg.Name.Contains("Nhs") || ccg.ShortName.Contains("Nhs"))
@@ -444,26 +462,17 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
+        public void TestGetSupportedAreaTypes()
+        {
+            var areaTypes = ReaderFactory.GetAreasReader().GetSupportedAreaTypes();
+            Assert.IsTrue(areaTypes.Any());
+        }
+
+        [TestMethod]
         public void TestGetNhsId()
         {
             var nhsId = ReaderFactory.GetAreasReader().GetNhsChoicesAreaId("A81001");
             Assert.IsTrue(nhsId == "36798");
-        }
-
-        [TestMethod]
-        public void TestGetChimatResourceId()
-        {
-            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria,
-                ProfileIds.ChildHealthProfiles);
-            Assert.AreEqual(ChimatResourceIds.Cumbria, id);
-        }
-
-        [TestMethod]
-        public void TestGetChimatWayResourceId()
-        {
-            var id = ReaderFactory.GetAreasReader().GetChimatResourceId(AreaCodes.CountyUa_Cumbria,
-                ProfileIds.WhatAboutYouth);
-            Assert.AreEqual(ChimatWayResourceIds.Cumbria, id);
         }
 
         [TestMethod]
@@ -498,6 +507,11 @@ namespace PholioVisualisation.DataAccessTest
             var nearestNeighbours = Reader().GetNearestNeighbours(AreaCodes.CountyUa_Cumbria, 1);
 
             Assert.IsTrue(nearestNeighbours.Count > 0);
+        }
+
+        private static IAreasReader Reader()
+        {
+            return ReaderFactory.GetAreasReader();
         }
     }
 }

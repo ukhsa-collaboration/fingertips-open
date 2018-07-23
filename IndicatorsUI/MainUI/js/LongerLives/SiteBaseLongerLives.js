@@ -29,26 +29,29 @@ function handleAjaxFailure(e) {
 }
 
 function getAreaTypeNamePlural(areaTypeId) {
-    return areaTypeId === AreaTypeIds.CCG ? 'CCGs' :
+    return areaTypeId === AreaTypeIds.CCGPreApr2017 ? 'CCGs' :
         areaTypeId === AreaTypeIds.CountyUA ? 'Counties & Unitary Authorities' :
         areaTypeId === AreaTypeIds.DistrictUA ? 'Districts & Unitary Authorities' :
         'General Practices';
 }
 
 function getAreaTypeNameSingular(areaTypeId) {
-    return areaTypeId === AreaTypeIds.CCG ? 'CCG' :
+    return areaTypeId === AreaTypeIds.CCGPreApr2017 ? 'CCG' :
         areaTypeId === AreaTypeIds.CountyUA ? 'County & Unitary Authority' :
         areaTypeId === AreaTypeIds.DistrictUA ? 'District & Unitary Authority' :
         'General Practice';
 }
 
 function getSimpleAreaTypeName() {
-    return MT.model.parentAreaType === AreaTypeIds.CountyUA ? 'County/UA' : 'CCG';
+    var areaTypeId = MT.model.parentAreaType;
+    return areaTypeId === AreaTypeIds.CountyUA ? 'County/UA' :
+        areaTypeId === AreaTypeIds.DistrictUA ? 'District/UA' :
+        'CCG';
 }
 
 function getSimpleAreaTypeNamePlural(areaTypeId) {
 
-    if (areaTypeId === AreaTypeIds.CCG) {
+    if (areaTypeId === AreaTypeIds.CCGPreApr2017) {
         return 'CCG';
     }
 
@@ -59,7 +62,7 @@ function getSimpleAreaTypeNamePlural(areaTypeId) {
 
 function getSimpleAreaTypeNameSingular(areaTypeId) {
 
-    if (areaTypeId === AreaTypeIds.CCG) {
+    if (areaTypeId === AreaTypeIds.CCGPreApr2017) {
         return 'CCG';
     }
 
@@ -80,7 +83,7 @@ function getSimilarAreaTooltipText() {
         case AreaTypeIds.DistrictUA:
             text = 'This view shows your chosen local authority in comparison to those in the same ONS cluster';
             break;
-        case AreaTypeIds.CCG:
+        case AreaTypeIds.CCGPreApr2017:
             text = 'This view shows your chosen CCG in comparison to similar CCGs';
             break;
         case AreaTypeIds.Practice:
@@ -148,8 +151,8 @@ function getAllAreas(model) {
 */
 function getAreaTypes() {
 
-    var parameters = new ParameterBuilder().add('profile_ids',
-        getProfileIds(MT.model.profileId));
+    var parameters = new ParameterBuilder();
+    parameters.add('profile_ids', MT.model.profileId);
 
     ajaxGet('api/area_types',
         parameters.build(),
@@ -219,10 +222,6 @@ function getIndicatorMetadata(groupId, getDefinition, getSystemContent) {
     }
 };
 
-function getIndicatorIdArgument() {
-    return '';
-}
-
 function getAreaValuesCallback(obj) {
 
     loaded.areaValues[ajaxMonitor.state.indicatorKey] = obj;
@@ -246,36 +245,41 @@ function getCurrentComparator() {
     return area;
 }
 
+
+//TODO: text should come from database
 function highlightSelectedTopic() {
 
     var id = null;
 
     switch (MT.model.profileId) {
         case ProfileIds.Diabetes:
-            id = 'diabetes';
+            id = 'Diabetes';
             break;
         case ProfileIds.Suicide:
-            id = 'suicide';
+            id = 'Suicide Prevention';
             break;
         case ProfileIds.Mortality:
-            id = 'mortality';
+            id = 'Premature Mortality';
             break;
         case ProfileIds.HealthChecks:
-            id = 'health-checks';
+            id = 'NHS Health Checks';
             break;
         case ProfileIds.Hypertension:
-            id = 'blood-pressure';
+            id = 'High Blood Pressure';
             break;
         case ProfileIds.DrugsAndAlcohol:
-            id = 'drugs-and-alcohol';
+            id = 'Alcohol And Drugs';
             break;
         case ProfileIds.Cancer:
-            id = 'cancer';
+            id = 'Cancer';
+            break;
+        case ProfileIds.PublicHealthDashboard:
+            id = "Public Health Dashboard";
             break;
     }
 
     if (id) {
-        $('#' + id + '-topic').addClass('selected');
+        $('#selected-topic').text(id);
     }
 }
 
@@ -287,7 +291,8 @@ function highlightSelectedTab() {
         'home': 'home-nav',
         'project': 'about-project-nav',
         'data': 'about-data-nav',
-        'connect': 'connect-nav'
+        'connect': 'connect-nav',
+        'map': 'map-with-data'
     }
 
     var id = lookUp[lastWord] ?
@@ -303,7 +308,7 @@ function getDecileCategoryTypeId(areaTypeId) {
             return CategoryTypeIds.DeprivationDecileCountyUA2015;
         case AreaTypeIds.DistrictUA:
             return CategoryTypeIds.DeprivationDecileDistrictUA2015;
-        case AreaTypeIds.CCG:
+        case AreaTypeIds.CCGPreApr2017:
             return CategoryTypeIds.DeprivationDecileCCG2010;
         default:
             throw 'Unsupported area type';
@@ -400,14 +405,8 @@ function displayAreaRangeElements(isNational) {
     }).showA(isNational);
 }
 
-function getSimilarAreaCode() {
-    return loaded.areaDetails.getData().Decile.Code;
-}
-
 function isSimilarAreas() {
-    var model = MT.model;
-    return model.parentCode !== NATIONAL_CODE &&
-        model.areaTypeId !== AreaTypeIds.Practice;
+    return !!MT.model.similarAreaCode;
 }
 
 function getUrlParameterString() {
@@ -422,7 +421,8 @@ function getParentDetails(parentCode, areaCode, index) {
     if (!isDefined(areaCode)) {
         areaCode = NATIONAL_CODE;
     }
-    var ranks = loaded.areaDetails.getData({ areaCode: parentCode }).Ranks[areaCode];
+    var details = loaded.areaDetails.getData({ areaCode: parentCode });
+    var ranks = details.Ranks[areaCode];
     return ranks[index].AreaRank;
 }
 
@@ -566,35 +566,64 @@ function AreaDetailsDataManager() {
     }
 }
 
+function doesAreaTypeCompareToOnsCluster() {
+    return MT.model.areaTypeId === AreaTypeIds.DistrictUA;
+}
+
+function getOnsClusterName(onsClusterCode) {
+    return loaded.areaDetails.getData({ areaCode: onsClusterCode }).Area.Name;
+}
+
+function getOnsClusterAreaTypeId() {
+    if (MT.model.areaTypeId === AreaTypeIds.CCGPreApr2017) {
+        return AreaTypeIds.OnsClusterGroup2001;
+    }
+    return AreaTypeIds.OnsClusterGroup2011;
+}
+
 function getOnsClusterCode(model) {
     var parameters = new ParameterBuilder();
     parameters.add('profile_id', model.profileId);
     parameters.add('child_area_type_id', model.areaTypeId);
-    parameters.add('parent_area_type_id', AreaTypeIds.OnsClusterGroup);
+    parameters.add('parent_area_type_id', getOnsClusterAreaTypeId());
 
     // Get parent areas
     ajaxGet('api/parent_to_child_areas', parameters.build(), getOnsClusterCodeCallback);
 }
 
-function getOnsClusterCodeCallback(obj) {
-
-    var model = MT.model;
-    var onsGroupCode;
-    for (var onsCode in obj) {
-        _.each(obj[onsCode], function (area) {
-            if (area === model.areaCode) {
-                onsGroupCode = onsCode;
-            }
-        });
-    };
-
-    onsClusterCode = onsGroupCode;
+function getOnsClusterCodeCallback(onsCodeToChildAreas) {
+    loaded.onsClusterCodes = onsCodeToChildAreas;
     ajaxMonitor.callCompleted();
+}
+
+function getOnsCodeForArea(areaCode) {
+    var onsCodeForArea = null;
+    var onsCodeToChildAreas = loaded.onsClusterCodes;
+    for (var onsCode in onsCodeToChildAreas) {
+        var childAreas = onsCodeToChildAreas[onsCode];
+        _.each(childAreas,
+            function (area) {
+                if (area === areaCode) {
+                    onsCodeForArea = onsCode;
+                }
+            });
+        if (onsCodeForArea) break;
+    };
+    return onsCodeForArea;
 }
 
 quintileColors = ['#DED3EC', '#BEA7DA', '#9E7CC8', '#7E50B6', '#5E25A4'];
 
 $(document).ready(function () {
+
+    // Click event listener to hide the topic menu
+    $(window).click(function (e) {
+        if (e.target.id !== 'profile-topic-text') {
+            if ($('#profile-topic-menu').is(":visible")) {
+                $('#profile-topic-menu').hide();
+            }
+        }
+    });
 
     // Do not proceed if test page
     if (!MT.model) {
@@ -620,6 +649,88 @@ $(document).ready(function () {
     }
 });
 
+// Returns text string from sig for given indicator data
+function getSignificanceText(sig, groupRoot) {
+
+    var comparatorMethodId = groupRoot.ComparatorMethodId;
+
+    if (sig === 0) {
+        return '';
+    }
+
+    var suffix = '<br>fifth';
+    if (comparatorMethodId === ComparatorMethodIds.Quintiles) {
+        switch (sig) {
+            case 1:
+                return 'Lowest' + suffix;
+            case 2:
+                return 'second<br>lowest' + suffix;
+            case 3:
+                return 'middle' + suffix;
+            case 4:
+                return 'second<br>highest' + suffix;
+            case 5:
+                return 'highest' + suffix;
+        }
+    }
+
+    suffix = ' average';
+    if (comparatorMethodId === ComparatorMethodIds.Quartiles) {
+        if (isFeatureEnabled('useLongerLivesBestWorstLabels')) {
+            switch (sig) {
+                case 1:
+                    return 'best';
+                case 2:
+                    return 'better than average rank';
+                case 3:
+                    return 'worse than average rank';
+                case 4:
+                    return 'worst';
+            }
+        } else {
+            switch (sig) {
+                case 1:
+                    return 'substantially above' + suffix;
+                case 2:
+                    return 'above' + suffix;
+                case 3:
+                    return 'below' + suffix;
+                case 4:
+                    return 'substantially below' + suffix;
+            }
+        }
+    }
+
+    suffix = ' than average';
+    switch (groupRoot.PolarityId) {
+        case PolarityIds.BlueOrangeBlue:
+            switch (sig) {
+                case 1:
+                    return 'lower' + suffix;;
+                case 2:
+                    return 'consistent with average'; // Amber;
+                case 3:
+                    return 'higher' + suffix;;
+            }
+        default:
+            // Polarity handled in web services re: HighIsGood/LowIsGood
+            switch (sig) {
+                case 1:
+                    return 'worse' + suffix; // Red
+                case 2:
+                    return 'consistent with average'; // Amber
+                case 3:
+                    return 'better' + suffix; // Green
+            }
+    }
+
+    return '';
+}
+
+function isNearestNeighbour() {
+    return MT.model.similarAreaCode && MT.model.similarAreaCode.indexOf('nn-') === 0;
+}
+
 function unlock() {
     FT.ajaxLock = null;
 }
@@ -631,6 +742,7 @@ SPINNER_STATE = false;
 
 loaded.areaDetails = new AreaDetailsDataManager();
 loaded.categories = {};
+loaded.neighbours = {};
 loaded.areaLists = {};
 
 /**
@@ -647,5 +759,6 @@ AnalyticsCategories = {
 
 AnalyticsAction = {
     ALL_AREAS: 'AllAreasSelected',
-    SIMILAR_AREAS: 'SimilarAreasSelected'
+    SIMILAR_AREAS: 'SimilarAreasSelected',
+    NEAREST_NEIGHBOURS: 'NearestNeighboursSelected'
 }

@@ -1,0 +1,17 @@
+﻿@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForUserAccount")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row col-md-12">
+        <div id="div-content">
+            <div>
+                <h2>Sorry, the verification email could not be sent</h2>
+                <p>We tried to send you an email so that you could verify the email address you registered with.
+                <p>For technical reasons we were not able to send an email at this time. Please try and sign in again later.</p>
+                <p>If problems verifying your account persist then please contact <a href="mailto:profilefeedback@phe.gov.uk?Subject=Fingertips%20help" target="_top">profilefeedback@phe.gov.uk</a></p>
+            </div>
+        </div>
+    </div>
+</div>

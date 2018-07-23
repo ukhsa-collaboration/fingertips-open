@@ -10,41 +10,44 @@ namespace PholioVisualisation.Analysis
     {
         public PholioReader PholioReader { get; set; }
 
-        private IndicatorComparer comparer;
-        private bool assignConfidenceVariable;
-        private Grouping grouping;
+        private IndicatorComparer _comparer;
+        private bool _assignConfidenceVariable;
+        private Grouping _grouping;
 
         public IndicatorComparer New(Grouping grouping)
         {
-            assignConfidenceVariable = false;
-            this.grouping = grouping;
+            _assignConfidenceVariable = false;
+            _grouping = grouping;
 
             CheckDependencies();
 
             switch (grouping.ComparatorMethodId)
             {
                 case ComparatorMethodIds.NoComparison:
-                    comparer = new NoComparisonComparer();
+                    _comparer = new NoComparisonComparer();
                     break;
                 case ComparatorMethodIds.SingleOverlappingCIs:
-                    comparer = new SingleOverlappingCIsComparer();
+                    _comparer = new SingleOverlappingCIsComparer();
                     break;
                 case ComparatorMethodIds.SpcForProportions:
-                    comparer = new SpcForProportionsComparer();
-                    assignConfidenceVariable = true;
+                    _comparer = new SpcForProportionsComparer();
+                    _assignConfidenceVariable = true;
                     break;
                 case ComparatorMethodIds.SpcForDsr:
-                    comparer = new SpcForDsrComparer();
-                    assignConfidenceVariable = true;
+                    _comparer = new SpcForDsrComparer();
+                    _assignConfidenceVariable = true;
                     break;
                 case ComparatorMethodIds.DoubleOverlappingCIs:
-                    comparer = new DoubleOverlappingCIsComparer();
+                    _comparer = new DoubleOverlappingCIsComparer();
                     break;
                 case ComparatorMethodIds.Quintiles:
-                    comparer = new QuintilesComparer();
+                    _comparer = new QuintilesComparer();
+                    break;
+                case ComparatorMethodIds.Quartiles:
+                    _comparer = new QuartilesComparer();
                     break;
                 case ComparatorMethodIds.SuicidePreventionPlan:
-                    comparer = new SuicidePreventPlanComparer();
+                    _comparer = new SuicidePreventPlanComparer();
                     break;
                 default:
                     throw new FingertipsException("Invalid comparator method ID: " + grouping.ComparatorMethodId);
@@ -52,19 +55,19 @@ namespace PholioVisualisation.Analysis
 
             AssignConfidenceVariable();
 
-            comparer.PolarityId = grouping.PolarityId;
+            _comparer.PolarityId = grouping.PolarityId;
 
-            return comparer;
+            return _comparer;
         }
 
         private void AssignConfidenceVariable()
         {
-            if (assignConfidenceVariable)
+            if (_assignConfidenceVariable)
             {
                 var comparatorConfidence = PholioReader.GetComparatorConfidence
-                    (grouping.ComparatorMethodId, grouping.ComparatorConfidence);
+                    (_grouping.ComparatorMethodId, _grouping.ComparatorConfidence);
 
-                comparer.ConfidenceVariable = comparatorConfidence.ConfidenceVariable;
+                _comparer.ConfidenceVariable = comparatorConfidence.ConfidenceVariable;
             }
         }
 

@@ -4,11 +4,10 @@
 
 #map {
     position: relative;
-    border: 1px solid #CCC;
     border-top: 0;
     height: 960px;
     min-height: 960px;
-    width: 962px;
+    width: 964px;
 }
 
 .map-canvas {
@@ -298,11 +297,10 @@
     padding: 0.5em 1em;
 }
 
-.map-info-box .map-info-header a {
-    font-size: 0.80em;
+.map-info-box .map-info-header a, .map-info-box .map-info-header span {
     float: left;
-    margin-left: 2px;
-    margin-top: 2px;
+    padding: 8px;
+    font-size: 12px;
 }
 
 .map-info-box .map-info-header span.map-info-close {
@@ -358,8 +356,7 @@ span.map-info-close {
 
     .map-info-box .map-info-header a {
         color: #fff;
-        text-decoration: none;
-        width: 85%;
+        text-decoration: underline;
     }
 
         .map-info-box .map-info-header a:hover {
@@ -376,22 +373,26 @@ span.map-info-close {
 }
 
     .map-info-box .map-info-footer a {
-        color: #fff;
-        width: 92%;
-        padding: 0.35em 8% 0.5em 0; /* NM 14/05/13 */
-        text-align: right;
-    }
-
-    .map-info-box .map-info-footer span {
-        color: #fff;
-        width: 92%;
-        padding: 0.35em 8% 0.5em 0; /* NM 14/05/13 */
-        text-align: right;
+        text-decoration: underline;
+        color: white;
     }
 
     .map-info-box .map-info-footer a:hover {
         color: #808080;
     }
+
+    .map-info-box .map-info-footer ul {
+        list-style: none;
+        float: right;
+        margin-right: 30px;
+        margin-left: 0;
+        padding: 0;
+    }
+    .map-info-box .map-info-footer ul li {
+        display: inline-block;
+        color: white;
+    }
+    
 
 .map-info-body ul.totals {
     list-style: none;
@@ -538,82 +539,82 @@ div.plan {
 }
 
 div.grey-man {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1400px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1400px no-repeat;
     height: 45px;
 }
 
-div.grade-1 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+div.grade-0 {
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1500px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
-div.grade-3 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1700px no-repeat;
+div.grade-1 {
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -2000px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-2 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1600px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1600px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
-div.grade-0 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+div.grade-3 {
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1700px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-quintile-1 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -900px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -900px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-quintile-2 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1000px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1000px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-quintile-3 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1100px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1100px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-quintile-4 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1200px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1200px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.grade-quintile-5 {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1300px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1300px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.bobLower {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1800px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1800px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
 div.bobHigher {
-    background: url("../images/Mortality/ranking_icons.png") 0 -1900px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -1900px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
@@ -622,39 +623,39 @@ div.bobHigher {
 
 
 .map-info-stats dl {
-    background: url("../images/Mortality/ranking_icons.png") 0 -500px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 0 -500px no-repeat;
     float: left;
     clear: left;
     min-height: 45px;
 }
 
     .map-info-stats dl.grey-man {
-        background: url("../images/Mortality/ranking_icons.png") 0 -1400px no-repeat;
+        background: url("../images/Mortality/ranking_icons-v1.png") 0 -1400px no-repeat;
     }
 
     .map-info-stats dl.grade-1 {
-        background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+        background: url("../images/Mortality/ranking_icons-v1.png") 0 -1500px no-repeat;
         float: left;
         clear: left;
         min-height: 45px;
     }
 
     .map-info-stats dl.grade-3 {
-        background: url("../images/Mortality/ranking_icons.png") 0 -1700px no-repeat;
+        background: url("../images/Mortality/ranking_icons-v1.png") 0 -1700px no-repeat;
         float: left;
         clear: left;
         min-height: 45px;
     }
 
     .map-info-stats dl.grade-2 {
-        background: url("../images/Mortality/ranking_icons.png") 0 -1600px no-repeat;
+        background: url("../images/Mortality/ranking_icons-v1.png") 0 -1600px no-repeat;
         float: left;
         clear: left;
         min-height: 45px;
     }
 
     .map-info-stats dl.grade-0 {
-        background: url("../images/Mortality/ranking_icons.png") 0 -1500px no-repeat;
+        background: url("../images/Mortality/ranking_icons-v1.png") 0 -1500px no-repeat;
         float: left;
         clear: left;
         min-height: 45px;
@@ -997,7 +998,7 @@ span.minus {
 
 @media print {
 
-    .home_intro {
+    .home-intro {
         color: #333;
         padding-left: 0;
     }
@@ -1022,13 +1023,13 @@ span.minus {
 	Home header
 ------------------------------------------------------------ */
 
-.home_intro {
+.home-intro {
     background: #02ae94;
     color: #FFF;
     padding: 22px 10px 23px 37px;
 }
 
-    .home_intro h1 {
+    .home-intro h1 {
         float: left;
         font-family: 'transport_new_heavy', Arial, sans-serif;
         font-size: 6.8em;
@@ -1037,7 +1038,11 @@ span.minus {
         width: 900px;
     }
 
-    .home_intro h2 {
+#home-intro-140 h1, #home-intro-51 h1 {
+    font-size: 66px;/*smaller font for public health dashboard & diabetes so fits on one line*/
+}
+
+    .home-intro h2 {
         float: left;
         font-size: 2.7em;
         line-height: 1.25;
@@ -1046,13 +1051,13 @@ span.minus {
         width: 100%;
     }
 
-    .home_intro sup {
+    .home-intro sup {
         position: relative;
         font-size: 0.5em;
         top: -14px;
     }
 
-    .home_intro p {
+    .home-intro p {
         font-size: 1.4em;
         line-height: 1.6;
         margin: 0;
@@ -1089,6 +1094,32 @@ span.minus {
         line-height: 38px;
         padding: 0 45px 0 5px;
         width: 336px;
+    }
+
+.home-search-nav-map {
+    background: #FFF;
+    color: #000;
+    padding-left: 39px;
+}
+
+    .home-search-nav-map h1 {
+        font-size: 3em;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .home-search-nav-map div {
+        font-size: 20px;
+    }
+
+    .home-search-nav-map  #search_text {
+        background: #FFF url(../images/Mortality/search.png) right center no-repeat;
+        border: 1px solid black;
+        font-size: 1.4em;
+        height: 38px;
+        line-height: 38px;
+        padding: 0 45px 0 5px;
+        width: 436px;
     }
 
 #home_promos {

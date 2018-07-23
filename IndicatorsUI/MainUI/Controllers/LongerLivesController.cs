@@ -1,19 +1,25 @@
-﻿using System.Globalization;
+﻿using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
+using System.Globalization;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     [FingertipsOutputCache]
     public class LongerLivesController : BaseController
     {
-        private ProfileReader profileReader = ReaderFactory.GetProfileReader();
-        private const string DefaultProfileKey = ProfileUrlKeys.Diabetes;
+        private readonly string _defaultProfileKey;
+
+        private readonly ProfileReader _profileReader;
+
+        public LongerLivesController(ProfileReader profileReader, IAppConfig appConfig) : base(appConfig)
+        {
+            _profileReader = profileReader;
+            _defaultProfileKey = _appConfig.LongerLivesFrontPageProfileKey;
+        }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
@@ -25,28 +31,50 @@ namespace Profiles.MainUI.Controllers
             SetMetaTagContent();
         }
 
-        [CheckUserCanAccessSkin]
-        public ActionResult Home(string profileKey = DefaultProfileKey)
+        /// <summary>
+        /// Healthier Lives front page
+        /// </summary>
+        public ActionResult Home()
         {
+            return Home(null);
+        }
+
+        [Route("topic/{profileKey}")]
+        public ActionResult Home(string profileKey)
+        {
+            profileKey = GetProfileKey(profileKey);
             InitPage(profileKey, "Home");
             return GetProfileView(profileKey, "Home");
         }
 
-        [CheckUserCanAccessSkin]
-        public ActionResult AboutProject(string profileKey = DefaultProfileKey)
+        [Route("topic/{profileKey}/map-with-data")]
+        public ActionResult MapWithData(string profileKey = null)
         {
+            profileKey = GetProfileKey(profileKey);
+            InitPage(profileKey, "Map");
+            ViewBag.MapNoData = true;
+            return GetProfileView(profileKey, "Home");
+        }
+
+        [Route("topic/{profileKey}/about-project")]
+        [Route("about-project")]
+        public ActionResult AboutProject(string profileKey = null)
+        {
+            profileKey = GetProfileKey(profileKey);
             InitPage(profileKey, "About The Project");
             return View("AboutProject", PageModel);
         }
 
-        [CheckUserCanAccessSkin]
-        public ActionResult AboutData(string profileKey = DefaultProfileKey)
+        [Route("topic/{profileKey}/about-data")]
+        [Route("about-data")]
+        public ActionResult AboutData(string profileKey = null)
         {
+            profileKey = GetProfileKey(profileKey);
             InitPage(profileKey, "About The Data");
             return View("AboutData", PageModel);
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/mortality/comparisons")]
         public ActionResult MortalityRankings()
         {
             var profileKey = "mortality";
@@ -54,7 +82,7 @@ namespace Profiles.MainUI.Controllers
             return GetProfileView(profileKey, "Rankings");
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/mortality/area-details")]
         public ActionResult MortalityAreaDetails()
         {
             var profileKey = "mortality";
@@ -62,7 +90,7 @@ namespace Profiles.MainUI.Controllers
             return GetProfileView(profileKey, "AreaDetails");
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/{profileKey}/health-intervention/{intervention}")]
         public ActionResult HealthIntervention(string intervention)
         {
             InitPage(ProfileUrlKeys.LongerLives, "Health Interventions");
@@ -70,37 +98,40 @@ namespace Profiles.MainUI.Controllers
             return View("Mortality/MortalityHealthIntervention" + intervention.ToLower(), PageModel);
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/{profileKey}/comparisons")]
         public ActionResult PracticeRankings(string profileKey)
         {
-            InitPage(profileKey, "Practice List");
+            InitPage(profileKey, "National comparisons");
             return GetProfileView(profileKey, "Rankings");
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/{profileKey}/practice-details")]
         public ActionResult PracticeDetails(string profileKey)
         {
             InitPage(profileKey, "Practice Details");
             return GetProfileView(profileKey, "PracticeDetails");
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("topic/{profileKey}/area-details")]
         public ActionResult AreaDetails(string profileKey)
         {
             InitPage(profileKey, "Area Details");
             return View("Diabetes/DiabetesAreaDetails", PageModel);
         }
 
-        [CheckUserCanAccessSkin]
-        public ActionResult Connect(string profileKey = DefaultProfileKey)
+        [Route("topic/{profileKey}/connect")]
+        [Route("connect")]
+        public ActionResult Connect(string profileKey = null)
         {
+            profileKey = GetProfileKey(profileKey);
             InitPage(profileKey, "Connect");
             return GetProfileView(profileKey, "Connect");
         }
 
-        [CheckUserCanAccessSkin]
-        public ActionResult AreaSearchResults(string profileKey = DefaultProfileKey)
+        [Route("topic/{profileKey}/area-search-results")]
+        public ActionResult AreaSearchResults(string profileKey = null)
         {
+            profileKey = GetProfileKey(profileKey);
             var parameters = Request.QueryString;
             ViewBag.Area = parameters["place_name"];
             ViewBag.Easting = parameters["easting"];
@@ -109,7 +140,6 @@ namespace Profiles.MainUI.Controllers
             return GetProfileView(profileKey, "AreaSearchResults");
         }
 
-        [CheckUserCanAccessSkin]
         public ActionResult GetProfileView(string profileKey, string viewName)
         {
             TextInfo textInfo = new CultureInfo("en-GB", false).TextInfo;
@@ -123,7 +153,6 @@ namespace Profiles.MainUI.Controllers
             return View(prefix + "/" + prefix + viewName, PageModel);
         }
 
-        [CheckUserCanAccessSkin]
         public void InitPage(string profileKey, string pageName)
         {
             var profileDetails = new ProfileDetailsBuilder(profileKey).Build();
@@ -134,10 +163,10 @@ namespace Profiles.MainUI.Controllers
         private void SetMetaTagContent()
         {
             ViewBag.MetaDescription = ContentHelper.RemoveHtmlTags(
-                profileReader.GetContentItem(ContentKeys.MetaDescription, ProfileIds.LongerLives).Content);
+                _profileReader.GetContentItem(ContentKeys.MetaDescription, ProfileIds.LongerLives).Content);
 
             ViewBag.MetaKeywords = ContentHelper.RemoveHtmlTags(
-                profileReader.GetContentItem(ContentKeys.MetaKeywords, ProfileIds.LongerLives).Content);
+                _profileReader.GetContentItem(ContentKeys.MetaKeywords, ProfileIds.LongerLives).Content);
         }
 
         public ActionResult Get404Error()
@@ -157,15 +186,16 @@ namespace Profiles.MainUI.Controllers
                 InitPageModel();
             }
 
-            ConfigureWithProfile(new ProfileDetailsBuilder(DefaultProfileKey).Build());
+            ConfigureWithProfile(new ProfileDetailsBuilder(_defaultProfileKey).Build());
             PageModel.PageTitle = title;
             ViewBag.ErrorMessage = message;
             return View("../LongerLives/Error", PageModel);
         }
 
+        [Route("policy/{policyType}")]
         public ActionResult Policy(string policyType)
         {
-            ConfigureWithProfile(new ProfileDetailsBuilder(DefaultProfileKey).Build());
+            ConfigureWithProfile(new ProfileDetailsBuilder(_defaultProfileKey).Build());
 
             switch (policyType.ToLower())
             {
@@ -183,6 +213,16 @@ namespace Profiles.MainUI.Controllers
             }
 
             return Get404Error();
+        }
+
+        private string GetProfileKey(string profileKey)
+        {
+            if (profileKey == null)
+            {
+                return _defaultProfileKey;
+            }
+
+            return profileKey;
         }
     }
 }

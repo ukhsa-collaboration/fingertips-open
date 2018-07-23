@@ -18,8 +18,8 @@ namespace PholioVisualisation.Analysis
         private Significance GetSignificance(ValueWithCIsData data, ValueWithCIsData comparator)
         {
             if (CanComparisonGoAhead(data, comparator) == false ||
-                data.AreCIsValid == false ||
-                comparator.AreCIsValid == false)
+                data.Are95CIsValid == false ||
+                comparator.Are95CIsValid == false)
             {
                 return Significance.None;
             }
@@ -39,7 +39,7 @@ namespace PholioVisualisation.Analysis
 
         private static bool DoCIsOverlap(ValueWithCIsData data1, ValueWithCIsData data2)
         {
-            return data1.Value < data2.Value ? data2.LowerCI <= data1.UpperCI : data1.LowerCI <= data2.UpperCI;
+            return data1.Value < data2.Value ? data2.LowerCI95 <= data1.UpperCI95 : data1.LowerCI95 <= data2.UpperCI95;
         }
     }
 }

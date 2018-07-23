@@ -1,0 +1,16 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.IndicatorGridModel
+<div class="filtering button-box clearfix">
+    <b>Indicator Id:</b> @Html.TextBoxFor(model => model.IndicatorId,
+                                         new { size = 10, Id = "IndicatorId", Name = "IndicatorId", @class = "search-watermark", placeholder = "Enter Indicator Id" })
+    <b>Indicator text:</b> @Html.TextBoxFor(model => model.IndicatorText,
+                                           new { size = 50, Id = "search_text", Name = "search_text", @class = "search-watermark", placeholder = "Enter Search Term - Min. 3 Characters" })
+
+    <b>
+        @if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+        {
+            <input type="submit" id="filter-domain" class="show-spinner search-button" value="Filter this domain"/>
+        }
+    <input type="button" id="searchAll" class="search-button" value="Search all profiles"/>
+    </b>
+</div>

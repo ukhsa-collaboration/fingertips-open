@@ -3,6 +3,7 @@
 ------------------------------------------------------------ */
 #area-search td {
     padding: 3px 0;
+    border-top: none;
 }
 
 #area-search input {

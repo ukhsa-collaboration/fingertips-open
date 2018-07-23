@@ -1,16 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     [FingertipsOutputCache]
     public class ProfileController : BaseController
     {
+        public ProfileController(IAppConfig appConfig) : base(appConfig)
+        {
+
+        }
+
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
@@ -21,8 +26,8 @@ namespace Profiles.MainUI.Controllers
 
         /// <summary>
         /// Front page of site.
+        /// Route defined in RouteConfig.
         /// </summary>
-        [CheckUserCanAccessSkin]
         public ActionResult FrontPage()
         {
             // Get a list of ProfileCollections for this skin
@@ -38,56 +43,15 @@ namespace Profiles.MainUI.Controllers
 
             PageModel.PageType = PageType.SiteFrontPage;
 
-            ViewBag.ShowUpdateDelayedMessage = appConfig.ShowUpdateDelayedMessage;
+            ViewBag.ShowUpdateDelayedMessage = _appConfig.ShowUpdateDelayedMessage;
 
-            return View(PageModel.GetSkinView("Frontpage"), PageModel);
-        }
-
-        /// <summary>
-        /// A supporting information page for specific profile.
-        /// </summary>
-        [CheckUserCanAccessSkin]
-        public ActionResult SupportingInformation(string profileKey, string contentKey)
-        {
-            var details = ConfigureFingertipsProfileAndPageModelWithProfileDetails(profileKey);
-
-            if (details == null)
-            {
-                ErrorController.InvokeHttp404(HttpContext);
-                return new EmptyResult();
-            }
-
-            if (AccessControlHelper.ShouldDenyAccess(details))
-            {
-                return AccessControlHelper.GetAccessNotAllowedActionResult();
-            }
-
-            ViewBag.SupportingInformationContentItem =
-                ContentProvider.GetContentItem(contentKey, PageModel.ProfileId);
-            PageModel.PageTitle = details.Title;
-            PageModel.DisplayProfileTitle = true;
-
-            PageModel.PageType = PageType.SupportingInformation;
-            return View(PageModel);
-        }
-
-        /// <summary>
-        /// Get a simple HTML page for the PHOF profile.
-        /// </summary>
-        [CheckUserCanAccessSkin]
-        public ActionResult SimpleHtmlPage(string viewName)
-        {
-            ConfigureFingertipsProfileAndPageModelWithProfileDetails(PageModel.Skin.TemplateProfileUrlKey);
-
-            PageModel.PageType = PageType.SupportingInformation;
-
-            return View(PageModel.GetSkinView(viewName), PageModel);
+            return View("~/Views/FingertipsLandingPage/Frontpage.cshtml", PageModel);
         }
 
         /// <summary>
         /// Data page used for standalone profiles without a front page.
+        /// Route defined in RouteConfig.
         /// </summary>
-        [CheckUserCanAccessSkin]
         public ActionResult Data(string profileKey)
         {
             PageModel.DisplayProfileTitle = true;

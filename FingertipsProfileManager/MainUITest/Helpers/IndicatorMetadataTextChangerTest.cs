@@ -22,7 +22,7 @@ namespace Fpm.MainUITest.Helpers
         [TestInitialize]
         public void TestInitialize()
         {
-            _indicatorMetadataTextChanger = new IndicatorMetadataTextChanger(new ProfileRepository(), GetProfilesReader());
+            _indicatorMetadataTextChanger = new IndicatorMetadataTextChanger(new ProfileRepository(NHibernateSessionFactory.GetSession()), GetProfilesReader());
         }
 
         [TestMethod]
@@ -40,7 +40,7 @@ namespace Fpm.MainUITest.Helpers
             // Act: set the overridden text
             _indicatorMetadataTextChanger.UpdateIndicatorTextValues(IndicatorId,
                 new List<IndicatorMetadataTextItem> { item }, new List<IndicatorMetadataTextProperty> { property },
-                UserName, ProfileId);
+                UserName, ProfileId, false);
 
             // Assert: check name has been overridden
             IndicatorText indicatorText = GetProfilesReader().GetIndicatorTextValues(IndicatorId,

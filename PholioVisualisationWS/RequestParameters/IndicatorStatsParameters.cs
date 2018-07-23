@@ -14,7 +14,7 @@ namespace PholioVisualisation.RequestParameters
         public string ParentAreaCode { get; set; }
         public int ChildAreaTypeId { get; set; }
 
-        public List<int> RestrictResultsToProfileIdList { get; set; }
+        public IList<int> RestrictResultsToProfileIdList { get; set; }
 
         public IndicatorStatsParameters(NameValueCollection parameters)
             : base(parameters)
@@ -23,7 +23,7 @@ namespace PholioVisualisation.RequestParameters
             DataPointOffset = ParseInt(ParameterDataPointOffset);
             ParentAreaCode = ParseString(ParameterNames.ParentAreaCode);
             ChildAreaTypeId = ParseInt(ParameterNames.AreaTypeId);
-            RestrictResultsToProfileIdList = ParseIntList(ParameterNames.RestrictToProfileId, Convert.ToChar(","));
+            RestrictResultsToProfileIdList = new List<int>();
         }
 
         public override bool AreValid

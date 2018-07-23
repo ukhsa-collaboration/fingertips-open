@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using Fpm.ProfileData.Entities.LookUps;
-using Fpm.ProfileData.Entities.User;
 using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class AreaTypeRepository : RepositoryBase
+    public interface IAreaTypeRepository
+    {
+        IList<AreaType> GetAllAreaTypes();
+        AreaType GetAreaType(int areaTypeId);
+        IList<AreaTypeComponent> GetAreaTypeComponents(int parentAreaTypeId);
+        void SaveAreaType(AreaType areaType);
+    }
+
+    public class AreaTypeRepository : RepositoryBase, IAreaTypeRepository
     {
         public AreaTypeRepository()
             : this(NHibernateSessionFactory.GetSession())
@@ -18,7 +25,7 @@ namespace Fpm.ProfileData.Repositories
         {
         }
 
-        public IEnumerable<AreaType> GetAllAreaTypes()
+        public IList<AreaType> GetAllAreaTypes()
         {
             return CurrentSession.QueryOver<AreaType>()
                 .OrderBy(x => x.ShortName).Asc
@@ -32,12 +39,21 @@ namespace Fpm.ProfileData.Repositories
                 .SingleOrDefault();
         }
 
+        public IList<AreaTypeComponent> GetAreaTypeComponents(int parentAreaTypeId)
+        {
+            return CurrentSession.QueryOver<AreaTypeComponent>()
+                .Where(x => x.AreaTypeId == parentAreaTypeId)
+                .Cacheable()
+                .List();
+        }
+
         public void SaveAreaType(AreaType areaType)
         {
             try
             {
                 transaction = CurrentSession.BeginTransaction();
 
+                DeleteAreaTypeComponents(areaType);
                 CurrentSession.Save(areaType);
 
                 transaction.Commit();
@@ -48,5 +64,18 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
+        /// <summary>
+        /// Delete existing area type components that are no longer required
+        /// </summary>
+        private void DeleteAreaTypeComponents(AreaType areaType)
+        {
+            if (areaType.ComponentAreaTypesToDelete != null)
+            {
+                foreach (var areaTypeComponent in areaType.ComponentAreaTypesToDelete)
+                {
+                    CurrentSession.Delete(areaTypeComponent);
+                }
+            }
+        }
     }
 }

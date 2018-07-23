@@ -1,13 +1,16 @@
 ﻿using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Models;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class AreaSearchController : BaseController
     {
+        public AreaSearchController(IAppConfig appConfig) : base(appConfig)
+        {
+            
+        }
+
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
             base.OnActionExecuting(filterContext);
@@ -16,7 +19,6 @@ namespace Profiles.MainUI.Controllers
             InitPageModel();
         }
 
-        [CheckUserCanAccessSkin]
         public ActionResult AreaSearchResults(string profileKey, string areaCodeList, string search_type, 
             string place_name = null, string leadProfileUrlKey = null)
         {

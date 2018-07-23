@@ -30,10 +30,19 @@ namespace PholioVisualisation.SearchQueryingTest
         }
 
         [TestMethod]
-        public void TestSingleWordsQueriesMustContainAtLeast3Characters()
+        public void TestIsCommaSeparatedNumberList()
+        {
+            Assert.IsTrue(new SearchUserInput("1").IsCommaSeparatedNumberList);
+            Assert.IsTrue(new SearchUserInput("1,2").IsCommaSeparatedNumberList);
+            Assert.IsTrue(new SearchUserInput("1, 2").IsCommaSeparatedNumberList);
+            Assert.IsFalse(new SearchUserInput("1a").IsCommaSeparatedNumberList);
+        }
+
+        [TestMethod]
+        public void TestSingleWordsQueriesMustContainAtLeastTwoCharacters()
         {
             Assert.IsFalse(new SearchUserInput("a").IsQueryValid);
-            Assert.IsFalse(new SearchUserInput("aa").IsQueryValid);
+            Assert.IsTrue(new SearchUserInput("aa").IsQueryValid);
             Assert.IsTrue(new SearchUserInput("aaa").IsQueryValid);
         }
 

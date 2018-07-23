@@ -1,13 +1,13 @@
 ﻿using System.Web.UI;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
 using System.Web.Mvc;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     [FingertipsOutputCache]
     public class SingleProfileWithFrontPageController : BaseController
@@ -21,20 +21,32 @@ namespace Profiles.MainUI.Controllers
 
         private ProfileDetails profileDetails;
 
+        public SingleProfileWithFrontPageController(IAppConfig appConfig) : base(appConfig)
+        {
+
+        }
+
+        [Route("profile/{urlKey}")]
         public ActionResult FrontPage(string urlKey)
         {
-            ViewBag.ShowUpdateDelayedMessage = appConfig.ShowUpdateDelayedMessage;
+            ViewBag.ShowUpdateDelayedMessage = _appConfig.ShowUpdateDelayedMessage;
 
-            return GetPage(ViewNameFrontPage, DefaultViewFolder, urlKey,
+            var viewFolder = urlKey.ToLower() == ProfileUrlKeys.Phof
+                ? "Phof"
+                : DefaultViewFolder;
+
+            return GetPage(ViewNameFrontPage, viewFolder, urlKey,
                 PageType.FrontPageOfProfileWithFrontPage);
         }
 
+        [Route("profile/{urlKey}/data")]
         public ActionResult Data(string urlKey)
         {
             return GetPage(ViewNameData, DefaultViewFolder, urlKey,
                 PageType.DataPageOfProfileWithFrontPage);
         }
 
+        [Route("profile/{urlKey}/supporting-information/{contentKey}")]
         public ActionResult SupportingPage(string urlKey, string contentKey)
         {
             var result = GetPage(ViewNameSupportingInformation, DefaultViewFolder, urlKey,
@@ -58,7 +70,6 @@ namespace Profiles.MainUI.Controllers
                 PageType.DataPageOfProfileWithFrontPage);
         }
 
-        [CheckUserCanAccessSkin]
         private ActionResult GetPage(string viewName, string viewFolder, string urlKey,
             PageType pageType)
         {
@@ -81,16 +92,10 @@ namespace Profiles.MainUI.Controllers
             PageModel.PageTitle = profileDetails.Title;
 
             ConfigureWithProfile(profileDetails);
-
-            if (PageModel.HasExclusiveSkin == false)
-            {
-                PageModel.Skin.PartialViewFolder = viewFolder;
-            }
-
             PageModel.PageType = pageType;
             PageModel.DisplayProfileTitle = true;
 
-            return View(PageModel.GetSkinView(viewName), PageModel);
+            return View(string.Format("~/views/{0}/{1}.cshtml", viewFolder, viewName), PageModel);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace PholioVisualisation.PholioObjects
         string Code { get; }
 
         [JsonProperty]
-        int? Sequence { get; }
+        int? Sequence { get; set; }
 
         [JsonProperty]
         string Name { get; }
@@ -36,5 +36,8 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         bool IsGpPractice { get; }
+
+        [JsonIgnore]
+        bool IsOnsClusterGroup { get; }
     }
 }

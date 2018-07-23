@@ -1,5 +1,5 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Helpers
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
 @{ Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml"; }
 @section headContent {
     <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
@@ -14,26 +14,35 @@
 <div id="content" class="clearfix ranking_table_content">
     <div class="header">
         <h1 id="ranking-header"></h1>
+        <a id="area-details-link" areaCode="" style="display: none;" href="javascript:goToAreaDetails()">-</a>
         <div class="hr">
             <hr />
         </div>
     </div>
 
-    <div id="data_page_header" class="clearfix">        
-        @{
-            var style = Model.ProfileId == ProfileIds.HealthChecks
-                ? "width:908px;"
-                : string.Empty;
+    <div id="data_page_header" class="clearfix">
+        @if (ViewBag.ShowRankingInfoBox1)
+        {
+            var content1 = ContentProvider.GetContent("page-rankings-info-box1", Model.ProfileId);
+            var infoBox1Style = Model.ProfileId == ProfileIds.HealthChecks
+            ? "width:908px;"
+            : string.Empty;
+
+            <div id="info_box_1" class="info_box" style="@infoBox1Style">
+                @if (content1.ToString() != "")
+                {
+                    @Html.Raw(content1)
+                }
+            </div>
         }
-        
-        <div id="info_box_1" class="info_box" style="@style">
-            @if (Model.ProfileId == ProfileIds.DrugsAndAlcohol)
-            {        
-                @ContentProvider.GetContent("page-rankings-no-of-alcohol-dependent-people", Model.ProfileId)                    
-            }
-        </div>
-            
-        <div id="info_box_2" class="info_box" style="display: none;"></div>          
+        @if (ViewBag.ShowRankingInfoBox2)
+        {
+            var content2 = ContentProvider.GetContent("page-rankings-info-box2", Model.ProfileId);
+            var infoBox2Style = content2.ToString() == "" ? "display:none;" : "";
+
+            <div id="info_box_2" class="info_box" style="@infoBox2Style">@Html.Raw(content2)</div>
+        }
+
     </div>
 
     <div id="related_content">
@@ -100,8 +109,13 @@
                 else
                 {
                     <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
+                    if (Model.ProfileId == ProfileIds.PublicHealthDashboard)
+                    {
+                        <li>@Html.Partial("_HealthProfileLink")</li>
+                        <li>@Html.Partial("_FingertipsLink")</li>
+                    }
                 }
-                <li class="external_ccg_link" style="display: none;"><a href="javascript:goToPracticeProfiles();" class="external_link">View more data about this CCG at National General Practice Profiles</a></li>
+                <li id="practice-profile-link" style="display: none;"><a href="javascript:goToPracticeProfiles();" class="external_link">View more data about this CCG at National General Practice Profiles</a></li>
                 <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data">About the data</a></li>
             </ul>
         </div>
@@ -109,14 +123,15 @@
     <div id="main_content">
         <span id="data_legend"></span>
         @Html.Partial("_LegendInlineQuintiles")
+        @Html.Partial("_LegendInlineQuartiles")
 
         <div class="table-data" id="mortality-rankings">
             <div class="header non-similar clearfix">
                 <p id="hover-or-tap" class="tip" style="display: none;">Hover or tap on an <span id="area-type-singular"></span> to compare it to similar <span id="area-type-plural"></span></p>
-                <h2><span id="gp_count"></span></h2>
+                <h2 id="table-header"></h2>
             </div>
             <div class="header similar clearfix" style="display: none;">
-                <a class="return_link no-print right" href="javascript:showAllAreas();">&lt; return to <span class="area_name"></span></a>
+                <a class="return_link no-print right" href="javascript:showAllAreas();">&lt; Compare all in <span class="area_name"></span></a>
                 <h2><span id="comparison_type"></span></h2>
                 <h3>
                     Comparing <span id="comparing_practice_name"></span> <span id="comparing_area_type"></span> <span id="comparison_category"></span> in

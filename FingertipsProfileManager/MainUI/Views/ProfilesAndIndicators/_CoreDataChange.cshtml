@@ -1,0 +1,15 @@
+﻿@model Fpm.ProfileData.Entities.DataAudit.DataChange
+@if (Model.LastUploadedBy != null)
+{
+    <div class="data-change">
+        Most recent upload <strong>@Model.LastUploadedBy</strong>,
+        <strong>@Model.LastUploadedAt.ToString("dd-MM-yyyy HH:mm")</strong>
+    </div>
+}
+@if (Model.LastDeletedBy != null)
+{
+    <div class="data-change">
+        Most recent delete <strong>@Model.LastDeletedBy</strong>,
+        <strong>@Model.LastDeletedAt.ToString("dd-MM-yyyy HH:mm")</strong>
+    </div>
+}

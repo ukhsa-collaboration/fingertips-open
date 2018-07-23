@@ -12,6 +12,19 @@ namespace PholioVisualisation.ServiceActions
             string areaCode, int indicatorId, int sexId, int areaTypeId)
         {
             InitGrouping(profileId, areaTypeId, indicatorId, sexId);
+            if (_grouping == null)
+            {
+                // No inequalitity data available
+                return new PartitionDataForAllAges
+                {
+                    AreaCode = areaCode,
+                    IndicatorId = indicatorId,
+                    Ages = new List<Age>(),
+                    SexId = sexId,
+                    Data = new List<CoreDataSet>()
+                };
+            }
+
             InitMetadata(_grouping);
 
             var timePeriod = TimePeriod.GetDataPoint(_grouping);
@@ -19,6 +32,7 @@ namespace PholioVisualisation.ServiceActions
             // Get Data
             var dataList = _groupDataReader.GetCoreDataForAllAges(indicatorId,
                 timePeriod, areaCode, sexId);
+            dataList = FilterOutAgeIdsIfRequired(dataList);
 
             // Define and order ages
             var ages = GetAgesFromDataList(dataList);
@@ -36,6 +50,18 @@ namespace PholioVisualisation.ServiceActions
                 Ages = ages,
                 Data = dataList
             };
+        }
+
+        private IList<CoreDataSet> FilterOutAgeIdsIfRequired(IList<CoreDataSet> dataList)
+        {
+            if (_specialCase != null && _specialCase.ShouldOmitSpecificAgeId())
+            {
+                dataList = new CoreDataSetFilter(dataList)
+                    .RemoveWithAgeId(new List<int> {_specialCase.AgeIdToOmit})
+                    .ToList();
+            }
+
+            return dataList;
         }
 
         public PartitionTrendData GetPartitionTrendData(int profileId, string areaCode,

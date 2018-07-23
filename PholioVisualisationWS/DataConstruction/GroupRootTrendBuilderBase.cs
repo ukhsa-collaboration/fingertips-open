@@ -68,7 +68,7 @@ namespace PholioVisualisation.DataConstruction
             TrendRoot trendRoot = new TrendRoot(root);
             periods = Grouping.GetTimePeriodIterator(IndicatorMetadata.YearType).TimePeriods;
 
-            var formatter = NumericFormatterFactory.New(IndicatorMetadata, groupDataReader);
+            var formatter = new NumericFormatterFactory(groupDataReader).New(IndicatorMetadata);
             _coreDataProcessor = new CoreDataProcessor(formatter);
 
             // Get comparator trend data
@@ -143,7 +143,7 @@ namespace PholioVisualisation.DataConstruction
 
             if (hasData)
             {
-                AssignComparatorDataToTrendRoot(trendRoot, root.FirstGrouping, childAreaCodes);
+                AssignComparatorDataToTrendRoot(trendRoot, root.FirstGrouping, comparatorMap, childAreaCodes);
 
                 // Assign limits
                 var limitBuilder = new LimitsBuilder()
@@ -172,7 +172,8 @@ namespace PholioVisualisation.DataConstruction
             return new IndicatorComparerFactory { PholioReader = pholioReader }.New(Grouping);
         }
 
-        private void AssignComparatorDataToTrendRoot(TrendRoot trendRoot, Grouping grouping, IList<string> childAreaCodes)
+        private void AssignComparatorDataToTrendRoot(TrendRoot trendRoot, Grouping grouping, 
+            ComparatorMap comparatorMap, IList<string> childAreaCodes)
         {
             foreach (TimePeriod period in periods)
             {
@@ -188,8 +189,9 @@ namespace PholioVisualisation.DataConstruction
                 {
                     var comparatorId = keyValuePair.Key;
                     var comparatorDataList = keyValuePair.Value;
+                    var parentArea = comparatorMap.GetComparatorById(comparatorId).Area;
 
-                    var data = GetFormattedValueData(period, comparatorDataList, grouping, childAreaCodes);
+                    var data = GetFormattedValueData(period, comparatorDataList, grouping, parentArea, childAreaCodes);
                     _coreDataProcessor.RemoveRedundantValueNote(data);
                     comparatorToCoreData.Add(comparatorId, data);
 
@@ -259,25 +261,32 @@ namespace PholioVisualisation.DataConstruction
             return sig;
         }
 
-        private CoreDataSet GetFormattedValueData(TimePeriod period, IList<CoreDataSet> coreDataSetList, Grouping grouping,
-            IEnumerable<string> childAreaCodes)
+        private CoreDataSet GetFormattedValueData(TimePeriod period, IList<CoreDataSet> coreDataSetList, 
+            Grouping grouping, IArea parentArea, IEnumerable<string> childAreaCodes)
         {
             CoreDataSet benchmarkData = GetDataAtSpecificTimePeriod(coreDataSetList, period);
 
-            var parentArea = new Area { Code = coreDataSetList.Select(x => x.AreaCode).FirstOrDefault() };
             if (benchmarkData == null && grouping != null)
             {
-                //Get child area data only when necessary
+                // Get child area data only when necessary
                 var childAreaData = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(grouping, parentArea, period);
-                var filteredChildAreaData = new CoreDataSetFilter(childAreaData).SelectWithAreaCode(childAreaCodes);
-                benchmarkData = AverageCalculatorFactory.New(filteredChildAreaData, IndicatorMetadata).Average;
+                if (parentArea.IsCountry == false)
+                {
+                    childAreaData = new CoreDataSetFilter(childAreaData)
+                        .SelectWithAreaCodes(childAreaCodes).ToList();
+                }
+
+                benchmarkData = AverageCalculatorFactory.New(childAreaData, IndicatorMetadata).Average;
+                if (benchmarkData != null)
+                {
+                    benchmarkData.AreaCode = parentArea.Code;
+                }
             }
 
             if (benchmarkData == null)
             {
                 benchmarkData = CoreDataSet.GetNullObject(parentArea.Code);
             }
-
 
             _coreDataProcessor.FormatAndTruncate(benchmarkData);
             return benchmarkData;
@@ -289,7 +298,7 @@ namespace PholioVisualisation.DataConstruction
 
             if (periodToComparer.ContainsKey(period) == false)
             {
-                Area area = areasReader.GetAreaFromCode(areaCode);
+                IArea area = areasReader.GetAreaFromCode(areaCode);
                 var childDataList = provider.GetChildAreaData(grouping, area, period);
                 var comparatorValues = new CoreDataSetFilter(childDataList).SelectValidValues().ToList();
 

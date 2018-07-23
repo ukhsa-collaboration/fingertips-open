@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class ProfileCollection
     {

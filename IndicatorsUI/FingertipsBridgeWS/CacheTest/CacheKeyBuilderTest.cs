@@ -60,7 +60,7 @@ namespace IndicatorsUI.FingertipsBridgeWS.CacheTest
         {
             // No cache
             NameValueCollection nameValues = new NameValueCollection();
-            nameValues.Add("nocache", "");
+            nameValues.Add("no_cache", "");
             nameValues.Add(CacheKeyBuilder.ParameterAjaxCallId, "7");
             CacheKeyBuilder builder = new CacheKeyBuilder(nameValues, "b");
             Assert.IsFalse(builder.CanJsonBeCached);

@@ -29,7 +29,7 @@ namespace PholioVisualisation.DataConstruction
 
         protected NumericFormatter GetFormatter()
         {
-            return NumericFormatterFactory.New(IndicatorMetadata, groupDataReader);
+            return new NumericFormatterFactory(groupDataReader).New(IndicatorMetadata);
         }
 
         protected void InitBuild(Grouping grouping)

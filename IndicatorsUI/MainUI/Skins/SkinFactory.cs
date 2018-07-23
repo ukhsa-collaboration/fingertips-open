@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Web;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Skins
+namespace IndicatorsUI.MainUI.Skins
 {
     public static class SkinFactory
     {

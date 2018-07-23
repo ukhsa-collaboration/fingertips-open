@@ -12,8 +12,9 @@ namespace Fpm.Search
 
         public IEnumerable<IndicatorMetadataTextValue> SearchByText(string searchText)
         {
+            var text = new IndicatorSearchQueryText().GetSqlSearchText(searchText);
             return GetOrderedAndDistinct(
-                _reader.SearchIndicatorMetadataTextValuesByText("%" + searchText + "%"));
+                _reader.SearchIndicatorMetadataTextValuesByText("%" + text + "%"));
         }
 
         public IEnumerable<IndicatorMetadataTextValue> SearchByIndicatorId(int indicatorId)

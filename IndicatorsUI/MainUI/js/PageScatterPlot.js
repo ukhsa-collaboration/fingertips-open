@@ -237,7 +237,7 @@ scatterplot.reloadSupportingIndicators = function () {
     }
 
     $('#supporting-indicators [key="' + currentSelectionValue + '"]').attr('selected', 'selected');
-    $supportingIndicators.chosen({ width: '95%', search_contains: true });
+    $supportingIndicators.chosen({ width: '100%', search_contains: true });
     $supportingIndicators.prop('disabled', false).trigger("chosen:updated");
 }
 /**
@@ -273,8 +273,8 @@ scatterplot.ViewManager = function ($container) {
     };
 
     this.exportChart = function () {
-        chart.exportChart({ type: 'image/png' }, {
-        });
+        chart.exportChart({ type: 'image/png' }, {});
+        logEvent('ExportImage', getCurrentPageTitle());
     };
 
     /**
@@ -457,10 +457,17 @@ scatterplot.getSelectedAreaName = function () {
 */
 scatterplot.getGroupingDataForProfile = function (model) {
     var parameters = new ParameterBuilder(
-    ).add('profile_id', model.profileId
-    ).add('area_type_id', model.areaTypeId);
+        ).add('area_type_id', model.areaTypeId);
 
-    ajaxGet('api/grouproot_summaries',
+    if (isInSearchMode()) {
+        var path = 'by_indicator_id';
+        parameters.add('indicator_ids', getIndicatorIdsParameter());
+    } else {
+        path = 'by_profile_id';
+        parameters.add('profile_id', model.profileId);
+    }
+
+    ajaxGet('api/grouproot_summaries/' + path,
         parameters.build(),
         function (obj) {
             loaded.groupingDataForProfile = obj;
@@ -646,6 +653,8 @@ scatterplot.getIndicatorsUnit = function () {
 
 scatterplot.supportingIndicatorChanged = function () {
 
+    lock();
+
     var selectedSupportingIndicatorIndex = 0;
 
     // Format of key "<iid>-<sexId>"
@@ -794,8 +803,7 @@ loaded.groupingDataForProfile = {};
 loaded.areaNamesAndCodes = {};
 loaded.groupRootSecondary = {};
 
-// Scatter plot does not currently work for search results
-if (FT.model.profileId !== ProfileIds.SearchResults) {
+
     pages.add(PAGE_MODES.SCATTER_PLOT, {
         id: 'scatter',
         title: 'Compare<br>indicators',
@@ -805,7 +813,7 @@ if (FT.model.profileId !== ProfileIds.SearchResults) {
         jqIds: ['.geo-menu', 'indicator-menu-div', 'nearest-neighbour-link'],
         jqIdsNotInitiallyShown: []
     });
-}
+
 
 scatterplot.addSupportingIndicatorsMenu = function($container, $chartBox) {
     var supportingIndicators = $('#supporting-indicators');

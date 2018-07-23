@@ -31,7 +31,7 @@
             }
             <td class="left">
                 @Html.ActionLink(item.Description, "EditContentItem",
-                            new { contentId = item.Id, profileId = item.ProfileId, profileName = item.ProfileName }, null)
+                            new { contentId = item.Id, profileId = item.ProfileId }, null)
             </td>
             <td class="left">
                 @item.ContentKey

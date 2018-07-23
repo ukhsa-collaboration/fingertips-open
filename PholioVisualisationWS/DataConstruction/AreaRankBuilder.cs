@@ -1,20 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
     public class AreaRankBuilder
     {
-        public IGroupDataReader GroupDataReader { get; set; }
-        public IAreasReader AreasReader { get; set; }
-        public IArea Area { get; set; }
+        private IGroupDataReader _groupDataReader;
+        private IAreasReader _areasReader;
+        private IPholioLabelReader _pholioLabelReader;
+        private INumericFormatterFactory _numericFormatterFactory;
 
-        public AreaRankGrouping BuildRank(Grouping grouping, IndicatorMetadata indicatorMetadata,
-            TimePeriod timePeriod, IEnumerable<CoreDataSet> dataList)
+        public AreaRankBuilder(IGroupDataReader groupDataReader, IAreasReader areasReader,
+            IPholioLabelReader pholioLabelReader, INumericFormatterFactory numericFormatterFactory)
+        {
+            _groupDataReader = groupDataReader;
+            _areasReader = areasReader;
+            _pholioLabelReader = pholioLabelReader;
+            _numericFormatterFactory = numericFormatterFactory;
+        }
+
+        public AreaRankGrouping BuildRank(IArea area, Grouping grouping, IndicatorMetadata indicatorMetadata,
+            TimePeriod timePeriod, IList<CoreDataSet> dataList)
         {
             var validDataList = RankDataList.ValidDataList(dataList, grouping.PolarityId);
 
@@ -23,57 +33,73 @@ namespace PholioVisualisation.DataConstruction
                 return null;
             }
 
+            // Define limits
             var min = validDataList.First();
-            var minArea = AreasReader.GetAreaFromCode(min.AreaCode);
-
             var max = validDataList.Last();
-            var maxArea = AreasReader.GetAreaFromCode(max.AreaCode);
 
+            // Define rank and data
             CoreDataSet areaData;
             int? rank;
-            if (Area.IsCountry)
+            if (area.IsCountry || area.IsOnsClusterGroup)
             {
-                areaData = GroupDataReader.GetCoreData(grouping, timePeriod, Area.Code).FirstOrDefault();
+                areaData = _groupDataReader.GetCoreData(grouping, timePeriod, area.Code).FirstOrDefault();
                 rank = null;
             }
-            else if (Area is CategoryArea)
+            else if (area is CategoryArea)
             {
                 // Deprivation decile
-                var categoryArea = (CategoryArea)Area;
-                areaData = GroupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, categoryArea);
+                var categoryArea = (CategoryArea)area;
+                areaData = _groupDataReader.GetCoreDataForCategoryArea(grouping, timePeriod, categoryArea);
+                rank = null;
+            }
+            else if (area is NearestNeighbourArea)
+            {
+                // Nearest neighbour
+                areaData = CoreDataSet.GetNullObject(area.Code); // Average not calculated for neighbours
                 rank = null;
             }
             else
             {
-                areaData = AreaHelper.GetDataForAreaFromDataList(Area.Code, validDataList);
-                rank = validDataList.IndexOf(areaData) + 1;
+                // Define rank for child area
+                areaData = new CoreDataSetFilter(validDataList).SelectWithAreaCode(area.Code);
+                if (areaData == null)
+                {
+                    // Data not valid
+                    areaData = new CoreDataSetFilter(dataList).SelectWithAreaCode(area.Code);
+                    if (areaData == null)
+                    {
+                        // No data available
+                        areaData = CoreDataSet.GetNullObject(area.Code);
+                    }
+                    rank = null;
+                }
+                else
+                {
+                    rank = GetRank(validDataList, areaData);
+                }
             }
 
-            // Format data
-            var formatter = NumericFormatterFactory.New(indicatorMetadata, GroupDataReader);
-            formatter.Format(min);
-            formatter.Format(max);
-            formatter.Format(areaData);
-
-            // Reduce JSON footprint
-            var dataProcessor = new ValueDataProcessor(null);
-            dataProcessor.Truncate(areaData);
-            dataProcessor.Truncate(min);
-            dataProcessor.Truncate(max);
+            FormatAndTruncateData(indicatorMetadata, new List<CoreDataSet> { areaData, min, max });
 
             AreaRank areaRank = null;
             if (areaData != null)
-            {                
+            {
                 areaRank = new AreaRank
                 {
-                    // define Area when required
+                    Area = area,
                     Value = areaData.Value,
                     ValueFormatted = areaData.ValueFormatted,
                     Rank = rank,
                     Count = areaData.Count.Value,
-                    Denom = areaData.Denominator
+                    Denom = areaData.Denominator,
+                    ValueNote = GetValueNote(areaData)
                 };
             }
+
+            // Define areas
+            var areas = _areasReader.GetAreasFromCodes(new List<string> { min.AreaCode, max.AreaCode });
+            var minArea = areas.First(x => x.Code == min.AreaCode);
+            var maxArea = areas.First(x => x.Code == max.AreaCode);
 
             return new AreaRankGrouping
             {
@@ -94,9 +120,56 @@ namespace PholioVisualisation.DataConstruction
                     Area = maxArea,
                     Value = max.Value,
                     ValueFormatted = max.ValueFormatted,
-                    Rank = validDataList.Count(),
+                    Rank = validDataList.Count,
                     Count = max.Count.Value
+                },
+                IID = grouping.IndicatorId,
+                Sex = grouping.Sex,
+                Age = grouping.Age,
+                PolarityId = grouping.PolarityId
+            };
+        }
+
+        private void FormatAndTruncateData(IndicatorMetadata indicatorMetadata, List<CoreDataSet> dataList)
+        {
+            var formatter = _numericFormatterFactory.New(indicatorMetadata);
+            var dataProcessor = new ValueDataProcessor(null);
+
+            foreach (var data in dataList)
+            {
+                formatter.Format(data);
+                dataProcessor.Truncate(data);
+            }
+        }
+
+        public static int? GetRank(List<CoreDataSet> validDataList, CoreDataSet areaData)
+        {
+            var index = validDataList.IndexOf(areaData);
+
+            while (index > 0)
+            {
+                // If preceeding item has the same rank the use that instead
+                if (areaData.Value.Equals(validDataList[index - 1].Value))
+                {
+                    index--;
                 }
+                else
+                {
+                    break;
+                }
+            }
+
+            int? rank = index + 1;
+            return rank;
+        }
+
+
+        private ValueNote GetValueNote(CoreDataSet data)
+        {
+            return new ValueNote
+            {
+                Id = data.ValueNoteId,
+                Text = _pholioLabelReader.LookUpValueNoteLabel(data.ValueNoteId)
             };
         }
     }

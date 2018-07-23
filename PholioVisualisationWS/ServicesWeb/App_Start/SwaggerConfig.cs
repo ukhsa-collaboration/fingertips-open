@@ -5,15 +5,15 @@ using System.Web.Http;
 using System.Web.Http.Description;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.ServicesWeb;
 using WebActivatorEx;
-using ServicesWeb;
-using ServicesWeb.Helpers;
+using PholioVisualisation.ServicesWeb.Helpers;
 using Swashbuckle.Application;
 using Swashbuckle.Swagger;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
-namespace ServicesWeb
+namespace PholioVisualisation.ServicesWeb
 {
     /// <summary>
     /// Ensure any properties that have the JsonIgnore attribute are
@@ -48,18 +48,24 @@ namespace ServicesWeb
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
         {
             // Change host to be UI
-            swaggerDoc.host = UrlHelper.TrimProtocol(ApplicationConfiguration.UrlUI);
+            swaggerDoc.host = UrlHelper.TrimProtocol(ApplicationConfiguration.Instance.UrlUI);
 
             // Remove private API calls from live docs
-            if (ApplicationConfiguration.IsEnvironmentLive)
+            if (ApplicationConfiguration.Instance.IsEnvironmentLive)
             {
                 var omitedControllers = new List<string>
                 {
+                    "Content",
+                    "Documents",
                     "Home",
                     "Log",
-                    "StaticReports",
+                    "NonPublicServices",
                     "PdfReporting",
-                    "NonPublicServices"
+                    "Pholio",
+                    "StaticReports",
+                    "SSRSReport",
+                    "Upload",
+                    "UserFeedback"
                 };
 
                 foreach (var apiDescription in apiExplorer.ApiDescriptions)
@@ -78,10 +84,10 @@ namespace ServicesWeb
     {
         public static void Register()
         {
-            var uiUrl = ApplicationConfiguration.UrlUI;
+            var uiUrl = ApplicationConfiguration.Instance.UrlUI;
 
             // Only allow HTTPS access on live
-            if (ApplicationConfiguration.IsEnvironmentLive)
+            if (ApplicationConfiguration.Instance.IsEnvironmentLive)
             {
                 uiUrl = "https://" + UrlHelper.TrimProtocol(uiUrl);
             }
@@ -107,6 +113,10 @@ namespace ServicesWeb
                         //
                         c.SingleApiVersion("v1", "Public Health Data API");
 
+                        // If you want the output Swagger docs to be indented properly, enable the "PrettyPrint" option.
+                        //
+                        //c.PrettyPrint();
+
                         // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
                         // In this case, you must provide a lambda that tells Swashbuckle which actions should be
                         // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version"
@@ -130,6 +140,7 @@ namespace ServicesWeb
                         //c.BasicAuth("basic")
                         //    .Description("Basic HTTP Authentication");
                         //
+                        // NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
                         //c.ApiKey("apiKey")
                         //    .Description("API Key Authentication")
                         //    .Name("apiKey")
@@ -222,6 +233,9 @@ namespace ServicesWeb
 
                         c.DocumentFilter<FingertipsApiDocumentFilter>();
 
+                        //
+                        //c.OperationFilter<AddDefaultResponse>();
+                        //
                         // If you've defined an OAuth2 flow as described above, you could use a custom filter
                         // to inspect some attribute on each action and infer which (if any) OAuth2 scopes are required
                         // to execute the operation
@@ -249,17 +263,21 @@ namespace ServicesWeb
                     })
                 .EnableSwaggerUi(c =>
                     {
+                        // Use the "DocumentTitle" option to change the Document title.
+                        // Very helpful when you have multiple Swagger pages open, to tell them apart.
+                        //
+                        c.DocumentTitle("Public Health Data API");
+
                         // Use the "InjectStylesheet" option to enrich the UI with one or more additional CSS stylesheets.
                         // The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown below.
                         //
-                        c.InjectStylesheet(Assembly.GetAssembly(typeof(SwaggerConfig)), "ServicesWeb.swagger.css");
+                        c.InjectStylesheet(Assembly.GetAssembly(typeof(SwaggerConfig)), "PholioVisualisation.ServicesWeb.swagger.css");
 
                         // Use the "InjectJavaScript" option to invoke one or more custom JavaScripts after the swagger-ui
                         // has loaded. The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown above.
                         //
-                        //var thisAssembly = typeof(SwaggerConfig).Assembly;
                         //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
 
                         // The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false"
@@ -280,6 +298,11 @@ namespace ServicesWeb
                         //
                         //c.DocExpansion(DocExpansion.List);
 
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
+                        // it for all operations.
+                        //
+                        //c.SupportedSubmitMethods("GET", "HEAD");
+
                         // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
                         // It's typically used to instruct Swashbuckle to return your version instead of the default
                         // when a request is made for "index.html". As with all custom content, the file must be included
@@ -298,13 +321,24 @@ namespace ServicesWeb
                         // If your API supports the OAuth2 Implicit flow, and you've described it correctly, according to
                         // the Swagger 2.0 specification, you can enable UI support as shown below.
                         //
-                        //c.EnableOAuth2Support("test-client-id", "test-realm", "Swagger UI");
+                        //c.EnableOAuth2Support(
+                        //    clientId: "test-client-id",
+                        //    clientSecret: null,
+                        //    realm: "test-realm",
+                        //    appName: "Swagger UI"
+                        //    //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
+                        //);
+
+                        // If your API supports ApiKey, you can override the default values.
+                        // "apiKeyIn" can either be "query" or "header"
+                        //
+                        //c.EnableApiKeySupport("apiKey", "header");
                     });
         }
 
         protected static string GetXmlCommentsPath()
         {
-            var path = System.String.Format(@"{0}bin\SwaggerDocs.xml", System.AppDomain.CurrentDomain.BaseDirectory);
+            var path = string.Format(@"{0}bin\SwaggerDocs.xml", AppDomain.CurrentDomain.BaseDirectory);
             return path;
         }
     }

@@ -1,5 +1,5 @@
 ﻿
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public class KeyDisplay
     {

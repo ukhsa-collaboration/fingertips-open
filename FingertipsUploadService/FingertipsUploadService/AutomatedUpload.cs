@@ -42,7 +42,6 @@ namespace FingertipsUploadService
                     DateCreated = DateTime.Now,
                     Guid = guid,
                     Filename = actualFilename,
-                    JobType = UploadJobType.Batch,
                     Status = UploadJobStatus.NotStarted,
                     UserId = AppConfig.GetAutoUploadUserId(),
                 };

@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
+using PholioVisualisation.Parsers;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.Services;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     [RoutePrefix("api")]
     public class ProfilesController : BaseController
@@ -25,13 +25,16 @@ namespace ServicesWeb.Controllers
         {
             try
             {
+                var groupDataReader = ReaderFactory.GetGroupDataReader();
                 var profileConfigs = ReaderFactory.GetProfileReader().GetAllProfiles();
                 IList<Profile> profiles = new List<Profile>();
                 foreach (var profileConfig in profileConfigs)
                 {
                     if (profileConfig.ProfileId != ProfileIds.Search)
                     {
-                        profiles.Add(new ProfileInitialiser(profileConfig).InitialisedProfile);
+                        var profile = new ProfileInitialiser(profileConfig).InitialisedProfile;
+                        profiles.Add(profile);
+                        profile.GroupMetadata = groupDataReader.GetGroupingMetadataList(profile.GroupIds);
                     }
                 }
                 return profiles;
@@ -53,7 +56,9 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                return ReaderFactory.GetProfileReader().GetProfile(profile_id);
+                var profile = ReaderFactory.GetProfileReader().GetProfile(profile_id);
+                profile.GroupMetadata = ReaderFactory.GetGroupDataReader().GetGroupingMetadataList(profile.GroupIds);
+                return profile;
             }
             catch (Exception ex)
             {
@@ -109,30 +114,6 @@ namespace ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a content string associated with a specific profile
-        /// </summary>
-        /// <remarks>
-        /// </remarks>
-        /// <param name="profile_id">Profile ID</param>
-        /// <param name="key">Content key unique within the profile</param>
-        [HttpGet]
-        [Route("content")]
-        public string GetContent(int profile_id, string key)
-        {
-            try
-            {
-                var reader = ReaderFactory.GetContentReader();
-                ContentItem data = reader.GetContentForProfile(profile_id, key);
-                return data != null ? data.Content : string.Empty;
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// For each indicator lists the profiles that it is included in
         /// </summary>
         /// <remarks>A dictionary of indicator ID to a list of profiles
@@ -145,7 +126,7 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                var response = new ProfilePerIndicatorBuilder(ApplicationConfiguration.IsEnvironmentLive)
+                var response = new ProfilePerIndicatorBuilder(ApplicationConfiguration.Instance.IsEnvironmentLive)
                     .Build(new IntListStringParser(indicator_ids).IntList, area_type_id);
                 return response;
             }
@@ -154,6 +135,20 @@ namespace ServicesWeb.Controllers
                 Log(ex);
                 throw;
             }
+        }
+
+        private static IList<Profile> GetProfilesFromIds(IList<int> profileIds)
+        {
+            // Remove system profiles
+            profileIds = ProfileFilter.RemoveSystemProfileIds(profileIds);
+
+            var profileConfigs = ReaderFactory.GetProfileReader().GetProfilesById(profileIds);
+            IList<Profile> profiles = new List<Profile>();
+            foreach (var profileConfig in profileConfigs)
+            {
+                profiles.Add(new ProfileInitialiser(profileConfig).InitialisedProfile);
+            }
+            return profiles;
         }
     }
 }

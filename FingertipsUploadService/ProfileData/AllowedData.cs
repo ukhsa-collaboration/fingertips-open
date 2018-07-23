@@ -60,7 +60,10 @@ namespace FingertipsUploadService.ProfileData
             {
                 if (valueNoteIds == null)
                 {
-                    valueNoteIds = profilesReader.GetAllValueNoteIds().ToList();
+                    valueNoteIds = profilesReader.GetAllValueNoteIds()
+                        // Users cannot upload data with note for system aggregated values
+                        .Where(x => x != ProfileData.ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips)
+                        .ToList();
                 }
                 return valueNoteIds;
             }

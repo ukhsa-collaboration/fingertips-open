@@ -1,5 +1,4 @@
 ﻿using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Core;
 using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -13,64 +12,39 @@ namespace Fpm.ProfileDataTest.Respositories
     {
         private CoreDataRepository _coreDataRepository;
         private LoggingRepository _loggingRepository;
-        private static Guid batchId;
+        private Guid _batchId;
 
-        private const int indicatorId = IndicatorIds.ChildrenInPoverty;
+        private const int IndicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
         [TestInitialize]
         public void Init()
         {
-            _coreDataRepository = new CoreDataRepository();
+            _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
             _loggingRepository = new LoggingRepository();
             AutoMapperConfig.RegisterMappings();
-            batchId = Guid.NewGuid();
+            _batchId = Guid.NewGuid();
         }
 
         [TestCleanup]
         public void CleanUp()
         {
-            _coreDataRepository.DeleteCoreDataArchive(batchId);
-            _coreDataRepository.DeleteCoreData(batchId);
+            _coreDataRepository.DeleteCoreDataArchive(_batchId);
+            _coreDataRepository.DeleteCoreDataSet(_batchId);
 
             _coreDataRepository.Dispose();
             _loggingRepository.Dispose();
         }
 
         [TestMethod]
-        public void TestInsertUploadAudit()
-        {
-            //Insert the upload audit record
-            var uploadId = _loggingRepository.InsertUploadAudit(Guid.NewGuid(),
-                "TestUser", 10, @"C:\\Fingertips\\Test.xls", "Pholio$");
-
-            //Read the upload audit record back
-
-            var uploadAudit = _loggingRepository.GetUploadAudit(uploadId);
-
-            Assert.IsTrue(uploadAudit != null);
-
-            Assert.IsTrue(uploadAudit.Id == uploadId);
-
-            Assert.IsTrue(uploadAudit.UploadedBy == "TestUser");
-
-            //Delete the new record
-            _loggingRepository.DeleteUploadAudit(uploadId);
-
-            uploadAudit = _loggingRepository.GetUploadAudit(uploadId);
-
-            Assert.IsTrue(uploadAudit == null);
-        }
-
-        [TestMethod]
         public void TestDeleteCoreDataExecutes()
         {
-            _coreDataRepository.DeleteCoreData(batchId);
+            _coreDataRepository.DeleteCoreDataSet(_batchId);
         }
 
         [TestMethod]
         public void TestDeleteCoreDataArchive()
         {
-            _coreDataRepository.DeleteCoreDataArchive(batchId);
+            _coreDataRepository.DeleteCoreDataArchive(_batchId);
         }
 
         [TestMethod]
@@ -85,7 +59,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void GetAreaTypes_Returns_Non_Zero_Result()
         {
-            var result = _coreDataRepository.GetAreaTypes(indicatorId);
+            var result = _coreDataRepository.GetAreaTypes(IndicatorId);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -94,7 +68,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void GetSexes_Returns_Non_Zero_Result()
         {
-            var result = _coreDataRepository.GetSexes(indicatorId);
+            var result = _coreDataRepository.GetSexes(IndicatorId);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -103,7 +77,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void GetAges_Returns_Non_Zero_Result()
         {
-            var result = _coreDataRepository.GetAges(indicatorId);
+            var result = _coreDataRepository.GetAges(IndicatorId);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -112,7 +86,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void GetYearRanges_Returns_Non_Zero_Result()
         {
-            var result = _coreDataRepository.GetYearRanges(indicatorId);
+            var result = _coreDataRepository.GetYearRanges(IndicatorId);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -121,7 +95,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void GetYears_Returns_Non_Zero_Result()
         {
-            var result = _coreDataRepository.GetYears(indicatorId);
+            var result = _coreDataRepository.GetYears(IndicatorId);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -149,7 +123,7 @@ namespace Fpm.ProfileDataTest.Respositories
         public void GetCoreDataSet_Returns_Non_Zero_Result()
         {
             int rowsCount;
-            var result = _coreDataRepository.GetCoreDataSet(indicatorId, out rowsCount);
+            var result = _coreDataRepository.GetCoreDataSet(IndicatorId, out rowsCount);
 
             Assert.IsTrue(result != null
                 && result.Any());
@@ -159,14 +133,14 @@ namespace Fpm.ProfileDataTest.Respositories
         public void GetCoreDataSet_Returns_Result_For_Given_Filters()
         {
             int rowsFound;
-            var filters = new Dictionary<string, int>();
+            var filters = new Dictionary<string, object>();
 
             filters.Add(CoreDataFilters.Year, 2011);
             filters.Add(CoreDataFilters.Month, 8);
             filters.Add(CoreDataFilters.SexId, SexIds.Persons);
             filters.Add(CoreDataFilters.AreaTypeId, AreaTypeIds.GpPractice);
 
-            var result = _coreDataRepository.GetCoreDataSet(indicatorId, filters, out rowsFound);
+            var result = _coreDataRepository.GetCoreDataSet(IndicatorId, filters, out rowsFound);
 
             Assert.IsTrue(result != null);
 
@@ -182,7 +156,7 @@ namespace Fpm.ProfileDataTest.Respositories
         {
             var userName = UserNames.Doris;
 
-            var result = _coreDataRepository.CanDeleteDataSet(indicatorId, userName);
+            var result = _coreDataRepository.CanDeleteDataSet(IndicatorId, userName);
 
             Assert.IsTrue(result);
         }
@@ -190,7 +164,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void CanDeleteDataSet_Returns_False_For_UnInvalidUser()
         {
-            var result = _coreDataRepository.CanDeleteDataSet(indicatorId, UserNames.NotAGenuineUserName);
+            var result = _coreDataRepository.CanDeleteDataSet(IndicatorId, UserNames.NotAGenuineUserName);
 
             Assert.IsFalse(result);
         }
@@ -205,29 +179,26 @@ namespace Fpm.ProfileDataTest.Respositories
             Assert.IsTrue(result == false);
         }
 
-        private static CoreDataSet GetRecordToInsert()
+        [TestMethod]
+        public void DeleteCoreDataSet_Executes_If_Not_A_Real_Indicator_Id()
         {
-            var val = new Random(150).Next();
-            return new CoreDataSet()
-            {
-                IndicatorId = IndicatorIds.ObesityYear6,
-                Year = 2014,
-                YearRange = 1,
-                Quarter = -1,
-                Month = -1,
-                SexId = SexIds.Male,
-                AgeId = AgeIds.AllAges,
-                AreaCode = AreaCodes.CountyUa_Cambridgeshire,
-                Count = val,
-                Value = val,
-                LowerCi = val,
-                UpperCi = val,
-                Denominator = 0,
-                Denominator_2 = 0,
-                ValueNoteId = 0,
-                CategoryTypeId = 1,
-                CategoryId = 1
-            };
+            var userName = UserNames.Shan;
+
+            var result = _coreDataRepository.DeleteCoreDataSet(IndicatorIds.Undefined, 
+                new Dictionary<string, object>(), userName);
+
+            Assert.AreEqual(0, result);
+        }
+
+        [TestMethod]
+        public void DeleteCoreDataSet_Can_Delete_Data()
+        {
+            var userName = UserNames.Shan;
+
+            var result = _coreDataRepository.DeleteCoreDataSet(IndicatorIds.MrsaBloodstreamInfections,
+                new Dictionary<string, object>(), userName);
+
+            Assert.IsTrue(result > -1);
         }
     }
 }

@@ -8,8 +8,11 @@
       <generator class="identity" />
     </id>
 
-    <property name="Name" column="name" />    
+    <property name="Name" column="name" />
+    <property name="File" column="filename" />
     <property name="Parameters" column="parameters" />
+    <property name="Notes" column="notes" />
+    <property name="IsLive" column="isLive" />
   </class>
 
   <class name="ReportsProfileMapping" table="SSRS_ReportsProfileMapping">

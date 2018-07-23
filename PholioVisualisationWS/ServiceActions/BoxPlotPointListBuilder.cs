@@ -24,12 +24,11 @@ namespace PholioVisualisation.ServiceActions
             var grouping = GetGrouping(groupingDifferentiator, parentArea, profileId);
             var timePeriods = TimePeriodIterator.TimePeriodsFromGrouping(grouping, indicatorMetadata.YearType);
 
-            var indicatorStatsBuilder = new IndicatorStatsBuilder();
+            var indicatorStatsBuilder = new IndicatorStatsBuilder(indicatorMetadata, parentArea, profileId);
 
             foreach (var timePeriod in timePeriods)
             {
-               var indicatorStats = indicatorStatsBuilder.GetIndicatorStats(timePeriod, grouping,
-                    indicatorMetadata, parentArea, profileId);
+               var indicatorStats = indicatorStatsBuilder.GetIndicatorStats(grouping, timePeriod);
                 boxPlotPoints.Add(indicatorStats);
             }
 

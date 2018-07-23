@@ -44,7 +44,7 @@ namespace Fpm.MainUISeleniumTest
             SeleniumHelper.WaitForExpectedElementToBeVisible(driver, By.Id("copyIndicators"));
 
             // Check the correct profile is selected in the profile menu
-            var copyProfileSelect = driver.FindElement(By.Id("selectedProfileId"));
+            var copyProfileSelect = driver.FindElement(By.Id("TargetProfileUrlKey"));
             var copySelectElement = new SelectElement(copyProfileSelect);
             var selectedProfileName = copySelectElement.SelectedOption.Text;
             Assert.AreEqual("Hypertension", selectedProfileName, "Incorrect profile selected");

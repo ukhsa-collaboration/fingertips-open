@@ -4,7 +4,7 @@ using NHibernate.Cfg;
 using System;
 using System.Collections.Generic;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     /// <summary>
     /// An implementation of IDataAccessServiceFactory that uses NHibernate to persist data
@@ -93,7 +93,7 @@ namespace Profiles.DataAccess
             if (staticSessionFactory == null)
             {
                 List<string> assemblyNames = new List<string>();
-                assemblyNames.Add("Profiles.DomainObjects");
+                assemblyNames.Add("IndicatorsUI.DomainObjects");
                 staticSessionFactory = new ReaderFactory(assemblyNames).sessionFactory;
             }
 

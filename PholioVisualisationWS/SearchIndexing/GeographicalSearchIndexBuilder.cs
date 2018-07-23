@@ -168,10 +168,13 @@ namespace PholioVisualisation.SearchIndexing
             AddParentAreaMapping(doc, AreaTypeIds.GoRegion, parentAreas.AreaCode6);
             AddParentAreaMapping(doc, AreaTypeIds.CountyAndUnitaryAuthority, parentAreas.AreaCode102);
             AddParentAreaMapping(doc, AreaTypeIds.DistrictAndUnitaryAuthority, parentAreas.AreaCode101);
-            AddParentAreaMapping(doc, AreaTypeIds.Ccg, parentAreas.AreaCode19);
-            AddParentAreaMapping(doc, AreaTypeIds.Subregion, parentAreas.AreaCode46);
+            AddParentAreaMapping(doc, AreaTypeIds.CcgsPreApr2017, parentAreas.AreaCode153);
             AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2013To2015, parentAreas.AreaCode103);
             AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2015, parentAreas.AreaCode104);
+
+            // Subregion removed as searchable area type because boundary changes mean we no longer have
+            // the postcode mappings
+            //AddParentAreaMapping(doc, AreaTypeIds.Subregion, parentAreas.AreaCode46);
         }
 
         private void AddParentAreaMapping(Document doc, int areaTypeId, string areaCode)

@@ -17,7 +17,7 @@ namespace Fpm.MainUITest.Helpers
         [TestInitialize]
         public void TestInitialize()
         {
-            _profileRepository = new ProfileRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
             _profilesReader = ReaderFactory.GetProfilesReader();
         }
 

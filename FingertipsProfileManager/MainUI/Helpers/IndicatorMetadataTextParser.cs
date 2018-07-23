@@ -6,7 +6,12 @@ using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class IndicatorMetadataTextParser
+    public interface IIndicatorMetadataTextParser
+    {
+        IList<IndicatorMetadataTextItem> Parse(string concaternatedMetadataProperties);
+    }
+
+    public class IndicatorMetadataTextParser : IIndicatorMetadataTextParser
     {
         public const char Separator = '¬';
 

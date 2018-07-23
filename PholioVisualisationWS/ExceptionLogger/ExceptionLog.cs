@@ -11,7 +11,7 @@ namespace PholioVisualisation.ExceptionLogging
     {
         public static void LogException(Exception ex, string url)
         {
-            string filePath = ApplicationConfiguration.ExceptionLogFilePath;
+            string filePath = ApplicationConfiguration.Instance.ExceptionLogFilePath;
             if (string.IsNullOrEmpty(filePath) == false)
             {
                 // Log to local file if log file
@@ -27,7 +27,7 @@ namespace PholioVisualisation.ExceptionLogging
         {
             string jsonException = new JavaScriptSerializer().Serialize(new
             {
-                application = ApplicationConfiguration.ApplicationName,
+                application = ApplicationConfiguration.Instance.ApplicationName,
                 username = "PholioVisualisationWS",
                 message = ex.Message,
                 stackTrace = ex.StackTrace,
@@ -37,7 +37,7 @@ namespace PholioVisualisation.ExceptionLogging
                 server = Environment.MachineName
             });
 
-            var logger = WebRequest.Create(ApplicationConfiguration.CoreWsUrlForLogging + "log/exception") as HttpWebRequest;
+            var logger = WebRequest.Create(ApplicationConfiguration.Instance.CoreWsUrlForLogging + "log/exception") as HttpWebRequest;
             logger.ContentType = "application/json";
             logger.Method = "POST";
 

@@ -29,6 +29,11 @@ namespace PholioVisualisation.Formatting
 
         public static string CommariseFormattedValue(string s)
         {
+            if (s == "-")
+            {
+                return s;
+            }
+
             if (s.IndexOf('.') > -1)
             {
                 var bits = s.Split('.');

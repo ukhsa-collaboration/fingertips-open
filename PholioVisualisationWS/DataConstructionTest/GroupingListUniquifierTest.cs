@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
@@ -69,6 +70,46 @@ namespace PholioVisualisation.DataConstructionTest
             grouping.AgeId = UniqueValue;
             var uniqueGroupings = UniqueGroupings(Grouping(), grouping);
             Assert.AreEqual(2, uniqueGroupings.Count);
+        }
+
+        [TestMethod]
+        public void Test_Widest_Time_Period_Range_Is_Used_For_Grouping()
+        {
+            // Arrange: data with a variety of years
+            var grouping1 = Grouping();
+            grouping1.BaselineYear = 2001;
+            grouping1.DataPointYear = 2009;
+            var grouping2 = Grouping();
+            grouping2.BaselineYear = 2000;
+            grouping2.DataPointYear = 2009;
+            var grouping3 = Grouping();
+            grouping3.BaselineYear = 2001;
+            grouping3.DataPointYear = 2010;
+
+            var uniqueGroupings = UniqueGroupings(grouping1, grouping2, grouping3);
+
+            // Assert: earliest baseline and latest datapoint used
+            Assert.AreEqual(1, uniqueGroupings.Count);
+            Assert.AreEqual(2000, uniqueGroupings.First().BaselineYear);
+            Assert.AreEqual(2010, uniqueGroupings.First().DataPointYear);
+        }
+
+        [TestMethod]
+        public void Test_Commonest_Polarity_Is_Used_For_Grouping()
+        {
+            // Arrange: data with a variety of years
+            var grouping1 = Grouping();
+            grouping1.PolarityId = PolarityIds.NotApplicable;
+            var grouping2 = Grouping();
+            grouping2.PolarityId = PolarityIds.BlueOrangeBlue;
+            var grouping3 = Grouping();
+            grouping3.PolarityId = PolarityIds.BlueOrangeBlue;
+
+            var uniqueGroupings = UniqueGroupings(grouping1, grouping2, grouping3);
+
+            // Assert: commonest polarity id used
+            Assert.AreEqual(1, uniqueGroupings.Count);
+            Assert.AreEqual(PolarityIds.BlueOrangeBlue, uniqueGroupings.First().PolarityId);
         }
 
         private static Grouping Grouping()

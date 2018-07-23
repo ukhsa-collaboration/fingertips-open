@@ -1,0 +1,88 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.IndicatorGridModel
+@if (Model.IndicatorNamesGrid != null)
+{
+    <table class="grid sortable">
+        <thead>
+        <tr>
+            <th class="header">Seq</th>
+            <th class="header">Id</th>
+            <th class="header">Indicator Name</th>
+            <th class="header">Sex</th>
+            <th class="header">Age Id</th>
+            <th class="header">From</th>
+            <th class="header">To</th>
+            <th class="header">Benchmarking Method</th>
+            <th>
+                Select @Html.CheckBox("select-all", false, new {@class = "select-all-check-box"})
+            </th>
+            <th>Data</th>
+        </tr>
+        </thead>
+        @foreach (var item in Model.IndicatorNamesGrid)
+        {
+            var timePeriodHelper = new TimePeriodHelper(item);
+            var later = timePeriodHelper.GetPeriodIfLaterThanDatapoint();
+
+            <tr>
+                <td class="center">
+                    @item.Sequence
+                </td>
+                <td class="center">
+                    <a class="edit-link" href="@(Model.GetIndicatorUrl(item.IndicatorId, item.AgeId, item.SexId))">@item.IndicatorId</a>
+                </td>
+                <td class="left">
+                    <a class="edit-link" href="@(Model.GetIndicatorUrl(item.IndicatorId, item.AgeId, item.SexId))">@item.IndicatorName</a>
+                </td>
+                <td class="center">
+                    @item.Sex
+                </td>
+                <td class="left">
+                    @item.Age (@item.AgeId)
+                </td>
+                <td class="left">
+                    @timePeriodHelper.GetBaselineString()
+                </td>
+                <td class="left">
+                    @if (later != null)
+                    {
+                        <a class="info-tooltip text-tooltip later-period"
+                           laterstring="@timePeriodHelper.GetLatestPeriodString()"
+                           year="@later.Year" quarter="@later.Quarter" month="@later.Month"
+                           indicatorid="@item.IndicatorId" sexid="@item.SexId" ageid="@item.AgeId" yearrange="@later.YearRange">
+                            @timePeriodHelper.GetDatapointString()
+                        </a>
+                    }
+                    else
+                    {
+                        @timePeriodHelper.GetDatapointString()
+                    }
+                </td>
+                @if (item.ComparatorConfidence != "" && item.ComparatorConfidence != "-1")
+                {
+                    <td class="left">
+                        @item.ComparatorMethod (@item.ComparatorConfidence)
+                    </td>
+                }
+                else
+                {
+                    <td class="left">
+                        @item.ComparatorMethod
+                    </td>
+                }
+                <td class="center">
+                    @Html.CheckBox(item.IndicatorId + "_selected", false,
+                        new
+                        {
+                            @class = "indicator-check-box",
+                            @value = item.IndicatorId + "~" + item.SexId + "~" + item.AgeId
+                        })
+                </td>
+                <td class="center">
+                    <input type="button" class="view-indicator-data-btn" id="view-data-@item.IndicatorId"
+                           value="View Data" indicatorname="@item.IndicatorName"/>
+                </td>
+            </tr>
+        }
+    </table>
+}

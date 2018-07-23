@@ -32,7 +32,7 @@ namespace PholioVisualisation.PdfData
             this.groupRootSelector = groupRootSelector;
             this.indicatorMetadataCollection = indicatorMetadataCollection;
 
-            _indicatorComparerFactory = new IndicatorComparerFactory {PholioReader = pholioReader};
+            _indicatorComparerFactory = new IndicatorComparerFactory { PholioReader = pholioReader };
         }
 
         public KeyMessageData BuildData()
@@ -63,7 +63,7 @@ namespace PholioVisualisation.PdfData
             // Key Message 4
             AssignAdultAlcoholAdmissions();
             AssignAdultSelfHarmAdmissions();
-            AssignAdultSmokingRelatedDeaths();
+            AssignAdultSmokingInRoutineAndManualOccupations();
             AssignAdultExcessWeightSig();
             AssignAdultSmokingPrevalenceSig();
             AssignAdultPhysicalActivitySig();
@@ -71,10 +71,9 @@ namespace PholioVisualisation.PdfData
             AssignAdultSTISig();
             AssignAdultKilledAndSeriouslyInjuredOnRoadsSig();
             AssignAdultIncidenceOfTBSig();
-
             AssignAdultStatutoryHomelessnessSig();
             AssignAdultViolentCrimeSig();
-            AssignAdultLongTermUnemploymentSig();
+            AssignPeopleInEmploymentSig();
             AssignAdultExcessWinterDeathsSig();
             AssignAdultUnder75MortalityRateCvdSig();
             AssignAdultUnder75MortalityRateCancerSig();
@@ -188,7 +187,7 @@ namespace PholioVisualisation.PdfData
 
         private bool IsSlopeIndexOfInequalityForLifeExpectancySignificant(CoreDataSet data)
         {
-            return data.LowerCI > 0 || data.UpperCI < 0;
+            return data.LowerCI95 > 0 || data.UpperCI95 < 0;
         }
 
         #endregion
@@ -341,56 +340,30 @@ namespace PholioVisualisation.PdfData
 
         #endregion
 
-        #region 4.4
-
-        private void AssignAdultSmokingRelatedDeaths()
-        {
-            Grouping grouping = groupRootSelector.AdultSmokingRelatedDeaths.FirstGrouping;
-            Significance significance;
-            CoreDataSet coreDataSet = GetCoreDataSet(grouping, out significance);
-
-            keyMessageData.AdultSmokingRelatedDeathsSignificance = significance;
-
-            if (coreDataSet != null)
-            {
-                if (coreDataSet.IsValueValid)
-                {
-                    keyMessageData.AdultSmokingRelatedDeaths = coreDataSet.Value;
-                }
-
-                if (coreDataSet.IsCountValid)
-                {
-                    keyMessageData.AdultSmokingRelatedDeathsPerYear = coreDataSet.CountPerYear;
-                }
-            }
-        }
-
-        #endregion
-
         #region 4.5
 
         private void AssignAdultExcessWeightSig()
         {
-            Grouping grouping = groupRootSelector.AdultExcessWeight.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultExcessWeightSignificance = significance;
+            keyMessageData.AdultExcessWeightSignificance =
+                GetSig(groupRootSelector.AdultExcessWeight);
         }
 
         private void AssignAdultSmokingPrevalenceSig()
         {
-            Grouping grouping = groupRootSelector.AdultSmokingPrevalence.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultSmokingPrevalenceSignificance = significance;
+            keyMessageData.AdultSmokingPrevalenceSignificance =
+                GetSig(groupRootSelector.AdultSmokingPrevalence);
         }
 
         private void AssignAdultPhysicalActivitySig()
         {
-            Grouping grouping = groupRootSelector.AdultPhysicalActivity.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultPhysicalActivitySignificance = significance;
+            keyMessageData.AdultPhysicalActivitySignificance =
+                GetSig(groupRootSelector.AdultPhysicalActivity);
+        }
+
+        private void AssignAdultSmokingInRoutineAndManualOccupations()
+        {
+            keyMessageData.AdultSmokingInRoutineAndManualOccupationsSignificance =
+                GetSig(groupRootSelector.AdultSmokingInRoutineAndManualOccupations);
         }
 
         #endregion
@@ -399,34 +372,32 @@ namespace PholioVisualisation.PdfData
 
         private void AssignAdultHipFracturesSig()
         {
-            Grouping grouping = groupRootSelector.AdultHipFractures.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultHipFracturesSignificance = significance;
+            keyMessageData.AdultHipFracturesSignificance = GetSig(groupRootSelector.AdultHipFractures);
         }
 
         private void AssignAdultSTISig()
         {
-            Grouping grouping = groupRootSelector.AdultSTI.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultSTISignificance = significance;
+            keyMessageData.AdultSTISignificance = GetSig(groupRootSelector.AdultSTI);
         }
 
         private void AssignAdultKilledAndSeriouslyInjuredOnRoadsSig()
         {
-            Grouping grouping = groupRootSelector.AdultKilledAndSeriouslyInjuredOnRoads.FirstGrouping;
-            Significance significance;
-            GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultKilledAndSeriouslyInjuredOnRoadsSignificance = significance;
+            keyMessageData.AdultKilledAndSeriouslyInjuredOnRoadsSignificance = GetSig(
+                groupRootSelector.AdultKilledAndSeriouslyInjuredOnRoads);
         }
 
         private void AssignAdultIncidenceOfTBSig()
         {
-            Grouping grouping = groupRootSelector.AdultIncidenceOfTB.FirstGrouping;
+            keyMessageData.AdultIncidenceOfTBSignificance = GetSig(
+                groupRootSelector.AdultIncidenceOfTB);
+        }
+
+        private Significance GetSig(GroupRoot groupRoot)
+        {
+            Grouping grouping = groupRoot.FirstGrouping;
             Significance significance;
             GetCoreDataSet(grouping, out significance);
-            keyMessageData.AdultIncidenceOfTBSignificance = significance;
+            return significance;
         }
 
         #endregion
@@ -444,10 +415,10 @@ namespace PholioVisualisation.PdfData
             keyMessageData.AdultViolentCrimeSig = GetSignificanceOnly(groupRootSelector.AdultViolentCrime);
         }
 
-        public void AssignAdultLongTermUnemploymentSig()
+        public void AssignPeopleInEmploymentSig()
         {
-            keyMessageData.AdultLongTermUnemploymentSig =
-                GetSignificanceOnly(groupRootSelector.AdultLongTermUnemployment);
+            keyMessageData.PeopleInEmploymentSig =
+                GetSignificanceOnly(groupRootSelector.PeopleInEmployment);
         }
 
         public void AssignAdultExcessWinterDeathsSig()

@@ -3,7 +3,6 @@
                    assembly="Fpm.ProfileData"
                    namespace="Fpm.ProfileData.Entities.LookUps">
 
-
   <!-- Skin class -->
   <class name="Skin" table="ui_siteskins">
 
@@ -37,27 +36,27 @@
 
   </class>
 
- <!-- Year Type class -->
-<class name="YearType" table="l_yeartypes">
+  <!-- Year Type class -->
+  <class name="YearType" table="l_yeartypes">
 
-  <id name="Id" column="yeartypeid" type="Int32" unsaved-value="-1">
-    <generator class="identity"/>
-  </id>
+    <id name="Id" column="yeartypeid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
 
-  <property name="Label" column="yeartype"/>
+    <property name="Label" column="yeartype"/>
 
-</class>
+  </class>
 
+  <!-- Unit class -->
   <class name="Unit" table="l_units">
 
-  <id name="Id" column="unitid" type="Int32" unsaved-value="-1">
-    <generator class="identity"/>
-  </id>
-  <property name="Label" column="unit"/>
-  <property name="IsCurrent" column="IsCurrent"/>
+    <id name="Id" column="unitid" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Label" column="unit"/>
+    <property name="IsCurrent" column="IsCurrent"/>
 
-</class>
-
+  </class>
 
   <!-- ConfidenceIntervalMethod class -->
   <class name="ConfidenceIntervalMethod" table="l_cimethods">
@@ -108,6 +107,21 @@
     <property name="IsSupported" column="issupported"/>
     <property name="IsSearchable" column="issearchable"/>
     <property name="ShouldWarnForSmallNumbers" column="shouldwarnforsmallnumbers"/>
+
+    <set name="ComponentAreaTypes" cascade="all" inverse="true">
+      <key column="areatypeid" />
+      <one-to-many class="AreaTypeComponent" />
+    </set>
+  </class>
+
+  <!-- AreaTypeComponent class -->
+  <class name="AreaTypeComponent" table="l_areatypecomponents">
+
+    <composite-id>
+      <key-property name="AreaTypeId" column="areatypeid" />
+      <key-property name="ComponentAreaTypeId" column="componentareatypeid" />
+    </composite-id>
+
   </class>
 
   <!-- Value Type class -->
@@ -134,7 +148,7 @@
 
   </class>
 
-  
+
   <!-- DenominatorType class -->
   <class name="DenominatorType" table="L_DenominatorTypes">
 
@@ -171,6 +185,8 @@
     </id>
     <property name="Name" column="name"/>
     <property name="ShortName" column="shortname"/>
+    <property name="Description" column="description"/>
+    <property name="Notes" column="notes"/>
   </class>
 
 </hibernate-mapping>

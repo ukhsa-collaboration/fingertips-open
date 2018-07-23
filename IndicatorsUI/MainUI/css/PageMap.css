@@ -116,9 +116,10 @@
 }
 
 table.custom-key-table td {
-	width: 90px;
+	width: 80px;
 	text-align: center;
 	padding: 2px;
+    border: solid 1px #fff;
 }
 
 td.continual_range
@@ -130,10 +131,6 @@ td.whiteText {
 	color: #FFFFFF;
 }
 
-/* Allow the PDF and the map layers buttons to both float on same line */
-.leaflet-right .leaflet-control {
-	clear: none;
-}
 .layerControl p {
 	margin-left: 5px;
 }
@@ -223,3 +220,4 @@ td.whiteText {
     height: 100%;
     width: 100%;
 }
+

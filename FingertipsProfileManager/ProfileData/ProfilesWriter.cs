@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using NHibernate;
 
@@ -22,15 +23,16 @@ namespace Fpm.ProfileData
         public void UpdateTargetConfig(TargetConfig target)
         {
             var fromDatabase = GetTargetById(target.Id);
-
-            // Copy properties to object retrieved from the database
-            fromDatabase.LowerLimit = target.LowerLimit;
-            fromDatabase.UpperLimit = target.UpperLimit;
-            fromDatabase.Description = target.Description;
-            fromDatabase.PolarityId = target.PolarityId;
-            fromDatabase.LegendHtml = target.LegendHtml;
-
+            CopyTargetConfig(target, fromDatabase);
             UpdateObject(fromDatabase);
+        }
+
+        public TargetConfig NewTargetConfig(TargetConfig target)
+        {
+            var newTarget = new TargetConfig();
+            CopyTargetConfig(target, newTarget);
+            var id = SaveNewObject(newTarget);
+            return GetTargetById(id);
         }
 
         public void UpdateGroupingMetadata(GroupingMetadata groupingMetadata)
@@ -110,21 +112,6 @@ namespace Fpm.ProfileData
             SaveNewObject(targetAudit);
         }
 
-        public TargetConfig NewTargetConfig(TargetConfig target)
-        {
-            var newTarget = new TargetConfig
-            {
-                Description = target.Description,
-                LowerLimit = target.LowerLimit,
-                UpperLimit = target.UpperLimit,
-                PolarityId = target.PolarityId,
-                LegendHtml = target.LegendHtml
-            };
-
-            var id = SaveNewObject(newTarget);
-            return GetTargetById(id);
-        }
-
         public ContentItem NewContentItem(int profileId, string contentKey, string description, bool isPlainTextContent, string content)
         {
             var contentItem = new ContentItem
@@ -159,15 +146,26 @@ namespace Fpm.ProfileData
             UpdateObject(fromDatabase);
         }
 
-        public void SetGroupingSequence(int groupId, int areaTypeId, int indicatorId, int sexId, int sequence)
-        {
-
-        }
-
         public void DeleteContentItem(string contentKey, int profileId)
         {
             var contentItem = GetContentItem(contentKey, profileId);
             DeleteObject(contentItem);
+        }
+
+        public int NewDocument(Document doc)
+        {
+            var id = SaveNewObject(doc);
+            return id;
+        }
+
+        public void UpdateDocument(Document doc)
+        {
+            UpdateObject(doc);
+        }
+
+        public void DeleteDocument(Document doc)
+        {
+            DeleteObject(doc);
         }
 
         public void DeleteGroupingMetadata(int groupId)
@@ -312,20 +310,27 @@ namespace Fpm.ProfileData
             }
         }
 
-        public int NewDocument(Document doc)
+        private static void CopyTargetConfig(TargetConfig @from, TargetConfig to)
         {
-            var id = SaveNewObject(doc);
-            return id;
+            to.Description = @from.Description;
+            to.LowerLimit = @from.LowerLimit;
+            to.UpperLimit = @from.UpperLimit;
+            to.PolarityId = @from.PolarityId;
+            to.LegendHtml = @from.LegendHtml;
+            to.UseCIsForLimitComparison = @from.UseCIsForLimitComparison;
         }
 
-        public void UpdateDocument(Document doc)
+        public void UpdateCategoryType(CategoryType categoryType)
         {
-            UpdateObject(doc);
-        }
+            var fromDatabase = GetCategoryType(categoryType.Id);
 
-        public void DeleteDocument(Document doc)
-        {
-            DeleteObject(doc);
+            // Copy properties to object retrieved from the database
+            fromDatabase.Name = categoryType.Name;
+            fromDatabase.ShortName = categoryType.ShortName;
+            fromDatabase.Description = categoryType.Description;
+            fromDatabase.Notes = categoryType.Notes;
+
+            UpdateObject(fromDatabase);
         }
     }
 }

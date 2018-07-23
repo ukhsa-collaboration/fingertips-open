@@ -95,24 +95,24 @@ textarea {
 /* FONTS */
 @font-face {
     font-family: 'transport_new_heavy';
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.eot);
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewheavy-webfont.svg#transport_new_heavyregular) format('svg');
+    src: url(../fonts/transportnewheavy-webfont.eot);
+    src: url(../fonts/transportnewheavy-webfont.eot?#iefix) format('embedded-opentype'), url(../fonts/transportnewheavy-webfont.woff) format('woff'), url(../fonts/transportnewheavy-webfont.ttf) format('truetype'), url(../fonts/transportnewheavy-webfont.svg#transport_new_heavyregular) format('svg');
     font-weight: bold;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'transport_new';
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.eot);
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewlight-webfont.svg#transportnew_lightregular) format('svg');
+    src: url(../fonts/transportnewlight-webfont.eot);
+    src: url(../fonts/transportnewlight-webfont.eot?#iefix) format('embedded-opentype'), url(../fonts/transportnewlight-webfont.woff) format('woff'), url(../fonts/transportnewlight-webfont.ttf) format('truetype'), url(../fonts/transportnewlight-webfont.svg#transportnew_lightregular) format('svg');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'transport_new_medium';
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.eot);
-    src: url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.eot?#iefix) format('embedded-opentype'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.woff) format('woff'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.ttf) format('truetype'), url(http://healthierlives.phe.org.uk/fonts/transportnewmedium-webfont.svg#transportnew_mediumregular) format('svg');
+    src: url(../fonts/transportnewmedium-webfont.eot);
+    src: url(../fonts/transportnewmedium-webfont.eot?#iefix) format('embedded-opentype'), url(../fonts/transportnewmedium-webfont.woff) format('woff'), url(../fonts/transportnewmedium-webfont.ttf) format('truetype'), url(../fonts/transportnewmedium-webfont.svg#transportnew_mediumregular) format('svg');
     font-weight: normal;
     font-style: normal;
 }
@@ -621,7 +621,7 @@ body {
 
 .js .tooltip, .tooltip-right,
 .tooltip-touch {
-    background: url("../images/Mortality/ranking_icons.png") 2px -697px no-repeat;
+    background: url("../images/Mortality/ranking_icons-v1.png") 2px -697px no-repeat;
     cursor: pointer;
     display: inline-block;
     height: 15px;
@@ -716,6 +716,27 @@ body {
     border-bottom: 12px solid #FFF;
 }
 
+
+.tooltip-two {    
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 0 10px;
+    border-color: transparent transparent transparent #02ae94;
+}
+.tooltip-two div {
+    width: 150px;
+    background: #02ae94;
+    margin-left: -10px;
+    color: #FFF;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1.3;
+    padding: 6px 9px;
+    
+}
+
 /* DATA PAGE */
 #data_page_header {
     margin: 0 auto;
@@ -741,7 +762,7 @@ body {
     }
 
     #data_page_header .info_box {
-        background: #F1F1F1 url(../images/Mortality/ranking_icons.png) 14px 14px no-repeat;
+        background: #F1F1F1 url(../images/Mortality/ranking_icons-v1.png) 14px 14px no-repeat;
         float: left;
         margin: 10px 10px 0 0;
         min-height: 45px;
@@ -804,7 +825,7 @@ body {
     }
 
     #data_page_header .info_box_3{
-        background: #F1F1F1 url(../images/Mortality/ranking_icons.png) 14px 14px no-repeat;
+        background: #F1F1F1 url(../images/Mortality/ranking_icons-v1.png) 14px 14px no-repeat;
         float: left;
         margin: 10px 10px 0 0;
         min-height: 45px;
@@ -890,9 +911,9 @@ body {
 
         .data_page_content #related_content .compare h3 {
             font-size: 1em;
-            font-weight: normal;
+            font-weight: bold;
             margin: 0;
-            padding: 2px 0 13px;
+            padding: 2px 0 5px;
         }
 
         .data_page_content #related_content .compare ul {
@@ -943,7 +964,6 @@ body {
 }
 
         .data_page_content #related_content .similar_authorities ul {
-            font-size: 0.9em;
             line-height: 1.5;
             list-style: none;
             margin: 0;
@@ -1064,7 +1084,7 @@ body {
 }
 
 #data_page_table th {
-    padding: 20px 0 18px 0;
+    padding: 9px 0;
 }
 
     #data_page_table th span {
@@ -1183,15 +1203,31 @@ body {
     text-transform: none;
 }
 
+#data_page_table th.col2 {
+    width:540px;
+}
+
 #data_page_table td.col1 div {
     position: relative;
     overflow: hidden;
-    height: 140px;
     width: 80%;
-    left:10%; /* see ie7.css for difference */
+    left:10%;
+    height: 100px;
 }
 
-#data_page_table .col1 img {
+#data_page_table td.col1 div.sig-label {
+    height: auto;
+    padding-top: 40px;
+    font-size: 14px;
+    width: 100%;
+    left: 0;
+}
+
+#data_page_table td.col1 div.image {
+    height: 135px;
+}
+
+#data_page_table td.col1 img {
     position: absolute;
 }
 
@@ -1555,13 +1591,13 @@ body {
     display: block;
     font-family: "transport_new_medium", Arial, sans-serif;
     position: absolute;
-    right: -60px;
+    right: -90px;
     top: 6px;
-    width: 50px;
+    width: 80px;
 }
 
 #main_content .bar_chart .zero_val {
-    right: -50px;
+    right: -80px;
 }
 
 #main_content .bar_chart .high_low_message {
@@ -1569,6 +1605,10 @@ body {
     font-size: 2.1em;
     font-weight: bold;
     text-transform: uppercase;
+}
+
+#main_content .bar_chart .tooltip {
+    text-transform: none;
 }
 
 #main_ranking .bar_chart .high_low_message {
@@ -1902,7 +1942,7 @@ body {
     }
 
 .interventions .premature_deaths {
-    background: url(../images/Mortality/ranking_icons.png) 2px -597px no-repeat;
+    background: url(../images/Mortality/ranking_icons-v1.png) 2px -597px no-repeat;
     padding: 1px 5px 9px 29px;
 }
 
@@ -2107,7 +2147,7 @@ body {
         }
 
         .ranking_table_content > .header .stats dl {
-            background: url(../images/Mortality/ranking_icons.png) 0 -500px no-repeat;
+            background: url(../images/Mortality/ranking_icons-v1.png) 0 -500px no-repeat;
             float: left;
             clear: none;
             min-height: 45px;
@@ -2200,6 +2240,23 @@ body {
     padding-left: 0.8em;
 }
 
+div.legend {
+    display: inline-block;
+}
+
+div.legend ul {
+    margin: 0.4em 0;
+    list-style: none;
+}
+div.legend ul li {
+        display: inline-block;
+    float:left;
+}
+div.legend ul li.grade {
+    margin-left: 15px;
+}
+
+
 /* generic coloured gradings */
 
 #main_content .grade img{
@@ -2235,7 +2292,7 @@ body {
 }
 
 #main_content.area-details span.grade {
-   margin-left: 10px;
+   margin-left: 15px;
 }
 
 #main_content p.legend{
@@ -2353,8 +2410,7 @@ padding-bottom:0;
         }
 
         .ranking_table_content .table-data table td a {
-            text-decoration: none;
-            color: #000;
+            color: #2e3191;
         }
 
             .ranking_table_content .table-data table tr:hover td a,
@@ -2606,32 +2662,87 @@ padding-bottom:0;
     margin: 0 0 10px;
 }
 
-#topic-links {
-    float: right;
-    font-size: 20px;
+#profile-topic {
+    font-size: 25px;
     margin-top: 15px;
+    padding-top: 15px;
+    clear: both;
+    position: relative;
 }
 
-#topic-links a, #topic-links a:visited {
-    text-decoration: none;
+#profile-topic-text {
+    float: left;
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    padding: 5px;
+    width: 240px;
+}
+
+#profile-topic-text i {
+    color: #fff;
+    font-size: 80%;
+    position: relative;
+    top: -3px;
+    pointer-events: none;
+}
+
+#profile-topic #selected-topic {
     color: black;
-    padding: 10px;
-    margin-left: 5px;
+    background-color: white;
+    float: right;
+    font-size: 30px;
 }
 
-#topic-links a.selected {
-    background: #000;
-    color: #FEFEFE;
-    cursor: text;
+#profile-topic-menu {
+    clear: both;
+    border: 1px solid black;
+    position: absolute;
+    top: 110px;
+    z-index: 10;
+    background-color: white;
+    width: 962px;
+    display: none;
 }
-
-#topic-links a:hover {
-    text-decoration: underline;
-}
-
-    #topic-links a.selected:hover {
-            text-decoration: none;
+    #profile-topic-menu > div hr {
+        width: 100%;
+        margin-top: 10px;
+        border-width: 2px;
+        margin-bottom: 0;
     }
+
+#profile-topic-menu topic-list {
+    padding-bottom: 0; 
+}
+
+    #profile-topic-menu topic-list .row {
+        display: table;
+        width: 100%;
+        padding-top: 0;
+        margin-top: 0;
+        margin-bottom: 5px; 
+    }
+
+
+    #profile-topic-menu #topic-list .col {   
+        width: 220px;
+        display: table-cell;
+        padding: 2px 10px;               
+    }
+
+    #profile-topic-menu #topic-list .col a{
+        font-size: 18px;
+        margin-bottom: 0;
+        display: block;
+        color: #000;
+    }
+
+        #profile-topic-menu #topic-list .col div {
+            font-size: 14px;
+            margin-top: 3px;
+            padding-top: 0;
+            clear: both;
+        }
 
 #overlay {
     position: absolute;

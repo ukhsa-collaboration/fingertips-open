@@ -88,13 +88,12 @@ span.area-type {
 .edit-link {
     font-size: 90%;
     margin-left: 2px;
-    float: left;
     display: block;
-    text-align: left;
 }
 
 a.edit-link {
     color: #2e3191;
+    cursor: pointer;
 }
 
 span.edit-link {
@@ -521,6 +520,11 @@ input[type=checkbox] {
         cursor: pointer;
         background: #E5F0FF;
     }
+   
+     #batchUploadForm .btn {
+         color: #fff;
+     }
+
 
 #upload-cancel {
     color: #003399;
@@ -577,7 +581,7 @@ input[type=checkbox] {
     margin-bottom: 5px;
 }
 
-select, .indicator, .year-Range {
+select, .indicator, .year-Range, .timestamp-override {
     border: 2px solid #003399;
     background: #E5F0FF;
     border-radius: 4px;
@@ -757,6 +761,14 @@ a.upload-error {
 
 /* Layout helpers
 ----------------------------------*/
+
+.ui-icon { width: 16px; height: 16px; background-image: url("images/ui-icons_444444_256x240.png"); }
+.ui-icon-circle-triangle-e {
+    background-position: -48px -192px;
+}
+.ui-icon-circle-triangle-w {
+    background-position: -80px -192px;
+}
 .ui-helper-hidden {
     display: none;
 }
@@ -1838,7 +1850,7 @@ label.btn-file {
 }
 
 /* Upload job progress */
-#progress-menu .in-progress {
+tr.in-progress {
     background-color: #E2EFDA;
     padding: 5px 10px 5px 10px;
     width: 250px;
@@ -1846,7 +1858,7 @@ label.btn-file {
     font-size: 17px;
 }
 
-#progress-menu .in-queue {
+tr.in-queue {
     background-color: #F8CBAD;
     padding: 5px 10px 5px 10px;
     width: 250px;
@@ -1854,7 +1866,7 @@ label.btn-file {
     font-size: 17px;
 }
 
-#progress-menu .awaiting-confirmation {
+tr.awaiting-confirmation {
     background-color: #C00000;
     color: #ffffff;
     padding: 5px 10px 5px 10px;
@@ -1864,11 +1876,11 @@ label.btn-file {
     margin-left: 6px;
 }
 
-#progress-menu .in-queue-bg {
+tr.in-queue-bg {
     background-color: #F8CBAD;
 }
 
-#progress-menu .in-progress-bg {
+tr.in-progress-bg {
     background-color: #E2EFDA;
 }
 
@@ -2302,11 +2314,6 @@ LI.site-link {
     margin-right: 0;
 }
 
-#content-index #audit_history {
-    float: right;
-    margin-right: 300px;
-}
-
 #content-index .sortable {
     width: 900px;
 }
@@ -2318,6 +2325,19 @@ LI.site-link {
     #content-index .sortable tr td:last-child {
         width: 200px;
     }
+
+#content-index-button-box {
+    width: 900px;
+}
+
+#content-index-button-box .left {
+    float: left;
+}
+
+#content-index-button-box .right {
+    float: right;
+    margin-left: 10px;
+}
 
 .content-row {
     color: #003399;
@@ -2407,14 +2427,18 @@ LI.site-link {
     }
 
     #tbl-view-data .cell-small {
-        width: 30px;
+        width: 32px;
     }
 
     #tbl-view-data .cell-medium {
-        width: 45px;
+        width: 43px;
     }
 
     #tbl-view-data .cell-large {
+        width: 65px;
+    }
+
+    #tbl-view-data .cell-area-code {
         width: 70px;
     }
 
@@ -2442,13 +2466,19 @@ LI.site-link {
 
     #tbl-view-data th:last-child {
         width: 7px;
-        border-right: 0px;
+        border-right: 0;
     }
 
     #tbl-view-data .hide {
         display: none;
     }
 
+    #coreDataView {
+        margin-top: -20px;
+    }
+    .data-change {
+        font-size: 12px;
+    }
 /*----------------------------------------
   Filter data
 ------------------------------------------*/
@@ -2482,6 +2512,13 @@ LI.site-link {
 
     .filters select {
         margin-right: 10px !important;
+    }
+
+    .filters input {
+            border: 2px solid #003399;
+        background: #E5F0FF;
+        padding: 3px 3px;
+            border-radius: 4px;
     }
 
     .filters .content-row label {
@@ -2584,4 +2621,51 @@ LI.site-link {
 
 .form-horizontal .checkbox-inline {
     margin-top: 10px;
+}
+
+
+
+/*----------------------------------------
+  User Feedback
+------------------------------------------*/ 
+#user-feedback {
+    border-collapse:collapse; table-layout:fixed; width:1150px;
+}
+
+/*----------------------------------------
+  Live updates
+------------------------------------------*/ 
+#live-update-table td:nth-child(2) {
+    text-align: left;
+}
+
+#live-update-table td a {
+    text-align: center;
+}
+
+.live-update-error-message {
+    max-height: 300px;
+    overflow-y: scroll;
+    border: 1px solid;
+    font-size: 12px;
+    padding: 4px;
+    display: block;
+}
+
+.update-success {
+    color: #008040;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.update-failed {
+    color: #ff0000;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.update-wait {
+    color: #0000FF;
+    font-weight: bold;
+    font-style: italic;
 }

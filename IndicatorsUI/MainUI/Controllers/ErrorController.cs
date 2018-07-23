@@ -1,20 +1,25 @@
-﻿using Profiles.DataAccess;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Models;
-using Profiles.MainUI.Skins;
+﻿using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
+using IndicatorsUI.MainUI.Skins;
 using System;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class ErrorController : BaseController
     {
         private const string ViewName = "Error";
 
         private ErrorPageModel errorPageModel;
+
+        public ErrorController(IAppConfig appConfig) : base(appConfig)
+        {
+
+        }
 
         protected override void NewPageModel()
         {
@@ -30,6 +35,7 @@ namespace Profiles.MainUI.Controllers
             InitPageModel();
         }
 
+        [Route("access-not-allowed")]
         public ActionResult AccessNotAllowed()
         {
             HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
@@ -46,7 +52,7 @@ namespace Profiles.MainUI.Controllers
 
             if (SkinFactory.GetSkin().Name == SkinNames.Mortality)
             {
-                return new LongerLivesController().Get404Error();
+                return new LongerLivesController(ReaderFactory.GetProfileReader(), _appConfig).Get404Error();
             }
 
             PageModel.PageTitle = "Page not found";
@@ -62,7 +68,7 @@ namespace Profiles.MainUI.Controllers
 
             if (SkinFactory.GetSkin().Name == SkinNames.Mortality)
             {
-                return new LongerLivesController().Get500Error();
+                return new LongerLivesController(ReaderFactory.GetProfileReader(), _appConfig).Get500Error();
             }
 
             PageModel.PageTitle = "Unexpected Error";
@@ -75,6 +81,7 @@ namespace Profiles.MainUI.Controllers
             return View(ViewName, errorPageModel);
         }
 
+        [Route("browser-not-supported")]
         public ActionResult BrowserNotSupported()
         {
             return View("BrowserNotSupported");
@@ -83,7 +90,7 @@ namespace Profiles.MainUI.Controllers
 
         public static ActionResult InvokeHttp404(HttpContextBase httpContext)
         {
-            IController errorController = new ErrorController();
+            IController errorController = new ErrorController(AppConfig.Instance);
             var errorRoute = new RouteData();
             errorRoute.Values.Add("controller", "Error");
             errorRoute.Values.Add("action", "Http404");

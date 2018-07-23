@@ -1,9 +1,9 @@
 ﻿using NHibernate;
 using NHibernate.Criterion;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 using System.Collections.Generic;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class NearestNeighbourReader : BaseReader
     {
@@ -16,6 +16,7 @@ namespace Profiles.DataAccess
         {
             var profileIds = new List<int> { -1, profileId };
             return CurrentSession.CreateCriteria<ProfileNearestNeighbourAreaTypeMapping>()
+                .SetCacheable(true)
                 .Add(Restrictions.In("ProfileId", profileIds))
                 .List<ProfileNearestNeighbourAreaTypeMapping>();
         }
@@ -23,6 +24,7 @@ namespace Profiles.DataAccess
         public IList<NeighbourType> GetNearestNeighbourAreaType(List<int> neighbourId)
         {
             return CurrentSession.CreateCriteria<NeighbourType>()
+                .SetCacheable(true)
                 .Add(Restrictions.In("NeighbourTypeId", neighbourId))
                 .List<NeighbourType>();
         }

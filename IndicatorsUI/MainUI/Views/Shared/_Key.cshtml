@@ -1,0 +1,23 @@
+﻿@model IndicatorsUI.MainUI.Models.PageModel
+<div class="standard-width clearfix">
+
+    @Html.Partial("_KeybarChart")
+    @Html.Partial("_KeyValueNote")
+    @Html.Partial("_KeySpineChart")
+    @Html.Partial("_KeyTartanRug")
+    @Html.Partial("_KeyInequality")
+    @Html.Partial("_KeyRecentTrends")
+    @Html.Partial("_KeyDataQuality")
+    @* used for dynamically generated keys *@
+    <div id="key-ad-hoc" class="key-container" style="display: none;"></div>
+</div>
+<div class="standard-width clearfix">
+    <div id="tab-specific-options" class="tab-options clearfix" style="display: none;"></div>
+    @Html.Partial("_SortMultipleCharts")
+</div>
+@* used for Area Profiles *@
+<script type="text/javascript">
+//<![CDATA[
+    var spineChartImage = '@(ViewBag.ImagesUrl)spine-key-label-id-@(Model.SpineChartMinMaxLabel.LabelId).png';
+//]]</script>
+

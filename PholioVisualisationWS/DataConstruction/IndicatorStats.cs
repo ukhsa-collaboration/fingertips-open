@@ -14,6 +14,7 @@ namespace PholioVisualisation.DataConstruction
         public IndicatorStatsPercentilesFormatted StatsF { get; set; }
         public bool? HaveRequiredValues { get; set; }
         public string Period { get; set; }
+        public Limits Limits { get; set; }
     }
 
 }

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
@@ -13,7 +16,9 @@ namespace PholioVisualisation.SearchIndexing
     {
         public const string DirectoryIndicators = "indicators";
 
-        private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
+        private IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
+
+        private IEnumerable<IndicatorMetadataTextProperty> properties;
 
         public IndicatorSearchIndexBuilder(string directoryPath)
             : base(directoryPath)
@@ -25,15 +30,14 @@ namespace PholioVisualisation.SearchIndexing
             IndexWriter writer = GetWriter(DirectoryIndicators);
             writer.DeleteAll();
 
-            var properties = groupDataReader
-                .GetIndicatorMetadataTextProperties()
-                .Where(p => p.IsSearchable);
+            properties = _groupDataReader
+                .GetIndicatorMetadataTextProperties();
 
-            IEnumerable<IndicatorMetadata> indicatorMetadataList = GetIndicatorMetadataList(properties);
+            IEnumerable<IndicatorMetadata> indicatorMetadataList = GetIndicatorMetadataList();
 
             foreach (IndicatorMetadata indicatorMetadata in indicatorMetadataList)
             {
-                IndexIndicator(indicatorMetadata, properties, writer);
+                IndexIndicator(indicatorMetadata, writer);
             }
 
             writer.Optimize();
@@ -41,45 +45,46 @@ namespace PholioVisualisation.SearchIndexing
             writer.Close();
         }
 
-        private static void IndexIndicator(IndicatorMetadata indicatorMetadata,
-            IEnumerable<IndicatorMetadataTextProperty> properties, IndexWriter writer)
+        private void IndexIndicator(IndicatorMetadata indicatorMetadata, IndexWriter writer)
         {
             Document doc = new Document();
-            doc.Add(new Field("id", indicatorMetadata.IndicatorId.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
 
-            var text = indicatorMetadata.Descriptive;
-
-            StringBuilder sb = new StringBuilder();
-            foreach (var indicatorMetadataTextProperty in properties)
-            {
-                var key = indicatorMetadataTextProperty.ColumnName;
-
-                if (text.ContainsKey(key))
-                {
-                    sb.Append(text[key]);
-                    sb.Append(" ");
-                }
-            }
-
-            doc.Add(new Field("IndicatorText",
-                  sb.ToString().ToLower(), Field.Store.NO,
-                  Field.Index.ANALYZED));
+            IndexIndicatorId(indicatorMetadata, doc);
+            IndexTextMetadata(indicatorMetadata, doc);
 
             writer.AddDocument(doc);
         }
 
-        private IEnumerable<IndicatorMetadata> GetIndicatorMetadataList(IEnumerable<IndicatorMetadataTextProperty> properties)
+        private void IndexIndicatorId(IndicatorMetadata indicatorMetadata, Document doc)
+        {
+            doc.Add(new Field("id", indicatorMetadata.IndicatorId.ToString(), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        }
+
+        private void IndexTextMetadata(IndicatorMetadata indicatorMetadata, Document doc)
+        {
+            var text = indicatorMetadata.Descriptive;
+
+            foreach (var indicatorMetadataTextProperty in properties)
+            {
+                var key = indicatorMetadataTextProperty.ColumnName;
+                var indexText = text.ContainsKey(key) ? text[key] : string.Empty;
+                doc.Add(new Field(key, indexText.ToLower(), Field.Store.NO, Field.Index.ANALYZED));
+            }
+        }
+
+        private IEnumerable<IndicatorMetadata> GetIndicatorMetadataList()
         {
             var groupIds = ReaderFactory.GetProfileReader().GetGroupIdsFromAllProfiles();
-            var groupings = groupDataReader.GetGroupingsByGroupIds(groupIds);
-            return groupDataReader.GetIndicatorMetadata(groupings.ToList(), properties.ToList());
+            var groupings = _groupDataReader.GetGroupingsByGroupIds(groupIds);
+            return _groupDataReader.GetIndicatorMetadata(groupings.ToList(), properties.ToList());
         }
 
         private IndexWriter GetWriter(string type)
         {
+            var analyzer = new SynonymAnalyzer();
+
             return new IndexWriter(
-                GetIndexDirectory(type),
-                new StandardAnalyzer(Lucene.Net.Util.Version.LUCENE_29),
+                GetIndexDirectory(type), analyzer,
                 true,
                 new IndexWriter.MaxFieldLength(25000));
         }

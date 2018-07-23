@@ -168,113 +168,18 @@ namespace PholioVisualisation.KeyMessagesTest
         }
 
         [TestMethod]
-        public void TestSentence3_Wrong_Data()
+        public void TestSentence3_Empty_String_When_No_Data()
         {
             var builder = new HealthProfilesKeyMessage4Builder
             {
                 data = new KeyMessageData
                 {
-                    AdultSelfHarmAdmissions = "30.0",
-                    AdultSelfHarmAdmissionsPerYear = "55,567",
-                    AdultSelfHarmAdmissionsSignificance = Significance.Same
+                    AdultSelfHarmAdmissions = "",
+                    AdultSelfHarmAdmissionsPerYear = ""
                 }
             };
             var sentence = builder.GetSentence3();
-            Assert.AreNotEqual("The rate of self-harm hospital stays is 30.0*. This represents 44,567 stays per year.", sentence);
-        }
-
-        #endregion
-
-        #region Sentence-4 Tests
-
-        [TestMethod]
-        public void TestSentence4_Sig_Better()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    AdultSmokingRelatedDeaths = 50.1,
-                    AdultSmokingRelatedDeathsPerYear = 19000.2,
-                    AdultSmokingRelatedDeathsSignificance = Significance.Better,
-                }
-            };
-            var sentence = builder.GetSentence4();
-            Assert.AreEqual(
-                "The rate of smoking related deaths is 50*, better than the average for England. This represents 19,000 deaths per year.",
-                sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence4_Sig_Worse()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    AdultSmokingRelatedDeaths = 50.1,
-                    AdultSmokingRelatedDeathsPerYear = 19000.2,
-                    AdultSmokingRelatedDeathsSignificance = Significance.Worse,
-                }
-            };
-            var sentence = builder.GetSentence4();
-            Assert.AreEqual(
-                "The rate of smoking related deaths is 50*, worse than the average for England. This represents 19,000 deaths per year.",
-                sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence4_Sig_None()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    AdultSmokingRelatedDeaths = 50.1,
-                    AdultSmokingRelatedDeathsPerYear = 19000.2,
-                    AdultSmokingRelatedDeathsSignificance = Significance.None,
-                }
-            };
-            var sentence = builder.GetSentence4();
-            Assert.AreEqual(
-                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
-                sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence4_Sig_Same()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    AdultSmokingRelatedDeaths = 50.1,
-                    AdultSmokingRelatedDeathsPerYear = 19000.2,
-                    AdultSmokingRelatedDeathsSignificance = Significance.Same,
-                }
-            };
-            var sentence = builder.GetSentence4();
-            Assert.AreEqual(
-                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
-                sentence);
-        }
-
-        [TestMethod]
-        public void TestSentence4_Wrong_Data()
-        {
-            var builder = new HealthProfilesKeyMessage4Builder
-            {
-                data = new KeyMessageData
-                {
-                    AdultSmokingRelatedDeaths = 90,
-                    AdultSmokingRelatedDeathsPerYear = 19050,
-                    AdultSmokingRelatedDeathsSignificance = Significance.Same,
-                }
-            };
-            var sentence = builder.GetSentence4();
-            Assert.AreNotEqual(
-                "The rate of smoking related deaths is 50*. This represents 19,000 deaths per year.",
-                sentence);
+            Assert.AreEqual("", sentence);
         }
 
         #endregion
@@ -418,12 +323,13 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultExcessWeightSignificance = Significance.Better,
                     AdultSmokingPrevalenceSignificance = Significance.Worse,
-                    AdultPhysicalActivitySignificance = Significance.Better
+                    AdultPhysicalActivitySignificance = Significance.Better,
+                    AdultSmokingInRoutineAndManualOccupationsSignificance = Significance.Better
                 }
             };
             var sentence = builder.GetSentence5(Significance.Better);
             Assert.AreEqual(
-                "Estimated levels of adult excess weight and physical activity are better than the England average.",
+                "Estimated levels of adult excess weight, smoking in routine and manual occupations and physical activity are better than the England average.",
                 sentence);
         }
 
@@ -822,7 +728,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Same,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -843,7 +749,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -865,7 +771,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
-                    AdultLongTermUnemploymentSig = Significance.Worse,
+                    PeopleInEmploymentSig = Significance.Worse,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -873,7 +779,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Worse);
             Assert.AreEqual(
-                "Rates of statutory homelessness, violent crime and long term unemployment are worse than average.",
+                "Rates of statutory homelessness, violent crime and the percentage of people in employment are worse than average.",
                 sentence);
         }
 
@@ -886,7 +792,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Better,
-                    AdultLongTermUnemploymentSig = Significance.Worse,
+                    PeopleInEmploymentSig = Significance.Worse,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -894,7 +800,7 @@ namespace PholioVisualisation.KeyMessagesTest
             };
             var sentence = builder.GetSentence7(Significance.Worse);
             Assert.AreEqual(
-                "Rates of statutory homelessness and long term unemployment are worse than average.",
+                "Rates of statutory homelessness and the percentage of people in employment are worse than average.",
                 sentence);
         }
 
@@ -907,7 +813,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Better,
                     AdultViolentCrimeSig = Significance.Better,
-                    AdultLongTermUnemploymentSig = Significance.Better,
+                    PeopleInEmploymentSig = Significance.Better,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -932,7 +838,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Worse,
-                    AdultLongTermUnemploymentSig = Significance.Worse,
+                    PeopleInEmploymentSig = Significance.Worse,
                     AdultExcessWinterDeathsSig = Significance.Worse,
                     AdultUnder75MortalityRateCvdSig = Significance.Worse,
                     AdultUnder75MortalityRateCancerSig = Significance.Worse,
@@ -953,7 +859,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Better,
                     AdultViolentCrimeSig = Significance.Same,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Worse,
                     AdultUnder75MortalityRateCancerSig = Significance.Worse,
@@ -974,7 +880,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Worse,
                     AdultViolentCrimeSig = Significance.Same,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Same,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -996,7 +902,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Same,
                     AdultViolentCrimeSig = Significance.Same,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,
@@ -1017,7 +923,7 @@ namespace PholioVisualisation.KeyMessagesTest
                 {
                     AdultStatutoryHomelessnessSig = Significance.Same,
                     AdultViolentCrimeSig = Significance.Same,
-                    AdultLongTermUnemploymentSig = Significance.Same,
+                    PeopleInEmploymentSig = Significance.Same,
                     AdultExcessWinterDeathsSig = Significance.Better,
                     AdultUnder75MortalityRateCvdSig = Significance.Better,
                     AdultUnder75MortalityRateCancerSig = Significance.Better,

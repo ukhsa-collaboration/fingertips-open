@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class ContentItem
     {

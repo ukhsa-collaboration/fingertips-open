@@ -16,13 +16,13 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestFactoryMethod()
         {
-            Assert.IsTrue(NumericFormatterFactory.NewWithLimits(GetMetadata(1), null) is FixedDecimalPlaceFormatter);
+            Assert.IsTrue(new NumericFormatterFactory(null).NewWithLimits(GetMetadata(1), null) is FixedDecimalPlaceFormatter);
         }
 
         [TestMethod]
         public void TestFactoryMethod_FixedDecimalPlaceFormatterNotReturnedIfDecimalPlacesLessThanZero()
         {
-            Assert.IsFalse(NumericFormatterFactory.NewWithLimits(GetMetadata(-1), null) is FixedDecimalPlaceFormatter);
+            Assert.IsFalse(new NumericFormatterFactory(null).NewWithLimits(GetMetadata(-1), null) is FixedDecimalPlaceFormatter);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace PholioVisualisation.FormattingTest
             };
 
             // Format first time
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(0), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(0), null);
             formatter.Format(data);
             Assert.AreEqual("1", data.ValueFormatted);
 
@@ -79,7 +79,7 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestFormatStats()
         {
-            var formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(1), null);
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(1), null);
             var stats = new IndicatorStatsPercentiles
             {
                 Min = 1.111111,
@@ -104,36 +104,38 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestFormatConfidenceIntervals()
         {
-            var formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(1), null);
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(1), null);
             var data = new ValueWithCIsData
             {
-                LowerCI = 1.1111,
-                UpperCI = 9.9999
+                LowerCI95 = 1.1111,
+                UpperCI95 = 9.9999,
+                LowerCI99_8 = 2.2222,
+                UpperCI99_8 = 3.4444
             };
             formatter.FormatConfidenceIntervals(data);
 
-            Assert.AreEqual("1.1", data.LowerCIF);
-            Assert.AreEqual("10.0", data.UpperCIF);
+            Assert.AreEqual("1.1", data.LowerCI95F);
+            Assert.AreEqual("10.0", data.UpperCI95F);
+            Assert.AreEqual("2.2", data.LowerCI99_8F);
+            Assert.AreEqual("3.4", data.UpperCI99_8F);
         }
 
         [TestMethod]
         public void TestFormatConfidenceIntervals_NullValues()
         {
-            var formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(1), null);
-            var data = new ValueWithCIsData
-            {
-                LowerCI = ValueData.NullValue,
-                UpperCI = ValueData.NullValue
-            };
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(1), null);
+            var data = new ValueWithCIsData();
             formatter.FormatConfidenceIntervals(data);
 
-            Assert.AreEqual(NumericFormatter.NoValue, data.LowerCIF);
-            Assert.AreEqual(NumericFormatter.NoValue, data.UpperCIF);
+            Assert.AreEqual(NumericFormatter.NoValue, data.LowerCI95F);
+            Assert.AreEqual(NumericFormatter.NoValue, data.UpperCI95F);
+            Assert.AreEqual(NumericFormatter.NoValue, data.UpperCI99_8F);
+            Assert.AreEqual(NumericFormatter.NoValue, data.UpperCI99_8F);
         }
 
         private string FormatValue(double val, int decimalPlacesDisplayed)
         {
-            var formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(decimalPlacesDisplayed), null);
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(decimalPlacesDisplayed), null);
             var data = new ValueData { Value = val };
             formatter.Format(data);
             return data.ValueFormatted;

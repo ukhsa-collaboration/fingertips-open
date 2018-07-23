@@ -7,7 +7,14 @@ using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class IndicatorMetadataTextChanger
+    public interface IIndicatorMetadataTextChanger
+    {
+        void UpdateIndicatorTextValues(int indicatorId, IList<IndicatorMetadataTextItem> textChangesByUser,
+            IList<IndicatorMetadataTextProperty> properties, string userName, int profileId,
+            bool isOwnerProfileBeingEdited);
+    }
+
+    public class IndicatorMetadataTextChanger : IIndicatorMetadataTextChanger
     {
         private readonly ProfileRepository _profileRepository;
         private readonly ProfilesReader _profilesReader;
@@ -24,7 +31,7 @@ namespace Fpm.MainUI.Helpers
         }
 
         public void UpdateIndicatorTextValues(int indicatorId, IList<IndicatorMetadataTextItem> textChangesByUser,
-            IList<IndicatorMetadataTextProperty> properties, string userName, int profileId)
+            IList<IndicatorMetadataTextProperty> properties, string userName, int profileId, bool isOwnerProfileBeingEdited)
         {
             foreach (var textChangeByUser in textChangesByUser)
             {
@@ -32,21 +39,10 @@ namespace Fpm.MainUI.Helpers
 
                 // Get properties + existing values
                 IndicatorText indicatorText = _profilesReader.GetIndicatorTextValues(indicatorId,
-                        new List<IndicatorMetadataTextProperty> { property },
-                        profileId).First();
+                        new List<IndicatorMetadataTextProperty> { property }, profileId).First();
 
                 // Figure out whether to update generic or specific property
-                int? profileIdForProperty;
-                if (textChangeByUser.IsBeingOverriddenForFirstTime || indicatorText.HasSpecificValue())
-                {
-                    // Update profile specific property
-                    profileIdForProperty = profileId;
-                }
-                else
-                {
-                    // Update generic property
-                    profileIdForProperty = null;
-                }
+                var profileIdForProperty = GetProfileIdForProperty(profileId, isOwnerProfileBeingEdited);
 
                 // Text that is being replaced
                 var oldText = GetTextBeingReplaced(textChangeByUser, indicatorText);
@@ -60,7 +56,7 @@ namespace Fpm.MainUI.Helpers
 
                 var userText = textChangeByUser.Text;
 
-                if (_hasNewOverridenTextEntryBeenCreated == false && 
+                if (isOwnerProfileBeingEdited == false && _hasNewOverridenTextEntryBeenCreated == false &&
                     indicatorAlreadyOverridden == false && textChangeByUser.IsBeingOverriddenForFirstTime)
                 {
                     // Create new override
@@ -80,6 +76,13 @@ namespace Fpm.MainUI.Helpers
             }
 
             RemoveEmptyOverrides(indicatorId, profileId, properties);
+        }
+
+        private static int? GetProfileIdForProperty(int profileId, bool isOwnerProfileBeingEdited)
+        {
+            return isOwnerProfileBeingEdited
+                ? (int?)null // Update generic property
+                : profileId; // Update profile specific property
         }
 
         private string GetTextBeingReplaced(IndicatorMetadataTextItem item, IndicatorText indicatorText)

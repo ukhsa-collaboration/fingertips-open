@@ -63,7 +63,7 @@ namespace FingertipsDataExtractionTool
             {
                 AreaCode = AreaCodes.England,
                 GroupIds = new List<int> { groupId },
-                ParentAreaTypeId = AreaTypeIds.Ccg
+                ParentAreaTypeId = AreaTypeIds.CcgsPostApr2017
             };
 
             var workBook = builder.BuildWorkbook();

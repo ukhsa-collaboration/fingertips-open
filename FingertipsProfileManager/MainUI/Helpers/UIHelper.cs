@@ -3,14 +3,12 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using Fpm.ProfileData.Entities.LookUps;
-using iTextSharp.text;
-using iTextSharp.text.pdf.crypto;
-using WebGrease.Css.Extensions;
 
 namespace Fpm.MainUI.Helpers
 {
     public static class UIHelper
     {
+        public const int ShowAll = -99;
 
         public static SelectList SetSelectedItem(this SelectList list, string value)
         {
@@ -41,13 +39,13 @@ namespace Fpm.MainUI.Helpers
         {
             var items = sexList.Select(sex => new SelectListItem
             {
-                Value = sex.SexID.ToString(), 
+                Value = sex.SexID.ToString(),
                 Text = sex.Description
             }).ToList();
 
-            if (sexId.HasValue)  SetSelectedValue(items, sexId.Value.ToString() );
-        
-           
+            if (sexId.HasValue) SetSelectedValue(items, sexId.Value.ToString());
+
+
             return items;
         }
 
@@ -69,27 +67,27 @@ namespace Fpm.MainUI.Helpers
         {
             return GetSelectList(list.ToList());
         }
-        
+
         public static SelectList ConvertToSelectListWithAnyOption(this IEnumerable<int> list)
         {
-            var newList = list.Select(x => new SelectListItem() {Text = x.ToString(), Value = x.ToString()}).ToList();
+            var newList = list.Select(x => new SelectListItem()
+            {
+                Text = x == -1 ? "n/a" : x.ToString(),
+                Value = x.ToString()
+            }).ToList();
             return GetSelectList(newList);
         }
 
         private static SelectList GetSelectList(IList<SelectListItem> newList)
         {
-            if (newList.Count() <= 1)
+            if (newList.Count == 0)
             {
-                if (newList.Count == 0)
-                {
-                    newList = new List<SelectListItem>();
-                    newList.Add(new SelectListItem { Text = "n/a", Value = "-1" });
-                    return new SelectList(newList, "Value", "Text");
-                }
+                newList = new List<SelectListItem>();
+                newList.Add(new SelectListItem { Text = "n/a", Value = "-1" });
             }
-            else
+            else if (newList.Count > 1)
             {
-                newList.Insert(0, new SelectListItem() { Value = "-1", Text = "Any" });
+                newList.Insert(0, new SelectListItem() { Value = ShowAll.ToString(), Text = "Any" });
             }
             return new SelectList(newList, "Value", "Text");
         }
@@ -102,15 +100,15 @@ namespace Fpm.MainUI.Helpers
         public static string Round(this double? value, int decimalPlaces = 2)
         {
             if (value.HasValue == false) return string.Empty;
-            
+
             return RoundDouble(value.Value, decimalPlaces);
         }
-        
+
 
         private static string RoundDouble(double value, int decimalPlaces)
         {
             if (value == -1) return value.ToString();
-            
+
             return value.ToString("0." + new string('0', decimalPlaces));
         }
 

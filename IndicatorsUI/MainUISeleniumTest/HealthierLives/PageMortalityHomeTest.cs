@@ -19,8 +19,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
                 driver.FindElement(By.XPath(XPaths.NavAboutTheProject)));
             TestHelper.AssertElementTextIsEqual("About the data",
                 driver.FindElement(By.XPath(XPaths.NavAboutTheData)));
-            TestHelper.AssertElementTextIsEqual("Connect",
-                driver.FindElement(By.XPath(XPaths.NavConnect)));
 
             // Check home navigation is selected
             string cssClass = driver.FindElement(By.Id("home-nav")).GetAttribute("class");

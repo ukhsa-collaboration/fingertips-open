@@ -1,4 +1,6 @@
-﻿namespace Fpm.MainUI.ViewModels.ProfilesAndIndicators
+﻿using Fpm.ProfileData.Entities.DataAudit;
+
+namespace Fpm.MainUI.ViewModels.ProfilesAndIndicators
 {
     public class BrowseDataViewModel
     {
@@ -22,5 +24,8 @@
 
         public CoreDataSetViewModel Results { get; set; }
 
-      }
+        public DataChange DataChange { get; set; }
+
+        public string AreaCode { get; set; }
+    }
 }

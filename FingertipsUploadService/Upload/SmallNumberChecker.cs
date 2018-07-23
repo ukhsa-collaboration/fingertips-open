@@ -1,4 +1,6 @@
-﻿using FingertipsUploadService.ProfileData;
+﻿using System;
+using System.Collections.Generic;
+using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.ProfileData.Repositories;
 using System.Data;
 
@@ -10,6 +12,8 @@ namespace FingertipsUploadService.Upload
         private readonly ProfilesReader _profilesReader;
         private readonly AreaTypeRepository _areaTypeRepository;
 
+        private Dictionary<int, int> _indicatorIdToDisclosureId = new Dictionary<int, int>();
+
         public SmallNumberChecker(ProfilesReader profilesReader,
             IDisclosureControlRepository disclosureControlRepository,
             AreaTypeRepository areaTypeRepository)
@@ -19,7 +23,7 @@ namespace FingertipsUploadService.Upload
             _areaTypeRepository = areaTypeRepository;
         }
 
-        public void Check(DataRow row, int rowNumber, BatchUpload batchUpload)
+        public void Check(DataRow row, int rowNumber, UploadJobAnalysis uploadJobAnalysis)
         {
             var indicatorDisclosureControlId = GetIndicatorDisclosureControlId(row);
 
@@ -35,7 +39,7 @@ namespace FingertipsUploadService.Upload
                     var isSmallNumber = new SmallNumberFormulaHelper().IsSmallNumber(count, smallNumberFormula);
                     if (isSmallNumber)
                     {
-                        batchUpload.SmallNumberWarnings.Add(new SmallNumberWarning(rowNumber + 1, count));
+                        uploadJobAnalysis.SmallNumberWarnings.Add(new SmallNumberWarning(rowNumber + 1, count));
                     }
                 }
             }
@@ -43,10 +47,19 @@ namespace FingertipsUploadService.Upload
 
         private int GetIndicatorDisclosureControlId(DataRow row)
         {
-            var indicatorId = row.Field<double>(UploadColumnNames.IndicatorId);
-            var indicatorDisclosureControlId = _profilesReader
-                .GetIndicatorMetadata((int)indicatorId).DisclosureControlId;
-            return indicatorDisclosureControlId;
+            var indicatorId = (int)row.Field<double>(UploadColumnNames.IndicatorId);
+
+            // Check if disclosure ID already retrieved
+            if (_indicatorIdToDisclosureId.ContainsKey(indicatorId))
+            {
+                return _indicatorIdToDisclosureId[indicatorId];
+            }
+
+            var metadata = _profilesReader.GetIndicatorMetadata(indicatorId);
+            var disclosureControlId = metadata.DisclosureControlId;
+            _indicatorIdToDisclosureId.Add(indicatorId, disclosureControlId);
+
+            return disclosureControlId;
         }
 
         private bool ShouldWarnForSmallNumberByAreaType(DataRow row)

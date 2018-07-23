@@ -220,7 +220,7 @@ function showMessageIfIndicatorNotAvailableForNewAreaType() {
 
             // Show message that previous indicator is not available
             var popupWidth = 600;
-            var left = ($(window).width() - popupWidth) / 2;
+            var left = lightbox.getLeftForCenteredPopup(popupWidth);
             var top = 300;
 
             var indicatorName = ui.getMetadataHash()[previousIID].Descriptive.Name;
@@ -376,14 +376,14 @@ function updatePreferredState() {
     var preferredAreas = FT.preferredAreas;
     if (preferredAreas.doesAreaCodeNeedUpdating()) {
         preferredAreas.updateAreaCode();
-        Cookies.set('preferredAreas', preferredAreas.serialise());
+        Cookies.set('preferredAreas', preferredAreas.serialise(), { expires: 1000 });
     }
 
     // Update preferred area type ID cookie
     var preferredAreaTypeIds = FT.preferredAreaTypeIds;
     if (preferredAreaTypeIds.doesAreaTypeIdNeedUpdating()) {
         preferredAreaTypeIds.updateAreaTypeId();
-        Cookies.set('preferredAreaTypes', preferredAreaTypeIds.serialise());
+        Cookies.set('preferredAreaTypes', preferredAreaTypeIds.serialise(), { expires: 1000 });
     }
 }
 
@@ -640,7 +640,7 @@ function getCurrentPageTitle() {
 }
 
 function restoreLastViewedAreaTypeId(model) {
-
+    
     // Is area type ID defined for current profile
     if (!ftHistory.isParameterDefinedInHash('ati')) {
         // No area type in bookmarked state
@@ -659,6 +659,7 @@ function documentReady() {
 
         // Init model
         var model = FT.model;
+  
         ftHistory.init(model);
         model.update();
 
@@ -669,8 +670,10 @@ function documentReady() {
         restoreLastViewedAreaTypeId(model);
 
         pages.init();
+
         if (typeof initSite === f) initSite();
         initData();
+
         initPageElements();
 
         if (isNational) {
@@ -680,9 +683,10 @@ function documentReady() {
 
         stems = new SpineChartStems(spineHeaders);
         getValueNotesCall();
+
         // Log initial state
         logEvent('DomainSelected', getCurrentDomainName(), 'LandedOn');
-        logEvent('TabSelected', pages.getCurrentPage().title, 'LandedOn');
+        logEvent('TabSelected', getCurrentPageTitle(), 'LandedOn');
     }
 }
 
@@ -914,7 +918,7 @@ function ComparisonConfig(groupRoot, indicatorMetadata) {
 		isCheckboxChecked('#target-benchmark');
 
     _this.useTarget = useTarget;
-    _this.useQuintileColouring = groupRoot.ComparatorMethodId === PolarityIds.Quintiles;
+    _this.useQuintileColouring = groupRoot.ComparatorMethodId === ComparatorMethodIds.Quintiles;
 
     if (_this.useQuintileColouring) {
         _this.showQuintileLegend = true;
@@ -1096,7 +1100,7 @@ function getDataValues(data, attribute) {
     return a;
 }
 
-function getTrendHeader(metadata, root, areaName, clickHandler) {
+function getTrendHeader(metadata, root, areaName, clickHandler, isNewData) {
 
     var unit = metadata.Unit.Label,
 		unitLabel = unit !== '' ?
@@ -1104,11 +1108,28 @@ function getTrendHeader(metadata, root, areaName, clickHandler) {
 			'';
 
     return ['<div class="trend-header"><div class="trend-title"><a class="trend-link" title="More about this indicator" href="javascript:',
-		clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>',
+		clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>' + getNewDataBadge(isNewData),
 		getIndicatorDataQualityHtml(metadata.Descriptive.DataQuality),
 		'<span class="trend-area">', areaName, '</span>', '</div>',
 		'<div class="trend-unit">', metadata.ValueType.Name, unitLabel, '</div>',
 		'</div>'].join('');
+}
+
+function hasDataChanged(groupRoot) {
+    var isNewData = false;
+
+    if (groupRoot.DateChanges !== null) {
+        isNewData = groupRoot.DateChanges.HasDataChangedRecently;
+    }
+    return isNewData;
+}
+
+function getNewDataBadge(isNewData) {
+    var badge = '';
+    if (isNewData === true) {
+        badge = NEW_DATA_BADGE;
+    }
+    return badge;
 }
 
 function getSource(metadata) {
@@ -1212,17 +1233,6 @@ function setIndicatorIndex(i) {
     $('#indicatorMenu').val(i);
 }
 
-function setIndicatorIndexAndUpdateModel(i) {
-    setIndicatorIndex(i);
-
-    // Update model
-    var root = groupRoots[i];
-    var model = FT.model;
-    model.iid = root.IID;
-    model.ageId = root.Age.Id;
-    model.sexId = root.Sex.Id;
-}
-
 function getGroupAndAreaTypeKey(areaTypeId) {
     return getKey(FT.model.groupId, areaTypeId, FT.model.nearestNeighbour);
 }
@@ -1264,7 +1274,7 @@ function initPageElements() {
     menus.parentType = new ParentTypeMenu('#parentAreaTypesMenu', model);
     menus.area = new AreaMenu('#areaMenu', model);
     menus.benchmark = new BenchmarkMenu('#comparator', model);
-    
+
     // Key heading
     var benchmark = enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY ?
 		'England' :
@@ -1273,6 +1283,12 @@ function initPageElements() {
 
     // Selected domain
     $('#domain' + model.groupId).addClass('selected-domain');
+    var $domainMenu = $('#domain-dropdown');
+    if ($domainMenu.length) {
+        $domainMenu.val(model.groupId);
+        // Make text visible now domain is selected
+        $domainMenu.css('color', '');
+    }
 
     // Benchmark target option
     $('#target-benchmark').click(function () {
@@ -1467,7 +1483,6 @@ function getAreaHash(areas) {
 };
 
 function setAreas() {
-
     var sortedAreas = FT.data.sortedAreas = getChildAreas();
 
     var isNearestNeighbours = FT.model.isNearestNeighbours();
@@ -1613,25 +1628,6 @@ function BarScale(dataList) {
 		0;
 }
 
-function MinMaxFinder(arrayOfNumbers) {
-    this.setValues(arrayOfNumbers);
-}
-
-MinMaxFinder.prototype = {
-    setValues: function (arrayOfNumbers) {
-
-        var areValues = arrayOfNumbers.length > 0;
-
-        if (areValues) {
-
-            this.min = _.min(arrayOfNumbers),
-				this.max = _.max(arrayOfNumbers);
-        }
-        this.isValid = areValues;
-    }
-
-};
-
 //
 // Shows the appropriate legend for a bar chart page.
 //
@@ -1645,7 +1641,7 @@ function showBarChartLegend(useTarget) {
 //
 // Displays a legend for the target
 //
-function setTargetLegendHtml(comparisonConfig, metadata) {
+function setTargetLegendHtml(comparisonConfig, metadata) {    
     if (comparisonConfig.useTarget) {
         var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
         $('#key-ad-hoc').html(
@@ -1664,7 +1660,7 @@ function TargetLegend(metadata) {
         ? ['bobLower', 'bobHigher']
         : ['worse', 'better'];
 
-    this.render = function() {
+    this.render = function () {
 
         // Legend may already be defined
         var legendHtml = targetConfig.LegendHtml;
@@ -1694,8 +1690,8 @@ function TargetLegend(metadata) {
             higherColour: colourClasses[1]
         };
         templates.add(bespokeKey,
-            '<span class="target {{lowerColour}}">&lt;previous year\'s England value</span>' +
-            '<span class="target {{higherColour}}">&ge;previous year\'s England value</span>');
+            start + '{{lowerColour}}">&lt;previous year\'s England value</span>' +
+            start + '{{higherColour}}">&ge;previous year\'s England value</span>');
 
         return templates.render(bespokeKey, viewModel);
     }
@@ -1718,12 +1714,13 @@ function TargetLegend(metadata) {
         }
     }
 
-    this.renderValueComparison = function() {
-        
-        var lowerLimit = new CommaNumber(targetConfig.LowerLimit).unrounded(),
-		upperLimit = targetConfig.UpperLimit,
-		suffix = new ValueSuffix(metadata.Unit).getShortLabel(),
-		html;
+    this.renderValueComparison = function () {
+
+        var lowerLimit = new CommaNumber(targetConfig.LowerLimit).unrounded();
+        var upperLimit = targetConfig.UpperLimit;
+        var useCIs = targetConfig.UseCIsForLimitComparison;
+        var suffix = new ValueSuffix(metadata.Unit).getShortLabel();
+        var html;
 
         // Switch colouring if low is good
         if (targetConfig.PolarityId === PolarityIds.RAGLowIsGood) {
@@ -1738,6 +1735,9 @@ function TargetLegend(metadata) {
             upperLimit = new CommaNumber(upperLimit).unrounded();
             html.push(start, 'same">', lowerLimit, suffix, ' to ', upperLimit, suffix, end);
         } else {
+            if (useCIs) {
+                html.push(start, 'same">Similar to ', lowerLimit, suffix, end);
+            }
             upperLimit = lowerLimit;
         }
 
@@ -1850,6 +1850,7 @@ function getParentAreaGroups() {
                     }));
 
                 loaded.parentAreaGroups = areaTypeMap;
+
                 new ParentTypes(FT.model).setDefault();
 
                 ajaxMonitor.callCompleted();
@@ -1862,6 +1863,7 @@ function getParentAreaGroups() {
 
 function initAreaData2() {
     var model = FT.model;
+
     if (!loaded.areaTypes[model.areaTypeId]) {
         // Area type id that was restored from cookie is not available for current profile anymore
         FT.model.areaTypeId = defaultAreaType;
@@ -2083,7 +2085,6 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
 }
 
 function ParentTypes(model) {
-
     var types = loaded.parentAreaGroups[model.areaTypeId];
 
     this.setDefault = function () {
@@ -2211,7 +2212,7 @@ function AreaTypeMenu(model, areaTypes) {
 
 		    var areaTypesArray = areaTypes.getAreaTypes();
 
-            // Select current area type
+		    // Select current area type
 		    _.each(areaTypesArray, function (a) {
 		        if (a.Id === model.areaTypeId) {
 		            a.selected = selected;
@@ -2298,7 +2299,7 @@ function initAreaElements() {
     menus.parentType.setOptions();
     setAreas();
     displayAreaSearchOptions(model.areaTypeId);
-
+    
     // Set area type ID in case (e.g user selected browser back or forward)
     menus.areaType.setTypeId(model.areaTypeId);
 
@@ -2314,6 +2315,7 @@ function initAreaElements() {
     if (isInSearchMode()) {
         indicatorSearch.hideAreaTypesWithNoResults();
     }
+
     refreshCurrentPage();
 }
 
@@ -2333,6 +2335,9 @@ function benchmarkChanged() {
     }
 }
 
+/**
+ * Domain is selected by domain buttons
+ */
 function domainClicked(groupId) {
     var model = FT.model;
     if (model.groupId !== groupId && !FT.ajaxLock) {
@@ -2348,8 +2353,23 @@ function domainClicked(groupId) {
     }
 }
 
+/**
+ * Domain is selected using drop down menu
+ */
+function domainSelected() {
+    var selectedGroupId = parseInt($('#domain-dropdown').val());
+
+    if (FT.model.groupId !== selectedGroupId) {
+        domainClicked(selectedGroupId);
+    }
+}
+
 function getCurrentDomainName() {
-    return $.trim($('#domain' + FT.model.groupId).text());
+    var groupId = FT.model.groupId;
+    if ($('#domain-dropdown').length > 0) //if dropdown is visible
+        return $('#domain-dropdown>option[value=' + groupId + ']').text();
+    else
+        return $.trim($('#domain' + groupId).text());
 }
 
 function populateIndicatorMenus() {
@@ -2529,7 +2549,11 @@ function displayAreaSearchOptions(areaTypeId) {
     var $searchOption = $('#area-search-link');
     var $span = $('#area-search-link-box span');
 
-    if (loaded.areaTypes[areaTypeId].IsSearchable) {
+    if (areaTypeId === AreaTypeIds.Practice) {
+        // Hide all - search is on map tab
+        $searchOption.hide();
+        $span.hide();
+    } else if (loaded.areaTypes[areaTypeId].IsSearchable) {
         // Area search is only available for the above area types
         $searchOption.show();
         $span.hide();
@@ -2552,19 +2576,16 @@ function incArrayIndex(array, index, step) {
 }
 
 // Dummy for search equivalent
-function getIndicatorIdArgument() {
-    return '';
-}
+function addIndicatorIdParameter() {
 
-// Dummy for search equivalent
-function addIndicatorIdParameter() { }
+}
 
 function setAreaType(areaTypeId) {
 
     var model = FT.model;
     if (model.areaTypeId !== areaTypeId) {
-
         lock();
+
         FT.menus.areaType.setTypeId(areaTypeId);
         new ParentTypes(model).matchTypeNameOrChange(FT.menus.parentType.getName());
 
@@ -2573,7 +2594,7 @@ function setAreaType(areaTypeId) {
         ajaxMonitor.setCalls(1);
 
         getAllAreas(areaTypeId);
-        
+
         ajaxMonitor.monitor(initAreaData2);
     }
 }
@@ -2700,12 +2721,8 @@ function showExportChartLink(chartVariable) {
 * @class showExportTableLink
 */
 function showExportTableLink(containerId, fileNamePrefix, legends) {
-    return '<div class="export-chart-box"><a class="export-link" href="javascript:exportTableAsImage(' +
-        '\'' + containerId + '\'' +
-        ',' +
-        '\'' + fileNamePrefix + '\'' +
-        ',\'' + legends + '\'' +
-        ')">Export table as image</a></div>';
+    return '<div class="export-chart-box"><a class="export-link" href="javascript:exportTableAsImage(\''
+        + containerId + '\',\'' + fileNamePrefix + '\',\'' + legends + '\')">Export table as image</a></div>';
 }
 
 /**
@@ -2714,33 +2731,31 @@ function showExportTableLink(containerId, fileNamePrefix, legends) {
 */
 function exportTableAsImage(containerId, fileNamePrefix, legends) {
 
-    if (isIE8()) {
-        browserUpgradeMessage();
-    } else {
-        containerId = '#' + containerId;
-        $(containerId + ' .export-chart-box').hide();
-        $(containerId + ' .columnSort').hide();
-        $(containerId).css('font-family', 'Arial');
-        $(containerId).css('background', 'white');
-        var container = $(containerId);
+    containerId = '#' + containerId;
+    $(containerId + ' .export-chart-box').hide();
+    $(containerId + ' .columnSort').hide();
+    $(containerId).css('font-family', 'Arial');
+    $(containerId).css('background', 'white');
+    var container = $(containerId);
 
-        if (legends && legends.length > 0) {
-            var legendContainer = $("<div id='legends'></div>");
+    if (legends && legends.length > 0) {
+        var legendContainer = $("<div id='legends'></div>");
 
-            $.each(legends.split(','), function (index, legendId) {
-                var legend = $(legendId).clone().attr('id', 'legendId').after('#id');
-                legendContainer.append(legend);
-            });
-            $('#legends').css('font-family', 'Arial');
-            container.prepend(legendContainer);
-        }
-
-        saveElementAsImage(container, fileNamePrefix);
-
-        if (legends) $('#legends').remove();
-        $(containerId + ' .export-chart-box').show();
-        $(containerId + ' .columnSort').show();
+        $.each(legends.split(','), function (index, legendId) {
+            var legend = $(legendId).clone().attr('id', 'legendId').after('#id');
+            legendContainer.append(legend);
+        });
+        $('#legends').css('font-family', 'Arial');
+        container.prepend(legendContainer);
     }
+
+    saveElementAsImage(container, fileNamePrefix);
+
+    if (legends) $('#legends').remove();
+    $(containerId + ' .export-chart-box').show();
+    $(containerId + ' .columnSort').show();
+
+    logEvent('ExportImage', getCurrentPageTitle());
 }
 
 function nearestNeighboursSelected() {
@@ -2769,7 +2784,7 @@ function showAndHideNearestNeighboursMenu() {
         // Nearest neighbours displayed
 
         var config = getNearestNeighboursConfig();
-               
+
         // Display neighbours explanation
         var headerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
             areaHash[FT.model.areaCode].Name + ' ' + nnSelectedText + '</h2></span>';
@@ -2780,7 +2795,7 @@ function showAndHideNearestNeighboursMenu() {
         viewModel.text = config.altText
             ? config.altText
             : 'nearest neighbours';
-        
+
         // More information link
         viewModel.isLink = config.ExtraLink.length > 0;
         if (viewModel.isLink) {
@@ -2848,7 +2863,7 @@ function setNearestNeighbourLinkText() {
     if (doesAreaTypeHaveNearestNeighbours() && area) {
         var config = getNearestNeighboursConfig();
 
-        var name = FT.model.areaTypeId === AreaTypeIds.CCG
+        var name = FT.model.areaTypeId === AreaTypeIds.CCGPreApr2017
             ? area.Short
             : area.Name;
 
@@ -2886,7 +2901,7 @@ function getNearestNeighbourCode() {
 }
 
 function getNearestNeighboursConfig() {
-    return  FT.config.nearestNeighbour[FT.model.areaTypeId];
+    return FT.config.nearestNeighbour[FT.model.areaTypeId];
 }
 
 FT.model.isNearestNeighbours = function () {
@@ -2910,7 +2925,7 @@ function displayNoData() {
     showAndHidePageElements();
 
     // Hide current tab contents
-    pages.getContainerJq().hide();
+    $('#' + pages.getCurrentPage().id + '-container').hide();
 
     // Show no data message
     $('#no-domain-data').show();
@@ -2963,7 +2978,7 @@ var recentTrendSelected = {
         } else if (areaCode === FT.model.parentCode) {
 
             var popupWidth = 400,
-                left = ($(window).width() - popupWidth) / 2,
+                left = lightbox.getLeftForCenteredPopup(popupWidth),
                 top = $('body').scrollTop() + 200,
                 html = '<br><br>' + '<div>The benchmark has been changed to ' + getParentArea().Name + '</div><br><br>';
             lightbox.show(html, top, left, popupWidth);
@@ -3062,13 +3077,14 @@ var barChart = {
     },
     setIndicatorTableHeaderHtml: function (root, rootIndex) {
         var grouping = getFirstGrouping(root);
-
+       
         var period = isDefined(grouping)
             ? grouping.Period
             : '';
 
         var html = getTrendHeader(barChartState.metadata, root, period,
-            'goToMetadataPage(' + rootIndex + ')');
+            'goToMetadataPage(' + rootIndex + ')', hasDataChanged(root));
+
         $('#indicator-details-header').html(html);
     }
 };
@@ -3106,7 +3122,7 @@ function addOrderandPercentilesToData(coreDataList) {
     });
 
     // Second, set orderFrac for each.
-    var j = 0;
+    var areaIndex = 0;
     $.each(areaOrder, function (i, coreData) {
         var data = hash[coreData.AreaCode];
         if (coreData.ValF === '-') {
@@ -3114,12 +3130,12 @@ function addOrderandPercentilesToData(coreDataList) {
             data.orderFrac = -1;
         }
         else {
-            data.order = numAreas - j;
-            data.orderFrac = 1 - j / numAreas;
-            var position = numAreas + 1 - j + 1;
+            data.order = numAreas - areaIndex;
+            data.orderFrac = 1 - areaIndex / numAreas;
+            var position = numAreas + 1 - areaIndex + 1;
             data.quartile = Math.ceil(position / (numAreas / 4));
             data.quintile = Math.ceil(position / (numAreas / 5));
-            j++;
+            areaIndex++;
         }
     });
 
@@ -3138,13 +3154,14 @@ var CSS_CENTER = 'center';
 var CSS_NUMERIC = 'numeric';
 var CSS_NUMERIC_WITH_TOOLTIP = 'numeric boot-tooltip';
 var EMPTY_TD_CONTENTS = '&nbsp;'; // Necessary for empty bordered TDs in IE
-var NO_DATA = '<div class="noData">-</div>';
+var NO_DATA = '<div class="no-data">-</div>';
 var VALUE_NOTE = '*';
 var MAIN = '#main';
 var nextUniqueId = 0;
 var GET_METADATA_SYSTEM_CONTENT = 'yes';
 var SEARCH_NO_RESULT_TOP_OFFSET = 21;
 var stems;
+var NEW_DATA_BADGE = '<span style="margin-right:8px;" class="badge badge-success">New data</span>';
 
 // UI State
 var cells = null;
@@ -3160,16 +3177,17 @@ var chart;
 $(document).ready(documentReady);
 
 function showHideAreaAddress() {
+    var id = "#gp-address-placeholder";
+    var $addressBox = $(id);
 
-    var $addressBox = $("#gp-address-placeholder");
-
-    if (FT.model.areaTypeId === AreaTypeIds.Practice && pages.getCurrent() !== PAGE_MODES.METADATA) {
-        var $address = $('#gp-address-placeholder address');
+    if (FT.model.areaTypeId === AreaTypeIds.Practice
+        && pages.getCurrent() !== PAGE_MODES.METADATA && pages.getCurrent() !== PAGE_MODES.ENGLAND) {
+        var $address = $(id + ' address');
         $address.html('&nbsp;');
         var parameters = new ParameterBuilder().add('area_code', FT.model.areaCode);
         ajaxGet('api/area_address',
             parameters.build(),
-            function(result) {
+            function (result) {
                 $address.html(result.Name + ", " + getAddressText(result));
             },
             handleAjaxFailure);

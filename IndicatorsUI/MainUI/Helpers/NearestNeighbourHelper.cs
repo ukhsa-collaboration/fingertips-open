@@ -1,9 +1,9 @@
-﻿using Profiles.DataAccess;
-using Profiles.DomainObjects;
+﻿using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class NearestNeighbourHelper
     {

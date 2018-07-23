@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 using System.Net.Mime;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class DownloadController : Controller
     {
+        [Route("documents/{filename}.{ext}")]
         public ActionResult Index(string filename, string ext)
         {
             if (string.IsNullOrEmpty(filename) || string.IsNullOrEmpty(ext)) return HttpNotFound();

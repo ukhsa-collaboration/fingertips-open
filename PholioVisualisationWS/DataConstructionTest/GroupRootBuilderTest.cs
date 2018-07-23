@@ -179,6 +179,11 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(43, roots[0].IndicatorId);
             Assert.AreEqual(2, roots[1].IndicatorId);
             Assert.AreEqual(9, roots[2].IndicatorId);
+
+            // Sequences are set
+            Assert.AreEqual(1, roots[0].Sequence);
+            Assert.AreEqual(2, roots[1].Sequence);
+            Assert.AreEqual(3, roots[2].Sequence);
         }
 
         [TestMethod]

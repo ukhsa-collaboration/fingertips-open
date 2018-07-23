@@ -7,6 +7,8 @@ namespace PholioVisualisation.ServiceActions
 {
     public class PartitionDataForAllCategoriesBuilder : PartitionDataBuilderBase
     {
+        private IList<CoreDataSet> _specialCaseBenchmarkDataList = new List<CoreDataSet>();
+
         public PartitionDataForAllCategories GetPartitionData(int profileId,
             string areaCode, int indicatorId, int sexId, int ageId, int areaTypeId)
         {
@@ -15,7 +17,8 @@ namespace PholioVisualisation.ServiceActions
                 AreaCode = areaCode,
                 IndicatorId = indicatorId,
                 AgeId = ageId,
-                SexId = sexId
+                SexId = sexId,
+                BenchmarkDataSpecialCases = _specialCaseBenchmarkDataList
             };
 
             // Check grouping exists
@@ -35,6 +38,7 @@ namespace PholioVisualisation.ServiceActions
 
             CalculateSignificances(areaCode, timePeriod, categoryDataList);
             FormatData(categoryDataList);
+            FormatData(_specialCaseBenchmarkDataList);
 
             partitionData.CategoryTypes = GetCategoryTypes(categoryDataList);
             partitionData.Data = categoryDataList;
@@ -123,6 +127,32 @@ namespace PholioVisualisation.ServiceActions
             List<int> categoryTypeIds = categoryDataList.Select(x => x.CategoryTypeId).Distinct().ToList();
             IList<CategoryType> categoryTypes = _areasReader.GetCategoryTypes(categoryTypeIds);
             return categoryTypes;
+        }
+
+        /// <summary>
+        /// Override base method to allow handling of special cases, e.g. where a specific age must be used
+        /// </summary>
+        protected override CoreDataSet GetSpecialCaseBenchmarkData(TimePeriod timePeriod, 
+            IArea area)
+        {
+            // Handle special case for selecting benchmark data where specific age ID is required
+            var ageId = _grouping.AgeId;
+            if (_specialCase.ShouldUseSpecificAgeId())
+            {
+                _grouping.AgeId = _specialCase.BenchmarkAgeId;
+            }
+
+            // Get benchmark data
+            CoreDataSet benchmarkData = base.GetBenchmarkData(timePeriod, area);
+
+            if (_specialCase.ShouldUseSpecificAgeId())
+            {
+                _specialCaseBenchmarkDataList.Add(benchmarkData);
+            }
+
+            // Restore original age ID
+            _grouping.AgeId = ageId;
+            return benchmarkData;
         }
     }
 }

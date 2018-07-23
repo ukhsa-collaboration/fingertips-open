@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.MainUI.Helpers;
+using IndicatorsUI.MainUI.Helpers;
 
 namespace IndicatorsUI.MainUITest.Helpers
 {
     [TestClass]
     public class ColumnAssignerTest
     {
-        private int itemCount;
+        private int _itemCount;
 
         [TestMethod]
         public void TestNoItems()
@@ -56,19 +56,19 @@ namespace IndicatorsUI.MainUITest.Helpers
 
             var assigner = new ColumnAssigner(totalItemCount, columnCount);
 
-            itemCount = 0;
+            _itemCount = 0;
 
             for (int i = 0; i < columnCount; i++)
             {
                 AssignItemsToCurrentColumn(assigner);
 
                 var expectedItemsSoFar = columnItemCounts.ToList().Take(i + 1).Sum();
-                Assert.AreEqual(expectedItemsSoFar, itemCount);
+                Assert.AreEqual(expectedItemsSoFar, _itemCount);
 
                 assigner.NewColumn();
             }
 
-            Assert.AreEqual(totalItemCount, itemCount);
+            Assert.AreEqual(totalItemCount, _itemCount);
         }
 
 
@@ -76,7 +76,7 @@ namespace IndicatorsUI.MainUITest.Helpers
         {
             while (assigner.IsNextIndexInCurrentColumn)
             {
-                itemCount++;
+                _itemCount++;
                 var index = assigner.NextIndex;
             }
         }

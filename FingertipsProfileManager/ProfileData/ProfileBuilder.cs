@@ -61,43 +61,43 @@ namespace Fpm.ProfileData
             }
 
             // Indicators
-            if (profile.AreIndicatorsToBeListed)
+
+            if (profile.SelectedDomain > 0 && domainGroupings != null && profile.GroupingMetadatas.Count > 0)
             {
-                if (profile.SelectedDomain > 0 && domainGroupings != null)
+                // Only include indicators from the selected domain and area type
+                IEnumerable<int> indicatorIds;
+                if (selectedAreaTypeId > 0)
                 {
-                    // Only include indicators from the selected domain and area type
-                    IEnumerable<int> indicatorIds;
-                    if (selectedAreaTypeId > 0)
-                    {
-                        indicatorIds = domainGroupings
-                            .Where(x => x.AreaTypeId == selectedAreaTypeId)
-                            .OrderBy(v => v.Sequence)
-                            .Select(x => x.IndicatorId).Distinct();
+                    indicatorIds = domainGroupings
+                        .Where(x => x.AreaTypeId == selectedAreaTypeId)
+                        .OrderBy(v => v.Sequence)
+                        .Select(x => x.IndicatorId).Distinct();
 
-                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, 
-                            selectedAreaTypeId, profile.Id);
-                    }
-                    else
-                    {
-                        indicatorIds = domainGroupings
-                            .OrderBy(v => v.Sequence)
-                            .Select(x => x.IndicatorId)
-                            .Distinct();
-
-                        profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, 
-                            selectedAreaTypeId, profile.Id);
-                    }
+                    profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId,
+                        selectedAreaTypeId, profile.Id);
                 }
-                else if (profile.GroupingMetadatas.Count == 0)
+                else
                 {
-                    // No domains for this profile so use all groupings
-                    var indicatorIds =
-                        allGroupings.Where(x => x.AreaTypeId == selectedAreaTypeId).Select(x => x.IndicatorId).Distinct();
+                    indicatorIds = domainGroupings
+                        .OrderBy(v => v.Sequence)
+                        .Select(x => x.IndicatorId)
+                        .Distinct();
 
-                    profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaTypeId, profile.Id);
+                    profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId,
+                        selectedAreaTypeId, profile.Id);
                 }
             }
+            else if (profile.GroupingMetadatas.Count == 0)
+            {
+                // No domains for this profile so use all groupings
+                var indicatorIds =
+                    allGroupings.Where(x => x.AreaTypeId == selectedAreaTypeId).Select(x => x.IndicatorId).Distinct();
 
+                profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaTypeId,
+                    profile.Id);
+            }
+
+            //Handle IndicatorNames null condition if there is not domain present
             return profile;
         }
 

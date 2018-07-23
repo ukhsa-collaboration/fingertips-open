@@ -66,7 +66,7 @@ namespace Fpm.MainUI.Controllers
         {
             if (!TryUpdateModel(user))
             {
-                ViewBag.updateError = "Update Failure";
+                ViewBag.UpdateError = "Update Failure";
                 return View("CreateUser", user);
             }
 

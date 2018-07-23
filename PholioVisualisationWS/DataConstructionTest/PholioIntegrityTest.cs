@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -12,6 +13,65 @@ namespace PholioVisualisation.DataConstructionTest
     public class PholioIntegrityTest
     {
         private IAreasReader areasReader = ReaderFactory.GetAreasReader();
+
+        /// <summary>
+        /// All longer lives profiles need the comparator set
+        /// to "National and Subnational" in FPM. The exception is GP area type.
+        /// </summary>
+        [TestMethod]
+        public void TestAllLongerLivesProfilesHaveRequiredGroupings()
+        {
+            var failMessages = new List<string>();
+
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            var profileIds = ReaderFactory.GetProfileReader().GetLongerLivesProfileIds();
+            foreach (var profileId in profileIds)
+            {
+                var groupIds = groupDataReader.GetGroupIdsOfProfile(profileId);
+                foreach (var groupId in groupIds)
+                {
+                    var groupings = groupDataReader.GetGroupingsByGroupId(groupId)
+                        .Where(x => x.AreaTypeId != AreaTypeIds.GpPractice);
+
+                    // Group according to the parameters that are used to display
+                    var groupedGrouping = groupings.GroupBy(x =>
+                        new { x.IndicatorId, x.AreaTypeId, x.SexId, x.AgeId });
+
+                    foreach (var grouped in groupedGrouping)
+                    {
+                        if (grouped.Count() == 1)
+                        {
+                            failMessages.Add(string.Format(
+                                 "Comparator must be set to 'National and Subnational' for Indicator ID {0} Profile ID {1}",
+                                 grouped.Key.IndicatorId, profileId));
+                        }
+                    }
+                }   
+            }
+
+            // Check whether any indicators required the comparator changing
+            if (failMessages.Any())
+            {
+                foreach (var failMessage in failMessages)
+                {
+                    Console.WriteLine(failMessage);
+                }
+                Assert.Fail("Comparator must be set to 'National and Subnational' for all Longer Lives indicators");
+            }
+        }
+
+        [TestMethod]
+        public void Test_CIs_Are_Not_Both_Minus_One_Instead_Of_Null()
+        {
+            var count = ReaderFactory.GetGroupDataReader()
+                .GetCoreDataCountWhereBothCI95AreMinusOne();
+            Assert.AreEqual(0, count, @"There should be no CoreDataSet rows where both CI95 values are -1. 
+FUS should have changed these to nulls instead. Run this script to fix:
+update [CoreDataSet]
+set  [LowerCI95] = null, [UpperCI95] = null
+where [LowerCI95] = -1 and [UpperCI95] = -1
+             ");
+        }
 
         [TestMethod]
         public void TestNoDuplicatedIndicatorMetadataOverrides()
@@ -36,7 +96,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestAllIndicatorMetadataMandatoryPropertiesAreDefined()
         {
             // Check mandatory metadata properties are defined for all indicators
-            var indicatorIds = ReaderFactory.GetGroupDataReader().GetAllIndicators();
+            var indicatorIds = ReaderFactory.GetGroupDataReader().GetAllIndicatorIds();
             var provider = IndicatorMetadataProvider.Instance;
             var checker = new IndicatorMetadataChecker();
             foreach (var indicatorId in indicatorIds)

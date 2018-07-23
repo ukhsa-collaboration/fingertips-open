@@ -1,0 +1,32 @@
+﻿@using IndicatorsUI.DataAccess
+@using IndicatorsUI.DomainObjects
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForUserAccount")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row col-md-12">
+        <div id="div-content">
+            <div>
+                @if (AppConfig.Instance.IsFeatureActive(FeatureFlags.EmailVerification))
+                {
+                    <h2>Thank You! Please check your email to activate</h2>
+                    <p>Thank you for your registering with us.</p>
+                    <p>We will never share your email or any other personal data with anyone else.</p>
+                    <p>There is just one more step. We sent you a confirmation email with a link to activate your account. Please 
+                        check your email and click the link. This helps to ensure that your (and our) inbox remains 
+                        free of spam. You may need to check your spam folder or unblock 
+                        <a href="mailto:fingertips@notifications.service.gov.uk?Subject=This%20is%20an%20automatically%20generated%20email,%20please%20do%20not%20reply%20this%20email" title="This is an automatically generated email, please do not reply." target="_top">fingertips@notifications.service.gov.uk</a></p>
+                    <p>If you have any queries please contact <a href="mailto:profilefeedback@phe.gov.uk?Subject=Fingertips%20help" target="_top">profilefeedback@phe.gov.uk</a></p>
+                }
+                else
+                {
+                    <h2>Thank you!</h2>
+                    <p>Thank you for your registering with us.</p>
+                    <p>We will never share your email or any other personal data with anyone else.</p>
+                    <p>You can now @Html.ActionLink("Sign in", "Login")</p>
+                }
+        </div>
+    </div>
+</div>

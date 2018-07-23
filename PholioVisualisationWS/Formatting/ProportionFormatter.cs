@@ -22,8 +22,10 @@ namespace PholioVisualisation.Formatting
         {
             if (data != null && data.HasFormattedCIs == false)
             {
-                data.UpperCIF = formatMethod(data.UpperCI);
-                data.LowerCIF = formatMethod(data.LowerCI);
+                data.UpperCI95F = formatNullableMethod(data.UpperCI95);
+                data.LowerCI95F = formatNullableMethod(data.LowerCI95);
+                data.UpperCI99_8F = formatNullableMethod(data.UpperCI99_8);
+                data.LowerCI99_8F = formatNullableMethod(data.LowerCI99_8);
             }
         }
 
@@ -52,6 +54,21 @@ namespace PholioVisualisation.Formatting
                 return NoValue;
             }
 
+            return FormatValidValue(val);
+        }
+
+        private static string FormatOnNullableValue(double? val)
+        {
+            if (val.HasValue == false)
+            {
+                return NoValue;
+            }
+
+            return FormatValidValue(val.Value);
+        }
+
+        private static string FormatValidValue(double val)
+        {
             if (val >= 99.95)
             {
                 return "100";
@@ -65,6 +82,7 @@ namespace PholioVisualisation.Formatting
             if (limits == null)
             {
                 formatMethod = FormatOnValue;
+                formatNullableMethod = FormatOnNullableValue;
                 return;
             }
 
@@ -73,14 +91,17 @@ namespace PholioVisualisation.Formatting
             if (max < 1)
             {
                 formatMethod = Format3DP;
+                formatNullableMethod = FormatNullable3DP;
             }
             else if (max < 10)
             {
                 formatMethod = Format2DP;
+                formatNullableMethod = FormatNullable2DP;
             }
             else
             {
                 formatMethod = FormatOnValue;
+                formatNullableMethod = FormatOnNullableValue;
             }
         }
     }

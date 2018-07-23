@@ -41,6 +41,16 @@ namespace PholioVisualisation.DataConstruction
             return GetLimitsFromMinAndMax(values.Min(), values.Max());
         }
 
+        public Limits GetLimits(IList<double> values)
+        {
+            if (values == null || values.Any() == false)
+            {
+                return null;
+            }
+
+            return GetLimitsFromMinAndMax(values.Min(), values.Max());
+        }
+
         private void AddRegionAndChildAreas(IList<string> childAreaCodes, ComparatorMap comparatorMap)
         {
             ComparatorDetails regionalComparatorDetails = comparatorMap.GetSubnationalComparator();

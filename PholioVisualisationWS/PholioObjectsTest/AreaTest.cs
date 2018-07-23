@@ -18,11 +18,11 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Shape }.IsShape);
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsShape);
 
-            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Ccg }.IsCcg);
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.CcgsPreApr2017 }.IsCcg);
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsCcg);
 
             Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsGpPractice);
-            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.Ccg }.IsGpPractice);
+            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.CcgsPreApr2017 }.IsGpPractice);
 
             Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Country}.IsCountry);
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice}.IsCountry);

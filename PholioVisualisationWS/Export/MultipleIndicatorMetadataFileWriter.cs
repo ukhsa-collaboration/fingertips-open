@@ -11,7 +11,7 @@ namespace PholioVisualisation.Export
         private HtmlCleaner _htmlCleaner = new HtmlCleaner();
 
         public byte[] GetMetadataFileAsBytes(IList<IndicatorMetadata> indicatorMetadataList,
-            IList<IndicatorMetadataTextProperty> properties)
+            IList<Polarity> polarities, IList<IndicatorMetadataTextProperty> properties)
         {
             // Create CSV writer
             var csvWriter = new CsvWriter();
@@ -20,8 +20,9 @@ namespace PholioVisualisation.Export
             AddHeader(properties, csvWriter);
 
             // Add descriptive metadata properties
-            foreach (var indicatorMetadata in indicatorMetadataList)
+            for (var i =0 ; i < indicatorMetadataList.Count; i++)
             {
+                var indicatorMetadata = indicatorMetadataList[i];
                 var textList = new List<string>();
 
                 textList.Add(indicatorMetadata.IndicatorId.ToString());
@@ -32,6 +33,7 @@ namespace PholioVisualisation.Export
                 textList.Add(indicatorMetadata.Unit.Label);
                 textList.Add(indicatorMetadata.ValueType.Name);
                 textList.Add(indicatorMetadata.YearType.Name);
+                textList.Add(polarities[i].Name);
 
                 csvWriter.AddLine(textList.Cast<object>().ToArray());
             }
@@ -40,7 +42,7 @@ namespace PholioVisualisation.Export
             return bytes;
         }
 
-        private void AddIndicatorMetadataTextProperties(IList<IndicatorMetadataTextProperty> properties, 
+        private void AddIndicatorMetadataTextProperties(IList<IndicatorMetadataTextProperty> properties,
             IndicatorMetadata indicatorMetadata, List<string> textList)
         {
             var descriptive = indicatorMetadata.Descriptive;
@@ -76,7 +78,7 @@ namespace PholioVisualisation.Export
 
             headers.Add("Indicator ID");
             headers.AddRange(properties.Select(x => x.DisplayName));
-            headers.AddRange(new List<string> {"Unit", "Value type", "Year type"});
+            headers.AddRange(new List<string> { "Unit", "Value type", "Year type", "Polarity" });
 
             csvWriter.AddHeader(headers.Cast<object>().ToArray());
         }

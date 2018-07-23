@@ -15,14 +15,14 @@ namespace PholioVisualisation.DataConstruction
                 validDataList = dataList
                     .Where(x => x.IsValueValid)
                     .OrderByDescending(x => x.Value)
-                    .ToList();               
+                    .ToList();
             }
             else
             {
                 validDataList = dataList
                     .Where(x => x.IsValueValid)
                     .OrderBy(x => x.Value)
-                    .ToList();                
+                    .ToList();
             }
 
             return validDataList;

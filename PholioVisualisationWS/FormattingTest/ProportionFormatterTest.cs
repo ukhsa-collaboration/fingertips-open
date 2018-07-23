@@ -20,8 +20,8 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestFactoryMethod()
         {
-            Assert.IsTrue(NumericFormatterFactory.NewWithLimits(GetMetadata(), null) is ProportionFormatter);
-            Assert.IsFalse(NumericFormatterFactory.NewWithLimits(new IndicatorMetadata
+            Assert.IsTrue(new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null) is ProportionFormatter);
+            Assert.IsFalse(new NumericFormatterFactory(null).NewWithLimits(new IndicatorMetadata
             {
                 ValueTypeId = (int)ValueTypeId.CrudeRate
             }, new IndicatorStatsPercentiles { Max = 1 }) is ProportionFormatter);
@@ -30,7 +30,7 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestNullStatsAreFormatted()
         {
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             IndicatorStatsPercentilesFormatted stats = formatter.FormatStats(null);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Min);
             Assert.AreEqual(NumericFormatter.NoValue, stats.Max);
@@ -53,7 +53,7 @@ namespace PholioVisualisation.FormattingTest
             };
 
             // Format first time
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
             Assert.AreEqual("1.0", data.ValueFormatted);
 
@@ -71,7 +71,7 @@ namespace PholioVisualisation.FormattingTest
                 Value = 45.77777
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
 
             Assert.AreEqual("45.8", data.ValueFormatted);
@@ -80,7 +80,7 @@ namespace PholioVisualisation.FormattingTest
         [TestMethod]
         public void TestNullObjectFormattedCorrectlyIfNoStats()
         {
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             CoreDataSet data = CoreDataSet.GetNullObject(null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
@@ -99,7 +99,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile95 = 0,
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), statsPercentiles);
             CoreDataSet data = CoreDataSet.GetNullObject(null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
@@ -116,7 +116,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile75 = 0
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), statsPercentiles);
             CoreDataSet data = CoreDataSet.GetNullObject(null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
@@ -133,7 +133,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile75 = 0
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), statsPercentiles);
             CoreDataSet data = CoreDataSet.GetNullObject(null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
@@ -150,7 +150,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile75 = 0
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), statsPercentiles);
             CoreDataSet data = CoreDataSet.GetNullObject(null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
@@ -164,7 +164,7 @@ namespace PholioVisualisation.FormattingTest
                 Value = 0
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
 
             Assert.AreEqual("0.0", data.ValueFormatted);
@@ -178,7 +178,7 @@ namespace PholioVisualisation.FormattingTest
                 Value = 100
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
 
             Assert.AreEqual("100", data.ValueFormatted);
@@ -192,7 +192,7 @@ namespace PholioVisualisation.FormattingTest
                 Value = 100
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
         }
 
@@ -204,7 +204,7 @@ namespace PholioVisualisation.FormattingTest
                 Value = -1
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.Format(data);
             Assert.AreEqual(NumericFormatter.NoValue, data.ValueFormatted);
         }
@@ -223,7 +223,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile95 = 81
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.Proportion }, statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.Proportion }, statsPercentiles);
             IndicatorStatsPercentilesFormatted statsFormatted = formatter.FormatStats(statsPercentiles);
 
             Assert.AreEqual("45.1", statsFormatted.Min);
@@ -246,7 +246,7 @@ namespace PholioVisualisation.FormattingTest
                 Percentile75 = 50
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.Proportion }, statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(new IndicatorMetadata { ValueTypeId = (int)ValueTypeId.Proportion }, statsPercentiles);
             IndicatorStatsPercentilesFormatted statsFormatted = formatter.FormatStats(statsPercentiles);
 
             Assert.AreEqual("0.0", statsFormatted.Min);
@@ -258,21 +258,25 @@ namespace PholioVisualisation.FormattingTest
         {
             CoreDataSet data = new CoreDataSet()
             {
-                LowerCI = 52.3,
-                UpperCI = 65.3
+                LowerCI95 = 52.3,
+                UpperCI95 = 65.3,
+                LowerCI99_8 = 23.4,
+                UpperCI99_8 = 67.8
             };
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.FormatConfidenceIntervals(data);
 
-            Assert.AreEqual("52.3", data.LowerCIF);
-            Assert.AreEqual("65.3", data.UpperCIF);
+            Assert.AreEqual("52.3", data.LowerCI95F);
+            Assert.AreEqual("65.3", data.UpperCI95F);
+            Assert.AreEqual("23.4", data.LowerCI99_8F);
+            Assert.AreEqual("67.8", data.UpperCI99_8F);
         }
 
         [TestMethod]
         public void TestFormatConfidenceIntervalsToleratesNull()
         {
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), null);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), null);
             formatter.FormatConfidenceIntervals(null);
         }
 
@@ -316,7 +320,7 @@ namespace PholioVisualisation.FormattingTest
         private static void AssertValueAsExpected(IndicatorStatsPercentiles statsPercentiles, string expected, double val)
         {
 
-            NumericFormatter formatter = NumericFormatterFactory.NewWithLimits(GetMetadata(), statsPercentiles);
+            NumericFormatter formatter = new NumericFormatterFactory(null).NewWithLimits(GetMetadata(), statsPercentiles);
 
             CoreDataSet data = new CoreDataSet
             {

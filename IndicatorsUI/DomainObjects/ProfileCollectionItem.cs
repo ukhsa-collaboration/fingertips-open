@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Web.UI;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class ProfileCollectionItem
     {

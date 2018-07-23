@@ -21,6 +21,33 @@ h5.asterisk {
     margin-left: -4px;
 }
 
+#quartiles-detailed-key img {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    margin-right: 5px;
+    margin-top: -2px;
+}
+
+#quartiles-detailed-key {
+    margin-bottom: 20px;
+    border: 1px solid #f1f1f1
+}
+
+#quartiles-detailed-key th {
+    padding: 4px;
+    background-color: #f1f1f1;
+}
+
+#quartiles-detailed-key th:first-child {
+    width: 98px;
+}
+
+#quartiles-detailed-key td {
+    padding: 4px;
+        border: 1px solid #f1f1f1
+}
+
 /* Tooltip*/
 .indicator-tooltip {
     float: left;
@@ -222,13 +249,6 @@ h5.asterisk {
     font-size: 1.21em;
 }
 
-.map-info-header a {
-    font-size: 0.80em;
-    float: left;
-    margin-left: 2px;
-    margin-top: 2px;
-}
-
 dl,
 menu,
 ol,
@@ -242,10 +262,26 @@ ul {
     font-size: 4.0em;
 }
 
+.ranking_table_content > .header h1.smaller-header {
+    font-size: 3.0em;
+}
+
+#area-details-link {
+    position: relative;
+    float: right;
+    top: -42px;
+    color: #2e3191;
+    font-size: 14px;
+}
+#area-details-link:hover {
+    color: #2e8aca;
+}
+
 .ranking_table_content .table-data table thead {
     background-color: #000;
     height: 50px;
 }
+
 
 .ranking_table_content #related_content ul li.prev_risk_active a {
     color: #02ae94;
@@ -284,6 +320,11 @@ ul {
 
 .show-compare {
     display: block;
+}
+
+.compare-link a {
+    display: block;
+    padding: 0 5px;
 }
 
 .hide-compare {
@@ -367,6 +408,10 @@ vertical-align: top;
     height:11px;
 }
 
+#high-to-low-legend {
+    margin: 0.4em 0 !important;
+}
+
 #high-to-low-legend .quintile-1, #high-to-low-legend.grade-quintile-1 img {
     border: 1px solid #9e7cc8;
     width: 11px !important;
@@ -402,4 +447,60 @@ vertical-align: top;
 }
 .posttext {
     display:table-cell;
+}
+
+/*----------------------------------------
+    Lightbox
+------------------------------------------*/
+#lightBox
+{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #000;
+    height: 1000px;
+    width: 100%;
+    opacity: 0.50; /*IE9, etc*/
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
+    filter: alpha(opacity=50); /*IE6-7*/
+    z-index: 1;
+}
+#infoBox
+{
+    position: absolute;
+    background: white;
+    border: 5px solid #eee;
+    padding: 6px;
+    z-index: 1000;
+    border-radius: 5px;
+}
+
+#infoBox h1
+{
+    width: 100%;
+    text-align: center;
+    color: #333;
+}
+#infoBox .close
+{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    height: 16px;
+    width: 16px;
+    background-image: url(../images/close2.png);
+    cursor: pointer;
+}
+
+.compare-popup a {
+    font-size: 14px;
+    padding: 5px;
+    margin-right: 20px;
+    color: #2e3191;
+    float: right;
+}
+
+.compare-popup a:hover {
+     color: #2e8aca;
 }

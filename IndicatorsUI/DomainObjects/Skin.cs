@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     /// <summary>
     /// Site skin.
@@ -20,7 +20,6 @@ namespace Profiles.DomainObjects
         public string Title { get; set; }
         public string TestHost { get; set; }
         public string LiveHost { get; set; }
-        public string AccessControlGroup { get; set; }
 
         public bool IsTitle
         {
@@ -35,22 +34,6 @@ namespace Profiles.DomainObjects
             get
             {
                 return Id == SkinIds.LongerLives;
-            }
-        }
-
-        public bool IsPhof
-        {
-            get
-            {
-                return Id == SkinIds.Phof;
-            }
-        }
-
-        public bool IsTobacco
-        {
-            get
-            {
-                return Id == SkinIds.Tobacco;                
             }
         }
     }

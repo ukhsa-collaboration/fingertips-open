@@ -1,0 +1,15 @@
+﻿@using System.Web.Optimization
+@using IndicatorsUI.MainUI.Models;
+@model PageModel
+@Styles.Render("~/bundles/css-core-data-page")
+<script type="text/javascript">
+    //<![CDATA[
+    profileUrlKey = '@ViewBag.ProfileUrlKey';
+    FT.model.profileId = @Model.ProfileId;
+    FT.features = @Html.Raw(ViewBag.FeatureSwitchJavaScript);
+    FT.config.profileCollectionUrlKey = '@ViewBag.LeadProfileUrlKey';
+    FT.config.hasStaticReports = @JsHelper.GetJsBool(Model.HasStaticReports);
+    FT.config.staticReportsFolders = '@ViewBag.StaticReportsFolders'.split(',');
+    FT.config.staticReportsLabel = '@ViewBag.StaticReportsLabel';
+//]]</script>
+

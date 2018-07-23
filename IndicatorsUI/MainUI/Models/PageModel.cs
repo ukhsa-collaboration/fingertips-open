@@ -1,18 +1,17 @@
-﻿using System.Collections.Generic;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Skins;
+﻿using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Skins;
+using System.Collections.Generic;
 
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public class PageModel
     {
-        private readonly AppConfig appConfig;
+        private readonly IAppConfig appConfig;
         private Skin skin;
-        private string skinViewPrefix;
 
-        public PageModel(AppConfig appConfig)
+        public PageModel(IAppConfig appConfig)
         {
             this.appConfig = appConfig;
             ProfileId = ProfileIds.Undefined;
@@ -43,7 +42,7 @@ namespace Profiles.MainUI.Models
 
         public string GetTwitterHandle()
         {
-            if (skin.IsPhof)
+            if (ProfileId == ProfileIds.Phof)
             {
                 return "PHoutcomes";
             }
@@ -61,7 +60,7 @@ namespace Profiles.MainUI.Models
         public bool UseTargetBenchmarkByDefault { get; set; }
         public int RagColourId { get; set; }
         public SpineChartMinMaxLabelBuilder.MinMaxLabel SpineChartMinMaxLabel { get; set; }
-      
+
         /// <summary>
         /// Whether or not PDFs are available for the profile.
         /// </summary>
@@ -90,8 +89,6 @@ namespace Profiles.MainUI.Models
         ///     Used to limit search results and parent areas that are displayed in the region menu.
         /// </summary>
         public int TemplateProfileId { get; set; }
-
-        public int[] ProfileCollectionIdList { get; set; }
 
         public bool DisplayRagKey
         {
@@ -123,30 +120,12 @@ namespace Profiles.MainUI.Models
             get { return ProfileId == ProfileIds.Phof; }
         }
 
-        public string GetSkinView(string name)
-        {
-            if (skinViewPrefix == null)
-            {
-                InitSkinViewPrefix();
-            }
-
-            return skinViewPrefix + name + ".cshtml";
-        }
-
         public void SetJavaScriptVersionFolder(string folder)
         {
             string url = appConfig.StaticContentUrl + folder;
 
             JsPath = url + "js/";
             CssPath = url + "css/";
-        }
-
-        private void InitSkinViewPrefix()
-        {
-            // Define this on first pass
-            skinViewPrefix = skin != null && skin.PartialViewFolder != null
-                ? "~/Views/" + skin.PartialViewFolder + "/"
-                : "~/Views/Shared/";
         }
 
         private bool IsPageTitle()

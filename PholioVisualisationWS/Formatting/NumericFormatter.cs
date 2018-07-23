@@ -10,6 +10,9 @@ namespace PholioVisualisation.Formatting
         protected delegate string FormatMethod(double val);
         protected FormatMethod formatMethod;
 
+        protected delegate string FormatNullableMethod(double? val);
+        protected FormatNullableMethod formatNullableMethod;
+
         protected Limits limits;
         protected IndicatorMetadata metadata;
 
@@ -49,38 +52,44 @@ namespace PholioVisualisation.Formatting
 
         public static string FormatZeroDP(double val)
         {
-            if (val == ValueData.NullValue)
-            {
-                return NoValue;
-            }
-            return string.Format("{0:0}", val);
+            return val == ValueData.NullValue
+                ? NoValue
+                : string.Format("{0:0}", val);
         }
 
         public static string Format1DP(double val)
         {
-            if (val == ValueData.NullValue)
-            {
-                return NoValue;
-            }
-            return string.Format("{0:0.0}", val);
+            return val == ValueData.NullValue
+                ? NoValue
+                : string.Format("{0:0.0}", val);
         }
 
         public static string Format2DP(double val)
         {
-            if (val == ValueData.NullValue)
-            {
-                return NoValue;
-            }
-            return string.Format("{0:0.00}", val);
+            return val == ValueData.NullValue
+                ? NoValue
+                : string.Format("{0:0.00}", val);
         }
 
         public static string Format3DP(double val)
         {
-            if (val == ValueData.NullValue)
-            {
-                return NoValue;
-            }
-            return string.Format("{0:0.000}", val);
+            return val == ValueData.NullValue
+                ? NoValue
+                : string.Format("{0:0.000}", val);
+        }
+
+        public static string FormatNullable2DP(double? val)
+        {
+            return val.HasValue
+                ? string.Format("{0:0.00}", val)
+                : NoValue;
+        }
+
+        public static string FormatNullable3DP(double? val)
+        {
+            return val.HasValue
+                ? string.Format("{0:0.000}", val)
+                : NoValue;
         }
     }
 }

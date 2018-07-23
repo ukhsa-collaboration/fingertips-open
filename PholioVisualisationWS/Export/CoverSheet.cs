@@ -120,7 +120,7 @@ namespace PholioVisualisation.Export
 
         private static void AddPicture(IWorksheet ws, int left, int top, string fileName)
         {
-            string path = Path.Combine(ApplicationConfiguration.ImagesDirectory, fileName);
+            string path = Path.Combine(ApplicationConfiguration.Instance.ImagesDirectory, fileName);
             System.Drawing.Image i = System.Drawing.Image.FromFile(path);
             ws.Shapes.AddPicture(path, left, top, i.Width * PixelsToPoints, i.Height * PixelsToPoints);
         }

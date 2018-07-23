@@ -24,11 +24,15 @@ namespace PholioVisualisation.DataConstructionTest
 
             var coreDataSetFilter = CoreDataSetFilter(dataList);
             var average = new WeightedAverageCalculator(coreDataSetFilter, Unit(1)).Average;
+
+            // Assert: check values
             Assert.AreEqual(count, average.Count);
             Assert.AreEqual(denominator, average.Denominator);
             Assert.AreEqual(ValueData.NullValue, average.Denominator2);
-            Assert.AreEqual(ValueData.NullValue, average.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, average.UpperCI);
+            Assert.IsNull(average.LowerCI95);
+            Assert.IsNull(average.UpperCI95);
+            Assert.IsNull(average.LowerCI99_8);
+            Assert.IsNull(average.UpperCI99_8);
         }
 
         [TestMethod]

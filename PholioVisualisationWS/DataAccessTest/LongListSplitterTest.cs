@@ -19,7 +19,7 @@ namespace PholioVisualisation.DataAccessTest
             TakeNextSetOfCodes(splitter);
             TakeNextSetOfCodes(splitter);
 
-            Assert.AreEqual(NumberOfCodesToTakeAtOnce * 0.5, splitter.NextCodes().Count());
+            Assert.AreEqual(NumberOfCodesToTakeAtOnce * 0.5, splitter.NextItems().Count());
             Assert.IsFalse(splitter.AnyLeft());
         }
 
@@ -46,7 +46,7 @@ namespace PholioVisualisation.DataAccessTest
         private static void TakeNextSetOfCodes(LongListSplitter<string> splitter)
         {
             Assert.IsTrue(splitter.AnyLeft());
-            Assert.AreEqual(NumberOfCodesToTakeAtOnce, splitter.NextCodes().Count());
+            Assert.AreEqual(NumberOfCodesToTakeAtOnce, splitter.NextItems().Count());
         }
     }
 }

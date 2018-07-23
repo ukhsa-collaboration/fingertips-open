@@ -39,7 +39,7 @@ namespace PholioVisualisation.DataAccess
             "select {0}(d.{1}) from CoreDataSet d where d.IndicatorId = :indicatorId and d.Year between :startYear and :endYear" +
             " and d.SexId = :sexId and d.AgeId = :ageId and d.AreaCode in (:areaCodes) and d.{1} != -1 ";
 
-        private static readonly string[] DataColumns = { "Value", "LowerCI", "UpperCI" };
+        private static readonly string[] DataColumns = { "Value", "LowerCI95", "UpperCI95" };
 
         /// <summary>
         ///     Constructor
@@ -78,8 +78,8 @@ namespace PholioVisualisation.DataAccess
         /// Gets all core data between the base line and data point time points of a grouping.
         /// </summary>
         /// <returns>List of CoreDataSet</returns>
-        public IDictionary<string, IList<CoreDataSet>> GetTrendDataForSpecificCategoryForMultiplesAreas(Grouping grouping, 
-            int categoryTypeId, int categoryId, params string[] areaCodes)
+        public IDictionary<string, IList<CoreDataSet>> GetTrendDataForSpecificCategoryForMultiplesAreas(
+            Grouping grouping, int categoryTypeId, int categoryId, params string[] areaCodes)
         {
             var allData = new List<CoreDataSet>();
 
@@ -88,7 +88,7 @@ namespace PholioVisualisation.DataAccess
             while (splitter.AnyLeft())
             {
                 var criteria = CurrentSession.CreateCriteria<CoreDataSet>();
-                criteria.Add(Restrictions.In("AreaCode", splitter.NextCodes().ToList()));
+                criteria.Add(Restrictions.In("AreaCode", splitter.NextItems().ToList()));
                 AddGroupingRestrictions(grouping, criteria);
                 AddTimePeriodRestriction(grouping, criteria);
                 criteria.Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))

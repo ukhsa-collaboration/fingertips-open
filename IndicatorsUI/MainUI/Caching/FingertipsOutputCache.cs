@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Profiles.MainUI.Caching
+namespace IndicatorsUI.MainUI.Caching
 {
     public class FingertipsOutputCache : OutputCacheAttribute
     {

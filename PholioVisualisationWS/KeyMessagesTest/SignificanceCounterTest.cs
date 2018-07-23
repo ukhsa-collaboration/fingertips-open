@@ -30,19 +30,19 @@ namespace PholioVisualisation.KeyMessagesTest
         [TestMethod]
         public void TestProportionRed()
         {
-            Assert.AreEqual(1.0/6.0, new SignificanceCounter(Significances()).ProportionRed);
+            Assert.AreEqual(1.0 / 6.0, new SignificanceCounter(Significances()).GetProportionRed());
         }
 
         [TestMethod]
         public void TestProportionGreen()
         {
-            Assert.AreEqual(3.0/6.0, new SignificanceCounter(Significances()).ProportionGreen);
+            Assert.AreEqual(3.0 / 6.0, new SignificanceCounter(Significances()).GetProportionGreen());
         }
 
         [TestMethod]
         public void TestProportionAmber()
         {
-            Assert.AreEqual(2.0 / 6.0, new SignificanceCounter(Significances()).ProportionAmber);
+            Assert.AreEqual(2.0 / 6.0, new SignificanceCounter(Significances()).GetProportionAmber());
         }
 
         private static List<Significance> Significances()

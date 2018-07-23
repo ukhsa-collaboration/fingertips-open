@@ -1,6 +1,6 @@
-﻿using Profiles.DataAccess;
+﻿using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Caching
+namespace IndicatorsUI.MainUI.Caching
 {
     public static class CacheHelper
     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,6 +38,7 @@ namespace PholioVisualisation.ServicesTest
         private byte[] GetData(string path)
         {
             var url = TestHelper.BaseUrl + "api/pdf/" + path;
+            Debug.WriteLine(url);
             return new WebClient().DownloadData(url);
         }
 

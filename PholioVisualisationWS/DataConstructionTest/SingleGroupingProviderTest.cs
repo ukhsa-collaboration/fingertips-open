@@ -98,6 +98,16 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
+        public void TestGetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId()
+        {
+            var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(),
+                new GroupIdProvider(ReaderFactory.GetProfileReader()));
+            var grouping = provider.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(areaTypeId, indicatorId, sexId, ageId);
+
+            AssertIdsAreSameAsRequested(grouping);
+        }
+
+        [TestMethod]
         public void TestWhenNoGroupingInPholioMatchesRequestedParameters()
         {
             var provider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(),
@@ -111,16 +121,26 @@ namespace PholioVisualisation.DataConstructionTest
         {
             // Arrange
             _groupDataReader.Setup(x => x.GetGroupingsByGroupIdsAndIndicatorIds(It.IsAny<IList<int>>(),
-                It.IsAny<IList<int>>())).Returns(new List<Grouping>
-                {
-                    new Grouping {DataPointYear = 2000, AreaTypeId = 3},
-                    new Grouping {DataPointYear = 2002, AreaTypeId = 3},
-                    new Grouping {DataPointYear = 2001, AreaTypeId = 3}
-                });
+                It.IsAny<IList<int>>())).Returns(GetGroupings());
 
             // Act: Get the latest grouping
             var grouping = new SingleGroupingProvider(_groupDataReader.Object, null)
                 .GetGroupingWithLatestDataPoint(new List<int> { 1 }, 2, 3);
+
+            // Assert: most recent year
+            Assert.AreEqual(2002, grouping.DataPointYear);
+        }
+        
+        [TestMethod]
+        public void Test_GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId_WithLatestDataPoint()
+        {
+            // Arrange
+            _groupDataReader.Setup(x => x.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(It.IsAny<int>(),
+                It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetGroupings());
+
+            // Act: Get the latest grouping
+            var grouping = new SingleGroupingProvider(_groupDataReader.Object, null)
+                .GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(1, 2, 3,4);
 
             // Assert: most recent year
             Assert.AreEqual(2002, grouping.DataPointYear);
@@ -179,6 +199,16 @@ namespace PholioVisualisation.DataConstructionTest
             groupIdProvider.Protected();
             var o = groupIdProvider.Object;
             return o;
+        }
+
+        private static IList<Grouping> GetGroupings()
+        {
+            return new List<Grouping>
+            {
+                new Grouping {DataPointYear = 2000, AreaTypeId = 3},
+                new Grouping {DataPointYear = 2002, AreaTypeId = 3},
+                new Grouping {DataPointYear = 2001, AreaTypeId = 3}
+            };
         }
     }
 }

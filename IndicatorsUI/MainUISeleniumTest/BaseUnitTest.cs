@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using Profiles.MainUI.Skins;
+using IndicatorsUI.MainUI.Skins;
 using System.Collections.Generic;
 using System.Linq;
 

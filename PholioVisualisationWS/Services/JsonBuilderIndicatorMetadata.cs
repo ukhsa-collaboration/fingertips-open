@@ -9,7 +9,7 @@ using System.Web;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderIndicatorMetadata : JsonBuilderBase
+    public class JsonBuilderIndicatorMetadata :JsonBuilderBase
     {
         private IndicatorMetadataParameters _parameters;
         private IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
@@ -22,16 +22,15 @@ namespace PholioVisualisation.Services
             Parameters = _parameters;
         }
 
-        public JsonBuilderIndicatorMetadata(IndicatorMetadataParameters parameters)
-        {
-            _parameters = parameters;
-            Parameters = _parameters;
-        }
-
         public override string GetJson()
         {
             var metadataMap = GetIndicatorMetadatas();
             return JsonConvert.SerializeObject(metadataMap);
+        }
+
+        public JsonBuilderIndicatorMetadata(IndicatorMetadataParameters parameters)
+        {
+            _parameters = parameters;
         }
 
         public Dictionary<int, IndicatorMetadata> GetIndicatorMetadatas()
@@ -63,7 +62,7 @@ namespace PholioVisualisation.Services
             else
             {
                 // All indicators
-                var ids = _groupDataReader.GetAllIndicators();
+                var ids = _groupDataReader.GetAllIndicatorIds();
                 indicatorMetadataList = _indicatorMetadataProvider.GetIndicatorMetadata(ids);
             }
             return indicatorMetadataList;

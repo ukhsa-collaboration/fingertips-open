@@ -20,7 +20,7 @@ namespace FingertipsBridgeWS.Cache
         /// <summary>
         /// Parameter used to indicate the json response of a call should not be cached.
         /// </summary>
-        public const string ParameterNoCache = "nocache";
+        public const string ParameterNoCache = "no_cache";
 
         public string ServiceId { get; set; }
 

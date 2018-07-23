@@ -6,6 +6,7 @@
 @{
     ViewBag.Title = "FPM - Content Manager";
     var hasUserAccessToProfile = UserDetails.CurrentUser().HasWritePermissionsToProfile(Model.ProfileId);
+    var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 @Scripts.Render("~/content.js")
@@ -28,13 +29,20 @@
         @Html.Partial("_ContentItemTable", Model.ContentItems)
     }
 
-    <div class="button-box">
+    <div id="content-index-button-box">
         @if (hasUserAccessToProfile)
         {
-            <input type="button" value="New Content" 
-                   onclick="location.href = '@Url.Action("CreateContentItem", "Content", new {selectedProfile = Model.ProfileId})'" />
+            <button type="button" class="btn btn-primary left" onclick="location.href = '@Url.Action("CreateContentItem", "Content", new {selectedProfile = Model.ProfileId})'" title="Click to add new content">
+                New content
+            </button>
         }
-        <input type="button" id="audit_history" value="Show History" />
+        
+        @if (isAdministrator)
+        {
+            <button type="button" class="btn btn-secondary right" id="publish_live" title="Select content item(s) and click to publish live">Publish to live site</button>
+        }
+
+        <button type="button" class="btn btn-secondary right" id="audit_history" title="Select content item(s) and click to view change history">Show history</button>
     </div>
 </div>
 

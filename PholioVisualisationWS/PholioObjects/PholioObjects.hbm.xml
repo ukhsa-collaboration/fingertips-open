@@ -3,6 +3,27 @@
                    assembly="PholioVisualisation.PholioObjects"
                    namespace="PholioVisualisation.PholioObjects">
 
+  <!-- AreaTypeComponent class -->
+  <class name="AreaTypeComponent" table="l_areatypecomponents">
+
+    <composite-id>
+      <key-property name="AreaTypeId" column="areatypeid" type="int" />
+      <key-property name="ComponentAreaTypeId" column="componentareatypeid" type="int" />
+    </composite-id>
+  </class>
+  
+  <!-- IndicatorMetadataSearchExpectation class -->
+  <class name="IndicatorMetadataSearchExpectation" table="indicatormetadatasearchexpectations">
+
+    <composite-id>
+      <key-property name="IndicatorId" column="indicatorid" type="int" />
+      <key-property name="SearchTerm" column="searchterm" type="string" />
+    </composite-id>
+
+    <property name="Expectation" column="expectation"/>
+
+  </class>
+  
   <!-- ComparatorMethod class -->
   <class name="ComparatorMethod" table="l_comparatormethods">
 
@@ -80,6 +101,14 @@
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
     <property name="IsProfileLive" column="is_profile_live"/>
+    <property name="NewDataTimeSpanInDays" column="new_data_time_span_in_days"/>      
+  </class>
+
+  <!-- LongerLivesProfile class -->
+  <class name="LongerLivesProfile" table="ui_profileslongerlives">
+
+    <id name="ProfileId" column="profileid" type="int" unsaved-value="-1">
+    </id>
   </class>
 
   <!-- ValueNote class -->
@@ -103,7 +132,7 @@
     <property name="PolarityId" column="polarityid"/>
     <property name="Description" column="description"/>
     <property name="LegendHtml" column="legendhtml"/>
-
+    <property name="UseCIsForLimitComparison" column="use_cis_for_limit_comparison"/>
   </class>
 
   <!-- HelpText class -->
@@ -125,7 +154,7 @@
 
     <property name="ContentKey" column="contentkey"/>
     <property name="ProfileId" column="profileid"/>
-    <property name="Content" column="content"/>
+    <property name="Content" column="content" type="StringClob" />
     <property name="IsPlainText" column="plaintextcontent"/>
 
   </class>
@@ -174,6 +203,8 @@
     <property name="ShortName" column="areatype"/>
     <property name="IsCurrent" column="iscurrent"/>
     <property name="IsSearchable" column="issearchable"/>
+    <property name="IsSupported" column="issupported"/>
+    <property name="CanBeDisplayedOnMap" column="canbedisplayedonmap"/>
 
   </class>
 
@@ -203,7 +234,7 @@
     <property name="Easting" column="easting"/>
     <property name="Northing" column="northing"/>
     <property name="AreaCode6" column="areacode6"/>
-    <property name="AreaCode19" column="areacode19"/>
+    <property name="AreaCode153" column="areacode153"/>
     <property name="AreaCode46" column="areacode46"/>
     <property name="AreaCode101" column="areacode101"/>
     <property name="AreaCode102" column="areacode102"/>
@@ -285,8 +316,10 @@
     <property name="AreaCode" column="areacode"/>
     <property name="Denominator" column="denominator"/>
     <property name="Denominator2" column="denominator_2"/>
-    <property name="UpperCI" column="upperci"/>
-    <property name="LowerCI" column="lowerci"/>
+    <property name="UpperCI95" column="upperci95"/>
+    <property name="LowerCI95" column="lowerci95"/>
+    <property name="UpperCI99_8" column="upperci99_8"/>
+    <property name="LowerCI99_8" column="lowerci99_8"/>
     <property name="Year" column="year"/>
     <property name="YearRange" column="yearrange"/>
     <property name="Quarter" column="quarter"/>
@@ -345,10 +378,12 @@
     <property name="UnitId" column="unitid"/>
     <property name="YearTypeId" column="yeartypeid"/>
     <property name="ConfidenceIntervalMethodId" column="cimethodid"/>
-    <property name="ConfidenceLevel" column="confidencelevel"/>
     <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
     <property name="TargetId" column="targetid"/>
     <property name="AlwaysShowSpineChart" column="alwaysshowspinechart"/>
+    <property name="LatestChangeTimestampOverride" column="LatestChangeTimestampOverride"/>
+    <property name="ShouldNewDataBeHighlighted" column="ShouldNewDataBeHighlighted"/>
+    <property name="SpecialCases" column="SpecialCases"/>
 
     <many-to-one name="Unit" column="unitid" lazy="false"/>
     <many-to-one name="YearType" column="yeartypeid" lazy="false"/>
@@ -371,9 +406,57 @@
     <property name="Definition" column="definition"/>
     <property name="IsHtml" column="ishtml"/>
     <property name="IsMandatory" column="ismandatory"/>
-    <property name="IsSearchable" column="issearchable"/>
     <property name="IsSystemContent" column="issystemcontent"/>
     <property name="DisplayOrder" column="displayorder"/>
+    <property name="SearchBoost" column="searchboost"/>
+  </class>
+
+
+  <!-- IndicatorMetadataTextValue class -->
+  <class name="IndicatorMetadataTextValue" table="IndicatorMetadataTextValues">
+
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid" />
+    <property name="ProfileId" column="profileid"/>
+    <property name="Name" column="[1_name]"/>
+    <property name="NameLong" column="[2_namelong]" />
+    <property name="Definition" type="StringClob">
+      <column name="[3_Definition]" sql-type="text"/>
+    </property>
+    <property name="Rationale" type="StringClob">
+      <column name="[4_Rationale]" sql-type="text"/>
+    </property>
+    <property name="Policy" column="[5_Policy]" />
+    <property name="DataSource" column="[6_DataSource]" />
+    <property name="Producer" column="[7_Producer]" />
+    <property name="IndSourceLink" column="[8_IndSourceLink]" />
+    <property name="IndMethod" type="StringClob">
+      <column name="[9_IndMethod]" sql-type="text"/>
+    </property>
+    <property name="StandardPop" column="[10_StandardPop]" />
+    <property name="CIMethod" column="[11_CIMethod]" />
+    <property name="CountSource" column="[12_CountSource]" />
+    <property name="CountDefinition" column="[13_CountDefinition]" />
+    <property name="DenomSource" column="[14_DenomSource]" />
+    <property name="DenomDefinition" column="[15_DenomDefinition]" />
+    <property name="DiscControl" column="[16_DiscControl]" />
+    <property name="Caveats" type="StringClob">
+      <column name="[17_Caveats]" sql-type="text"/>
+    </property>
+    <property name="Copyright" column="[18_Copyright]" />
+    <property name="Reuse" column="[19_Reuse]" />
+    <property name="Links" column="[20_Links]" />
+    <property name="RefNum" column="[21_RefNum]" />
+    <property name="Notes" type="StringClob">
+      <column name="[22_Notes]" sql-type="text"/>
+    </property>
+    <property name="Frequency" column="[23_Frequency]" />
+    <property name="Rounding" column="[24_Rounding]" />
+    <property name="DataQuality" column="[25_DataQuality]" />
+    <property name="IndicatorContent" column="[26_IndicatorContent]" />
   </class>
 
 
@@ -409,6 +492,12 @@
 
     <many-to-one name="Sex" column="sexid" lazy="false"/>
     <many-to-one name="Age" column="ageid" lazy="false"/>
+
+    <sql-insert>
+      insert into grouping (GroupID, IndicatorID, AreaTypeID, SexID, AgeID, ComparatorID, ComparatorMethodID, ComparatorConfidence, YearRange, BaselineYear,
+      BaselineQuarter, BaselineMonth, DataPointYear, DataPointQuarter, DataPointMonth, Sequence, ComparatorTargetID, PolarityID)
+      values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+    </sql-insert>
 
   </class>
 
@@ -496,6 +585,8 @@
     </id>
     <property name="Name" column="name"/>
     <property name="ShortName" column="shortname"/>
+    <property name="Description" column="description"/>
+    <property name="Notes" column="Notes"/>
 
     <set name="CategoriesFromDatabase">
       <key column="categorytypeid"  not-null="true"/>
@@ -521,23 +612,6 @@
     </id>
     <property name="NhsChoicesId" column="NhsChoicesId"/>
   </class>
-
-  <!-- Chimat resource ID mapping -->
-  <class name="AreaCodeChimatResourceIdMapping" table="l_areacodechimatresource">
-    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-    <property name="ChimatResourceId" column="ChimatResourceId"/>
-  </class>
-
-  <!-- Chimat health behaviours (WAY) resource ID mapping -->
-  <class name="AreaCodeChimatWayResourceIdMapping" table="l_areacodechimatresource">
-    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-    <property name="ChimatWayResourceId" column="ChimatWayResourceId"/>
-  </class>
-
 
   <!-- ProfilePdf-->
   <class name="ProfilePdf" table="ui_profilepdfs">
@@ -565,7 +639,10 @@
       <generator class="identity"/>
     </id>
     <property name="Name" column="name" />
+    <property name="File" column="filename" />
     <property name="Parameters" column="parameters" />
+    <property name="Notes" column="notes" />
+    <property name="IsLive" column="islive" />
   </class>
 
   <!-- SSRSReport Mapping -->
@@ -578,6 +655,87 @@
     <property name="ProfileId" column="profileid" />
   </class>
 
+  <class name="CoreDataDeleteAudit" table="FPM_CoreData_DeleteAudit">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="IndicatorId" column="IndicatorId" />
+    <property name="WhereCondition" column="WhereCondition" />
+    <property name="RowsDeleted" column="RowsDeleted" />
+    <property name="DateDeleted" column="DateDeleted" />
+    <property name="DeletedBy" column="DeletedBy" />
+    <property name="DeleteBatchId" column="DeleteBatchId" />
+  </class>
+
+  <class name="CoreDataUploadAudit" table="UploadJob">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="DateCreated" column="DateCreated" />
+    <property name="UserId" column="UserId" />
+  </class>
+
+  <class name="DatabaseLog" table="databaselog">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="Timestamp" column="timestamp" />
+    <property name="Event" column="event" />
+  </class>
+
+  <class name="FpmUser" table="FPM_User">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="DisplayName" column="DisplayName" />
+    <property name="UserName" column="UserName" />
+    <property name="IsAdministrator" column="IsAdministrator" />
+  </class>
+
+  <class name="MonthlyRelease" table="MonthlyRelease">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="ReleaseDate" column="ReleaseDate" />
+  </class>
+
+  <class name="UserFeedback" table="UserFeedback">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="Url" column="Url" />
+    <property name="WhatUserWasDoing" column="WhatUserWasDoing" />
+    <property name="WhatWentWrong" column="WhatWentWrong" />
+    <property name="Email" column="Email" />
+    <property name="Environment" column="Environment" />
+    <property name="Timestamp" column="Timestamp" />
+    <property name="HasBeenDealtWith" column="HasBeenDealtWith" />
+
+  </class>
+
+  <class name="FpmDocument" table="FPM_Document">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="ProfileId" column="ProfileId" />
+    <property name="FileName" column="FileName" />
+    <property name="FileData" column="FileData" length="10000000" />
+    <property name="UploadedOn" column="UploadedOn" />
+    <property name="UploadedBy" column="UploadedBy" />
+  </class>
+
+  <!-- NearestNeighbourType -->
+  <class name="NearestNeighbourType" table="L_AreaCodeNeighbourTypes">
+    <id name="NeighbourTypeId" column="NeighbourTypeId" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="Name" column="Name"/>
+    <property name="Description" column="Description"/>
+    <property name="LinkText" column="LinkText"/>
+    <property name="SelectedText" column="SelectedText"/>
+    <property name="ExtraLink" column="ExtraLink"/>
+  </class>
+  
   <!-- Get Nearby Practices by calling stored procedure  -->
   <sql-query name="GetNearbyGpPractice_SP">
     <query-param name="easting" type="string"/>
@@ -596,8 +754,12 @@
     exec [dbo].[usp_find_nearby_gp_practices] :easting, :northing, :areatypeid
   </sql-query>
 
-  <sql-query name="SelectIndicatorsChangedWithPreviousDays">
-    exec usp_select_indicators_changed_with_previous_days :days
+  <sql-query name="SelectIndicatorsUploadedSinceDate">
+    exec usp_select_indicators_uploaded_since_date :date
+  </sql-query>
+
+  <sql-query name="SelectIndicatorsDeletedSinceDate">
+    exec usp_select_indicators_deleted_since_date :date
   </sql-query>
 
   <!-- SQL Queries -->
@@ -693,7 +855,7 @@
     FROM L_CategorisedAreas t1
     INNER JOIN L_AreaMapping t2
     ON childLevelGeographyCode = areacode
-    WHERE ParentAreaTypeID = 15 and
+    WHERE ParentAreaTypeID = :parentAreaType and
     ChildAreaTypeID = :childAreaTypeId and
     CategoryTypeID = :categoryTypeId and
     parentLevelGeographyCode = :parentAreaCode
@@ -716,6 +878,44 @@
     FROM [IndicatorMetadataTextValues]
     group by IndicatorID, profileid
     having count([1_Name]) > 1
+  </sql-query>
+
+  <sql-query name="GetAvailableGroupingDataByIndicatorIdAndAreaTypeId">
+    select distinct g.IndicatorId, g.AreaTypeId from Grouping g
+    where (:areaTypeId IS NULL OR g.AreaTypeID = :areaTypeId) and (:indicatorId IS NULL OR g.IndicatorId = :indicatorId)
+    order by g.IndicatorId, g.AreaTypeId desc
+  </sql-query>
+
+  <sql-query name="GetLastSuccessfulUploadAuditForAnIndicator">
+    select top(1) [Id], [DateCreated], [UserId] from UploadJob where guid in  (
+    select distinct  uploadbatchid from coredataset
+    where uploadbatchid is not null
+    and IndicatorID = :indicatorId)  and status = 1000 order by DateCreated desc
+  </sql-query>
+
+  <sql-query name="SelectIndicatorNames">
+    select indicatorid as Id,[1_Name] as Name from IndicatorMetadataTextValues
+    where profileId is null
+    and IndicatorID in (:indicatorIds)
+  </sql-query>
+
+  <sql-query name="Insert_Groupings">
+    insert into grouping (GroupID, IndicatorID, AreaTypeID, SexID, AgeID, ComparatorID, ComparatorMethodID, 
+      ComparatorConfidence, YearRange, BaselineYear, BaselineQuarter, BaselineMonth, DataPointYear,
+      DataPointQuarter, DataPointMonth, Sequence, ComparatorTargetID, PolarityID)
+    values (:GroupId, :IndicatorId, :AreaTypeId, :SexId, :AgeId, :ComparatorId, :ComparatorMethodId, 
+      :ComparatorConfidence, :YearRange, :BaselineYear, :BaselineQuarter, :BaselineMonth, :DataPointYear,
+      :DataPointQuarter, :DataPointMonth, :Sequence, :ComparatorTargetId, :PolarityId)
+  </sql-query>
+
+  <sql-query name="Insert_ContentItem">
+    insert into fpm_content (ContentKey, ProfileId, Description, Content, PlainTextContent)
+    values (:ContentKey, :ProfileId, :Description, :Content, :IsPlainText)
+  </sql-query>
+
+  <sql-query name="Insert_FpmDocument">
+    insert into fpm_document (ProfileId, FileName, FileData, UploadedOn, UploadedBy)
+    values (:ProfileId, :FileName, :FileData, :UploadedOn, :UploadedBy)
   </sql-query>
 
 </hibernate-mapping>

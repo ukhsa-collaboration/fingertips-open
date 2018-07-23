@@ -1,64 +1,56 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using Fpm.ProfileData.Repositories;
 
 namespace Fpm.ProfileData
 {
-    public class AreaTypeIdSplitter
+    public interface IAreaTypeIdSplitter
     {
-        public List<int> Ids { get; set; }
+        List<int> GetComponentAreaTypeIds(int areaTypeId);
+        List<int> GetComponentAreaTypeIds(IEnumerable<int> areaTypeIds);
+    }
 
-        public AreaTypeIdSplitter(int areaTypeId)
+    /// <summary>
+    /// Splits area types into their component area types where appropriate.
+    /// </summary>
+    /// <remarks>Copy of class in PholioVisualisationWS</remarks>
+    public class AreaTypeIdSplitter : IAreaTypeIdSplitter
+    {
+        private IAreaTypeRepository _areaTypeComponentRepository;
+
+        public AreaTypeIdSplitter(IAreaTypeRepository areaTypeComponentRepository)
         {
-            SetIds(new List<int> { areaTypeId });
+            _areaTypeComponentRepository = areaTypeComponentRepository;
         }
 
-        public AreaTypeIdSplitter(IEnumerable<int> areaTypeIds)
+        public List<int> GetComponentAreaTypeIds(int areaTypeId)
         {
-            SetIds(areaTypeIds);
+            return GetComponentAreaTypeIds(new List<int> { areaTypeId });
         }
 
-        private void SetIds(IEnumerable<int> areaTypeIds)
+        public List<int> GetComponentAreaTypeIds(IEnumerable<int> areaTypeIds)
         {
-            Ids = new List<int>();
+            var ids = new List<int>();
 
             foreach (var areaTypeId in areaTypeIds)
             {
-                switch (areaTypeId)
+                var componentAreaTypeIds = _areaTypeComponentRepository
+                    .GetAreaTypeComponents(areaTypeId)
+                    .Select(x => x.ComponentAreaTypeId)
+                    .ToList();
+
+                if (componentAreaTypeIds.Any())
                 {
-                    case AreaTypeIds.CountyAndUnitaryAuthority:
-                        Ids.Add(AreaTypeIds.County);
-                        Ids.Add(AreaTypeIds.UnitaryAuthority);
-                        break;
-
-                    case AreaTypeIds.DistrictAndUnitaryAuthority:
-                        Ids.Add(AreaTypeIds.District);
-                        Ids.Add(AreaTypeIds.UnitaryAuthority);
-                        break;
-
-                    case AreaTypeIds.PheCentresFrom2013To2015:
-                        Ids.Add(AreaTypeIds.PheCentreFrom2013);
-                        Ids.Add(AreaTypeIds.PheCentreFrom2013To2015);
-                        break;
-
-                    case AreaTypeIds.PheCentresFrom2015:
-                        Ids.Add(AreaTypeIds.PheCentreFrom2015);
-                        Ids.Add(AreaTypeIds.PheCentreFrom2013To2015);
-                        break;
-
-                    case AreaTypeIds.MentalHealthTrustsIncludingCombinedAcuteTrusts:
-                        Ids.Add(AreaTypeIds.MentalHealthTrust);
-                        Ids.Add(AreaTypeIds.CombinedMentalHealthAndAcuteTrust);
-                        break;
-
-                    case AreaTypeIds.AcuteTrustsIncludingCombinedMentalHealthTrusts:
-                        Ids.Add(AreaTypeIds.AcuteTrust);
-                        Ids.Add(AreaTypeIds.CombinedMentalHealthAndAcuteTrust);
-                        break;
-
-                    default:
-                        Ids.Add(areaTypeId);
-                        break;
+                    ids.AddRange(componentAreaTypeIds);
+                }
+                else
+                {
+                    // Area type is not made up of other area types
+                    ids.Add(areaTypeId);
                 }
             }
+
+            return ids;
         }
     }
 }

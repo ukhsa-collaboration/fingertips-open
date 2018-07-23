@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Controllers;
+using PholioVisualisation.ServicesWeb.Controllers;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {
@@ -58,6 +58,14 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
             var response = new IndicatorMetadataController().GetIndicatorMetadataFileByProfileGroup(
                 GroupIds.HealthProfiles_OurCommunities);
             Assert.IsNotNull(response);
+        }
+
+        [TestMethod]
+        public void Test_Get_All_Metadata()
+        {
+            var indicatorIdToMetadata = new IndicatorMetadataController().GetAllIndicatorMetadata();
+            Assert.IsNotNull(indicatorIdToMetadata);
+            Assert.IsTrue(indicatorIdToMetadata.Count > 0);
         }
     }
 }

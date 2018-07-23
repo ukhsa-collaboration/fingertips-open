@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class UrlHelper
     {

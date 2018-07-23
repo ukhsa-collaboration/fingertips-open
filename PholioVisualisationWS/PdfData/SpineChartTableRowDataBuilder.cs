@@ -109,8 +109,8 @@ namespace PholioVisualisation.PdfData
         private void SetStats(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata indicatorMetadata)
         {
             var parentArea = new ParentArea(AreaCodes.England, grouping.AreaTypeId);
-            var indicatorStatsResponse = new IndicatorStatsBuilder().GetIndicatorStats(timePeriod, grouping,
-                indicatorMetadata, parentArea, _profileId);
+            var indicatorStatsResponse = new IndicatorStatsBuilder(indicatorMetadata, parentArea, _profileId)
+                .GetIndicatorStats(grouping, timePeriod);
             var stats = indicatorStatsResponse.Stats;
             if (stats != null)
             {
@@ -160,7 +160,7 @@ namespace PholioVisualisation.PdfData
                     if (IncludeTrendMarkers)
                     {
                         trendMarkerResult = _trendMarkersProvider.GetTrendResults(
-                            new List<IArea> {area}, metadata, grouping).Values.First();
+                            new List<IArea> { area }, metadata, grouping).Values.First();
                     }
 
                     // Truncate after significance has been calculated

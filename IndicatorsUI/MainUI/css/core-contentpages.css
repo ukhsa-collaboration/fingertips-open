@@ -1,9 +1,9 @@
 ﻿
 h2 {
-    margin: 35px 0px 3px 0;
+    margin: 35px 0 3px 0 !important;
     padding: 0 0 3px 0;
     border-bottom: 5px solid #02ae94;
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 td {
@@ -27,7 +27,7 @@ td {
 }
 
 #about-fingertips li {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 #about-fingertips p {
@@ -38,11 +38,12 @@ td {
 }
 
 #introduction p {
+    font-size: 17px;
     margin-top: 12px;
 }
 
 #introduction table {
-    margin: 0 0px;
+    margin: 0;
     font-size: 17px;
 }
 

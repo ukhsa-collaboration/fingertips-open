@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataConstructionTest
 {
@@ -53,7 +53,21 @@ namespace IndicatorsUI.DataConstructionTest
 
             // Assert 
             var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
-            Assert.AreEqual("http://" + skin.LiveHost, host);
+            Assert.AreEqual("https://" + skin.LiveHost, host);
+        }
+
+        [TestMethod]
+        public void TestHostAndProtocolInLiveTestingEnvironment()
+        {
+            // Arrange: construct protocol and host
+            var parameters = new NameValueCollection();
+            parameters.Add("Environment", "live");
+            var config = new AppConfig(parameters);
+            var url = "https://live-a.phe.org.uk";
+            
+            // Assert 
+            var host = new FingertipsUrl(config, new Uri(url)).ProtocolAndHost;
+            Assert.AreEqual(url, host);
         }
     }
 }

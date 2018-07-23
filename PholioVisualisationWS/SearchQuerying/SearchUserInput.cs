@@ -41,13 +41,17 @@ namespace PholioVisualisation.SearchQuerying
                 {
                     var term = terms.First();
 
-                    return ContainsAnyNumbers
-                        ? term.Length > 2 // e.g. "s1*"
-                        : term.Length > 3;
+                    // e.g. "a*"
+                    return term.Length > 2;
                 }
 
                 return true;
             }
+        }
+
+        public bool IsCommaSeparatedNumberList
+        {
+            get { return Regex.IsMatch(SearchText, @"^[\d, ]+$"); }
         }
 
         public bool ContainsAnyNumbers
@@ -61,10 +65,7 @@ namespace PholioVisualisation.SearchQuerying
 
             if (string.IsNullOrEmpty(SearchText) == false)
             {
-                string searchString = SearchText.Trim();
-
-                searchString = new Regex("[^A-Za-z0-9 ]").Replace(searchString, " ");
-
+                var searchString = CleanSearchText;
                 if (string.IsNullOrEmpty(searchString) == false)
                 {
                     string[] split = searchString.Split(new[] { ' ' },
@@ -82,6 +83,15 @@ namespace PholioVisualisation.SearchQuerying
                         }
                     }
                 }
+            }
+        }
+
+        public string CleanSearchText
+        {
+            get
+            {
+                string searchString = SearchText.Trim();
+                return new Regex("[^A-Za-z0-9 ]").Replace(searchString, " ");
             }
         }
 

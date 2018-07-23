@@ -6,23 +6,36 @@ namespace PholioVisualisation.Export
     {
         private LookUpManager _lookUpManager;
         private CoreDataSet _coreDataSet;
-        public string LowerCI;
-        public string UpperCI;
+        public string LowerCI95;
+        public string UpperCI95;
+        public string LowerCI99_8;
+        public string UpperCI99_8;
 
         public CoreDataSetExportFormatter(LookUpManager lookUpManager, CoreDataSet coreDataSet)
         {
             _lookUpManager = lookUpManager;
             _coreDataSet = coreDataSet;
 
-            if (_coreDataSet.AreCIsValid)
+            if (_coreDataSet.Are95CIsValid)
             {
-                LowerCI = _coreDataSet.LowerCI.ToString();
-                UpperCI = _coreDataSet.UpperCI.ToString();
+                LowerCI95 = _coreDataSet.LowerCI95.ToString();
+                UpperCI95 = _coreDataSet.UpperCI95.ToString();
             }
             else
             {
-                LowerCI = string.Empty;
-                UpperCI = string.Empty;
+                LowerCI95 = string.Empty;
+                UpperCI95 = string.Empty;
+            }
+
+            if (_coreDataSet.Are99_8CIsValid)
+            {
+                LowerCI99_8 = _coreDataSet.LowerCI99_8.ToString();
+                UpperCI99_8 = _coreDataSet.UpperCI99_8.ToString();
+            }
+            else
+            {
+                LowerCI99_8 = string.Empty;
+                UpperCI99_8 = string.Empty;
             }
         }
 

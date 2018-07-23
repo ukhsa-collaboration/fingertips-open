@@ -1,9 +1,0 @@
-﻿@using Profiles.MainUI.Models
- @model PageModel
- <link rel="Stylesheet" type="text/css" href="@(Model.CssPath)core-datapage.css" />
-<script type="text/javascript">
-//<![CDATA[
-     restrictSearchProfileId = null;
-     profileCollectionIdList = @Html.Raw(Json.Encode(Model.ProfileCollectionIdList));
- //]]</script>
-<script src="@(Model.JsPath)SiteKeyIndicators.js" type="text/javascript"></script>

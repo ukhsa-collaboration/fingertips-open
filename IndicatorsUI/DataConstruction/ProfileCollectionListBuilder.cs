@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataConstruction
+namespace IndicatorsUI.DataConstruction
 {
     public class ProfileCollectionListBuilder
     {

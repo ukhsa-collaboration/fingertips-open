@@ -10,79 +10,93 @@ namespace PholioVisualisation.ServicesTest
     public class EntitiesControllerEndPointTest
     {
         [TestMethod]
+        public void TestGetNearestNeighbourTypes()
+        {
+            byte[] data = GetData("nearest_neighbour_types");
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetNearestNeighbourType()
+        {
+            byte[] data = GetData("nearest_neighbour_type?neighbour_type_id=1");
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetValueNotes()
         {
-            byte[] data = DataControllerEndPointTest.GetData("value_notes");
+            byte[] data = GetData("value_notes");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetTrendMarkers()
         {
-            byte[] data = DataControllerEndPointTest.GetData("recent_trends");
+            byte[] data = GetData("recent_trends");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetSexes()
         {
-            byte[] data = DataControllerEndPointTest.GetData("sexes");
+            byte[] data = GetData("sexes");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetAges()
         {
-            byte[] data = DataControllerEndPointTest.GetData("ages");
+            byte[] data = GetData("ages");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetAge()
         {
-            byte[] data = DataControllerEndPointTest.GetData("age?id=" + AgeIds.From0To4);
+            byte[] data = GetData("age?id=" + AgeIds.From0To4);
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetCategoryTypes()
         {
-            byte[] data = DataControllerEndPointTest.GetData("category_types");
+            byte[] data = GetData("category_types");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetPolarities()
         {
-            byte[] data = DataControllerEndPointTest.GetData("polarities");
+            byte[] data = GetData("polarities");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetConfidenceIntervalMethods()
         {
-            byte[] data = DataControllerEndPointTest.GetData("confidence_interval_methods");
+            byte[] data = GetData("confidence_interval_methods");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetConfidenceIntervalMethod()
         {
-            byte[] data = DataControllerEndPointTest.GetData("confidence_interval_method?id=" + ConfidenceIntervalMethodIds.Byars);
+            byte[] data = GetData("confidence_interval_method?id=" + ConfidenceIntervalMethodIds.Byars);
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetComparatorMethods()
         {
-            byte[] data = DataControllerEndPointTest.GetData("comparator_methods");
+            byte[] data = GetData("comparator_methods");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetComparatorMethod()
         {
-            byte[] data = DataControllerEndPointTest.GetData("comparator_method?id=" +
+            byte[] data = GetData("comparator_method?id=" +
                 ComparatorMethodIds.SingleOverlappingCIs);
             TestHelper.IsData(data);
         }
@@ -90,14 +104,14 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetComparators()
         {
-            byte[] data = DataControllerEndPointTest.GetData("comparators");
+            byte[] data = GetData("comparators");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetComparator()
         {
-            byte[] data = DataControllerEndPointTest.GetData("comparator?id=" +
+            byte[] data = GetData("comparator?id=" +
                 ComparatorIds.Subnational);
             TestHelper.IsData(data);
         }
@@ -105,7 +119,7 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetComparatorSignificances()
         {
-            byte[] data = DataControllerEndPointTest.GetData("comparator_significances?polarity_id=" +
+            byte[] data = GetData("comparator_significances?polarity_id=" +
                 PolarityIds.BlueOrangeBlue);
             TestHelper.IsData(data);
         }
@@ -113,7 +127,7 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetCategories()
         {
-            byte[] data = DataControllerEndPointTest.GetData("categories?" +
+            byte[] data = GetData("categories?" +
                 "category_type_id=" + CategoryTypeIds.EthnicGroups5);
             TestHelper.IsData(data);
         }
@@ -121,29 +135,35 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetUnits()
         {
-            byte[] data = DataControllerEndPointTest.GetData("units");
+            byte[] data = GetData("units");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetYearTypes()
         {
-            byte[] data = DataControllerEndPointTest.GetData("year_types");
+            byte[] data = GetData("year_types");
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetYearType()
         {
-            byte[] data = DataControllerEndPointTest.GetData("year_type?id=" + YearTypeIds.Academic);
+            byte[] data = GetData("year_type?id=" + YearTypeIds.Academic);
             TestHelper.IsData(data);
         }
 
         [TestMethod]
         public void TestGetValueTypes()
         {
-            byte[] data = DataControllerEndPointTest.GetData("value_types");
+            byte[] data = GetData("value_types");
             TestHelper.IsData(data);
         }
+
+        public byte[] GetData(string path)
+        {
+            return DataControllerEndPointTest.GetData(path);
+        }
+    
     }
 }

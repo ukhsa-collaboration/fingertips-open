@@ -4,7 +4,15 @@ using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class TimePeriodHelper
+    public interface ITimePeriodHelper
+    {
+        string GetDatapointString();
+        string GetBaselineString();
+        string GetLatestPeriodString();
+        TimePeriod GetPeriodIfLaterThanDatapoint();
+    }
+
+    public class TimePeriodHelper : ITimePeriodHelper
     {
         private TimePeriodReader timePeriodReader = new TimePeriodReader();
         private GroupingPlusName grouping;

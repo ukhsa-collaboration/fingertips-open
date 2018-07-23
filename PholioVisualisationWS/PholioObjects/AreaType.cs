@@ -1,8 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
@@ -19,8 +16,14 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsCurrent { get; set; }
 
+        [JsonIgnore]
+        public bool IsSupported { get; set; }
+
         [JsonProperty]
         public bool IsSearchable { get; set; }
+
+        [JsonProperty]
+        public bool CanBeDisplayedOnMap { get; set; }
 
         [JsonProperty]
         public IList<IAreaType> ParentAreaTypes { get; set; }

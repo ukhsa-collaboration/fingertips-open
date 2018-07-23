@@ -1,6 +1,7 @@
 ﻿using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.PholioObjects;
 using System;
 using System.Collections.Generic;
@@ -42,6 +43,8 @@ namespace PholioVisualisation.DataAccess
         IList<Area> GetParentAreas(string childAreaCode);
         IList<AreaType> GetAreaTypes(IEnumerable<int> areaTypeIds);
         IList<AreaType> GetAllAreaTypes();
+        IList<AreaType> GetSupportedAreaTypes();
+        IList<int> GetAllAreaTypeIds();
         AreaType GetAreaType(int areaTypeId);
 
         /// <summary>
@@ -52,6 +55,7 @@ namespace PholioVisualisation.DataAccess
         int GetChildAreaCount(string parentAreaCode, int areaTypeId);
         int GetChildAreaCount(CategoryArea categoryArea, int childAreaTypeId);
 
+        IList<string> GetAreaCodesThatDoNotExist(IList<string> areaCodes);
         IList<string> GetAreaCodesForAreaType(int areaTypeId);
         IList<string> GetProfileParentAreaCodes(int profileId, int parentAreaTypeId);
         IList<string> GetChildAreaCodes(string parentAreaCode, int areaTypeId);
@@ -72,7 +76,6 @@ namespace PholioVisualisation.DataAccess
         IList<CategoryType> GetAllCategoryTypes();
 
         string GetNhsChoicesAreaId(string areaCode);
-        int GetChimatResourceId(string areaCode, int profileId);
         IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId);
         IList<AreaCodeNeighbourMapping> GetNearestNeighbours(string areaCode, int neighbourTypeId);
 
@@ -123,6 +126,7 @@ namespace PholioVisualisation.DataAccess
         public virtual IList<ParentAreaGroup> GetParentAreaGroups(int profileId, int childAreaTypeId)
         {
             return CurrentSession.CreateCriteria<ParentAreaGroup>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("ProfileId", profileId))
                 .Add(Restrictions.Eq("ChildAreaTypeId", childAreaTypeId))
                 .List<ParentAreaGroup>();
@@ -149,10 +153,42 @@ namespace PholioVisualisation.DataAccess
             return q.List<IArea>();
         }
 
+        public virtual IList<string> GetAreaCodesThatDoNotExist(IList<string> areaCodes)
+        {
+            var distinctCodes = areaCodes.Distinct().ToList();
+
+            var splitter = new LongListSplitter<string>(distinctCodes);
+            var codesThatDoNotExist = new List<string>();
+            while (splitter.AnyLeft())
+            {
+                var codesToBeChecked = splitter.NextItems().ToList();
+                var codesThatExist = GetAreaCodesThatExist(codesToBeChecked);
+
+                // Are there any non-existant codes
+                if (codesToBeChecked.Count != codesThatExist.Count)
+                {
+                    // All codes exist
+                    codesThatDoNotExist.AddRange(
+                        codesToBeChecked.Where(x => codesThatExist.Contains(x) == false));
+                }
+            }
+
+            return codesThatDoNotExist;
+        }
+
+        private IList<string> GetAreaCodesThatExist(IEnumerable<string> areaCodes)
+        {
+            return CurrentSession.CreateCriteria<Area>()
+                .Add(Restrictions.In("Code", areaCodes.ToList()))
+                .SetProjection(Projections.Property("Code"))
+                .List<string>();
+        }
+
         public virtual IList<IArea> GetAreasByAreaTypeId(int areaTypeId)
         {
             return CurrentSession.CreateCriteria<IArea>()
-                .Add(Restrictions.In("AreaTypeId", new AreaTypeIdSplitter(areaTypeId).Ids))
+                .SetCacheable(true)
+                .Add(Restrictions.In("AreaTypeId", GetComponentAreaTypeIds(areaTypeId).ToArray()))
                 .Add(Restrictions.Eq("IsCurrent", true))
                 .List<IArea>();
         }
@@ -203,15 +239,17 @@ namespace PholioVisualisation.DataAccess
         public IList<AreaAddress> GetAreaWithAddressByAreaTypeId(int areaTypeId)
         {
             var q = CurrentSession.CreateQuery("from AreaAddress a where a.AreaTypeId = :areaTypeId and a.IsCurrent = 1");
+            q.SetCacheable(true);
             q.SetParameter("areaTypeId", areaTypeId);
             return q.List<AreaAddress>();
         }
 
         public virtual IList<IArea> GetChildAreas(string parentArea, int childAreaTypeId)
         {
+            // Throws exception if SetCacheable(true)
             var q = CurrentSession.GetNamedQuery("GetChildAreas");
             q.SetParameter("parentArea", parentArea);
-            q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(childAreaTypeId).Ids);
+            q.SetParameterList("childAreaTypeIds", GetComponentAreaTypeIds(childAreaTypeId));
             return GetAreas(q).Cast<IArea>().ToList();
         }
 
@@ -225,27 +263,32 @@ namespace PholioVisualisation.DataAccess
             int childAreaTypeId)
         {
             var q = CurrentSession.GetNamedQuery("GetParentsFromChildAreaIdAndParentAreaTypeId");
-            q.SetParameterList("parentAreaTypeIds", new AreaTypeIdSplitter(parentAreaTypeIds).Ids);
+            q.SetParameterList("parentAreaTypeIds", GetComponentAreaTypeIds(parentAreaTypeIds));
             q.SetParameter("childAreaTypeId", childAreaTypeId);
 
-            return q.List().Cast<object[]>().ToDictionary(row => (string)row[4], GetAreaFromRow);
+            var results = q.List().Cast<object[]>();
+            var map = GetAreaCodeToAreaMap(results);
+            return map;
         }
 
         public Dictionary<string, Area> GetParentAreasFromChildAreaId(int parentAreaTypeId, int childAreaTypeId)
         {
+            // Error thrown if SetCacheable(true);
             var q = CurrentSession.GetNamedQuery("GetAllParentsFromChildAreaId");
-            q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(childAreaTypeId).Ids);
-            q.SetParameterList("parentAreaTypeIds", new AreaTypeIdSplitter(parentAreaTypeId).Ids);
+            q.SetParameterList("childAreaTypeIds", GetComponentAreaTypeIds(childAreaTypeId));
+            q.SetParameterList("parentAreaTypeIds", GetComponentAreaTypeIds(parentAreaTypeId));
 
-            return q.List().Cast<object[]>().ToDictionary(row => (string)row[4], GetAreaFromRow);
+            var results = q.List().Cast<object[]>();
+            var map = GetAreaCodeToAreaMap(results);
+            return map;
         }
 
         public IList<string> GetParentCodesFromChildAreaId(int childAreaTypeId)
         {
             var q = CurrentSession.CreateQuery("select distinct h.ParentAreaCode from  Area a, AreaHierarchy h" +
                                                " where a.Code = h.ChildAreaCode and a.AreaTypeId in (:childAreaTypeIds) and a.IsCurrent = 1");
-
-            q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(childAreaTypeId).Ids);
+            q.SetCacheable(true);
+            q.SetParameterList("childAreaTypeIds", GetComponentAreaTypeIds(childAreaTypeId));
             return q.List<string>();
         }
 
@@ -259,7 +302,24 @@ namespace PholioVisualisation.DataAccess
         public virtual IList<AreaType> GetAllAreaTypes()
         {
             return CurrentSession.CreateCriteria<AreaType>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("IsCurrent", true))
+                .List<AreaType>();
+        }
+
+        public IList<int> GetAllAreaTypeIds()
+        {
+            return CurrentSession.CreateCriteria<AreaType>()
+                .SetCacheable(true)
+                .Add(Restrictions.Eq("IsCurrent", true))
+                .SetProjection(Projections.Property("Id"))
+                .List<int>();
+        }
+
+        public virtual IList<AreaType> GetSupportedAreaTypes()
+        {
+            return CurrentSession.QueryOver<AreaType>()
+                .Where(x => x.IsSupported && x.IsCurrent)
                 .List<AreaType>();
         }
 
@@ -272,6 +332,7 @@ namespace PholioVisualisation.DataAccess
             }
 
             return CurrentSession.CreateCriteria<AreaType>()
+                .SetCacheable(true)
                 .Add(Restrictions.In("Id", list))
                 .List<AreaType>();
         }
@@ -279,6 +340,7 @@ namespace PholioVisualisation.DataAccess
         public virtual AreaType GetAreaType(int areaTypeId)
         {
             var result = CurrentSession.CreateCriteria<AreaType>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("Id", areaTypeId))
                 .UniqueResult<AreaType>();
             return result;
@@ -292,16 +354,25 @@ namespace PholioVisualisation.DataAccess
             var q =
                 CurrentSession.CreateQuery(
                     "select count (a) from Area a where a.AreaTypeId in (:areaTypeIds) and a.IsCurrent = 1");
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetCacheable(true);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             return Convert.ToInt32(q.UniqueResult<long>());
         }
 
         public int GetChildAreaCount(string parentAreaCode, int areaTypeId)
         {
+            // Throws exception is SetCacheable(true)
             var q = CurrentSession.GetNamedQuery("GetChildAreaCount");
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             q.SetParameter("parentAreaCode", parentAreaCode);
             return q.UniqueResult<int>();
+        }
+
+        public IList<string> GetAllAreaCodes()
+        {
+            return CurrentSession.CreateCriteria<Area>()
+                .SetProjection(Projections.Property("Code"))
+                .List<string>();
         }
 
         public IList<string> GetAreaCodesForAreaType(int areaTypeId)
@@ -309,7 +380,8 @@ namespace PholioVisualisation.DataAccess
             var q =
                 CurrentSession.CreateQuery(
                     "select (a.Code) from Area a where a.AreaTypeId in (:areaTypeIds) and a.IsCurrent = 1");
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetCacheable(true);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             return q.List<string>();
         }
 
@@ -331,8 +403,9 @@ namespace PholioVisualisation.DataAccess
 
         public IList<string> GetChildAreaCodes(string parentAreaCode, int areaTypeId)
         {
+            // Error thrown if SetCacheable(true)
             var q = CurrentSession.GetNamedQuery("GetChildAreaCodes");
-            q.SetParameterList("childAreaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetParameterList("childAreaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             q.SetParameter("parentAreaCode", parentAreaCode);
             return q.List<string>();
         }
@@ -341,6 +414,7 @@ namespace PholioVisualisation.DataAccess
             int categoryTypeId)
         {
             var result = CurrentSession.CreateCriteria<CategorisedArea>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("ParentAreaTypeId", parentAreaTypeId))
                 .Add(Restrictions.Eq("ChildAreaTypeId", childAreaTypeId))
                 .Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
@@ -379,6 +453,7 @@ namespace PholioVisualisation.DataAccess
         public Category GetCategory(int categoryTypeId, int categoryId)
         {
             var result = CurrentSession.CreateCriteria<Category>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
                 .Add(Restrictions.Eq("Id", categoryId))
                 .UniqueResult<Category>();
@@ -388,6 +463,7 @@ namespace PholioVisualisation.DataAccess
         public IList<Category> GetCategories(int categoryTypeId)
         {
             var result = CurrentSession.CreateCriteria<Category>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("CategoryTypeId", categoryTypeId))
                 .AddOrder(Order.Asc("Id"))
                 .List<Category>();
@@ -397,6 +473,7 @@ namespace PholioVisualisation.DataAccess
         public CategoryType GetCategoryType(int categoryTypeId)
         {
             var result = CurrentSession.CreateCriteria<CategoryType>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("Id", categoryTypeId))
                 .UniqueResult<CategoryType>();
             return result;
@@ -405,13 +482,25 @@ namespace PholioVisualisation.DataAccess
         public IList<CategoryType> GetCategoryTypes(IList<int> categoryTypeIds)
         {
             return CurrentSession.CreateCriteria<CategoryType>()
+                .SetCacheable(true)
                 .Add(Restrictions.In("Id", categoryTypeIds.ToList()))
                 .List<CategoryType>();
+        }
+
+        public IList<AreaCodeNeighbourMapping> GetNearestNeighbours(string areaCode, int neighbourTypeId)
+        {
+            return CurrentSession.CreateCriteria<AreaCodeNeighbourMapping>()
+                .Add(Restrictions.Conjunction()
+                    .Add(Restrictions.Eq("AreaCode", areaCode))
+                    .Add(Restrictions.Eq("NeighbourTypeId", neighbourTypeId)))
+                .AddOrder(Order.Asc("Position"))
+                .List<AreaCodeNeighbourMapping>();
         }
 
         public IList<CategoryType> GetAllCategoryTypes()
         {
             return CurrentSession.CreateCriteria<CategoryType>()
+                .SetCacheable(true)
                 .List<CategoryType>();
         }
 
@@ -422,28 +511,6 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<AreaCodeNhsMapping>();
 
             return mapping == null ? string.Empty : mapping.NhsChoicesId;
-        }
-
-        public int GetChimatResourceId(string areaCode, int profileId)
-        {
-            if (profileId == 94)
-            {
-                // using the HealthBehaviours Profile, return WAY pdf
-                var mapping = CurrentSession.CreateCriteria<AreaCodeChimatWayResourceIdMapping>()
-                    .Add(Restrictions.Eq("AreaCode", areaCode))
-                    .UniqueResult<AreaCodeChimatWayResourceIdMapping>();
-
-                return mapping == null ? ChimatResourceIds.NotFound : mapping.ChimatWayResourceId;
-            }
-            else
-            {
-                // currently only child health profiles - 105, more may be added
-                var mapping = CurrentSession.CreateCriteria<AreaCodeChimatResourceIdMapping>()
-                    .Add(Restrictions.Eq("AreaCode", areaCode))
-                    .UniqueResult<AreaCodeChimatResourceIdMapping>();
-
-                return mapping == null ? ChimatResourceIds.NotFound : mapping.ChimatResourceId;
-            }
         }
 
         public IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId)
@@ -478,6 +545,12 @@ namespace PholioVisualisation.DataAccess
             }
         }
 
+        private IList<int> GetComponentAreaTypeIds(int areaTypeId)
+        {
+            return new AreaTypeIdSplitter(new AreaTypeComponentRepository())
+                .GetComponentAreaTypeIds(areaTypeId);
+        }
+
         private static IList<Area> GetAreas(IQuery q)
         {
             var list = q.List();
@@ -491,18 +564,22 @@ namespace PholioVisualisation.DataAccess
                 Code = (string)row[0],
                 Name = (string)row[1],
                 ShortName = (string)row[2],
-                AreaTypeId = (int)row[3]
+                AreaTypeId = Convert.ToInt32(row[3])
             };
         }
 
-        public IList<AreaCodeNeighbourMapping> GetNearestNeighbours(string areaCode, int neighbourTypeId)
+        private static Dictionary<string, Area> GetAreaCodeToAreaMap(IEnumerable<object[]> results)
         {
-            return CurrentSession.CreateCriteria<AreaCodeNeighbourMapping>()
-                .Add(Restrictions.Conjunction()
-                    .Add(Restrictions.Eq("AreaCode", areaCode))
-                    .Add(Restrictions.Eq("NeighbourTypeId", neighbourTypeId)))
-                .AddOrder(Order.Asc("Position"))
-                .List<AreaCodeNeighbourMapping>();
+            var map = new Dictionary<string, Area>();
+            foreach (var result in results)
+            {
+                var areaCode = (string)result[4];
+                if (map.ContainsKey(areaCode) == false)
+                {
+                    map.Add(areaCode, GetAreaFromRow(result));
+                }
+            }
+            return map;
         }
     }
 }

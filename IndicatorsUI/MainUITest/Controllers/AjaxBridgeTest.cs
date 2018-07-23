@@ -2,8 +2,8 @@
 using System.Net;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUITest.Controllers
 {
@@ -23,13 +23,6 @@ namespace IndicatorsUI.MainUITest.Controllers
 
             Assert.IsTrue(json.Contains("IndicatorId"),
                 "Both IndicatorsUI and PholioVisualisationWS need to be running for this to work");
-        }
-
-        [TestMethod]
-        public void Test_Data_Can_Be_Used_Instead_Of_Api_For_Backwards_Compatibility()
-        {
-            var json = GetJson("data/value_notes");
-            Assert.IsTrue(json.Contains("Value missing"));
         }
 
         [TestMethod]

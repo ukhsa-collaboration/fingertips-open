@@ -2,6 +2,6 @@
 {
     public class WorksheetNames
     {
-        public const string BatchPholio = "Pholio$";
+        public const string Pholio = "Pholio$";
     }
 }

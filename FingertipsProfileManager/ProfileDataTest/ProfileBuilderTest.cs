@@ -13,7 +13,7 @@ namespace Fpm.ProfileDataTest
         [TestInitialize]
         public void Init()
         {
-            _profileRepository = new ProfileRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
         }
 
         [TestCleanup]

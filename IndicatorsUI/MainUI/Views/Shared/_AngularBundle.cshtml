@@ -1,0 +1,12 @@
+﻿@using System.Web.Optimization
+@using IndicatorsUI.MainUI.Models
+@model PageModel
+@{ var pageType = Model.PageType; }
+@if (pageType == PageType.DataPageOfProfileWithFrontPage ||
+                pageType == PageType.DataPageOfProfileWithoutFrontPage ||
+                pageType == PageType.IndicatorSearchResultsDataPage ||
+                pageType == PageType.IndicatorListDataPage)
+{
+    @* Transpiled TypeScript files *@
+    @Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/js-angular")
+}

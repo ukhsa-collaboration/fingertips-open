@@ -24,7 +24,7 @@ namespace PholioVisualisation.PdfDataTest
         {
             Assert.IsNotNull(_supportingInformation);
         }
-
+        
         [TestMethod]
         public void TestBuild_PopulationAssigned()
         {
@@ -77,7 +77,7 @@ namespace PholioVisualisation.PdfDataTest
         [TestMethod]
         public void TestLsoaQuintilesAssigned()
         {
-            Assert.IsNotNull(Data().LsoaQuintiles);
+            Assert.IsNotNull(Data().LsoaQuintilesWithinLocalArea);
         }
 
         [TestMethod]

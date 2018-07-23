@@ -58,7 +58,8 @@ namespace PholioVisualisation.DataConstruction
             return GetGroupingBySexId(groupIds, areaTypeId, indicatorId, sexId);
         }
 
-        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndAgeId(int profileId, int areaTypeId, int indicatorId, int ageId)
+        public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndAgeId(
+            int profileId, int areaTypeId, int indicatorId, int ageId)
         {
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingByAgeId(groupIds, areaTypeId, indicatorId, ageId);
@@ -72,11 +73,11 @@ namespace PholioVisualisation.DataConstruction
                 .Where(x => x.AreaTypeId == childAreaTypeId)
                 .ToList();
 
-            var sortedGroupings = new GroupingSorter(groupings).SortByDataPointTimePeriodMostRecentFirst();
-            return sortedGroupings.FirstOrDefault();
+            return ReduceGroupings(groupings);
         }
 
-        public virtual Grouping GetGroupingWithLatestDataPointForAnyProfile(GroupingDifferentiator groupingDifferentiator, int childAreaTypeId)
+        public virtual Grouping GetGroupingWithLatestDataPointForAnyProfile(
+            GroupingDifferentiator groupingDifferentiator, int childAreaTypeId)
         {
             var groupings = groupDataReader.GetGroupingsByIndicatorId(groupingDifferentiator.IndicatorId)
                 .Where(x => x.AreaTypeId == childAreaTypeId &&
@@ -84,8 +85,16 @@ namespace PholioVisualisation.DataConstruction
                         x.AgeId == groupingDifferentiator.AgeId)
                 .ToList();
 
-            var sortedGroupings = new GroupingSorter(groupings).SortByDataPointTimePeriodMostRecentFirst();
-            return sortedGroupings.FirstOrDefault();
+            return ReduceGroupings(groupings);
+        }
+
+        public virtual Grouping GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int areaTypeId,
+            int indicatorId, int sexId, int ageId)
+        {
+            var groupings = groupDataReader.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(
+                areaTypeId, indicatorId, sexId, ageId);
+
+            return ReduceGroupings(groupings);
         }
 
         private Grouping GetGroupingByAgeId(IEnumerable<int> groupIds, int areaTypeId, int indicatorId, int ageId)
@@ -124,16 +133,31 @@ namespace PholioVisualisation.DataConstruction
         {
             foreach (var groupId in groupIds)
             {
-                var grouping = groupDataReader
-                    .GetGroupings(groupId, indicatorId, areaTypeId, sexId, ageId)
-                    .FirstOrDefault();
+                var groupings = groupDataReader
+                    .GetGroupings(groupId, indicatorId, areaTypeId, sexId, ageId);
 
+                var grouping = groupings.FirstOrDefault();
                 if (grouping != null)
                 {
-                    return grouping;
+                    return ReduceGroupings(groupings);
                 }
             }
             return null;
+        }
+
+        private static Grouping ReduceGroupings(IList<Grouping> groupings)
+        {
+            if (groupings.Any() == false) return null;
+
+            var groupingSorter = new GroupingSorter(groupings);
+            var sortedGroupings = groupingSorter.SortByDataPointTimePeriodMostRecentFirst();
+            var grouping = sortedGroupings.First();
+
+            // Use most common polarity for consistency
+            var polarityId = groupingSorter.GetMostCommonPolarityId();
+            grouping.PolarityId = polarityId;
+
+            return grouping;
         }
 
         private IEnumerable<int> GetGroupIds(int groupId, int profileIdToSelectGroupingsFrom)

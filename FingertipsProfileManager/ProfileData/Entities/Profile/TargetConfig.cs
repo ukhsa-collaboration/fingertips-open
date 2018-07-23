@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Foolproof;
 
 namespace Fpm.ProfileData.Entities.Profile
 {
@@ -7,14 +8,16 @@ namespace Fpm.ProfileData.Entities.Profile
         public int Id { get; set; }
 
         [Display(Name = "Lower limit")]
+        [RequiredIfTrue("UseCIsForLimitComparison", ErrorMessage = "Lower limit must be set for CIs comparison")]
         public double? LowerLimit { get; set; }
 
         [Display(Name = "Upper limit")]
         public double? UpperLimit { get; set; }
 
+        [Display(Name = "Bespoke target key")]
         public string BespokeTargetKey { get; set; }
 
-        [Display(Name = "Legend HTML (optional)")]
+        [Display(Name = "Legend HTML")]
         [StringLength(300)]
         public string LegendHtml { get; set; }
 
@@ -26,6 +29,13 @@ namespace Fpm.ProfileData.Entities.Profile
         [StringLength(150)]
         public string Description { get; set; }
 
+        /// <summary>
+        /// Default would be to use the area values.
+        /// </summary>
+        [Display(Name = "Assess limit against area CIs")]
+        public bool UseCIsForLimitComparison { get; set; }
+
+        [Display(Name = "Bespoke target")]
         public bool IsBespokeTarget
         {
             get { return string.IsNullOrEmpty(BespokeTargetKey) == false; }

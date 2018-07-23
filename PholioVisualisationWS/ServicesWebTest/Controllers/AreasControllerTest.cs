@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Controllers;
+using PholioVisualisation.ServicesWeb.Controllers;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {

@@ -5,7 +5,7 @@ using IndicatorsUI.MainUISeleniumTest.Fingertips;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {

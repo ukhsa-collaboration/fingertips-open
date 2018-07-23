@@ -8,9 +8,9 @@ namespace PholioVisualisation.DataConstruction
 {
     public class AreaListProvider
     {
-        public virtual List<IArea> Areas { get; private set; }
+        public virtual IList<IArea> Areas { get; private set; }
 
-        private IAreasReader areasReader;
+        private IAreasReader _areasReader;
 
         /// <summary>
         /// Parameterless constructor to enable mocking
@@ -19,17 +19,17 @@ namespace PholioVisualisation.DataConstruction
 
         public AreaListProvider(IAreasReader areasReader)
         {
-            this.areasReader = areasReader;
+            this._areasReader = areasReader;
         }
 
         public void CreateAreaListFromAreaCodes(IEnumerable<string> areaCodes)
         {
-            Areas = areaCodes.Select(areaCode => AreaFactory.NewArea(areasReader, areaCode)).ToList();
+            Areas = areaCodes.Select(areaCode => AreaFactory.NewArea(_areasReader, areaCode)).ToList();
         }
 
         public void CreateAreaListFromAreaTypeId(int profileId, int areaTypeId)
         {
-            if (areaTypeId > NeighbourAreaType.IdAddition) 
+            if (areaTypeId > NearestNeighbourAreaType.IdAddition) 
             {
                 IList<Area> areas = new List<Area>
                     {
@@ -42,40 +42,46 @@ namespace PholioVisualisation.DataConstruction
             {
                 // e.g All categories for a category type
                 int categoryTypeId = CategoryAreaType.GetCategoryTypeIdFromAreaTypeId(areaTypeId);
-                Areas = areasReader.GetCategories(categoryTypeId)
+                Areas = _areasReader.GetCategories(categoryTypeId)
                     .Select(CategoryArea.New).Cast<IArea>().ToList();
             }
             else
             {
-                IList<string> parentCodes = areasReader.GetProfileParentAreaCodes(profileId, areaTypeId);
+                IList<string> parentCodes = _areasReader.GetProfileParentAreaCodes(profileId, areaTypeId);
 
                 IList<IArea> areas = parentCodes.Any()
-                    ? areasReader.GetAreasFromCodes(parentCodes)
-                    : areasReader.GetAreasByAreaTypeId(areaTypeId);
+                    ? _areasReader.GetAreasFromCodes(parentCodes)
+                    : _areasReader.GetAreasByAreaTypeId(areaTypeId);
 
                 Areas = areas.Cast<IArea>().ToList();
             }
         }
 
-        public void CreateAreaListFromNearestNeighbourAreaCode(int profileId, string parentAreaCode)
+        public void CreateAreaListFromNearestNeighbourAreaCode(string parentAreaCode)
         {
             var nearestNeighbourArea = new NearestNeighbourArea(parentAreaCode);
-            var nearestNeighbours = areasReader.GetNearestNeighbours(nearestNeighbourArea.AreaCodeOfAreaWithNeighbours, nearestNeighbourArea.NeighbourTypeId);
+            var nearestNeighbours = _areasReader.GetNearestNeighbours(nearestNeighbourArea.AreaCodeOfAreaWithNeighbours,
+                nearestNeighbourArea.NeighbourTypeId);
             var nearestNeighboursAreas = nearestNeighbours.Select(x => x.NeighbourAreaCode).ToList();
-            var areas = areasReader.GetAreasFromCodes(nearestNeighboursAreas);
+            var areas = _areasReader.GetAreasFromCodes(nearestNeighboursAreas);
             var sortedAreas = new List<IArea>();
             // Sort list of NN by their rank.
+            var sequence = 1;
             foreach (var nearestNeighbourAreaCode in nearestNeighboursAreas)
             {
-                var temp = areas.Where(x => x.Code == nearestNeighbourAreaCode).FirstOrDefault();
-                sortedAreas.Add(temp);
+                var area = areas.FirstOrDefault(x => x.Code == nearestNeighbourAreaCode);
+                if (area != null)
+                {
+                    area.Sequence = sequence++;
+                }
+                sortedAreas.Add(area);
             }
             Areas = sortedAreas;
         }
 
         public virtual void CreateChildAreaList(string parentAreaCode, int childAreaTypeId)
         {
-            Areas = new ChildAreaListBuilder(areasReader).GetChildAreas(parentAreaCode, childAreaTypeId);
+            Areas = new ChildAreaListBuilder(_areasReader).GetChildAreas(parentAreaCode, childAreaTypeId);
         }
 
         public virtual void RemoveAreasIgnoredEverywhere(IgnoredAreasFilter ignoredAreasFilter)

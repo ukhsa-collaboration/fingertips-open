@@ -26,7 +26,11 @@ namespace Fpm.ProfileDataTest.Respositories
             var server = GetTestServerName();
             IList<ExceptionLog> exceptions1day = _exceptionLogRepository.GetExceptionsByServer(1, server);
             IList<ExceptionLog> exceptions10days = _exceptionLogRepository.GetExceptionsByServer(10, server);
-            Assert.IsTrue(exceptions10days.Count > exceptions1day.Count);
+
+            Assert.IsTrue(
+                exceptions10days.Count > exceptions1day.Count || 
+                exceptions10days.Count == ExceptionsRepository.MaxExceptionCount && 
+                exceptions1day.Count == ExceptionsRepository.MaxExceptionCount);
         }
 
         [TestMethod]

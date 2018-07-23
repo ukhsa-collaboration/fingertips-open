@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FingertipsUploadService</RootNamespace>
     <AssemblyName>FingertipsUploadService</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
     <PublishUrl>publish\</PublishUrl>
@@ -49,20 +49,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=4.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CsvHelper, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
       <HintPath>..\packages\CsvHelper.2.16.3.0\lib\net45\CsvHelper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\PholioVisualisationWS\DataAccess\bin\Debug\NHibernate.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.2.3\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.4.11\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SpreadsheetGear, Version=6.0.3.222, Culture=neutral, PublicKeyToken=39c186f5904944ec, processorArchitecture=MSIL">
@@ -93,13 +97,11 @@
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
     <Compile Include="AutomatedUpload.cs" />
-    <Compile Include="BatchJobWorker.cs" />
+    <Compile Include="UploadJobWorker.cs" />
     <Compile Include="FpmFileReader\CsvFileReader.cs" />
     <Compile Include="FpmFileReader\FileReaderFactory.cs" />
-    <Compile Include="Helpers\CsvRowParser.cs" />
+    <Compile Include="Helpers\CsvStreamReader.cs" />
     <Compile Include="FpmFileReader\ExcelFileReader.cs" />
-    <Compile Include="Helpers\DataSanitizer.cs" />
-    <Compile Include="Helpers\FileDuplicationHandler.cs" />
     <Compile Include="Helpers\FilePathHelper.cs" />
     <Compile Include="FpmFileReader\IUploadFileReader.cs" />
     <Compile Include="Helpers\StatusHelper.cs" />
@@ -121,7 +123,6 @@
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="AutoMapperConfig.cs" />
     <Compile Include="UploadManager.cs" />
   </ItemGroup>
   <ItemGroup>

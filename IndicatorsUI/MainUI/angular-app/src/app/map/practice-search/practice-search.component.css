@@ -1,0 +1,116 @@
+.glyphicon {
+    display: none;
+}
+
+.googleMapNg {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #CCC;
+    width: 550px;
+    height: 600px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    clear: both;
+    overflow: hidden;
+}
+
+#default_search_header {
+    width: 400px;
+    padding-top: 10px;
+    position: absolute;
+}
+
+#practice-list-info {
+    min-height: 30px;
+}
+
+#practice-list-info input {
+    max-width: 450px;
+}
+
+#practice-list-info h3 {
+    font-size: 1.4em;
+    margin-top: 10px;
+}
+
+.practice-header {
+    cursor: pointer;
+}
+
+.nearby-practices-map {
+    float: right;
+    width: 550px;
+    height: 0px;
+    margin-top: -10px;
+    overflow: hidden;
+}
+
+.nearby-practices-map #google-map {
+    margin-bottom: 10px;
+}
+
+#table-container {
+    height: 600px;
+    overflow-y: scroll;
+}
+
+.nearby-practices-table {
+    float: left;
+    width: 45%;
+}
+
+.nearby-practices-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.nearby-practices-table .header {
+    position: relative;
+    background-color: #02ae94;
+    padding: 10px;
+    color: #fff;
+}
+
+.nearby-practices-table td,
+.nearby-practices-table th {
+    padding: 0;
+    font-weight: normal;
+    text-align: left;
+    vertical-align: top;
+    font-size: 16px;
+}
+
+#show-all-practices {
+    padding: 23px 0 18px 0;
+}
+
+#show-all-practices a,
+a:visited,
+a:active,
+a:hover {
+    color: #1d1dae;
+}
+
+#show-all-practices a,
+a:visited,
+a:active,
+a:hover {
+    color: #2e3191;
+    text-decoration: underline;
+    font-size: 16px;
+}
+
+#show-all-practices a {
+    cursor: pointer;
+}
+
+.highlight-address {
+    background-color: #e6e6e6
+}
+
+.highlight-header {
+    background-color: #525252;
+    position: relative;
+    padding: 10px;
+    color: #fff;
+}

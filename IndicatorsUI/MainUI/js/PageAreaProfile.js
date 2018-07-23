@@ -18,6 +18,11 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
 
     // Indicator name
     var indicatorText = formatter.getIndicatorName() + getIndicatorDataQualityHtml(formatter.getDataQuality());
+        
+    if (hasDataChanged(groupRoot)) {
+        indicatorText = indicatorText + NEW_DATA_BADGE;
+    }
+
     var targetLegend = getTargetLegendHtml(comparisonConfig, metadata);
     html.push(renderIndicatorCell(rootIndex, indicatorText, targetLegend));
     
@@ -124,7 +129,7 @@ function addIndicatorRow(groupRoot, rowNumber, coreDataSet,
 
 function renderIndicatorCell(rootIndex, indicatorText, targetLegend) {
     templates.add('indicatorCell', '<td id="spine-indicator_{{rootIndex}}" class="pLink" ' +
-        'onclick="indicatorNameClicked(\'{{rootIndex}}\');"  onmouseover="highlightRow(this);" onmouseout="unhighlightRow();" >{{{indicatorText}}}' +
+        'onclick="indicatorNameClicked(\'{{rootIndex}}\');"  onmouseover="highlightRow(this);" onmouseout="unhighlightRow();" >{{{indicatorText}}} ' +
         '<br>{{{targetLegend}}}</td>');
 
     var html = templates.render('indicatorCell',
@@ -293,9 +298,9 @@ function getIndicatorStats() {
             ).add('parent_area_code', parentAreaCode);
 
         addProfileOrIndicatorsParameters(parameters);
-        addRestrictToProfilesIdsParameter(parameters);
 
-        ajaxGet('api/indicator_statistics', parameters.build(), getIndicatorStatsCallback);
+        var method = isInSearchMode() ? 'by_indicator_id' : 'by_profile_id';
+        ajaxGet('api/indicator_statistics/' + method, parameters.build(), getIndicatorStatsCallback);
     }
 }
 
@@ -438,7 +443,7 @@ AreaTooltipProvider.prototype = {
 
         // Value cell with a value note asterisk
         if (firstBit === 'apc') {
-            var noteId = $('#' + id).attr('vn');;
+            var noteId = $('#' + id).attr('vn');
             var html = new ValueNoteTooltipProvider().getHtmlFromNoteId(noteId);
             return html;
         }
@@ -464,6 +469,8 @@ AreaTooltipProvider.prototype = {
         // e.g. bits = 'q1_3'
         var stem = bits[0],
         rowNumber = bits[1];
+
+        var noteId = $('[id^="apc_' + rowNumber + '"]').attr('vn');
 
         try {
             var formatter = this.map[rowNumber];
@@ -491,6 +498,15 @@ AreaTooltipProvider.prototype = {
             // Indicator name
             html.push('</span><span id="tooltipIndicator">',
                 formatter.getIndicatorName(), '</span>');
+
+            // Value note
+            if (stem == 'm') {
+                if (noteId != null) {
+                    var valueNote = new ValueNoteTooltipProvider().getHtmlFromNoteId(noteId);
+                    valueNote = valueNote.replace("tooltipValueNote", "tooltipValueNote tooltipValueNote-spine-chart");
+                    html.push(valueNote);
+                }
+            }
             
         }
         return html.join('');
@@ -513,7 +529,9 @@ var NO_SPINE_DATA = '<div class="noSpine">-</div>';
 var INSUFFICIENT_DATA = '<div class="noSpine">Insufficient number of values for a spine chart</div>';
 
 templates.add('areaProfile',
-    '<div style="height:50px;"><div style="width:500px; float:left;padding-top:20px;">' + showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') + '</div><div style="float:right;"> <img src="{{spineChartImage}}"></div></div>' +
+    '<div style="height:50px;"><div style="width:500px; float:left;padding-top:20px;">' +
+    showExportTableLink('areas-container', 'AreaProfilesTable', '#key-spine-chart,#spine-range-key') +
+    '</div><div style="float:right;"> <img src="{{spineChartImage}}"></div></div>' +
     '<table id="' + ID_SINGLE_AREA_TABLE + '" class="bordered-table" style="table-layout: auto;" cellspacing="0" cellpadding="0"><thead>\
 <tr><th id="spine-indicator-header" rowspan="2">Indicator</th><th id="spine-period-header" rowspan="2">Period</th><th style="position: relative;" class="numericHeader areaName topRow" colspan="{{trendColSpan}}">-</th>\
 {{#isNationalAndRegional}}{{#isNotNN}}<th class="numericHeader topRow parent-area-type">{{parentType}}</th>{{/isNotNN}}<th class="numericHeader topRow">England</th>\

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Specialized;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataAccessTest
 {
@@ -184,6 +184,19 @@ namespace IndicatorsUI.DataAccessTest
             Assert.IsTrue(result == "http://testurl.com/test/");
 
         }
+
+        [TestMethod]
+        public void TestFeature_When_Not_Defined()
+        {
+            Assert.IsFalse(new AppConfig(new NameValueCollection()).IsFeatureActive("a"));
+        }
+
+        [TestMethod]
+        public void TestFeature_When_Defined()
+        {
+            Assert.IsTrue(GetConfig("ActiveFeatures", "a").IsFeatureActive("a"));
+        }
+
         private static AppConfig GetConfig(string key, string val)
         {
             NameValueCollection parameters = new NameValueCollection();

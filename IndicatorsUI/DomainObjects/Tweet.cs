@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class Tweet
     {

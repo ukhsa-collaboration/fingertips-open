@@ -7,11 +7,19 @@ namespace PholioVisualisation.DataConstruction
 {
     public class GroupDataBuilderByIndicatorIds : GroupDataBuilderBase
     {
-        public IList<int> IndicatorIds;
-        public string ParentAreaCode;
         public int AreaTypeId;
+        public IList<int> RestrictSearchProfileIds { get; set; }
+        public IList<int> IndicatorIds;
 
-        public List<int> RestrictSearchProfileIds { get; set; }
+        /// <summary>
+        /// Mutually exclusive parameter with AreaCode
+        /// </summary>
+        public string ParentAreaCode;
+
+        /// <summary>
+        /// Mutually exclusive parameter with ParentAreaCode
+        /// </summary>
+        public string AreaCode;
 
         protected override void ReadGroupings(IGroupDataReader groupDataReader)
         {
@@ -27,6 +35,12 @@ namespace PholioVisualisation.DataConstruction
 
         protected override IList<IArea> GetChildAreas()
         {
+            if (string.IsNullOrEmpty(AreaCode) == false)
+            {
+                return new List<IArea> { AreaFactory.NewArea(AreasReader, AreaCode) };
+            }
+
+            // Get child areas of parent
             if (ParentAreaCode == null)
             {
                 ParentAreaCode = GetParentAreaCode();

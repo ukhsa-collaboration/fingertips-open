@@ -1,11 +1,11 @@
 ﻿
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public static class JsHelper
     {
-        public static string GetJsBool(bool b)
+        public static string GetJsBool(bool? b)
         {
-            return b ? "true" : "false";
+            return (b ?? false) ? "true" : "false";
         }
 
         public static string GetIncludePath(string file, string path)

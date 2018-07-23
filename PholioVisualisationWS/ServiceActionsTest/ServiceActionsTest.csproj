@@ -8,7 +8,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.ServiceActionsTest</RootNamespace>
     <AssemblyName>PholioVisualisation.ServiceActionsTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -37,31 +37,34 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.2.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.2.2\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Moq, Version=4.5.29.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.5.29\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Moq, Version=4.7.145.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.7.145\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -76,9 +79,12 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AreaAddressProviderTest.cs" />
     <Compile Include="AreasOfAreaTypeActionTest.cs" />
     <Compile Include="AreaTypesActionTest.cs" />
     <Compile Include="BoxPlotPointListBuilderTest.cs" />
+    <Compile Include="DeploymentStatusProviderTest.cs" />
+    <Compile Include="IndicatorSearchActionTest.cs" />
     <Compile Include="PartitionDataForAllAgesBuilderTest.cs" />
     <Compile Include="PartitionDataForAllCategoriesBuilderTest.cs" />
     <Compile Include="PartitionDataForAllSexesBuilderTest.cs" />
@@ -103,6 +109,10 @@
       <Project>{a9fd008c-07b0-49bf-87b2-bc1a39242282}</Project>
       <Name>DataConstruction</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DataSorting\DataSorting.csproj">
+      <Project>{24500DF1-56B2-425C-BDE4-851561897EC2}</Project>
+      <Name>DataSorting</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>
       <Name>Formatting</Name>
@@ -114,6 +124,10 @@
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
       <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SearchQuerying\SearchQuerying.csproj">
+      <Project>{618BCEBB-2D74-4146-BF59-53A58E006A8C}</Project>
+      <Name>SearchQuerying</Name>
     </ProjectReference>
     <ProjectReference Include="..\ServiceActions\ServiceActions.csproj">
       <Project>{40254974-c7e8-4303-b3ff-bf8a0f8c6491}</Project>

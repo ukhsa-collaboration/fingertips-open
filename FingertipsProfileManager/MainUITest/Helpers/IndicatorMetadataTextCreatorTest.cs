@@ -23,7 +23,7 @@ namespace Fpm.MainUITest.Helpers
         [TestInitialize]
         public void TestInitialize()
         {
-            var repo = new ProfileRepository();
+            var repo = new ProfileRepository(NHibernateSessionFactory.GetSession());
             _indicatorId = repo.GetNextIndicatorId();
             _indicatorMetadataTextCreator = new IndicatorMetadataTextCreator(repo);
             _indicatorMetadataTextProperties = IndicatorMetadataTextProperties();

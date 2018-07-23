@@ -5,6 +5,16 @@ namespace PholioVisualisation.PholioObjects
 {
     public class AreaAddress
     {
+        public AreaAddress() { }
+
+        public AreaAddress(IArea area)
+        {
+            Code = area.Code;
+            Name = area.Name;
+            ShortName = area.ShortName;
+            AreaTypeId = area.AreaTypeId;
+        }
+
         [JsonProperty]
         public string Code { get; set; }
 

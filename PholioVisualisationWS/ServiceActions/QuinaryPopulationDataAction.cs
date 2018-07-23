@@ -6,55 +6,6 @@ namespace PholioVisualisation.ServiceActions
 {
     public class QuinaryPopulationDataAction
     {
-        /// <summary>
-        /// LEGACY: Only user for practice profiles
-        /// </summary>
-        public Dictionary<string, object> GetPopulationAndSummary(string areaCode, int groupId, int dataPointOffset)
-        {
-            QuinaryPopulationBuilder builder = new QuinaryPopulationBuilder
-            {
-                DataPointOffset = dataPointOffset,
-                AreaCode = areaCode,
-                GroupId = groupId,
-                AreOnlyPopulationsRequired = false
-            };
-
-            builder.BuildPopulationAndSummary();
-
-            Dictionary<string, object> responseObjects = new Dictionary<string, object>();
-
-            responseObjects.Add("Code", areaCode);
-
-            // Quinary population
-            responseObjects.Add("Values", builder.Values);
-            responseObjects.Add("Labels", builder.Labels);
-
-            // Practice specific information
-            if (builder.EthnicityText != null)
-            {
-                responseObjects.Add("Ethnicity", builder.EthnicityText);
-            }
-
-            if (builder.DeprivationDecile.HasValue)
-            {
-                responseObjects.Add("GpDeprivationDecile", builder.DeprivationDecile);
-            }
-
-            if (builder.Shape.HasValue)
-            {
-                responseObjects.Add("Shape", builder.Shape);
-            }
-
-            responseObjects.Add("AdHocValues", builder.AdHocValues);
-
-            var listSize = builder.ListSize;
-            if (listSize != null)
-            {
-                responseObjects.Add("ListSize", listSize);
-            }
-
-            return responseObjects;
-        }
 
         public Dictionary<string, object> GetPopulationOnly(string areaCode, int areaTypeId,
             int profileId, int indicatorId, int dataPointOffset)

@@ -1,4 +1,4 @@
-﻿namespace Profiles.DomainObjects
+﻿namespace IndicatorsUI.DomainObjects
 {
     public class ProfileNearestNeighbourAreaTypeMapping
     {

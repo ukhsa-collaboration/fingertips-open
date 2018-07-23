@@ -1,0 +1,41 @@
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Models
+@model PageModel
+@{
+    var headings = (IList<Domain>)ViewBag.DomainHeadings;
+}
+
+@if (headings != null && headings.Count > 1)
+{
+    <div id="domain-box" class="clearfix">
+        @if (headings.Count < 10)
+        {
+            var width = Math.Round(99.0 / headings.Count, 2);
+            // NOTE - this is a table so that the domains never wrap onto a second line
+            <table>
+                <tbody>
+                <tr>
+                    @foreach (var c in headings)
+                    {
+                        <td id="domain@(c.GroupId)" class="domain-option" style="width: @(width)%;" onclick="domainClicked(@(c.GroupId))">
+                            @c.SubHeading
+                        </td>
+                    }
+                </tr>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="domain-dropdown-div">
+                <span>Domain: </span>
+                <select id="domain-dropdown" onchange="domainSelected()" style="color: #fff;">
+                    @foreach (var domain in headings)
+                    {
+                        <option value="@domain.GroupId">@domain.SubHeading</option>
+                    }
+                </select>
+            </div>
+        }
+    </div>
+}

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ServicesWeb.Helpers;
+using PholioVisualisation.ServicesWeb.Helpers;
 
 namespace PholioVisualisation.ServicesWebTest
 {

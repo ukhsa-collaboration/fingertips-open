@@ -104,7 +104,7 @@ describe('CommaNumber', function () {
 
 describe('isFeatureEnabled', function () {
 
-    FT.features = {ExportTartanRug:true,ExportHighCharts:true}
+    FT.features = ['ExportTartanRug', 'ExportHighCharts'];
 
     it('Feature flag is defined', function() {
         expect(isFeatureEnabled('ExportHighCharts')).toBe(true);

@@ -5,6 +5,7 @@
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
 @{
     ViewBag.Title = "FPM - Profile Manager";
+    var userLookup = ViewBag.UserLookup;
 }
 
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
@@ -24,9 +25,8 @@
                 <th class="header">Url Key</th>
                 <th class="header">Live</th>
                 <th class="header">PDFs</th>
-                <th class="header">Default area type</th>
-                <th class="header">Areas ignored everywhere</th>
-                <th class="header">Areas ignored for spine chart</th>
+                <th class="header" style="width:80px;">Default area type</th>
+                <th class="header">Contact</th>
             </tr>
         </thead>
         @foreach (var item in Model.ProfileGrid)
@@ -52,10 +52,7 @@
                     @item.DefaultAreaTypeId
                 </td>
                 <td class="left">
-                    @item.AreasIgnoredEverywhere
-                </td>
-                <td class="left">
-                    @item.AreasIgnoredForSpineChart
+                    @(userLookup[item.ContactUserId])
                 </td>
             </tr>
         }

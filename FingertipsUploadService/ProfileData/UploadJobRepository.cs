@@ -89,15 +89,6 @@ namespace FingertipsUploadService.ProfileData
                 .ExecuteUpdate();
         }
 
-        // Only used to clean the test environment 
-        public void DeleteAllJob()
-        {
-            const string query = "delete from uploadjob";
-            CurrentSession
-                .CreateSQLQuery(query)
-                .ExecuteUpdate();
-        }
-
         public void CreateNewJob(UploadJob job)
         {
             try

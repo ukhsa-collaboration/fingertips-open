@@ -1,5 +1,4 @@
 ﻿using FingertipsUploadService.ProfileData;
-using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,8 @@ namespace FingertipsUploadService.Upload
 {
     public class CoreDataSetDuplicateChecker
     {
-        public List<DuplicateRowInDatabaseError> GetDuplicates(List<UploadDataModel> data, CoreDataRepository repository, UploadJobType jobType)
+        public List<DuplicateRowInDatabaseError> GetDuplicates(IList<UploadDataModel> data,
+            CoreDataRepository repository)
         {
             var lastIndicatorId = -1;
             var rowIndex = 1;

@@ -1,0 +1,9 @@
+<div id="population-container" style="display:none;">
+    <div class="standard-width">
+        <ft-population-chart [populations]="populations" *ngIf="isAnyData()"></ft-population-chart>
+        <ft-population-summary *ngIf="showSummary" [allPopulationData]="allPopulationData"></ft-population-summary>
+        <div class="no-indicator-data" *ngIf="!isAnyData()">
+            No population data available for current area type
+        </div>
+    </div>
+</div>

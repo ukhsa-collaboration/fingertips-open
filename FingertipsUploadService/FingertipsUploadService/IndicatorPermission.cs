@@ -14,7 +14,7 @@ namespace FingertipsUploadService
         private List<string> noneExistingIndicators = new List<string>();
         private List<string> indicatorsWithoutPermission = new List<string>();
 
-        public bool Check(List<int> indicators, UploadJob job, UploadJobErrorRepository errorRepository)
+        public bool DoesUserHasPermissionForAllIndicators(IList<int> indicators, UploadJob job, UploadJobErrorRepository errorRepository)
         {
 
             // Check permission
@@ -39,7 +39,7 @@ namespace FingertipsUploadService
             return true;
         }
 
-        private void CheckIndicatorPermissionForCurrentUser(List<int> indicators, int userId)
+        private void CheckIndicatorPermissionForCurrentUser(IList<int> indicators, int userId)
         {
             //            var permissions = new List<string>();
             // List of indicator ids in current batch

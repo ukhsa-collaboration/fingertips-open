@@ -8,6 +8,15 @@ namespace Fpm.MainUI
         {
             var cssPath = "~/" + AppConfig.CssPath;
             var jsPath = "~/" + AppConfig.JsPath;
+            var angularDist = "~/" + AppConfig.AngularAppDistPath;
+
+            bundles.Add(new ScriptBundle("~/angular-dist")
+                .Include(angularDist + "inline.bundle.js")
+                .Include(angularDist + "polyfills.bundle.js")
+                .Include(angularDist + "styles.bundle.js")
+                .Include(angularDist + "vendor.bundle.js")
+                .Include(angularDist + "main.bundle.js")
+                );
 
             bundles.Add(new StyleBundle("~/css/site")
                .Include(cssPath + "bootstrap.css")
@@ -58,6 +67,9 @@ namespace Fpm.MainUI
 
             bundles.Add(new ScriptBundle("~/exception-log.js")
                 .Include(jsPath + "ExceptionLog/exception-log.js"));
+
+            bundles.Add(new ScriptBundle("~/userfeedback.js")
+                .Include(jsPath + "UserFeedback/userfeedback.js"));
         }
     }
 }

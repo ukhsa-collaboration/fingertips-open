@@ -13,11 +13,10 @@ export class GoogleMapService {
 
   constructor(private http: Http, private ftHelperservice: FTHelperService){ }
 
-  loadMap(mapEl: ElementRef, mapOptions: google.maps.MapOptions): google.maps.Map {
-      const container = mapEl.nativeElement.querySelector('#google-map');
+  loadMap(mapDiv: Element, mapOptions: google.maps.MapOptions): google.maps.Map {
       this.map = null;
-      if(container != null){
-        this.map = new google.maps.Map(container, mapOptions);
+      if(mapDiv != null){
+        this.map = new google.maps.Map(mapDiv, mapOptions);
       }
       return this.map;
   }
@@ -26,8 +25,7 @@ export class GoogleMapService {
        return this.http.get( baseUrl).map(res => res.json()).catch(this.handleError);
   }
   private handleError(error: any) {
-        console.error(error);
-        const errorMessage: string = 'Unsupported map type.Maps are not available for ' + this.ftHelperservice.getAreaTypeName();
+        const errorMessage: string = 'Unsupported map type. Maps are not available for this area type.';
         return Observable.throw(errorMessage);
   }
 }

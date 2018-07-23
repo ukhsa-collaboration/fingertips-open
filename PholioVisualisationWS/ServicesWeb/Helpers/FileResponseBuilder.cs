@@ -3,14 +3,24 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
-namespace ServicesWeb.Helpers
+namespace PholioVisualisation.ServicesWeb.Helpers
 {
-    public class FileResponseBuilder
+    public interface IFileResponseBuilder
+    {
+        HttpResponseMessage Message { get; }
+
+        void SetFileContent(byte[] content);
+
+        void SetFilename(string file_name);
+    }
+    
+    public class FileResponseBuilder : IFileResponseBuilder
     {
         private HttpResponseMessage _message;
 
-        public HttpResponseMessage Message {
-            get { return _message;}
+        public HttpResponseMessage Message
+        {
+            get { return _message; }
         }
 
         public FileResponseBuilder()

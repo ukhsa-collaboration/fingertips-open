@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     /// <summary>
     /// Assigns a collection of items into a specified number of columns. Assignment

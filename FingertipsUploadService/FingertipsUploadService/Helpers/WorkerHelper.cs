@@ -2,6 +2,7 @@
 using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.Upload;
 using System.Data;
+using UploadJob = FingertipsUploadService.ProfileData.Entities.Job.UploadJob;
 
 namespace FingertipsUploadService.Helpers
 {
@@ -11,11 +12,10 @@ namespace FingertipsUploadService.Helpers
         {
             var rowCount = 0;
 
-
             for (var i = 0; i < dataTable.Rows.Count; i++)
             {
                 var row = dataTable.Rows[i];
-                var rowParser = new UploadSimpleRowParser(row);
+                var rowParser = new UploadRowParser(row);
 
                 if (rowParser.DoesRowContainData == false)
                 {
@@ -25,12 +25,8 @@ namespace FingertipsUploadService.Helpers
                 rowCount++;
             }
 
-
-
             job.TotalRows = rowCount;
             repository.UpdateJob(job);
         }
-
-
     }
 }

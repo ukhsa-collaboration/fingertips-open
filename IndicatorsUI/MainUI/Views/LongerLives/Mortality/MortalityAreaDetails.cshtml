@@ -1,5 +1,5 @@
-﻿@using Profiles.DomainObjects
-@model Profiles.MainUI.Models.PageModel
+﻿@using IndicatorsUI.DomainObjects
+@model IndicatorsUI.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml"; 
 }
@@ -36,7 +36,7 @@
             <ul>
                 <li id="socioeconomic_ib" >
 
-                    <img src="@(ViewBag.ImagesUrl)Mortality/ranking_icons.png" />
+                    <img src="@(ViewBag.ImagesUrl)Mortality/ranking_icons-v1.png" />
                 </li>
                 <li class="deprivation">
                     <span class="deprivation">Socioeconomic deprivation</span>
@@ -54,7 +54,7 @@
                 </ul>   
                 
                             
-            <a href="javascript:MT.nav.rankings();" class="more_info no-print">View full rankings</a>
+            <a href="javascript:MT.nav.rankings();" class="more_info no-print">View similar areas rankings</a>
             </div>
 
         </div>

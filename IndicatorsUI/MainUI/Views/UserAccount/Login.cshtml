@@ -1,0 +1,78 @@
+﻿@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@model IndicatorsUI.MainUI.Models.UserAccess.LoginViewModel
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForUserAccount")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row">
+        @using (Html.BeginForm("ValidateLogin", "UserAccount", FormMethod.Post, new { id = "frm-login-for-fingertips" }))
+        {
+            Html.EnableClientValidation(true);
+
+            <div class="col-md-8">
+                <h2>Sign in</h2>
+
+                @if (ViewBag.DisplayResendEmail != null && (bool)ViewBag.DisplayResendEmail)
+                {
+                    @* User has not validated email address yet*@
+                    <div><p>Before you can log in you will need to verify your email address. 
+                    You should have received an email from us that will tell you how to do this. 
+                    If not please select the button below to resend.</p></div>
+                    @Html.HiddenFor(s => s.UserName)
+                    <button id="resend-verification-email" class="btn btn-lg btn-primary" type="submit" name="action:ResendEmail">
+                        Resend verification email
+                    </button>
+                }
+                else
+                {
+                    @* Sign in options*@
+                    <div role="note" aria-label="Information" class="application-notice info-notice">
+                        <p>If you have already registered as a user, please enter your email address and password then select the sign in button.</p>
+                    </div>
+
+                    @Html.ValidationSummary(true, "", new { @class = "error-message" })
+
+                    <div class="form-group">
+                        <label class="form-label-bold">
+                            <span class="form-label-bold">Email Address</span>
+                            <span class="form-hint"></span>
+                        </label>
+
+                        @Html.TextBoxFor(s => s.UserName, new {@class = "form-control form-control-full-width", id = "email"})
+                        @Html.ValidationMessageFor(m => m.UserName, "", new {@class = "error-message"})
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold">
+                            <span class="form-label-bold">Password</span>
+                            <span class="form-hint"></span>
+                        </label>
+                        @Html.PasswordFor(s => s.Password, new {@class = "form-control form-control-full-width", id = "pwd"})
+                        @Html.ValidationMessageFor(m => m.Password, "", new {@class = "error-message"})
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label-bold">
+                            @Html.CheckBoxFor(d => d.KeepUserLoggedIn)
+                            Keep me logged in
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <button class="btn btn-lg btn-primary" type="submit" id="btn-login" style="float: left;" name="action:SignIn">
+                            Sign in
+                        </button>
+                        @Html.ActionLink("Forgot your password?", "ForgotPassword", "UserAccount", null,
+                            new {style = "margin-left:28px;margin-top:12px;float: left;", @class = "form-label-bold"})
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label-bold" style="float: left;">
+                            Don't have an account?
+                        </div>
+                        @Html.ActionLink("Sign up", "Registration", "UserAccount", null,
+                            new {style = "float: left;margin-left:10px;", @class = "form-label-bold"})
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

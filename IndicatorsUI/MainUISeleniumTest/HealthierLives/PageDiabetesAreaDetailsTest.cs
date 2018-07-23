@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
-using System;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 using System.Collections.Generic;
 
 namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
@@ -14,11 +12,15 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
         private void LoadHealthChecksAreaDetailsPage(IWebDriver webDriver, string parameters)
         {
             webDriver.Navigate().GoToUrl(AppConfig.Instance.BridgeWsUrl + "topic/nhs-health-check/area-details" + parameters);
+            waitFor.AjaxLockToBeUnlocked();
+            waitFor.ExpectedElementToBeVisible(By.Id("main_ranking"));
         }
 
         private void LoadDrugsAndAlcoholAreaDetailsPage(IWebDriver webDriver, string parameters)
         {
             webDriver.Navigate().GoToUrl(AppConfig.Instance.BridgeWsUrl + "topic/drugs-and-alcohol/area-details" + parameters);
+            waitFor.AjaxLockToBeUnlocked();
+            waitFor.ExpectedElementToBeVisible(By.Id("data_page_table"));
         }
 
         [TestMethod]
@@ -30,12 +32,10 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 
             LoadHealthChecksAreaDetailsPage(driver, parameters.HashParameterString);
 
-            // ImplicitlyWait for the area filter to render
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-            wait.Until(d => d.FindElement(By.Id("main_ranking")));
-
+            // Assert: no data labels 
             Assert.IsTrue(driver.FindElement(By.Id("main_ranking")).Text.Contains("NO DATA"));
-            Assert.IsTrue(driver.FindElement(By.Id("c3")).Text.Contains("No data"));
+            var text = driver.FindElement(By.Id("c3")).Text;
+            Assert.IsTrue(text.Contains("No data"));
         }
 
         [TestMethod]
@@ -46,10 +46,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             parameters.AddParentAreaCode(AreaCodes.England);
 
             LoadHealthChecksAreaDetailsPage(driver, parameters.HashParameterString);
-
-            // ImplicitlyWait for the area filter to render
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("main_ranking")));
 
             Assert.IsFalse(driver.FindElement(By.Id("main_ranking")).Text.Contains("NO DATA"));
         }
@@ -62,10 +58,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             parameters.AddParentAreaCode(AreaCodes.England);
 
             LoadHealthChecksAreaDetailsPage(driver, parameters.HashParameterString);
-
-            // ImplicitlyWait for the area filter to render
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("main_ranking")));
 
             IList<IWebElement> percentSigns = driver.FindElements(By.CssSelector(".unit.arial"));
             Assert.IsTrue(percentSigns.Count > 0);
@@ -80,9 +72,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 
             LoadHealthChecksAreaDetailsPage(driver, parameters.HashParameterString);
 
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("main_ranking")));
-
             Assert.IsTrue(driver.FindElement(By.Id("main_ranking")).GetAttribute("class").Contains("no-data"));
         }
 
@@ -94,9 +83,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             parameters.AddParentAreaCode(AreaCodes.England);
 
             LoadDrugsAndAlcoholAreaDetailsPage(driver, parameters.HashParameterString);
-
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("data_page_table")));
 
             Assert.IsTrue(driver.FindElement(By.Id("data_page_header")).Text.Contains("Croydon"));
         }
@@ -110,9 +96,6 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 
             LoadDrugsAndAlcoholAreaDetailsPage(driver, parameters.HashParameterString);
 
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("data_page_table")));
-
             Assert.AreEqual("Drugs and Alcohol", driver.FindElement(By.XPath(XPaths.DrugsAndAlcoholAreaRankingsTableName)).Text);
         }
 
@@ -125,15 +108,12 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 
             LoadDrugsAndAlcoholAreaDetailsPage(driver, parameters.HashParameterString);
 
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("data_page_table")));
-
             var rankingTableElements = driver.FindElements(By.Id("a_row"));
 
             foreach (var webElement in rankingTableElements)
             {
-                Assert.AreEqual("none", webElement.GetAttribute("class"));
-                Assert.AreEqual(string.Empty, webElement.FindElement(By.ClassName("drugs-n-alcohol")).Text);
+                Assert.AreEqual("no-data", webElement.GetAttribute("class"));
+                TestHelper.AssertTextContains(webElement.Text, "no data");
             }
         }
     }

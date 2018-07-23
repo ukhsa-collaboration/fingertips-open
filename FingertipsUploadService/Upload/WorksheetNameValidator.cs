@@ -8,9 +8,9 @@ namespace FingertipsUploadService.Upload
 {
     public class WorksheetNameValidator : IWorksheetNameValidator
     {
-        public bool ValidateBatch(List<string> worksheets)
+        public bool Validate(List<string> worksheets)
         {
-            return worksheets.Any(x => x.Equals(WorksheetNames.BatchPholio, StringComparison.InvariantCultureIgnoreCase));
+            return worksheets.Any(x => x.Equals(WorksheetNames.Pholio, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

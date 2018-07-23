@@ -25,7 +25,19 @@ function viewIndicatorData(indicatorId, indicatorName) {
 }
 
 function initDataBrowse() {
+
     $('.filter-item').unbind().change(function () {
+        enableDeleteButton(false);
+        enableGetButton(true);
+    });
+
+    // Area code filter
+    $('input.filter-item').keydown(function (event) {
+        // Do not want enter press submit form
+        if (event.keyCode == 13) {
+            event.preventDefault();
+            return false;
+        }
         enableDeleteButton(false);
         enableGetButton(true);
     });
@@ -90,12 +102,13 @@ function initDataBrowse() {
     }
 
     function enableButton(isEnabled, elementId) {
+        var disabled = 'disabled';
         var $element = $(elementId);
-        $element.prop('disabled', !isEnabled);
+        $element.prop(disabled, !isEnabled);
         if (isEnabled) {
-            $element.removeClass('disabled');
+            $element.removeClass(disabled);
         } else {
-            $element.addClass('disabled');
+            $element.addClass(disabled);
         }
     }
 }

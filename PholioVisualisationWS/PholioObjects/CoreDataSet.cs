@@ -22,10 +22,13 @@ namespace PholioVisualisation.PholioObjects
         /// <summary>
         ///     Required by NHibernate to map to CoreDataSet table.
         /// </summary>
-        [JsonIgnore]
+        [JsonProperty]
         public int UniqueId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
+        public int Uid { get; set; }
+
+        [JsonProperty]
         public int IndicatorId { get; set; }
 
         [JsonIgnore]
@@ -73,16 +76,16 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "Denom2")]
         public double Denominator2 { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int Year { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int YearRange { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int Quarter { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int Month { get; set; }
 
         /// <summary>
@@ -127,7 +130,7 @@ namespace PholioVisualisation.PholioObjects
         /// </summary>
         public bool ShouldSerializeCategoryTypeId()
         {
-            return CategoryTypeId != -1;
+            return CategoryTypeId != 0;
         }
 
         public void CopyValues(Grouping grouping, TimePeriod timePeriod)
@@ -161,14 +164,6 @@ namespace PholioVisualisation.PholioObjects
             data.Count = NullValue;
             data.Denominator = NullValue;
             data.Denominator2 = NullValue;
-        }
-
-        /// <summary>
-        ///     Whether or not Denominator2 should be serialised to JSON.
-        /// </summary>
-        public bool ShouldSerializeDenominator2()
-        {
-            return Denominator2 != NullValue;
         }
 
         /// <summary>

@@ -313,7 +313,7 @@ namespace PholioVisualisation.Export
 
         private static void AddCcgParent(Dictionary<string, Area> map, string code, IList<Area> parentAreas)
         {
-            var area = parentAreas.FirstOrDefault(a => a.AreaTypeId == AreaTypeIds.Ccg);
+            var area = parentAreas.FirstOrDefault(a => a.AreaTypeId == AreaTypeIds.CcgsPreApr2017);
             AddArea(area, map, code);
         }
 

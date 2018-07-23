@@ -1,20 +1,21 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Helpers
-@using Profiles.MainUI.Models
+﻿@using System.Web.Optimization
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
 @model PageModel
 @{
     Layout = "~/Views/Shared/_LayoutPage.cshtml";
 }
 
 @section headContent {
-    @Html.Partial(Model.GetSkinView("_SkinSpecificJavaScriptAndCssForContentPages"))
+    @Html.Partial("_JavaScriptAndCssExtraForAreaSearch")
+    @Html.Partial("_JavaScriptAndCssForContentPage")
+    @Styles.Render("~/bundles/css-phof")
     @Html.Partial("_TwitterStyle")
     <script type="text/javascript">
-//<![CDATA[
+        //<![CDATA[
         Twitter_Handle = '@(Model.GetTwitterHandle())';
         //]]</script>
 }
-
 <div class="title-divider"></div>
 @{
     HtmlString recentUpdates = ContentProvider.GetRecentUpdates(Model.ProfileId);
@@ -26,38 +27,39 @@
     <div class="row">
         @Html.Partial("_UpdateDelayedMessage")
         <div class="col-md-8">
-            @if (Model.Skin.IsPhof)
-            {
-                @Html.Partial(Model.GetSkinView("_PhofDomains"))
-            }
-        </div>
-        <div class="col-md-4">
-            @if (Model.Skin.IsPhof)
-            {
-                @Html.Partial("_TwitterFeed")
-            }
-        </div>
-    </div>
-</div>
-<div id="search-box-public-health-outcomes-framework" class="container">
-    <div class="row">
-
-        <div id="introduction" class="col-md-8">
-            @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
-            @ContentProvider.GetIntroduction(Model.ProfileId)
-        </div>
-        @if (areUpdates)
-        {
-            <div id="recent-updates" class="col-md-4">
-                @if (Model.Skin.IsTobacco)
-                {
-                    @Html.Partial("_StartButton")
-                }
-                <h2>Recent updates</h2>
-                <div class="@updatesCssClass">
-                    @recentUpdates
+            @Html.Partial("~/Views/Phof/_PhofDomains.cshtml")
+            <div>
+                <div id="introduction">
+                    @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
+                    @ContentProvider.GetIntroduction(Model.ProfileId)
                 </div>
             </div>
-        }
-    </div>
+        </div>
+        <div class="col-md-4">
+            <div style="padding-top: 20px;">
+                <figure id="image-figure" class="figure">
+                    <a href="https://www.youtube.com/watch?v=UL3Q_cqWKvs&feature=youtu.be" target="_blank">
+                        <img src="~/images/image-video/phof-video.png" class="figure-img img-fluid rounded img-responsive" alt="An introduction to using the Fingertips Tool">
+                    </a>
+                    <figcaption class="figure-caption"></figcaption>
+                </figure>
+            </div>
+            <div class="row">
+                @if (areUpdates)
+                {
+                    <div style="width: 100%;">
+                        <div id="recent-updates">
+                            <h2>Recent updates</h2>
+                            <div class="@updatesCssClass">
+                                @recentUpdates
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row">
+                @Html.Partial("_TwitterFeed")
+            </div>
+        </div>
+    </div>   
 </div>

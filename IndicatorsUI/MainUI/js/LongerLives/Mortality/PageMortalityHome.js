@@ -45,7 +45,9 @@ function displayPage() {
 
     displayMapLegend();
     var comparatorAreaCode = getCurrentComparator().Code;
-    var isSimilarView = isSimilarAreas();
+
+    var isSimilarView = model.parentCode !== NATIONAL_CODE;
+
     var areaDetails = isSimilarView ?
         loaded.areaDetails.getData() :
         null;
@@ -90,6 +92,38 @@ function displayPage() {
     }
 
     unlock();
+}
+
+
+/**
+ * Modify the color of all non-similar areas
+ */
+function setNonSimilarPolygons() {
+    var polygons = mapState.areaCodeToPolygonHash;
+    if (MT.model.areaTypeId === AreaTypeIds.DistrictUA) {
+        // Uncolour all areas that are not in the same ONS group
+        if (selectedRootIndex === 'dep') {
+            var comparatorAreaCode = getCurrentComparator().Code;
+            var root = groupRoots[ROOT_INDEXES.DEPRIVATION];
+            var key = getIndicatorKey(root, MT.model, comparatorAreaCode);
+            var onsClusterHash = flattenOnsClusters(loaded.areaValues[key]);
+
+            for (var areaCode in polygons) {
+                if (!onsClusterHash[areaCode]) {
+                    polygons[areaCode].set('fillColor', '#999');
+                }
+            }
+        }
+    } else {
+        // Uncolour all areas that are not in the same decile
+        var deciles = loaded.categories[AreaTypeIds.DeprivationDecile];
+        var targetDecile = deciles[MT.model.areaCode];
+        for (var areaCode in polygons) {
+            if (deciles[areaCode] !== targetDecile) {
+                polygons[areaCode].set('fillColor', '#999');
+            }
+        }
+    }
 }
 
 function getSecondaryData() {
@@ -326,14 +360,14 @@ function initMapOptions() {
     });
 }
 
-function switchAreas(areaTypeId) {
+function selectAreaType(areaTypeId) {
 
     var model = MT.model;
-    setUrl('#ati/' + areaTypeId + '/gid/' + model.groupId + '/pat/' + areaTypeId);
+    setUrl('#ati/' + areaTypeId + '/gid/' + model.groupId);
     window.location.reload();
 }
 
-popUpFooter = '</div><div class="map-info-footer clearfix"><a href="javascript:MT.nav.areaDetails();">View local authority details</a></div>\
+popUpFooter = '</div><div class="map-info-footer clearfix" style="text-align:right;padding-right:30px;"><a href="javascript:MT.nav.areaDetails();">View local authority details</a></div>\
 <div class="map-info-tail" onclick="pointerClicked()"><i></i></div>\</div>';
 
 popUpHeader = '<div class="map-template map-info"><div class="map-info-header clearfix"><span class="map-info-close" onclick="closeInfo()">&times;</span>\
@@ -341,10 +375,6 @@ popUpHeader = '<div class="map-template map-info"><div class="map-info-header cl
 
 population = '<dl class="stat population_stat"><dt>Population</dt><dd><strong>{{population}}</strong></dd></dl>';
 totalMortality = '<dl class="stat premature_death_stat"><dt>Total premature deaths</dt><dd><strong>{{prematuredeaths}}</strong> for {{period}}</dd></dl>';
-
-templates.add('areaHover',
-    '<div class="{{hoverTemplateClass}} map-info"><div class="map-info-header clearfix">{{#showSimilarLink}}<a href="javascript:viewSimilar()">{{similarText}} similar areas on map ></a>{{/showSimilarLink}}</div><div class="hover-map-info-body map-info-stats clearfix">'
-        + '<h4 class="hover-place-name">{{nameofplace}}</h4>' + '</div><div class="map-info-footer clearfix"></div><div class="{{hoverTemplateTailClass}}" onclick="pointerClicked()"><i></i></div></div>');
 
 templates.add('areaoverlay',
     popUpHeader + '<div class="map-info-right"><dl class="stat ranked_stat {{rankClass}} {{imageclass}}"><dt id="filterHeader">{{filterheader}}</dt><dd><i></i>Ranked <strong>{{ranked}}</strong>out of <span class="rank-max">{{rankoutof}}</span></dd></dl></div>' +

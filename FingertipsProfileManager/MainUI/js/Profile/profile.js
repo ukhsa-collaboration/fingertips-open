@@ -57,6 +57,7 @@ function LoadProfileDetail(profileId) {
 function SaveProfileDetail() {
     var name = $('#Name').val();
     var data = $('#frmProfile').serialize();
+    console.log(data);
     $.post('/profile/NonAdminProfileDetails', data)
         .success(function (response) {
             if (response) {

@@ -1,17 +1,17 @@
 ﻿using FingertipsUploadService.ProfileData.Entities.Core;
 using FingertipsUploadService.ProfileData.Helpers;
 using NHibernate;
+using NHibernate.Criterion;
 using NHibernate.Transform;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 
 namespace FingertipsUploadService.ProfileData.Repositories
 {
     public class CoreDataRepository : RepositoryBase
     {
+        const int NumberOfRowsBatch = 100;
         // poor man injection, should be removed when we use DI containers
         public CoreDataRepository()
             : this(NHibernateSessionFactory.GetSession())
@@ -26,18 +26,19 @@ namespace FingertipsUploadService.ProfileData.Repositories
         public IEnumerable<CoreDataSet> GetCoreDataSets(IEnumerable<DuplicateRowInDatabaseError> duplicateRows)
         {
             return CurrentSession
-                    .CreateQuery("from CoreDataSet cds where cds.Uid in (:Id)")
-                    .SetParameterList("Id", duplicateRows.Select(x => x.Uid).ToList())
+                    .CreateQuery("from CoreDataSet cds where cds.Uid in (:Ids)")
+                    .SetParameterList("Ids", duplicateRows.Select(x => x.Uid).ToList())
                     .List<CoreDataSet>();
         }
 
         public void InsertCoreDataArchive(IEnumerable<DuplicateRowInDatabaseError> duplicateRows, Guid replacementUploadloadBatchId)
         {
-            try
+
+            foreach (var duplicateBatch in duplicateRows.Batch(NumberOfRowsBatch))
             {
-                foreach (var duplicateBatch in duplicateRows.Batch(100))
+                if (duplicateBatch != null)
                 {
-                    if (duplicateBatch != null)
+                    try
                     {
                         transaction = CurrentSession.BeginTransaction();
 
@@ -55,13 +56,14 @@ namespace FingertipsUploadService.ProfileData.Repositories
 
                         transaction.Commit();
                     }
+                    catch (Exception exception)
+                    {
+                        HandleException(exception);
+                    }
                 }
 
             }
-            catch (Exception exception)
-            {
-                HandleException(exception);
-            }
+
         }
 
         public int InsertCoreData(CoreDataSet coreDataSet, Guid uploadBatchId)
@@ -138,40 +140,16 @@ namespace FingertipsUploadService.ProfileData.Repositories
             }
         }
 
-        public IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, out int totalRows)
+        public IList<CoreDataSet> GetCoreDataSetByUploadJobId(Guid uploadBatchId)
         {
-            return GetCoreDataSet(indicatorId, null, out totalRows);
-        }
-
-        public IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, Dictionary<string, int> filters, out int totalRows)
-        {
-            // Dynamic Query
-            const string sqlSelectColumns = "SELECT Top 500 Uid, IndicatorId,Year,YearRange,Quarter,Month," +
-                                            "AgeId,SexId,AreaCode,Count,Value,LowerCi,UpperCi,Denominator,Denominator_2," +
-                                            "ValueNoteId,UploadBatchId,CategoryTypeId, CategoryId " +
-                                            "FROM Coredataset cds ";
-
-            const string sqlSelectCount = "SELECT count(*) totalRows FROM Coredataset cds ";
-
-            var sqlWhere = "WHERE indicatorId = " + indicatorId;
-
-            var sqlFilters = filters != null ? GetSqlFromFilters(filters) : string.Empty;
-
-            Debug.WriteLine(sqlSelectCount + sqlWhere + sqlFilters);
-
-            totalRows = CurrentSession.CreateSQLQuery(sqlSelectCount + sqlWhere + sqlFilters)
-                 .UniqueResult<int>();
-
-            var result = CurrentSession.CreateSQLQuery(sqlSelectColumns + sqlWhere + sqlFilters)
-                .SetResultTransformer(Transformers.AliasToBean<CoreDataSet>())
+            return CurrentSession.CreateCriteria<CoreDataSet>()
+                .Add(Restrictions.Eq("UploadBatchId", uploadBatchId))
                 .List<CoreDataSet>();
-
-            return result;
         }
 
         public IList<CoreDataSetDuplicateResponse> GetDuplicateCoreDataSetForAnIndicator(CoreDataSet data)
         {
-            return CurrentSession.GetNamedQuery("Find_Duplciate_Rows_In_CoreDataSet_SP")
+            return CurrentSession.GetNamedQuery("Find_Duplicate_CoreDataSet_Rows_SP")
                 .SetInt32("indicator_id", data.IndicatorId)
                 .SetInt32("year", data.Year)
                 .SetInt32("year_range", data.YearRange)
@@ -184,26 +162,6 @@ namespace FingertipsUploadService.ProfileData.Repositories
                 .SetInt32("category_id", data.CategoryId)
                 .SetResultTransformer(Transformers.AliasToBean<CoreDataSetDuplicateResponse>())
                 .List<CoreDataSetDuplicateResponse>();
-        }
-
-        private string GetSqlFromFilters(Dictionary<string, int> filters)
-        {
-            if (filters == null) return string.Empty;
-
-            var sqlBuilder = new StringBuilder();
-
-            foreach (var key in filters.Keys)
-            {
-                if (key == CoreDataFilters.AreaTypeId)
-                {
-                    sqlBuilder.Append(" AND AreaCode IN (SELECT areacode FROM l_areas where areatypeId = " + filters[key] + ")");
-                }
-                else
-                {
-                    sqlBuilder.Append(" AND " + key + " = " + filters[key]);
-                }
-            }
-            return sqlBuilder.ToString();
         }
     }
 }

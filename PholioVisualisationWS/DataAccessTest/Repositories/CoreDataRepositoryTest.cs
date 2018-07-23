@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.PholioObjects;
-using StructureMap.Diagnostics;
+//using StructureMap.Diagnostics;
 
 namespace PholioVisualisation.DataAccessTest.Repositories
 {

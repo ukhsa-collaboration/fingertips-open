@@ -20,7 +20,7 @@ namespace PholioVisualisation.SearchIndexingTest
         [TestMethod]
         public void TestBuildIndicatorSearchIndex()
         {
-            var builder = new IndicatorSearchIndexBuilder(ApplicationConfiguration.SearchIndexDirectory);
+            var builder = new IndicatorSearchIndexBuilder(ApplicationConfiguration.Instance.SearchIndexDirectory);
             SearchIndexingTestHelper.BuildIndexesThenCheckIndexFolderExists(builder,
                 IndicatorSearchIndexBuilder.DirectoryIndicators);
         }

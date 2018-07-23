@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
-                   assembly="Profiles.DomainObjects"
-                   namespace="Profiles.DomainObjects">
+                   assembly="IndicatorsUI.DomainObjects"
+                   namespace="IndicatorsUI.DomainObjects">
 
   <!-- ProfileDetails class -->
   <class name="ProfileDetails" table="UI_Profiles">
@@ -24,7 +24,7 @@
     <property name="SkinId" column="skin_id"/>
     <property name="HasOwnFrontPage" column="has_own_front_page"/>
     <property name="ProfileCollectionIdsString" column="lead_profile_for_collection_ids"/>
-    
+
     <property name="ShowDataQuality" column="show_data_quality"/>
     <property name="IsNational" column="is_national"/>
     <property name="HasRecentTrends" column="has_trend_markers"/>
@@ -39,8 +39,8 @@
     <property name="IsChangeFromPreviousPeriodShown" column="is_change_from_previous_period_shown"/>
 
     <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
-    <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/> 
-    
+    <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/>
+
   </class>
 
   <!-- Domain class -->
@@ -48,12 +48,12 @@
 
     <id name="GroupId" column="groupid" type="int" unsaved-value="-1">
     </id>
-    
+
     <property name="Number" column="Sequence"/>
     <property name="SubHeading" column="GroupName"/>
     <property name="Tooltip" column="Tooltip"/>
     <property name="ProfileId" column="ProfileId"/>
-    
+
   </class>
 
   <!-- ProfileCollection class -->
@@ -61,10 +61,10 @@
 
     <id name="Id" column="id" type="int" unsaved-value="-1">
     </id>
-    
+
     <property name="CollectionName" column="collectionname"/>
     <property name="CollectionSkinTitle" column="collectionskintitle"/>
-    
+
   </class>
 
   <!-- Profiles collection items class -->
@@ -72,7 +72,7 @@
 
     <id name="Id" column="id" type="int" unsaved-value="-1">
     </id>
-    
+
     <property name="ProfileCollectionId" column="profilecollectionid"/>
     <property name="ProfileId" column="profileid"/>
     <property name="DisplayDomains" column="displaydomains"/>
@@ -97,7 +97,7 @@
 
     <id name="Id" column="id" type="int" unsaved-value="-1">
     </id>
-    
+
     <property name="SkinId" column="skinid"/>
     <property name="ProfileCollectionId" column="profilecollectionid"/>
   </class>
@@ -116,7 +116,6 @@
     <property name="Title" column="title"/>
     <property name="TestHost" column="test_host"/>
     <property name="LiveHost" column="live_host"/>
-    <property name="AccessControlGroup" column="access_control_group"/>
 
   </class>
 
@@ -142,7 +141,11 @@
     <property name="ExtraJsFiles" column="extrajsfiles"/>
     <property name="Title" column="title"/>
     <property name="DomainsToDisplay" column="domainstodisplay"/>
-    
+    <property name="ShowCallOutBoxPopulation" column="showcalloutboxpopulation"/>
+    <property name="ShowRankingInfoBox1" column="showrankinginfobox1"/>
+    <property name="ShowRankingInfoBox2" column="showrankinginfobox2"/>
+    <property name="ShowQuintilesLegend" column="showquintileslegend"/>
+
     <many-to-one name="SupportingProfileDetails" column="supportingprofileid" lazy="false"/>
   </class>
 
@@ -167,22 +170,22 @@
     <id name="Id" column="id" type="int" unsaved-value="-1">
       <generator class="identity"/>
     </id>
-    <property name ="ProfileId"       column="profileid"/>
-    <property name ="NeighbourTypeId" column="neighbourtypeid" />    
-    <property name ="AreaTypeId"      column="areatypeid" />
+    <property name="ProfileId" column="profileid"/>
+    <property name="NeighbourTypeId" column="neighbourtypeid" />
+    <property name="AreaTypeId" column="areatypeid" />
   </class>
 
   <class name="NeighbourType" table="l_areacodeneighbourtypes">
     <id name="NeighbourTypeId" column="neighbourtypeid" type="int" unsaved-value="-1">
       <generator class="identity"/>
     </id>
-    <property name ="Name"      column="name" />
-    <property name ="Description"      column="description" />
-    <property name ="LinkText"      column="linktext" />
-    <property name ="SelectedText"      column="selectedtext" />
-    <property name ="ExtraLink"      column="extralink" />
+    <property name="Name" column="name" />
+    <property name="Description" column="description" />
+    <property name="LinkText" column="linktext" />
+    <property name="SelectedText" column="selectedtext" />
+    <property name="ExtraLink" column="extralink" />
   </class>
-    
+
 </hibernate-mapping>
 
 

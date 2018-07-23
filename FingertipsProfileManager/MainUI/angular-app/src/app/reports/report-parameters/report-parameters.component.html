@@ -1,0 +1,32 @@
+<div class="form-group">
+    <label for="newParameter" class="control-label col-xs-2">Parameter</label>
+    <div class="col-xs-4">
+        <select class="form-control" [(ngModel)]="selectedParameter">
+                    <option *ngFor="let parameter of parameters" [value]="parameter">{{parameter}}</option>
+        </select>
+    </div>
+    <div>
+        <button class="btn" (click)="addParameter()">Add</button>
+    </div>
+</div>
+<!-- Parameters for the report -->
+<div class="row col-md-offset-2">
+    <div *ngIf="selectedParameters?.length > 0">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        List of parameters
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let parameter of selectedParameters; let i = index">
+                    <td>{{parameter}}</td>
+                    <td><button (click)="removeParameter(i)" class="btn btn-danger">Remove</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

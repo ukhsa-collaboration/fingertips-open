@@ -6,6 +6,5 @@
         public int ParentAreaTypeId;
         public int ChildAreaTypeId;
         public int ProfileId;
-        public bool IncludeSortableTimePeriod;
     }
 }

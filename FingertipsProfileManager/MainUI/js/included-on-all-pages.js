@@ -141,24 +141,26 @@ function initTableSorter() {
 
 function registerReloadPopUpDomains() {
     $(document).on('change', '#selectedProfileId', function () {
-
-        setCopyMetadataOption();
-        var selectedDomain = $('#selectedDomainId');
+        var $domainMenu = $('#selectedDomainId');
 
         $.ajax({
             type: "post",
             url: "/reloadDomains",
             data: { selectedProfile: $('#selectedProfileId').val() },
             success: function (data) {
-                selectedDomain.empty();
-                selectedDomain.addClass('dropdown-not-selected');
-                $.each(data, function (key, value) {
-                    selectedDomain.append($('<option value="' + value.Text + '"></option>').val(value.Value).html(value.Text));
-                });
+                repopulateDomainMenu($domainMenu, data);
             },
             error: function (xhr, error) {
             }
         });
+    });
+}
+
+function repopulateDomainMenu($menu, domains) {
+    $menu.empty();
+    $menu.addClass('dropdown-not-selected');
+    $.each(domains, function (key, value) {
+        $menu.append($('<option value="' + value.Text + '"></option>').val(value.Value).html(value.Text));
     });
 }
 
@@ -201,22 +203,12 @@ function setUrl(url) {
     location.href = url;
 }
 
-function setCopyMetadataOption() {
-    var copyFromProfile = $('#selectedProfile').val();
-    var copyToProfile = $('#selectedProfileId').val();    
-    var copyToDomainId = $('#selectedDomainId').val();
-    var copyToAreaTypeId = $('#selectedAreaTypeId').val();
-    
-    if (copyFromProfile !== copyToProfile) {
+function setCopyIndicatorDetails() {
 
-        $('#targetProfile').val(copyToProfile +  '~' + copyToDomainId + '~' + copyToAreaTypeId);
-
-        $('#copyIndicatorMetadataOptions').show();
-        $('#copyMetadataOption').prop('checked', true);
-    } else {
-        $('#copyIndicatorMetadataOptions').hide();
-        $('#copyMetadataOption').prop('checked', false);        
-    } 
+    // Target details
+    var copyToProfile = $('#selectedProfileId').val();
+    var srcDomainId = $('#selectedDomainId').val();
+    $('#targetProfile').val(copyToProfile + '~' + srcDomainId);
 }
 
 $(document).ready(function () {
@@ -248,3 +240,10 @@ $(document).ready(function () {
 function popupwindow(url, title, w, h) {
     return window.open(url, title, 'toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=no, resizable=no, copyhistory=no, width=' + w + ', height=' + h + ', top=' + top + ', left=' + left);
 }
+
+ComparatorMethodIds = {
+    Undefined : -1,
+    SuicidePlanDefined: 14,
+    Quintiles: 15,
+    Quartiles : 16
+};

@@ -4,9 +4,9 @@ using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Web;
 using System.Web.Script.Serialization;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public static class ExceptionLogger
     {

@@ -94,7 +94,7 @@ namespace PholioVisualisation.ExportTest.File
                 AreaTypeIds.PheCentreObsolete);
 
             var expectedFileName = ProfileIds.SubstanceMisuse + "-A-102-43.xlsx";
-            var expectedFilePath = Path.Combine(ApplicationConfiguration.ExportFileDirectory, expectedFileName);
+            var expectedFilePath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, expectedFileName);
             Assert.AreEqual(expectedFilePath, maker.FilePath);
         }
 

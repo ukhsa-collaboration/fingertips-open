@@ -11,23 +11,23 @@
     
     @if (Model.DeleteStatus.HasValue)
     {
-        <label class='field-validation-@(Model.DeleteStatus.Value == true ? "success" : "error")'> @Model.Message </label>
+        <label class='field-validation-@(Model.DeleteStatus.Value ? "success" : "error")'> @Model.Message </label>
     }
     else
     {
-        <h3>Rows found: @rowsFound
-        @if (Model.DataSet != null && @rowsFound > 0)
+        <h3>@rowsFound rows found 
+        @if (Model.DataSet != null && rowsFound > 0)
         {
              <span style="font-size:small" >(@rowsDisplayed displayed)</span> <br/>
         }
         </h3>  
     }
     
-    @if (@rowsFound > 0)
+    @if (rowsFound > 0)
     {
         if (Model.CanDeleteDataSet)
          {
-             <input type="button" class="btn-delete" id="btn-delete-filteredData" value="Delete @rowsFound rows" />
+             <input type="button" style="float: right;" class="btn btn-danger" id="btn-delete-filteredData" value="Delete @rowsFound rows" />
          }
          else
          {
@@ -47,16 +47,18 @@
             <th class="cell-medium">Month</th>         
             <th class="cell-small">Age<br/>Id</th>         
             <th class="cell-small">Sex<br/>Id</th>         
-            <th class="cell-large">Area<br/>Code</th>         
+            <th class="cell-area-code">Area<br/>Code</th>         
             <th class="cell-large">Count</th>         
             <th class="cell-large">Value</th>         
-            <th class="cell-large">Lower<br/>CI</th>         
-            <th class="cell-large">Upper<br/>CI</th>         
+            <th class="cell-large">Lower<br/>CI 95</th>
+            <th class="cell-large">Upper<br/>CI 95</th>
+            <th class="cell-large">Lower<br />CI 99.8</th>
+            <th class="cell-large">Upper<br />CI 99.8</th>    
             <th class="cell-large">Denom</th>         
             <th class="cell-large">Denom2</th>         
-            <th class="cell-large">Value Note<br/>Id</th>         
-            <th class="cell-medium">Cat<br/>TypeId</th>         
-            <th class="cell-medium">Cat<br/> Id</th> 
+            <th class="cell-medium">Value<br />Note<br/>Id</th>         
+            <th class="cell-medium">Cat<br/>Type<br />Id</th>         
+            <th class="cell-medium">Cat<br/>Id</th> 
             <th class='@(noScroll ? "hide" : "")'></th>        
         </tr>
     </thead>                
@@ -72,14 +74,16 @@
                     <td class="cell-medium">@data.Month</td>
                     <td class="cell-small">@data.AgeId</td>
                     <td class="cell-small">@data.SexId</td>
-                    <td class="cell-large">@data.AreaCode</td>
+                    <td class="cell-area-code">@data.AreaCode</td>
                     <td class="cell-large right-align">@data.Count.Round()</td>
                     <td class="cell-large right-align">@data.Value.Round()</td>
-                    <td class="cell-large right-align">@data.LowerCi.Round()</td>
-                    <td class="cell-large right-align">@data.UpperCi.Round()</td>
+                    <td class="cell-large right-align">@CoreDataSetFormatter.Format(data.LowerCI95)</td>
+                    <td class="cell-large right-align">@CoreDataSetFormatter.Format(data.UpperCI95)</td>
+                    <td class="cell-large right-align">@CoreDataSetFormatter.Format(data.LowerCI99_8)</td>
+                    <td class="cell-large right-align">@CoreDataSetFormatter.Format(data.UpperCI99_8)</td>
                     <td class="cell-large right-align">@data.Denominator.Round()</td>
                     <td class="cell-large right-align">@data.Denominator_2.Round()</td>
-                    <td class="cell-large">@data.ValueNoteId</td>
+                    <td class="cell-medium">@data.ValueNoteId</td>
                     <td class="cell-medium">@data.CategoryTypeId</td>
                     <td class="cell-medium">@data.CategoryId</td>
                    <td class='@(noScroll ? "hide" : "")'></td>

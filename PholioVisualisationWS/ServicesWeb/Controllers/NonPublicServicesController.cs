@@ -1,9 +1,16 @@
 ﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.ServiceActions;
 using System;
+using System.Collections.Generic;
 using System.Web.Http;
+using AutoMapper;
+using PholioVisualisation.DataAccess.Repositories;
+using PholioVisualisation.DataConstruction;
+using PholioVisualisation.PholioObjects;
+using PholioVisualisation.Services;
+using PholioVisualisation.UserData.IndicatorLists;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     /// <summary>
     /// Services that are used by Fingertips or Longer Lives but should not be included
@@ -32,17 +39,20 @@ namespace ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a Chimat resource ID for a given area and profile
+        /// Gets the blue / green status of all deployment components
         /// </summary>
-        /// <param name="area_code">Area code</param>
-        /// <param name="profile_id">Profile ID</param>
         [HttpGet]
-        [Route("area/chimat_resource_id")]
-        public int GetChimatResourceId(string area_code, int profile_id)
+        [Route("internal/blue-green-status")]
+        public DeploymentStatus GetBlueGreenStatus()
         {
             try
             {
-                return ReaderFactory.GetAreasReader().GetChimatResourceId(area_code, profile_id);
+                if (ApplicationConfiguration.Instance.IsEnvironmentLive)
+                {
+                    return new DeploymentStatusProvider(ApplicationConfiguration.Instance,
+                        new ConnectionStringsWrapper(), new DatabaseLogRepository()).GetDeploymentStatus();
+                }
+                return null;
             }
             catch (Exception ex)
             {
@@ -70,7 +80,103 @@ namespace ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
+                throw;
+            }
+        }
 
+        /// <summary>
+        /// Gets all the indicator IDs of an indicator list for each area type
+        /// </summary>
+        /// <param name="indicator_list_id">Indicator list ID</param>
+        [HttpGet]
+        [Route("indicator-list/indicators-for-each-area-type")]
+        public object GetIndicatorsByAreaTypeForIndicatorList(string indicator_list_id)
+        {
+            try
+            {
+                // Init dependencies
+                var groupDataReader = ReaderFactory.GetGroupDataReader();
+                var profileReader = ReaderFactory.GetProfileReader();
+                var areaTypeListProvider =
+                    new AreaTypeListProvider(new GroupIdProvider(profileReader), ReaderFactory.GetAreasReader(), groupDataReader);
+                var groupingListProvider = new GroupingListProvider(groupDataReader, profileReader);
+                var indicatorsWithDataByAreaTypeBuilder = new IndicatorsWithDataByAreaTypeBuilder(groupDataReader, groupingListProvider);
+
+                // Get data
+                var indicatorIds = new IndicatorListRepository().GetIndicatorIdsInIndicatorList(indicator_list_id);
+                var profileIds = profileReader.GetAllProfileIds();
+                var areaTypes = areaTypeListProvider.GetSupportedAreaTypes();
+
+                return indicatorsWithDataByAreaTypeBuilder.GetDictionaryOfAreaTypeToIndicatorIds(areaTypes, indicatorIds, profileIds);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        [HttpGet]
+        [Route("indicator-list")]
+        public object GetIndicatorList(string id)
+        {
+            try
+            {
+                var pholioReader = ReaderFactory.GetPholioReader();
+
+                var listVm = new IndicatorListProvider(new IndicatorListRepository(),
+                    pholioReader, new IndicatorMetadataRepository())
+                    .GetIndicatorList(id);
+                return listVm;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Gets the most recent data for a list of indicator IDs
+        /// </summary>
+        /// <param name="indicator_list_id">Indicator list ID</param>
+        /// <param name="area_type_id">Area type ID</param>
+        /// <param name="parent_area_code">Parent area code</param>
+        [HttpGet]
+        [Route("latest_data/indicator_list_for_child_areas")]
+        public IList<GroupRoot> GetGroupDataAtDataPointForIndicatorList(string indicator_list_id,
+            int area_type_id, string parent_area_code)
+        {
+            try
+            {
+                var listId = indicator_list_id;
+
+                var comparatorMap = DataController.GetComparatorMapForParentArea(area_type_id, parent_area_code);
+
+                var singleGroupingProvider = new SingleGroupingProvider(ReaderFactory.GetGroupDataReader(), null);
+                var builder = new GroupDataBuilderByIndicatorList(new IndicatorListRepository(), singleGroupingProvider)
+                {
+                    ProfileId = ProfileIds.Undefined,
+                    IndicatorListPublicId = listId,
+                    ComparatorMap = comparatorMap,
+                    ChildAreaTypeId = area_type_id
+                };
+
+                var roots = new JsonBuilderGroupDataAtDataPointBySearch(builder).GetGroupRoots();
+
+                // User may have selected from multiple age/sex categories so need to display 
+                foreach (var groupRoot in roots)
+                {
+                    groupRoot.StateSex = true;
+                    groupRoot.StateAge = true;
+                }
+
+                return roots;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
                 throw;
             }
         }

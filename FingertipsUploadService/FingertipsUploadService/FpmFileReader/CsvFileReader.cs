@@ -1,42 +1,37 @@
 ﻿using FingertipsUploadService.Helpers;
 using FingertipsUploadService.Upload;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 
 namespace FingertipsUploadService.FpmFileReader
 {
-    public class CsvFileReader : IUploadFileReader
+    public class CsvFileReader : IUploadFileReader, IDisposable
     {
-        private readonly StreamReader _streamReader;
+        private StreamReader _streamReader;
 
-        public CsvFileReader(string csvfile)
+        public CsvFileReader(string filePath)
         {
-            _streamReader = new StreamReader(csvfile);
+            _streamReader = new StreamReader(filePath);
         }
 
         public List<string> GetWorksheets()
         {
-            return new List<string> { WorksheetNames.BatchPholio };
+            return new List<string> { WorksheetNames.Pholio };
         }
 
-        public DataTable GetIndicatorDetails()
+
+        public DataTable ReadData()
         {
-            // We don't need to implement as CSV files are not supported for 
-            // single uploadsw
-            throw new System.NotImplementedException();
+            return new CsvStreamReader().Read(_streamReader);
         }
 
-        public DataTable GetPholioData()
-        {
-            // We don't need to implement as CSV files are not supported for 
-            // single uploadsw
-            throw new System.NotImplementedException();
-        }
 
-        public DataTable GetBatchData()
+        public void Dispose()
         {
-            return new CsvRowParser().Parse(_streamReader);
+            _streamReader.Close();
+            _streamReader = null;
         }
     }
 

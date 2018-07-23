@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class SkinProfileCollection
     {

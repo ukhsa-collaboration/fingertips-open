@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.Export</RootNamespace>
     <AssemblyName>PholioVisualisation.Export</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -35,24 +35,16 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+      <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="SpreadsheetGear, Version=6.0.3.222, Culture=neutral, PublicKeyToken=39c186f5904944ec, processorArchitecture=MSIL">
       <HintPath>..\lib\SpreadsheetGear.dll</HintPath>
-    </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -78,7 +70,6 @@
     <Compile Include="ExcelFileBuilder.cs" />
     <Compile Include="ExcelFileWriter.cs" />
     <Compile Include="ExcelHelper.cs" />
-    <Compile Include="ExportDIRegistry.cs" />
     <Compile Include="File\ExportFileManager.cs" />
     <Compile Include="File\FileBuilder.cs" />
     <Compile Include="File\CacheFileNamer.cs" />
@@ -109,7 +100,7 @@
       <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>
       <Name>Analysis</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+    <ProjectReference Include="..\DataSorting\DataSorting.csproj">
       <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
       <Name>DataSorting</Name>
     </ProjectReference>
@@ -135,6 +126,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="Export.cd" />
     <None Include="packages.config" />
   </ItemGroup>

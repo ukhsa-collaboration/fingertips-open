@@ -24,9 +24,9 @@ function getIndicatorSpecifyingData(selectedIndicators) {
     return {
         jdata: selectedIndicators,
         selectedProfileUrlkey: $profile.val(),
-            selectedProfileName: $profile.find(':selected')[0].text,
-            selectedDomainId: $domain.val(),
-            selectedDomainName: $domain.find(':selected')[0].text,
+        selectedProfileName: $profile.find(':selected')[0].text,
+        selectedDomainId: $domain.val(),
+        selectedDomainName: $domain.find(':selected')[0].text,
         selectedAreaTypeId: $('#SelectedAreaTypeId').val()
     };
 }
@@ -48,7 +48,6 @@ $(document).ready(function () {
     // When user clicks Confirm in the copy indicators dialogue
     $(document).on('click', '#ConfirmCopy', function () {
         loading();
-        var c = getIndicatorKeys();
         $('#indicatorTransferDetails').val(getIndicatorKeys());
         $('form#CopyIndicatorForm').submit();
     });
@@ -68,7 +67,9 @@ $(document).ready(function () {
     $('#resetArea').val('False');
 
     $('#selectedProfile').change(function () {
-        $('#selectedDomain')[0].selectedIndex = 0;
+        if ($('#selectedDomain').length > 0) {
+            $('#selectedDomain')[0].selectedIndex = 0;
+        }
         $('#sortBy').val('Sequence');
         $('#ascending').val('True');
         $('#resetArea').val('True');
@@ -104,7 +105,7 @@ $(document).ready(function () {
     });
 
     $('#edit_Domains').click(function () {
-        lightbox.show($('#editDomains').html(), 250, 300, 600);
+        lightbox.show($('#editDomains').html(), 250, 0, 700);
 
         $('.unselected-domain').hover(function () {
             if (!$(this).hasClass('selected-domain')) {
@@ -270,7 +271,27 @@ $(document).ready(function () {
         viewIndicatorData(indicatorId, indicatorName);
     });
 
+    registerCopyDomains();
 });
+
+function registerCopyDomains() {
+    var profileMenuId = '#TargetProfileUrlKey';
+
+    $(document).on('change', profileMenuId, function () {
+        var $domainMenu = $('#TargetGroupId');
+
+        $.ajax({
+            type: "post",
+            url: "/reloadDomains",
+            data: { selectedProfile: $(profileMenuId).val() },
+            success: function (data) {
+                repopulateDomainMenu($domainMenu, data);
+            },
+            error: function (xhr, error) {
+            }
+        });
+    });
+}
 
 function initLaterDataLinks() {
     // Highlight when later data is available
@@ -309,7 +330,7 @@ function initLaterDataLinks() {
 }
 
 function indicatorAction(ajaxAction, popupId, action) {
-    var selectedIndicators = [] ;
+    var selectedIndicators = [];
 
     $('.indicator-check-box:checked').each(function () {
         selectedIndicators.push($(this).val());
@@ -339,7 +360,4 @@ function indicatorAction(ajaxAction, popupId, action) {
         showSimpleMessagePopUp('Please select some indicators to ' + action);
     }
 }
-
-
-
 

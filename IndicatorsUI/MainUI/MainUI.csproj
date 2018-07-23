@@ -12,9 +12,9 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Profiles.MainUI</RootNamespace>
-    <AssemblyName>Profiles.MainUI</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <RootNamespace>IndicatorsUI.MainUI</RootNamespace>
+    <AssemblyName>IndicatorsUI.MainUI</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <FileUpgradeFlags>
@@ -56,26 +56,70 @@
       <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.2.2.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.2.2\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Hammock.ClientProfile, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c148cfba29ed1a4d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Hammock.ClientProfile.dll</HintPath>
     </Reference>
-    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
-      <HintPath>..\packages\Iesi.Collections.4.0.1.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.3\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\lib\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="JWT, Version=1.3.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\JWT.1.3.4\lib\3.5\JWT.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Core, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Core.2.2.1\lib\net45\Microsoft.AspNet.Identity.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.EntityFramework, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.EntityFramework.2.2.1\lib\net45\Microsoft.AspNet.Identity.EntityFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.Identity.Owin, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.Identity.Owin.2.2.1\lib\net45\Microsoft.AspNet.Identity.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.3.1.0\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Host.SystemWeb, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Host.SystemWeb.3.1.0\lib\net45\Microsoft.Owin.Host.SystemWeb.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.3.1.0\lib\net45\Microsoft.Owin.Security.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Owin.Security.Cookies, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.Cookies.3.1.0\lib\net45\Microsoft.Owin.Security.Cookies.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.Owin.Security.OAuth, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Owin.Security.OAuth.3.1.0\lib\net45\Microsoft.Owin.Security.OAuth.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.ReportViewer.WebForms, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <HintPath>..\packages\MicosoftReportViewerWebForms_v11.1.0.1\lib\Microsoft.ReportViewer.WebForms.DLL</HintPath>
       <Private>True</Private>
@@ -84,16 +128,23 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Caches.SysCache, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=6876f2ea66c9f443, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.Caches.SysCache.4.0.0.4000\lib\net40\NHibernate.Caches.SysCache.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ReportViewerForMvc, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ReportViewerForMvc.1.0.1\lib\net45\ReportViewerForMvc.dll</HintPath>
+    <Reference Include="Notify, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Notify.1.2.0\lib\net452\Notify.dll</HintPath>
+    </Reference>
+    <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
+      <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Svg">
@@ -104,6 +155,7 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -151,22 +203,52 @@
     <Reference Include="TweetSharp">
       <HintPath>..\lib\TweetSharp.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.Abstractions, Version=3.1.3.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Abstractions.3.1.3\lib\net45\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.5.6.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Container.5.5.6\lib\net45\Unity.Container.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Mvc, Version=5.0.12.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Mvc.5.0.12\lib\net45\Unity.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActionFilters\MultipleButtonAttribute.cs" />
     <Compile Include="App_Start\AutoMapperConfig.cs" />
+    <Compile Include="App_Start\UnityConfig.cs" />
+    <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Controllers\UserFeedbackController.cs" />
+    <Compile Include="Helpers\AreaSearchHelper.cs" />
+    <Compile Include="Helpers\EmailSender.cs" />
+    <Compile Include="Helpers\IdentityWrapper.cs" />
+    <Compile Include="Configuration\IndicatorListMappingProfile.cs" />
+    <Compile Include="Controllers\HtmlController.cs" />
+    <Compile Include="Controllers\IndicatorListController.cs" />
+    <Compile Include="Controllers\UserAccountController.cs" />
     <Compile Include="Controllers\RedirectController.cs" />
     <Compile Include="Controllers\SsrsController.cs" />
     <Compile Include="Controllers\SwaggerBridgeController.cs" />
     <Compile Include="Helpers\AjaxUrl.cs" />
     <Compile Include="Helpers\ContentProvider.cs" />
+    <Compile Include="Helpers\ExceptionLoggerWrapper.cs" />
     <Compile Include="Helpers\NearestNeighbourHelper.cs" />
+    <Compile Include="Helpers\PublicIdGenerator.cs" />
+    <Compile Include="Helpers\QuartilesLabelHelper.cs" />
+    <Compile Include="Helpers\ResponseHelper.cs" />
     <Compile Include="Helpers\SpineChartMinMaxLabelBuilder.cs" />
     <Compile Include="Controllers\AreaSearchController.cs" />
-    <Compile Include="Filters\CheckUserCanAccessSkin.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Caching\CachePolicyHelper.cs" />
@@ -174,16 +256,15 @@
     <Compile Include="Caching\FingertipsOutputCache.cs" />
     <Compile Include="Caching\JsonCache.cs" />
     <Compile Include="Helpers\AccessControlHelper.cs" />
-    <Compile Include="Helpers\BrowserHelper.cs" />
     <Compile Include="Helpers\ColumnAssigner.cs" />
     <Compile Include="Helpers\ProfileCollectionProvider.cs" />
     <Compile Include="Helpers\ContactUs.cs" />
     <Compile Include="Helpers\ContentHelper.cs" />
     <Compile Include="Helpers\RowAssigner.cs" />
     <Compile Include="Helpers\ExceptionLogger.cs" />
-    <Compile Include="Helpers\SsrsHelper.cs" />
     <Compile Include="Helpers\SupportingPage.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
+    <Compile Include="Helpers\UserAccountHelper.cs" />
     <Compile Include="Helpers\UserDetails.cs" />
     <Compile Include="Helpers\VerticalText.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -201,7 +282,21 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\WebServiceHelper.cs" />
     <Compile Include="Models\PageType.cs" />
+    <Compile Include="Models\UserAccess\ForgotPasswordViewModel.cs" />
+    <Compile Include="Models\UserAccess\LoginViewModel.cs" />
+    <Compile Include="Models\UserAccess\PageMessageViewModel.cs" />
+    <Compile Include="Models\UserAccess\RegisterViewModel.cs" />
+    <Compile Include="Models\UserAccess\ResetPasswordViewModel.cs" />
+    <Compile Include="Models\UserAccess\TaskResult.cs" />
+    <Compile Include="Models\UserAccess\UserViewModel.cs" />
+    <Compile Include="Models\UserList\IndicatorListItemViewModel.cs" />
+    <Compile Include="Models\UserList\IndicatorListPageViewModel.cs" />
+    <Compile Include="Models\UserList\IndicatorListsViewModel.cs" />
+    <Compile Include="Models\UserList\IndicatorListViewModel.cs" />
+    <Compile Include="Models\UserList\ViewIndicatorListViewModel.cs" />
+    <Compile Include="OWIN\Startup.cs" />
     <Compile Include="Models\SearchLabels.cs" />
     <Compile Include="Models\TitleFont.cs" />
     <Compile Include="Models\Error.cs" />
@@ -216,7 +311,6 @@
     <Compile Include="Models\PageModel.cs" />
     <Compile Include="Models\PageOption.cs" />
     <Compile Include="Models\ParentDisplay.cs" />
-    <Compile Include="Models\PhofBody.cs" />
     <Compile Include="Models\PhofHeadings.cs" />
     <Compile Include="Models\StartButton.cs" />
     <Compile Include="Models\YearRange.cs" />
@@ -231,17 +325,18 @@
     <Content Include="css\AreaSearch\area-search.css" />
     <Content Include="css\common.css" />
     <Content Include="css\core-contentpages.css" />
-    <Content Include="css\fingertips.css" />
+    <Content Include="css\font-awesome.min.css" />
+    <Content Include="css\govuk-gds-elements-styles.css" />
+    <Content Include="css\IndicatorList\indicator-list-edit.css" />
+    <Content Include="css\IndicatorList\indicator-list-index.css" />
     <Content Include="css\jquery-ui-1.10.1.css" />
     <Content Include="css\longer-lives-diabetes.css" />
+    <Content Include="css\PageMap.css" />
     <Content Include="css\twitter.css" />
-    <Content Include="css\leaflet.css" />
     <Content Include="css\longer-lives-main.css" />
     <Content Include="css\longer-lives-map.css" />
-    <Content Include="css\PageMap.css" />
     <Content Include="css\phof.css" />
-    <Content Include="css\practice-profiles.css" />
-    <Content Include="gulpfile.js" />
+    <Content Include="css\Login\login.css" />
     <Content Include="images\basemaps.jpg" />
     <Content Include="images\box-plot-label-id-3.png" />
     <Content Include="images\circle_quintile1_medium.png" />
@@ -259,6 +354,7 @@
     <Content Include="images\header-low.png" />
     <Content Include="images\image-icon.png" />
     <Content Include="images\image-video\introduction-fingertips-tool.png" />
+    <Content Include="images\image-video\phof-video.png" />
     <Content Include="images\image-video\play_large.png" />
     <Content Include="images\latest-news\suicide-prevention.png" />
     <Content Include="images\map_width.png" />
@@ -313,9 +409,6 @@
     <Content Include="images\Mortality\twitter_corner.png" />
     <Content Include="css\longer-lives-normalize.css" />
     <Content Include="css\core-allpages.css" />
-    <Content Include="fonts\transportnewheavy-webfont.svg" />
-    <Content Include="fonts\transportnewlight-webfont.svg" />
-    <Content Include="fonts\transportnewmedium-webfont.svg" />
     <Content Include="Global.asax" />
     <Content Include="css\core-datapage.css" />
     <Content Include="images\department_logo.gif" />
@@ -358,7 +451,7 @@
     <Content Include="images\Mortality\ProfJohnNewton.jpg" />
     <Content Include="images\Mortality\promoCorner%402x.png" />
     <Content Include="images\Mortality\promoCorner.png" />
-    <Content Include="images\Mortality\ranking_icons.png" />
+    <Content Include="images\Mortality\ranking_icons-v1.png" />
     <Content Include="images\Mortality\search%402x.png" />
     <Content Include="images\Mortality\search.png" />
     <Content Include="images\opacity.jpg" />
@@ -403,6 +496,9 @@
     <Content Include="js\common.js" />
     <Content Include="js\EnvironmentTest.js" />
     <Content Include="js\fingertipsGlobal.js" />
+    <Content Include="js\Indicatorlist\indicator-list-edit.js" />
+    <Content Include="js\Indicatorlist\indicator-list-index.js" />
+    <Content Include="js\Indicatorlist\indicator-list-view.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaDetails.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesAreaSearchResults.js" />
     <Content Include="js\LongerLives\Diabetes\CallOutBox.js" />
@@ -411,7 +507,7 @@
     <Content Include="js\LongerLives\PageBaseLongerLivesHome.js" />
     <Content Include="js\PageBoxPlots.js" />
     <Content Include="js\PageEngland.js" />
-    <Content Include="js\PageMap.js" />
+    <Content Include="js\PageMetadata.js" />
     <Content Include="js\PagePopulationNew.js" />
     <Content Include="js\PageReports.js" />
     <Content Include="js\PageScatterPlot.js" />
@@ -429,50 +525,33 @@
     <Content Include="js\PageBarChart.js" />
     <Content Include="js\PageDownload.js" />
     <Content Include="js\PageInequalities.js" />
-    <Content Include="js\PageMapNew.js" />
-    <Content Include="js\PageMetadata.js" />
+    <Content Include="js\PageMap.js" />
     <Content Include="js\LongerLives\Mortality\PageMortalityAreaDetails.js" />
     <Content Include="js\LongerLives\Mortality\PageMortalityHome.js" />
     <Content Include="js\LongerLives\Mortality\PageMortalityIntervention.js" />
     <Content Include="js\LongerLives\Mortality\PageMortalityRankings.js" />
-    <Content Include="js\PagePopulation.js" />
-    <Content Include="js\PagePracticeBarChart.js" />
-    <Content Include="js\PagePracticeSearch.js" />
-    <Content Include="js\PagePracticeSpineChart.js" />
-    <Content Include="js\PagePracticeTrends.js" />
-    <Content Include="js\PageScatter.js" />
     <Content Include="js\PageTartanRug.js" />
     <Content Include="js\pholio-constants.js" />
-    <Content Include="js\practice-profiles-ie8.js" />
     <Content Include="js\TooltipRecentTrends.js" />
     <Content Include="js\SiteKeyIndicators.js" />
     <Content Include="js\LongerLives\Mortality\SiteMortality.js" />
-    <Content Include="js\SitePracticeProfiles.js" />
     <Content Include="js\SiteSearch.js" />
     <Content Include="js\spineChart.js" />
     <Content Include="js\TestPage.js" />
     <Content Include="js\tooltip.js" />
-    <Content Include="ReportViewerWebForm.aspx" />
     <Content Include="Views\Search\Data.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Shared\AreaMenu.cshtml" />
+    <Content Include="Views\Shared\_AreaMenu.cshtml" />
     <Content Include="bower.json" />
     <Content Include=".bowerrc" />
-    <None Include="Controllers\Controllers.cd" />
+    <None Include=".bin\bower.cmd" />
+    <None Include=".bin\git.cmd" />
+    <None Include=".bin\node.cmd" />
     <Content Include="Views\LongerLives\Mortality\_MortalityLayoutPage.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityHome.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityRankings.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityConnect.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityAreaDetails.cshtml" />
-    <Content Include="fonts\transportnewheavy-webfont.eot" />
-    <Content Include="fonts\transportnewheavy-webfont.ttf" />
-    <Content Include="fonts\transportnewheavy-webfont.woff" />
-    <Content Include="fonts\transportnewlight-webfont.eot" />
-    <Content Include="fonts\transportnewlight-webfont.ttf" />
-    <Content Include="fonts\transportnewlight-webfont.woff" />
-    <Content Include="fonts\transportnewmedium-webfont.eot" />
-    <Content Include="fonts\transportnewmedium-webfont.ttf" />
-    <Content Include="fonts\transportnewmedium-webfont.woff" />
     <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventioncancer.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionheart_disease_and_stroke.cshtml" />
     <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionliver_disease.cshtml" />
@@ -488,31 +567,17 @@
     <Content Include="Views\LongerLives\PolicyCookies.cshtml" />
     <Content Include="Views\LongerLives\PolicyAccessibility.cshtml" />
     <Content Include="Views\LongerLives\_CampaignLink.cshtml" />
-    <Content Include="Views\Search\_SearchSpecificJavaScript.cshtml" />
+    <Content Include="Views\Search\_JavaScriptForSearch.cshtml" />
     <Content Include="jsTest\jasmine-1.3.1\MIT.LICENSE" />
-    <Content Include="Views\Shared\AreaTypeMenu.cshtml" />
-    <Content Include="Views\MidlandsAndEast\_PageLinks.cshtml" />
-    <Content Include="Views\MidlandsAndEast\SiteFooter.cshtml" />
-    <Content Include="Views\PracticeProfiles\FrontPage.cshtml" />
-    <Content Include="Views\PracticeProfiles\SiteFooter.cshtml" />
-    <Content Include="Views\PracticeProfiles\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
-    <Content Include="Views\PracticeProfiles\Data.cshtml" />
-    <Content Include="Views\PracticeProfiles\_IE8.cshtml" />
-    <Content Include="Views\ProfileCollectionWithFrontPage\SiteFooter.cshtml" />
+    <Content Include="Views\Shared\_AreaTypeMenu.cshtml" />
+    <Content Include="Views\FingertipsLandingPage\_PageLinks.cshtml" />
+    <Content Include="Views\FingertipsLandingPage\_SiteFooter.cshtml" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\_SiteFooter.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\Data.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\FrontPage.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\_PageLinks.cshtml" />
-    <Content Include="Views\ProfileCollectionWithFrontPage\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
-    <Content Include="Views\PracticeProfiles\_PageLinks.cshtml" />
-    <Content Include="Views\Phof\_PageLinks.cshtml" />
-    <Content Include="Views\Phof\ContactUs.cshtml" />
-    <Content Include="Views\Phof\Faqs.cshtml" />
     <Content Include="Views\Phof\FrontPage.cshtml" />
-    <Content Include="Views\Phof\FurtherInfo.cshtml" />
-    <Content Include="Views\Phof\SiteFooter.cshtml" />
     <Content Include="Views\Phof\_PhofDomains.cshtml" />
-    <Content Include="Views\Phof\_SkinSpecificJavaScriptAndCssForContentPages.cshtml" />
-    <Content Include="Views\Phof\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\LongerLives\Diabetes\DiabetesHome.cshtml" />
     <Content Include="Views\LongerLives\Diabetes\_DiabetesLayoutPage.cshtml" />
     <Content Include="Views\LongerLives\_DiabetesHeader.cshtml" />
@@ -537,39 +602,60 @@
     <Content Include="Views\LongerLives\Diabetes\_MapLegend.cshtml" />
     <Content Include="Views\LongerLives\_LegendInlineBob.cshtml" />
     <Content Include="Views\Shared\_DomainTooltipIcon.cshtml" />
-    <Content Include="Views\LongerLives\_ViewSimliar.cshtml" />
+    <Content Include="Views\LongerLives\_ViewSimilar.cshtml" />
     <Content Include="Views\Search\SearchNotAvailable.cshtml" />
     <Content Include="Views\Shared\_PracticeProfilesDomainCollection.cshtml" />
-    <Content Include="packages.config" />
-    <Content Include="Views\Phof\Data.cshtml" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\AreaSearch\AreaSearchResults.cshtml" />
     <Content Include="Views\AreaSearch\_IntroductionAreaSearch.cshtml" />
-    <Content Include="Views\MidlandsAndEast\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\LongerLives\_MentalHealthLink.cshtml" />
     <Content Include="proxy.conf.json" />
-    <None Include="Views\Shared\Banner.cshtml" />
-    <Content Include="Views\Shared\KeyBarChart.cshtml" />
+    <Content Include="fonts\fontawesome-webfont.eot" />
+    <Content Include="fonts\fontawesome-webfont.woff" />
+    <Content Include="fonts\fontawesome-webfont.ttf" />
+    <Content Include="fonts\fontawesome-webfont.woff2" />
+    <Content Include="Views\UserAccount\Login.cshtml" />
+    <Content Include="Views\UserAccount\Registration.cshtml" />
+    <Content Include="Views\UserAccount\Thankyou.cshtml" />
+    <Content Include="Views\IndicatorList\IndicatorListIndex.cshtml" />
+    <Content Include="Views\UserAccount\ResetPassword.cshtml" />
+    <Content Include="Views\UserAccount\Message.cshtml" />
+    <Content Include="Views\UserAccount\EditMyAccount.cshtml" />
+    <Content Include="Views\IndicatorList\CreateIndicatorList.cshtml" />
+    <Content Include="Views\IndicatorList\ViewIndicatorList.cshtml" />
+    <Content Include="Views\LongerLives\_SearchAreaPublicHealthDashboard.cshtml" />
+    <Content Include="Views\LongerLives\_HealthProfileLink.cshtml" />
+    <Content Include="Views\LongerLives\_FingertipsLink.cshtml" />
+    <Content Include="Views\LongerLives\_LegendInlineQuartiles.cshtml" />
+    <Content Include="Views\LongerLives\_LegendDetailedQuartiles.cshtml" />
+    <Content Include="Views\UserAccount\ForgotPassword.cshtml" />
+    <Content Include="Views\IndicatorList\_IndicatorListHeader.cshtml" />
+    <None Include="Views\Shared\_Banner.cshtml" />
+    <Content Include="Views\Shared\_KeyBarChart.cshtml" />
     <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
     <Content Include="Views\Shared\Data.cshtml" />
-    <Content Include="Views\Shared\PageContainers.cshtml" />
-    <Content Include="Views\Shared\IndicatorsMenu.cshtml" />
-    <Content Include="Views\Shared\BenchmarkMenu.cshtml" />
+    <Content Include="Views\Shared\_PageContainers.cshtml" />
+    <Content Include="Views\Shared\_IndicatorsMenu.cshtml" />
+    <Content Include="Views\Shared\_BenchmarkMenu.cshtml" />
     <Content Include="Views\LongerLives\_SearchAreaSmall.cshtml" />
     <Content Include="Views\Shared\BrowserNotSupported.cshtml" />
-    <None Include="Views\Shared\Domains.cshtml" />
-    <Content Include="Views\Shared\KeyTartanRug.cshtml" />
-    <Content Include="Views\Shared\Key.cshtml" />
-    <Content Include="Views\Shared\KeySpineChart.cshtml">
+    <None Include="Views\Shared\_Domains.cshtml" />
+    <Content Include="Views\Shared\_KeyTartanRug.cshtml" />
+    <Content Include="Views\Shared\_Key.cshtml" />
+    <Content Include="Views\Shared\_KeySpineChart.cshtml">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="Views\Shared\KeyInequality.cshtml" />
-    <Content Include="Views\Shared\ParentTypeMenu.cshtml" />
-    <Content Include="Views\Shared\_Html2Canvas.cshtml" />
-    <None Include="Views\Shared\SiteFooter.cshtml" />
-    <Content Include="Views\Shared\ParentAreaMenu.cshtml" />
-    <None Include="Views\Shared\Spinner.cshtml" />
+    <Content Include="Views\Shared\_KeyInequality.cshtml" />
+    <Content Include="Views\Shared\_ParentTypeMenu.cshtml" />
+    <Content Include="Views\Shared\_JavaScriptAndCssForContentPage.cshtml" />
+    <Content Include="Views\Shared\_JavaScriptAndCssExtraForAreaSearch.cshtml" />
+    <None Include="Views\Shared\_SiteFooter.cshtml" />
+    <Content Include="Views\Shared\_ParentAreaMenu.cshtml" />
+    <None Include="Views\Shared\_Spinner.cshtml" />
     <Content Include="Views\Shared\_JavaScriptAndCssForDataPage.cshtml" />
-    <Content Include="Views\Shared\ViewOptions.cshtml" />
+    <Content Include="Views\Shared\_ViewOptions.cshtml" />
     <Content Include="Views\Shared\SupportingInformation.cshtml" />
     <Content Include="Views\Static\ReportContainer.html" />
     <Content Include="Web.config">
@@ -584,39 +670,31 @@
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\MidlandsAndEast\FrontPage.cshtml" />
-    <Content Include="Views\Shared\SearchBox.cshtml" />
+    <Content Include="Views\FingertipsLandingPage\FrontPage.cshtml" />
+    <Content Include="Views\Shared\_SearchBox.cshtml" />
     <Content Include="Views\LongerLives\_SearchArea.cshtml" />
     <Content Include="Views\Shared\_GoogleAnalytics.cshtml" />
-    <Content Include="Views\Shared\_MapCss.cshtml" />
-    <Content Include="Views\Shared\_JQuery.cshtml" />
     <Content Include="Views\Shared\_Favicon.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
-    <Content Include="Views\Shared\_PhofBody.cshtml" />
     <Content Include="Views\Shared\_TwitterBox.cshtml" />
     <Content Include="Views\Shared\_DataPageBody.cshtml" />
     <Content Include="Views\Shared\_ProfileSpecificCssFiles.cshtml" />
     <Content Include="Views\Shared\_ProfileSpecificJsFiles.cshtml" />
     <Content Include="Views\Shared\_ProfileCollection.cshtml" />
-    <Content Include="Views\Shared\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
-    <Content Include="Views\Shared\_GlobalJsVariablesForDataPage.cshtml" />
-    <Content Include="Views\Shared\_GlobalJsVariablesForContentPage.cshtml" />
     <Content Include="Views\Shared\_PoliciesAndCopyright.cshtml" />
     <Content Include="Views\Shared\_ProfileCollectionItemLink.cshtml" />
-    <Content Include="Views\SingleProfileWithFrontPage\SiteFooter.cshtml" />
+    <Content Include="Views\SingleProfileWithFrontPage\_SiteFooter.cshtml" />
     <Content Include="Views\SingleProfileWithFrontPage\FrontPage.cshtml" />
-    <Content Include="Views\SingleProfileWithFrontPage\_SkinSpecificJavaScriptAndCssForDataPage.cshtml" />
     <Content Include="Views\SingleProfileWithFrontPage\Data.cshtml" />
     <Content Include="Views\Shared\_IntroductionAndRecentUpdates.cshtml" />
     <Content Include="Views\Test\_LayoutPage.cshtml" />
     <Content Include="Views\Test\FingertipsTest.cshtml" />
-    <Content Include="Views\Test\PracticeProfilesTest.cshtml" />
     <Content Include="Views\Shared\_PheLogoBanner.cshtml" />
     <Content Include="Views\SingleProfileWithFrontPage\_PageLinks.cshtml" />
     <Content Include="Views\Shared\_PageLinks.cshtml" />
     <Content Include="Views\Shared\_TwitterFeed.cshtml" />
     <Content Include="Views\Shared\_TwitterStyle.cshtml" />
-    <Content Include="Views\Shared\KeyDataQuality.cshtml" />
+    <Content Include="Views\Shared\_KeyDataQuality.cshtml" />
     <Content Include="Views\Test\DiabetesTest.cshtml" />
     <Content Include="Views\ProfileCollectionWithFrontPage\ProfileFrontPage.cshtml" />
     <Content Include="Views\Shared\_StartButton.cshtml" />
@@ -637,6 +715,17 @@
     <Content Include="Views\Shared\_BenchmarkAgainstGoal.cshtml" />
     <Content Include="Views\Shared\_StartButtonForHref.cshtml" />
     <Content Include="Views\Shared\_GPPracticeAddress.cshtml" />
+    <Content Include="Views\Shared\_MetaTags.cshtml" />
+    <Content Include="Views\Shared\_SupportedBrowserCheck.cshtml" />
+    <Content Include="Views\Shared\_AngularBundle.cshtml" />
+    <Content Include="Views\Shared\_IndicatorListCollectionLinks.cshtml" />
+    <Content Include="Views\Shared\_Alert.cshtml" />
+    <Content Include="Views\Shared\_YourAccountMenu.cshtml" />
+    <Content Include="Views\Shared\_GoogleMaps.cshtml" />
+    <Content Include="Views\Shared\_HttpsCheck.cshtml" />
+    <Content Include="Views\UserAccount\EmailError.cshtml" />
+    <Content Include="Views\UserAccount\_JavaScriptAndCssForUserAccount.cshtml" />
+    <Content Include="Views\Shared\_UserFeedback.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
@@ -662,14 +751,17 @@
       <Project>{44bbccab-d4bd-4c71-939b-2d94a63d0627}</Project>
       <Name>Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UserAccess\UserAccess.csproj">
+      <Project>{f2b3238f-0791-486b-9eab-ac4ffc98cd6a}</Project>
+      <Name>UserAccess</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="css\chosen\" />
     <Folder Include="images\chosen\" />
     <Folder Include="js\vendor\" />
     <Folder Include="libs\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Views\Ssrs\" />
+    <Folder Include="Views\UserFeedback\" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{4A0DDDB5-7A95-4FBF-97CC-616D07737A77}" />
@@ -689,9 +781,9 @@
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
         <WebProjectProperties>
-          <UseIIS>True</UseIIS>
+          <UseIIS>False</UseIIS>
           <AutoAssignPort>False</AutoAssignPort>
-          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerPort>59822</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:59822/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

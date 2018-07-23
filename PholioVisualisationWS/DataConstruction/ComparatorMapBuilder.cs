@@ -11,6 +11,12 @@ namespace PholioVisualisation.DataConstruction
 
         public ComparatorMap ComparatorMap { get; set; }
 
+        public ComparatorMapBuilder(int childAreaTypeId) 
+        {
+            ComparatorMap = new ComparatorMap();
+            AddNationalComparator(childAreaTypeId);
+        }
+
         public ComparatorMapBuilder(ParentArea parentArea) :
             this(new List<ParentArea> { parentArea }) { }
 

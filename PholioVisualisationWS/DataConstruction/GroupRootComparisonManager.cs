@@ -53,8 +53,8 @@ namespace PholioVisualisation.DataConstruction
 
                 if (nationalGrouping != null && regionalGrouping != null && regionalGrouping.ComparatorData != null)
                 {
-                    Significance significance = comparer.Compare(regionalGrouping.ComparatorData,
-                        nationalGrouping.ComparatorData, metadata);
+                    // If category comparer expection here then method may need to be in CanCompareSubnationalAgainstNational
+                    Significance significance = comparer.Compare(regionalGrouping.ComparatorData, nationalGrouping.ComparatorData, metadata);
                     regionalGrouping.ComparatorData.AddSignificance(nationalGrouping.ComparatorId,
                         significance);
                 }
@@ -65,6 +65,7 @@ namespace PholioVisualisation.DataConstruction
         {
             return
                 comparatorMethodId != ComparatorMethodIds.Quintiles &&
+                comparatorMethodId != ComparatorMethodIds.Quartiles &&
                 comparatorMethodId != ComparatorMethodIds.NoComparison;
         }
 

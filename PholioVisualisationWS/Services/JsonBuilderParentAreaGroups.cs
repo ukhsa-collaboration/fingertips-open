@@ -14,26 +14,13 @@ namespace PholioVisualisation.Services
     /// <summary>
     /// Returns list of available parent types for areas.
     /// </summary>
-    public class JsonBuilderParentAreaGroups : JsonBuilderBase
+    public class JsonBuilderParentAreaGroups 
     {
         private ParentAreaGroupsParameters _parameters;
-
-        public JsonBuilderParentAreaGroups(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new ParentAreaGroupsParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
 
         public JsonBuilderParentAreaGroups(ParentAreaGroupsParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            return JsonConvert.SerializeObject(GetChildAreaTypeIdToParentAreaTypes());
         }
 
         public IList<IAreaType> GetChildAreaTypeIdToParentAreaTypes()

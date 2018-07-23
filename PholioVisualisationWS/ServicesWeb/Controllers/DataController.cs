@@ -1,23 +1,23 @@
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.ServiceActions;
 using PholioVisualisation.Services;
+using PholioVisualisation.ServicesWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using PholioVisualisation.Export;
-using PholioVisualisation.Export.File;
-using ServicesWeb.Common;
-using ServicesWeb.Helpers;
+using PholioVisualisation.Parsers;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     [RoutePrefix("api")]
     public class DataController : BaseController
@@ -31,7 +31,7 @@ namespace ServicesWeb.Controllers
 
         public DataController()
         {
-            
+
         }
 
         /// <summary>
@@ -51,7 +51,8 @@ namespace ServicesWeb.Controllers
         /// <param name="area_type_id">Area type ID</param>
         [HttpGet]
         [Route("latest_data/all_indicators_in_profile_group_for_child_areas")]
-        public IList<GroupRoot> GetGroupDataAtDataPoint(int profile_id, int group_id, int area_type_id, string parent_area_code)
+        public IList<GroupRoot> GetGroupDataAtDataPoint(int profile_id, int group_id,
+            int area_type_id, string parent_area_code)
         {
             try
             {
@@ -80,20 +81,57 @@ namespace ServicesWeb.Controllers
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         [HttpGet]
         [Route("latest_data/specific_indicators_for_child_areas")]
-        public IList<GroupRoot> GetGroupDataAtDataPoint(int profile_id, int area_type_id, string parent_area_code,
-            string indicator_ids, string restrict_to_profile_ids)
+        public IList<GroupRoot> GetGroupDataAtDataPoint(int area_type_id, string parent_area_code,
+            string indicator_ids, string restrict_to_profile_ids = "")
         {
             try
             {
-                NameValueCollection nameValues = new NameValueCollection();
-                nameValues.Add(DataParameters.ParameterIndicatorIds, indicator_ids);
-                nameValues.Add(ParameterNames.RestrictToProfileId, restrict_to_profile_ids);
-                nameValues.Add(ParameterNames.AreaTypeId, area_type_id.ToString());
-                nameValues.Add(ParameterNames.ProfileId, profile_id.ToString());
-                nameValues.Add(ParameterNames.ParentAreaCode, parent_area_code);
+                var comparatorMap = GetComparatorMapForParentArea(area_type_id, parent_area_code);
+                var builder = new GroupDataBuilderByIndicatorIds
+                {
+                    IndicatorIds = new IntListStringParser(indicator_ids).IntList,
+                    ProfileId = ProfileIds.Undefined,
+                    RestrictSearchProfileIds = GetProfileIds(restrict_to_profile_ids),
+                    ComparatorMap = comparatorMap,
+                    AreaCode = null,
+                    AreaTypeId = area_type_id
+                };
 
-                var parameters = new GroupDataAtDataPointBySearchParameters(nameValues);
-                return new JsonBuilderGroupDataAtDataPointBySearch(parameters).GetGroupRoots();
+                return new JsonBuilderGroupDataAtDataPointBySearch(builder).GetGroupRoots();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets the most recent data for a list of indicator IDs
+        /// </summary>
+        /// <param name="area_type_id">Area type ID</param>
+        /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
+        /// <param name="parent_area_code">Parent area code</param>
+        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
+        [HttpGet]
+        [Route("latest_data/specific_indicators_for_single_area")]
+        public IList<GroupRoot> GetGroupDataAtDataPointForSpecificArea(int area_type_id, string area_code,
+            string indicator_ids, string restrict_to_profile_ids = "")
+        {
+            try
+            {
+                var comparatorMap = new ComparatorMapBuilder(area_type_id).ComparatorMap;
+                var builder = new GroupDataBuilderByIndicatorIds
+                {
+                    IndicatorIds = new IntListStringParser(indicator_ids).IntList,
+                    ProfileId = ProfileIds.Undefined,
+                    RestrictSearchProfileIds = GetProfileIds(restrict_to_profile_ids),
+                    ComparatorMap = comparatorMap,
+                    AreaCode = area_code,
+                    AreaTypeId = area_type_id
+                };
+
+                return new JsonBuilderGroupDataAtDataPointBySearch(builder).GetGroupRoots();
             }
             catch (Exception ex)
             {
@@ -117,13 +155,17 @@ namespace ServicesWeb.Controllers
         public List<CoreDataSet> GetGroupDataAtDataPointOfSpecificAreas(string area_code,
             int area_type_id, int profile_id, int group_id)
         {
-            IAreasReader areasReader = ReaderFactory.GetAreasReader();
-
             try
             {
-                IArea parentArea = (area_code == AreaCodes.England)
-                    ? AreaFactory.NewArea(areasReader, area_code)
-                    : areasReader.GetParentAreas(area_code).First();
+                IAreasReader areasReader = ReaderFactory.GetAreasReader();
+
+                IArea parentArea = AreaFactory.NewArea(areasReader, area_code);
+                if (parentArea.IsCountry == false &&
+                    parentArea is CategoryArea == false &&
+                    parentArea is NearestNeighbourArea == false)
+                {
+                    parentArea = areasReader.GetParentAreas(area_code).First();
+                }
 
                 GroupData data = new GroupDataAtDataPointRepository().GetGroupDataProcessed(parentArea.Code,
                     area_type_id,
@@ -307,19 +349,20 @@ namespace ServicesWeb.Controllers
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         [HttpGet]
         [Route("trend_data/specific_indicators_for_child_areas")]
-        public IList<TrendRoot> GetTrendData(int profile_id, int area_type_id, string parent_area_code,
-            string indicator_ids, string restrict_to_profile_ids)
+        public IList<TrendRoot> GetTrendData(int area_type_id, string parent_area_code,
+            string indicator_ids, string restrict_to_profile_ids = "")
         {
             try
             {
                 NameValueCollection nameValues = new NameValueCollection();
                 nameValues.Add(DataParameters.ParameterIndicatorIds, indicator_ids);
-                nameValues.Add(ParameterNames.RestrictToProfileId, restrict_to_profile_ids);
                 nameValues.Add(ParameterNames.AreaTypeId, area_type_id.ToString());
                 nameValues.Add(ParameterNames.ParentAreaCode, parent_area_code);
-                nameValues.Add(ParameterNames.ProfileId, profile_id.ToString());
+                nameValues.Add(ParameterNames.ProfileId, ProfileIds.Search.ToString());
 
                 var parameters = new TrendDataBySearchParameters(nameValues);
+                parameters.RestrictResultsToProfileIdList = GetProfileIds(restrict_to_profile_ids);
+
                 return new JsonBuilderTrendDataBySearch(parameters).GetTrendData();
             }
             catch (Exception ex)
@@ -492,20 +535,49 @@ namespace ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a list of all the indicators within a profile
+        /// Gets certain details of the specified indicators.
         /// </summary>
         /// <remarks>
-        /// The indicators are differentiated by age and sex where appropriate. Returns a list of group roots.
+        /// The indicators are differentiated by age and sex where appropriate. Returns a list of group root summaries.
+        /// These can optionally be limited to belonging to a specific profile.
+        /// </remarks>
+        /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
+        /// <param name="profile_id">Profile ID [optional]</param>
+        [HttpGet]
+        [Route("grouproot_summaries/by_indicator_id")]
+        public IList<GroupRootSummary> GetGroupDataForProfile(string indicator_ids, int? profile_id = null)
+        {
+            try
+            {
+                var summaries = new GroupRootSummaryBuilder(ReaderFactory.GetGroupDataReader())
+                    .BuildForIndicatorIds(new IntListStringParser(indicator_ids).IntList, profile_id)
+                    .ToList();
+                summaries.Sort();
+                return summaries;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets summaries of a specific list of indicators.
+        /// </summary>
+        /// <remarks>
+        /// The indicators are differentiated by age and sex where appropriate. Returns a list of group root summaries. 
         /// </remarks>
         /// <param name="profile_id">Profile ID</param>
         /// <param name="area_type_id">Area type ID</param>
         [HttpGet]
-        [Route("grouproot_summaries")]
+        [Route("grouproot_summaries/by_profile_id")]
         public IList<GroupRootSummary> GetGroupDataForProfile(int profile_id, int area_type_id)
         {
             try
             {
-                var summaries = new GroupRootSummaryBuilder().Build(profile_id, area_type_id)
+                var summaries = new GroupRootSummaryBuilder(ReaderFactory.GetGroupDataReader())
+                    .BuildForProfileAndAreaType(profile_id, area_type_id)
                     .ToList();
                 summaries.Sort();
                 return summaries;
@@ -535,28 +607,6 @@ namespace ServicesWeb.Controllers
             {
                 return new SpcForDsrLimitsAction().GetResponse(comparator_value,
                     population_min, population_max, unit_value, year_range);
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets population data used in the Practice Profiles
-        /// </summary>
-        /// <param name="area_code">Area code</param>
-        /// <param name="group_id">Group ID</param>
-        /// <param name="data_point_offset">Time period offset from the data point (i.e. latest available time period)</param>
-        [HttpGet]
-        [Route("quinary_population_data")]
-        public Dictionary<string, object> GetQuinaryPopulationData(string area_code,
-            int group_id, int data_point_offset = 0)
-        {
-            try
-            {
-                return new QuinaryPopulationDataAction().GetPopulationAndSummary(area_code, group_id, data_point_offset);
             }
             catch (Exception ex)
             {
@@ -601,7 +651,7 @@ namespace ServicesWeb.Controllers
         {
             try
             {
-                return new QuinaryPopulationDataAction().GetPopulationOnly(area_code, area_type_id, 
+                return new QuinaryPopulationDataAction().GetPopulationOnly(area_code, area_type_id,
                     profile_id, indicator_id, data_point_offset);
             }
             catch (Exception ex)
@@ -714,6 +764,77 @@ namespace ServicesWeb.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("indicator_statistics")]
+        [Obsolete("Deprecated, use indicator_statistics/by_indicator_id or indicator_statistics/by_profile_id instead")]
+        public Dictionary<int, IndicatorStats> GetIndicatorStatistics(int child_area_type_id,
+            string parent_area_code, int? profile_id = null, int? group_id = null, string indicator_ids = null,
+            string restrict_to_profile_ids = "", int data_point_offset = 0)
+        {
+            // Deprecated in favour of more specific methods
+
+            var groupId = group_id ?? 1;
+            var profileId = profile_id ?? ProfileIds.Search;
+
+            try
+            {
+                NameValueCollection nameValues = new NameValueCollection();
+                nameValues.Add(ParameterNames.GroupIds, groupId.ToString());
+                nameValues.Add(ParameterNames.ProfileId, profileId.ToString());
+                nameValues.Add(ParameterNames.AreaTypeId, child_area_type_id.ToString());
+                nameValues.Add(ParameterNames.ParentAreaCode, parent_area_code);
+                nameValues.Add(DataParameters.ParameterIndicatorIds, indicator_ids);
+                nameValues.Add(IndicatorStatsParameters.ParameterDataPointOffset, data_point_offset.ToString());
+
+                var parameters = new IndicatorStatsParameters(nameValues);
+                parameters.RestrictResultsToProfileIdList = GetProfileIds(restrict_to_profile_ids);
+
+                return new JsonBuilderIndicatorStats(parameters).GetIndicatorStats();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets descriptive statistics (min, max, median, interquartile range) for the latest values for
+        /// a list of indicators
+        /// </summary>
+        /// <param name="child_area_type_id">Child area type ID</param>
+        /// <param name="parent_area_code">Parent area code</param>
+        /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
+        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
+        /// <param name="data_point_offset">Offset in years, quarters or months from the most recent time point [default is 0]</param>
+        [HttpGet]
+        [Route("indicator_statistics/by_indicator_id")]
+        public Dictionary<int, IndicatorStats> GetIndicatorStatisticsByIndicatorId(int child_area_type_id,
+            string parent_area_code, string indicator_ids = null,
+            string restrict_to_profile_ids = "", int data_point_offset = 0)
+        {
+            try
+            {
+                NameValueCollection nameValues = new NameValueCollection();
+                nameValues.Add(ParameterNames.GroupIds, GroupIds.Search.ToString());
+                nameValues.Add(ParameterNames.ProfileId, ProfileIds.Search.ToString());
+                nameValues.Add(ParameterNames.AreaTypeId, child_area_type_id.ToString());
+                nameValues.Add(ParameterNames.ParentAreaCode, parent_area_code);
+                nameValues.Add(DataParameters.ParameterIndicatorIds, indicator_ids);
+                nameValues.Add(IndicatorStatsParameters.ParameterDataPointOffset, data_point_offset.ToString());
+
+                var parameters = new IndicatorStatsParameters(nameValues);
+                parameters.RestrictResultsToProfileIdList = GetProfileIds(restrict_to_profile_ids);
+
+                return new JsonBuilderIndicatorStats(parameters).GetIndicatorStats();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
         /// <summary>
         /// Gets descriptive statistics (min, max, median, interquartile range) for the latest values for
         ///  all the indicators in a profile group
@@ -722,14 +843,11 @@ namespace ServicesWeb.Controllers
         /// <param name="child_area_type_id">Child area type ID</param>
         /// <param name="parent_area_code">Parent area code</param>
         /// <param name="profile_id">Profile ID</param>
-        /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
-        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         /// <param name="data_point_offset">Offset in years, quarters or months from the most recent time point [default is 0]</param>
         [HttpGet]
-        [Route("indicator_statistics")]
-        public Dictionary<int, IndicatorStats> GetIndicatorStatistics(int group_id,
-            int child_area_type_id, string parent_area_code, int? profile_id = null,
-            string indicator_ids = null, string restrict_to_profile_ids = null, int data_point_offset = 0)
+        [Route("indicator_statistics/by_profile_id")]
+        public Dictionary<int, IndicatorStats> GetIndicatorStatisticsByProfileId(int child_area_type_id,
+            string parent_area_code, int profile_id, int group_id, int data_point_offset = 0)
         {
             try
             {
@@ -738,11 +856,10 @@ namespace ServicesWeb.Controllers
                 nameValues.Add(ParameterNames.ProfileId, profile_id.ToString());
                 nameValues.Add(ParameterNames.AreaTypeId, child_area_type_id.ToString());
                 nameValues.Add(ParameterNames.ParentAreaCode, parent_area_code);
-                nameValues.Add(DataParameters.ParameterIndicatorIds, indicator_ids);
-                nameValues.Add(ParameterNames.RestrictToProfileId, restrict_to_profile_ids);
                 nameValues.Add(IndicatorStatsParameters.ParameterDataPointOffset, data_point_offset.ToString());
 
                 var parameters = new IndicatorStatsParameters(nameValues);
+
                 return new JsonBuilderIndicatorStats(parameters).GetIndicatorStats();
             }
             catch (Exception ex)
@@ -799,14 +916,13 @@ namespace ServicesWeb.Controllers
         /// <param name="indicator_ids">Comma separated list of indicator IDs [Maximum 100]</param>
         /// <param name="child_area_type_id">Child area type ID</param>
         /// <param name="parent_area_type_id">Parent area type ID</param>
-        /// <param name="profile_id">Profile ID [Optional]</param>
+        /// <param name="profile_id">Profile ID [optional]</param>
         /// <param name="parent_area_code">The parent area code [default is England]</param>
-        /// <param name="include_sortable_time_periods">Whether or not to include sortable time periods [default is no]</param>
         [HttpGet]
         [Route("all_data/csv/by_indicator_id")]
         public HttpResponseMessage GetDataFileForIndicatorList(string indicator_ids,
             int child_area_type_id, int parent_area_type_id, int profile_id = ProfileIds.Undefined,
-            string parent_area_code = AreaCodes.England, string include_sortable_time_periods = "no")
+            string parent_area_code = AreaCodes.England)
         {
             try
             {
@@ -823,8 +939,7 @@ namespace ServicesWeb.Controllers
                     ProfileId = profile_id,
                     ChildAreaTypeId = child_area_type_id,
                     ParentAreaTypeId = parent_area_type_id,
-                    ParentAreaCode = parent_area_code,
-                    IncludeSortableTimePeriod = ServiceHelper.ParseYesOrNo(include_sortable_time_periods)
+                    ParentAreaCode = parent_area_code
                 };
 
                 return GetIndicatorDataResponse(indicatorIds, exportParameters);
@@ -844,12 +959,10 @@ namespace ServicesWeb.Controllers
         /// <param name="parent_area_type_id">Parent area type ID</param>
         /// <param name="group_id">Profile group ID</param>
         /// <param name="parent_area_code">The parent area code [default is England]</param>
-        /// <param name="include_sortable_time_periods">Whether or not to include sortable time periods [default is no]</param>
         [HttpGet]
         [Route("all_data/csv/by_group_id")]
         public HttpResponseMessage GetDataFileForGroup(int child_area_type_id,
-            int parent_area_type_id, int group_id, string parent_area_code = AreaCodes.England,
-            string include_sortable_time_periods = "no")
+            int parent_area_type_id, int group_id, string parent_area_code = AreaCodes.England)
         {
             try
             {
@@ -868,8 +981,7 @@ namespace ServicesWeb.Controllers
                     ProfileId = profileId,
                     ChildAreaTypeId = child_area_type_id,
                     ParentAreaTypeId = parent_area_type_id,
-                    ParentAreaCode = parent_area_code,
-                    IncludeSortableTimePeriod = ServiceHelper.ParseYesOrNo(include_sortable_time_periods)
+                    ParentAreaCode = parent_area_code
                 };
 
                 return GetIndicatorDataResponse(indicatorIds, exportParameters);
@@ -889,39 +1001,88 @@ namespace ServicesWeb.Controllers
         /// <param name="parent_area_type_id">Parent area type ID</param>
         /// <param name="profile_id">Profile ID</param>
         /// <param name="parent_area_code">The parent area code [default is England]</param>
-        /// <param name="include_sortable_time_periods">Whether or not to include sortable time periods [default is no]</param>
         [HttpGet]
         [Route("all_data/csv/by_profile_id")]
         public HttpResponseMessage GetDataFileForProfile(int child_area_type_id,
-            int parent_area_type_id, int profile_id, string parent_area_code = AreaCodes.England, 
-            string include_sortable_time_periods = "no")
+            int parent_area_type_id, int profile_id, string parent_area_code = AreaCodes.England)
         {
             try
             {
-                var filename = SingleEntityFileNamer.GetProfileDataFileNameForUser(profile_id);
+                var filename = SingleEntityFileNamer.GetDataForUserbyProfileAndAreaType(profile_id, child_area_type_id);
                 var fileManager = new ExportFileManager(filename);
 
+                // Parameters
+                var exportParameters = new IndicatorExportParameters
+                {
+                    ProfileId = profile_id,
+                    ChildAreaTypeId = child_area_type_id,
+                    ParentAreaTypeId = parent_area_type_id,
+                    ParentAreaCode = parent_area_code
+                };
+
                 // Check whether file is already cached
-                var content = fileManager.TryGetFile();
+                byte[] content = fileManager.TryGetFile();
                 if (content == null)
                 {
                     // Get indicatorIDs in profile
                     var indicatorIds = GetIndicatorIdListProvider().GetIdsForProfile(profile_id);
-
-                    var exportParameters = new IndicatorExportParameters
-                    {
-                        ProfileId = profile_id,
-                        ChildAreaTypeId = child_area_type_id,
-                        ParentAreaTypeId = parent_area_type_id,
-                        ParentAreaCode = parent_area_code,
-                        IncludeSortableTimePeriod = ServiceHelper.ParseYesOrNo(include_sortable_time_periods)
-                    };
 
                     // Create file
                     content = GetIndicatorFileContent(indicatorIds, exportParameters);
                 }
 
                 return FileResponseBuilder.NewMessage(content, filename);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns the available data for each combination of indicator ID and area type ID.
+        /// </summary>
+        /// <remarks>If only the indicator ID is specified then the results will be returned
+        /// for every area type for which data is available.
+        /// </remarks>
+        /// <param name="indicator_id">Filter by indicator ID</param>
+        /// <param name="areaType_id">Filter by area type ID [optional]</param>
+        [HttpGet]
+        [Route("available_data")]
+        public IList<GroupingData> GetAvailableDataForGrouping(int? indicator_id = null, int? area_type_id = null)
+        {
+            try
+            {
+                var groupDataReader = ReaderFactory.GetGroupDataReader();
+                return groupDataReader.GetAvailableDataByIndicatorIdAndAreaTypeId(indicator_id, area_type_id);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns the time and person deleted and uploaded data for a given indicator
+        /// </summary>
+        /// <param name="indicator_id">Indicator ID</param>
+        [HttpGet]
+        [Route("data_changes")]
+        public DataChange GetDataChanges(int indicator_id)
+        {
+            try
+            {
+                var dataChange = new AuditProvider().GetLatestAuditData(indicator_id);
+
+                if (dataChange != null)
+                {
+                    // Only serialise user names in test environment
+                    dataChange.ShouldSerializeUserNames = !ApplicationConfiguration.Instance.IsEnvironmentLive;
+                }
+
+                return dataChange;
             }
             catch (Exception ex)
             {
@@ -946,7 +1107,7 @@ namespace ServicesWeb.Controllers
             var fileContent = GetIndicatorFileContent(indicatorIds, exportParameters);
             if (fileContent != null)
             {
-                var filename = SingleEntityFileNamer.IndicatorDataFilenameForUser;
+                var filename = SingleEntityFileNamer.GetDataForUserbyIndicatorAndAreaType(exportParameters.ChildAreaTypeId);
                 return FileResponseBuilder.NewMessage(fileContent, filename);
             }
 
@@ -985,5 +1146,13 @@ namespace ServicesWeb.Controllers
             var singleGroupingProvider = new SingleGroupingProvider(groupDataReader, groupIdProvider);
             return singleGroupingProvider;
         }
+
+
+        public static ComparatorMap GetComparatorMapForParentArea(int area_type_id, string parent_area_code)
+        {
+            var parentArea = new ParentArea(parent_area_code, area_type_id);
+            return new ComparatorMapBuilder(parentArea).ComparatorMap;
+        }
+
     }
 }

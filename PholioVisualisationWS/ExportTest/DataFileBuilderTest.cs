@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export;
 using PholioVisualisation.Export.File;
 using PholioVisualisation.PholioObjects;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace PholioVisualisation.ExportTest
 {
@@ -61,7 +60,7 @@ namespace PholioVisualisation.ExportTest
 
             var parameters = new IndicatorExportParameters
             {
-                ChildAreaTypeId = AreaTypeIds.Ccg,
+                ChildAreaTypeId = AreaTypeIds.CcgsPostApr2018,
                 ParentAreaCode = AreaCodes.England,
                 ParentAreaTypeId = AreaTypeIds.Subregion,
                 ProfileId = ProfileIds.Amr
@@ -93,7 +92,7 @@ namespace PholioVisualisation.ExportTest
                 GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
 
             var bytes = fileBuilder.GetFileForSpecifiedIndicators(
-                new List<int> { IndicatorIds.EstimatedPrevalenceCommonMentalHealthDisorders },
+                new List<int> { IndicatorIds.LongTermDisability },
                 parameters);
 
             // Assert
@@ -109,7 +108,7 @@ namespace PholioVisualisation.ExportTest
                 ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 ParentAreaCode = AreaCodes.Gor_EastMidlands,
                 ParentAreaTypeId = AreaTypeIds.GoRegion,
-                ProfileId = ProfileIds.Undefined
+                ProfileId = ProfileIds.Undefined,
             };
 
             var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
@@ -134,8 +133,7 @@ namespace PholioVisualisation.ExportTest
                     ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                     ParentAreaCode = AreaCodes.England,
                     ParentAreaTypeId = AreaTypeIds.GoRegion,
-                    ProfileId = ProfileIds.Phof,
-                    IncludeSortableTimePeriod = true
+                    ProfileId = ProfileIds.Phof
                 };
 
                 var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,

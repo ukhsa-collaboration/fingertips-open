@@ -133,19 +133,9 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("scatter-plot-chart-box"));
         }
 
-        public void ChosenSearch()
-        {
-            ExpectedElementToBeVisible(By.ClassName("chosen-search"));
-        }
-
         public void FingertipsNearestNeighboursMenuToLoad()
         {
             ExpectedElementToBeVisible(By.Id("nearest-neighbour-links"));
-        }
-
-        public void FingertipsNearestNeighboursTartunRugToLoad()
-        {
-            ExpectedElementToBeVisible(By.Id("rightTartanTable"));
         }
 
         public void FingertipsAreaSearchResultsPageToLoad()
@@ -197,20 +187,24 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("main_ranking"));
         }
 
-        public void MortalityRankingsTableToLoad()
+        public void SignInPageToLoad()
         {
-            ExpectedElementToBeVisible(By.Id("mortality-rankings-table"));
-        }
-
-        public void PracticeProfilesBarChartsTabToLoad()
-        {
-            ExpectedElementToBeVisible(By.Id("barBox"));
-            ExpectedElementToBeVisible(By.Id("indicatorMenu"));
+            ExpectedElementToBeVisible(By.Id("frm-login-for-fingertips"));
         }
 
         public void FingertipsTrendsTableToLoad()
         {
             ExpectedElementToBeVisible(By.Id("trendTable0"));
+        }
+
+        public void FingertipsEnglandTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("england-table"));
+        }
+
+        public void FingertipsMetadataTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.ClassName("definition-table"));
         }
 
         public void FingertipsProfileFrontPageToLoad()
@@ -221,6 +215,31 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void HealthInterventionPageToLoad()
         {
             ExpectedElementToBeVisible(By.ClassName("useful_links"));
+        }
+
+        public void FingertipsPopulationGraphToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("population-chart"));
+        }
+
+        public void FingertipsPopulationPopupToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("infoBox"));
+        }
+
+        public void FingertipsPopulationPracticeSummaryToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("registered-persons"));
+        }
+
+        public void FingertipsCategoryTypeDescriptionsToLoad()
+        {
+            ExpectedElementToBeVisible(By.ClassName(Classes.InformationToolTipWithPosition));
+        }
+
+        public void FingertipsCategoryTypeDescriptionPopupToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("infoBox"));
         }
 
         public void GoogleMapToLoad()

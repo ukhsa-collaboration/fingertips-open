@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -25,6 +26,24 @@ namespace PholioVisualisation.Export
             _areasReader = areasReader;
             _parameters = parameters;
             _areaFactory = areaFactory;
+        }
+
+        /// <summary>
+        /// Init method to allow for lazy initialisation.
+        /// </summary>
+        public void Init()
+        {
+            if (_parentAreaCodes == null)
+            {
+                var parentAreas = GetParentAreas(_parameters);
+                _parentAreaCodes = parentAreas.Select(x => x.Code).ToArray();
+                _childAreaCodeToParentAreaMap = _areasReader.GetParentAreasFromChildAreaId(_parameters.ParentAreaTypeId,
+                    _parameters.ChildAreaTypeId);
+
+                InitParentToChildAreaCodeMap();
+
+                InitChildAreaCodes();
+            }
         }
 
         public string[] ParentAreaCodes
@@ -67,24 +86,6 @@ namespace PholioVisualisation.Export
             get { return _areaFactory.NewArea(AreaCodes.England); }
         }
 
-        /// <summary>
-        /// Init method to allow for lazy initialisation.
-        /// </summary>
-        public void Init()
-        {
-            if (_parentAreaCodes == null)
-            {
-                var parentAreas = GetParentAreas(_parameters);
-                _parentAreaCodes = parentAreas.Select(x => x.Code).ToArray();
-                _childAreaCodeToParentAreaMap = _areasReader.GetParentAreasFromChildAreaId(_parameters.ParentAreaTypeId,
-                    _parameters.ChildAreaTypeId);
-
-                InitParentToChildAreaCodeMap();
-
-                InitChildAreaCodes();
-            }
-        }
-
         private void InitParentToChildAreaCodeMap()
         {
             _parentAreaCodeToChildAreaCodesMap = new Dictionary<string, List<string>>();
@@ -113,7 +114,8 @@ namespace PholioVisualisation.Export
         private IList<IArea> GetParentAreas(IndicatorExportParameters parameters)
         {
             IList<IArea> parentAreas;
-            if (parameters.ParentAreaCode == AreaCodes.England)
+            if (parameters.ParentAreaCode.Equals(AreaCodes.England,
+                StringComparison.CurrentCultureIgnoreCase))
             {
                 // all for parent area type
                 parentAreas = new ChildAreaListBuilder(_areasReader).GetChildAreas(parameters.ParentAreaCode,

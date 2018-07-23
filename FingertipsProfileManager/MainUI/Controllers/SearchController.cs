@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -122,12 +121,12 @@ namespace Fpm.MainUI.Controllers
                 }
             }
 
-            return RedirectToAction("SortPageAndFilter", "ProfilesAndIndicators", new { ProfileKey = selectedProfileId });
+            return RedirectToAction("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators", new { ProfileKey = selectedProfileId });
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _profileRepository = new ProfileRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
             base.OnActionExecuting(filterContext);
         }
 

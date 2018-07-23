@@ -18,7 +18,7 @@ namespace Fpm.MainUI.Helpers
         public bool IsInequalitiesTab { get; set; }
         public CompareAreasOption CompareAreasOption { get; set; }
 
-        public const string MapFileName = "+map";
+        public const string MapFileName = "PageMap.js";
         public const string ScatterPlotFileName = "PageScatterPlot.js";
         public const string EnglandFileName = "PageEngland.js";
         public const string PopulationFileName = "PagePopulationNew.js";

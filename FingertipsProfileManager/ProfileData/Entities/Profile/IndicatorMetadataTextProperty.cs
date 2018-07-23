@@ -18,6 +18,8 @@
 
         public int DisplayOrder { get; set; }
 
+        public bool IsOverridable { get; set; }
+
         public string GetSqlColumnName()
         {
             return PropertyId + "_" + ColumnName;

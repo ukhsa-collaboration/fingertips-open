@@ -15,7 +15,7 @@ namespace FingertipsDataExtractionTool
 {
     public interface IDataFileGenerator
     {
-        void Generate();
+        void Generate(int profileIdToStartFrom = 0);
     }
 
     public class DataFileGenerator : IDataFileGenerator
@@ -35,26 +35,26 @@ namespace FingertipsDataExtractionTool
             _profileReader = profileReader;
         }
 
-        public void Generate()
+        public void Generate(int profileIdToStartFrom = 0)
         {
             _logger.Info("About to start generating CSV files for Core Profiles");
-            var allProfiles = _profileReader.GetAllProfiles();
-            allProfiles = ProfileFilter.RemoveSystemProfiles(allProfiles);
+            var allProfiles = GetProfiles(profileIdToStartFrom);
 
             foreach (var profile in allProfiles)
             {
+                var profileId = profile.ProfileId;
                 if (ShouldExcelFilesBeBuiltForProfile(profile))
                 {
-                    var childAreaTypeIds = GetChildAreaTypeIdsForProfile(profile.ProfileId);
+                    var childAreaTypeIds = GetChildAreaTypeIdsForProfile(profileId);
 
                     foreach (var childAreaTypeId in childAreaTypeIds)
                     {
                         var parentAreaTypeIds = _areaTypeListProvider
-                            .GetParentAreaTypeIdsUsedInProfile(profile.ProfileId, childAreaTypeId)
+                            .GetParentAreaTypeIdsUsedInProfile(profileId, childAreaTypeId)
                             .ToList();
 
-                        var categoryAreaTypeIds = _areaTypeListProvider.GetParentCategoryTypeIdsUsedInProfile(
-                            profile.ProfileId, childAreaTypeId)
+                        var categoryAreaTypeIds = _areaTypeListProvider
+                            .GetParentCategoryTypeIdsUsedInProfile(profileId, childAreaTypeId)
                             .Select(CategoryAreaType.GetAreaTypeIdFromCategoryTypeId);
 
                         // Combine parent area type IDs with category area type IDs
@@ -63,12 +63,12 @@ namespace FingertipsDataExtractionTool
                         foreach (var parentAreaTypeId in parentAreaTypeIds)
                         {
                             _logger.Info("Creating Excel file with " +
-                                GetProfileDetailsText(profile.ProfileId,
+                                GetProfileDetailsText(profileId,
                                 parentAreaTypeId, childAreaTypeId));
 
                             var watch = new FileTimer(_logger);
 
-                            CreateExcelFilesForCoreProfiles(profile.ProfileId, childAreaTypeId,
+                            CreateExcelFilesForCoreProfiles(profileId, childAreaTypeId,
                                 parentAreaTypeId);
 
                             watch.Stop();
@@ -77,6 +77,14 @@ namespace FingertipsDataExtractionTool
                 }
             }
             _logger.Info("Core profiles generation completed.");
+        }
+
+        private IList<ProfileConfig> GetProfiles(int profileIdToStartFrom)
+        {
+            var allProfiles = _profileReader.GetAllProfiles();
+            allProfiles = ProfileFilter.RemoveSystemProfiles(allProfiles);
+            allProfiles = allProfiles.Where(x => x.ProfileId >= profileIdToStartFrom).ToList();
+            return allProfiles;
         }
 
         private static bool ShouldExcelFilesBeBuiltForProfile(ProfileConfig profile)

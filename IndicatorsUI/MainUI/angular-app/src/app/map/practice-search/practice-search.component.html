@@ -1,0 +1,64 @@
+<div class="container" style="margin-left:-15px;">
+    <div class="row">
+        <div *ngIf="searchMode" class="col-md-8">
+            <h2>Find your practice</h2>
+        </div>
+        <div id="practice-list-info" class="col-md-6">
+            <h3>Search for a practice by postcode or place name:</h3>
+            <input [(ngModel)]="placeNameText" [typeahead]="dataSource" (typeaheadLoading)="changeTypeaheadLoading($event)" (typeaheadNoResults)="changeTypeaheadNoResults($event)" (typeaheadOnSelect)="typeaheadOnSelect($event)" typeaheadOptionsLimit="7" typeaheadOptionField="displayName"
+                placeholder="" [typeaheadWaitMs]="200" [typeaheadMinLength]="3" class="form-control" id="gp-practice-search-text">
+        </div>
+        <div class="col-md-6">
+            <div id="show-all-practices" [hidden]="!displayCCGPracticeLink">
+                <a id="all_ccg_practices" (click)="onShowAllPracticeinCCGClick()" title="Display all practices within CCG on the map">
+                            Show all practices in CCG</a>
+            </div>
+            <div *ngIf="typeaheadNoResults===true" class="">
+                No Results Found
+            </div>
+        </div>
+    </div>
+    <div id="practice-list-info" class="row col-md-12">
+        <h3 *ngIf="nearByPractices?.length > 0 " id="practice-count-info">{{practiceCountText}}</h3>
+    </div>
+</div>
+<div class="nearby-practices-table" *ngIf="nearByPractices?.length >0">
+    <div class="table-data" id="mortality-rankings">
+        <div id="table-container" #scrollPracticeTable>
+            <table id="search-table">
+                <tbody>
+                    <tr *ngFor="let item of nearByPractices" id="practice-header">
+                        <table>
+                            <tr [attr.id]="item.areaCode">
+                                <td colspan="2">
+                                    <div class="practice-header clearfix" [ngClass]="{'highlight-header': item.selected,'header': item.selected==false}" (click)="onSelectPracticeClick(item.areaCode)">
+                                        {{item.areaCode}} - {{item.areaName}}
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr [ngClass]="{'highlight-address': item.selected}">
+                                <td style="width:70%">
+                                    <div>{{item.addressLine1}}</div>
+                                    <div>{{item.addressLine2}}</div>
+                                    <div>{{item.postcode}}</div>
+                                </td>
+                                <td style="width:30%">
+                                    <div *ngIf="!showCcgPractices" class="center-text">{{item.distanceValF}} miles</div>
+                                    <div>
+                                        <a (click)="onSelectPracticeClick(item.areaCode)" style="color: #2e3191;text-decoration: underline;" id="select-practice">
+                                         Select
+                                       </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div [style.height]="height + 'px'" class="nearby-practices-map">
+    <div id="google-map" #googleMapNew class="googleMapNg">
+    </div>
+</div>

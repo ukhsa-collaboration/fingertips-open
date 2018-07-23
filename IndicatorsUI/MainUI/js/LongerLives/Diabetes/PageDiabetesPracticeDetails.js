@@ -65,7 +65,7 @@ function displayPage() {
 
     $('#area-header').html(getSimpleAreaTypeName() + '<br>value');
     $('#outcomes-header').html(getSimpleAreaTypeName());
-    $('#comparison-header').html('Compared to the other practices in the ' + getSimpleAreaTypeName());
+    $('#legend-header').html('Compared to the other practices in the ' + getSimpleAreaTypeName());
 
     $('#area-address').html(getAddressText(areaAddress));
 

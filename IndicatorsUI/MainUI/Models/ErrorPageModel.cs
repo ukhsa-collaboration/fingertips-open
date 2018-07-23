@@ -1,7 +1,7 @@
 ﻿
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public class ErrorPageModel : PageModel
     {

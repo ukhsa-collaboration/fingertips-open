@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using DIResolver;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
@@ -51,10 +50,10 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetProfilePdfs()
         {
-            var areaTypes = Reader().GetProfilePdfs(ProfileIds.Phof);
+            var areaTypes = Reader().GetProfilePdfs(ProfileIds.PracticeProfiles);
 
-            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority));
+            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.GpPractice));
+            Assert.IsNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.Subregion));
         }
 
         [TestMethod]
@@ -92,6 +91,13 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetAllProfileIds()
         {
             var ids = Reader().GetAllProfileIds();
+            Assert.IsTrue(ids.Any());
+        }
+
+        [TestMethod]
+        public void TestGetLongerLivesProfileIds()
+        {
+            var ids = Reader().GetLongerLivesProfileIds();
             Assert.IsTrue(ids.Any());
         }
 

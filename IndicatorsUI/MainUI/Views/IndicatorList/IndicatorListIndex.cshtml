@@ -1,0 +1,71 @@
+﻿@using System.Web.Optimization
+@model IndicatorsUI.MainUI.Models.UserList.IndicatorListsViewModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_IndicatorListHeader")
+    @Styles.Render("~/bundles/css-indicator-list-index")
+    @Scripts.Render("~/bundles/js-indicator-list-index")
+}
+<div class="title-divider"></div>
+<div class="container">
+    <div class="row">
+        <div id="div-content" class="col-md-12">
+            <h2>Your indicator lists</h2>
+            <p>Indicator lists allow you to view data for specific indicators and share links to those views with others</p>
+            @Html.ActionLink("Create new indicator list", "create", "indicatorlist", new { },
+                new { @class = "btn btn-primary" })
+        </div>
+        @if (Model.IndicatorLists.Any())
+        {
+            <div id="grid-content" class="col-md-12">
+                @{
+                    WebGrid grid = new WebGrid(
+                        source: Model.IndicatorLists,
+                        canPage: true,
+                        canSort: true,
+                        rowsPerPage: 15
+                        );
+
+                }
+                @*set webgrid style in MVC*@
+                @grid.GetHtml(
+                    tableStyle: "webgrid-table",
+                    headerStyle: "webgrid-header",
+                    footerStyle: "webgrid-footer",
+                    alternatingRowStyle: "webgrid-alternating-row",
+                    selectedRowStyle: "webgrid-selected-row",
+                    rowStyle: "webgrid-row-style",
+                    mode: WebGridPagerModes.All,
+                    columns: grid.Columns(
+                        grid.Column("ListName", "List name", canSort: true),
+                        grid.Column(header: "View", style: "center", format: (item) =>
+                        {
+                            var link = Html.ActionLink("View", "ViewIndicatorList", "Search",
+                                new { listId = item.PublicId }, new { @class = "btn btn-primary" });
+
+                            return link;
+                        }),
+                        grid.Column(header: "Edit", style: "center", format: (item) =>
+                        {
+                            var link = Html.ActionLink("Edit", "edit", "indicatorlist",
+                                new { listId = item.PublicId }, new { @class = "btn btn-primary" });
+                            return link;
+                        }),
+                        grid.Column(header: "Share by email", style: "center", format: (item) =>
+                        {
+                            var link = Html.Raw("<a href=\"#\" class=\"btn btn-primary\" onclick=\"return openEmailDialog(this,'" + item.PublicId + 
+                                "','" + item.ListName + "')\">Share</a> ");
+                            return link;
+                        }),
+                        grid.Column(header: "Delete", style: "center", format: (item) =>
+                        {
+                            var link = Html.ActionLink("Delete", "Delete", "indicatorlist",
+                                new { listid = item.PublicId },
+                                new { @class = "btn btn-primary", onclick = "return deleteConfirm(this);" });
+                            return link;
+                        })
+                        ))
+            </div>
+                    }
+    </div>
+</div>

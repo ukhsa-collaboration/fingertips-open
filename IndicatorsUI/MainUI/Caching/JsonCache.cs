@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Caching;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI.Caching
+namespace IndicatorsUI.MainUI.Caching
 {
     public class JsonCache
     {

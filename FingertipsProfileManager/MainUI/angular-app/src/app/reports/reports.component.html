@@ -1,0 +1,11 @@
+<div *ngIf="isInit">
+  <br/>
+  <!--List-->
+  <div *ngIf="status== StatusList">
+    <app-report-list-view (getListViewStatus)="getListViewStatus($event)" [userProfilesHash]="userProfilesHash"></app-report-list-view>
+  </div>
+  <!--Edit-->
+  <div *ngIf="status== StatusEdit || status== StatusNew">
+    <app-report-edit-view (getReportViewStatus)="getReportViewStatus($event)" [editProfileId]="editProfileId" [userProfilesHash]="userProfilesHash"></app-report-edit-view>
+  </div>
+</div>

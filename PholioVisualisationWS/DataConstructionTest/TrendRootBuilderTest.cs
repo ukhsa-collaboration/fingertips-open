@@ -32,8 +32,8 @@ namespace PholioVisualisation.DataConstructionTest
                 AssignData = true
             }.Build();
 
-            IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(data.GroupRoots, comparatorMap, areaTypeId, profileId,
-                data.IndicatorMetadata, false);
+            IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(data.GroupRoots, 
+                comparatorMap, areaTypeId, profileId, data.IndicatorMetadata, false);
             Assert.IsTrue(trendRoots.Count > 0);
             Assert.IsTrue(trendRoots[0].Periods.Count > 0);
             Assert.IsNotNull(trendRoots[0].Limits);
@@ -46,8 +46,8 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestDiabetesPrevAndRiskHighestQuintileExists()
         {
-            var areaTypeId = AreaTypeIds.Ccg;
-            var profileId = ProfileIds.Diabetes;
+            var areaTypeId = AreaTypeIds.CcgsPreApr2017;
+            var profileId = ProfileIds.DiabetesLongerLives;
 
             var parentArea = new ParentArea(AreaCodes.CommissioningRegionLondon, areaTypeId);
             ComparatorMap comparatorMap = new ComparatorMapBuilder(parentArea).ComparatorMap;
@@ -56,18 +56,19 @@ namespace PholioVisualisation.DataConstructionTest
             {
                 GroupId = GroupIds.Diabetes_PrevalenceAndRisk,
                 ChildAreaTypeId = areaTypeId,
-                ProfileId = ProfileIds.Diabetes,
+                ProfileId = ProfileIds.DiabetesLongerLives,
                 ComparatorMap = comparatorMap,
                 AssignData = true
             }.Build();
 
-            IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(data.GroupRoots, comparatorMap, areaTypeId, profileId,
-                data.IndicatorMetadata, false);
+            IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(data.GroupRoots, 
+                comparatorMap, areaTypeId, profileId, data.IndicatorMetadata, false);
 
-            var highestQuintileCount = trendRoots.Select(x => x.DataPoints.Values.FirstOrDefault()[0].Significance).Count(significances => significances.ContainsValue((Significance)5));
+            var highestQuintileCount = trendRoots
+                .Select(x => x.DataPoints.Values.FirstOrDefault()[0].Significance)
+                .Count(significances => significances.ContainsValue((Significance)5));
             
             Assert.AreNotEqual(highestQuintileCount, 0);
-
         }
 
         [TestMethod]

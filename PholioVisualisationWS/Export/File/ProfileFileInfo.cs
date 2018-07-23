@@ -26,7 +26,7 @@ namespace PholioVisualisation.Export.File
             this.profileId = profileId;
 
             InitAreaString();
-            FilePath = Path.Combine(ApplicationConfiguration.ExportFileDirectory, FileName);
+            FilePath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, FileName);
         }
 
         /// <summary>

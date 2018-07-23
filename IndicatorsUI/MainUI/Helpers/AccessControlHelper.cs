@@ -1,9 +1,9 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class AccessControlHelper
     {

@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
+using Newtonsoft.Json;
 
 namespace Fpm.MainUI.Controllers
 {
@@ -31,9 +36,7 @@ namespace Fpm.MainUI.Controllers
             }
 
             var viewModel = GetViewModel(profileId);
-
-            viewModel.ProfileList = new ProfileMenuHelper()
-                .GetProfilesUserHasPermissionToExcludingSpecialProfiles(user);
+            viewModel.ProfileList = ProfileMenuHelper.GetProfileListForCurrentUser();
             ViewBag.DocumentItems = _reader.GetDocumentsWithoutFileData(profileId);
             ViewBag.ProfileId = profileId;
             return View(viewModel);
@@ -129,6 +132,60 @@ namespace Fpm.MainUI.Controllers
             }
 
             throw new FpmException("User does not have the right to delete document " + id);
+        }
+
+        [HttpPost]
+        [Route("publish")]
+        public async Task<ActionResult> Publish(int id)
+        {
+            // Read the live update key from the configuration
+            string liveUpdateKey = AppConfig.GetLiveUpdateKey();
+
+            // Read the api url from the configuration
+            string apiUrl = AppConfig.GetLiveSiteWsUrl();
+            apiUrl = apiUrl + "api/document";
+
+            // Read the document with file data to be published
+            Document document = _reader.GetDocumentWithFileData(id);
+
+            // If document not found then throw exception
+            if (document == null)
+            {
+                throw new FpmException("Content item could not be published with id " + id);
+            }
+
+            // Setup the http client object and post asynchronously to the web api method
+            // to publish the document on live server
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(apiUrl);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                // Serialise and add the live update key and document to the multi part form data content
+                using (var formData = new MultipartFormDataContent())
+                {
+                    formData.Add(new StringContent(JsonConvert.SerializeObject(liveUpdateKey)), "LiveUpdateKey");
+
+                    formData.Add(new StringContent(JsonConvert.SerializeObject(document)), "Document");
+
+                    // Post asynchronously the request to the web api method
+                    HttpResponseMessage response = await client.PostAsync(apiUrl, formData);
+
+                    // If the publishing of the document succeeded then return a json result
+                    if (response.IsSuccessStatusCode)
+                    {
+                        return new JsonResult
+                        {
+                            Data = "Success",
+                            JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                        };
+                    }
+                }
+            }
+
+            // If the code execution reached here throw exception
+            throw new FpmException("Publishing live failed for the document " + id);
         }
 
         private static DocumentsGridModel GetViewModel(int profileId)

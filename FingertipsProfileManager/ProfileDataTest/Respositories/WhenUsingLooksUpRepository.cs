@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Fpm.ProfileData;
 using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -7,13 +8,12 @@ namespace Fpm.ProfileDataTest.Respositories
     [TestClass]
     public class WhenUsingLooksUpRepository
     {
-
         private LookUpsRepository _lookUpsRepository;
 
         [TestInitialize]
         public void Init()
         {
-            _lookUpsRepository = new LookUpsRepository();
+            _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
         }
 
         [TestCleanup]

@@ -17,15 +17,15 @@ namespace PholioVisualisation.PholioObjectsTest
             ValueWithCIsData data = new ValueWithCIsData
             {
                 Value = 1,
-                LowerCI = 2,
-                UpperCI = 3,
+                LowerCI95 = 2,
+                UpperCI95 = 3,
                 Count = 4
             };
             ValueWithCIsData copy = data.GetValueWithCIsData();
             Assert.AreEqual(data.Value, copy.Value);
             Assert.AreEqual(data.Count, copy.Count);
-            Assert.AreEqual(data.LowerCI, copy.LowerCI);
-            Assert.AreEqual(data.UpperCI, copy.UpperCI);
+            Assert.AreEqual(data.LowerCI95, copy.LowerCI95);
+            Assert.AreEqual(data.UpperCI95, copy.UpperCI95);
         }
 
         [TestMethod]
@@ -34,30 +34,30 @@ namespace PholioVisualisation.PholioObjectsTest
             Assert.IsFalse(new ValueWithCIsData
             {
                 Value = 1,
-                LowerCI = ValueData.NullValue,
-                UpperCI = ValueData.NullValue
-            }.AreCIsValid);
+                LowerCI95 = null,
+                UpperCI95 = null
+            }.Are95CIsValid);
+
+            Assert.IsFalse(new ValueWithCIsData
+            {
+                Value = 1,
+                LowerCI95 = null,
+                UpperCI95 = 3
+            }.Are95CIsValid);
+
+            Assert.IsFalse(new ValueWithCIsData
+            {
+                Value = 1,
+                LowerCI95 = 2,
+                UpperCI95 = null
+            }.Are95CIsValid);
 
             Assert.IsTrue(new ValueWithCIsData
             {
                 Value = 1,
-                LowerCI = ValueData.NullValue,
-                UpperCI = 3
-            }.AreCIsValid);
-
-            Assert.IsTrue(new ValueWithCIsData
-            {
-                Value = 1,
-                LowerCI = 2,
-                UpperCI = ValueData.NullValue
-            }.AreCIsValid);
-
-            Assert.IsTrue(new ValueWithCIsData
-            {
-                Value = 1,
-                LowerCI = 2,
-                UpperCI = 3
-            }.AreCIsValid);
+                LowerCI95 = 2,
+                UpperCI95 = 3
+            }.Are95CIsValid);
         }
     }
 }

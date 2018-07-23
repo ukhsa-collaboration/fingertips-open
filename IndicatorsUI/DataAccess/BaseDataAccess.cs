@@ -5,7 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class BaseDataAccess
     {

@@ -1,21 +1,20 @@
 using Newtonsoft.Json;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Models;
-using Profiles.MainUI.Skins;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
+using IndicatorsUI.MainUI.Skins;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class BaseController : Controller
     {
         protected PageModel PageModel;
-        protected string Host;
-        protected AppConfig appConfig = AppConfig.Instance;
+        protected IAppConfig _appConfig;
         protected ProfileCollectionBuilder ProfileCollectionBuilder;
 
         protected override void HandleUnknownAction(string actionName)
@@ -23,44 +22,57 @@ namespace Profiles.MainUI.Controllers
             ErrorController.InvokeHttp404(HttpContext);
         }
 
+        protected BaseController(IAppConfig appConfig)
+        {
+            _appConfig = appConfig;
+        }
+
         protected virtual void NewPageModel()
         {
-            PageModel = new PageModel(appConfig);
+            PageModel = new PageModel(_appConfig);
         }
 
         protected void InitPageModel()
         {
-            ProfileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), appConfig);
-            NewPageModel();
+            var versionFolder = _appConfig.JavaScriptVersionFolder;
+            if (PageModel == null)
+            {
+                ProfileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), _appConfig);
+                NewPageModel();
+                           
+                PageModel.CoreServicesUrl = _appConfig.CoreWsUrl;
+                PageModel.UseMinifiedJavaScript = _appConfig.UseMinifiedJavaScript;
 
-            var versionFolder = appConfig.JavaScriptVersionFolder;
+                PageModel.SetJavaScriptVersionFolder(versionFolder);
+                PageModel.Skin = SkinFactory.GetSkin();
 
-            PageModel.CoreServicesUrl = appConfig.CoreWsUrl;
-            PageModel.UseMinifiedJavaScript = appConfig.UseMinifiedJavaScript;
+                PageModel.ProfileCollections = new List<ProfileCollection>();
+                
 
-            PageModel.SetJavaScriptVersionFolder(versionFolder);
-            PageModel.Skin = SkinFactory.GetSkin();
+                PageModel.NationalProfileCollection =
+                    ProfileCollectionBuilder.GetCollection(ProfileCollectionIds.NationalProfiles);
 
-            PageModel.ProfileCollections = new List<ProfileCollection>();
-            PageModel.ProfileCollectionIdList = new int[] { };
+                PageModel.HighlightedProfileCollection =
+                    ProfileCollectionBuilder.GetCollection((ProfileCollectionIds.HighlightedProfiles));
 
-            PageModel.NationalProfileCollection = ProfileCollectionBuilder.GetCollection(ProfileCollectionIds.NationalProfiles);
-
-            PageModel.HighlightedProfileCollection =
-                ProfileCollectionBuilder.GetCollection((ProfileCollectionIds.HighlightedProfiles));
-
+                SetBridgeServicesUrl();
+                ViewBag.ImagesUrl = _appConfig.StaticContentUrl + versionFolder + "images/";
+                ViewBag.PdfUrl = _appConfig.PdfUrl;
+                ViewBag.UseGoogleAnalytics = _appConfig.UseGoogleAnalytics;
+                ViewBag.JavaScriptVersion = versionFolder;
+                ViewBag.PageModel = PageModel;
+            }
             SetBridgeServicesUrl();
-            ViewBag.ImagesUrl = appConfig.StaticContentUrl + versionFolder + "images/";
-            ViewBag.PdfUrl = appConfig.PdfUrl;
-            ViewBag.UseGoogleAnalytics = appConfig.UseGoogleAnalytics;
+            ViewBag.ImagesUrl = _appConfig.StaticContentUrl + versionFolder + "images/";
+            ViewBag.PdfUrl = _appConfig.PdfUrl;
+            ViewBag.UseGoogleAnalytics = _appConfig.UseGoogleAnalytics;
             ViewBag.JavaScriptVersion = versionFolder;
-            ViewBag.ShowCancer = appConfig.ShowCancer;
-            ViewBag.FeatureSwitch = appConfig.FeatureSwitch;
+            ViewBag.FeatureSwitchJavaScript = JsonConvert.SerializeObject(_appConfig.ActiveFeatures);
         }
 
         private void SetBridgeServicesUrl()
         {
-            var bridge = appConfig.BridgeWsUrl;
+            var bridge = _appConfig.BridgeWsUrl;
             if (string.IsNullOrEmpty(bridge))
             {
                 IfRequestNotDefinedExplainWhy();
@@ -73,6 +85,7 @@ namespace Profiles.MainUI.Controllers
                 bridge = protocol + url.Authority + "/";
             }
             PageModel.BridgeServicesUrl = bridge;
+            ViewBag.BridgeServiceUrl = bridge;
         }
 
         private void IfRequestNotDefinedExplainWhy()
@@ -145,7 +158,7 @@ namespace Profiles.MainUI.Controllers
                 ViewBag.ShowDataQuality = details.ShowDataQuality.ToString().ToLower();
                 ViewBag.IsNational = details.IsNational;
 
-                ViewBag.FingertipsUrl = new FingertipsUrl(appConfig, Request.Url).ProtocolAndHost;
+                ViewBag.FingertipsUrl = new FingertipsUrl(_appConfig, Request.Url).ProtocolAndHost;
                 PageModel.IsOfficialStatistics = details.IsOfficialStatistics;
                 PageModel.FrontPageAreaSearchAreaTypes = details.FrontPageAreaSearchAreaTypes;
                 PageModel.HasAnyData = details.HasAnyData;
@@ -183,6 +196,10 @@ namespace Profiles.MainUI.Controllers
 
             ViewBag.Title = longerLivesDetails.Title;
             ViewBag.DomainsToDisplay = longerLivesDetails.DomainsToDisplay;
+            ViewBag.ShowCallOutBoxPopulation = details.LongerLivesProfileDetails.ShowCallOutBoxPopulation;
+            ViewBag.ShowRankingInfoBox1 = details.LongerLivesProfileDetails.ShowRankingInfoBox1;
+            ViewBag.ShowRankingInfoBox2 = details.LongerLivesProfileDetails.ShowRankingInfoBox2;
+            ViewBag.ShowQuintilesLegend = details.LongerLivesProfileDetails.ShowQuintilesLegend;
         }
 
         protected void AssignDomainHeadings(ProfileDetails details)
@@ -203,10 +220,18 @@ namespace Profiles.MainUI.Controllers
                 ? details
                 : new ProfileDetailsBuilder(leadProfileUrlKey).Build();
 
-            var profileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), appConfig);
+            var profileCollectionBuilder = new ProfileCollectionBuilder(ReaderFactory.GetProfileReader(), _appConfig);
 
             PageModel.ProfileCollections = new ProfileCollectionListBuilder(profileCollectionBuilder)
                 .GetProfileCollections(leadProfileUrlKey, profileDetails.ProfileCollectionIds);
+        }
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            base.OnActionExecuting(filterContext);
+
+            // Called here because the Request object is not available in the constructor
+            InitPageModel();
         }
     }
 }

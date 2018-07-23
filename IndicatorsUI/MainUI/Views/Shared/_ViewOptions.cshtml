@@ -1,0 +1,53 @@
+﻿@using IndicatorsUI.MainUI.Models
+@model PageModel
+@* Tabs *@
+<div id="tabs" class="selectionBox clearfix">
+</div>
+@* Menus and key *@
+@{
+    var hasNearestNeighbours = ViewBag.IsNational;
+}
+
+<div id="view-options" class="container">
+    <div class="row" id="area-type">
+        <div class="col-md-4">    
+            @Html.Partial("_AreaTypeMenu")
+        </div>
+        <div class="col-md-5">
+            @Html.Partial("_ParentTypeMenu")
+        </div>
+        <div class="col-md-3">
+            @Html.Partial("_BenchmarkMenu")
+            @Html.Partial("_BenchmarkAgainstGoal")
+        </div>
+        <div id="nearest-neighbour-links" class="col-md-9" style="display: none;"></div>
+    </div>
+
+    <div class="row" id="area">
+        @if (hasNearestNeighbours)
+        {
+            <div id="nearest-neighbour-header" class="col-md-9" style="display: none;"></div>
+        }
+        <div class="col-md-4">
+            @Html.Partial("_AreaMenu")
+        </div>
+        <div class="col-md-4">
+            @Html.Partial("_ParentAreaMenu")
+            @if (hasNearestNeighbours)
+            {
+                <div id="nearest-neighbour-wrapper" style="display: none;">
+                    <a id="nearest-neighbour-link" onclick="nearestNeighboursSelected()" class="a-link"></a>
+                </div>
+            }
+        </div>
+    </div>
+    <!--Here's the GP address placeholder-->
+    @Html.Partial("_GPPracticeAddress")
+    <div class="row">
+        <div class="col-md-12">
+            @Html.Partial("_IndicatorsMenu")
+        </div>
+    </div>
+</div>
+@Html.Partial("_Key")
+

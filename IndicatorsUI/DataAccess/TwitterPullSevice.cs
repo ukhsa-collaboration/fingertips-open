@@ -7,9 +7,9 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json.Linq;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class TwitterPullService
     {
@@ -28,7 +28,6 @@ namespace Profiles.DataAccess
             _consumerSecret = consumerSecret;
             _handle = twitterHandle;
         }
-
 
         public List<Tweet> ListTweetsOnUserTimeline(int noOfTweets = 3)
         {

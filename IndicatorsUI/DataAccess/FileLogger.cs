@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     /// <summary>
     ///     Simple logger for writing to a text file.

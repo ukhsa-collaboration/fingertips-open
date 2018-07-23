@@ -20,7 +20,7 @@ namespace PholioVisualisation.FormattingTest
             IndicatorMetadata metadata = new IndicatorMetadata { YearTypeId = 1 };
 
             Limits limits = new Limits { Min = 0, Max = 50 };
-            var formatter = NumericFormatterFactory.NewWithLimits(metadata, limits);
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(metadata, limits);
             new GroupRootFormatter().Format(groupRoot, metadata, new DataPointTimePeriodFormatter(), formatter);
 
             Assert.AreEqual("2005", groupRoot.Grouping[0].TimePeriodText);

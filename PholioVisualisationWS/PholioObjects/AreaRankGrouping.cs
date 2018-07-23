@@ -19,5 +19,16 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public AreaRank Max { get; set; }
 
+        [JsonProperty]
+        public int IID { get; set; }
+
+        [JsonProperty]
+        public Sex Sex { get; set; }
+
+        [JsonProperty]
+        public Age Age { get; set; }
+
+        [JsonProperty]
+        public int PolarityId { get; set; }
     }
 }

@@ -40,6 +40,19 @@
             '<button class="btn btn-secondary active" onclick="lightbox.hide()">Cancel</button></div>',
             20, 400, 600);
     });
+
+    // Init publish document buttons
+    $('.document-publish').click(function (evt) {
+        evt.preventDefault();
+        var $publishLink = $(this);
+        var documentId = $publishLink.attr("documentId");
+
+        lightbox.show("<h3>Publish document</h3>" +
+            "<p>This document will be published to Live.</p><p>Are you sure you want to go ahead?</p>" +
+            '<div class="form-group"><button class="btn btn-primary active" onclick="publishDocument(' + documentId + ')">Confirm</button> ' +
+            '<button class="btn btn-secondary active" onclick="lightbox.hide()">Cancel</button></div>',
+            150, 400, 400);
+    });
 }
 
 function deleteDocument(documentId) {
@@ -50,6 +63,16 @@ function deleteDocument(documentId) {
       }).fail(function () {
           alert("Failed to delete");
       });
+}
+
+function publishDocument(documentId) {
+    $.post("documents/publish?id=" + documentId
+    ).done(function () {
+        $('#document-publish-live-td-' + documentId).html('<span class="update-success">Published</span>');
+        lightbox.hide();
+    }).fail(function () {
+        showSimpleMessagePopUp('Sorry, that did not work');
+    });
 }
 
 function showUploadControl() {

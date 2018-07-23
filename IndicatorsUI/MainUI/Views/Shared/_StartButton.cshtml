@@ -1,15 +1,10 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Models
+﻿@using IndicatorsUI.MainUI.Models
 @model PageModel
 @if (Model.HasAnyData)
 {
     var urlKey = ViewBag.ProfileUrlKey;
     string href;
-    if (Model.ProfileId == ProfileIds.Phof)
-    {
-        href = string.Format("/{0}#gid/{1}", urlKey, GroupIds.Phof_OverarchingIndicators);
-    }
-    else if (Model.DefaultFingertipsTabId == -1)
+    if (Model.DefaultFingertipsTabId == -1)
     {
         href = string.Format("/profile/{0}/data", urlKey);
     }

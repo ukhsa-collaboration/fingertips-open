@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
+using PholioVisualisation.UserData.IndicatorLists;
 
-namespace ServicesWeb
+namespace PholioVisualisation.ServicesWeb
 {
     public class AutoMapperConfig
     {
         public static void RegisterMappings()
         {
-            Mapper.Initialize(cfg =>
-            {
-                //  cfg.CreateMap<CoreDataSet, CoreDataSetArchive>();
-            });
-            Mapper.Configuration.CompileMappings();
         }
     }
 }

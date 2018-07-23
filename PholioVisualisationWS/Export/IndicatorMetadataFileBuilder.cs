@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.Analysis;
 using PholioVisualisation.DataConstruction;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.Export
@@ -9,12 +11,14 @@ namespace PholioVisualisation.Export
     {
         private IndicatorMetadataProvider _indicatorMetadataProvider;
         private GroupingListProvider _groupingListProvider;
+        private IList<Polarity> _polarities;
 
         public IndicatorMetadataFileBuilder(IndicatorMetadataProvider indicatorMetadataProvider,
-            GroupingListProvider groupingListProvider)
+            GroupingListProvider groupingListProvider, IList<Polarity> polarities)
         {
             _indicatorMetadataProvider = indicatorMetadataProvider;
             _groupingListProvider = groupingListProvider;
+            _polarities = polarities;
         }
 
         public byte[] GetFileForGroups(IList<int> groupIds)
@@ -68,13 +72,26 @@ namespace PholioVisualisation.Export
 
             // Sort metadata according to grouping order
             var orderedMetadata = new List<IndicatorMetadata>();
+            var orderedPolarities = new List<Polarity>();
             foreach (var indicatorId in groupings.Select(x => x.IndicatorId).Distinct())
             {
+                var polarity = GetMostCommonPolarity(groupings, indicatorId);
+                orderedPolarities.Add(polarity);
                 orderedMetadata.Add(metadataList.First(x => x.IndicatorId == indicatorId));
             }
 
-            return new MultipleIndicatorMetadataFileWriter().GetMetadataFileAsBytes(orderedMetadata,
+            return new MultipleIndicatorMetadataFileWriter().GetMetadataFileAsBytes(orderedMetadata, orderedPolarities,
                 GetIndicatorMetadataTextProperties());
+        }
+
+        /// <summary>
+        /// Get most frquently used polarity
+        /// </summary>
+        private Polarity GetMostCommonPolarity(IList<Grouping> groupings, int indicatorId)
+        {
+            groupings = groupings.Where(x => x.IndicatorId == indicatorId).ToList();
+            var polarityId = new GroupingSorter(groupings).GetMostCommonPolarityId();
+            return _polarities.First(x => x.Id == polarityId);
         }
 
         private IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties()

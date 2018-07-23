@@ -32,7 +32,8 @@ areaSearch.init = function () {
     var areaTypeId = areaSearch.getAreaTypeForSearchResults();
 
     // Set parent area
-    ns.state.parentAreaType = areaTypeId === AreaTypeIds.CCG
+    ns.state.parentAreaType = areaTypeId === AreaTypeIds.CCGPreApr2017 ||
+        areaTypeId === AreaTypeIds.CCGPostApr2017
         ? AreaTypeIds.Subregion
         : AreaTypeIds.Region;
 
@@ -357,7 +358,7 @@ areaSearchResults.prepareViewModel = function () {
     // Init area type names
     var areaTypeNames = [];
     var areaTypeNameHash = {
-        19: 'CCGs',
+        153: 'CCGs',
         102:'Counties / Unitary Authorities', 
         101:'Districts'
     };

@@ -34,12 +34,7 @@ function goToTartanRugPage() {
 
         ui.setScrollTop();
 
-        // Enable floating table header for area names
-        // **** Please note - 15/04/2016 - The jquery.floatThead.js file has been manualy modified to ensure
-        // the sticky-heading functionality works for IE - See comments in this file and FIN-748
-        if (!isIE8() && !isIE9()) {
-            $('#left-tartan-table,#rightTartanTable').floatThead({ position: 'absolute' });
-        }
+        $('#left-tartan-table,#rightTartanTable').floatThead({ position: 'absolute' });
 
         unlock();
     }
@@ -84,6 +79,7 @@ tartanRug.ViewManager = function (config) {
                     // Needed so does not load the repage
                     ev.preventDefault();
                     tartanRug.saveAsImage();
+                    logEvent('ExportImage', getCurrentPageTitle());
                 }
             }
         };
@@ -308,10 +304,12 @@ function setTartanRugHtml(isDownloadable) {
 
             rug.newRow(groupRootIndex);
 
+            var newDataBadge = hasDataChanged(groupRoot) ? NEW_DATA_BADGE : '';
+
             rug.setIndicator(
                 metadataText.Name + new SexAndAge().getLabel(groupRoot),
-                getIndicatorDataQualityHtml(metadataText.DataQuality) + '<br>' +
-                getTargetLegendHtml(comparisonConfig, indicatorMetadata)
+                getIndicatorDataQualityHtml(metadataText.DataQuality) + newDataBadge + '<br>' +
+                getTargetLegendHtml(comparisonConfig, indicatorMetadata) 
             );
 
             // National data
@@ -552,7 +550,7 @@ function TartanRug(areaCount, isSubnationalDisplayed, isDownloadable, trendDispl
     };
 
     this.setIndicator = function (name, dataQuality) {
-        row.indicator = name;
+        row.indicator = name ;
         row.indicatorDataQuality = dataQuality;
     };
 
@@ -803,27 +801,23 @@ var TrendDisplayOption = {
 
 tartanRug.saveAsImage = function () {
 
-    if (isIE8()) {
-        browserUpgradeMessage();
-    } else {
+    // Reset so no scroll - any scroll can produce weird results
+    $(window).scrollTop(0);
 
-        // Reset so no scroll - any scroll can produce weird results
-        $(window).scrollTop(0);
+    // resize the tartan rug and show overflow
+    tartanRugResize(tartanRugSizeState.Expand);
+    $('#keyTartanRug').css('font-family', 'Arial');
 
-        // resize the tartan rug and show overflow
-        tartanRugResize(tartanRugSizeState.Expand);
-        $('#keyTartanRug').css('font-family', 'Arial');
+    styleTartanRugForExport();
 
-        styleTartanRugForExport();
+    // capture the tartan rug
+    var overviewContainer = $('#overview-container');
+    var keyContainer = $('#keyTartanRug').clone().attr('id', 'overviewKeys').after('#id');
+    overviewContainer.prepend(keyContainer);
+    saveElementAsImage(overviewContainer, 'OverviewTable');
 
-        // capture the tartan rug
-        var overviewContainer = $('#overview-container');
-        var keyContainer = $('#keyTartanRug').clone().attr('id', 'overviewKeys').after('#id');
-        overviewContainer.prepend(keyContainer);
-        saveElementAsImage(overviewContainer, 'OverviewTable');
-        // put the tartan rug back to normal        
-        goToTartanRugPage();
-    }
+    // put the tartan rug back to normal        
+    goToTartanRugPage();
 }
 
 function styleTartanRugForExport() {
@@ -847,9 +841,9 @@ function styleTartanRugForExport() {
 * @method showTrendInfo
 */
 function showTrendInfo() {
-    var top = 300,
-        popupWidth = 600,
-        left = ($(window).width() - popupWidth) / 2;
+    var top = 300;
+    var popupWidth = 600;
+    var left = lightbox.getLeftForCenteredPopup(popupWidth);
 
     var parameters = new ParameterBuilder().add('profile_id', ProfileIds.Phof).add('key', 'trends-info');
 
@@ -903,7 +897,7 @@ templates.add('tartan',
         '{{#benchmarks}}<th class="comparator-header">{{{0}}}</th>{{/benchmarks}}' +
         '</tr></thead><tbody>{{#rows}}<tr>' +
         '{{#divider}}<td class="tartan-divider" colspan="5"><div class="divider-box">&nbsp;<div class="divider-text">{{heading}}</div></div></td>{{/divider}}' +
-        '{{^divider}}<td id="rug-indicator-{{rootIndex}}" class="rug-indicator pLink" onclick="indicatorNameClicked(\'{{rootIndex}}\');" onmouseover="highlightRow(this, false);" onmouseout="unhighlightRow(false);"><div>{{indicator}}{{{indicatorDataQuality}}}</div></td>' +
+        '{{^divider}}<td id="rug-indicator-{{rootIndex}}" class="rug-indicator pLink" onclick="indicatorNameClicked(\'{{rootIndex}}\');" onmouseover="highlightRow(this, false);" onmouseout="unhighlightRow(false);"><div>{{{indicator}}}{{{indicatorDataQuality}}}</div></td>' +
         '<td class="rug-period center">{{period}}</td>' +
         '<td class="sort"><a class="rowSort" title="Sort on {{indicator}}" href="javascript:sortTartanRug({{number}});">&nbsp;</a></td>' +
         '{{#benchmarkValues}}{{{html}}}{{/benchmarkValues}}' +

@@ -1,10 +1,10 @@
-﻿@using Profiles.MainUI.Models
+﻿@using IndicatorsUI.MainUI.Models
 @if ((int)ViewBag.EnumParentDisplay == (int)ParentDisplay.NationalAndRegional)
 {
     var targetBenchmarkChecked = Model.UseTargetBenchmarkByDefault ? "checked='checked'" : "";
     <div id="target-benchmark-box" style="display: none;">
         <ul class="menu" style="width:250px;">
-            <li class="label">
+            <li>
                 Benchmark against goal where applicable
             </li>
             <li>

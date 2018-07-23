@@ -1,17 +1,19 @@
-﻿@using Profiles.DomainObjects
-@using Profiles.MainUI.Helpers
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
 @model ProfileCollection
 
-<h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
+@if (Model.ProfileCollectionItems.Any())
+{
+    <h2 class="home-area-text">@Model.CollectionSkinTitle</h2>
 
-<table class="table margin-left">
-    <tbody>
+    <table class="table margin-left">
+        <tbody>
         @{
             int itemCount = Model.ProfileCollectionItems.Count();
             int columnCount = itemCount == 4
                 ? 2 // 2 x 2
                 : 3;
-            int columnWidth = 100 / columnCount;
+            int columnWidth = 100/columnCount;
             var rowAssigner = new RowAssigner(columnCount);
         }
 
@@ -22,36 +24,36 @@
                 @Html.Raw("<tr>")
             }
 
-        <td style="width:@(columnWidth)%;">
-            @Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)
+            <td style="width: @(columnWidth)%;">
+                @Html.Partial("_ProfileCollectionItemLink", profileCollectionItem)
 
 
-            @ContentProvider.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
+                @ContentProvider.GetContent(ContentKeys.Description, profileCollectionItem.ProfileDetails.Id)
 
 
-            @if (profileCollectionItem.DisplayDomains)
-            {
-                <ul>
-                    @foreach (var domain in profileCollectionItem.ProfileDetails.Domains)
-                    {
-                        <li class="domain-heading-link">
-                            @if (profileCollectionItem.ProfileDetails.HasExclusiveSkin)
-                            {
-                                <a href="@profileCollectionItem.ExternalUrl/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
-                            }
-                            else if (Model.IsCollectionFrontPage)
-                            {
-                                <a href="/profile-group/@Model.UrlKey/profile/@profileCollectionItem.ProfileDetails.ProfileUrlKey/data#gid/@domain.GroupId">@domain.SubHeading</a>
-                            }
-                            else
-                            {
-                                <a href="/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
-                            }
-                        </li>
-                    }
-                </ul>
-            }
-        </td>
+                @if (profileCollectionItem.DisplayDomains)
+                {
+                    <ul>
+                        @foreach (var domain in profileCollectionItem.ProfileDetails.Domains)
+                        {
+                            <li class="domain-heading-link">
+                                @if (profileCollectionItem.ProfileDetails.HasExclusiveSkin)
+                                {
+                                    <a href="@profileCollectionItem.ExternalUrl/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
+                                }
+                                else if (Model.IsCollectionFrontPage)
+                                {
+                                    <a href="/profile-group/@Model.UrlKey/profile/@profileCollectionItem.ProfileDetails.ProfileUrlKey/data#gid/@domain.GroupId">@domain.SubHeading</a>
+                                }
+                                else
+                                {
+                                    <a href="/@profileCollectionItem.ProfileDetails.ProfileUrlKey#gid/@domain.GroupId">@domain.SubHeading</a>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+            </td>
             if (rowAssigner.IsItemLastOfRow)
             {
                 @Html.Raw("</tr>")
@@ -61,4 +63,4 @@
         }
         </tbody>
     </table>
-
+}

@@ -25,7 +25,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void NewCcgCoreDataSetProvider()
         {
-            Assert.IsTrue(Provider(AreaTypeIds.Ccg) is CcgCoreDataSetProvider);
+            Assert.IsTrue(Provider(AreaTypeIds.CcgsPreApr2017) is CcgCoreDataSetProvider);
         }
 
         [TestMethod]

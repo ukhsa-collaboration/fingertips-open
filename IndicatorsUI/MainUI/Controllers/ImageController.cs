@@ -1,17 +1,17 @@
 ﻿using System;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     public class ImageController : Controller
     {
+        [Route("img/vertical-text")]
         [FingertipsOutputCache]
         [ValidateInput(false)]
         public ActionResult VerticalText(string text)
@@ -22,6 +22,7 @@ namespace Profiles.MainUI.Controllers
             return new FileStreamResult(stream, "image/png");
         }
 
+        [Route("img/gp-scatter-chart")]
         [FingertipsOutputCache]
         public ActionResult PracticeScatterChart()
         {
@@ -37,6 +38,7 @@ namespace Profiles.MainUI.Controllers
         /// <summary>
         /// Returns png image from HTML canvas 
         /// </summary>
+        [Route("capture-shot")]
         [HttpPost]
         public ActionResult CaptureShot(FormCollection formCollection)
         {

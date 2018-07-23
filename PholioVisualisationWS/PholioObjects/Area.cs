@@ -4,6 +4,8 @@ namespace PholioVisualisation.PholioObjects
 {
     public class Area : IArea
     {
+        private int? _sequence;
+
         [JsonProperty]
         public string Code { get; set; }
 
@@ -24,8 +26,20 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsCurrent { get; set; }
 
-        [JsonIgnore]
-        public int? Sequence { get; set; }
+        [JsonProperty]
+        public virtual int? Sequence
+        {
+            get { return _sequence; }
+            set { _sequence = value; }
+        }
+
+        /// <summary>
+        /// Whether or not Sequence should be serialised to JSON.
+        /// </summary>
+        public bool ShouldSerializeSequence()
+        {
+            return _sequence.HasValue;
+        }
 
         /// <summary>
         /// Whether or not the area is a CCG.
@@ -33,7 +47,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsCcg
         {
-            get { return AreaTypeId == AreaTypeIds.Ccg; }
+            get { return AreaTypeId == AreaTypeIds.CcgsPreApr2017; }
         }
 
         /// <summary>
@@ -82,12 +96,16 @@ namespace PholioVisualisation.PholioObjects
         }
 
         /// <summary>
-        /// Whether or not the area is a PCT.
+        /// Whether or not the area is an ONS Cluster Group.
         /// </summary>
         [JsonIgnore]
-        public bool IsPct
+        public bool IsOnsClusterGroup
         {
-            get { return AreaTypeId == AreaTypeIds.Pct; }
+            get
+            {
+                return AreaTypeId == AreaTypeIds.OnsClusterGroup2001 ||
+                  AreaTypeId == AreaTypeIds.OnsClusterGroup2011;
+            }
         }
 
         /// <summary>

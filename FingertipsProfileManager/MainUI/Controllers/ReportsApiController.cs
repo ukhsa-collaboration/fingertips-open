@@ -28,8 +28,11 @@ namespace Fpm.MainUI.Controllers
                 {
                     Id = report.Id,
                     Name = report.Name,
+                    File = report.File,
                     Parameters = report.Parameters.Split(',').ToList(),
-                    Profiles = profiles
+                    Profiles = profiles,
+                    Notes = report.Notes,
+                    IsLive = report.IsLive
                 });
             }
 
@@ -48,8 +51,11 @@ namespace Fpm.MainUI.Controllers
             {
                 Id = report.Id,
                 Name = report.Name,
+                File = report.File,
                 Parameters = report.Parameters.Split(',').ToList(),
-                Profiles = profilesForReport.Where(x => x.ReportId == report.Id).Select(x => x.ProfileId).ToList()
+                Profiles = profilesForReport.Where(x => x.ReportId == report.Id).Select(x => x.ProfileId).ToList(),
+                Notes = report.Notes,
+                IsLive = report.IsLive
             };
 
             var json = JsonConvert.SerializeObject(response);
@@ -72,8 +78,12 @@ namespace Fpm.MainUI.Controllers
             var report = new Report
             {
                 Name = model.Name,
-                Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : ""
+                File = model.File,
+                Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : "",
+                Notes = model.Notes,
+                IsLive = model.IsLive
             };
+
 
             var reportId = _repo.AddReport(report);
 
@@ -104,7 +114,10 @@ namespace Fpm.MainUI.Controllers
             {
                 Id = model.Id,
                 Name = model.Name,
-                Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : ""
+                File = model.File,
+                Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : "",
+                Notes = model.Notes,
+                IsLive = model.IsLive
             };
 
             _repo.UpdateReport(report);

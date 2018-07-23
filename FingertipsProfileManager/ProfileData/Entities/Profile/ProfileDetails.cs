@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using Fpm.ProfileData.Entities.LookUps;
+﻿using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.User;
+using System.Collections.Generic;
 
 namespace Fpm.ProfileData.Entities.Profile
 {
@@ -16,7 +16,7 @@ namespace Fpm.ProfileData.Entities.Profile
 
         public string DomainDescription { get; set; }
 
-        public IEnumerable<UserGroupPermissions> UserPermissions { get; set; } 
+        public IEnumerable<UserGroupPermissions> UserPermissions { get; set; }
 
         public int DefaultAreaTypeId { get; set; }
         public int ContactUserId { get; set; }
@@ -48,20 +48,22 @@ namespace Fpm.ProfileData.Entities.Profile
         public string StaticReportsLabel { get; set; }
         public string LeadProfileForCollectionIds { get; set; }
         public bool IsChangeFromPreviousPeriodShown { get; set; }
-        
+
         public string SortBy { get; set; }
 
         public List<int> GroupIds { get; set; }
 
         public int SpineChartMinMaxLabelId { get; set; }
 
-        public IEnumerable<AreaType>PdfAreaTypes { get; set; }
+        public IEnumerable<AreaType> PdfAreaTypes { get; set; }
+
+        public int NewDataTimeSpanInDays { get; set; }
 
         public void SetDefaultValues(string extraJsFiles)
         {
             DefaultAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
             ExtraJsFiles = extraJsFiles;
-            ExtraCssFiles = "+map";
+            ExtraCssFiles = "PageMap.css";
             EnumParentDisplay = 0;
             AreasIgnoredForSpineChart =
                 AreaCodes.CountyUa_IslesOfScilly + "," + AreaCodes.CountyUa_CityOfLondon;

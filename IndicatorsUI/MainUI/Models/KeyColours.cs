@@ -1,4 +1,4 @@
-﻿namespace Profiles.MainUI.Models
+﻿namespace IndicatorsUI.MainUI.Models
 {
     public static class KeyColours
     {

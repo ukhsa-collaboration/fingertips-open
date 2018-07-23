@@ -1,6 +1,6 @@
-﻿using Profiles.DomainObjects;
+﻿using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public class SearchLabels
     {

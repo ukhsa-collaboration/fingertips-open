@@ -14,6 +14,7 @@
     @Scripts.Render("~/js/common")
     @Scripts.Render("~/js/bootstrap")
     @RenderSection("ExtraScripts", required:false)
+
 </head>
 <body>
     @Html.Partial("_Banner")
@@ -25,6 +26,5 @@
     </div>
         @Html.Partial("_Footer")
         @RenderSection("AngularApp", required: false);
-
 </body>
 </html>

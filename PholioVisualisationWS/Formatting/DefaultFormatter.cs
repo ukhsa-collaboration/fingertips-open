@@ -48,18 +48,28 @@ namespace PholioVisualisation.Formatting
         {
             if (data != null && data.HasFormattedCIs == false)
             {
-                data.UpperCIF = FormatValue(data.UpperCI);
-                data.LowerCIF = FormatValue(data.LowerCI);
+                data.UpperCI95F = FormatNullableValue(data.UpperCI95);
+                data.LowerCI95F = FormatNullableValue(data.LowerCI95);
+                data.UpperCI99_8F = FormatNullableValue(data.UpperCI99_8);
+                data.LowerCI99_8F = FormatNullableValue(data.LowerCI99_8);
             }
         }
 
         private string FormatValue(double val)
         {
-            if (val == -1)
+            if (val == ValueData.NullValue)
             {
                 return NoValue;
             }
             return formatMethod(val);
+        }
+
+        /// <summary>
+        /// Nullables are never -1
+        /// </summary>
+        private string FormatNullableValue(double? val)
+        {
+            return val.HasValue ? formatMethod(val.Value) : NoValue;
         }
 
         private string FormatOnValue(double val)
@@ -79,13 +89,23 @@ namespace PholioVisualisation.Formatting
             return Format2DP(val);
         }
 
+        private string FormatNullableOnValue(double? val)
+        {
+            if (val.HasValue)
+            {
+                return FormatOnValue(val.Value);
+            }
+            return NoValue;
+        }
+
         protected override void SetFormatMethod()
         {
             if (limits == null)
             {
-                formatMethod = FormatOnValue;
+                formatMethod = FormatOnValue;                                                                                                                                                          
+                formatNullableMethod = FormatNullableOnValue;
                 return;
-            }
+            }                                                                                                                                          
 
             double max = limits.Max;
 

@@ -15,8 +15,8 @@ namespace PholioVisualisation.AnalysisTest
         {
             var trendMarkerResult = new TrendMarkerResult();
             new TrendBetweenTwoValuesCalculator().SetTrendMarker(
-                new CoreDataSet { Value = 1, LowerCI = 0.9, UpperCI = 1.1 },
-                new CoreDataSet { Value = 2, LowerCI = 1.9, UpperCI = 2.1 },
+                new CoreDataSet { Value = 1, LowerCI95 = 0.9, UpperCI95 = 1.1 },
+                new CoreDataSet { Value = 2, LowerCI95 = 1.9, UpperCI95 = 2.1 },
                 trendMarkerResult);
 
             Assert.AreEqual(TrendMarker.Decreasing,
@@ -28,8 +28,8 @@ namespace PholioVisualisation.AnalysisTest
         {
             var trendMarkerResult = new TrendMarkerResult();
             new TrendBetweenTwoValuesCalculator().SetTrendMarker(
-                new CoreDataSet { Value = 1, LowerCI = 0.9, UpperCI = 1.6 },
-                new CoreDataSet { Value = 2, LowerCI = 1.5, UpperCI = 2.1 },
+                new CoreDataSet { Value = 1, LowerCI95 = 0.9, UpperCI95 = 1.6 },
+                new CoreDataSet { Value = 2, LowerCI95 = 1.5, UpperCI95 = 2.1 },
                 trendMarkerResult);
 
             Assert.AreEqual(TrendMarker.NoChange,
@@ -52,8 +52,8 @@ namespace PholioVisualisation.AnalysisTest
         {
             var trendMarkerResult = new TrendMarkerResult();
             new TrendBetweenTwoValuesCalculator().SetTrendMarker(
-                new CoreDataSet { Value = 1, LowerCI =ValueData.NullValue, UpperCI = ValueData.NullValue },
-                new CoreDataSet { Value = 2, LowerCI = 1.5, UpperCI = 2.1 },
+                new CoreDataSet { Value = 1 },
+                new CoreDataSet { Value = 2, LowerCI95 = 1.5, UpperCI95 = 2.1 },
                 trendMarkerResult);
 
             Assert.AreEqual(TrendMarker.CannotBeCalculated,
@@ -65,10 +65,10 @@ namespace PholioVisualisation.AnalysisTest
         {
             var dataList = new List<CoreDataSet>
             {
-                new CoreDataSet { Value = 2, LowerCI = 1.9, UpperCI = 2.1, Year = 2000 },
-                new CoreDataSet { Value = 2, LowerCI = 1.9, UpperCI = 2.1, Year = 2002 },
-                new CoreDataSet { Value = 1, LowerCI = 0.9, UpperCI = 1.1, Year = 2003 },
-                new CoreDataSet { Value = 2, LowerCI = 1.5, UpperCI = 2.1, Year = 2001 }
+                new CoreDataSet { Value = 2, LowerCI95 = 1.9, UpperCI95 = 2.1, Year = 2000 },
+                new CoreDataSet { Value = 2, LowerCI95 = 1.9, UpperCI95 = 2.1, Year = 2002 },
+                new CoreDataSet { Value = 1, LowerCI95 = 0.9, UpperCI95 = 1.1, Year = 2003 },
+                new CoreDataSet { Value = 2, LowerCI95 = 1.5, UpperCI95 = 2.1, Year = 2001 }
             };
 
             var trendMarkerResult = new TrendMarkerResult();

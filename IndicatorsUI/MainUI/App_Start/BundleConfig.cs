@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Web.Optimization;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
-namespace Profiles.MainUI
+namespace IndicatorsUI.MainUI
 {
     public class BundleConfig
     {
@@ -13,51 +13,100 @@ namespace Profiles.MainUI
             var staticPath = "~/" + appConfig.JavaScriptVersionFolder;
             var jsPath = staticPath + "js/";
             var cssPath = staticPath + "css/";
-            var tsPath = staticPath + "ts/";
+            var angularPath = staticPath + "angular-app-dist/";
 
             // Add scripts
             AddScripts(bundles, jsPath, "js-fingertips", GetJsFingertips());
             AddScripts(bundles, jsPath, "js-fingertips-js-file", GetJsFingertipsJsFile());
             AddScripts(bundles, jsPath, "js-longer-lives", GetJsLongerLives());
-            AddScripts(bundles, jsPath, "js-practice-profiles", GetJsPracticeProfiles());
             AddScripts(bundles, jsPath, "js-fingertips-maps", GetJsFingertipsMaps());
             AddScripts(bundles, jsPath, "js-area-search", GetJsAreaSearch());
+            AddScripts(bundles, jsPath, "js-html-2-canvas", GetJsHtml2Canvas());
+            AddScripts(bundles, jsPath, "js-site-key-indicators", "SiteKeyIndicators.js");
+            AddScripts(bundles, jsPath, "js-twitter", "PageTwitterFeed.js");
 
-            //Add TranspiledFiles
-            AddScripts(bundles, tsPath, "ts-file", GetTranspiledFiles());
+            // Scripts: Indicator lists
+            AddScripts(bundles, jsPath, "js-indicator-list-edit", "Indicatorlist/indicator-list-edit.js");
+            AddScripts(bundles, jsPath, "js-indicator-list-index", "Indicatorlist/indicator-list-index.js");
+            AddScripts(bundles, jsPath, "js-indicator-list-view", "Indicatorlist/indicator-list-view.js");
+
+            // Add single files
+            AddSingleScriptFiles(bundles, jsPath);
+            AddSingleStyleFiles(bundles, cssPath);
 
             // Add styles
             AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
             AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
-            AddStyles(bundles, cssPath, "css-area-search", new[] {"AreaSearch/area-search.css"});
+            AddStyles(bundles, cssPath, "css-area-search", "AreaSearch/area-search.css");
+            AddStyles(bundles, cssPath, "css-core-content-pages", "core-contentpages.css");
+            AddStyles(bundles, cssPath, "css-core-data-page", "core-datapage.css");
+            AddStyles(bundles, cssPath, "css-phof", "phof.css");
+            AddStyles(bundles, cssPath, "css-login", "Login/login.css");
 
-            // Add styles
-            AddStyles(bundles, cssPath, "css-fingertips", GetCssFingertips());
-            AddStyles(bundles, cssPath, "css-longer-lives", GetCssLongerLives());
-            AddStyles(bundles, cssPath, "css-area-search", new[] { "AreaSearch/area-search.css" });
+            // Styles: Indicator lists
+            AddStyles(bundles, cssPath, "css-indicator-list-edit", "IndicatorList/indicator-list-edit.css");
+            AddStyles(bundles, cssPath, "css-indicator-list-index", "IndicatorList/indicator-list-index.css");
 
-            //Add TranspiledFiles
-            AddScripts(bundles, tsPath, "ts-file", GetTranspiledFiles());
-
+            // Add TranspiledFiles
+            AddScripts(bundles, angularPath, "js-angular", GetAngularFiles());
         }
 
-        private static string[] GetTranspiledFiles()
+        private static void AddSingleScriptFiles(BundleCollection bundles, string path)
+        {
+            string[] files = new[]
+            {
+                "PageTartanRug.js",
+                "PageScatterPlot.js",
+                "PageMap.js",
+                "PageAreaTrends.js",
+                "PageBarChart.js",
+                "PageBarChartAndFunnelPlot.js",
+                "PageAreaProfile.js",
+                "PageInequalities.js",
+                "PageEngland.js",
+                "PagePopulationNew.js",
+                "PageBoxPlots.js",
+                "PageMetadata.js",
+                "PageDownload.js",
+                "PageReports.js",
+                "SiteSearch.js"
+            };
+
+            foreach (var file in files)
+            {
+                AddScripts(bundles, path, file, file);
+            }
+        }
+
+        private static void AddSingleStyleFiles(BundleCollection bundles, string path)
+        {
+            string[] files = new[]
+            {
+                "PageMap.css"
+            };
+
+            foreach (var file in files)
+            {
+                AddStyles(bundles, path, file, file);
+            }
+        }
+
+        private static string[] GetAngularFiles()
         {
             var tsFiles = new[]
             {
-                "inline.bundle.js", "polyfills.bundle.js", "styles.bundle.js", "vendor.bundle.js", "main.bundle.js"
+                "inline.bundle.js", "polyfills.bundle.js", "styles.bundle.js", "vendor.bundle.js",
+                "main.bundle.js", "scripts.bundle.js"
             };
             return tsFiles;
         }
 
-        private static string[] GetJsPracticeProfiles()
+        private static string[] GetJsHtml2Canvas()
         {
             var jsFiles = new[]
             {
-                "vendor/chosen/chosen.jquery.js",
-                "PageMetadata.js", "PagePopulation.js", "PagePracticeSpineChart.js",
-                "PageScatter.js", "PagePracticeBarChart.js", "PagePracticeTrends.js",
-                "PagePracticeSearch.js", "PageCluster.js", "SitePracticeProfiles.js"
+                "vendor/html2canvas/html2canvas.min.js",
+                "vendor/html2canvas/html2canvas.svg.min.js"
             };
             return jsFiles;
         }
@@ -100,6 +149,7 @@ namespace Profiles.MainUI
         {
             var cssFiles = new[]
             {
+                "vendor/font-awesome/font-awesome.min.css",
                 "longer-lives-normalize.css",
                 "longer-lives-main.css",
                 "longer-lives-map.css",
@@ -114,10 +164,10 @@ namespace Profiles.MainUI
             {
                 "bootstrap/bootstrap.min.css",
                 "common.css",
-                "fingertips.css",
                 "jquery-ui-1.10.1.css",
                 "core-allpages.css",
-                "chosen/chosen.min.css"
+                "chosen/chosen.min.css",
+                "font-awesome.min.css"
             };
             return cssFiles;
         }
@@ -128,12 +178,10 @@ namespace Profiles.MainUI
             {
                 "vendor/jquery/jquery.min.js",
                 "vendor/tether/tether.min.js",
-                "vendor/bootstrap/bootstrap.min.js",
                 "vendor/chosen/chosen.jquery.js",
                 "mortality-jquery-ui-1.10.3.custom.min.js",
-                "vendor/highcharts/highcharts.js",
-                "vendor/highcharts/highcharts-more.js",
-                "vendor/highcharts/exporting.js",
+                "vendor/popper.js/popper.min.js", // Required by Bootstrap
+                "vendor/bootstrap/bootstrap.min.js",
                 "vendor/underscore/underscore-min.js",
                 "vendor/hogan.js/hogan.min.js",
                 "pholio-constants.js",
@@ -143,11 +191,9 @@ namespace Profiles.MainUI
                 "spineChart.js",
                 "vendor/jquery.floatThead/jquery.floatThead.min.js",
                 "vendor/js-cookie/js.cookie.js"
-                
             };
             return jsFiles;
         }
-
 
         private static string[] GetJsFingertipsJsFile()
         {
@@ -161,14 +207,7 @@ namespace Profiles.MainUI
 
         private static string[] GetJsFingertipsMaps()
         {
-            // new version of esri-leaflet.js can be downloaded from http://esri.github.io/esri-leaflet/download
-            var jsFiles = new[]
-            {
-                "vendor/leaflet/leaflet.js",
-                "vendor/esri-leaflet-v1.0.0-rc.2/esri-leaflet.js",
-                "PageMap.js"
-            };
-            return jsFiles;
+            return new[] { "PageMap.js" };
         }
 
         private static string[] PrependUrlPath(string[] files, string preceedingPath)
@@ -180,14 +219,14 @@ namespace Profiles.MainUI
         }
 
         public static void AddStyles(BundleCollection bundles, string path, string bundleName,
-            string[] files)
+            params string[] files)
         {
             bundles.Add(new StyleBundle("~/bundles/" + bundleName).Include(
                 PrependUrlPath(files, path)));
         }
 
         public static void AddScripts(BundleCollection bundles, string path, string bundleName,
-            string[] files)
+            params string[] files)
         {
             bundles.Add(new ScriptBundle("~/bundles/" + bundleName).Include(
                 PrependUrlPath(files, path)));

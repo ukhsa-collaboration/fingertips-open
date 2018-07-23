@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class TwitterClient
     {

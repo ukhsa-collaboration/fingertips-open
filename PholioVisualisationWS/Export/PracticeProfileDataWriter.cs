@@ -377,10 +377,10 @@ namespace PholioVisualisation.Export
         {
             CoreDataSet data = map[code];
             cells[row, column].Value = Round(data.Value);
-            if (data.AreCIsValid)
+            if (data.Are95CIsValid)
             {                
-                cells[row, column + 1].Value = Round(data.LowerCI);
-                cells[row, column + 2].Value = Round(data.UpperCI);
+                cells[row, column + 1].Value = data.LowerCI95.HasValue ? Round(data.LowerCI95.Value).ToString() : string.Empty;
+                cells[row, column + 2].Value = data.UpperCI95.HasValue ? Round(data.UpperCI95.Value).ToString() : string.Empty;
                 cells[row, column + 3].Value = data.Count;
                 cells[row, column + 4].Value = data.Denominator;
             }

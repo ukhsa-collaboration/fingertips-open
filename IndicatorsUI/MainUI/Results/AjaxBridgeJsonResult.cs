@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Profiles.MainUI.Results
+namespace IndicatorsUI.MainUI.Results
 {
     public class AjaxBridgeJsonResult : JsonResult
     {

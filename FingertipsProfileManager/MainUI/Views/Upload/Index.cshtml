@@ -19,12 +19,10 @@
 @{
     <script>
         var pageConst = {
-            simpleTemplateUrl: '@Model.SimpleTemplateUrl',
-            simpleLastUpdated: '@Model.SimpleLastUpdated',
             batchTemplateUrl: '@Model.BatchTemplateUrl',
             batchLastUpdated: '@Model.BatchLastUpdated'
         }
-        var currentUser = @Html.Raw(Json.Encode(@Model.User));
+        var currentUser = @Html.Raw(Json.Encode(Model.User));
     </script>
 }
 
@@ -37,7 +35,10 @@
             <a data-target="#" data-toggle="tab" ng-href="#/">Upload new data</a>
         </li>
         <li class="cursor-pointer" id="progress-tab">
-            <a data-toggle="tab" ng-href="#status">Upload jobs&nbsp;</a>
+            <a data-toggle="tab" ng-href="#status">Your upload jobs&nbsp;</a>
+        </li>
+        <li class="cursor-pointer" id="queue-tab">
+            <a data-toggle="tab" ng-href="#queue">Active upload jobs&nbsp;</a>
         </li>
     </ul>
     <div ng-view></div>

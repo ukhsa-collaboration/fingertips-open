@@ -8,17 +8,11 @@ namespace PholioVisualisation.KeyMessages
 {
     public class HealthProfilesKeyMessage4Builder
     {
-        private const string Sentence1Template =
-            "In {{Year}}, {{AdultObesityPercent}}%{{AdultObesityCount}} of adults are classified as obese{{SignificanceText}}";
-
         private const string Sentence2Template =
             "The rate of alcohol-related harm hospital stays is {{AlcoholAdmissionsToHospital}}{{SignificanceText}} This represents {{AdultAlcoholAdmissionsPerYear}} stays per year.";
 
         private const string Sentence3Template =
             "The rate of self-harm hospital stays is {{AdultSelfHarmAdmissions}}{{SignificanceText}} This represents {{AdultSelfHarmAdmissionsPerYear}} stays per year.";
-
-        private const string Sentence4Template =
-            "The rate of smoking related deaths is {{AdultSmokingRelatedDeaths}}{{SignificanceText}} This represents {{AdultSmokingRelatedDeathsPerYear}} deaths per year.";
 
         private const string Sentence5Template =
             "Estimated levels of adult {{Options}} are {{BetterOrWorse}} than the England average.";
@@ -35,7 +29,6 @@ namespace PholioVisualisation.KeyMessages
             var message = new SentenceJoiner();
             message.Add(GetSentence2());
             message.Add(GetSentence3());
-            message.Add(GetSentence4());
             message.Add(GetSentence5(Significance.Worse));
             message.Add(GetSentence5(Significance.Better));
             message.Add(GetSentence6(Significance.Worse));
@@ -67,6 +60,11 @@ namespace PholioVisualisation.KeyMessages
 
         public string GetSentence3()
         {
+            if (string.IsNullOrWhiteSpace(data.AdultSelfHarmAdmissions))
+            {
+                return string.Empty;
+            }
+
             var sentenceData = new Dictionary<string, string>
             {
                 {"AdultSelfHarmAdmissions", data.AdultSelfHarmAdmissions},
@@ -76,41 +74,23 @@ namespace PholioVisualisation.KeyMessages
             return Render.StringToString(Sentence3Template, sentenceData);
         }
 
-        public string GetSentence4()
-        {
-            if (data.AdultSmokingRelatedDeaths.HasValue &&
-                data.AdultSmokingRelatedDeathsPerYear.HasValue)
-            {
-                var val = NumericFormatter.FormatZeroDP(data.AdultSmokingRelatedDeaths.Value);
-                var count = NumberCommariser.Commarise0DP(data.AdultSmokingRelatedDeathsPerYear.Value);
-
-                var sentenceData = new Dictionary<string, string>
-                {
-                    {"AdultSmokingRelatedDeaths", val},
-                    {"AdultSmokingRelatedDeathsPerYear", count},
-                    {"SignificanceText", GetSignificanceTextWithAsterisks(data.AdultSmokingRelatedDeathsSignificance)}
-                };
-                return Render.StringToString(Sentence4Template, sentenceData);
-            }
-            return string.Empty;
-        }
-
         public string GetSentence5(Significance sig)
         {
-            var qualifiedItems = new List<string>();
-            if ((data.AdultExcessWeightSignificance != sig) &&
-                (data.AdultSmokingPrevalenceSignificance != sig) &&
-                (data.AdultPhysicalActivitySignificance != sig))
+            var labels = new List<SignificanceLabel>
+            {
+                SignificanceLabel.New(data.AdultExcessWeightSignificance,"excess weight"),
+                SignificanceLabel.New(data.AdultSmokingPrevalenceSignificance,"smoking"),
+                SignificanceLabel.New(data.AdultSmokingInRoutineAndManualOccupationsSignificance,
+                    "smoking in routine and manual occupations"),
+                SignificanceLabel.New(data.AdultPhysicalActivitySignificance,"physical activity"),
+            };
+
+            if (labels.Any(x => x.Significance == sig) == false)
             {
                 return string.Empty;
             }
 
-            if (data.AdultExcessWeightSignificance == sig)
-                qualifiedItems.Add("excess weight");
-            if (data.AdultSmokingPrevalenceSignificance == sig)
-                qualifiedItems.Add("smoking");
-            if (data.AdultPhysicalActivitySignificance == sig)
-                qualifiedItems.Add("physical activity");
+            var qualifiedItems = GetQualifiedItems(sig, labels);
 
             string options = PhraseJoiner.Join(qualifiedItems);
 
@@ -124,23 +104,21 @@ namespace PholioVisualisation.KeyMessages
 
         public string GetSentence6(Significance sig)
         {
-            var qualifiedItems = new List<string>();
-            if ((data.AdultHipFracturesSignificance != sig) &&
-                (data.AdultSTISignificance != sig) &&
-                (data.AdultKilledAndSeriouslyInjuredOnRoadsSignificance != sig) &&
-                (data.AdultIncidenceOfTBSignificance != sig))
+            var labels = new List<SignificanceLabel>
+            {
+                SignificanceLabel.New(data.AdultHipFracturesSignificance,"hip fractures"),
+                SignificanceLabel.New(data.AdultSTISignificance,"sexually transmitted infections"),
+                SignificanceLabel.New(data.AdultKilledAndSeriouslyInjuredOnRoadsSignificance,
+                    "people killed and seriously injured on roads"),
+                SignificanceLabel.New(data.AdultIncidenceOfTBSignificance, "TB")
+            };
+
+            if (labels.Any(x => x.Significance == sig) == false)
             {
                 return string.Empty;
             }
 
-            if (data.AdultHipFracturesSignificance == sig)
-                qualifiedItems.Add("hip fractures");
-            if (data.AdultSTISignificance == sig)
-                qualifiedItems.Add("sexually transmitted infections");
-            if (data.AdultKilledAndSeriouslyInjuredOnRoadsSignificance == sig)
-                qualifiedItems.Add("people killed and seriously injured on roads");
-            if (data.AdultIncidenceOfTBSignificance == sig)
-                qualifiedItems.Add("TB");
+            var qualifiedItems = GetQualifiedItems(sig, labels);
 
             string rate, isOrAre;
             if (qualifiedItems.Count > 1)
@@ -168,37 +146,25 @@ namespace PholioVisualisation.KeyMessages
 
         public string GetSentence7(Significance sig)
         {
-            var sigList = new List<Significance>
+            var labels = new List<SignificanceLabel>
             {
-                data.AdultStatutoryHomelessnessSig,
-                data.AdultViolentCrimeSig,
-                data.AdultLongTermUnemploymentSig,
-                data.AdultExcessWinterDeathsSig,
-                data.AdultUnder75MortalityRateCvdSig,
-                data.AdultUnder75MortalityRateCancerSig
+                SignificanceLabel.New(data.AdultStatutoryHomelessnessSig,"statutory homelessness"),
+                SignificanceLabel.New(data.AdultViolentCrimeSig,"violent crime"),
+                SignificanceLabel.New(data.AdultExcessWinterDeathsSig,"excess winter deaths"),
+                SignificanceLabel.New(data.AdultUnder75MortalityRateCvdSig,"early deaths from cardiovascular diseases"),
+                SignificanceLabel.New(data.AdultUnder75MortalityRateCancerSig,"early deaths from cancer"),
+                SignificanceLabel.New(data.PeopleInEmploymentSig,"the percentage of people in employment")
             };
 
-            var significanceCounter = new SignificanceCounter(sigList);
+            var significanceCounter = new SignificanceCounter(labels.Select(x => x.Significance));
 
-            if (significanceCounter.ProportionGreen < 0.5 && significanceCounter.ProportionAmber < 0.5)
+            if (significanceCounter.GetProportionGreen() < 0.5 &&
+                significanceCounter.GetProportionAmber() < 0.5)
             {
                 return string.Empty;
             }
 
-            var qualifiedItems = new List<string>();
-
-            if (data.AdultStatutoryHomelessnessSig == sig)
-                qualifiedItems.Add("statutory homelessness");
-            if (data.AdultViolentCrimeSig == sig)
-                qualifiedItems.Add("violent crime");
-            if (data.AdultLongTermUnemploymentSig == sig)
-                qualifiedItems.Add("long term unemployment");
-            if (data.AdultExcessWinterDeathsSig == sig)
-                qualifiedItems.Add("excess winter deaths");
-            if (data.AdultUnder75MortalityRateCvdSig == sig)
-                qualifiedItems.Add("early deaths from cardiovascular diseases");
-            if (data.AdultUnder75MortalityRateCancerSig == sig)
-                qualifiedItems.Add("early deaths from cancer");
+            var qualifiedItems  = GetQualifiedItems(sig, labels);
 
             if (!qualifiedItems.Any())
                 // check at least one of the indicator is red or green ( depending upon passed sig )
@@ -258,6 +224,17 @@ namespace PholioVisualisation.KeyMessages
         public static string GetBetterOrWorse(Significance sig)
         {
             return sig == Significance.Better ? "better" : "worse";
+        }
+
+        private static List<string> GetQualifiedItems(Significance sig, List<SignificanceLabel> labels)
+        {
+            var qualifiedItems = new List<string>();
+            foreach (var label in labels)
+            {
+                if (label.Significance == sig)
+                    qualifiedItems.Add(label.Label);
+            }
+            return qualifiedItems;
         }
     }
 }

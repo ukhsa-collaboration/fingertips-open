@@ -1,5 +1,5 @@
 ﻿
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class UserNames
     {
@@ -10,6 +10,7 @@ namespace Profiles.DomainObjects
     {
         public const string FpmUsers = "Global.Fingertips.FingertipsProfileManager";
         public const string LibraryServices = "Global.CKO.LibraryServices";
+        public const string Phof = "Global.Fingertips.AccessControlPhof";
     }
 
     public class ContentKeys
@@ -21,11 +22,9 @@ namespace Profiles.DomainObjects
         public const string Twitter = "twitter";
         public const string ContactUs = "contact-us";
         public const string FurtherInfo = "further-info";
-        public const string AdditionalDataAndReports = "additional-data-and-reports";
-        public const string QuarterlyData = "quarterly-data";
         public const string Faqs = "faqs";
-        public const string Inequalities = "inequalities";
-        public const string FurtherResources = "evidence-and-resources";
+        public const string FurtherInformation = "further-information";
+        public const string FurtherResources = "further-resources";
 
         /// <summary>
         /// The instructions on the map page of Longer Lives
@@ -53,54 +52,48 @@ namespace Profiles.DomainObjects
 
     public class ProfileUrlKeys
     {
-        public const string AdultSocialCare = "adultsocialcare";
-        public const string ChildHealthOverview = "child-health-overview";
         public const string SevereMentalIllness = "severe-mental-illness";
-        public const string ChildrenAndYoungPeoplesHealthBenchmarkingTool = "cyphof";
         public const string Phof = "public-health-outcomes-framework";
-        public const string Tobacco = "tobacco-control";
         public const string LongerLives = "mortality";
         public const string TbStrategy = "tb-monitoring";
         public const string Diabetes = "diabetes";
         public const string HealthProfiles = "health-profiles";
+        public const string Populations = "populations";
         public const string SexualHealth = "sexualhealth";
+        public const string MentalHealth = "mental-health";
         public const string PracticeProfiles = "general-practice";
-        public const string MarmotHealthyLifeExpectancy = "marmot-healthy-life-expectancy";
         public const string MarmotIndicatorsForLocalAuthorities = "marmot-indicators";
-        public const string AmrLocalIndicators = "amr-local-indicators";
+        public const string PublicHealthDashboard = "public-health-dashboard";
     }
 
     public class ProfileIds
     {
         public const int Undefined = -1;
-        public const int HealthInequalities = 7;
-        public const int SubstanceMisuse = 17;
         public const int Tobacco = 18;
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
         public const int LongerLives = 22;
-        public const int UnassignedIndicators = 23;
         public const int HealthProfiles = 26;
-        public const int MentalHealth = 36;
         public const int SevereMentalIllness = 41;
         public const int SexualHealth = 45;
-        public const int Diabetes = 51;
+        public const int DiabetesLongerLives = 51;
         public const int LiverDisease = 55;
+        public const int Hypertension = 67;
         public const int SuicidePrevention = 73;
         public const int DrugsAndAlcohol = 75;
         public const int HealthChecks = 77;
         public const int LocalAlcoholProfiles = 87;
         public const int ChildHealth = 105;
         public const int WiderDeterminantsOfHealth = 130;
+        public const int Populations = 132;
+        public const int Diabetes = 139;
+        public const int PublicHealthDashboard = 140;
     }
 
     public class GroupIds
     {
-        public const int AMR_AntibioticPrescribing = 1938132909;
-        public const int PracticeProfiles_SupportingIndicators = 1200006;
         public const int SevereMentalIllness_PsychosisPathway = 1938132719;
         public const int SevereMentalIllness_RiskFactors = 8000027;
-        public const int SevereMentalIllness_Prevalence = 8000030;
         public const int SevereMentalIllness_Finance = 8000040;
         public const int Phof_HealthImprovment = 1000042;
         public const int Phof_WiderDeterminantsofHealth = 1000041;
@@ -113,6 +106,7 @@ namespace Profiles.DomainObjects
     public class IndicatorIds
     {
         public const int GapInLifeExpectancyAtBirth = 90365;
+        public const int LifeExpectancyAtBirth = 90366;
     }
 
     public class SexIds
@@ -129,10 +123,13 @@ namespace Profiles.DomainObjects
 
     public class AreaTypeIds
     {
+        public const int Region = 6;
         public const int GpPractice = 7;
-        public const int CCG = 19;
+        public const int CcgPreApr2017 = 153;
+        public const int CcgPostApr2017 = 152;
         public const int DistrictAndUnitaryAuthority = 101;
         public const int CountyAndUnitaryAuthority = 102;
+        public const int PheCentresFrom2015 = 104;
     }
 
     public class AreaCodes
@@ -145,13 +142,10 @@ namespace Profiles.DomainObjects
         public const string Hartlepool = "E06000001";
 
         // CCGs
-        public const string CcgNhsNorthumberland = "E38000130";
         public const string CcgWalthamForest = "E38000192";
 
         // GP Practices
         public const string GpPracticeThatchedHouseMedicalCentre = "F86639";
-        public const string GpPracticeWestminsterAndPimlico = "E87014";
-        public const string Cambridge = "Cambridge";
 
         //Regions
         public const string RegionEastOfEngland = "E12000006";
@@ -163,8 +157,6 @@ namespace Profiles.DomainObjects
     public class SkinIds
     {
         public const int Core = 2;
-        public const int Phof = 3;
-        public const int Tobacco = 4;
         public const int LongerLives = 5;
     }
 
@@ -189,7 +181,9 @@ namespace Profiles.DomainObjects
         public const int AreaProfile = 1;
         public const int CompareAreas = 3;
         public const int Inequalities = 7;
+        public const int Map = 8;
         public const int ScatterPlot = 10;
+        public const int Reports = 13;
     }
 
     public class NeighbourTypes
@@ -197,5 +191,22 @@ namespace Profiles.DomainObjects
         public const int CIPFA = 1;
         public const int TenMostSimilarCCGs = 2;
         public const int ChildrensServicesStatisticalNeighbours = 3;
+    }
+
+    public class NotifyEmailTemplates
+    {
+        public const string ResetPassword = "3e7a8124-68cc-4fb8-b21e-b030df40ec60";
+        public const string VerifyEmailAddress = "b2d4e6f5-1f62-47ff-a9fd-0b06793a4a1a";
+    }
+
+    public class MaximumFieldLengths
+    {
+        public const int EmailAddress = 50;
+        public const int Password = 25;
+    }
+
+    public class FeatureFlags
+    {
+        public const string EmailVerification = "emailVerification";
     }
 }

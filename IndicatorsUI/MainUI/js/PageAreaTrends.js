@@ -582,6 +582,8 @@ function exportChart(groupRootIndex) {
             }
         }
     });
+
+    logEvent('ExportImage', getCurrentPageTitle());
 }
 
 function toggleCIBars(groupRootIndex) {
@@ -833,7 +835,7 @@ function getLargeTrendChartAndTableHtml(indexesDisplayed) {
     for (var i in displayedGroupRoots) {
 
         var groupRoot = displayedGroupRoots[i];
-
+                
         var trendRoot = areaTrends.findMatchingTrendRoot(groupRoot, currentTrendRoots);
 
         if (isDefined(trendRoot)) {
@@ -843,7 +845,7 @@ function getLargeTrendChartAndTableHtml(indexesDisplayed) {
                 comparisonConfig = new ComparisonConfig(trendRoot, metadata);
 
             h.push(getTrendHeader(metadata, trendRoot, areaName,
-                'goToMetadataPage(' + i + ')'));
+                'goToMetadataPage(' + i + ')', hasDataChanged(groupRoot)));
 
             var showCIText = areaTrendsState.showConfBars
                 ? 'Hide confidence intervals'
@@ -957,25 +959,31 @@ function displayTrends() {
     hideAndShowTrendKeys();
 }
 
-function getSmallMultipleTrendChartsHtml() {
 
+function getSmallMultipleTrendChartsHtml() {    
     var h = [],
     index = getIndicatorIndex(),
     root = currentTrendRoots[index];
-    var chartCount = 0;
-
+    var chartCount = 0;    
     if (root) {
         var comparatorVals = [],
         vals = root.ComparatorValue;
+
+        var hasDataChanged = false;
+        var currentRoot = getGroupRootsToDisplay();
+        if (currentRoot && currentRoot[0].DateChanges) {
+            hasDataChanged = currentRoot[0].DateChanges.HasDataChangedRecently;
+        }
+              
         for (var i in vals) {
             comparatorVals.push(vals[i][comparatorId]);
         }
 
         var cssClass = getSparkBoxClass(),
         metadata = ui.getMetadataHash()[root.IID];
-
+        
         h.push(getTrendHeader(metadata, root, '',
-            'goToMetadataPage(' + i + ')'));
+            'goToMetadataPage(' + i + ')', hasDataChanged));
 
         // Benchmark target key
         var comparisonConfig = new ComparisonConfig(root, metadata);
@@ -1011,7 +1019,7 @@ function getSmallMultipleTrendChartsHtml() {
                         // Define view model
                         var viewModel = {};
                         viewModel.cssClass = cssClass;
-                        viewModel.areaNameShort = trimName(chartTitle, 23);
+                        viewModel.areaName = trimName(chartTitle, 23);
                         viewModel.areaCode = areaCode;
                         viewModel.chartId = 'at-' + areaCode;
 
@@ -1405,7 +1413,8 @@ function TrendTableRow() {
     };
 }
 
-var NO_TREND_DATA = '<div class="no-data-300">No trend data available</div>';
+
+var NO_TREND_DATA = '<div class="no-indicator-data">No trend data available</div>';
 var currentTrendRoots = null;
 var viewModeState = 0;
 var sortedAreasForTrends = [];
@@ -1426,7 +1435,7 @@ pages.add(PAGE_MODES.AREA_TRENDS, {
 });
 
 templates.add('areaTrends', '<div class="sparkline-box {{cssClass}} " >' +
-    '<div class="multi-trend-header"><a onclick="toggleViewMode(\'{{areaCode}}\');"> {{areaNameShort}} </a></div>' +
+    '<div class="multi-trend-header"><a onclick="toggleViewMode(\'{{areaCode}}\');">{{areaName}}</a></div>' +
     '<div class="fl">' +
     '<div id={{chartId}}></div>' +
     '</div></div>');

@@ -187,7 +187,7 @@ MT.nav = {
     //
     home: function (model) {
 
-        if ($('.home_intro').length) {
+        if ($('.home-intro').length) {
             // Already on home page
             return;
         }
@@ -268,7 +268,6 @@ comparatorIds = [NATIONAL_COMPARATOR_ID, DEPRIVATION_DECILE_COMPARATOR_ID];
 comparatorId = NATIONAL_COMPARATOR_ID;
 groupRoots = null;
 selectedRootIndex = ROOT_INDEXES.OVERALL_MORTALITY;
-onsClusterCode = '';
 
 causeOptions = [
     { key: 'cancer' },

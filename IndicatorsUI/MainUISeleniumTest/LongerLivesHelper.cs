@@ -16,8 +16,6 @@ namespace IndicatorsUI.MainUISeleniumTest
                 driver.FindElement(By.XPath(XPaths.NavAboutTheProject)));
             TestHelper.AssertElementTextIsEqual("About the data",
                 driver.FindElement(By.XPath(XPaths.NavAboutTheData)));
-            TestHelper.AssertElementTextIsEqual("Connect",
-                driver.FindElement(By.XPath(XPaths.NavConnect)));
         }
 
         public static void ClickOnMapAndWaitForPopUp(IWebDriver webDriver, int x, int y)

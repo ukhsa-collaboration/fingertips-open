@@ -9,11 +9,10 @@ using PholioVisualisation.DataConstruction;
 using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
-using PholioVisualisation.ServiceActions;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderIndicatorStats : JsonBuilderBase
+    public class JsonBuilderIndicatorStats 
     {
         private IndicatorStatsParameters _parameters;
 
@@ -22,23 +21,9 @@ namespace PholioVisualisation.Services
 
         private IList<int> _profileIds;
 
-        public JsonBuilderIndicatorStats(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new IndicatorStatsParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
-
         public JsonBuilderIndicatorStats(IndicatorStatsParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var responseObjects = GetIndicatorStats();
-            return JsonConvert.SerializeObject(responseObjects);
         }
 
         public Dictionary<int, IndicatorStats> GetIndicatorStats()
@@ -47,8 +32,6 @@ namespace PholioVisualisation.Services
 
             var roots = GetRoots();
             var responseObjects = new Dictionary<int, IndicatorStats>();
-
-            var indicatorStatsBuilder = new IndicatorStatsBuilder();
 
             int rootIndex = 0;
             foreach (var root in roots)
@@ -60,8 +43,8 @@ namespace PholioVisualisation.Services
 
                 var parentArea = new ParentArea(_parameters.ParentAreaCode, _parameters.ChildAreaTypeId);
 
-                var indicatorStatsResponse = indicatorStatsBuilder.GetIndicatorStats(timePeriod,grouping,
-                    metadata, parentArea,_parameters.ProfileId);
+                var indicatorStatsBuilder = new IndicatorStatsBuilder(metadata, parentArea, _parameters.ProfileId);
+                var indicatorStatsResponse = indicatorStatsBuilder.GetIndicatorStats(grouping, timePeriod);
 
                 responseObjects[rootIndex] = indicatorStatsResponse;
 

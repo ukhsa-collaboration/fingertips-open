@@ -36,5 +36,9 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonProperty]
         public bool HasTrendMarkers { get; set; }
+
+        [JsonIgnore]
+        public int NewDataTimeSpanInDays { get; set; }
+
     }
 }

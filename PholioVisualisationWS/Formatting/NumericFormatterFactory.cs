@@ -1,20 +1,43 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.Formatting
 {
-    public class NumericFormatterFactory
+    public interface INumericFormatterFactory
     {
         /// <summary>
         /// New numeric formatter instance.
         /// </summary>
-        public static NumericFormatter New(IndicatorMetadata metadata, IGroupDataReader groupDataReader)
+        NumericFormatter New(IndicatorMetadata metadata);
+
+        /// <summary>
+        /// New numeric formatter instance.
+        /// </summary>
+        /// <param name="metadata">Indicator metadata of data to be formatted.</param>
+        /// <param name="limits">May be null if fixed decimal place is specified in metadata.</param>
+        NumericFormatter NewWithLimits(IndicatorMetadata metadata, Limits limits);
+    }
+
+    public class NumericFormatterFactory : INumericFormatterFactory
+    {
+        private IGroupDataReader _groupDataReader;
+
+        public NumericFormatterFactory(IGroupDataReader groupDataReader)
         {
-            var limits = groupDataReader.GetCoreDataLimitsByIndicatorId(metadata.IndicatorId);
+            _groupDataReader = groupDataReader;
+        }
+
+        /// <summary>
+        /// New numeric formatter instance.
+        /// </summary>
+        public NumericFormatter New(IndicatorMetadata metadata)
+        {
+            var limits = _groupDataReader.GetCoreDataLimitsByIndicatorId(metadata.IndicatorId);
             return NewWithLimits(metadata, limits);
         }
 
@@ -23,7 +46,7 @@ namespace PholioVisualisation.Formatting
         /// </summary>
         /// <param name="metadata">Indicator metadata of data to be formatted.</param>
         /// <param name="limits">May be null if fixed decimal place is specified in metadata.</param>
-       public static NumericFormatter NewWithLimits(IndicatorMetadata metadata, Limits limits)
+       public NumericFormatter NewWithLimits(IndicatorMetadata metadata, Limits limits)
         {
             if (metadata.IndicatorId == IndicatorIds.SuicidePreventionPlan)
             {

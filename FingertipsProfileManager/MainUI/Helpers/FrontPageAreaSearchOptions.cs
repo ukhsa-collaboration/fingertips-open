@@ -14,7 +14,9 @@ namespace Fpm.MainUI.Helpers
             var list = new List<SelectListItem>
             {
                 new SelectListItem {Text = NoSearchText, Value = null},
-                new SelectListItem {Text = "CCG", Value = AreaTypeIds.Ccg.ToString()},
+                new SelectListItem {Text = "CCG (pre 4/2017)", Value = AreaTypeIds.CcgsPreApr2017.ToString()},
+                new SelectListItem {Text = "CCG (post 4/2017) [Place and postcode search not available]",
+                    Value = AreaTypeIds.CcgsPostApr2017.ToString()},
                 new SelectListItem {Text = "County/UA", Value = AreaTypeIds.CountyAndUnitaryAuthority.ToString()},
                 new SelectListItem
                 {

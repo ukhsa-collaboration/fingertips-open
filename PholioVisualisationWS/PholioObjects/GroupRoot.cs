@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
@@ -11,6 +11,9 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonProperty]
         public IList<CoreDataSet> Data { get; set; }
+
+        [JsonProperty]
+        public int Sequence { get; set; }
 
         public GroupRoot()
         {
@@ -23,6 +26,9 @@ namespace PholioVisualisation.PholioObjects
         {
             get { return Grouping.FirstOrDefault(); }
         }
+
+        [JsonProperty]
+        public IndicatorDateChange DateChanges { get; set; }
 
         public void Add(Grouping grouping)
         {

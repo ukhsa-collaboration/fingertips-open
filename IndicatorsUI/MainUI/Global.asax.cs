@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
+﻿using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Controllers;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.UserAccess;
+using System;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using Profiles.DataAccess;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Controllers;
 
-namespace Profiles.MainUI
+namespace IndicatorsUI.MainUI
 {
     public class MvcApplication : HttpApplication
     {
@@ -19,9 +17,17 @@ namespace Profiles.MainUI
         {
             AreaRegistration.RegisterAllAreas();
             RegisterGlobalFilters(GlobalFilters.Filters);
+            UnityMvcActivator.Start();
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             AutoMapperConfig.RegisterMappings();
+            MetadataTypesRegister.InstallForAssembly();
+        }
+
+        protected void Application_PreSendRequestHeaders()
+        {
+            // Prevents IIS from including server name and version in response headers
+            Response.Headers.Remove("Server");
         }
 
         public static void RegisterGlobalFilters(GlobalFilterCollection filters)
@@ -44,7 +50,7 @@ namespace Profiles.MainUI
                 // Log by web service to staging pholio database
                 ExceptionLogger.LogException(exception, "Global.asax");
             }
-            
+
             RouteData routeData = new RouteData();
             routeData.Values.Add("controller", "Error");
             routeData.Values.Add("action", "Http500");
@@ -57,7 +63,7 @@ namespace Profiles.MainUI
             Response.TrySkipIisCustomErrors = true;
 
             // Call target Controller and pass the routeData.
-            IController errorController = new ErrorController();
+            IController errorController = new ErrorController(AppConfig.Instance);
             errorController.Execute(new RequestContext(
                  new HttpContextWrapper(Context), routeData));
         }

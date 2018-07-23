@@ -21,26 +21,6 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
-                "SortPageAndFilter", // Route name
-                "SortPageAndFilter", // URL with parameters
-                new
-                {
-                    controller = "ProfilesAndIndicators",
-                    action = "SortPageAndFilter",
-                }
-                );
-
-            routes.MapRoute(
-                "SortProfilesAndFilter", // Route name
-                "SortProfilesAndFilter", // URL with parameters
-                new
-                {
-                    controller = "Profile",
-                    action = "SortProfilesAndFilter",
-                }
-                );
-
-            routes.MapRoute(
                 "ProfileManager", // Route name
                 "ProfileManager", // URL with parameters
                 new
@@ -61,16 +41,6 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
-                "ProfilesAndIndicators", // Route name
-                "ProfilesAndIndicators", // URL with parameters
-                new
-                {
-                    controller = "ProfilesAndIndicators",
-                    action = "Index",
-                }
-                );
-
-            routes.MapRoute(
                 "GetAudit", // Route name
                 "GetAudit", // URL with parameters
                 new
@@ -87,16 +57,6 @@ namespace Fpm.MainUI.Routes
                 {
                     controller = "Upload",
                     action = "Index",
-                }
-                );
-
-            routes.MapRoute(
-                "UploadSimpleFile", // Route name
-                "UploadSimpleFile", // URL with parameters
-                new
-                {
-                    controller = "Upload",
-                    action = "UploadSimpleFile"
                 }
                 );
 
@@ -138,6 +98,15 @@ namespace Fpm.MainUI.Routes
                 {
                     controller = "Upload",
                     action = "CurrentUserJobProgress"
+                }
+                );
+            routes.MapRoute(
+                "GetAllActiveJobProgress",
+                "upload/progress",
+                new
+                {
+                    controller = "Upload",
+                    action = "GetAllActiveJobProgress"
                 }
                 );
 
@@ -373,28 +342,6 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
-                "genericIndicatorSave", // Route name
-                "indicator/{indicatorId}", // URL with parameters
-                new
-                {
-                    controller = ProfileController,
-                    action = "GenericIndicatorSave"
-                },
-                new { httpMethod = new HttpMethodConstraint("POST") }
-                );
-
-            routes.MapRoute(
-                "genericIndicator", // Route name
-                "indicator/{indicatorId}", // URL with parameters
-                new
-                {
-                    controller = ProfileController,
-                    action = "GenericIndicator"
-                },
-                new { httpMethod = new HttpMethodConstraint("GET") }
-                );
-
-            routes.MapRoute(
                 "domainIndicators", // Route name
                 "profile/{urlKey}/area-type/{areatype}/domain/{selectedDomainNumber}", // URL with parameters
                 new
@@ -420,15 +367,15 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
-                "default", // Route name
-                "", // URL with parameters
-                new
-                {
-                    controller = "ProfilesAndIndicators",
-                    action = "Index"
-                }
-                );
+               "UserFeedback", // Route name
+               "userfeedback", // URL with parameters
+               new
+               {
+                   controller = "UserFeedback",
+                   action = "Index"
+               }
+               );
         }
-       
+
     }
 }

@@ -6,10 +6,10 @@
             center: getMapCenter(),
             zoom: 7,
             scrollwheel: false,
-            mapTypeId: noTiles,
             zoomControlOptions: {
                 style: google.maps.ZoomControlStyle.LARGE
             },
+            backgroundColor: getMapBackgroundColour(),
             disableDefaultUI: true, // a way to quickly hide all controls
             zoomControl: false
         };
@@ -44,6 +44,11 @@
     return map;
 }
 
+function getMapBackgroundColour() {
+
+    return MT.model.profileId === ProfileIds.PublicHealthDashboard ? '#fff' : '#E5E3DF';
+}
+
 function redrawMap() {
 
     ajaxMonitor.setCalls(1);
@@ -51,6 +56,7 @@ function redrawMap() {
     var model = MT.model;
 
     if (selectedRootIndex === 'dep') {
+        //NOTE Longer Lives premature mortality only
         if (model.areaTypeId === AreaTypeIds.CountyUA) {
             getDecileData(model);
         } else {
@@ -86,12 +92,7 @@ function initMap() {
 
         $('#gmap').css('background', 'none');
 
-        // Link to rankings in map help
-        var navFunction = MT.model.profileId === ProfileIds.Mortality
-            ? 'rankings'
-            : 'nationalRankings';
-
-        $('#map-help').append('<p><a href="javascript:MT.nav.' + navFunction + '();">See national ' +
+        $('#map-help').append('<p><a href="javascript:MT.nav.rankings();">See ' +
                 getAreaTypeNameSingular(MT.model.areaTypeId) + ' comparison table</a></p>');
     }
 }
@@ -125,17 +126,9 @@ function initNoMap() {
     }
 }
 
-function btnZoomInClicked() {
+function changeZoom(modifier) {
     var map = mapState.map;
-    map.setZoom(map.getZoom() + 1);
-    if (mapState.isPopup) {
-        CallOutBox.fitToMapViewPort();
-    }
-}
-
-function btnZoomOutClicked() {
-    var map = mapState.map;
-    map.setZoom(map.getZoom() - 1);
+    map.setZoom(map.getZoom() + modifier);
     if (mapState.isPopup) {
         CallOutBox.fitToMapViewPort();
     }
@@ -151,13 +144,13 @@ function closeInfo() {
     }
 }
 
-CallOutBox.show = function() {
+CallOutBox.show = function () {
     CallOutBox.fitToMapViewPort();
     $('.map-info-box').show();
     unlock();
 }
 
-CallOutBox.fitToMapViewPort = function() {
+CallOutBox.fitToMapViewPort = function () {
 
     var state = mapState;
 
@@ -181,24 +174,22 @@ CallOutBox.fitToMapViewPort = function() {
     });
 }
 
-CallOutBox.hide = function() {
+CallOutBox.hide = function () {
     $('.map-info-box').hide();
 }
 
 function setHoverPopupHtml(areaCode) {
     tooltipManager.setHtml(
         templates.render('areaHover', {
-            nameofplace: loaded.areaLists[MT.model.areaTypeId][areaCode].Name,
-            hoverTemplateClass: 'hover-map-template',
-            hoverTemplateTailClass: 'map-info-tail'
+            nameofplace: loaded.areaLists[MT.model.areaTypeId][areaCode].Name
         }));
 }
 
 function displayPopup() {
     setPolygonCentre(MT.model.areaCode);
-    
+
     var marker = CallOutBox.getPositionOfPointer();
-    
+
     if (MT.model.profileId === ProfileIds.Mortality) {
         var content = getPopUpHtml();
         var infoBox = CallOutBox.newInfoBox(content);
@@ -209,7 +200,6 @@ function displayPopup() {
             content = CallOutBox.getPopUpHtml();
             infoBox = CallOutBox.newInfoBox(content);
             CallOutBox.openInfo(infoBox, marker, content);
-            updateCompareBox();
         } else {
             unlock();
         }
@@ -234,7 +224,7 @@ CallOutBox.newInfoBox = function (content) {
     });
 }
 
-CallOutBox.getPositionOfPointer = function() {
+CallOutBox.getPositionOfPointer = function () {
 
     // Marker position
     if (!mapState.latLng) {
@@ -329,70 +319,87 @@ function getDeprivationPopUpHtml(areaDetails, areaPopulation) {
     });
 }
 
+function viewNearestNeighbours() {
+    if (!FT.ajaxLock) {
+        lock();
+        var model = MT.model;
+        model.parentCode = getNearestNeighbourCode();
+        model.similarAreaCode = model.parentCode;
+
+        ftHistory.setHistory();
+
+        ajaxMonitor.setCalls(2);
+
+        getAreaValues(groupRoots[selectedRootIndex], model);
+        getNearestNeighbours();
+
+        ajaxMonitor.monitor(displayPage);
+    }
+}
+
 function viewSimilar() {
-   
+
     if (!FT.ajaxLock) {
 
         lock();
 
         var model = MT.model;
-        if (model.areaTypeId === AreaTypeIds.CCG) {
+        if (doesAreaTypeCompareToOnsCluster()) {
             // Need to know what the parent area code is first
             ajaxMonitor.setCalls(1);
             getOnsClusterCode(model);
             ajaxMonitor.monitor(viewSimilarPart2);
         } else {
+            // Compare to deprivation group
             viewSimilarPart2();
         }
     }
 }
 
 function viewSimilarPart2() {
-   
-        var model = MT.model,
-        areaCode = model.areaCode;
 
-        // Set decile parent
-        var areaDetails = loaded.areaDetails.getData();
-        mapState.comparisonArea = areaCode;
+    var model = MT.model;
+    var areaCode = model.areaCode;
 
-        if (model.areaTypeId === AreaTypeIds.CountyUA) {
-            model.parentCode = areaDetails.Decile.Code;
-        } 
-        else {
-            model.parentCode = onsClusterCode;
+    // Set parent
+    var areaDetails = loaded.areaDetails.getData();
+    mapState.comparisonArea = areaCode;
+    if (doesAreaTypeCompareToOnsCluster()) {
+        model.parentCode = getOnsCodeForArea(areaCode);
+    } else {
+        model.parentCode = areaDetails.Decile.Code;
+    }
+    model.similarAreaCode = model.parentCode;
 
-        }
+    comparatorId = DEPRIVATION_DECILE_COMPARATOR_ID;
 
-        comparatorId = DEPRIVATION_DECILE_COMPARATOR_ID;
+    ftHistory.setHistory();
 
-        ftHistory.setHistory();
+    // Get decile and area details
+    ajaxMonitor.setCalls(3);
 
-        var isDeprivation = selectedRootIndex === 'dep';
+    getDecileData(model);
+    loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
 
-        // Get decile and area details
-        ajaxMonitor.setCalls(3);
+    if (selectedRootIndex === 'dep') {
+        //NOTE Longer lives premature mortality only Deprivation selected
+        getAreaValues(groupRoots[ROOT_INDEXES.DEPRIVATION], model,
+            getCurrentComparator().Code);
+    } else {
+        getAreaValues(groupRoots[selectedRootIndex], model);
+    }
 
-        getDecileData(model);
-        loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
-
-        if (isDeprivation) {
-            getAreaValues(groupRoots[ROOT_INDEXES.DEPRIVATION], model,
-                getCurrentComparator().Code);
-        } else {
-            getAreaValues(groupRoots[selectedRootIndex], model);
-       }
-
-        ajaxMonitor.monitor(displayPage);
+    ajaxMonitor.monitor(displayPage);
 }
 
 function viewNational() {
-  
+
     if (!FT.ajaxLock) {
 
         var model = MT.model;
 
         model.parentCode = NATIONAL_CODE;
+        model.similarAreaCode = null;
         comparatorId = NATIONAL_COMPARATOR_ID;
         ftHistory.setHistory();
 
@@ -410,36 +417,9 @@ function viewNational() {
 }
 
 function flattenOnsClusters(onsClusters) {
-    //flatten onsClusters
     var onsClusterHash = {};
     _.each(onsClusters, function (a) { onsClusterHash[a.AreaCode] = a; });
     return onsClusterHash;
-}
-
-function setNonSimilarPolygons() {
-    var polygons = mapState.areaCodeToPolygonHash;
-    if (MT.model.areaTypeId === AreaTypeIds.DistrictUA) {
-        if (selectedRootIndex === 'dep') {
-            var comparatorAreaCode = getCurrentComparator().Code;
-            var root = groupRoots[ROOT_INDEXES.DEPRIVATION];
-            var key = getIndicatorKey(root, MT.model, comparatorAreaCode);
-            var onsClusterHash = flattenOnsClusters(loaded.areaValues[key]);
-
-            for (var areaCode in polygons) {
-                if (!onsClusterHash[areaCode]) {
-                    polygons[areaCode].set('fillColor', '#999');
-                }
-            }
-        }
-    } else {
-        var deciles = loaded.categories[AreaTypeIds.DeprivationDecile];
-        var targetDecile = deciles[MT.model.areaCode];
-        for (var areaCode in polygons) {
-            if (deciles[areaCode] !== targetDecile) {
-                polygons[areaCode].set('fillColor', '#999');
-            }
-        }
-    }
 }
 
 function isAreaInCurrentDecile(areaCode) {
@@ -496,7 +476,7 @@ function pointerClicked() {
 }
 
 function getTopLink(text) {
-    
+
     if (isSimilarAreas()) {
         text += "all";
         var func = "viewNational";
@@ -512,20 +492,16 @@ function getTopLink(text) {
 }
 
 function updateCompareBox() {
-   
+
     var $mapOverlayTitle = $('.map-overlay-title');
     if (isSimilarAreas()) {
 
-        if (mapState.comparisonArea) {
-            var areaCode = mapState.comparisonArea;
-        } else {
-            // Comparision area not availabe as state loaded from hash   
-            areaCode = MT.model.areaCode;
-            mapState.comparisonArea = areaCode;
+        if (!mapState.comparisonArea) {
+            mapState.comparisonArea = MT.model.areaCode;
         }
 
+        // Display comparing text
         var text = getComparisonText();
-
         $('#similar-text').html(text);
 
         // Set the similar areas tooltip text
@@ -552,14 +528,7 @@ function getComparisonText() {
         }
     } else {
         // Only decile but areas are different colours
-        if (MT.model.areaTypeId === AreaTypeIds.CountyUA) {
-            text = 'Comparing ' + areaName + ' to similar areas only';
-        } else {
-            //Cant seem to return a name for OnsCluster
-            text = 'Comparing ' + areaName + ' to similar areas only';
-            //text = 'Comparing ' + areaName + ' to similar areas in ' +
-            //    getOnsClusterName(MT.model.parentCode);
-        }
+        text = 'Comparing ' + areaName + ' to similar areas only';
     }
 
     return text;
@@ -618,6 +587,8 @@ function getBoundariesCallback(data) {
 
 function initPolygons(map) {
 
+    var areaCode;
+
     var boundaries = loaded.boundaries[MT.model.areaTypeId],
         areaCodeToPolygonHash = {},
         mapOffset = null,
@@ -630,7 +601,7 @@ function initPolygons(map) {
     if (boundaries.features) {
         for (var x = 0; x < boundaries.features.length; x++) {
 
-            var areaCode = boundaries.features[x].properties.AreaCode;
+            areaCode = boundaries.features[x].properties.AreaCode;
             var coordinates = boundaries.features[x].geometry.coordinates;
             coords = [];
 
@@ -675,7 +646,7 @@ function initPolygons(map) {
 
                     // Show hover popup
                     if (!$('.map-template').is(visible) &&
-                        polygon.fillColor != '#999' /*an area that is not in the peer group*/ &&
+                        polygon.fillColor !== '#999' /*an area that is not in the peer group*/ &&
                         !$('.no-data-found').is(visible)) {
 
                         setHoverPopupHtml(areaCode);
@@ -701,20 +672,25 @@ function initPolygons(map) {
                 tooltipManager.hide();
             });
 
-            googleMaps.event.addListener(polygon, 'click', function() {
+            googleMaps.event.addListener(polygon, 'click', function () {
                 tooltipManager.hide();
 
                 if (!FT.ajaxLock) {
 
-                    mapState.isPopup = true;
-
-                    // Ignore clicks on areas that are not part of the current decile
                     areaCode = $(this)[0].areaCode;
-                    MT.model.areaCode = areaCode;
-                    if (isSimilarAreas() && !isAreaInCurrentDecile(areaCode)) {
+
+                    // Check whether pop up should be displayed
+                    if (isMapWithNoData()) {
+                        // Navigate straight to area details
+                        MT.model.areaCode = areaCode;
+                        MT.nav.areaDetails();
+                        return;
+                    } else if (isSimilarAreas() && !isAreaInSimilarAreas(areaCode)) {
+                        // Ignore clicks on areas that are non-similar areas
                         return;
                     }
 
+                    mapState.isPopup = true;
                     setCalloutBoxPixelOffset();
 
                     // Unlocked in CallOutBox.show
@@ -722,6 +698,9 @@ function initPolygons(map) {
 
                     var strokeWeight = 'strokeWeight';
                     polygon.set(strokeWeight, 3);
+
+                    // Show pop up
+                    MT.model.areaCode = areaCode;
                     showInfoBox();
 
                     // Correct issue where last polygon border is highlighted
@@ -737,34 +716,51 @@ function initPolygons(map) {
     }
 }
 
+function isMapWithNoData() {
+    return MT.model.profileId === ProfileIds.PublicHealthDashboard && !MT.config.showMapWithNoData;
+}
+
+function isAreaInSimilarAreas(areaCode) {
+
+    if (isNearestNeighbour()) {
+        // Get list of neighbours
+        var codeWithNeighbours = getAreaCodeOfAreaWithNeighbours();
+        var neighbours = loaded.neighbours[codeWithNeighbours].slice();
+        neighbours.push(codeWithNeighbours);
+
+        // Do not show pop up unless neighbour area
+        if (_.contains(neighbours, areaCode))
+            return true;
+    } else if (isAreaInCurrentDecile(areaCode)) {
+        return true;
+    }
+    return false;
+}
+
 function colorPolygons(areaValues, root, parentValue) {
 
     var polygons = mapState.areaCodeToPolygonHash;
     var significanceFunction = getPolygonColourFunction(root, parentValue);
-    var colorProp = 'color' + comparatorId;
-    var noRatingColour = '#C9C9C9';
+    var colorProp = 'color';
 
+    var shouldShowArea = isNearestNeighbour() 
+        ? function (areaCode) { return isAreaInSimilarAreas(areaCode); }
+        : function () { return true; }
     for (var areaCode in polygons) {
 
         var data = areaValues[areaCode];
         var dataInfo = new CoreDataSetInfo(data);
 
-        if (dataInfo.isValue()) {
-
-            // Colour is not already defined for this data object
+        if (dataInfo.isValue() && shouldShowArea(areaCode)) {
             if (!data.hasOwnProperty(colorProp)) {
-                if (dataInfo.isNote() && data.NoteId === 401) {
-                    // Data quality issue
-                    data[colorProp] = noRatingColour;
-                } else {
-                    data[colorProp] = significanceFunction(data.Sig[comparatorId], data.Val);
-                }
+                // Colour is not already defined for this data object
+                data[colorProp] = significanceFunction(data.Sig[comparatorId], data.Val);
             }
-
             var color = data[colorProp];
 
         } else {
-            color = noRatingColour;
+            // Grey - no value
+            color = '#C9C9C9';
         }
 
         polygons[areaCode].set('fillColor', color);
@@ -772,9 +768,17 @@ function colorPolygons(areaValues, root, parentValue) {
 }
 
 function colorAllPolygonsGrey() {
+    colorAllPolygons('#C9C9C9');
+}
+
+function colorAllPolygonsBlue() {
+    colorAllPolygons('#63A1C3');
+}
+
+function colorAllPolygons(color) {
     var polygons = mapState.areaCodeToPolygonHash;
     for (var areaCode in polygons) {
-        polygons[areaCode].set('fillColor', '#C9C9C9');
+        polygons[areaCode].set('fillColor', color);
     }
 }
 
@@ -825,7 +829,7 @@ function initHomeElements() {
     populateAreaTypes();
 
     // Adjust page title size
-    var $title = $('.home_intro h1');
+    var $title = $('.home-intro h1');
     var size = $title.html().length;
     if (size > 28) {
         $title.css('font-size', '62px');
@@ -839,24 +843,24 @@ function populateAreaTypes() {
     var templateName = 'areaFilter';
 
     templates.add(templateName, '<div class="compare" id="map-overlay-filters"><h5>{{#isOneType}}Areas on map{{/isOneType}}{{^isOneType}}Change map to show{{/isOneType}}</h5><ul class="filters">\
-    {{#types}}<li id="{{Id}}" class="areaFilter {{class}}">{{#isOneType}}{{Short}}{{/isOneType}}{{^isOneType}}<a id="switchAreaType" href="javascript:switchAreas({{Id}});">{{Short}}</a>{{/isOneType}}</li>{{/types}}');
+    {{#types}}<li id="{{Id}}" class="areaFilter {{class}}">{{#isOneType}}{{Short}}{{/isOneType}}{{^isOneType}}<a href="javascript:selectAreaType({{Id}});">{{Short}}</a>{{/isOneType}}</li>{{/types}}');
 
     setAreaTypeOptionHtml(templateName);
 }
 
 CallOutBox.openInfo = function (info, marker, content) {
-     
+
     if (mapState.isPopup) {
-        
+
         var map = mapState.map;
         var hasAreaChanged = activeInfoArea !== null &&
             (activeInfoArea !== MT.model.areaCode);
-        
+
         // Close if area changed
         if (activeInfo && hasAreaChanged) {
             activeInfo.close();
-        } 
-        
+        }
+
         if (!activeInfo || hasAreaChanged) {
             info.open(map, marker);
             activeInfo = info;
@@ -865,16 +869,25 @@ CallOutBox.openInfo = function (info, marker, content) {
             // Just change content
             $('.map-info-box').html(content);
         }
-        
+
         setTimeout('CallOutBox.show()', 0);
     } else {
-       
+
         if (activeInfo) {
             activeInfo.close();
-        }  
+        }
     }
 }
 DEPRIVATION_DECILE_COMPARATOR_ID = 1;
+
+/**
+ * Template displayed when user hovers over area on map
+ */
+templates.add('areaHover',
+    '<div class="hover-map-template map-info"><div class="hover-map-info-body clearfix">'
+    + '<h4 class="hover-place-name">{{nameofplace}}</h4></div><div class="map-info-footer clearfix"></div>'
+    + '<div class="map-info-tail"><i></i></div></div>');
+
 // Pop up content is selected area has no data
 templates.add('nodatafound',
     '<div id="map-overlay" class="no-data-found"><div class="map-info map-info-empty" id="map-empty-template"><div class="map-info-header clearfix"><span class="map-info-close" onclick="closeInfo()">&times;</span></div><div class="map-info-body"><h4>{{nameofplace}}</h4><p>Data unavailable</p></div><div class="map-info-tail"><i></i></div></div></div>');

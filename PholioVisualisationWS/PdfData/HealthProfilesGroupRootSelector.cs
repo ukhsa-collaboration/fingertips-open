@@ -168,9 +168,9 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.HospitalStaysForSelfHarm); }
         }
 
-        public GroupRoot AdultSmokingRelatedDeaths
+        public GroupRoot AdultSmokingInRoutineAndManualOccupations
         {
-            get { return GetGroupRoot(IndicatorIds.AdultSmokingRelatedDeaths); }
+            get { return GetGroupRoot(IndicatorIds.SmokingInRoutineAndManualOccupations); }
         }
 
         public GroupRoot AdultExcessWeight
@@ -208,6 +208,11 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.IncidenceOfTB); }
         }
 
+        public GroupRoot EstimatedDementiaDiagnosisRate
+        {
+            get { return GetGroupRoot(IndicatorIds.EstimatedDementiaDiagnosisRate); }
+        }
+
         public GroupRoot AdultStatutoryHomelessness
         {
             get { return GetGroupRoot(IndicatorIds.StatutoryHomelessness2); }
@@ -218,9 +223,9 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.ViolentCrime); }
         }
 
-        public GroupRoot AdultLongTermUnemployment
+        public GroupRoot PeopleInEmployment
         {
-            get { return GetGroupRoot(IndicatorIds.LongTermUnemployment); }
+            get { return GetGroupRoot(IndicatorIds.PeopleInEmployment); }
         }
 
         public GroupRoot AdultExcessWinterDeaths

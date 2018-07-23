@@ -9,6 +9,9 @@ namespace Fpm.MainUI
         private static string jsPath;
         private static string cssPath;
         private static string angularAppPath;
+        private static string angularAppDistPath;
+
+
 
         public static string LastUpdatedDateBatchTemplate
         {
@@ -55,9 +58,24 @@ namespace Fpm.MainUI
             get { return angularAppPath ?? (angularAppPath = GetPath("AngularApps")); }
         }
 
+        public static string AngularAppDistPath
+        {
+            get { return angularAppDistPath ?? (angularAppDistPath = GetPath("angular-app-dist")); }
+        }
+
         public static string GetPholioWs()
         {
             return GetAppSetting("CoreWsUrl");
+        }
+
+        public static string GetLiveSiteWsUrl()
+        {
+            return GetAppSetting("LiveSiteWsUrl");
+        }
+
+        public static string GetLiveUpdateKey()
+        {
+            return GetAppSetting("LiveUpdateKey");
         }
 
         private static string GetPath(string folderName)

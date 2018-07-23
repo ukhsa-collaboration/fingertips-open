@@ -1,0 +1,51 @@
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
+
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+
+@{
+    ViewBag.Title = "User Feedback";
+}
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css"/>
+@Scripts.Render("~/userfeedback.js")
+
+<div class="standardWidth">
+    <h2 class="subheading">User Feedback</h2>
+
+    <table id="user-feedback" class="grid sortable">
+        <colgroup>
+            <col style="width: 7%">
+            <col style="width: 5%">
+            <col style="width: 24%">
+            <col style="width: 24%">
+            <col style="width: 19%">
+            <col style="width: 20%">
+@*            <col style="width: 5%">*@
+        </colgroup>
+        <thead>
+        <tr>
+            <th class="header">Time</th>
+            <th class="header">Env</th>
+            <th class="header">What user was doing</th>
+            <th class="header">What went wrong</th>
+            <th class="header">Email</th>
+            <th class="header">Url</th>
+@*            <th class="header">Action</th>*@
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var feedback in Model)
+        {
+            <tr>
+                <td class="left">@feedback.Timestamp.ToString("yyyy/MM/dd")</td>
+                <td class="left">@feedback.Environment</td>
+                <td class="left" style="word-wrap: break-word">@feedback.WhatUserWasDoing</td>
+                <td class="left" style="word-wrap: break-word">@feedback.WhatWentWrong</td>
+                <td class="left">@feedback.Email</td>
+                <td class="left" style="word-wrap: break-word"><a href="@feedback.Url" target="_brank">@feedback.Url</a></td>
+@*                <td><button>Archive</button></td>*@
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

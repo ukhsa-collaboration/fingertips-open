@@ -1,9 +1,9 @@
 ﻿function goToReportsPage() {    
     setPageMode(PAGE_MODES.REPORTS);
-    ajaxMonitor.setCalls(1);
+    ajaxMonitor.setCalls(2);
     getReportsData();
+    getContentText('ssrs-report-extra-notes');
     ajaxMonitor.monitor(displayReport);
-   
 }
 
 function getReportsData() {
@@ -15,64 +15,80 @@ function getReportsData() {
 
 
 function displayReport() {
-
+    
     var obj = {
-        reports: reports
-    }
+        reports: reports,
+        hasReports: reports.length > 0,
+        noReports: reports.length < 1,
+        word: 'word',
+        pdf: 'pdf',
+        extraNotes: loaded.contentText
+    };
 
-    templates.add('ssrsReportList', '<h2>Reports</h2><table class="bordered-table table-hover" >' +
+    templates.add('ssrsReportList', '<h2>Related reports</h2>' +
+        '{{#hasReports}}' +
+        '<table class="bordered-table table-hover" >' +
+        '<thead>' +
+        '<tr>' +
+        '<th>Name</th>' +
+        '<th style="width:400px;">Notes</th>' +
+        '<th colspan="3" style="text-align:center;width:400px;">Download</th>' +
+        '</tr>' +
+        '</thead>' + 
         '<tbody>' +
         '{{#reports}}' +
         '<tr>' +
         '<td>{{Name}}</td>' +
-        '<td class="format"><a class="pLink" href="#" onclick="openReport({{Id}}); return false;"  target="_blank">HTML</a></td>' +
-        '<td class="format"><a class="pLink" href="#" onclick="openReport({{Id}}, 1); return false;" >PDF</a></td>' +
-        '<td class="format"><a class="pLink" href="#" onclick="openReport({{Id}}, 2); return false;" >Word</a></td>' +
+        '<td>{{{Notes}}}</td>' +
+        '<td class="format"><a class="pLink" href="#" onclick="openReport({{Id}}, \'pdf\'); return false;" >PDF</a></td>' +
+        '<td class="format"><a class="pLink" href="#" onclick="openReport({{Id}}, \'word\'); return false;" >Word</a></td>' +
         '</tr>' +
         '{{/reports}}' +
         '</tbody>' +
-        '</table>');
+        '</table>' +
+        '<br><br><div>Please note reports open in a separate tab or window. Reports may take a minute or two to load.</div>' +
+        '<br><div>{{{extraNotes}}}</div>' +
+        '{{/hasReports}}' +
+        '{{#noReports}}<div>There are no reports available for this profile</div>{{/noReports}}' 
+        );
 
     pages.getContainerJq().html(templates.render('ssrsReportList', obj));
 
     showAndHidePageElements();
     loadReports();
-    // Select the first report
-    renderReport(getReportUrl(reports[0]));
-    // Add Change Event to report list
-    $('#reports').on('change', function () {
-        var index = $("#reports option:selected").val();
-        renderReport(getReportUrl(reports[index].Name));
-    });
     unlock();
 }
 
 
-function getReportUrl(report,format) {    
-    var parameters = report.Parameters.split(',');    
-    var ssrsParameters='';
-    for (var i = 0; i < parameters.length; i ++) {
-        if (parameters[i] === 'areaCode') {
-            ssrsParameters +=  '&areaCode=' + FT.model.areaCode;
-        } else if (parameters[i] === 'areaTypeId') {
-            ssrsParameters += '&areaTypeId=' + FT.model.areaTypeId;
-        } else if (parameters[i] === 'parentCode') {
-            ssrsParameters += '&parentCode=' + FT.model.parentCode;
-        } else if (parameters[i] === 'parentTypeId') {
-            ssrsParameters += '&parentTypeId=' + FT.model.parentTypeId;
-        } else if (parameters[i] === 'groupId') {
-            ssrsParameters += '&groupId=' + FT.model.groupId;
-        }
+function getReportUrl(report, format) {
+
+    var parameters = report.Parameters;
+   
+    var baseUrl = '/reports/ssrs/';
+
+    var model = FT.model;
+
+    var reportUrl = baseUrl + "?reportName=" + encodeURIComponent(report.File);
+    if (parameters.includes('areaCode')) {
+        reportUrl = reportUrl + "&areaCode=" + model.areaCode;
+    }
+    if (parameters.includes('areaTypeId')) {
+        reportUrl = reportUrl + "&areaTypeId=" + model.areaTypeId;
+    }
+    
+    if (parameters.includes('parentCode')) {
+        reportUrl = reportUrl + "&parentCode=" + model.parentCode;
+    }
+     
+    if (parameters.includes('parentTypeId')) {
+        reportUrl = reportUrl + "&parentTypeId=" + model.parentTypeId;
     }
 
-    var baseUrl = 'http://sqlpor01.phe.gov.uk/ReportServer/Pages/ReportViewer.aspx?%2f';
-    var finalUrl = baseUrl + report.Name + '&rs:Command=Render' + ssrsParameters + '&rc:Toolbar=false';
-    if (format === FORMAT_PDF) {
-        finalUrl = baseUrl + report.Name + '&rs:Command=Render' + ssrsParameters + '&rc:Toolbar=false' + '&rs:Format=PDF';
-    } else if (format === FORMAT_WORD) {
-        finalUrl = baseUrl + report.Name + '&rs:Command=Render' + ssrsParameters + '&rc:Toolbar=false' + '&rs:Format=WORD';
+    if (parameters.includes('groupId')) {
+        reportUrl = reportUrl + "&groupId=" + model.groupId;
     }
-    return finalUrl;
+
+    return  reportUrl + "&format=" +format;   
 }
 
 function  renderReport(url) {
@@ -85,11 +101,11 @@ function loadReports() {
     }
 }
 
-function openReport(x, format) {
-    console.log(format);
-    window.open(getReportUrl(reports[0],format),'_blank');
+function openReport(id, format) {
+    var selectedReport = _.findWhere(reports, { Id: id });
+    window.open(getReportUrl(selectedReport, format), '_blank');
+    logEvent('SsrsReportView', format, id);
 }
-
 
 
 var reports;
@@ -103,5 +119,4 @@ pages.add(PAGE_MODES.REPORTS,
     gotoName: 'goToReportsPage',
     needsContainer: true,
     jqIds: [ 'areaMenuBox', 'parentTypeBox', 'areaTypeBox', 'region-menu-box']
-
 });

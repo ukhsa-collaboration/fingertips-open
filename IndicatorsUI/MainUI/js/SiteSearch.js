@@ -5,33 +5,36 @@
 
 var indicatorSearch = {};
 
-
 function getGroupingData() {
 
     if (!indicatorIdList.anyForAreaType(FT.model.areaTypeId)) {
         getGroupingDataCallback(null);
     } else {
 
-        var sid = getGroupAndCurrentAreaTypeKey();
+        var key = getGroupAndCurrentAreaTypeKey();
 
         // Subgroup purely used as ID for caching data on client
         var code = FT.model.parentCode;
-        if (ui.isDataLoaded(sid, code)) {
-            getGroupingDataCallback(ui.getData(sid, code));
+        if (ui.isDataLoaded(key, code)) {
+            getGroupingDataCallback(ui.getData(key, code));
         } else {
 
             showSpinner();
-
-            var parameters = new ParameterBuilder();
-            addGroupDataParameters(parameters);
-            addProfileOrIndicatorsParameters(parameters);
-            addRestrictToProfilesIdsParameter(parameters);
-
-            ajaxGet('api/latest_data/specific_indicators_for_child_areas', parameters.build(),
-                getGroupingDataCallback, handleAjaxFailure);
+            getGroupingDataCall();
         }
     }
 };
+
+function getGroupingDataCall() {
+
+    var parameters = new ParameterBuilder();
+    parameters.setNotToCache();
+    addGroupDataParameters(parameters);
+    addProfileOrIndicatorsParameters(parameters);
+
+    ajaxGet('api/latest_data/specific_indicators_for_child_areas', parameters.build(),
+        getGroupingDataCallback, handleAjaxFailure);
+} 
 
 function getTrendData() {
 
@@ -44,10 +47,10 @@ function getTrendData() {
         showSpinner();
 
         var parameters = new ParameterBuilder(
+            ).setNotToCache(
             ).add('area_type_id', FT.model.areaTypeId
             ).add('parent_area_code', parentCode);
 
-        addRestrictToProfilesIdsParameter(parameters);
         addProfileOrIndicatorsParameters(parameters);
 
         ajaxGet('api/trend_data/specific_indicators_for_child_areas', parameters.build(), getTrendDataCallback);
@@ -63,39 +66,53 @@ function addSearchLink(h, text, areaTypeId, cssClass) {
 
 function getSearchResults() {
 
+    // Protect against null text
+    if (searchText == null) searchText = "";
+
+    // Clean search text
+    searchText = searchText.trim().toLowerCase();
+
     var parameters = new ParameterBuilder().add('search_text', searchText);
 
-    addRestrictToProfilesIdsParameter(parameters);
-
-    ajaxGet('api/indicator_search',
-        parameters.build(),
-        function (areaTypeToIndicatorIdsMap) {
-
-            // Only keep results where area type contains some results
-            var filteredResults = indicatorSearch.filterResults(areaTypeToIndicatorIdsMap);
-
-            // Init area types
-            var areaTypeIds = _.keys(filteredResults);
-            var filterAreaTypes = indicatorSearch.filterAreaTypes(loaded.areaTypes, areaTypeIds);
-            loaded.areaTypes = filterAreaTypes;
-            FT.menus.areaType = new AreaTypeMenu(FT.model,
-                new AreaTypes(filterAreaTypes));
-
-            searchState.areaTypeIdsWithResults = areaTypeIds;
-
-            // Init indicator list
-            indicatorIdList = new IndicatorIdList(filteredResults);
-
-            ajaxMonitor.callCompleted();
-        }, handleAjaxFailure);
+    ajaxGet('api/indicator_search', parameters.build(),
+        getSearchResultsCallback, handleAjaxFailure);
 
     logEvent('Search', 'IndicatorSearch', searchText);
+}
+
+function getSearchResultsCallback(areaTypeToIndicatorIdsMap) {
+
+    // Only keep results where area type contains some results
+    var filteredResults = indicatorSearch.filterResults(areaTypeToIndicatorIdsMap);
+
+    // Init area types
+    var areaTypeIds = _.keys(filteredResults);
+    var filterAreaTypes = indicatorSearch.filterAreaTypes(loaded.areaTypes, areaTypeIds);
+    loaded.areaTypes = filterAreaTypes;
+    FT.menus.areaType = new AreaTypeMenu(FT.model, new AreaTypes(filterAreaTypes));
+
+    searchState.areaTypeIdsWithResults = areaTypeIds;
+
+    // Init indicator list
+    indicatorIdList = new IndicatorIdList(filteredResults);
+
+    ajaxMonitor.callCompleted();
 }
 
 indicatorSearch.filterResults = function (areaTypeToIndicatorIdsMap) {
     var toKeep = {};
     for (var areaTypeId in areaTypeToIndicatorIdsMap) {
         if (areaTypeToIndicatorIdsMap[areaTypeId].length > 0) {
+            toKeep[areaTypeId] = areaTypeToIndicatorIdsMap[areaTypeId];
+        }
+    }
+    return toKeep;
+}
+
+indicatorSearch.filterResultsSelected = function (areaTypeToIndicatorIdsMap, listIndicatorId) {
+    var toKeep = {};
+    for (var areaTypeId in areaTypeToIndicatorIdsMap) {
+        if (areaTypeToIndicatorIdsMap[areaTypeId].length > 0 && areaTypeToIndicatorIdsMap) {
             toKeep[areaTypeId] = areaTypeToIndicatorIdsMap[areaTypeId];
         }
     }
@@ -145,9 +162,9 @@ function SearchResultSummary(indicatorIdList) {
 
     this.display = function (selectedAreaTypeId) {
 
-        var h = ['<table class="fl"><tr>'];
+        var html = ['<table class="fl"><tr>'];
 
-        addTd(h, 'Search results for <i><b>' + searchText + '</i></b>&nbsp;&nbsp;');
+        addTd(html, 'Search results for <i><b>' + searchText + '</i></b>&nbsp;&nbsp;');
 
         var areaTypes = new AreaTypes().getAreaTypes();
         areaTypes = _.sortBy(areaTypes, 'Short');
@@ -157,17 +174,20 @@ function SearchResultSummary(indicatorIdList) {
             var areaTypeId = areaTypes[i].Id,
             count = indicatorIdList.getIndicatorCount(areaTypeId);
 
-            var selected = areaTypeId === selectedAreaTypeId ? 'selected' : '';
+            // Only add links for area types with data
+            if (count > 0) {
+                var selected = areaTypeId === selectedAreaTypeId ? 'selected' : '';
 
-            addSearchLink(h,
-                areaTypes[i].Short + ' [' + count + ']',
-                areaTypeId,
-                selected);
+                addSearchLink(html,
+                    areaTypes[i].Short + ' [' + count + ']',
+                    areaTypeId,
+                    selected);
+            }
         }
 
-        h.push('<tr/></table>');
+        html.push('<tr/></table>');
 
-        $label.html(h.join(''));
+        $label.html(html.join(''));
     }
 }
 
@@ -193,9 +213,7 @@ function initSearch() {
 * @class getAreaTypes
 */
 function getAreaTypes() {
-    var parameters = new ParameterBuilder().add('profile_ids',
-        getProfileIds(FT.model.areaTypeId));
-
+    var parameters = new ParameterBuilder();
     ajaxGet('api/area_types',
         parameters.build(),
         function (areaTypes) {
@@ -234,15 +252,6 @@ function searchResultsLoaded() {
     initAreaData();
 }
 
-function getIndicatorIdArgument() {
-
-    var areaTypeId = FT.model.areaTypeId;
-
-    return indicatorIdList.anyForAreaType(areaTypeId) ?
-        '&iids=' + indicatorIdList.getIds(areaTypeId) :
-        indicatorIds = [];
-}
-
 function getIndicatorIdsParameter() {
 
     var areaTypeId = FT.model.areaTypeId;
@@ -255,12 +264,12 @@ function getIndicatorIdsParameter() {
 }
 
 function addIndicatorIdParameter(parameters) {
-
     var areaTypeId = FT.model.areaTypeId;
-
+    
     if (indicatorIdList.anyForAreaType(areaTypeId)) {
-        parameters.add('indicator_ids', indicatorIdList.getIds(areaTypeId).join(','));
-    } else {
+        parameters.add('indicator_ids', getIndicatorIdsParameter());
+    }
+    else {
         indicatorIds = [];
     }
 }
@@ -342,7 +351,8 @@ function showIndicatorProfileOrigin(event) {
 
         var parameters = new ParameterBuilder(
         ).add('indicator_ids', indicatorIds
-        ).add('area_type_id', model.areaTypeId);
+        ).add('area_type_id', model.areaTypeId
+        ).setNotToCache();
 
         ajaxGet('api/profiles_containing_indicators', parameters.build(),
             function (data) {
@@ -371,7 +381,7 @@ function displayProfilesForIndicatorPopUp() {
 
     // Show lightbox
     var popupWidth = 900;
-    var left = ($(window).width() - popupWidth) / 2;
+    var left = lightbox.getLeftForCenteredPopup(popupWidth);
     var top = 200;
     lightbox.show(html, top, left, popupWidth);
 
@@ -411,3 +421,4 @@ searchState = {
 
 templates.add('profiles-per-indicator',
     '<div><ul>{{#data}} <li><span><a href="{{{Url}}}" target="_blank">{{ProfileName}}</a><span>{{/data}}</ul></div>');
+

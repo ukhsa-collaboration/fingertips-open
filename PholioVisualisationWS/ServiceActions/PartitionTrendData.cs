@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.ServiceActions
 {
@@ -20,6 +21,5 @@ namespace PholioVisualisation.ServiceActions
 
         [JsonProperty]
         public IList<CoreDataSet> AreaAverage { get; set; }
-
     }
 }

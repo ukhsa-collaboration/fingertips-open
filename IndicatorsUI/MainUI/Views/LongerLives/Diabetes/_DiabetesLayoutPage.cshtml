@@ -1,40 +1,44 @@
 ﻿@using System.Web.Optimization
 @using System.Web.Script.Serialization
 @using System.Web.UI.WebControls
-@using Profiles.MainUI.Models;
+@using IndicatorsUI.MainUI.Models;
 @model PageModel
 <!DOCTYPE html>
 <html lang="en-GB">
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="keywords" content="@ViewBag.MetaKeywords" />
         <meta name="author" content="Public Health England (PHE)" />
         <meta name="description" content="@ViewBag.MetaDescription" />
         <title>
             @Model.Title - @Model.PageTitle
         </title>
+        @Html.Partial("_HttpsCheck")
         @Html.Partial("_Favicon")
         @Styles.Render("~/bundles/css-longer-lives")
         <link rel="stylesheet" type="text/css" href="@(Model.CssPath)longer-lives-diabetes.css" />  
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos&sensor=false" type="text/javascript"></script>
+        @Html.Partial("_GoogleMaps")
         @Scripts.Render("~/bundles/js-longer-lives")           
         <script src="@(Model.JsPath)LongerLives/Diabetes/SiteDiabetes.js" type="text/javascript"></script>
-        <script type="text/javascript">        //<![CDATA[  
+
+        <script type="text/javascript">                                                        //<![CDATA[
             FT = {version:'@ViewBag.JavaScriptVersion'};
             FT.url = {
                 img: '@(ViewBag.ImagesUrl)',
                 bridge: '@Model.BridgeServicesUrl',
                 corews: '@Model.CoreServicesUrl'
             };
+            FT.features = @Html.Raw(ViewBag.FeatureSwitchJavaScript);
             profileTitle = '@ViewBag.Title';
             groupIds =  @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["groupIds"]));
             profileUrlKey = '@ViewBag.ProfileUrlKey';
             MT.model.profileId = @Model.ProfileId;
-            MT.model.areaTypeId = @(ViewBag.DefaultAreaType);    
-            MT.model.parentAreaType = @(ViewBag.DefaultAreaType);    
-            restrictSearchProfileId = @Model.TemplateProfileId;
-            profileCollectionIdList = [@Model.TemplateProfileId];
+            MT.model.areaTypeId = @(ViewBag.DefaultAreaType);
+            MT.model.parentAreaType = @(ViewBag.DefaultAreaType);
+            MT.config = {
+            showCallOutBoxPopulation : @Json.Encode(ViewBag.ShowCallOutBoxPopulation),
+            showRankingBox1 : @Json.Encode(ViewBag.ShowRankingInfoBox1),
+            showRankingBox2 : @Json.Encode(ViewBag.ShowRankingInfoBox2)};
             //]]</script>
         
 @* Longer lives specific configuration*@
@@ -42,7 +46,7 @@
         {
             <script type="text/javascript">//<![CDATA[
             SupportingProfileId = @ViewBag.LongerLivesSupportingProfileId;
-            SupportingGroupId = @Html.Raw(new JavaScriptSerializer().Serialize(@ViewBag.SupportingGroupId));
+            SupportingGroupId = @Html.Raw(new JavaScriptSerializer().Serialize(ViewBag.SupportingGroupId));
             hasPracticeData = @ViewBag.HasPracticeData;
             MT.model.groupId = @ViewBag.DefaultGroupId;
             domainsToDisplay = @ViewBag.DomainsToDisplay;

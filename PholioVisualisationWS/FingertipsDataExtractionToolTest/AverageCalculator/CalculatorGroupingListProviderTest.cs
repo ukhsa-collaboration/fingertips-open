@@ -18,7 +18,7 @@ namespace PholioVisualisation.FingertipsDataExtractionToolTest.AverageCalculator
         public void TestInitialize()
         {
             _groupDataReader = new Mock<IGroupDataReader>();
-            _groupDataReader.Setup(x => x.GetAllIndicators()).Returns(new List<int> {1});
+            _groupDataReader.Setup(x => x.GetAllIndicatorIds()).Returns(new List<int> {1});
         }
 
         [TestMethod]

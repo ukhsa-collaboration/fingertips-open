@@ -54,6 +54,13 @@
             </div>
         </div>
 
+        <div class="row form-group">
+            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.ComponentAreaTypesString)</label>
+            <div class="col-md-2">
+                @Html.TextBoxFor(x => x.ComponentAreaTypesString, new {@class = "form-control"})
+            </div>
+        </div>
+
         <div class="row form-group margin-top-space">
 
             @if (UserDetails.CurrentUser().IsAdministrator)

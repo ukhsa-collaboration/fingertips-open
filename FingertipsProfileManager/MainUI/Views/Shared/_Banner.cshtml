@@ -22,7 +22,7 @@
         <span id="app-title">Fingertips Profile Manager</span>
         <ul style="float: right;">
             <li class="site-link">@Html.ActionLink("Profiles", "EditProfileNonAdmin", "Profile", new { profileId = ViewBag.ProfileId }, new { })</li>
-            <li class="site-link">@Html.ActionLink("Indicators", "Index", "ProfilesAndIndicators", new { profileId = ViewBag.ProfileId }, new { })</li>
+            <li class="site-link">@Html.ActionLink("Indicators", "ListIndicatorsInProfile", "ProfilesAndIndicators", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link"><a href="/upload">Upload data</a></li>
             <li class="site-link">@Html.ActionLink("Documents", "DocumentsIndex", "Documents", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link">@Html.ActionLink("Content", "ContentIndex", "Content", new { profileId = ViewBag.ProfileId }, new { })</li>
@@ -49,6 +49,9 @@
                     </li>
                     <li class="site-link">
                         <a href="/reports">Reports</a>
+                    </li>
+                    <li class="site-link">
+                        <a href="/userfeedback">User Feedback</a>
                     </li>
                 </ul>
             </li>

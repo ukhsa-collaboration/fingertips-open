@@ -1,12 +1,13 @@
 ﻿using FingertipsUploadService.Upload;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 
 namespace FingertipsUploadService.FpmFileReader
 {
-    public class ExcelFileReader : IUploadFileReader
+    public class ExcelFileReader : IUploadFileReader, IDisposable
     {
         private readonly Logger _logger = LogManager.GetLogger("ExcelFileReader");
         private string _filePath;
@@ -57,16 +58,19 @@ namespace FingertipsUploadService.FpmFileReader
             return worksheetNames;
         }
 
+
+
         /// <summary>
         /// Reads indicator worksheet from batch upload file and  
         /// return it as DataTable
         /// </summary>
         /// <returns>DataTable</returns>
-        public DataTable GetBatchData()
+        public DataTable ReadData()
         {
-            var batchData = GetDataTableFromWorksheet(WorksheetNames.BatchPholio, true, "results");
+            var batchData = GetDataTableFromWorksheet(WorksheetNames.Pholio, true, "results");
             return batchData;
         }
+
 
         /// <summary>
         /// Reads worksheet into datatable
@@ -77,20 +81,43 @@ namespace FingertipsUploadService.FpmFileReader
         /// <returns>DataTable</returns>
         private DataTable GetDataTableFromWorksheet(string worksheetName, bool isFirstRowHeader, string newDataTableName)
         {
-            OleDbConnection connection = null;
-            OleDbDataAdapter adapter = null;
+            OleDbConnection connection = GetConnection(isFirstRowHeader);
+            OleDbDataAdapter adapter = new OleDbDataAdapter(string.Format(
+                "SELECT * FROM [{0}]", worksheetName), connection);
 
-            connection = GetConnection(isFirstRowHeader);
-            adapter = new OleDbDataAdapter(string.Format("SELECT * FROM [{0}]", worksheetName), connection);
-            var ds = new DataSet();
-            adapter.Fill(ds, newDataTableName);
-            var dataTable = ds.Tables[newDataTableName];
+            // Create table
+            var table = new DataTable();
+            adapter.FillSchema(table, SchemaType.Source);
 
+            // Specify data types for numeric columns
+            foreach (var columnName in UploadColumnNames.GetNumericColumnNames())
+            {
+                SetColumnNumeric(table, columnName);
+            }
+
+            adapter.Fill(table);
+
+            // Tidy up
             adapter.Dispose();
             connection.Dispose();
             connection.Close();
 
-            return dataTable;
+            return table;
+        }
+
+        private void SetColumnNumeric(DataTable table, string columnName)
+        {
+            if (table.Columns.Contains(columnName))
+            {
+                var column = table.Columns[columnName];
+                column.MaxLength = -1;
+                column.DataType = typeof(double);
+            }
+        }
+
+        public void Dispose()
+        {
+
         }
     }
 }

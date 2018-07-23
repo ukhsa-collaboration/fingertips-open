@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataConstruction
+namespace IndicatorsUI.DataConstruction
 {
     public enum FingertipsEnvironment
     {
@@ -17,12 +17,20 @@ namespace Profiles.DataConstruction
     public class FingertipsUrl
     {
         private readonly FingertipsEnvironment _environment;
+        private string _host;
 
-        public FingertipsUrl(AppConfig appConfig, Uri uri)
+        public FingertipsUrl(IAppConfig appConfig, Uri uri)
         {
             if (appConfig.IsEnvironmentLive)
             {
                 _environment = FingertipsEnvironment.Live;
+
+                // Use live-a.phe.org.uk or live-b.phe.org.uk when testing live site
+                var host = uri.Host;
+                if (host.StartsWith("live"))
+                {
+                    _host = host;
+                }
             }
             else if (uri.Host.Contains("localhost"))
             {
@@ -64,9 +72,7 @@ namespace Profiles.DataConstruction
                     case FingertipsEnvironment.Testing:
                         return "https://";
                     case FingertipsEnvironment.Live:
-                        /* DF - live used to be https but users preferentially directed to http
-                         * to mitigate PHE network caching, especially of error pages  */
-                        return "http://";
+                        return "https://";
                     default:
                         return "http://";
                 }
@@ -75,9 +81,15 @@ namespace Profiles.DataConstruction
 
         private string GetHost(Skin coreSkin)
         {
-            var host = _environment == FingertipsEnvironment.Live
-                ? coreSkin.LiveHost
-                : coreSkin.TestHost;
+            string host;
+            if (_environment == FingertipsEnvironment.Live)
+            {
+                host = _host ?? coreSkin.LiveHost;
+            }
+            else
+            {
+                host = coreSkin.TestHost;
+            }
             return host;
         }
     }

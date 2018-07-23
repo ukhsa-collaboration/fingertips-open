@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.UserFeedback">
+
+  <class name="UserFeedback" table="UserFeedback">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+    <property name="Url" column="Url" />
+    <property name="WhatUserWasDoing" column="WhatUserWasDoing" />
+    <property name="WhatWentWrong" column="WhatWentWrong" />
+    <property name="Email" column="Email" />
+    <property name="Environment" column="Environment" />
+    <property name="Timestamp" column="Timestamp" />
+    <property name="HasBeenDealtWith" column="HasBeenDealtWith" />
+  </class>
+
+</hibernate-mapping>
+

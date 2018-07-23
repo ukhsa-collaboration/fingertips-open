@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
+using IndicatorsUI.DataAccess;
 
 namespace IndicatorsUI.DataAccessTest
 {

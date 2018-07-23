@@ -1,0 +1,10 @@
+<div id="indicator-details-header" *ngIf="header">
+    <div class="trend-header">
+        <div class="trend-title">
+            <a class="trend-link" title="More about this indicator" href="javascript:goToMetadataPage(rootIndex);">
+               {{header.indicatorName}} {{header.ageSexLabel}} </a><span *ngIf="header.hasNewData" style="margin-right: 8px;" class="badge badge-success">New data</span>
+            <span class="benchmark-name">{{header.comparatorName}}</span></div>
+        <div class="trend-unit"><span> {{header.valueType}} {{header.unit}} </span>
+        </div>
+    </div>
+</div>

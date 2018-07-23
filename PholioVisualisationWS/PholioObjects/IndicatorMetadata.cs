@@ -1,6 +1,7 @@
 ﻿
-using System.Collections.Generic;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.PholioObjects
 {
@@ -37,9 +38,6 @@ namespace PholioVisualisation.PholioObjects
         public YearType YearType { get; set; }
 
         [JsonProperty]
-        public double ConfidenceLevel { get; set; }
-
-        [JsonProperty]
         public ConfidenceIntervalMethod ConfidenceIntervalMethod { get; set; }
 
         [JsonProperty]
@@ -50,6 +48,24 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonProperty(PropertyName = "Target")]
         public TargetConfig TargetConfig { get; set; }
+
+        [JsonProperty]
+        public DateTime? LatestChangeTimestampOverride { get; set; }
+
+        /// <summary>
+        /// String of comma-separated key value pairs
+        /// </summary>
+        [JsonProperty]
+        public string SpecialCases { get; set; }
+
+        [JsonIgnore]
+        public bool HasSpecialCases
+        {
+            get { return SpecialCases != null; }
+        }
+
+        [JsonIgnore]
+        public bool ShouldNewDataBeHighlighted { get; set; }
 
         [JsonIgnore]
         public bool HasTarget

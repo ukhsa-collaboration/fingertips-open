@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using NHibernate;
 using NHibernate.Cfg;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess
@@ -88,11 +89,10 @@ namespace PholioVisualisation.DataAccess
             return service;
         }
 
-        public static IContentReader GetContentReader()
+        public static IContentItemRepository GetContentItemRepository()
         {
-            ContentReader service = new ContentReader(GetSessionFactory());
-            service.OpenSession();
-            return service;
+            IContentItemRepository repository = new ContentItemRepository(GetSessionFactory());
+            return repository;
         }
 
 
@@ -110,7 +110,7 @@ namespace PholioVisualisation.DataAccess
             return service;
         }
 
-        private static ISessionFactory GetSessionFactory()
+        public static ISessionFactory GetSessionFactory()
         {
             if (staticSessionFactory == null)
             {

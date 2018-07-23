@@ -1,5 +1,18 @@
-﻿@using iTextSharp.text.pdf.qrcode
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
+@using Fpm.MainUI.Helpers
+@using iTextSharp.text.pdf.qrcode
 @model Fpm.MainUI.Models.LookupModel
+
+<link href="@(AppConfig.JsPath)tiny_mce/skins/lightgray/skin.min.css" rel="stylesheet" type="text/css" />
+
+<script src="@(AppConfig.JsPath)tiny_mce/tinymce.min.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)tiny_mce/jquery.tinymce.min.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)lookup-tables.js" type="text/javascript"></script>
+
+@{
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+}
 
 @if (Model.CategoryTypes != null)
 {
@@ -15,28 +28,57 @@
     using (Html.BeginForm("Categories", "LookUpTables", FormMethod.Post, new { id = "CategoriesForm" }))
     {
         <p style="margin-top:0;">Categories are used to specify inequality data in a batch indicator data upload.</p>
-        <h3>Category type:</h3>
-        @Html.DropDownListFor(x => x.CategoryTypeId, selectList,
-                     new
-                     {
-                         @Name = "categoryTypeId",
-                         @Id = "categoryTypeId",
-                         @class = "",
-                         @onchange = "submitForm('Categories');"
-                     })
+
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2 margin-top-space-em">Category type</label>
+            <div class="col-lg-10 margin-bottom-space-em">
+                @Html.DropDownListFor(x => x.CategoryTypeId, selectList,
+                    new
+                    {
+                        @Name = "categoryTypeId",
+                        @Id = "categoryTypeId",
+                        @class = "",
+                        @onchange = "submitForm('Categories');"
+                    })
+            </div>
+        </div>
+
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2">Description</label>
+            <div class="col-lg-10">
+                @Html.Raw(Model.GetSelectedCategoryType().Description)
+            </div>
+        </div>
+
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2">Notes</label>
+            <div class="col-lg-10">
+                @Html.Raw(Model.GetSelectedCategoryType().Notes)
+            </div>
+        </div>
+
+        <div class="row form-group form-horizontal">
+            <label class="col-lg-2"></label>
+            <div class="col-lg-10">
+                @if (isUserAdmin)
+                {
+                    <input class="btn btn-primary" id="edit" type="submit" value="Edit" formaction="@Url.Action("EditCategory", "LookUpTables")" />
+                }
+            </div>
+        </div>
 
         <h3 style="margin-top:40px;">Categories of @Model.GetSelectedCategoryType().ShortName:</h3>
-    <table id="lookup-table" class="grid sortable">
-        @Html.Partial("_TableHeader", new List<string> { "ID", "Name" })
-        <tbody>
-            @foreach (var category in categories)
-            {
-                <tr>
-                    <td>@category.CategoryId</td>
-                    <td>@category.Name</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+        <table id="lookup-table" class="grid sortable">
+            @Html.Partial("_TableHeader", new List<string> { "ID", "Name" })
+            <tbody>
+                @foreach (var category in categories)
+                {
+                    <tr>
+                        <td>@category.CategoryId</td>
+                        <td>@category.Name</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     }
 }

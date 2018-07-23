@@ -13,7 +13,6 @@ namespace FingertipsUploadService.Helpers
             return newFilePath;
         }
 
-
         public static string GetActualFilePath(UploadJob job)
         {
             var ext = Path.GetExtension(job.Filename);

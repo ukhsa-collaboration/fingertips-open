@@ -1,40 +1,34 @@
 ﻿@using System.Web.Optimization
-@using Profiles.DomainObjects
-@using Profiles.MainUI.Models
+@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
 @model PageModel
 
 @if (Model.FrontPageAreaSearchAreaTypes != null)
 {
-        var areaTypeLabel = Model.FrontPageAreaSearchAreaTypes.Contains(AreaTypeIds.CCG.ToString())
-            ? "CCG" : "local authority";
+    var areaSearch = new AreaSearchHelper(Model.ProfileId, Model.FrontPageAreaSearchAreaTypes);
+    var areaTypeLabel = areaSearch.GetAreaTypeLabelSingular();
 
-@* Area search title *@
-if (Model.ProfileId == ProfileIds.HealthProfiles)
-{
     <h2>
-        Find your Health Profile
+        @areaSearch.GetSearchHeading()
     </h2>
-}
-else
-{
-    <h2>
-        Find your area
-    </h2>
-}
 
-    @Html.Partial("Spinner")
+    @Html.Partial("_Spinner")
 
-
-    <table id="area-search" class="table margin-left" style="display:none;">
-        <tr><td>Search by postcode, town or @areaTypeLabel</td></tr>
-        <tr><td>
-                <input id="area-search-text" type="text" name="search_text" />
-            </td></tr>
-        <tr><td style="padding-top: 30px;">List areas by region</td></tr>
-        <tr><td><select id="parent-area-menu"><option /></select></td></tr>
+    <table id="area-search" class="table margin-left" style="display: none;">
+        @if (areaSearch.IsPlaceNameSearchAvailable)
+        {
+            <tr><td>Search by postcode, town or @areaTypeLabel</td></tr>
+            <tr>
+                <td>
+                    <input id="area-search-text" type="text" name="search_text"/>
+                </td>
+            </tr>
+        }
+        <tr><td style="padding-top: 30px;">List @(areaSearch.GetAreaTypeLabelPlural()) by region</td></tr>
+        <tr><td><select id="parent-area-menu"><option/></select></td></tr>
     </table>
     @Html.Partial("_SearchNoMatches")
-    @Html.Partial("_JsUrls")
     @Styles.Render("~/bundles/css-area-search")
     @Scripts.Render("~/bundles/js-area-search")
     <script type="text/javascript">
@@ -50,4 +44,13 @@ else
             areaSearch.init();
         });
     </script>
+}
+
+@if (Model.ProfileId == ProfileIds.PracticeProfiles)
+{
+<script type="text/javascript">
+    $(document).ready(function() {
+        callAngularEvent('MapEnvReady-Event', { 'searchMode': true });
+    });
+</script>
 }

@@ -22,8 +22,8 @@ namespace PholioVisualisation.Formatting
         {
             if (data != null && data.HasFormattedCIs == false)
             {
-                data.UpperCIF = NoValue;
-                data.LowerCIF = NoValue;
+                data.UpperCI95F = NoValue;
+                data.LowerCI95F = NoValue;
             }
         }
 

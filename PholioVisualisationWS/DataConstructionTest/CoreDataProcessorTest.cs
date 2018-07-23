@@ -18,12 +18,12 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var data = new CoreDataSet
             {
-                UpperCI = 2.222222222,
-                LowerCI = Number
+                UpperCI95 = 2.222222222,
+                LowerCI95 = Number
             };
             CoreDataProcessor().FormatAndTruncate(data);
-            Assert.AreEqual("1.11", data.LowerCIF);
-            Assert.AreEqual("2.22", data.UpperCIF);
+            Assert.AreEqual("1.11", data.LowerCI95F);
+            Assert.AreEqual("2.22", data.UpperCI95F);
         }
 
         [TestMethod]
@@ -46,17 +46,17 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestTruncateLowerCI()
         {
-            var data = new CoreDataSet { LowerCI = Number };
+            var data = new CoreDataSet { LowerCI95 = Number };
             TruncateData(data);
-            Assert.AreEqual(TruncatedNumber, data.LowerCI);
+            Assert.AreEqual(TruncatedNumber, data.LowerCI95);
         }
 
         [TestMethod]
         public void TestTruncateUpperCI()
         {
-            var data = new CoreDataSet { UpperCI = Number };
+            var data = new CoreDataSet { UpperCI95 = Number };
             TruncateData(data);
-            Assert.AreEqual(TruncatedNumber, data.UpperCI);
+            Assert.AreEqual(TruncatedNumber, data.UpperCI95);
         }
 
         [TestMethod]

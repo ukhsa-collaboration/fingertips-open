@@ -1,8 +1,8 @@
-﻿@using Profiles.DomainObjects
+﻿@using IndicatorsUI.DomainObjects
 @model Domain
 
 @{
-    var headingText = Model.ProfileId == ProfileIds.Diabetes
+    var headingText = Model.ProfileId == ProfileIds.DiabetesLongerLives
         ? "Select prevalence and risk factors to compare"
         : "Select other indicators to compare:";
 }

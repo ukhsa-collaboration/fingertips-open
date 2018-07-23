@@ -15,8 +15,6 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
         private LoggingRepository _loggingRepository;
         private static Guid batchId;
 
-        private const int indicatorId = IndicatorIds.HipFractures;
-
         [TestInitialize]
         public void Init()
         {
@@ -34,31 +32,6 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
 
             _coreDataRepository.Dispose();
             _loggingRepository.Dispose();
-        }
-
-        [TestMethod]
-        public void TestInsertUploadAudit()
-        {
-            //Insert the upload audit record
-            var uploadId = _loggingRepository.InsertUploadAudit(Guid.NewGuid(),
-                "TestUser", 10, @"C:\\Fingertips\\Test.xls", "Pholio$");
-
-            //Read the upload audit record back
-
-            var uploadAudit = _loggingRepository.GetUploadAudit(uploadId);
-
-            Assert.IsTrue(uploadAudit != null);
-
-            Assert.IsTrue(uploadAudit.Id == uploadId);
-
-            Assert.IsTrue(uploadAudit.UploadedBy == "TestUser");
-
-            //Delete the new record
-            _loggingRepository.DeleteUploadAudit(uploadId);
-
-            uploadAudit = _loggingRepository.GetUploadAudit(uploadId);
-
-            Assert.IsTrue(uploadAudit == null);
         }
 
         [TestMethod]
@@ -80,35 +53,10 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
         }
 
         [TestMethod]
-        public void GetCoreDataSet_Returns_Non_Zero_Result()
+        public void TestGetCoreDataSetByUploadJobId()
         {
-            int rowsCount;
-            var result = _coreDataRepository.GetCoreDataSet(indicatorId, out rowsCount);
-
-            Assert.IsTrue(result != null
-                && result.Any());
-        }
-
-        [TestMethod]
-        public void GetCoreDataSet_Returns_Result_For_Given_Filters()
-        {
-            int rowsFound;
-            var filters = new Dictionary<string, int>();
-
-            filters.Add(CoreDataFilters.Year, 2011);
-            filters.Add(CoreDataFilters.Month, 8);
-            filters.Add(CoreDataFilters.SexId, SexIds.Persons);
-            filters.Add(CoreDataFilters.AreaTypeId, AreaTypeIds.GpPractice);
-
-            var result = _coreDataRepository.GetCoreDataSet(indicatorId, filters, out rowsFound);
-
-            Assert.IsTrue(result != null);
-
-            var dataSetRowsCount = result.Count();
-            Console.WriteLine("Total records found " + rowsFound);
-            Console.WriteLine("Total records " + dataSetRowsCount);
-
-            Assert.IsTrue(dataSetRowsCount <= 500 && rowsFound >= dataSetRowsCount);
+            var data = _coreDataRepository.GetCoreDataSetByUploadJobId(Guid.NewGuid());
+            Assert.AreEqual(0 , data.Count);
         }
 
         [TestMethod]

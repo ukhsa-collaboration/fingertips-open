@@ -1,14 +1,16 @@
-﻿namespace Profiles.MainUI.Models
+﻿namespace IndicatorsUI.MainUI.Models
 {
     public enum PageType
     {
         Undefined = -1,
         SiteFrontPage = 1,
-        SupportingInformation = 8,
         DataPageOfProfileWithoutFrontPage = 2,
         FrontPageOfProfileWithFrontPage = 3,
         DataPageOfProfileWithFrontPage = 4,
-        AreaSearchResultsOfProfileWithFrontPage = 9,
         ProfileCollectionFrontPage = 5,
+        IndicatorSearchResultsDataPage = 6,
+        SupportingInformation = 8,
+        AreaSearchResultsOfProfileWithFrontPage = 9,
+        IndicatorListDataPage = 10
     }
 }

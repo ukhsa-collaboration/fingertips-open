@@ -3,7 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.MainUI.Models;
+using IndicatorsUI.MainUI.Models;
 
 namespace IndicatorsUI.MainUITest.Models
 {

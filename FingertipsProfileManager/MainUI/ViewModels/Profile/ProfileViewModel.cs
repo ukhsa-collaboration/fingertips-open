@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Fpm.MainUI.Helpers;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
 
 namespace Fpm.MainUI.ViewModels.Profile
 {
@@ -15,7 +15,7 @@ namespace Fpm.MainUI.ViewModels.Profile
 
         [Required]
         [Display(Name = "Profile Key")]
-        [RegularExpression(@"^[a-zA-Z0-9_-]*$", ErrorMessage="Only alpha/numeric characters (without spaces) allowed.")]
+        [RegularExpression(@"^[a-zA-Z0-9_-]*$", ErrorMessage = "Only alpha/numeric characters (without spaces) allowed.")]
         public string UrlKey { get; set; }
 
         [Required]
@@ -24,16 +24,14 @@ namespace Fpm.MainUI.ViewModels.Profile
 
         [Required]
         [Display(Name = "Domain Description")]
-        public string DomainDescription { get; set; }
 
         public int DefaultAreaTypeId { get; set; }
         public int ContactUserId { get; set; }
         public string ExtraCssFiles { get; set; }
-        public int EnumParentDisplay { get; set; }
         public string AreasIgnoredForSpineChart { get; set; }
         public int KeyColourId { get; set; }
         public int DefaultFingertipsTabId { get; set; }
-        
+
         public bool StartZeroYAxis { get; set; }
         public bool IsLive { get; set; }
         public string ReturnUrl { get; set; }
@@ -44,7 +42,6 @@ namespace Fpm.MainUI.ViewModels.Profile
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
-        public bool IsProfileWithOnlyStaticReports { get; set; }
         public string FrontPageAreaSearchAreaTypes { get; set; }
         public bool IsNational { get; set; }
         public bool HasOwnFrontPage { get; set; }
@@ -57,16 +54,14 @@ namespace Fpm.MainUI.ViewModels.Profile
         public string LeadProfileForCollectionIds { get; set; }
         public bool IsChangeFromPreviousPeriodShown { get; set; }
 
-        public string SortBy { get; set; }
-        
-        public List<int> GroupIds { get; set; }
-
         public int SpineChartMinMaxLabelId { get; set; }
-        
+
         public IEnumerable<ProfileAreaType> SelectedPdfAreaTypes { get; set; }
 
         public IEnumerable<ProfileUser> ProfileUsers { get; set; }
         public SelectList AllUsers { get; set; }
+
+        public int NewDataTimeSpanInDays { get; set; }
 
         // Tab options
         public bool IsMapTab { get; set; }

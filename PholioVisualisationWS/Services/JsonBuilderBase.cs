@@ -1,8 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System;
 using System.Web;
 using PholioVisualisation.ExceptionLogging;
 using PholioVisualisation.RequestParameters;
@@ -42,16 +38,11 @@ namespace PholioVisualisation.Services
                         response.Write(json);
                     }
                 }
-                else
-                {
-                    SetHttpErrorIfJsonP();
-                }
             }
             catch (Exception ex)
             {
                 ExceptionLog.LogException(ex, Context.Request.Url.AbsoluteUri);
                 Context.Response.Clear();
-                SetHttpErrorIfJsonP();
             }
 
             // No error message should be returned, absence of JSON interpreted as error by clients
@@ -59,13 +50,5 @@ namespace PholioVisualisation.Services
             response.Flush();
         }
 
-        private void SetHttpErrorIfJsonP()
-        {
-            if (Parameters is IJsonpParameters)
-            {
-                // The call is not made through the Fingertips Bridge so need to flag as error
-                Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            }
-        }
     }
 }

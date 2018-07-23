@@ -57,7 +57,7 @@ namespace PholioVisualisation.DataConstruction
                     IndicatorComparer comparer = indicatorComparerFactory.New(grouping);
                     IndicatorMetadata metadata = indicatorMetadataProvider.GetIndicatorMetadata(grouping.IndicatorId);
 
-                    var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+                    var formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
                     var dataProcessor = new ValueWithCIsDataProcessor(formatter);
 
                     List<ValueData> dataList = new List<ValueData>();

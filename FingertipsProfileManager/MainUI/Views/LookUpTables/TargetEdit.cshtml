@@ -6,6 +6,7 @@
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
 @{
     ViewBag.Title = "FPM - Edit goal";
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 <script src="@(AppConfig.JsPath)lookup-tables.js" type="text/javascript"></script>
@@ -19,54 +20,83 @@
         <p class="warning">Please do not change this goal unless you have permission to do so</p>
 
         <div class="row form-group">
-            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.Description)</label>
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.Description)</label>
             <div class="col-md-8">
-                @Html.TextBoxFor(x => x.Target.Description, new {@class = "form-control"})
+                @Html.TextBoxFor(x => x.Target.Description, new { @class = "form-control" })
             </div>
             @Html.ValidationMessage("Target.Description")
         </div>
 
         <div class="row form-group">
-            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.LegendHtml)</label>
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.LegendHtml) <small>(optional)</small></label>
             <div class="col-md-8">
-                @Html.TextBoxFor(x => x.Target.LegendHtml, new {@class = "form-control"})
+                @Html.TextBoxFor(x => x.Target.LegendHtml, new { @class = "form-control" })
             </div>
             @Html.ValidationMessage("Target.LegendHtml")
         </div>
 
         <div class="row form-group">
-            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.LowerLimit)</label>
-            <div class="col-md-2">
-                @Html.TextBoxFor(x => x.Target.LowerLimit, new {@class = "form-control"})
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.LowerLimit)</label>
+            <div class="col-md-3">
+                @Html.TextBoxFor(x => x.Target.LowerLimit, new { @class = "form-control" })
             </div>
             @Html.ValidationMessage("Target.LowerLimit")
         </div>
 
         <div class="row form-group">
-            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.UpperLimit)</label>
-            <div class="col-md-2">
-                @Html.TextBoxFor(x => x.Target.UpperLimit, new {@class = "form-control"})
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.UpperLimit)<br><small>(leave empty if only require one threshhold)</small></label>
+            <div class="col-md-3">
+                @Html.TextBoxFor(x => x.Target.UpperLimit, new { @class = "form-control" })
             </div>
             @Html.ValidationMessage("Target.UpperLimit")
         </div>
 
         <div class="row form-group">
-            <label class="col-md-2 col-form-label">@Html.LabelFor(x => x.Target.PolarityId)</label>
-            <div class="col-md-2">
-                @Html.DropDownListFor(x => x.Target.PolarityId, 
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.PolarityId)</label>
+            <div class="col-md-3">
+                @Html.DropDownListFor(x => x.Target.PolarityId,
                     CommonUtilities.GetListOfTargetPolarityTypes())
             </div>
         </div>
 
+        <div class="row form-group">
+            <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.UseCIsForLimitComparison)<br><small>(normally the area value is used)</small></label>
+            <div class="col-md-3">
+                @Html.CheckBoxFor(x => x.Target.UseCIsForLimitComparison, new { @class = "form-control" })
+            </div>
+        </div>
+
+        if (Model.Target.IsBespokeTarget)
+        {
+            if (isUserAdmin)
+            {
+                <div class="row form-group">
+                    <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.BespokeTargetKey)</label>
+                    <div class="col-md-3">
+                        @Html.TextBoxFor(x => x.Target.BespokeTargetKey, new {@class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row form-group">
+                    <label class="col-md-3 col-form-label">@Html.LabelFor(x => x.Target.IsBespokeTarget)<br><small>(logic has been hard coded)</small></label>
+                    <div class="col-md-3">
+                        @Html.CheckBoxFor(x => x.Target.IsBespokeTarget, new { @class = "form-control", disabled = "disabled" })
+                    </div>
+                </div>
+            }
+        }
+
         <div class="row form-group margin-top-space">
             <div class="col-md-7 col-md-offset-2">
-                <input class="btn btn-primary" type="submit" name="action:Save" value="Save"/>
-                <input class="btn btn-default" type="button" onclick="setUrl('@SiteUrls.TargetIndex')" value="Cancel"/>
+                <input class="btn btn-primary" type="submit" name="action:Save" value="Save" />
+                <input class="btn btn-default" type="button" onclick="setUrl('@SiteUrls.TargetIndex')" value="Cancel" />
             </div>
-            @if (UserDetails.CurrentUser().IsAdministrator)
+            @if (isUserAdmin)
             {
                 <div class="col-md-2">
-                    <input class="btn btn-danger" type="submit" name="action:Delete" value="Delete"/>
+                    <input class="btn btn-danger" type="submit" name="action:Delete" value="Delete" />
                 </div>
             }
         </div>

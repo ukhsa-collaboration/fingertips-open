@@ -398,10 +398,10 @@ namespace PholioVisualisation.KeyMessagesTest
 
         private KeyMessageData Sentence1Data(double green, double red, double amber)
         {
-            var mockSig = new Mock<SignificanceCounter>();
-            mockSig.SetupProperty(x => x.ProportionGreen, green);
-            mockSig.SetupProperty(x => x.ProportionRed, red);
-            mockSig.SetupProperty(x => x.ProportionAmber, amber);
+            var mockSig = new Mock<ISignificanceCounter>();
+            mockSig.Setup(x => x.GetProportionGreen()).Returns(green);
+            mockSig.Setup(x => x.GetProportionRed()).Returns(red);
+            mockSig.Setup(x => x.GetProportionAmber()).Returns(amber);
 
             return new KeyMessageData
             {

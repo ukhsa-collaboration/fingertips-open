@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DomainObjectsTest
 {

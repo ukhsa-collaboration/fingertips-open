@@ -4,66 +4,80 @@ using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using PholioVisualisation.DataAccess.Repositories;
+using Moq;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.DataAccessTest
 {
     [TestClass]
     public class AreaTypeIdSplitterTest
     {
-        [TestMethod]
-        public void TestCountyAndUnitaryAuthority()
-        {
-            AreaTypeIdSplitter splitter = new AreaTypeIdSplitter(
-                new[] { AreaTypeIds.CountyAndUnitaryAuthority });
+        private const int AreaTypeId1 = 99;
+        private const int AreaTypeId2 = 98;
 
-            Assert.AreEqual(2, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.County));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.UnitaryAuthority));
+        private Mock<IAreaTypeComponentRepository> _repo;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            _repo = new Mock<IAreaTypeComponentRepository>(MockBehavior.Strict);
         }
 
         [TestMethod]
-        public void TestLocalAuthorityAndUnitaryAuthority()
+        public void Test_Multiple_Area_Types()
         {
-            AreaTypeIdSplitter splitter = new AreaTypeIdSplitter(
-                new[] { AreaTypeIds.DistrictAndUnitaryAuthority });
+            _repo.Setup(x => x.GetAreaTypeComponents(AreaTypeId1))
+                .Returns(new List<AreaTypeComponent> {
+                    new AreaTypeComponent { ComponentAreaTypeId = 1},
+                    new AreaTypeComponent { ComponentAreaTypeId = 2},
+                });
 
-            Assert.AreEqual(2, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.District));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.UnitaryAuthority));
+            _repo.Setup(x => x.GetAreaTypeComponents(AreaTypeId2))
+                .Returns(new List<AreaTypeComponent> {
+                    new AreaTypeComponent { ComponentAreaTypeId = 3},
+                    new AreaTypeComponent { ComponentAreaTypeId = 4},
+                });
+
+            var ids = Splitter().GetComponentAreaTypeIds(
+                new[] { AreaTypeId1, AreaTypeId2 });
+
+            Assert.AreEqual(4, ids.Count);
+            Assert.IsTrue(ids.Contains(1));
+            Assert.IsTrue(ids.Contains(4));
         }
 
         [TestMethod]
-        public void TestCountyAndUnitaryAuthorityAndPct()
+        public void Test_Single_Area_Type()
         {
-            AreaTypeIdSplitter splitter = new AreaTypeIdSplitter(
-                new[] { AreaTypeIds.CountyAndUnitaryAuthority, AreaTypeIds.Pct });
+            _repo.Setup(x => x.GetAreaTypeComponents(AreaTypeId1))
+                .Returns(new List<AreaTypeComponent> {
+                    new AreaTypeComponent { ComponentAreaTypeId = 1},
+                    new AreaTypeComponent { ComponentAreaTypeId = 2},
+                });
+           
+            var ids = Splitter().GetComponentAreaTypeIds(AreaTypeId1);
 
-            Assert.AreEqual(3, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.County));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.UnitaryAuthority));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.Pct));
+            Assert.AreEqual(2, ids.Count);
+            Assert.IsTrue(ids.Contains(1));
+            Assert.IsTrue(ids.Contains(2));
         }
 
         [TestMethod]
-        public void TestAcuteTrustsIncludingCombinedMentalHealthTrusts()
+        public void Test_Area_Type_With_No_Components_Return_Input_Id()
         {
-            AreaTypeIdSplitter splitter = new AreaTypeIdSplitter(
-                new[] { AreaTypeIds.AcuteTrustsIncludingCombinedMentalHealthTrusts });
+            _repo.Setup(x => x.GetAreaTypeComponents(AreaTypeId1))
+                .Returns(new List<AreaTypeComponent> {});
 
-            Assert.AreEqual(2, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.AcuteTrust));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.CombinedMentalHealthAndAcuteTrust));
+            var ids = Splitter().GetComponentAreaTypeIds(AreaTypeId1);
+
+            Assert.AreEqual(1, ids.Count);
+            Assert.IsTrue(ids.Contains(AreaTypeId1));
         }
 
-        [TestMethod]
-        public void TestMentalHealthTrustsIncludingCombinedAcuteTrusts()
+        private IAreaTypeIdSplitter Splitter()
         {
-            AreaTypeIdSplitter splitter = new AreaTypeIdSplitter(
-                new[] { AreaTypeIds.MentalHealthTrustsIncludingCombinedAcuteTrusts });
-
-            Assert.AreEqual(2, splitter.Ids.Count);
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.MentalHealthTrust));
-            Assert.IsTrue(splitter.Ids.Contains(AreaTypeIds.CombinedMentalHealthAndAcuteTrust));
+            return new AreaTypeIdSplitter(_repo.Object);
         }
     }
 }

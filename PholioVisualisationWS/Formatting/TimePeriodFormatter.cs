@@ -50,6 +50,10 @@ namespace PholioVisualisation.Formatting
 
             switch (yearTypeId)
             {
+                case YearTypeIds.JulyToJune:
+                    yearText = GetYearlyRangeByMonths("Jul", "Jun", year, yearRange);
+                    break;
+
                 case YearTypeIds.AugustToJuly:
                     yearText = GetYearlyRangeByMonths("Aug", "Jul", year, yearRange);
                     break;

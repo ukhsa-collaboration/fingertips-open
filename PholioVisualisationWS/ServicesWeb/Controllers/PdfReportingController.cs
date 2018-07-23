@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.ServiceModel.Web;
 using System.Web.Http;
-using NHibernate.Type;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.Parsers;
 using PholioVisualisation.PdfData;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServiceActions;
-using ServicesWeb.Common;
+using PholioVisualisation.ServicesWeb.Helpers;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     /// <summary>
     /// Services to support generation of PDF reports for specific areas.

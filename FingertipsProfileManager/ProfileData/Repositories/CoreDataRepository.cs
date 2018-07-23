@@ -4,20 +4,34 @@ using NHibernate;
 using NHibernate.Transform;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class CoreDataRepository : RepositoryBase
+    public interface ICoreDataRepository
     {
-        // poor man injection, should be removed when we use DI containers
-        public CoreDataRepository()
-            : this(NHibernateSessionFactory.GetSession())
-        {
-        }
+        IEnumerable<CoreDataSetArchive> GetCoreDataArchives(string areaCode);
+        void DeleteCoreDataArchive(Guid uploadBatchId);
+        void DeleteCoreDataSet(Guid uploadBatchId);
+        Area GetAreaDetail(string areaCode);
+        void UpdateAreaDetail(Area newAreaDetail, string originalAreaCode, string loggedInUser);
+        IEnumerable<CategoryType> GetCategoryTypes(int indicatorId);
+        IEnumerable<AreaType> GetAreaTypes(int indicatorId);
+        IEnumerable<Sex> GetSexes(int indicatorId);
+        IEnumerable<Age> GetAges(int indicatorId);
+        IEnumerable<int> GetYearRanges(int indicatorId);
+        IEnumerable<int> GetYears(int indicatorId);
+        IEnumerable<int> GetMonths(int indicatorId);
+        IEnumerable<int> GetQuarters(int indicatorId);
+        IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, out int totalRows);
+        IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, Dictionary<string, object> filters, out int totalRows);
+        int DeleteCoreDataSet(int indicatorId, Dictionary<string, object> filters, string userName);
+        bool CanDeleteDataSet(int indicatorId, string userName);
+    }
 
+    public class CoreDataRepository : RepositoryBase, ICoreDataRepository
+    {
         public CoreDataRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
@@ -52,7 +66,7 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
-        public void DeleteCoreData(Guid uploadBatchId)
+        public void DeleteCoreDataSet(Guid uploadBatchId)
         {
             try
             {
@@ -222,11 +236,12 @@ namespace Fpm.ProfileData.Repositories
             return GetCoreDataSet(indicatorId, null, out totalRows);
         }
 
-        public IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, Dictionary<string, int> filters, out int totalRows)
+        public IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, 
+            Dictionary<string, object> filters, out int totalRows)
         {
             // Dynamic Query
             const string sqlSelectColumns = "SELECT Top 500 Uid, IndicatorId,Year,YearRange,Quarter,Month," +
-                                            "AgeId,SexId,AreaCode,Count,Value,LowerCi,UpperCi,Denominator,Denominator_2," +
+                                            "AgeId,SexId,AreaCode,Count,Value,LowerCI95,UpperCI95,LowerCI99_8,UpperCI99_8,Denominator,Denominator_2," +
                                             "ValueNoteId,UploadBatchId,CategoryTypeId, CategoryId " +
                                             "FROM Coredataset cds ";
 
@@ -246,11 +261,11 @@ namespace Fpm.ProfileData.Repositories
             return result;
         }
 
-        public int DeleteCoreDataSet(int indicatorId, Dictionary<string, int> filters, string userName)
+        public int DeleteCoreDataSet(int indicatorId, Dictionary<string, object> filters, string userName)
         {
 
             const string sqlColumns = " [IndicatorID] ,[Year] ,[YearRange] ,[Quarter] ,[Month] ,[AgeID] ,[SexID] ,[AreaCode] " +
-                                      ",[Count] ,[Value] ,[LowerCI] ,[UpperCI] ,[Denominator] ,[Denominator_2] ,[ValueNoteId] " +
+                                      ",[Count] ,[Value] ,[LowerCI95] ,[UpperCI95], [LowerCI99_8] ,[UpperCI99_8] ,[Denominator] ,[Denominator_2] ,[ValueNoteId] " +
                                       ",[uploadbatchid] ,[CategoryTypeID] ,[CategoryID]";
 
             var deleteBatchId = Guid.NewGuid();
@@ -288,7 +303,6 @@ namespace Fpm.ProfileData.Repositories
 
                 transaction.Commit();
                 return rowsDeleted;
-
             }
             catch (Exception exception)
             {
@@ -298,7 +312,7 @@ namespace Fpm.ProfileData.Repositories
             return -1;
         }
 
-        private string GetSqlFromFilters(Dictionary<string, int> filters)
+        private string GetSqlFromFilters(Dictionary<string, object> filters)
         {
             if (filters == null) return string.Empty;
 
@@ -309,6 +323,10 @@ namespace Fpm.ProfileData.Repositories
                 if (key == CoreDataFilters.AreaTypeId)
                 {
                     sqlBuilder.Append(" AND AreaCode IN (SELECT areacode FROM l_areas where areatypeId = " + filters[key] + ")");
+                }
+                else if (key == CoreDataFilters.AreaCode)
+                {
+                    sqlBuilder.Append(" AND AreaCode like '%" + filters[key] + "%'");
                 }
                 else
                 {

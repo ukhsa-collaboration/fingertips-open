@@ -2,38 +2,15 @@
 <hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
                    assembly="FingertipsUploadService.ProfileData"
                    namespace="FingertipsUploadService.ProfileData.Entities.Profile">
-  
- <!-- ProfileDetails class -->
+
+  <!-- ProfileDetails class -->
   <class name="ProfileDetails" table="UI_Profiles">
 
     <id name="Id" column="id" type="int" unsaved-value="-1">
       <generator class="identity"/>
     </id>
 
-    <property name="UrlKey" column="url_key"/>
     <property name="Name" column="name"/>
-    <property name="ArePdfs" column="are_pdfs"/>
-    <property name="StartZeroYAxis" column="start_zero_y_axis"/>
-    <property name="IsLive" column="is_profile_live"/>
-    <property name="IsProfileViewable" column="is_profile_viewable"/>
-    <property name="ShowDataQuality" column="show_data_quality"/>
-    <property name="IsNational" column="is_national"/>
-    <property name="HasOwnFrontPage" column="has_own_front_page"/>
-    <property name="DefaultAreaTypeId" column="default_area_type_id"/>
-    <property name="KeyColourId" column="key_colour_id"/>
-    <property name="SkinId" column="skin_id"/>
-    <property name="AreasIgnoredForSpineChart" column="areas_ignored_for_spine_chart"/>
-    <property name="AreasIgnoredEverywhere" column="areas_ignored_everywhere"/>
-    <property name="AreIndicatorsExcludedFromSearch" column="exclude_indicators_from_search"/>
-    <property name="ExtraJsFiles" column="extra_js_files"/>
-    <property name="ExtraCssFiles" column="extra_css_files"/>
-    <property name="AccessControlGroup" column="access_control_group"/>
-    <property name="DefaultFingertipsTabId" column="default_fingertips_tab_id"/>
-    <property name="ContactUserId" column="contact_user_id"/>
-    <property name="SpineChartMinMaxLabelId" column="spinechart_minmax_label_id"/>
-    <property name="EnumParentDisplay" column="enum_parent_display"/>
-    <property name="ShouldBuildExcel" column="should_build_excel"/>
-    <property name="HasTrendMarkers" column="has_trend_markers"/>
   </class>
 
   <!-- IndicatorMetadata class -->
@@ -42,16 +19,7 @@
     <id name="IndicatorId" column="indicatorid" type="int" unsaved-value="-1">
     </id>
 
-    <property name="DenominatorTypeId" column="denominatortypeid"/>
-    <property name="CIMethodId" column="cimethodid"/>
-    <property name="ValueTypeId" column="valuetypeid"/>
-    <property name="UnitId" column="unitid"/>
-    <property name="YearTypeId" column="yeartypeid"/>
-    <property name="ConfidenceLevel" column="confidencelevel"/>
     <property name="OwnerProfileId" column="ownerprofileId"/>
-    <property name="DecimalPlacesDisplayed" column="decimalplacesdisplayed"/>
-    <property name="TargetId" column="targetid"/>
-    <property name="DateEntered" column="DateEnteredInPHOLIO"/>
     <property name="DisclosureControlId" column="disclosurecontrolid"/>
   </class>
 
@@ -77,66 +45,6 @@
     <property name="Name" column="name" />
     <property name="ShortName" column="shortname" />
   </class>
-
-  <!-- SQL Queries -->
-  <sql-query name="GetIndicatorMetadataTextValues">
-    SELECT * FROM IndicatorMetadataTextValues 
-    WHERE (IndicatorID = :indicatorId) AND (ProfileId = :profileId OR ProfileId IS NULL) 
-    Order By ProfileId
-  </sql-query>
-  
-  <sql-query name="GetOverriddenIndicatorMetadataTextValuesForProfileId">
-    SELECT * FROM IndicatorMetadataTextValues 
-    WHERE (IndicatorID = :indicatorId) AND (ProfileId = :profileId) 
-  </sql-query>
-
-  <sql-query name="GetIndicatorDefaultMetadataTextValues">
-    SELECT * FROM IndicatorMetadataTextValues
-    WHERE (IndicatorID = :indicatorId) AND ProfileId IS NULL
-  </sql-query>
-
-  <sql-query name="GetAreaTypesForProfileId">
-      SELECT distinct t1.AreaTypeID as Id , t3.AreaType as Name
-      FROM [grouping] t1
-      inner join GroupingMetadata t2 on t1.Groupid = t2.groupid
-      inner join L_AreaTypes t3 on t1.AreaTypeID = t3.AreaTypeID
-      where t2.profileid = :profileId
-  </sql-query>
-
-  <sql-query name="GetPDFEnabledAreaTypesForProfileId">
-    SELECT distinct t1.AreaTypeID as Id, t2.AreaType as Name
-    FROM UI_ProfilePdfs t1
-    inner join L_AreaTypes t2 on t1.AreaTypeId = t2.AreaTypeID
-    where t1.profileid = :profileId
-  </sql-query>
-
-  <sql-query name="Delete_ProfilePDFs">
-    DELETE FROM UI_ProfilePdfs WHERE profileId = :ProfileId
-  </sql-query>
-
-  <sql-query name="Insert_ProfilePDFs">
-    INSERT INTO UI_ProfilePdfs (ProfileId, AreaTypeId) Values (:ProfileId, :AreaTypeId)
- </sql-query>
-
-  <sql-query name="GetGroupingPlusNames">
-    SELECT Distinct [1_Name] as IndicatorName, imtv.IndicatorID as IndicatorId, imtv.ProfileId as ProfileId,
-    g.GroupId, g.Sequence, g.AgeId, g.SexId, AreaTypeId,
-    YearRange, BaselineYear, BaselineQuarter, BaselineMonth, DatapointYear, DatapointQuarter, DatapointMonth,
-    s.Sex, cast(g.ComparatorConfidence as VARCHAR) as ComparatorConfidence ,
-    g.ComparatorMethodId, cm.ShortName as ComparatorMethod, im.YearTypeID as YearTypeId ,
-    L_Ages.Age
-    FROM IndicatorMetadataTextValues imtv
-    INNER JOIN grouping g ON imtv.IndicatorID = g.IndicatorID
-    INNER JOIN L_Sexes s ON g.SexID = s.SexID
-    INNER JOIN L_ComparatorMethods cm ON g.ComparatorMethodID = cm.ComparatorMethodID
-    INNER JOIN IndicatorMetadata im ON imtv.IndicatorID = im.IndicatorID
-    INNER JOIN L_Ages ON g.AgeID = L_Ages.AgeID
-    WHERE (imtv.IndicatorID =  :IndicatorId  )
-    AND g.GroupID =   :SelectedDomainId
-    AND (imtv.ProfileId =  :ProfileId   OR  imtv.ProfileId IS NULL)
-    AND (g.AreaTypeID =  :AreaTypeId )
-    ORDER BY g.GroupID DESC
-  </sql-query>
 
 </hibernate-mapping>
 

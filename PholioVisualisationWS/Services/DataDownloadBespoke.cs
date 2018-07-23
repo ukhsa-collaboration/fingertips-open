@@ -39,7 +39,7 @@ namespace PholioVisualisation.Services
 
                 byte[] bytes;
 
-                if (ApplicationConfiguration.UseFileCache && fileInfo.DoesFileExist)
+                if (ApplicationConfiguration.Instance.UseFileCache && fileInfo.DoesFileExist)
                 {
                     bytes = File.ReadAllBytes(fileInfo.FilePath);
                 }
@@ -56,7 +56,7 @@ namespace PholioVisualisation.Services
                     var workBook = builder.BuildWorkbook();
                     ExcelFileWriter writer = new ExcelFileWriter
                     {
-                        UseFileCache = ApplicationConfiguration.UseFileCache
+                        UseFileCache = ApplicationConfiguration.Instance.UseFileCache
                     };
                     bytes = writer.Write(fileInfo, workBook);
                 }

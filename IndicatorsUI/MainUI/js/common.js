@@ -244,6 +244,13 @@ function ParameterBuilder() {
         // Do not prefix with '?' as JQuery ajax will do this
         return url.join('');
     };
+
+    this.setNotToCache = function()
+    {
+        // Time stamp to beat network caching + no cache flag to indicate no caching to ajax bridge
+        this.add('no_cache', new Date().getTime());
+        return this;
+    }
 }
 
 var ftHistory = (function () {
@@ -397,31 +404,86 @@ function logEvent(category, action, label) {
     }
 }
 
-function isIE() {
-    var userAgent = navigator.userAgent;
-    return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
-}
-
-function isIE8() {
-    if (isIE()) {
-        var userAgent = navigator.userAgent.toLowerCase();
-        var version = parseInt(userAgent.split('msie')[1]);
-        return version === 8;
-    }
-    return false;
-}
-
-function isIE9() {
-    var userAgent = navigator.userAgent;
-    return userAgent.indexOf("MSIE 9.0") > -1;
-}
-
 function browserUpgradeMessage() {
     alert('Sorry this feature is not available for your browser. Please upgrade or use an alternative.');
 }
 
 function isFeatureEnabled(feature) {
-    var result = _.property(feature)(FT.features);
-    
-    return _.isUndefined(result) ? false : result;
+
+    feature = feature.toLowerCase();
+
+    // Is the feature flag contained within the list of active features
+    return _.some(FT.features, function(f) {
+        return f.toLowerCase() === feature;
+    });
+}
+
+function MinMaxFinder(arrayOfNumbers) {
+    this.setValues(arrayOfNumbers);
+}
+
+MinMaxFinder.prototype = {
+    setValues: function (arrayOfNumbers) {
+
+        var areValues = arrayOfNumbers.length > 0;
+
+        if (areValues) {
+            this.min = _.min(arrayOfNumbers);
+            this.max = _.max(arrayOfNumbers);
+        }
+        this.isValid = areValues;
+    }
+
+};
+
+function openFeedback() {
+    $('#footer-feedback').hide();
+    $('#footer-feedback-form').show();
+    return false;
+}
+
+function closeFeedback() {
+    $('#footer-feedback').show();
+    $('#footer-feedback-form').hide();
+    clearFeedbackForm();
+    return false;
+}
+
+function sendFeedback() {
+
+    var whatWereYouDoing = $("#what-were-you-doing").val(),
+        whatWentWrong = $("#what-went-wrong").val(),
+        email = $("#email-for-user-feedback").val();
+
+    if (whatWereYouDoing === '' && whatWentWrong === '') {
+        $('#footer-feedback-error-summary').html('<div class="alert alert-warning">Please tell us what went wrong?</div>');
+        return false;
+    }
+
+    var data = {
+        url: window.location.href,
+        whatUserWasDoing: whatWereYouDoing,
+        whatWentWrong: whatWentWrong,
+        email: email
+    };
+
+    var apiUrl = '/user_feedback';
+
+    $.post(apiUrl, data)
+        .success(function(obj) {
+            $('#footer-feedback').show();
+            $('#footer-feedback-form').hide();
+            clearFeedbackForm();
+            $('#feedback-message').html('<div style="color:white;">Thank you for your feedback</div>');
+        })
+        .error(function (error) {
+            $('#footer-feedback-error-summary').html('<div class="alert alert-danger">Sorry, we are unable to receive your message right now.</div>');
+        });
+    return false;
+}
+
+function clearFeedbackForm() {
+    $('#user-feedback-form').each(function () {
+        this.reset();
+    });
 }

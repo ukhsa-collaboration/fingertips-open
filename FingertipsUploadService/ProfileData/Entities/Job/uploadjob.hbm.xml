@@ -20,5 +20,8 @@
     <property name="ProgressStage" column="progressstage"/>
     <property name="TotalRowsCommitted" column="totalrowscommitted"/>
     <property name="TotalSmallNumberWarnings" column="TotalSmallNumberWarnings"/>
+    <property name="IsCellValidationPerRowDone" column="IsCellValidationPerRowDone"/>
+    <property name="IsSmallNumberOverrideApplied" column="IsSmallNumberOverrideApplied"/>
+    <property name="IsDuplicateOverrideApplied" column="IsDuplicateOverrideApplied"/>
   </class>
 </hibernate-mapping>

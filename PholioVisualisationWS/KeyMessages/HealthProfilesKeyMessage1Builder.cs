@@ -33,9 +33,9 @@ namespace PholioVisualisation.KeyMessages
         internal string GetSentence1()
         {
             var counter = data.SpineChartSignificances;
-            var green = counter.ProportionGreen;
-            var red = counter.ProportionRed;
-            var amber = counter.ProportionAmber;
+            var green = counter.GetProportionGreen();
+            var red = counter.GetProportionRed();
+            var amber = counter.GetProportionAmber();
             string worseBetterSimilarVaried;
 
             if ((red >= 0.5 && green <= 0.14) || (red >= 0.4 && green == 0.0) || (red > 0.7))

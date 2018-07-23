@@ -1,0 +1,105 @@
+﻿/*************************************
+* Create/edit indicator list
+**************************************/
+#create-indicator-list h3 {
+    margin-top: 9px;
+}
+
+#create-indicator-list .btn {
+    margin-top: 9px;
+}
+
+#create-indicator-list .btn-sm {
+    margin-top: 5px;
+}
+
+#indicator-list > div, #selected-indicator-list > div {
+    border: 2px solid #999;
+    border-bottom: none;
+    padding: 3px;
+    font-size: 16px;
+    position: relative;
+    overflow: hidden;
+}
+#indicator-list > div:last-child, #selected-indicator-list > div:last-child {
+    border-bottom: 2px solid #999;
+}
+#indicator-list > div:hover, #selected-indicator-list > div:hover {
+    background: #d1ffcc;
+    color: #aaa;
+}
+
+#indicator-list > div .item-button, #selected-indicator-list > div .item-button {
+    display: none;
+}
+
+#indicator-list > div:hover .item-button, #selected-indicator-list > div:hover .item-button {
+    display: block;
+}
+
+.item-button {
+    background: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    border-right: 2px solid #999;
+    color: #333;
+    cursor: pointer;
+}
+
+    .item-button i {
+        position: relative;
+        top: -2px;
+    }
+
+.item-button-up {
+    left: 50%;
+}
+
+.item-button-down {
+    border-right: none;
+    left: 75%;
+}
+
+.item-button-add {
+    border-right: none;
+}
+
+#profile-list {
+    width: 100%;
+}
+
+.subject-info-arrows {
+    float: left;
+    width: 10%;
+}
+
+    .subject-info-arrows input {
+        width: 70%;
+        margin-bottom: 5px;
+    }
+
+#btn-all-right, #btn-all-left {
+    font-size: smaller;
+    margin-bottom: 10px;
+    width: 73%;
+    font-family: proxima-nova,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* Create another front page for logged in users --*/
+#btn-front-create-new-lists a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+#alertBox {
+    margin-top: 10px;
+    width: 100%;
+}
+
+#alertBox p {
+    padding:0;
+    margin: 0;
+}

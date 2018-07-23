@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -22,6 +23,8 @@ namespace PholioVisualisation.DataConstruction
 
             var profileReader = ReaderFactory.GetProfileReader();
             var profiles = profileReader.GetProfilesForIndicators(indicatorIds.ToList(), areaTypeId);
+            profiles = ProfileFilter.RemoveSystemProfiles(profiles);
+
             var uniqueIndicators = profiles.Select(x => x.IndicatorId).Distinct().ToList();
 
             foreach (var indicator in uniqueIndicators)

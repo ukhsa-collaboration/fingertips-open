@@ -11,14 +11,80 @@ using System.Linq;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class ProfileRepository : RepositoryBase
+    public interface IProfileRepository
     {
-        // poor man injection, should be removed when we use DI containers
-        public ProfileRepository()
-            : this(NHibernateSessionFactory.GetSession())
-        {
-        }
+        void RefreshObject(object o);
+        IList<ProfileDetails> GetProfiles();
+        int CreateProfile(ProfileDetails profileDetails);
+        void UpdateProfile(ProfileDetails profileDetails);
+        void UpdateProfileDetail(ProfileDetails profileDetails);
+        void CreateIndicator(IEnumerable<IndicatorMetadataTextProperty> allPropertiesToAdd, int indicatorId);
+        void CreateNewOverriddenIndicator(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId);
+        bool DoesOverriddenIndicatorMetadataRecordAlreadyExist(int indicatorId, int? profileId);
+        IndicatorMetadata GetIndicatorMetadata(int indicatorId);
+        int GetNextIndicatorId();
+        int CreateGrouping(Grouping grouping);
+        int CreateProfileCollection(ProfileCollection profileCollection, string assignedProfiles);
+        bool UpdateProfileCollection(int profileCollectionId, string assignedProfilesToUpdate, string collectionNameToUpdate, string collectionSkinTitleToUpdate);
 
+        bool ChangeOwner(int indicatorId, int newOwnerProfileId,
+            IList<IndicatorText> newOwnerMetadataTextValues,
+            IList<IndicatorText> currentOwnerMetadataTextValues);
+
+        void UpdateProperty(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId);
+
+        bool CreateGroupingAndMetadata(int selectedProfileId, int selectedDomain, int nextIndicatorId,
+            int selectedAreaType, int selectedSex, int selectedAgeRange, int selectedComparator,
+            int selectedComparatorMethods,
+            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
+            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
+            int selectedDenominatorType, int startYear, int endYear, int startQuarterRange, int endQuarterRange,
+            int startMonthRange, int endMonthRange, string user, int? selectedDecimalPlaces, int? selectedTargetId,
+            DateTime? latestChangeTimestamp);
+
+        bool UpdateGroupingAndMetadata(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
+            int selectedAgeRange, int selectedComparator, int selectedComparatorMethods,
+            string selectedCiComparatorConfidence,
+            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
+            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
+            int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange,
+            int endMonthRange,
+            int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId,
+            IEnumerable<string> userAudit,
+            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart,
+            int disclosureControlId,
+            DateTime? somedate);
+
+        int GetNextAvailableIndicatorSequenceNumber(int domainId);
+
+        bool LogIndicatorMetadataTextPropertyChange(int propertyId, string oldText,
+            int indicatorId, int? profileId, string userName, DateTime timestamp);
+
+        bool LogAuditChange(string auditMessage, int indicatorId, int? groupId, string userName,
+            DateTime timestamp, string auditType);
+
+        bool DeleteChangeAudit(int indicatorId);
+
+        void MoveIndicatorToDomain(int indicatorId, int fromGroupId, int fromAreaTypeId, int fromSexId,
+            int fromAgeId, int toGroupId, int toAreaType, int toSexId, int toAgeId);
+
+        bool IndicatorGroupingsExist(int indicatorId, int domainId, int areaTypeId, int ageId, int sexId);
+
+        void CopyIndicatorToDomain(int indicatorId, int fromGroupId, int fromAreaTypeId, int fromSexId,
+            int fromAgeId, int toGroupId, int toAreaType, int toSexId, int toAgeId);
+
+        void DeleteIndicatorFromGrouping(int? groupId, int? indicatorId, int areaTypeId, int sexId, int ageId);
+        void DeleteOverriddenMetadataTextValues(int? indicatorId, int profileId);
+        void ArchiveIndicatorFromGrouping(int groupId, int? indicatorId, int areaTypeId, int sexId, int ageId);
+
+        IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId,
+            int profileId);
+
+        ProfileDetails GetProfileDetailsById(int Id);
+    }
+
+    public class ProfileRepository : RepositoryBase, IProfileRepository
+    {
         public ProfileRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
@@ -342,13 +408,14 @@ namespace Fpm.ProfileData.Repositories
             updateSession.ExecuteUpdate();
         }
 
-        public bool CreateGroupingAndMetaData(int selectedProfileId, int selectedDomain, int nextIndicatorId,
+        public bool CreateGroupingAndMetadata(int selectedProfileId, int selectedDomain, int nextIndicatorId,
             int selectedAreaType, int selectedSex, int selectedAgeRange, int selectedComparator, int selectedComparatorMethods,
             double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, double selectedCiConfidenceLevel, int selectedPolarityType, int selectedUnitType,
+            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
             int selectedDenominatorType, int startYear, int endYear, int startQuarterRange, int endQuarterRange,
-            int startMonthRange, int endMonthRange, int? selectedDecimalPlaces, int? selectedTargetId)
+            int startMonthRange, int endMonthRange, string user, int? selectedDecimalPlaces, int? selectedTargetId, DateTime? latestChangeTimestamp)
         {
+            // Create new indicator metadata
             var indicatorMetaData = new IndicatorMetadata()
             {
                 IndicatorId = nextIndicatorId,
@@ -357,11 +424,12 @@ namespace Fpm.ProfileData.Repositories
                 ValueTypeId = selectedValueType,
                 UnitId = selectedUnitType,
                 YearTypeId = selectedYearType,
-                ConfidenceLevel = selectedCiConfidenceLevel,
                 OwnerProfileId = selectedProfileId,
                 DecimalPlacesDisplayed = selectedDecimalPlaces,
                 TargetId = selectedTargetId,
-                DateEntered = DateTime.Now
+                DateEntered = DateTime.Now,
+                LatestChangeTimestampOverride = latestChangeTimestamp,
+                DisclosureControlId = DisclosureControlIds.FlagCountsBetween1And5
             };
 
             try
@@ -380,6 +448,9 @@ namespace Fpm.ProfileData.Repositories
                         comparatorId, startMonthRange, endMonthRange, nextAvailableIndicatorSequenceNumber);
                 }
 
+                LogAuditChange(string.Format("New Indicator {0} Successfully Created", nextIndicatorId), 
+                    nextIndicatorId, selectedDomain, user, DateTime.Now, "Create");
+
                 transaction.Commit();
                 return true;
             }
@@ -390,13 +461,14 @@ namespace Fpm.ProfileData.Repositories
             return false;
         }
 
-        public bool UpdateGroupingAndMetaData(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
+        public bool UpdateGroupingAndMetadata(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
             int selectedAgeRange, int selectedComparator, int selectedComparatorMethods, string selectedCiComparatorConfidence,
             double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
             int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
             int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange,
             int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId, IEnumerable<string> userAudit,
-            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart, int disclosureControlId)
+            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart, int disclosureControlId, 
+            DateTime? somedate)
         {
             try
             {
@@ -407,12 +479,12 @@ namespace Fpm.ProfileData.Repositories
                 indicatorMetaData.CIMethodId = selectedCiMethodType;
                 indicatorMetaData.ValueTypeId = selectedValueType;
                 indicatorMetaData.UnitId = selectedUnitType;
-                indicatorMetaData.ConfidenceLevel = Convert.ToDouble(selectedCiComparatorConfidence);
                 indicatorMetaData.YearTypeId = selectedYearType;
                 indicatorMetaData.DecimalPlacesDisplayed = selectedDecimalPlaces;
                 indicatorMetaData.TargetId = targetId;
                 indicatorMetaData.AlwaysShowSpineChart = alwaysShowSpineChart;
                 indicatorMetaData.DisclosureControlId = disclosureControlId;
+                indicatorMetaData.LatestChangeTimestampOverride = somedate;
 
                 transaction = CurrentSession.BeginTransaction();
 
@@ -488,7 +560,7 @@ namespace Fpm.ProfileData.Repositories
                     .UniqueResult<int>() + 1;
         }
 
-        public bool LogIndicatorMetadataTextPropertyChange(int propertyId, string oldText, 
+        public bool LogIndicatorMetadataTextPropertyChange(int propertyId, string oldText,
             int indicatorId, int? profileId, string userName, DateTime timestamp)
         {
             CurrentSession.Save(new IndicatorMetadataLog()
@@ -574,8 +646,10 @@ namespace Fpm.ProfileData.Repositories
             {
                 transaction = CurrentSession.BeginTransaction();
 
-                foreach (var grouping in GetGroupings(fromGroupId, indicatorId,
-                    fromAreaTypeId, fromSexId, fromAgeId))
+                var srcGroupings = GetGroupings(fromGroupId, indicatorId,
+                    fromAreaTypeId, fromSexId, fromAgeId);
+
+                foreach (var grouping in srcGroupings)
                 {
                     var newGrouping = new Grouping()
                     {

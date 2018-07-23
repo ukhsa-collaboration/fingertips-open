@@ -11,7 +11,7 @@ namespace PholioVisualisation.ExportTest
     public class PracticeProfileDataBuilderTest
     {
         public const string SheetNamePractice = "Practice";
-        public const string SheetNameCcg = "CCG";
+        public const string SheetNameCcg = @"CCGs (pre 4 2017)";
 
         [TestMethod]
         public void TestAllSheetsAreCreated()
@@ -20,10 +20,11 @@ namespace PholioVisualisation.ExportTest
             {
                 AreaCode = AreaCodes.Ccg_Barnet,
                 GroupIds = new List<int>{GroupIds.Population},
-                ParentAreaTypeId = AreaTypeIds.Ccg
+                ParentAreaTypeId = AreaTypeIds.CcgsPreApr2017
             };
 
             var workBook = builder.BuildWorkbook();
+
             Assert.AreEqual(4, workBook.Worksheets.Count);
             Assert.IsNotNull(workBook.Worksheets[SheetNamePractice]);
             Assert.IsNotNull(workBook.Worksheets[SheetNameCcg]);

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.Analysis;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.ExceptionLogging;
 using PholioVisualisation.PholioObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -13,6 +13,9 @@ namespace PholioVisualisation.DataConstruction
         protected IAreasReader AreasReader = ReaderFactory.GetAreasReader();
         protected IGroupDataReader GroupDataReader = ReaderFactory.GetGroupDataReader();
         private CoreDataProcessor _coreDataProcessor = new CoreDataProcessor(null);
+        private DateChangeHelper _dateChangeHelper;
+        private IProfileReader _profileReader;
+        private ProfileConfig _profileConfig;
 
         public bool AssignAreas = true;
         public bool AssignChildAreaData = true;
@@ -24,10 +27,18 @@ namespace PholioVisualisation.DataConstruction
         protected IList<Grouping> Groupings;
         public int ProfileId;
 
+
         /// <summary>
         ///     The specific time point at which to assign core data and comparator data.
         /// </summary>
         public TimePeriod TimePeriodOfData;
+
+
+        public GroupDataBuilderBase()
+        {
+            _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository());
+            _profileReader = ReaderFactory.GetProfileReader();
+        }
 
         public GroupData Build()
         {
@@ -53,11 +64,16 @@ namespace PholioVisualisation.DataConstruction
                     }
 
                     // Assign trend markers
-                    var profileReader = ReaderFactory.GetProfileReader();
-                    ProfileConfig profileConfig = profileReader.GetProfileConfig(ProfileId);
-                    if (profileConfig != null && profileConfig.HasTrendMarkers)
+                    _profileConfig = _profileReader.GetProfileConfig(ProfileId);
+
+                    if (_profileConfig != null && _profileConfig.HasTrendMarkers)
                     {
                         AssignRecentTrends();
+                    }
+
+                    if (ApplicationConfiguration.Instance.IsFeatureActive("recentlyChangedData"))
+                    {
+                        AssignDataChanges();
                     }
                 }
                 else
@@ -158,12 +174,23 @@ namespace PholioVisualisation.DataConstruction
                 .ReadChildAreas(parentAreaCode, ProfileId, childAreaTypeId);
         }
 
+        private void AssignDataChanges()
+        {
+            var metadataCollection = new IndicatorMetadataCollection(GroupData.IndicatorMetadata);
+            foreach (var groupRoot in GroupData.GroupRoots)
+            {
+                var indicatorMetadata = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
+
+                groupRoot.DateChanges = _dateChangeHelper.AssignDateChange(
+                    indicatorMetadata, _profileConfig.NewDataTimeSpanInDays);
+            }
+        }
+
         private void AssignRecentTrends()
         {
             if (GroupData.Areas != null)
             {
                 var trendMarkersProvider = TrendMarkersProvider.New();
-
                 var areas = GroupData.Areas.ToList();
                 AddParentAreas(areas);
 

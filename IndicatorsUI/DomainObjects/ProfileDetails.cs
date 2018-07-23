@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Profiles.DomainObjects
+namespace IndicatorsUI.DomainObjects
 {
     public class ProfileDetails
     {
@@ -63,6 +63,23 @@ namespace Profiles.DomainObjects
         public bool HasExclusiveSkin
         {
             get { return SkinId != SkinIds.Core; }
+        }
+
+        /// <summary>
+        /// Title for displaying to the user. Any internal extensions are removed
+        /// </summary>
+        public string DisplayTitle
+        {
+            get
+            {
+                // Remove longer lives extension
+                if (LongerLivesProfileDetails != null)
+                {
+                    return Title.Replace("- Longer Lives", "");
+                }
+
+                return Title;
+            }
         }
 
         public SpineChartMinMaxLabel SpineChartMinMaxLabel { get; set; }

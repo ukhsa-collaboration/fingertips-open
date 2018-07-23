@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Helpers;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Helpers;
 
 namespace IndicatorsUI.MainUITest.Helpers
 {

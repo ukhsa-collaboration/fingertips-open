@@ -27,7 +27,6 @@
     <IISExpressUseClassicPipelineMode />
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <TargetFrameworkProfile />
-    <WebGreaseLibPath>..\packages\WebGrease.1.5.2\lib</WebGreaseLibPath>
     <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -50,18 +49,23 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Antlr3.Runtime">
-      <HintPath>..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+    <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Antlr.3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper, Version=5.2.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.5.2.0\lib\net45\AutoMapper.dll</HintPath>
+    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FoolproofValidation, Version=0.9.5851.39121, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Foolproof.0.9.4518\lib\net45\FoolproofValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="itextsharp">
       <HintPath>..\lib\itextsharp.dll</HintPath>
     </Reference>
-    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -69,23 +73,17 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="StructureMap, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="StructureMap.Net4, Version=3.1.6.186, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\structuremap.3.1.6.186\lib\net40\StructureMap.Net4.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
+    <Reference Include="NHibernate, Version=4.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
@@ -131,8 +129,25 @@
     <Reference Include="System.Web.Services" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="WebGrease">
-      <HintPath>..\packages\WebGrease.1.5.2\lib\WebGrease.dll</HintPath>
+    <Reference Include="Unity.Abstractions, Version=3.1.0.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Abstractions.3.1.0\lib\net45\Unity.Abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Container, Version=5.5.1.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Container.5.5.1\lib\net45\Unity.Container.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Unity.Mvc, Version=5.0.12.0, Culture=neutral, PublicKeyToken=6d32ff45e0ccc69f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Unity.Mvc.5.0.12\lib\net45\Unity.Mvc.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -140,9 +155,12 @@
     <Compile Include="AppConfig.cs" />
     <Compile Include="App_Start\AutoMapperConfig.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\MainUIRegistry.cs" />
+    <Compile Include="App_Start\UnityConfig.cs" />
+    <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
+    <Compile Include="Controllers\IndicatorEditController.cs" />
+    <Compile Include="Controllers\LiveUpdateController.cs" />
     <Compile Include="Controllers\LookUpTablesController.cs" />
     <Compile Include="Controllers\ExceptionLogController.cs" />
     <Compile Include="Controllers\ProfileCollectionsController.cs" />
@@ -150,6 +168,7 @@
     <Compile Include="Controllers\ProfilesAndIndicatorsController.cs" />
     <Compile Include="Controllers\ReportsApiController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="Controllers\UserFeedbackController.cs" />
     <Compile Include="Helpers\AjaxOnlyAttribute.cs" />
     <Compile Include="Helpers\ApplicationConfiguration.cs" />
     <Compile Include="Helpers\AreaTypeSelectListBuilder.cs" />
@@ -165,6 +184,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\CoreDataSetFormatter.cs" />
     <Compile Include="Helpers\CurrentUser.cs" />
     <Compile Include="Helpers\ExtraJsFileHelper.cs" />
     <Compile Include="Helpers\FileNameHelper.cs" />
@@ -176,6 +196,7 @@
     <Compile Include="Helpers\IndicatorOwnerChanger.cs" />
     <Compile Include="Helpers\ProfileDetailsCopier.cs" />
     <Compile Include="Helpers\ProfileMenuHelper.cs" />
+    <Compile Include="Helpers\NewDataTimeSpanInDaysOptions.cs" />
     <Compile Include="Helpers\TimePeriodReader.cs" />
     <Compile Include="Helpers\TooltipHelper.cs" />
     <Compile Include="Helpers\UIHelper.cs" />
@@ -222,12 +243,14 @@
     <Compile Include="ViewModels\ProfilesAndIndicators\CoreDataSetViewModel.cs" />
     <Compile Include="ViewModels\ProfileAreaType.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseIndicatorDataFullPageViewModel.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\ProfileIndicatorMetadataTextValues.cs" />
     <Compile Include="ViewModels\ProfileUser.cs" />
     <Compile Include="ViewModels\ProfileUserViewModel.cs" />
     <Compile Include="ViewModels\Profile\ProfileViewModel.cs" />
     <Compile Include="ViewModels\Report\ReportViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadProgressViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadIndexViewModel.cs" />
+    <Compile Include="ViewModels\Upload\UploadQueueViewModel.cs" />
     <Compile Include="ViewModels\Upload\UploadSummaryViewModel.cs" />
     <Compile Include="ViewModels\Profile\ProfileIndexViewModel.cs" />
   </ItemGroup>
@@ -238,12 +261,22 @@
     <Content Include="AngularApps\upload\upload-app.js" />
     <Content Include="AngularApps\upload\view\upload-index.html" />
     <Content Include="AngularApps\upload\view\upload-progress.html" />
+    <Content Include="AngularApps\upload\view\upload-queue.html" />
+    <Content Include="Client Scripts\mvcfoolproof.unobtrusive.js" />
+    <Content Include="Client Scripts\mvcfoolproof.unobtrusive.min.js" />
+    <Content Include="Client Scripts\MvcFoolproofJQueryValidation.js" />
+    <Content Include="Client Scripts\MvcFoolproofJQueryValidation.min.js" />
+    <Content Include="Client Scripts\MvcFoolproofValidation.js" />
+    <Content Include="Client Scripts\MvcFoolproofValidation.min.js" />
+    <Content Include="Content\bootstrap.css" />
+    <Content Include="Content\bootstrap.min.css" />
     <Content Include="css\bootstrap-theme.css" />
     <Content Include="css\bootstrap-theme.min.css" />
     <Content Include="css\bootstrap.css" />
     <Content Include="css\bootstrap.min.css" />
     <Content Include="css\asc.gif" />
     <Content Include="css\bg.gif" />
+    <Content Include="css\datepicker.css" />
     <Content Include="css\desc.gif" />
     <Content Include="css\fingertips.css" />
     <Content Include="css\profile-manager.css" />
@@ -266,6 +299,7 @@
     <Content Include="js\es5-shim.min.js" />
     <Content Include="js\jquery-1.12.1.js" />
     <Content Include="js\jquery.form.js" />
+    <Content Include="js\LiveUpdate\live-update.js" />
     <Content Include="js\PageCoreData.js" />
     <Content Include="js\Documents\documents.js" />
     <Content Include="js\lookup-tables.js" />
@@ -282,6 +316,7 @@
     <Content Include="js\ProfileCollections\profile-collections.js" />
     <Content Include="js\jquery.watermark.min.js" />
     <Content Include="js\Profile\profile.js" />
+    <Content Include="js\UserFeedback\userfeedback.js" />
     <Content Include="js\User\user.js" />
     <Content Include="js\jquery.tablesorter.js" />
     <Content Include="js\jquery.tablesorter.widgets.js" />
@@ -362,7 +397,6 @@
     <Content Include="js\tiny_mce\skins\lightgray\skin.min.css" />
     <Content Include="js\tiny_mce\themes\modern\theme.min.js" />
     <Content Include="js\tiny_mce\tinymce.min.js" />
-    <Content Include="js\upload-manager.js" />
     <Content Include="js\PageIndicatorEdit.js" />
     <Content Include="js\jquery.unobtrusive-ajax.js" />
     <Content Include="js\jquery.unobtrusive-ajax.min.js" />
@@ -387,7 +421,7 @@
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\IndicatorNew\IndicatorNew.cshtml" />
-    <Content Include="Views\ProfilesAndIndicators\ProfilesAndIndicators.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\ListIndicatorsInProfile.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_CopySelectedIndicators.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_IndicatorAudit.cshtml" />
     <Content Include="Views\Content\ContentIndex.cshtml" />
@@ -425,7 +459,7 @@
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\Profile\IndicatorEdit.cshtml" />
+    <Content Include="Views\IndicatorEdit\IndicatorEdit.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_ReorderIndicators.cshtml" />
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
@@ -457,6 +491,14 @@
     <Content Include="Views\Profile\_FingertipsTabOptions.cshtml" />
     <Content Include="Views\LookUpTables\_AreaTypes.cshtml" />
     <Content Include="Views\LookUpTables\EditAreaType.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_IndicatorList.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_IndicatorFilter.cshtml" />
+    <Content Include="Views\Content\_ContentErrorMessage.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_CoreDataChange.cshtml" />
+    <Content Include="Views\IndicatorEdit\_LatestChangeOverride.cshtml" />
+    <Content Include="Views\UserFeedback\Index.cshtml" />
+    <Content Include="Views\LookUpTables\EditCategoryType.cshtml" />
+    <Content Include="Views\LiveUpdate\ProfileLiveUpdate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="js\Areas\Api\Controllers\" />
@@ -553,9 +595,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Profile\_AreaTypes.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\CoreData\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\ProfilesAndIndicators\BrowseIndicatorData.cshtml" />

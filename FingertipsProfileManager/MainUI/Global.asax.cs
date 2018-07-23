@@ -17,6 +17,8 @@ namespace Fpm.MainUI
             
             RegisterGlobalFilters(GlobalFilters.Filters);
 
+            UnityMvcActivator.Start();
+
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             BundleConfig.RegisterBundles(BundleTable.Bundles);

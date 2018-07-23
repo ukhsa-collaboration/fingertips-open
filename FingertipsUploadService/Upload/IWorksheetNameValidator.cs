@@ -5,6 +5,6 @@ namespace FingertipsUploadService.Upload
 {
     public interface IWorksheetNameValidator
     {
-        bool ValidateBatch(List<string> worksheets);
+        bool Validate(List<string> worksheets);
     }
 }

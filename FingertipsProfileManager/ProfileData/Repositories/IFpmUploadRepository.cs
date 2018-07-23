@@ -10,6 +10,7 @@ namespace Fpm.ProfileData.Repositories
     {
         void CreateJob(UploadJob job);
         IEnumerable<UploadJob> GetJobsForCurrentUser(int userId);
+        IEnumerable<UploadJob> GetAllJobsProgress();
         UploadJob GetJob(Guid jobGuid);
         IList<UploadJobError> FindJobErrorsByJobGuid(Guid jobGuid);
         bool UpdateJob(UploadJob job);

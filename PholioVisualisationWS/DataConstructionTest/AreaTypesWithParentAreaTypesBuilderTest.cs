@@ -115,7 +115,7 @@ namespace PholioVisualisation.DataConstructionTest
             {
                 new ParentAreaGroup
                 {
-                    ChildAreaTypeId = AreaTypeIds.Ccg,
+                    ChildAreaTypeId = AreaTypeIds.CcgsPreApr2017,
                     ParentAreaTypeId = AreaTypeIds.GoRegion,
                 },
                 ParentAreaGroup1(),

@@ -11,8 +11,8 @@ namespace PholioVisualisation.PholioObjects
         {
             Value = coreDataSet.Value;
             ValueF = coreDataSet.ValueFormatted;
-            LowerCIF = coreDataSet.LowerCIF;
-            UpperCIF = coreDataSet.UpperCIF;
+            LowerCIF = coreDataSet.LowerCI95F;
+            UpperCIF = coreDataSet.UpperCI95F;
             ValueNoteId = coreDataSet.ValueNoteId;
             Count = coreDataSet.Count;
             Significance = new Dictionary<int, Significance>();

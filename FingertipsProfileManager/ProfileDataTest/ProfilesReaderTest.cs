@@ -157,7 +157,7 @@ namespace Fpm.ProfileDataTest
         {
             ProfileDetails details = Reader().GetProfileDetails(UrlKeys.Phof);
             Assert.IsNotNull(details);
-            Assert.IsTrue(details.ArePdfs);
+            Assert.IsTrue(details.HasAnyData);
         }
 
         [TestMethod]
@@ -334,7 +334,7 @@ namespace Fpm.ProfileDataTest
             ProfilesReader reader = Reader();
 
             //Test for CCG 
-            areas = reader.GetAreas("Cam", AreaTypeIds.Ccg);
+            areas = reader.GetAreas("Cam", AreaTypeIds.CcgsPreApr2017);
             Assert.IsTrue(areas.Any());
 
             //Test for County/UA 
@@ -346,7 +346,7 @@ namespace Fpm.ProfileDataTest
             Assert.IsTrue(areas.Any());
 
             //Test for CCG - Not Found 
-            areas = reader.GetAreas("Camx", AreaTypeIds.Ccg);
+            areas = reader.GetAreas("Camx", AreaTypeIds.CcgsPreApr2017);
             Assert.IsFalse(areas.Any());
         }
 
@@ -354,7 +354,7 @@ namespace Fpm.ProfileDataTest
         public void TestGetAreas_AllAreaTypesSearchedIfAreaTypeIdIsNull()
         {
             ProfilesReader reader = Reader();
-            int onlyCcg = reader.GetAreas("Cam", AreaTypeIds.Ccg).Count();
+            int onlyCcg = reader.GetAreas("Cam", AreaTypeIds.CcgsPreApr2017).Count();
             int allAreaTypes = reader.GetAreas("Cam", null).Count();
             Assert.IsTrue(onlyCcg < allAreaTypes);
         }
@@ -432,6 +432,39 @@ namespace Fpm.ProfileDataTest
             var profile = Reader().GetOwnerProfilesByIndicatorIds(
                 IndicatorIds.IndicatorThatDoesNotExist);
             Assert.IsNull(profile);
+        }
+
+        [TestMethod]
+        public void TestGetGroupingIds()
+        {
+            var groupIds = Reader().GetGroupingIds(ProfileIds.Phof);
+            Assert.IsTrue(groupIds.Any());
+        }
+
+        [TestMethod]
+        public void TestGetGroupingIndicatorIds()
+        {
+            var groupIds = Reader().GetGroupingIds(ProfileIds.Phof);
+            var indicatorIds = Reader().GetGroupingIndicatorIds(groupIds);
+            Assert.IsTrue(indicatorIds.Any());
+        }
+
+        [TestMethod]
+        public void TestGetIndicatorMetadataTextValuesByIndicatorIdsAndProfileId()
+        {
+            var groupIds = Reader().GetGroupingIds(ProfileIds.Phof);
+            var indicatorIds = Reader().GetGroupingIndicatorIds(groupIds);
+
+            var indicatorMetadataTextValues = Reader()
+                .GetIndicatorMetadataTextValuesByIndicatorIdsAndProfileId(indicatorIds, ProfileIds.Phof);
+            Assert.IsTrue(indicatorMetadataTextValues.Any());
+        }
+
+        [TestMethod]
+        public void TestGetProfileName()
+        {
+            var profile = Reader().GetProfileDetailsByProfileId(ProfileIds.Phof);
+            Assert.AreEqual("public health outcomes framework", profile.Name.ToLower());
         }
 
         private void SaveNewDocument(string name)

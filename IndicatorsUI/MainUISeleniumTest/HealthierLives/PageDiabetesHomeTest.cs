@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
 {
@@ -19,26 +20,9 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
         [TestMethod]
         public void CheckTextOnHomePageReflectsCcgAreaType()
         {
-            CheckTextOnHomePageReflectsSelectedAreaType(LongerLivesIds.AreaTypeLinkCcgs, "CCG");
-        }
-
-        private void CheckTextOnHomePageReflectsSelectedAreaType(string areaTypeLinkId,
-            string areaTypeString)
-        {
             navigateTo.DiabetesHome();
-            SelectAreaTypeAndWaitForPageToLoad(driver, areaTypeLinkId);
-
-            // Check map help reflects area type
-            var text = driver.FindElement(By.Id("map-help")).Text;
-            TestHelper.AssertTextContains(text, areaTypeString);
-
-            // Check search heading reflects area type
-            text = driver.FindElement(By.ClassName("home_search")).Text;
-            TestHelper.AssertTextContains(text, areaTypeString);
-
-            // Check search text box reflects area type
-            text = driver.FindElement(By.Id("search_text")).GetAttribute("title");
-            TestHelper.AssertTextContains(text, areaTypeString);
+            SelectAreaTypeAndWaitForPageToLoad(driver, AreaTypeIds.CcgPreApr2017.ToString());
+            CheckTextOnHomePageReflectsSelectedAreaType("CCG");
         }
 
         [TestMethod]
@@ -85,6 +69,21 @@ namespace IndicatorsUI.MainUISeleniumTest.HealthierLives
             WaitFor.ThreadWait(0.1);        
             waitFor.PageToFinishLoading();
             waitFor.GoogleMapToLoad();
+        }
+
+        private void CheckTextOnHomePageReflectsSelectedAreaType(string areaTypeString)
+        {
+            // Check map help reflects area type
+            var text = driver.FindElement(By.Id("map-help")).Text;
+            TestHelper.AssertTextContains(text, areaTypeString);
+
+            // Check search heading reflects area type
+            text = driver.FindElement(By.ClassName("home_search")).Text;
+            TestHelper.AssertTextContains(text, areaTypeString);
+
+            // Check search text box reflects area type
+            text = driver.FindElement(By.Id("search_text")).GetAttribute("title");
+            TestHelper.AssertTextContains(text, areaTypeString);
         }
     }
 }

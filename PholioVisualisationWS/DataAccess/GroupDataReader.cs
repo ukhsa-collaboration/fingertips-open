@@ -1,10 +1,13 @@
-﻿using NHibernate;
+﻿using System;
+using NHibernate;
 using NHibernate.Criterion;
 using PholioVisualisation.PholioObjects;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using NHibernate.Transform;
+using PholioVisualisation.DataAccess.Repositories;
 
 namespace PholioVisualisation.DataAccess
 {
@@ -12,8 +15,10 @@ namespace PholioVisualisation.DataAccess
     {
         IList<int> GetIndicatorIdsByGroupIdAndAreaTypeId(int groupId, int areaTypeId);
         IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds);
-        IList<int> GetGroupingIds(int profileId);
+        IList<int> GetGroupIdsOfProfile(int profileId);
         Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId);
+        IList<int> GetGroupingMetadataGroupIdListByProfileId(int profileId);
+        IList<Grouping> GetGroupingsByGroupIdsAndIndicatorId(List<int> groupIds, int indicatorId);
         IList<Grouping> GetGroupings(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId);
         IList<Grouping> GetGroupings(int groupId, int indicatorId, int sexId, int ageId);
         IList<Grouping> GetGroupingsByGroupIdIndicatorIdSexId(int groupId, int areaTypeId, int indicatorId, int sexId);
@@ -24,7 +29,9 @@ namespace PholioVisualisation.DataAccess
         IList<Grouping> GetGroupingsByIndicatorId(int indicatorId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(IList<int> groupIds,
         IList<int> indicatorIds, int areaTypeId);
-
+        IList<Grouping> GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int areaTypeId, 
+            int indicatorId, int sexId, int ageId);
+        IList<GroupingData> GetAvailableDataByIndicatorIdAndAreaTypeId(int? indicatorId, int? areaTypeId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, IList<int> indicatorIds);
 
         /// <summary>
@@ -41,7 +48,7 @@ namespace PholioVisualisation.DataAccess
         /// Key is child area code, value is category ID
         /// </summary>
         Dictionary<string, int> GetCategoriesWithinParentArea(int categoryTypeId,
-            string parentAreaCode, int childAreaTypeId);
+            string parentAreaCode, int childAreaTypeId, int parentAreaType);
 
         IList<int> GetAllAgeIdsForIndicator(int indicatorId);
 
@@ -75,6 +82,9 @@ namespace PholioVisualisation.DataAccess
         IList<CoreDataSet> GetCoreDataListForChildrenOfCategoryArea(Grouping grouping,
             TimePeriod period, CategoryArea categoryArea);
 
+        IList<CoreDataSet> GetCoreDataListForChildrenOfNearestNeighbourArea(Grouping grouping,
+            TimePeriod period, NearestNeighbourArea area);
+
         IList<CoreDataSet> GetCoreDataListForAllCategoryAreasOfCategoryAreaType(Grouping grouping,
             TimePeriod timePeriod, int categoryTypeId, string areaCode);
 
@@ -83,6 +93,8 @@ namespace PholioVisualisation.DataAccess
         Limits GetCoreDataLimitsByIndicatorIdAndAreaTypeIdAndParentAreaCode(int indicatorId, int areaTypeId, string parentAreaCode);
         int GetCoreDataCountAtDataPoint(Grouping grouping);
         IList<CoreDataSet> GetCoreDataForAllAreasOfType(Grouping grouping, TimePeriod period);
+        int GetCoreDataCountWhereBothCI95AreMinusOne();
+        IList<CoreDataSet> GetCoreDataForIndicatorId(int indicatorId);
 
         IList<double> GetOrderedCoreDataValidValuesForAllAreasOfType(Grouping grouping, TimePeriod period,
             IEnumerable<string> ignoredAreaCodes);
@@ -99,14 +111,16 @@ namespace PholioVisualisation.DataAccess
         IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
+        IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValues(int indicatorId);
+
         IList<IndicatorMetadata> GetGroupSpecificIndicatorMetadataTextValues(IList<Grouping> groupings,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
         IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties();
 
-        IList<int> GetAllIndicators();
+        IList<int> GetAllIndicatorIds();
 
-        IList<CoreDataSet> GetDataIncludingInequalities(Grouping grouping, TimePeriod period,
+        IList<CoreDataSet> GetDataIncludingInequalities(int indicatorId, TimePeriod period,
             IList<int> excludedCategoryTypeIds, params string[] areaCodes);
 
         void ClearSession();
@@ -136,10 +150,16 @@ namespace PholioVisualisation.DataAccess
         private const string GetCoreDataListForChildrenOfCategoryAreaQueryString =
             "select d from CoreDataSet d, CategorisedArea c, Area a" +
             " where d.AreaCode = c.AreaCode and a.Code = c.AreaCode" + CategoryIdIsUndefined +
-            " and d.IndicatorId = :indicatorId" +
-            TimePeriodClause + " and d.SexId = :sexId and d.AgeId = :ageId and a.IsCurrent = 1" +
+            " and d.IndicatorId = :indicatorId" + TimePeriodClause +
+            " and d.SexId = :sexId and d.AgeId = :ageId and a.IsCurrent = 1" +
             " and c.CategoryTypeId = :categoryTypeId and c.CategoryId = :categoryId" +
             " and c.ChildAreaTypeId = :childAreaTypeId and c.ParentAreaTypeId = :parentAreaTypeId";
+
+        private const string GetCoreDataListForChildrenOfNearestNeighbourAreaQueryString =
+            "select d from CoreDataSet d, AreaCodeNeighbourMapping n" +
+            " where d.AreaCode = n.NeighbourAreaCode and n.AreaCode = :neighbourAreaCode" + CategoryIdIsUndefined +
+            " and d.IndicatorId = :indicatorId" + TimePeriodClause +
+            " and d.SexId = :sexId and d.AgeId = :ageId and n.NeighbourTypeId = :neighbourTypeId";
 
         private const string GetCoreDataForAllAreasOfTypeQueryString =
             "select d from CoreDataSet d, Area a" +
@@ -204,9 +224,10 @@ namespace PholioVisualisation.DataAccess
             return q.List<GroupingMetadata>();
         }
 
-        public IList<int> GetGroupingIds(int profileId)
+        public IList<int> GetGroupIdsOfProfile(int profileId)
         {
-            IQuery q = CurrentSession.CreateQuery("select  g.id from GroupingMetadata g where g.ProfileId = :profileId");
+            IQuery q = CurrentSession.CreateQuery("select g.id from GroupingMetadata g where g.ProfileId = :profileId order by g.Sequence");
+            q.SetCacheable(true);
             q.SetParameter("profileId", profileId);
             return q.List<int>();
         }
@@ -220,10 +241,27 @@ namespace PholioVisualisation.DataAccess
 
         public Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId)
         {
-            IQuery q = CurrentSession.CreateQuery("from Grouping g where g.GroupId = :groupId and g.IndicatorId = :indicatorId order by g.DataPointYear");
+            IQuery q = CurrentSession.CreateQuery(
+                "from Grouping g where g.GroupId = :groupId and g.IndicatorId = :indicatorId order by g.DataPointYear");
             q.SetParameter(ParameterGroupId, groupId);
             q.SetParameter(ParameterIndicatorId, indicatorId);
             return q.List<Grouping>().FirstOrDefault();
+        }
+
+        public IList<int> GetGroupingMetadataGroupIdListByProfileId(int profileId)
+        {
+            return CurrentSession.CreateCriteria<GroupingMetadata>()
+                .Add(Restrictions.Eq("ProfileId", profileId))
+                .SetProjection(Projections.Property("Id"))
+                .List<int>();
+        }
+
+        public IList<Grouping> GetGroupingsByGroupIdsAndIndicatorId(List<int> groupIds, int indicatorId)
+        {
+            return CurrentSession.CreateCriteria<Grouping>()
+                .Add(Restrictions.Eq("IndicatorId", indicatorId))
+                .Add(Restrictions.In("GroupId", groupIds))
+                .List<Grouping>();
         }
 
         public IList<Grouping> GetGroupings(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId)
@@ -309,7 +347,20 @@ namespace PholioVisualisation.DataAccess
                 .List<Grouping>();
         }
 
-        public virtual IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, 
+        public virtual IList<Grouping> GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(
+            int areaTypeId, int indicatorId, int sexId, int ageId)
+        {
+            return CurrentSession.QueryOver<Grouping>()
+                .Where(
+                    x =>
+                        x.IndicatorId == indicatorId &&
+                        x.AreaTypeId == areaTypeId &&
+                        x.SexId == sexId &&
+                        x.AgeId == ageId)
+                .List();
+        }
+
+        public virtual IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds,
             IList<int> indicatorIds)
         {
             List<Grouping> allGroupings = new List<Grouping>();
@@ -320,7 +371,7 @@ namespace PholioVisualisation.DataAccess
             {
                 var nextData = CurrentSession.CreateCriteria<Grouping>()
                     .Add(Restrictions.In("GroupId", groupIds.ToArray()))
-                    .Add(Restrictions.In(PropertyIndicatorId, splitter.NextCodes().ToArray()))
+                    .Add(Restrictions.In(PropertyIndicatorId, splitter.NextItems().ToArray()))
                     .List<Grouping>();
                 allGroupings.AddRange(nextData);
             }
@@ -328,6 +379,14 @@ namespace PholioVisualisation.DataAccess
             return allGroupings;
         }
 
+        public IList<GroupingData> GetAvailableDataByIndicatorIdAndAreaTypeId(int? indicatorId, int? areaTypeId)
+        {
+            IQuery q = CurrentSession.GetNamedQuery("GetAvailableGroupingDataByIndicatorIdAndAreaTypeId");
+            q.SetParameter("indicatorId", indicatorId);
+            q.SetParameter("areaTypeId", areaTypeId);
+            q.SetResultTransformer(Transformers.AliasToBean<GroupingData>());
+            return q.List<GroupingData>();
+        }
         /// <summary>
         /// NOTE: should use AgeID - need to change in all calling services
         /// </summary>
@@ -345,6 +404,7 @@ namespace PholioVisualisation.DataAccess
         public virtual IList<int> GetDistinctGroupingAreaTypeIdsForAllProfiles()
         {
             IQuery q = CurrentSession.CreateQuery("select distinct g.AreaTypeId from Grouping g");
+            q.SetCacheable(true);
             return q.List<int>();
         }
 
@@ -361,10 +421,10 @@ namespace PholioVisualisation.DataAccess
             return q.List<int>();
         }
 
-        public IList<Grouping> GetGroupingsByGroupId(int id)
+        public IList<Grouping> GetGroupingsByGroupId(int groupId)
         {
             IQuery q = CurrentSession.CreateQuery("from Grouping g where g.GroupId = :groupId order by g.Sequence");
-            q.SetParameter(ParameterGroupId, id);
+            q.SetParameter(ParameterGroupId, groupId);
             return q.List<Grouping>();
         }
 
@@ -379,9 +439,10 @@ namespace PholioVisualisation.DataAccess
         /// Key is child area code, value is category ID
         /// </summary>
         public Dictionary<string, int> GetCategoriesWithinParentArea(int categoryTypeId,
-            string parentAreaCode, int childAreaTypeId)
+            string parentAreaCode, int childAreaTypeId, int parentAreaType)
         {
             IQuery q = CurrentSession.GetNamedQuery("GetCategoriesWithinParentArea");
+            q.SetParameter("parentAreaType", parentAreaType);
             q.SetParameter("parentAreaCode", parentAreaCode);
             q.SetParameter("childAreaTypeId", childAreaTypeId);
             q.SetParameter("categoryTypeId", categoryTypeId);
@@ -389,15 +450,39 @@ namespace PholioVisualisation.DataAccess
 
             return results.Cast<object[]>().ToDictionary(
                 resultArray => (string)resultArray[0],
-                resultArray => (int)resultArray[1]);
+                resultArray => Convert.ToInt32(resultArray[1])
+                );
         }
 
         public IList<int> GetAllAgeIdsForIndicator(int indicatorId)
         {
             IQuery q = CurrentSession.CreateQuery(
                 "select distinct c.AgeId from CoreDataSet c where c.IndicatorId = :indicatorId");
+            q.SetCacheable(true);
             q.SetParameter(ParameterIndicatorId, indicatorId);
             return q.List<int>();
+        }
+
+        /// <summary>
+        /// This should always be zero. FUS should have converted double -1 to nulls.
+        /// </summary>
+        public int GetCoreDataCountWhereBothCI95AreMinusOne()
+        {
+            return CurrentSession.QueryOver<CoreDataSet>()
+                .Where(x => x.LowerCI95 == -1 && x.UpperCI95 == -1)
+                .RowCount();
+        }
+
+        /// <summary>
+        /// Gets the list of core data set based on the indicator id
+        /// </summary>
+        /// <param name="indicatorId">The indicator id</param>
+        /// <returns></returns>
+        public virtual IList<CoreDataSet> GetCoreDataForIndicatorId(int indicatorId)
+        {
+            return CurrentSession.CreateCriteria<CoreDataSet>()
+                .Add(Restrictions.Eq("IndicatorId", indicatorId))
+                .List<CoreDataSet>();
         }
 
         /// <summary>
@@ -462,12 +547,12 @@ namespace PholioVisualisation.DataAccess
             var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
-                var nextData = GetCoreDataForAreaCodes(grouping, period, splitter.NextCodes());
+                var nextData = GetCoreDataForAreaCodes(grouping, period, splitter.NextItems());
                 allData.AddRange(nextData);
             }
             return allData;
         }
-        //
+
         private IEnumerable<CoreDataSet> GetCoreDataForAreaCodes(Grouping grouping, TimePeriod period, IEnumerable<string> areaCodes)
         {
             IQuery q = CurrentSession.CreateQuery(string.Format(GetCoreDataQueryString, "in (:areaCodes)"));
@@ -554,6 +639,12 @@ namespace PholioVisualisation.DataAccess
 
         public virtual IList<CoreDataSet> GetCoreDataListForChildrenOfArea(Grouping grouping, TimePeriod period, string parentAreaCode)
         {
+            if (parentAreaCode.Equals(AreaCodes.England,
+                StringComparison.CurrentCultureIgnoreCase))
+            {
+                return GetCoreDataForAllAreasOfType(grouping, period);
+            }
+
             IQuery q = CurrentSession.CreateQuery(GetCoreDataListForChildrenOfAreaQueryString);
             q.SetParameter("parentAreaCode", parentAreaCode);
             SetTimePeriodParameters(q, period);
@@ -570,6 +661,17 @@ namespace PholioVisualisation.DataAccess
             q.SetParameter("categoryId", categoryArea.CategoryId);
             q.SetParameter("childAreaTypeId", grouping.AreaTypeId);
             q.SetParameter("parentAreaTypeId", categoryArea.ParentAreaTypeId);
+            SetTimePeriodParameters(q, period);
+            SetGroupingParameters(q, grouping);
+            return q.List<CoreDataSet>();
+        }
+
+        public virtual IList<CoreDataSet> GetCoreDataListForChildrenOfNearestNeighbourArea(Grouping grouping,
+            TimePeriod period, NearestNeighbourArea area)
+        {
+            IQuery q = CurrentSession.CreateQuery(GetCoreDataListForChildrenOfNearestNeighbourAreaQueryString);
+            q.SetParameter("neighbourTypeId", area.NeighbourTypeId);
+            q.SetParameter("neighbourAreaCode", area.AreaCodeOfAreaWithNeighbours);
             SetTimePeriodParameters(q, period);
             SetGroupingParameters(q, grouping);
             return q.List<CoreDataSet>();
@@ -621,7 +723,7 @@ namespace PholioVisualisation.DataAccess
              " where d.AreaCode = a.Code and d.IndicatorId = :indicatorId and a.AreaTypeId in (:areaTypeIds) and d.Value != -1 and a.IsCurrent = 1";
 
             IQuery q = CurrentSession.CreateQuery(query);
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             q.SetParameter("indicatorId", indicatorId);
             var limits = q.UniqueResult<object[]>();
 
@@ -645,7 +747,7 @@ namespace PholioVisualisation.DataAccess
               " and d.IndicatorId = :indicatorId and a.AreaTypeId in (:areaTypeIds) and d.Value != -1 and a.IsCurrent = 1";
 
             IQuery q = CurrentSession.CreateQuery(query);
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(areaTypeId).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             q.SetParameter("indicatorId", indicatorId);
             q.SetParameter("parentAreaCode", parentAreaCode);
             var limits = q.UniqueResult<object[]>();
@@ -681,9 +783,9 @@ namespace PholioVisualisation.DataAccess
             return q.List<CoreDataSet>();
         }
 
-        private static void SetAreaTypeIdsParameter(IQuery q, Grouping grouping)
+        private void SetAreaTypeIdsParameter(IQuery q, Grouping grouping)
         {
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(grouping.AreaTypeId).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(grouping.AreaTypeId));
         }
 
         public IList<double> GetOrderedCoreDataValidValuesForAllAreasOfType(Grouping grouping, TimePeriod period,
@@ -703,7 +805,7 @@ namespace PholioVisualisation.DataAccess
             IQuery q = CurrentSession.CreateQuery(queryString);
             SetTimePeriodParameters(q, period);
             SetGroupingParameters(q, grouping);
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(new List<int> { grouping.AreaTypeId }).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(grouping.AreaTypeId));
 
             if (areAnyIgnoredAreas)
             {
@@ -712,6 +814,13 @@ namespace PholioVisualisation.DataAccess
 
             return q.List<double>();
         }
+
+        private IList<int> GetComponentAreaTypeIds(int areaTypeId)
+        {
+            return new AreaTypeIdSplitter(new AreaTypeComponentRepository())
+                .GetComponentAreaTypeIds(areaTypeId);
+        }
+
 
         private static void SetGroupingParameters(IQuery q, Grouping grouping)
         {
@@ -728,7 +837,7 @@ namespace PholioVisualisation.DataAccess
             q.SetParameter("month", period.Month);
         }
 
-        public IList<int> GetAllIndicators()
+        public IList<int> GetAllIndicatorIds()
         {
             var q = CurrentSession.CreateSQLQuery("select distinct(IndicatorID) from Grouping");
             return q.List<int>();
@@ -737,18 +846,8 @@ namespace PholioVisualisation.DataAccess
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties)
         {
-            if (groupings.Count == 0)
-            {
-                return new List<IndicatorMetadata>();
-            }
-
-            int[] indicatorIds = (from g in groupings select g.IndicatorId).Distinct().ToArray();
-
-            IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId in (:indicatorIds)");
-            q.SetParameterList("indicatorIds", indicatorIds);
-            IList<IndicatorMetadata> metadata = q.List<IndicatorMetadata>();
-            AddIndicatorMetadataText(indicatorMetadataTextProperties, metadata.ToArray());
-            return metadata;
+            var indicatorIds = groupings.Select(x => x.IndicatorId).Distinct().ToList();
+            return GetIndicatorMetadata(indicatorIds, indicatorMetadataTextProperties);
         }
 
         public IndicatorMetadata GetIndicatorMetadata(Grouping grouping,
@@ -770,11 +869,38 @@ namespace PholioVisualisation.DataAccess
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties)
         {
-            IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId in (:indicatorIds)");
-            q.SetParameterList("indicatorIds", indicatorIds.ToList());
-            IList<IndicatorMetadata> metadata = q.List<IndicatorMetadata>();
-            AddIndicatorMetadataText(indicatorMetadataTextProperties, metadata.ToArray());
-            return metadata;
+            if (indicatorIds.Count == 0)
+            {
+                return new List<IndicatorMetadata>();
+            }
+
+            var allMetadata = new List<IndicatorMetadata>();
+
+            // Query the database 1000 areas at a time, for large numbers of items the query will fail otherwise
+            var splitter = new LongListSplitter<int>(indicatorIds);
+            while (splitter.AnyLeft())
+            {
+                IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId in (:indicatorIds)");
+                q.SetParameterList("indicatorIds", splitter.NextItems());
+                IList<IndicatorMetadata> metadata = q.List<IndicatorMetadata>();
+                AddIndicatorMetadataText(indicatorMetadataTextProperties, metadata.ToArray());
+
+                allMetadata.AddRange(metadata);
+            }
+
+            return allMetadata;
+        }
+
+        /// <summary>
+        /// Gets the list of indicator meta data text values based on the indicator id
+        /// </summary>
+        /// <param name="indicatorId">The indicator id</param>
+        /// <returns></returns>
+        public IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValues(int indicatorId)
+        {
+            return CurrentSession.CreateCriteria<IndicatorMetadataTextValue>()
+                .Add(Restrictions.Eq("IndicatorId", indicatorId))
+                .List<IndicatorMetadataTextValue>();
         }
 
         public IList<IndicatorMetadata> GetGroupSpecificIndicatorMetadataTextValues(IList<Grouping> groupings,
@@ -861,7 +987,7 @@ namespace PholioVisualisation.DataAccess
         }
 
         //Inequalities: Category Type and Category are NOT -1 and standard: -1
-        public virtual IList<CoreDataSet> GetDataIncludingInequalities(Grouping grouping, TimePeriod period,
+        public virtual IList<CoreDataSet> GetDataIncludingInequalities(int indicatorId, TimePeriod period,
             IList<int> excludedCategoryTypeIds, params string[] areaCodes)
         {
             if (areaCodes.Length == 0)
@@ -876,13 +1002,14 @@ namespace PholioVisualisation.DataAccess
             var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
-                var nextData = GetCoreDataForAreaCodesInequalities(grouping, period, excludedCategoryTypeIds, splitter.NextCodes());
+                var nextData = GetCoreDataForAreaCodesInequalities(indicatorId, 
+                    period, excludedCategoryTypeIds, splitter.NextItems());
                 allData.AddRange(nextData);
             }
             return allData;
         }
 
-        private IEnumerable<CoreDataSet> GetCoreDataForAreaCodesInequalities(Grouping grouping, TimePeriod period,
+        private IEnumerable<CoreDataSet> GetCoreDataForAreaCodesInequalities(int indicatorId, TimePeriod period,
             IList<int> excludedCategoryTypeIds, IEnumerable<string> areaCodes)
         {
             StringBuilder sb = new StringBuilder("in (:areaCodes)");
@@ -902,7 +1029,7 @@ namespace PholioVisualisation.DataAccess
 
             SetTimePeriodParameters(q, period);
 
-            q.SetParameter("indicatorId", grouping.IndicatorId);
+            q.SetParameter("indicatorId", indicatorId);
 
             var nextData = q.List<CoreDataSet>();
             return nextData;

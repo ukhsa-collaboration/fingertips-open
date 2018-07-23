@@ -1,21 +1,25 @@
 ﻿using System.Collections.Generic;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Filters;
-using Profiles.MainUI.Caching;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Caching;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     [FingertipsOutputCache]
     public class ProfileCollectionWithFrontPageController : BaseController
     {
         private ProfileDetails details;
 
-        [CheckUserCanAccessSkin]
+        public ProfileCollectionWithFrontPageController(IAppConfig appConfig) : base(appConfig)
+        {
+
+        }
+
+        [Route("profile-group/{leadProfileUrlKey}")]
         public ActionResult FrontPage(string leadProfileUrlKey)
         {
             InitPageModel();
@@ -30,7 +34,6 @@ namespace Profiles.MainUI.Controllers
             return GetView(leadProfileUrlKey, "FrontPage");
         }
 
-        [CheckUserCanAccessSkin]
         public ActionResult ProfileFrontPage(string leadProfileUrlKey, string profileUrlKey)
         {
             InitPageModel();
@@ -45,7 +48,7 @@ namespace Profiles.MainUI.Controllers
             return GetView(leadProfileUrlKey, "ProfileFrontPage");
         }
 
-        [CheckUserCanAccessSkin]
+        [Route("profile-group/{leadProfileUrlKey}/profile/{profileUrlKey}/data")]
         public ActionResult Data(string leadProfileUrlKey, string profileUrlKey)
         {
             InitPageModel();

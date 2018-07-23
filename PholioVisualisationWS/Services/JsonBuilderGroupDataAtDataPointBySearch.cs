@@ -2,58 +2,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
-using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderGroupDataAtDataPointBySearch : JsonBuilderBase
+    public class JsonBuilderGroupDataAtDataPointBySearch
     {
-        private GroupDataAtDataPointBySearchParameters _parameters;
+        private GroupDataBuilderBase _groupDataBuilder;
 
-        public JsonBuilderGroupDataAtDataPointBySearch(HttpContextBase context)
-            : base(context)
+        public JsonBuilderGroupDataAtDataPointBySearch(GroupDataBuilderBase groupDataBuilder)
         {
-            _parameters = new GroupDataAtDataPointBySearchParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
-
-        public JsonBuilderGroupDataAtDataPointBySearch(GroupDataAtDataPointBySearchParameters parameters)
-        {
-            _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var roots = GetGroupRoots();
-            return roots.Any()
-                ? JsonConvert.SerializeObject(roots)
-                : string.Empty;
+            _groupDataBuilder = groupDataBuilder;
         }
 
         public IList<GroupRoot> GetGroupRoots()
         {
-            int profileId = _parameters.ProfileId;
-
-            var parentArea = new ParentArea(_parameters.ParentAreaCode, _parameters.AreaTypeId);
-
-            // Do not repository as do not want results cached like this (need to be 
-            // cached by ID and areatype, i.e. repository by roots)
-            GroupData data = new GroupDataBuilderByIndicatorIds
-            {
-                IndicatorIds = _parameters.IndicatorIds,
-                ProfileId = profileId,
-                RestrictSearchProfileIds = _parameters.RestrictResultsToProfileIdList,
-                ComparatorMap = new ComparatorMapBuilder(parentArea).ComparatorMap,
-                AreaTypeId = _parameters.AreaTypeId
-            }.Build();
-
+            var data = _groupDataBuilder.Build();
 
             var targetComparerProvider = new TargetComparerProvider(ReaderFactory.GetGroupDataReader(), ReaderFactory.GetAreasReader());
             new GroupDataProcessor(targetComparerProvider).Process(data);

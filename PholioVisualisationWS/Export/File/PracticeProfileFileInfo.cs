@@ -16,7 +16,7 @@ namespace PholioVisualisation.Export.File
             this.profileKey = profileKey;
             this.groupIds = groupIds;
             this.areaCode = areaCode;
-            FilePath = Path.Combine(ApplicationConfiguration.ExportFileDirectory, FileName);
+            FilePath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, FileName);
         }
 
         public string FileName

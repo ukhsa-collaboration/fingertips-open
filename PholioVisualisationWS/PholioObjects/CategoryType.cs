@@ -17,6 +17,12 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "Short")]
         public string ShortName { get; set; }
 
+        [JsonProperty]
+        public string Description { get; set; }
+
+        [JsonProperty]
+        public string Notes { get; set; }
+
         /// <summary>
         /// Only used for retrieval from database by NHibernate. Use Categories to access data.
         /// </summary>

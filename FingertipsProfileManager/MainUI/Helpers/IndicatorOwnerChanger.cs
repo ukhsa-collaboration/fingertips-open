@@ -8,7 +8,12 @@ using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class IndicatorOwnerChanger
+    public interface IIndicatorOwnerChanger
+    {
+        void AssignIndicatorToProfile(int indicatorId, int newOwnerProfileId);
+    }
+
+    public class IndicatorOwnerChanger : IIndicatorOwnerChanger
     {
         private ProfilesReader _profilesReader;
         private ProfileRepository _profileRepository;

@@ -1,0 +1,43 @@
+﻿@using IndicatorsUI.DataAccess
+@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
+@model IndicatorsUI.MainUI.Models.PageModel
+
+@Html.Partial("_UserFeedback")
+<div id="footer" class="row">
+    <div id="footer_wrap" class="container">
+        <div class="col-md-9 footer_links">
+            @if (Model.NationalProfileCollection != null)
+            {
+                var items = Model.NationalProfileCollection.ProfileCollectionItemsSortedByName();
+                var columnAssigner = new ColumnAssigner(items.Count, 2);
+
+                <h3>More public health profiles</h3>
+                <ul class="col1">
+                    <li>
+                        <a class="title" href="https://www.gov.uk/guidance/phe-data-and-analysis-tools">PHE Data and Knowledge Gateway</a>
+                    </li>
+                    @while (columnAssigner.IsNextIndexInCurrentColumn)
+                    {
+                        <li>
+                            @Html.Partial("_ProfileCollectionItemLink", items[columnAssigner.NextIndex])
+                        </li>
+                    }
+                </ul>
+                columnAssigner.NewColumn();
+                <ul>
+                    @while (columnAssigner.IsNextIndexInCurrentColumn)
+                    {
+                        <li>
+                            @Html.Partial("_ProfileCollectionItemLink", items[columnAssigner.NextIndex])
+                        </li>
+                    }
+                </ul>
+            }
+
+        </div>
+
+        @Html.Partial("_PoliciesAndCopyright")
+    </div>
+</div>
+

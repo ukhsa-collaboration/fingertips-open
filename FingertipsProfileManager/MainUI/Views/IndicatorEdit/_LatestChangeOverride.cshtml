@@ -1,0 +1,27 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.IndicatorEdit
+<div>
+    <label class="associated-detail-label">
+        <small>"New data" override date</small>
+    </label>
+    @{
+        var lastChangeTimestampOverride = Model.IndicatorMetadata.LatestChangeTimestampOverride;
+        var lastChangeTimestampOverrideFormated = string.Format("{0:dd-MM-yyyy}", lastChangeTimestampOverride);
+    }
+    @{
+        var htmlAttributesLastChange = new RouteValueDictionary (
+            new { @class = "dropdown-selected timestamp-override year-Range" });
+        // User can only change checkbox if profile is owner
+        if (Model.DoesProfileOwnIndicator() == false)
+        {
+            htmlAttributesLastChange["disabled"] = "disabled";
+        }
+        TooltipHelper.AddTooltipLeft(htmlAttributesLastChange, 
+            "For users this will be displayed as the date the data was most recently updated. It is meant to be used where data was updated a significant time before it is available to users.");
+    }
+
+    @Html.TextBox("latestChangeTimestamp", lastChangeTimestampOverrideFormated,
+        htmlAttributesLastChange)
+
+</div>
+

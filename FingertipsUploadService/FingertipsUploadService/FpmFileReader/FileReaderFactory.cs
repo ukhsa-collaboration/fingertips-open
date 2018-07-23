@@ -5,10 +5,10 @@ namespace FingertipsUploadService.FpmFileReader
 {
     public class FileReaderFactory
     {
-        public IUploadFileReader Get(string filePath, UploadJobType jobType)
+        public IUploadFileReader Get(string filePath)
         {
             IUploadFileReader fileReader;
-            if (IsCsv(filePath) && jobType == UploadJobType.Batch)
+            if (IsCsv(filePath))
             {
                 fileReader = new CsvFileReader(filePath);
             }

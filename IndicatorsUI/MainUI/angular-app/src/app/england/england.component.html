@@ -1,0 +1,31 @@
+<div id="england-container" style="display:none;">
+    <div class="export-chart-box" style="display:block;">
+        <a class="export-link" (click)="onExportClick($event)">Export table as image</a>
+    </div>
+    <div id="england-table">
+        <table class="bordered-table table-hover">
+            <thead>
+                <tr>
+                    <th>Indicator</th>
+                    <th>Period</th>
+                    <th class="center">England<br/>count</th>
+                    <th class="center">England<br/>value</th>
+                    <th *ngIf="hasRecentTrends" class="center">Recent<br/>trend</th>
+                    <th *ngIf="isChangeFromPreviousPeriodShown" class="center">Change from<br/>previous time period</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let row of rows">
+                    <td><button class="pLink" href="#" (click)=indicatorNameClicked(row)>{{row.indicatorName}}</button>
+                    <span  *ngIf="row.hasNewData" style="margin-right: 8px;" class="badge badge-success">New data</span>
+                    </td>
+                    <td>{{row.period}}</td>
+                    <td class="numeric" [innerHTML]="row.count"></td>
+                    <td class="numeric" (mouseover)=showValueNoteTooltip($event,row) (mouseout)=hideTooltip() (mousemove)=positionTooltip($event) [innerHTML]="row.value"></td>
+                    <td *ngIf="hasRecentTrends" class="center pointer" (click)=recentTrendClicked(row) (mouseout)=hideTooltip() (mouseover)=showRecentTrendTooltip($event,row) (mousemove)=positionTooltip($event) [innerHTML]="row.recentTrendHtml"></td>
+                    <td *ngIf="isChangeFromPreviousPeriodShown" class="center" [innerHTML]="row.changeFromPreviousHtml"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

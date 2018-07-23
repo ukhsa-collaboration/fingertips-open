@@ -1,0 +1,19 @@
+﻿# Related terms for indicator search
+life expectancy > mortality rate
+asthma > respiratory disease
+falls > hip fractures
+physical activity > obesity, diabetes
+stroke > blood pressure
+alcohol > liver disease
+flu > excess winter deaths, respiratory disease
+deprivation > low income, free school meal, jobseeker
+obesity > physically active, diabetes
+diabetes > obesity, physically active
+excess weight > physically active, obesity
+overweight > physically active, obesity
+mental health > depression, dementia, self-harm
+dementia > depression
+self harm > deliberate injuries, suicide, depression
+suicide > self harm, deliberate injuries, depression
+substance misuse > alcohol, smoking, drug, opiate
+a and e > accident emergency

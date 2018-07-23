@@ -1,0 +1,56 @@
+:host /deep/ #population-info,
+#registered-persons {
+    width: 355px;
+    float: left;
+    margin-top: 6px;
+}
+
+:host /deep/ #population-info .bordered-table {
+    margin-bottom: 15px;
+    width: 100%;
+    float: left;
+}
+
+:host /deep/ #registered-persons td.header,
+#further-info-table td.header {
+    width: 200px;
+    background: #fafafa;
+    padding: 3px 3px 3px 0;
+    vertical-align: top;
+    text-align: right;
+}
+
+#population-info #decile-key {
+    width: 100%;
+}
+
+.practice-label {
+    width: 100%;
+    float: left;
+    text-align: center;
+    font-size: 14px;
+}
+
+#decile-key td {
+    height: 9px;
+    width: 30px;
+    border: 1px solid white;
+    border-top: 2px solid white;
+    border-bottom: none;
+}
+
+#deprivation-table,
+#ethnicity-table {
+    margin-top: 15px;
+}
+
+#deprivation {
+    text-align: center;
+}
+
+.deprivation-label {
+    font-size: 10px;
+    line-height: 10px;
+    color: #666;
+    margin-bottom: 3px;
+}

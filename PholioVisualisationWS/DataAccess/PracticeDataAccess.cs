@@ -56,7 +56,7 @@ namespace PholioVisualisation.DataAccess
  AND t2.AreaTypeId = {6} AND t2.IsCurrent = 1 AND t1.CategoryId = -1";
 
         private const string SqlGetPracticeCodeToBaseDataMapFromParentValueDataMap =
-@"SELECT t1.AreaCode, t1.Value, t1.LowerCI, t1.UpperCI, t1.Count, t1.Denominator
+@"SELECT t1.AreaCode, t1.Value, t1.LowerCI95, t1.UpperCI95, t1.Count, t1.Denominator
  FROM CoreDataSet AS t1 
  INNER JOIN L_Areas AS t2 ON t1.AreaCode = t2.AreaCode
  INNER JOIN L_AreaMapping AS t3 ON t1.AreaCode = t3.ChildLevelGeographyCode
@@ -65,7 +65,7 @@ namespace PholioVisualisation.DataAccess
  AND t2.AreaTypeId = {7} AND t1.AgeID = {8} AND t2.IsCurrent = 1 AND t1.CategoryId = -1";
 
         private const string SqlGetPracticeCodeToBaseDataMap =
-@"SELECT DISTINCT t1.AreaCode, t1.Value, t1.LowerCI, t1.UpperCI, t1.Count, t1.Denominator
+@"SELECT DISTINCT t1.AreaCode, t1.Value, t1.LowerCI95, t1.UpperCI95, t1.Count, t1.Denominator
  FROM CoreDataSet AS t1 
  INNER JOIN L_Areas AS t2 ON t1.AreaCode = t2.AreaCode
  WHERE t1.IndicatorID = {0} AND t1.SexID = {1} AND t1.Value IS NOT NULL
@@ -94,7 +94,7 @@ namespace PholioVisualisation.DataAccess
             {
                 population.Values.Add(new QuinaryPopulationValue
                 {
-                    AgeId = (int)row.ItemArray[0],
+                    AgeId = Convert.ToInt32(row.ItemArray[0]),
                     Value = (double)row.ItemArray[1]
                 });
 
@@ -218,15 +218,15 @@ namespace PholioVisualisation.DataAccess
                     && row.ItemArray[indexCount] != DBNull.Value 
                     && row.ItemArray[indexDenominator] != DBNull.Value)
                 {
-                    data.LowerCI = (double)row.ItemArray[indexLowerCi];
-                    data.UpperCI = (double)row.ItemArray[indexUperCi];
+                    data.LowerCI95 = (double)row.ItemArray[indexLowerCi];
+                    data.UpperCI95 = (double)row.ItemArray[indexUperCi];
                     data.Count = (double) row.ItemArray[indexCount];
                     data.Denominator = (double)row.ItemArray[indexDenominator];
                 }
                 else
                 {
-                    data.LowerCI = ValueData.NullValue;
-                    data.UpperCI = ValueData.NullValue;
+                    data.LowerCI95 = ValueData.NullValue;
+                    data.UpperCI95 = ValueData.NullValue;
                     data.Count = ValueData.NullValue;
                     data.Denominator = ValueData.NullValue;
                 }

@@ -14,21 +14,32 @@
 
 @using (Html.BeginForm("EditProfile", "Profile", FormMethod.Post))
 {
+    @* Profile ID *@
     <div class="row form-group">
         <label class="col-md-3 col-form-label">ID:</label>
         <div class="col-md-4">
             @Html.TextBoxFor(model => model.Id, new { @class = "disabled unselected-domain", @disabled = "disabled" })
         </div>
+        
+        @* Update live *@
+        <div class="col-md-3 pull-right text-right">
+            @Html.ActionLink("Update profile on live site",
+                "ProfileLiveUpdate","LiveUpdate", new { profileId = Model.Id }, new {})
+        </div>
     </div>
+
+    @* URL key *@
     <div class="row form-group">
         <label class="col-md-3 col-form-label">URL key:</label>
-        <div class="col-md-3 pull-right text-right">
-            <input class="btn btn-primary" id="copy-profile" name="action:CopyProfile" type="submit" value="Copy profile"
-                   data-toggle="tooltip" title="Groupings and content items will be copied but not documents" />
-        </div>
         <div class="col-md-4">
             @Html.TextBoxFor(model => model.UrlKey, new { @class = "unselected-domain" })
             @Html.ValidationMessageFor(model => model.UrlKey)
+        </div>
+
+        @* Copy profile button *@
+        <div class="col-md-3 pull-right text-right">
+            <input class="btn btn-primary" id="copy-profile" name="action:CopyProfile" type="submit" value="Copy profile"
+                   data-toggle="tooltip" title="Groupings and content items will be copied but not documents" />
         </div>
     </div>
 

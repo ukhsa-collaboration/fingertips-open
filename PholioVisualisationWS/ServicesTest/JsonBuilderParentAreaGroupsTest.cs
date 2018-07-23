@@ -21,7 +21,7 @@ namespace PholioVisualisation.ServicesTest
             var areaTypes =  new JsonBuilderParentAreaGroups(parameters).GetChildAreaTypeIdToParentAreaTypes();
 
             Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsFalse(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.Ccg));
+            Assert.IsFalse(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPreApr2017));
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace PholioVisualisation.ServicesTest
             var areaTypes = new JsonBuilderParentAreaGroups(parameters).GetChildAreaTypeIdToParentAreaTypes();
 
             Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.Ccg));
+            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPreApr2017));
         }
     }
 }

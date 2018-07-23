@@ -1,20 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Mvc;
-using System.Web.Routing;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace Fpm.MainUI.Controllers
 {
     public class IndicatorNewController : Controller
     {
         private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-      
+
         private ProfileRepository _profileRepository;
         private LookUpsRepository _lookUpsRepository;
 
@@ -33,18 +33,21 @@ namespace Fpm.MainUI.Controllers
 
             var userId = _reader.GetUserByUserName(UserDetails.CurrentUser().Name).Id;
             var permissionIds = _reader.GetUserGroupPermissionsByUserId(userId).Select(x => x.ProfileId);
-            var model = new ProfileIndex { Profiles = 
+            var model = new ProfileIndex
+            {
+                Profiles =
                 _reader.GetProfiles()
                 .OrderBy(x => x.Name)
-                .Where(x => permissionIds.Contains(x.Id)) };
+                .Where(x => permissionIds.Contains(x.Id))
+            };
 
             var listOfProfiles = CommonUtilities.GetOrderedListOfProfiles(model.Profiles);
             ViewBag.listOfProfiles = listOfProfiles;
 
             var domains = new ProfileMembers();
             var defaultProfile = listOfProfiles.FirstOrDefault();
-            
-            ViewBag.listOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile,_profileRepository);
+
+            ViewBag.listOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile, _profileRepository);
 
             ViewBag.selectedSex = new SelectList(_lookUpsRepository.GetSexes(), "SexID", "Description");
 
@@ -64,7 +67,7 @@ namespace Fpm.MainUI.Controllers
             ViewBag.selectedUnitType = new SelectList(_lookUpsRepository.GetUnits(), "Id", "Label");
 
             ViewBag.selectedDenominatorType = new SelectList(_lookUpsRepository.GetDenominatorTypes(), "Id", "Name");
-            
+
             return View(properties);
         }
 
@@ -72,10 +75,10 @@ namespace Fpm.MainUI.Controllers
         public JsonResult ReloadDomains(string selectedProfile)
         {
             var model = new ProfileMembers
-                {
-                    UrlKey = selectedProfile,
-                    Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.CountyAndUnitaryAuthority, _profileRepository)
-                };
+            {
+                UrlKey = selectedProfile,
+                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.CountyAndUnitaryAuthority, _profileRepository)
+            };
 
             IList<GroupingMetadata> groupingMetadatas = model.Profile.GroupingMetadatas;
 
@@ -87,18 +90,18 @@ namespace Fpm.MainUI.Controllers
         public JsonResult SaveNewIndicator(int? selectedDecimalPlaces, int? selectedTargetId, string selectedProfileId, string selectedDomain,
             int selectedAreaType, int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod,
             double selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, double selectedCiConfidenceLevel, int selectedPolarityType, int selectedUnitType,
+            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
             int selectedDenominatorType, string userMTVChanges, int startYear, int endYear,
-            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange)
+            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange, DateTime? latestChangeTimestamp)
         {
             var profileId = _reader.GetProfileDetails(selectedProfileId/*urlkey*/).Id;
             var groupId = int.Parse(selectedDomain);
 
             var newIndicatorId = SaveUserMTVChanges(profileId, groupId, selectedAreaType, selectedSex,
                 selectedAge, selectedComparator, selectedComparatorMethod, selectedComparatorConfidence, selectedYearType,
-                selectedYearRange, selectedValueType, selectedCiMethodType, selectedCiConfidenceLevel, selectedPolarityType,
+                selectedYearRange, selectedValueType, selectedCiMethodType, selectedPolarityType,
                 selectedUnitType, selectedDenominatorType, Uri.UnescapeDataString(userMTVChanges), startYear, endYear,
-                startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId);
+                startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId, latestChangeTimestamp);
 
             return Json(newIndicatorId);
         }
@@ -111,17 +114,17 @@ namespace Fpm.MainUI.Controllers
         }
 
         private int SaveUserMTVChanges(int profileId, int groupId, int selectedAreaType,
-            int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod, 
-            double selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType, 
-            int selectedCiMethodType, double selectedCiConfidenceLevel, int selectedPolarityType, int selectedUnitType, 
-            int selectedDenominatorType, string userMTVChanges, int startYear, int endYear, 
-            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange, int? selectedDecimalPlaces, 
-            int? selectedTargetId)
-        {   
+            int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod,
+            double selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType,
+            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
+            int selectedDenominatorType, string userMTVChanges, int startYear, int endYear,
+            int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange, int? selectedDecimalPlaces,
+            int? selectedTargetId, DateTime? latestChangeTimestamp)
+        {
             var properties = _reader.GetIndicatorMetadataTextProperties();
 
             var nextIndicatorId = _profileRepository.GetNextIndicatorId();
-           
+
             if (string.IsNullOrWhiteSpace(userMTVChanges) == false)
             {
                 var indicatorMetadataTextItems = new IndicatorMetadataTextParser().Parse(userMTVChanges);
@@ -129,12 +132,12 @@ namespace Fpm.MainUI.Controllers
                 new IndicatorMetadataTextCreator(_profileRepository).CreateNewIndicatorTextValues(
                     groupId, indicatorMetadataTextItems, properties, nextIndicatorId, _userName);
 
-                _profileRepository.CreateGroupingAndMetaData(profileId, groupId,
+                _profileRepository.CreateGroupingAndMetadata(profileId, groupId,
                     nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator, selectedComparatorMethod,
                     selectedComparatorConfidence, selectedYearType, selectedYearRange, selectedValueType, selectedCiMethodType,
-                    selectedCiConfidenceLevel, selectedPolarityType, selectedUnitType, selectedDenominatorType, startYear, endYear,
-                    startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces,
-                    selectedTargetId);
+                    selectedPolarityType, selectedUnitType, selectedDenominatorType, startYear, endYear,
+                    startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, _userName, selectedDecimalPlaces,
+                    selectedTargetId, latestChangeTimestamp);
             }
 
             return nextIndicatorId;
@@ -142,8 +145,8 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _profileRepository = new ProfileRepository();
-            _lookUpsRepository = new LookUpsRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
+            _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
         }
 
         protected override void OnActionExecuted(ActionExecutedContext filterContext)

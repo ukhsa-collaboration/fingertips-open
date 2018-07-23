@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Models
+namespace IndicatorsUI.MainUI.Models
 {
     public static class TitleFont
     {
@@ -19,7 +19,7 @@ namespace Profiles.MainUI.Models
             var length = s.Length;
             if (length > 25)
             {
-                return "font-size:" + Math.Round(95.0 / length, 1) + "em";
+                return "font-size:" + Math.Round(95.0 / length, 1) + "em !important;";
             }
 
             return string.Empty;

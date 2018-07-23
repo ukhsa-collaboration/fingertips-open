@@ -31,5 +31,10 @@ namespace Fpm.MainUISeleniumTest
         {
             Assert.AreEqual(expectedText, webElement.Text);
         }
+
+        public static void AssertElementTextIsEqual(string expectedText, string webElementText)
+        {
+            Assert.AreEqual(expectedText, webElementText);
+        }
     }
 }

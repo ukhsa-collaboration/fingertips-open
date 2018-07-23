@@ -61,11 +61,14 @@ function documentReady() {
         };
     });
 
-    $('.area-detail-link').live('click', function () {
+    $('.area-detail-link').on('click', function () {
         loading();
         var areaCode = $(this).text(),
             searchAreaTypeId = $('#areaTypeId').val(),
             searchText = $('#searchText').val();
+
+        // Turn off the click event to avoid multiple requests
+        $('.area-detail-link').off('click');
 
         $.ajax({
             cache: false,
@@ -84,6 +87,9 @@ function documentReady() {
             },
             error: function (xhr, error) {
                 loadingFinished();
+
+                // Failure. Turn on the click event, so the click event can be triggered again
+                $('.area-detail-link').on('click');
             }
         });
     });

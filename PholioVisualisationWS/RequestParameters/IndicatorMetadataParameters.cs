@@ -19,7 +19,7 @@ namespace PholioVisualisation.RequestParameters
         public bool IncludeDefinition { get; set; }
         public bool IncludeSystemContent { get; set; }
 
-        public List<int> RestrictResultsToProfileIds { get; set; }
+        public IList<int> RestrictResultsToProfileIds { get; set; }
 
         public IndicatorMetadataParameters(NameValueCollection parameters)
             : base(parameters)
@@ -28,7 +28,7 @@ namespace PholioVisualisation.RequestParameters
             IndicatorIds = ParseIntList(DataParameters.ParameterIndicatorIds, ',');
             IncludeDefinition = ParseYesOrNo(ParameterIncludeDefinition, false);
             IncludeSystemContent = ParseYesOrNo(ParameterIncludeSystemContent, false);
-            RestrictResultsToProfileIds = ParseIntList(ParameterNames.RestrictToProfileId, ',');
+            RestrictResultsToProfileIds = new List<int>();
         }
 
         public override bool AreValid

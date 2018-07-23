@@ -6,12 +6,41 @@ using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class ProfileMenuHelper
+    public interface IProfileMenuHelper
     {
+        SelectList GetProfilesUserHasPermissionToExcludingSpecialProfiles(UserDetails user);
+        SelectList GetProfilesUserHasPermissionToIncludingSpecialProfiles(UserDetails user);
+        SelectList GetAllProfiles(ProfilesReader profilesReader);
+    }
+
+    public class ProfileMenuHelper : IProfileMenuHelper
+    {
+        public static SelectList GetProfileListForCurrentUser()
+        {
+            var user = UserDetails.CurrentUser();
+            var menuHelper = new ProfileMenuHelper();
+            if (user.IsAdministrator)
+            {
+                return menuHelper.GetProfilesUserHasPermissionToIncludingSpecialProfiles(user);
+            }
+            return menuHelper.GetProfilesUserHasPermissionToExcludingSpecialProfiles(user);
+        }
+
         public SelectList GetProfilesUserHasPermissionToExcludingSpecialProfiles(UserDetails user)
         {
             var profiles = user.GetProfilesUserHasPermissionsTo()
                 .Where(x => x.Id != ProfileIds.ArchivedIndicators & x.Id != ProfileIds.UnassignedIndicators)
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            AddDefaultOption(profiles);
+
+            return GetSelectList(profiles);
+        }
+
+        public SelectList GetProfilesUserHasPermissionToIncludingSpecialProfiles(UserDetails user)
+        {
+            var profiles = user.GetProfilesUserHasPermissionsTo()
                 .OrderBy(x => x.Name)
                 .ToList();
 

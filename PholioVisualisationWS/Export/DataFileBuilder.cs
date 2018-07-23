@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.Analysis;
+﻿using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export.File;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.Export
 {
@@ -53,8 +53,6 @@ namespace PholioVisualisation.Export
             var singleGroupingProvider = new SingleGroupingProvider(groupDataReader, null);
 
             var excludedCategoryTypeIds = CategoryTypeIdsExcludedForExport.Ids;
-            var includeSortableTimePeriod = _parameters.IncludeSortableTimePeriod;
-
             var indicatorMetadataTextOption = GetIndicatorMetadataTextOption(parameters.ProfileId);
 
             var childAreaTypeId = parameters.ChildAreaTypeId;
@@ -90,7 +88,7 @@ namespace PholioVisualisation.Export
                 var categoryComparer = _comparer as ICategoryComparer;
 
                 var indicatorMetadata = _indicatorMetadataProvider.GetIndicatorMetadata(
-                    new List<Grouping> {grouping}, indicatorMetadataTextOption).First();
+                    new List<Grouping> { grouping }, indicatorMetadataTextOption).First();
 
                 var timePeriodFormatter = new TimePeriodTextFormatter(indicatorMetadata);
                 var timePeriods = grouping.GetTimePeriodIterator(indicatorMetadata.YearType).TimePeriods;
@@ -108,13 +106,12 @@ namespace PholioVisualisation.Export
                         isLastPeriod = true;
                     }
                     string timeString = timePeriodFormatter.Format(timePeriod);
-                    int? sortableTimePeriod = includeSortableTimePeriod ?
-                        timePeriod.ToSortableNumber() : (int?)null;
+                    int sortableTimePeriod = timePeriod.ToSortableNumber();
 
                     try
                     {
                         // England data
-                        var englandCoreDatas = groupDataReader.GetDataIncludingInequalities(grouping, timePeriod,
+                        var englandCoreDatas = groupDataReader.GetDataIncludingInequalities(indicatorId, timePeriod,
                             excludedCategoryTypeIds, england.Code);
                         var englandCoreDatasForComparison =
                             englandCoreDatas.Where(x => x.CategoryTypeId == CategoryTypeIds.Undefined).ToList();
@@ -143,14 +140,14 @@ namespace PholioVisualisation.Export
                                     coreData.YearRange, trendDataList);
                             }
 
+                            // Write England data
                             fileWriter.WriteData(indicatorMetadata, coreData, timeString, null, trendMarkerResult,
-                                toEnglandSignificance,
-                                Significance.None);
+                                toEnglandSignificance, Significance.None, sortableTimePeriod);
                         }
                         coreDataCollector.AddEnglandDataList(englandCoreDatas);
 
                         // Subnational data
-                        var parentCoreDatas = groupDataReader.GetDataIncludingInequalities(grouping, timePeriod,
+                        var parentCoreDatas = groupDataReader.GetDataIncludingInequalities(indicatorId, timePeriod,
                             excludedCategoryTypeIds, _areaHelper.ParentAreaCodes);
                         var parentCoreDatasForComparison =
                             parentCoreDatas.Where(x => x.CategoryTypeId == CategoryTypeIds.Undefined).ToList();
@@ -175,12 +172,12 @@ namespace PholioVisualisation.Export
                             }
 
                             fileWriter.WriteData(indicatorMetadata, coreData, timeString, england, trendMarkerResult,
-                                toEnglandSignificance, Significance.None);
+                                toEnglandSignificance, Significance.None, sortableTimePeriod);
                         }
                         coreDataCollector.AddParentDataList(parentCoreDatas);
 
                         // Child data
-                        var childCoreDatas = groupDataReader.GetDataIncludingInequalities(grouping, timePeriod,
+                        var childCoreDatas = groupDataReader.GetDataIncludingInequalities(indicatorId, timePeriod,
                             excludedCategoryTypeIds, _areaHelper.ChildAreaCodes);
                         var childAreaCodeToParentAreaMap = _areaHelper.ChildAreaCodeToParentAreaMap;
 
@@ -371,17 +368,16 @@ namespace PholioVisualisation.Export
                 "Indicator ID", "Indicator Name", "Parent Code", "Parent Name",
                 "Area Code", "Area Name", "Area Type", "Sex", "Age",
                 "Category Type", "Category",
-                "Time period", "Value", "Lower CI limit", "Upper CI limit",
+                "Time period", "Value",
+                "Lower CI 95.0 limit", "Upper CI 95.0 limit",
+                "Lower CI 99.8 limit", "Upper CI 99.8 limit",
                 "Count", "Denominator",
                 "Value note", "Recent Trend",
                 "Compared to England value or percentiles",
-                "Compared to subnational parent value or percentiles"
+                "Compared to subnational parent value or percentiles",
+                "Time period Sortable",
+                "New data"
             };
-
-            if (_parameters.IncludeSortableTimePeriod)
-            {
-                headings.Add("Time period Sortable");
-            }
 
             csvWriter.AddHeader(headings.ToArray());
             var bytes = csvWriter.WriteAsBytes();

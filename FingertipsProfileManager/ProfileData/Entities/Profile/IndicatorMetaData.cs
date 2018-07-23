@@ -8,7 +8,6 @@ namespace Fpm.ProfileData.Entities.Profile
         public int IndicatorId { get; set; }
         public int DenominatorTypeId { get; set; }
         public int CIMethodId { get; set; }
-        public double ConfidenceLevel { get; set; }
         public bool AlwaysShowSpineChart { get; set; }
 
         [Display(Name = "ValueTypeId")]
@@ -22,5 +21,8 @@ namespace Fpm.ProfileData.Entities.Profile
         public int? TargetId { get; set; }
         public DateTime DateEntered { get; set; }
         public int DisclosureControlId { get; set; }
+        public DateTime? LatestChangeTimestampOverride { get; set; }
+
+
     }
 }

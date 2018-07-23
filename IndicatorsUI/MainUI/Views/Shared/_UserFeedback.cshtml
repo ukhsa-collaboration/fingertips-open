@@ -1,0 +1,40 @@
+﻿@using IndicatorsUI.DataAccess
+@using IndicatorsUI.MainUI.Models
+    <script type="text/javascript">
+    //<![CDATA[
+        isEnvironmentLive = @JsHelper.GetJsBool(AppConfig.Instance.IsEnvironmentLive);
+    //]]</script>
+    <div id="footer-feedback-form" class="container">
+        <div id="footer-feedback-form-divder"></div>
+        <div><a href="#" onclick="return closeFeedback()">Close</a></div>
+        <div id="footer-feedback-error-summary"></div>
+        <div class="title">Help us improve these profiles</div>
+        <form id="user-feedback-form">
+            <div class="form-group">
+                <label for="what-were-you-doing">What were you doing?</label>
+                <input type="text" class="form-control" id="what-were-you-doing">
+            </div>
+
+            <div class="form-group">
+                <label for="what-went-wrong">What went wrong?</label>
+                <input type="text" class="form-control" id="what-went-wrong">
+            </div>
+            <div class="form-group">
+                <label for="email-for-user-feedback">Email address (if required for reply)</label>
+                <input type="text" class="form-control" id="email-for-user-feedback">
+            </div>
+            <br/>
+        </form>
+        <div class="form-group">
+            <button type="button" id="send-feedback-btn" onclick="sendFeedback()">Send</button>
+        </div>
+
+    </div>
+    <div id="footer-feedback" class="row">
+        <div class="col-sm"></div>
+        <div id="feedback-message" class="col-sm">
+            <a href="#" onclick="return openFeedback()">Is there anything wrong with this page?</a>
+        </div>
+        <div class="col-sm"></div>
+    </div>
+    <div id="feedback-footer-divider" class="row"></div>

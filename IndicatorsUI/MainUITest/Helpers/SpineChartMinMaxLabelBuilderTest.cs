@@ -1,8 +1,8 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Helpers;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Helpers;
+using IndicatorsUI.MainUI.Models;
 
 namespace IndicatorsUI.MainUITest.Helpers
 {

@@ -11,7 +11,8 @@ namespace PholioVisualisation.ServiceActions
 
         public object GetResponse(int profileId, int groupId, int childAreaTypeId, string areaCode)
         {
-            return new LongerLivesAreaDetailsBuilder().GetAreaDetails(profileId, groupId, childAreaTypeId, areaCode);
+            return new LongerLivesAreaDetailsBuilder()
+                .GetAreaDetails(profileId, groupId, childAreaTypeId, areaCode);
         }
     }
 }

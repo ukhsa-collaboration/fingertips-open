@@ -16,8 +16,10 @@ namespace Fpm.ProfileData.Entities.Core
 
         public double? Count { get; set; }
         public double Value { get; set; }
-        public double LowerCi { get; set; }
-        public double UpperCi { get; set; }
+        public double? LowerCI95 { get; set; }
+        public double? UpperCI95 { get; set; }
+        public double? LowerCI99_8 { get; set; }
+        public double? UpperCI99_8 { get; set; }
         public double Denominator { get; set; }
         public double Denominator_2 { get; set; }
         public int ValueNoteId { get; set; }

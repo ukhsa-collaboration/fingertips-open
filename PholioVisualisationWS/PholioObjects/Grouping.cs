@@ -40,16 +40,22 @@ namespace PholioVisualisation.PholioObjects
             ComparatorData = templateGrouping.ComparatorData;
         }
 
-        [JsonIgnore]
+        /// <summary>
+        /// Entity ID
+        /// </summary>
+        [JsonProperty]
         public int GroupingId { get; set; }
 
+        /// <summary>
+        /// Domain ID
+        /// </summary>
         [JsonProperty]
         public int GroupId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int SexId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int AgeId { get; set; }
 
         [JsonIgnore]
@@ -58,16 +64,16 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public Age Age { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int AreaTypeId { get; set; }
 
         [JsonProperty]
         public int ComparatorId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int IndicatorId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int PolarityId { get; set; }
 
         [JsonProperty(PropertyName = "ComparatorMethodId")]
@@ -76,31 +82,31 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty(PropertyName = "SigLevel")]
         public double ComparatorConfidence { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int? ComparatorTargetId { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int Sequence { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int BaselineYear { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int BaselineQuarter { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int BaselineMonth { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int DataPointYear { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int DataPointQuarter { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int DataPointMonth { get; set; }
 
-        [JsonIgnore]
+        [JsonProperty]
         public int YearRange { get; set; }
 
         [JsonProperty(PropertyName = "Period")]

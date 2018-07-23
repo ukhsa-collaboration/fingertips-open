@@ -9,7 +9,7 @@ namespace Fpm.MainUI.Models
         // Filtering-related properties
         public string ProfileName { get; set; }
         public string DomainName { get; set; }
-        public int DomainId { get; set; }
+        public int DomainIndex { get; set; }
         public int AreaTypeId { get; set; }
 
         public IEnumerable<GroupingPlusName> IndicatorsThatCantBeTransferred { get; set; }

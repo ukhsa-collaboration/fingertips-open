@@ -46,7 +46,21 @@ namespace PholioVisualisation.DataConstruction
                 }
             }
 
+            SetSequences();
+
             return GroupRoots;
+        }
+
+        /// <summary>
+        /// Set the sequence of each group root in the list
+        /// </summary>
+        private void SetSequences()
+        {
+            var sequence = 1;
+            foreach (var groupRoot in GroupRoots)
+            {
+                groupRoot.Sequence = sequence++;
+            }
         }
 
         private void CreateNewRoot(List<Grouping> groupingsWithSameIndicatorIdSexIdAndAgeId,

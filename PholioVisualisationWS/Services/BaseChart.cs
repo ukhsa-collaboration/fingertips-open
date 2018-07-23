@@ -11,8 +11,6 @@ namespace PholioVisualisation.Services
         protected static Font LabelFont = new Font("Verdana", 8F, FontStyle.Regular, GraphicsUnit.Point);
         protected static Color GridColor = Color.FromArgb(64, 64, 64, 64);
         protected static Color NonRagDarkBlue = Color.FromArgb(85, 85, 230);
-        protected static Color NonRagLightBlue = Color.FromArgb(119, 119, 183);
-        protected static Color ErrorBarColor = Color.FromArgb(55, 55, 55);
         protected static Color InequalityRangeColor = Color.FromArgb(160, 160, 160);
 
         protected Chart Chart = new Chart();

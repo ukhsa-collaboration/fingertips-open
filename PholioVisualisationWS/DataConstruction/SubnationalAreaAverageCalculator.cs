@@ -26,7 +26,13 @@ namespace PholioVisualisation.DataConstruction
                 childAreas.Select(x => x.Code).ToArray());
 
             var averageCalculator = AverageCalculatorFactory.New(childDataList, metadata);
-            return averageCalculator.Average;
+            var average = averageCalculator.Average;
+            if (average != null)
+            {
+                average.AreaCode = subnationalArea.Code;
+            }
+
+            return average;
         }
 
     }

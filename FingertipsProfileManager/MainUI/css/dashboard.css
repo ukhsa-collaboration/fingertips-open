@@ -499,3 +499,7 @@ a.sortDesc {
 .mce-tinymce {
     margin-bottom: 10px;
 }
+
+.max-width {
+    width: 100% !important;
+}

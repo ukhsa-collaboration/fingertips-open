@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DataAccess;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Skins;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Skins;
 using System.Collections.Generic;
 
 namespace IndicatorsUI.DataAccessTest
@@ -10,8 +10,8 @@ namespace IndicatorsUI.DataAccessTest
     public class ProfileReaderTest
     {
         private const string ProfileUrlKey = ProfileUrlKeys.Phof;
-        private const string TestHostPhofUrl = "testphof.phe.org.uk";
-        private const string LiveHostPhofUrl = "www.phoutcomes.info";
+        private const string TestHostFingertipsUrl = "testprofiles.phe.org.uk";
+        private const string LiveHostFingertipsUrl = "fingertips.phe.org.uk";
         private const string TestHostLongerLivesUrl = "testhealthierlives.phe.org.uk";
         private const string LiveHostLongerLivesUrl = "healthierlives.phe.org.uk";
         private const string TestEnvironment = "Test";
@@ -46,20 +46,20 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetProfileDetailsArePdfs()
         {
-            Assert.IsTrue(PhofProfile().ArePdfs);
+            Assert.IsTrue(SpecificProfile(ProfileUrlKeys.HealthProfiles).ArePdfs);
             Assert.IsFalse(SpecificProfile(ProfileUrlKeys.LongerLives).ArePdfs);
         }
 
         [TestMethod]
         public void TestGetProfileDetailsExtraJavaScriptFilesString()
         {
-            AssertContains("+map", PhofProfile().ExtraJavaScriptFilesString);
+            AssertContains("PageMap.js", PhofProfile().ExtraJavaScriptFilesString);
         }
 
         [TestMethod]
         public void TestGetProfileDetailsExtraCssFilesString()
         {
-            AssertContains("+map", PhofProfile().ExtraCssFilesString);
+            AssertContains("PageMap.css", PhofProfile().ExtraCssFilesString);
         }
 
         [TestMethod]
@@ -114,37 +114,37 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetSkinFromName()
         {
-            var skin = ReaderFactory.GetProfileReader().GetSkinFromName(SkinNames.Phof);
-            AssertPhofSkinProperties(skin);
+            var skin = ReaderFactory.GetProfileReader().GetSkinFromName(SkinNames.Core);
+            AssertCoreSkinProperties(skin);
         }
 
         [TestMethod]
         public void TestGetSkinFromId()
         {
-            var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Phof);
-            AssertPhofSkinProperties(skin);
+            var skin = ReaderFactory.GetProfileReader().GetSkinFromId(SkinIds.Core);
+            AssertCoreSkinProperties(skin);
         }
 
         [TestMethod]
         public void TestGetSkinFromTestHost()
         {
-            var skin = GetSkin(TestHostPhofUrl, TestEnvironment);
-            AssertPhofSkinProperties(skin);
+            var skin = GetSkin(TestHostFingertipsUrl, TestEnvironment);
+            AssertCoreSkinProperties(skin);
         }
 
         [TestMethod]
         public void TestGetSkinFromLiveHost()
         {
-            var skin = GetSkin(LiveHostPhofUrl, LiveEnvironment);
-            AssertPhofSkinProperties(skin);
+            var skin = GetSkin(LiveHostFingertipsUrl, LiveEnvironment);
+            AssertCoreSkinProperties(skin);
         }
 
-        private static void AssertPhofSkinProperties(Skin skin)
+        private static void AssertCoreSkinProperties(Skin skin)
         {
-            Assert.AreEqual(SkinNames.Phof, skin.Name);
-            Assert.AreEqual("Phof", skin.PartialViewFolder);
-            AssertContains("outcomes", skin.TemplateProfileUrlKey);
-            AssertContains("outcomes", skin.MetaDescription);
+            Assert.AreEqual(SkinNames.Core, skin.Name);
+            Assert.AreEqual("FingertipsLandingPage", skin.PartialViewFolder);
+            Assert.AreEqual(ProfileUrlKeys.Populations, skin.TemplateProfileUrlKey);
+            AssertContains("Fingertips", skin.MetaDescription);
             AssertValidGoogleAnalyticsCode(skin.GoogleAnalyticsKey);
         }
 
@@ -181,8 +181,8 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetSkinTitle()
         {
-            var skin = GetSkin(LiveHostPhofUrl, LiveEnvironment);
-            AssertContains("Outcomes", skin.Title);
+            var skin = GetSkin(LiveHostFingertipsUrl, LiveEnvironment);
+            AssertContains("Health", skin.Title);
         }
 
         [TestMethod]
@@ -216,7 +216,7 @@ namespace IndicatorsUI.DataAccessTest
         public void TestGetDomainIds()
         {
             var profileReader = ReaderFactory.GetProfileReader();
-            var domainIds = profileReader.GetDomainIds(ProfileIds.Diabetes);
+            var domainIds = profileReader.GetDomainIds(ProfileIds.DiabetesLongerLives);
             Assert.IsTrue(domainIds.Count > 0);
         }
 
@@ -240,7 +240,7 @@ namespace IndicatorsUI.DataAccessTest
             var reader = Reader();
             Assert.IsNull(reader.GetProfileDetails(ProfileIds.Phof).LongerLivesProfileDetails);
 
-            var details = reader.GetProfileDetails(ProfileIds.Diabetes).LongerLivesProfileDetails;
+            var details = reader.GetProfileDetails(ProfileIds.DiabetesLongerLives).LongerLivesProfileDetails;
 
             Assert.IsNotNull(details);
             Assert.IsNotNull(details.Title);

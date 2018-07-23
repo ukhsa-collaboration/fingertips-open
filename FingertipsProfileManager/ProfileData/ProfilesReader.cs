@@ -9,10 +9,22 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Fpm.ProfileData.Repositories;
 
 namespace Fpm.ProfileData
 {
-    public class ProfilesReader : BaseReader
+    public interface IProfilesReader
+    {
+        IList<int> GetGroupingIds(int profileId);
+        IList<int> GetGroupingIndicatorIds(IList<int> groupIds);
+
+        IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValuesByIndicatorIdsAndProfileId(
+            IList<int> indicatorIds, int profileId);
+
+        ProfileDetails GetProfileDetailsByProfileId(int profileId);
+    }
+
+    public class ProfilesReader : BaseReader, IProfilesReader
     {
         public const int MaxAreaResults = 1000;
 
@@ -101,6 +113,14 @@ namespace Fpm.ProfileData
             return q.List<Grouping>();
         }
 
+        public IList<int> GetGroupingIndicatorIds(IList<int> groupIds)
+        {
+            return CurrentSession.CreateCriteria<Grouping>()
+                .Add(Restrictions.In("GroupId", groupIds.ToList()))
+                .SetProjection(Projections.Property("IndicatorId"))
+                .List<int>();
+        }
+
         public IList<int> GetGroupingIds(int profileId)
         {
             IQuery q = CurrentSession.CreateQuery("select g.id from GroupingMetadata g where g.ProfileId = :profileId");
@@ -143,9 +163,22 @@ namespace Fpm.ProfileData
 
         public IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds)
         {
+            if (groupIds.Any() == false)
+            {
+                return new List<GroupingMetadata>();
+            }
+
             IQuery q = CurrentSession.CreateQuery("from GroupingMetadata g where g.GroupId in (:groupIds) order by g.Sequence");
             q.SetParameterList("groupIds", groupIds);
             return q.List<GroupingMetadata>();
+        }
+
+        public IList<int> GetGroupingMetadataGroupIdListByProfileId(int profileId)
+        {
+            return CurrentSession.CreateCriteria<GroupingMetadata>()
+                .Add(Restrictions.Eq("ProfileId", profileId))
+                .SetProjection(Projections.Property("GroupId"))
+                .List<int>();
         }
 
         public GroupingMetadata GetGroupingMetadata(int groupId)
@@ -180,6 +213,25 @@ namespace Fpm.ProfileData
                 .Add(Restrictions.Like("IndicatorId", indicatorId))
                 .Add(Restrictions.IsNull("ProfileId"))
              .List<IndicatorMetadataTextValue>();
+        }
+
+        public IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValuesByProfileId(int profileId)
+        {
+            return CurrentSession.CreateCriteria<IndicatorMetadataTextValue>()
+                .Add(Restrictions.Eq("ProfileId", profileId))
+                .List<IndicatorMetadataTextValue>();
+        }
+
+        public IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValuesByIndicatorIdsAndProfileId(
+            IList<int> indicatorIds, int profileId)
+        {
+            return CurrentSession.CreateCriteria<IndicatorMetadataTextValue>()
+                .Add(Restrictions.In("IndicatorId", indicatorIds.ToList()))
+                .Add(Restrictions.Disjunction()
+                    .Add(Restrictions.Eq("ProfileId", profileId))
+                    .Add(Restrictions.Eq("ProfileId", null))
+                )
+                .List<IndicatorMetadataTextValue>();
         }
 
         public IList GetIndicatorDefaultTextValues(int indicatorId)
@@ -348,6 +400,13 @@ namespace Fpm.ProfileData
 
         }
 
+        public virtual CategoryType GetCategoryType(int categoryTypeId)
+        {
+            return CurrentSession.CreateCriteria <CategoryType>()
+                .Add(Restrictions.Eq("Id", categoryTypeId))
+                .UniqueResult<CategoryType>();
+        }
+
         public virtual IList<Category> GetCategoriesByCategoryTypeId(int categoryTypeId)
         {
             return CurrentSession.CreateCriteria<Category>()
@@ -375,7 +434,7 @@ namespace Fpm.ProfileData
 
             if (areaTypeId.HasValue)
             {
-                criteria.Add(Restrictions.In("AreaTypeId", new AreaTypeIdSplitter(areaTypeId.Value).Ids));
+                criteria.Add(Restrictions.In("AreaTypeId", GetComponentAreaTypeIds(areaTypeId.Value).ToArray()));
             }
 
             var areas = criteria.AddOrder(Order.Asc("AreaTypeId"))
@@ -482,7 +541,7 @@ namespace Fpm.ProfileData
             q.SetParameter("sexId", groupingPlusNames.SexId);
             q.SetParameter("ageId", groupingPlusNames.AgeId);
             q.SetParameter("yearRange", groupingPlusNames.YearRange);
-            q.SetParameterList("areaTypeIds", new AreaTypeIdSplitter(new List<int> { groupingPlusNames.AreaTypeId }).Ids);
+            q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(groupingPlusNames.AreaTypeId));
             var rows = q.List<object[]>();
 
             List<TimePeriod> periods = new List<TimePeriod>();
@@ -516,6 +575,13 @@ namespace Fpm.ProfileData
             q.SetParameter("contentId", contentId);
             ContentItem contentItem = q.UniqueResult<ContentItem>();
             return contentItem;
+        }
+
+        public IList<ContentItem> GetContentItems(IList<int> contentIds)
+        {
+            IQuery q = CurrentSession.CreateQuery("from ContentItem fc where fc.Id in (:contentIds)");
+            q.SetParameterList("contentIds", contentIds);
+            return q.List<ContentItem>();
         }
 
         public ContentItem GetContentItem(string contentKey, int profileId)
@@ -589,7 +655,7 @@ namespace Fpm.ProfileData
             .TransformUsing(Transformers.AliasToBean<Document>())
             .List<Document>();
 
-            return documents;
+            return documents.OrderByDescending(x => x.UploadedOn).ToList();
         }
 
         public Document GetDocumentWithoutFileData(int id)
@@ -601,6 +667,19 @@ namespace Fpm.ProfileData
             .Select(projectionList)
             .TransformUsing(Transformers.AliasToBean<Document>())
             .SingleOrDefault<Document>();
+
+            return doc;
+        }
+
+        public Document GetDocumentWithFileData(int id)
+        {
+            ProjectionList projectionList = GetDocumentProjectionListWithFileData();
+
+            var doc = CurrentSession.QueryOver<Document>()
+                .Where(d => d.Id == id)
+                .Select(projectionList)
+                .TransformUsing(Transformers.AliasToBean<Document>())
+                .SingleOrDefault<Document>();
 
             return doc;
         }
@@ -626,6 +705,19 @@ namespace Fpm.ProfileData
                 .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
                 .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
                 .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
+                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
+                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
+        }
+
+        private ProjectionList GetDocumentProjectionListWithFileData()
+        {
+            Document documentTypeCast = null;
+
+            return Projections.ProjectionList()
+                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
+                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
+                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
+                .Add(Projections.Property<Document>(x => x.FileData).WithAlias(() => documentTypeCast.FileData))
                 .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
                 .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
         }
@@ -657,6 +749,12 @@ namespace Fpm.ProfileData
             IQuery q = CurrentSession.CreateQuery("from UserGroupPermissions ugp where ugp.ProfileId = :profileid");
             q.SetParameter("profileid", profileId);
             return q.List<UserGroupPermissions>();
+        }
+
+        private IList<int> GetComponentAreaTypeIds(int areaTypeId)
+        {
+            return new AreaTypeIdSplitter(new AreaTypeRepository())
+                .GetComponentAreaTypeIds(areaTypeId);
         }
     }
 }

@@ -17,6 +17,13 @@ namespace PholioVisualisation.PholioObjectsTest
         }
 
         [TestMethod]
+        public void TestGetAreaCodeFromNeighbourAreaCode()
+        {
+            var code = NearestNeighbourArea.GetAreaCodeFromNeighbourAreaCode("nn-1-a");
+            Assert.AreEqual("a", code);
+        }
+
+        [TestMethod]
         public void TestNeighbourAreaCodes()
         {
             var code = NearestNeighbourArea.CreateAreaCode(1, "a");

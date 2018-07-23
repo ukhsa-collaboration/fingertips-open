@@ -45,6 +45,12 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             Assert.IsFalse(html.Contains("Acute"), "Results for acute trust not expected");
         }
 
+        [TestMethod]
+        public void CheckSearchFindsIndicators()
+        {
+            CheckSearchFindsSomeIndicators(driver, "smoking");
+        }
+
         public static void CheckSearchFindsSomeIndicators(IWebDriver driver, string searchText)
         {
             new NavigateTo(driver).FingertipsIndicatorSearchResults(searchText);

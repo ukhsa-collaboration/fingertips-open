@@ -10,30 +10,16 @@ using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderAreaValues : JsonBuilderBase
+    public class JsonBuilderAreaValues 
     {
         private AreaValuesParameters _parameters;
 
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
         private IProfileReader profileReader = ReaderFactory.GetProfileReader();
 
-        public JsonBuilderAreaValues(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new AreaValuesParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
-
         public JsonBuilderAreaValues(AreaValuesParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var values = GetValues();
-            return JsonConvert.SerializeObject(values);
         }
 
         public IList<CoreDataSet> GetValues()

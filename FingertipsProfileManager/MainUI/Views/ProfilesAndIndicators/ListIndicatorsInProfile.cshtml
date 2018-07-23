@@ -1,0 +1,120 @@
+﻿@using Fpm.MainUI
+@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.Models.IndicatorGridModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Profiles & indicators";
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+}
+
+<link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
+<script src="@(AppConfig.JsPath)jquery.watermark.min.js" type="text/javascript"></script>
+
+<script src="@(AppConfig.JsPath)PageProfilesAndIndicators.js" type="text/javascript"></script>
+<script src="@(AppConfig.JsPath)PageCoreData.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+    FT = {
+        model: {
+            profileId: @Model.Profile.Id,
+            areaTypeId: @Model.SelectedAreaTypeId
+        }
+    };
+</script>
+
+<div class="standardWidth">
+
+    @using (Html.BeginForm("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators", FormMethod.Get, new { id = "IndicatorManagementForm" }))
+    {
+        <div class="subheading clearfix">
+            <h2 style="float: left;">Profiles & indicators</h2>
+
+            @if (Model.Profile.IsProfileViewable)
+            {
+                <div class="right-info clearfix">
+                    <a href="@CommonUtilities.GetTestSiteUrl(Model)" target="_blank">View selected profile in Fingertips</a>
+                </div>
+            }
+
+            <div class="right-info clearfix">
+                Profile contact: <a href="mailto:@Model.EmailAddress?subject=@Model.Profile.Name" title="Send an email regarding the current profile">@Model.ContactUserName</a>
+            </div>
+        </div>
+
+        if (isUserAdmin)
+        {
+            <div class="clearfix">
+                <span class="info-for-admins">Area Type ID: @Model.SelectedAreaTypeId</span>
+                <span class="info-for-admins">Group ID: @Model.SelectedGroupId</span>
+                <span class="info-for-admins">Profile ID: @Model.Profile.Id</span>
+            </div>
+        }
+
+        <div class="button-box clearfix">
+            <b>Profile:</b>
+            @Html.DropDownListFor(model => model.ProfileKey, Model.ProfileList, new { Id = "selectedProfile" })
+           
+            @if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+            {
+                <b>Domain:</b>
+                @Html.DropDownListFor(model => model.DomainSequence, Model.DomainList, new {Id = "selectedDomain"})
+            }
+            @if (Model.AreaTypeList != null)
+            {
+                <b>Area:</b>
+                @Html.DropDownListFor(model => model.Profile.SelectedAreaType, Model.AreaTypeList,
+                    new { Id = "SelectedAreaTypeId", Name = "SelectedAreaTypeId", style = "max-width: 200px;" })
+            }
+            @Html.Hidden("sortBy", Model.SortBy)
+            @Html.Hidden("ascending", Model.SortAscending)
+            <input type="hidden" id="resetArea" name="resetArea" value="false" />
+        </div>
+
+        @Html.Partial("_IndicatorFilter")
+        @Html.Partial("_IndicatorList")
+    }
+    @Html.Partial("_GridEditDomains")
+    @{
+        var userHasAssignedProfiles = Model.UserHasAssignedPermissions ? "block" : "none";
+        var userHasWritePermissions = Model.UserGroupPermissions == null ? "none" : "inline";
+        var isArchiveProfile = Model.IsArchiveProfile() ? "none" : "inline";
+    }
+    <div class="button-box" style="display: @userHasAssignedProfiles">
+    @if (CommonUtilities.IsReadOnlyMode())
+    {
+        <input type="button" id="edit_Domains" value="Manage Domains" disabled="disabled" style="display: @userHasWritePermissions" />
+
+        
+             <input type="button" id="reorder_Indicators" value="Reorder Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+             <input type="button" value="New Indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")    ' " disabled=" disabled"/>
+
+             <div class="divRight">
+                 <input type="button" id="audit_history" value="Show History"/>
+                 <input type="button" id="delete-indicators-button" value="Remove Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+                 <input type="button" id="move-indicators-button" value="Move Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+                 <input type="button" id="copy-indicators-button" value="Copy Indicators" disabled="disabled"/>
+             </div>
+         
+    }
+    else
+    {
+        <input type="button" id="edit_Domains" value="Manage domains" style="display: @userHasWritePermissions" />
+        if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+        {
+            <input type="button" id="reorder_Indicators" value="Reorder indicators" style="display: @userHasWritePermissions"/>
+            <input type="button" value="New indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")'"/>
+            <div class="divRight">
+                <input type="button" id="audit_history" value="Show history"/>
+                <input type="button" id="delete-indicators-button" value="Remove indicators" style="display: @userHasWritePermissions"/>
+                <input type="button" id="move-indicators-button" value="Move indicators" style="display: @userHasWritePermissions"/>
+                <input type="button" id="copy-indicators-button" value="Copy indicators" style="display: @isArchiveProfile"/>
+            </div>
+        }
+    }
+    </div>
+
+<div class="a-modal">
+    <!-- Place at bottom of page -->
+</div>
+

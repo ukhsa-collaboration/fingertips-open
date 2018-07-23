@@ -19,9 +19,9 @@ namespace Fpm.MainUITest.Controllers
         [TestInitialize]
         public void Init()
         {
-            _coreDataRepository = new CoreDataRepository();
-            _lookUpsRepository = new LookUpsRepository();
-            _profileRepository = new ProfileRepository();
+            _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
+            _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
         }
 
         [TestCleanup]

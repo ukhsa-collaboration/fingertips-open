@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.ViewModels.Areas;
+using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Core;
 using Fpm.ProfileData.Repositories;
 
@@ -96,7 +97,7 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _coreDataRepository = new CoreDataRepository();
+            _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
 
             base.OnActionExecuting(filterContext);
         }

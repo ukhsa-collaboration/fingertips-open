@@ -10,7 +10,17 @@ namespace PholioVisualisation.Analysis
     {
         public int ValueTypeId { get; set; }
         public double UnitValue { get; set; }
+
+        /// <summary>
+        /// All data including invalid data
+        /// </summary>
         public IEnumerable<CoreDataSet> Data { get; set; }
+
+        /// <summary>
+        /// Longest unbroken sequence of valid data if enough are available
+        /// </summary>
+        public IEnumerable<CoreDataSet> ValidData { get; set; }
+
         public int YearRange { get; set; }
 
         public bool IsValid(ref string validationMessage)
@@ -42,8 +52,9 @@ namespace PholioVisualisation.Analysis
                 return false;
             }
 
-            var Data = GetValidDataList();
-            if (Data.Count < TrendMarkerCalculator.MinimumNumberOfPoints)
+            // Define valid data
+            ValidData = GetValidDataList();
+            if (ValidData.Count() < TrendMarkerCalculator.MinimumNumberOfPoints)
             {
                 validationMessage = "Not enough data points with valid values to calculate recent trend";
                 return false;
@@ -55,7 +66,7 @@ namespace PholioVisualisation.Analysis
         /// <summary>
         /// Get the data (starting with the most recent) until an invalid data point is reached.
         /// </summary>
-        private List<CoreDataSet> GetValidDataList()
+        private IList<CoreDataSet> GetValidDataList()
         {
             var orderedData = new CoreDataSetSorter(Data.ToList()).SortByDescendingYear();
             var validData = new List<CoreDataSet>();
@@ -67,6 +78,7 @@ namespace PholioVisualisation.Analysis
                 }
                 else
                 {
+                    // Sequence of valid data should be unbroken by missing points
                     break;
                 }
             }
@@ -215,8 +227,8 @@ namespace PholioVisualisation.Analysis
             const double chiSquared99Point8 = 9.54953570608324; // inExcel =CHIINV(0.002,1)
             double chiSquaredConfidence = chiSquared99Point8;
 
-            var fullDataList = trendRequest.Data.ToList();
-            for (int pointsToUse = MinimumNumberOfPoints; pointsToUse <= fullDataList.Count; pointsToUse++)
+            var validDataList = trendRequest.ValidData.ToList();
+            for (int pointsToUse = MinimumNumberOfPoints; pointsToUse <= validDataList.Count; pointsToUse++)
             {
                 pointsUsed = pointsToUse;
 
@@ -227,7 +239,7 @@ namespace PholioVisualisation.Analysis
                 double sumOfnAndtSq = 0;
                 double t = pointsUsed;
 
-                var dataList = GetMostRecentDataOrderedByIncreasingYear(fullDataList, pointsToUse);
+                var dataList = GetMostRecentDataOrderedByIncreasingYear(validDataList, pointsToUse);
                 foreach (var coreDataSet in dataList)
                 {
                     var r = coreDataSet.Count.Value;

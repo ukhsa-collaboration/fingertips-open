@@ -115,7 +115,7 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _profileRepository = new ProfileRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
 
             base.OnActionExecuting(filterContext);
         }

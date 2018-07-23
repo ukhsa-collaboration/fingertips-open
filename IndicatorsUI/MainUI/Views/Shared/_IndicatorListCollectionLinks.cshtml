@@ -1,0 +1,19 @@
+﻿@* Display the user's indicator lists *@
+@model IndicatorsUI.MainUI.Models.UserList.IndicatorListsViewModel
+<h2 class="home-area-text">Your Indicator Lists</h2>
+<ul class="data-column nav-col-2">
+    @foreach (var indicatorList in Model.IndicatorLists)
+    {
+        <li>
+            <a class="title" href="@Url.Action("ViewIndicatorList", "Search", 
+                                  new {listId = indicatorList.PublicId})">@indicatorList.ListName</a>
+        </li>
+    }
+</ul>
+<div id="btn-my-indicator-lists">
+    @if (Model.IndicatorLists.Count > 0) {
+        @Html.ActionLink("Manage your indicator lists", "Index", "IndicatorList", new {}, new {@class = "btn btn-primary"})
+    } else {
+        @Html.ActionLink("Create your first indicator list", "Create", "IndicatorList", new { }, new { @class = "btn btn-primary" })
+    }
+</div>

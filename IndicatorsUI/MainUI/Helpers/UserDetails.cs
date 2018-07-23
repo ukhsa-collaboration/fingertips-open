@@ -1,9 +1,9 @@
 ﻿using System;
 using System.DirectoryServices.AccountManagement;
 using System.Web;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class UserDetails
     {

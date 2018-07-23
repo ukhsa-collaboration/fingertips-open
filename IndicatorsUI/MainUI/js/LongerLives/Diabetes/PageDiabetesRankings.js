@@ -8,12 +8,11 @@ function initPage() {
 }
 
 function updatePage() {
+
     resetRankingsState();
-
-    var model = MT.model;
-
     setGlobalGroupIds();
 
+    var model = MT.model;
     ajaxMonitor.setCalls(9);
 
     getAreaAddress(model.parentCode);
@@ -27,6 +26,34 @@ function updatePage() {
     getEnglandSupportingData(model);
 
     ajaxMonitor.monitor(getSecondaryData);
+}
+
+function getSecondaryData() {
+
+    changeNumberOrder(); // Reorder table_options pretext
+
+    var model = MT.model;
+    setGlobalGroupRootIndexesAndIndicatorId();
+
+    ajaxMonitor.setCalls(rankingsState.comparisonIsAvailable ? 6 : 5);
+
+    if (rankingsState.comparisonIsAvailable) {
+        getComparisonValues(model);
+    }
+
+    loaded.primaryDataValues.fetchDataByAjax(groupRoots[selectedRootIndex]);
+    loaded.practiceValues.fetchDataByAjax(groupRoots[ROOT_INDEXES.POPULATION]);
+    getPracticeList();
+    getSupportingDataValues(selectedSupportingGroupRootIndex);
+    getValueNotes();
+
+    ajaxMonitor.monitor(displayPage);
+
+    populateAreaTypes(model);
+    populateCauseList();
+    createExportLinks();
+    populateSupportingIndicatorList();
+    removeLoadingSpinner();
 }
 
 function setGlobalGroupIds() {
@@ -69,40 +96,34 @@ function getSupportingDataValues(prevAndRiskRootIndex) {
         });
 };
 
-function getSecondaryData() {
-
-    changeNumberOrder();   // Reorder table_options pretext
+function setGlobalGroupRootIndexesAndIndicatorId() {
 
     var model = MT.model;
-    setGlobalIndicatorIds();
 
-    rankingsState.comparisonIsAvailable = isComparisonAvailable(model);
-    rankingsState.compareSimilar = isSimilarAreas();
-
-    ajaxMonitor.setCalls(rankingsState.comparisonIsAvailable ? 6 : 5);
-
-    if (rankingsState.comparisonIsAvailable) {
-        getComparisonValues(model);
+    if (!isDefined(model.indicatorId)) {
+        // No indicator specified in hash
+        model.indicatorId = getDefaultIndicator();
+        selectedRootIndex = 0;
+        selectedSupportingGroupRootIndex = 0;
+    } else if (isSupportingIndicatorSelected) {
+        // Indicator in hash is in a supporting domain
+        selectedSupportingGroupRootIndex = getIndexOfGroupRootThatContainsIndicator(
+            model, supportingGroupRoots);
+        model.indicatorId = getDefaultIndicator();
+        selectedRootIndex = 0;
+    } else {
+        // model.indicatorId already is set to an indicator in a primary domain
+        selectedSupportingGroupRootIndex = 0;
+        selectedRootIndex = getIndexOfGroupRootThatContainsIndicator(
+            model, groupRoots);
     }
-
-    loaded.primaryDataValues.fetchDataByAjax(groupRoots[selectedRootIndex]);
-    loaded.practiceValues.fetchDataByAjax(groupRoots[ROOT_INDEXES.POPULATION]);
-    getPracticeList();
-    getSupportingDataValues(selectedSupportingGroupRootIndex);
-    getValueNotes();
-
-    ajaxMonitor.monitor(displayPage);
-
-    populateAreaTypes(model);
-    populateCauseList();
-    createExportLinks();
-    populateSupportingIndicatorList();
-    removeLoadingSpinner();
 }
 
 function getComparisonValues(model) {
     if (model.areaTypeId === AreaTypeIds.Practice) {
         ajaxMonitor.callCompleted();
+    } else if (doesAreaTypeCompareToOnsCluster()) {
+        getOnsClusterCode(model);
     } else {
         getDecileData(model);
     }
@@ -110,10 +131,7 @@ function getComparisonValues(model) {
 
 function resetRankingsState() {
 
-    // Preserve table ordering
-    var state = rankingsState;
-    var sortAscending = state ? state.sortAscending : true;
-    var sortedColumn = state ? state.sortedColumn : 2;
+    var oldState = rankingsState;
 
     // Global variable containing state specific to this page
     rankingsState = {
@@ -123,17 +141,17 @@ function resetRankingsState() {
         areaCodeToRowHash: {},
         // Whether the view has been initialised
         isInitialised: false,
-        // Are similar categories being compared
-        comparisonValues: {},
-        // Compare similar mode
-        compareSimilar: false,
-        // Is the comparison option available
-        comparisonIsAvailable: false
+        // Is the comparison option available to offer
+        comparisonIsAvailable: isComparisonAvailable(MT.model),
+        sortAscending: true,
+        sortedColumn: 2
     }
 
     // Restore table ordering
-    rankingsState.sortAscending = sortAscending;
-    rankingsState.sortedColumn = sortedColumn;
+    if (oldState) {
+        rankingsState.sortAscending = oldState.sortAscending;
+        rankingsState.sortedColumn = rankingsState.sortedColumn;
+    }
 }
 
 function displayRankingLegend() {
@@ -148,7 +166,7 @@ function displayRankingLegend() {
         viewModel.comparator = 'area';
         template = 'bobLegend';
     } else {
-        template = 'ragLegend';
+        template = 'ragAndBobLegend';
     }
 
     var html = templates.render(template, viewModel);
@@ -167,51 +185,86 @@ function displayPage() {
     toggleComparisonHeader();
     setBreadcrumb();
     displayParentAreaName();
+    displayPracticeProfileLink();
+    displayAreaDetailsLink();
+    displayRankingHeader();
+    displayTableHeader(rows);
+    $('#area-type-name').html(getAreaTypeNamePlural(MT.model.areaTypeId));
+    $('#similar-areas-tooltip').html(getSimilarAreaTooltipText());
+    displayLegendHeader();
+    displayCompareSimilarHelpText();
 
-    var areaTypeId = MT.model.areaTypeId;
-    if (areaTypeId === AreaTypeIds.CCG) {
-        $('.external_ccg_link').show();
+    // Similar areas mode may be indicated by area code being passed as a parameter
+    if (MT.model.similarAreaCode) {
+        if (isNearestNeighbour()) {
+            displayNearestNeighbours();
+        } else {
+            displaySimilarAreas(MT.model.areaCode);
+        }
+    } else {
+        unlock();
     }
+}
 
-    $('#ranking-header').html(getRankingHeader());
+function displayAreaDetailsLink() {
+    if (!hasPracticeData && MT.model.areaCode) {
+        // Only display for profiles with area details page
+        var $link = $('#area-details-link');
+        $link.prop('areaCode', MT.model.areaCode);
+        var areaName = getArea().Name;
+        $link.html('Details for ' + areaName).show();
+    }
+}
 
-    // Message in table header
+function goToAreaDetails() {
+    var $link = $('#area-details-link');
+    MT.model.areaCode = $link.prop('areaCode');
+    MT.nav.areaDetails();
+}
+
+function displayPracticeProfileLink() {
+    if (MT.model.areaTypeId === AreaTypeIds.CCGPreApr2017) {
+        $('#practice-profile-link').show();
+    }
+}
+
+function displayTableHeader(rows) {
+    var areaTypeId = MT.model.areaTypeId;
     if (rows.length === 1) {
         var html = '1 ' + getAreaTypeNameSingular(areaTypeId);
     } else {
         html = 'Comparing ' + rows.length + ' ' + getAreaTypeNamePlural(areaTypeId);
     }
-    $('#gp_count').html(html);
+    $('#table-header').html(html);
+}
 
-    $('#area-type-name').html(getAreaTypeNamePlural(areaTypeId));
-
-    $('#similar-areas-tooltip').html(getSimilarAreaTooltipText());
-
-    var comparisonText;
-    if (MT.model.parentCode === NATIONAL_CODE) {
-        comparisonText = "Compared to other areas";
-    } else {
-        comparisonText = "Compared to the other practices in the " + getSimpleAreaTypeName();
-    }
-
-    $('#comparison-header').html(comparisonText);
-
+function displayCompareSimilarHelpText() {
     var $hoverOrTap = $('#hover-or-tap');
     if (rankingsState.comparisonIsAvailable) {
+        var areaTypeId = MT.model.areaTypeId;
         $('#area-type-singular').html(getSimpleAreaTypeNameSingular(areaTypeId));
         $('#area-type-plural').html(getSimpleAreaTypeNamePlural(areaTypeId));
         $hoverOrTap.show();
     } else {
         $hoverOrTap.hide();
     }
+}
 
-    unlock();
+function displayLegendHeader() {
+    // Set comparison text
+    var comparisonText;
+    if (MT.model.parentCode === NATIONAL_CODE) {
+        comparisonText = "Compared to other areas";
+    } else {
+        comparisonText = "Compared to the other practices in the " + getSimpleAreaTypeName();
+    }
+    $('#legend-header').html(comparisonText);
 }
 
 function displayParentAreaName() {
     var area = loaded.addresses[MT.model.parentCode];
 
-    var areaName = area.AreaTypeId === 15
+    var areaName = area.AreaTypeId === AreaTypeIds.Country
         ? area.Name
         : 'this ' + getSimpleAreaTypeNameSingular(MT.model.parentAreaType);
 
@@ -234,7 +287,8 @@ function displayTable(rows) {
         column2Unit = "",
         showEnglandVal = false;
 
-    if ((MT.model.areaTypeId === AreaTypeIds.CCG) || (MT.model.areaTypeId === AreaTypeIds.CountyUA)) {
+    var areaTypeId = MT.model.areaTypeId;
+    if (areaTypeId !== AreaTypeIds.Practice) {
         var model = {};
         model.areaCode = MT.model.parentCode;
         model.areaTypeId = MT.model.areaTypeId;
@@ -243,7 +297,6 @@ function displayTable(rows) {
 
         var primaryMetadataHash = loaded.indicatorMetadata[model.groupId];
         var supportingMetadataHash = loaded.indicatorMetadata[selectedSupportingGroupId];
-
 
         // get primary grouping data
         var primaryGroupData = loaded.groupDataAtDataPoint.getData(model);
@@ -255,15 +308,33 @@ function displayTable(rows) {
         var supportingIndicatorMetadata = supportingMetadataHash[selectedSupportingIndicatorId];
         model.groupId = selectedSupportingGroupId;
         var supportingGroupData = loaded.groupDataAtDataPoint.getData(model);
-        column1Val = supportingIndicatorMetadata.IID === IndicatorIds.Deprivation ? 'N/A' : supportingGroupData[selectedSupportingGroupRootIndex].ValF;
+        column1Val = supportingIndicatorMetadata.IID === IndicatorIds.Deprivation
+            ? 'N/A'
+            : supportingGroupData[selectedSupportingGroupRootIndex].ValF;
         column1Unit = new UnitFormat(supportingIndicatorMetadata, column1Val).getLabel();
 
         showEnglandVal = true;
     }
 
+    // primary indicator sig property to rows object
+    // this is used for the tooltip
+    _.forEach(rows, function (row) {
+        if (row.PrimaryData) {
+            row.primaryIndicatorSig = row.PrimaryData !== null ? row.PrimaryData.Sig[-1] : 0;
+        }
+    });
+
     // Render data
     $('#diabetes-rankings-table tbody').html(
-        templates.render('rows', { rows: rows, englandValCol1: column1Val, englandValCol2: column2Val, col1Unit: column1Unit, col2Unit: column2Unit, showEnglandVal: showEnglandVal })
+        templates.render('rows',
+        {
+            rows: rows,
+            englandValCol1: column1Val,
+            englandValCol2: column2Val,
+            col1Unit: column1Unit,
+            col2Unit: column2Unit,
+            showEnglandVal: showEnglandVal
+        })
     );
 }
 
@@ -271,7 +342,7 @@ function setBreadcrumb() {
     var links = ['<li><a href="javascript:MT.nav.home();">Home</a></li>'];
 
     if (MT.model.areaTypeId === AreaTypeIds.Practice) {
-        links.push('<li id="national-comparisons"><a href="javascript:switchAreas(' +
+        links.push('<li id="national-comparisons"><a href="javascript:selectAreaType(' +
             MT.model.parentAreaType + ')">National comparisons</a></li>',
             '<li id="practice-comparisons" class="last"><a>Practice comparisons</a></li>');
     } else {
@@ -281,11 +352,19 @@ function setBreadcrumb() {
     $('#breadcrumbs').html(links);
 }
 
-function getRankingHeader() {
+function displayRankingHeader() {
     var areaName = loaded.addresses[MT.model.parentCode].Name;
-    return (MT.model.parentCode === NATIONAL_CODE
-        ? 'National comparisons'
-        : areaName);
+
+    var $header = $('#ranking-header');
+
+    if (MT.model.parentCode === NATIONAL_CODE) {
+        var header = 'National comparisons';
+    } else {
+        header = areaName;
+        $header.addClass('smaller-header');
+    }
+
+    $header.html(header);
 }
 
 function getDefaultIndicator() {
@@ -303,7 +382,7 @@ function populateAreaTypes(model) {
             var templateName = 'areaFilter';
 
             templates.add(templateName, '<h5><span class="pretext">1.</span><span class="posttext">Select Area</span></h5><ul class="areaFilters">\
-            {{#types}}<li id="{{Id}}" class="areaFilter {{class}}"><a href="javascript:switchAreas({{Id}});">{{Short}}</a></li>{{/types}}' + '<div class="hr"><hr /></div>');
+            {{#types}}<li id="{{Id}}" class="areaFilter {{class}}"><a href="javascript:selectAreaType({{Id}});">{{Short}}</a></li>{{/types}}' + '<div class="hr"><hr /></div>');
 
             setAreaTypeOptionHtml(templateName);
 
@@ -314,7 +393,7 @@ function populateAreaTypes(model) {
     }
 }
 
-function switchAreas(parentAreaTypeId) {
+function selectAreaType(parentAreaTypeId) {
 
     if (!FT.ajaxLock) {
         lock();
@@ -335,7 +414,7 @@ function createExportLinks() {
         ).add('child_area_type_id', model.areaTypeId);
 
     // Via core so saves as HTML
-    var exportLink = '<a href="/api/all_data/csv/by_profile_id?';
+    var exportLink = '<a href="' + FT.url.corews + 'api/all_data/csv/by_profile_id?';
 
     // National data download link (not for practices)
     var $link = $('#download_data_for_england');
@@ -565,8 +644,12 @@ function selectPrimaryIndicator(rootIndex) {
             : 0;
         selectedRootIndex = rootIndex;
 
-        model.indicatorId = groupRoots[rootIndex].IID;
+        var groupRoot = groupRoots[rootIndex];
+        model.indicatorId = groupRoot.IID;
+        model.sexId = groupRoot.Sex.Id;
         isSupportingIndicatorSelected = false;
+
+        ftHistory.setHistory();
 
         ajaxMonitor.setCalls(1);
         loaded.primaryDataValues.fetchDataByAjax(groupRoots[selectedRootIndex]);
@@ -606,20 +689,41 @@ function setSelectedSupportingIndicator(indicatorId) {
     selectedCause.addClass(cssClass);
 }
 
-function selectPractice(code) {
-    rankingsState.compareSimilar = false;
+/**
+ * Practice or CCG clicked
+ */
+function selectRankingsArea(code) {
 
     var model = MT.model;
     if (hasPracticeData) {
         if (!FT.ajaxLock) {
+            // CCG or practice clicked
+
             lock();
-            model.parentCode = model.parentCode;
-            model.areaCode = code;
-            model.areaTypeId === AreaTypeIds.Practice ? MT.nav.practiceDetails(model) : MT.nav.rankings();
+            showLoadingSpinner();
+
+            model.similarAreaCode = null;
+
+            if (model.areaTypeId === AreaTypeIds.Practice) {
+                // Practice clicked: Show practice details
+                model.areaCode = code;
+                MT.nav.practiceDetails(model);
+            } else {
+                // CCG clicked: Show practices in a CCG
+                MT.nav.practiceRankings(code);
+            }
+
             scrollToTop();
         }
     } else {
+        // Area clicked: Show area details
         model.areaCode = code;
+
+        if (isNearestNeighbour()) {
+            // Need to change NN code to selected area
+            model.similarAreaCode = model.parentCode = getNearestNeighbourCode();
+        }
+
         MT.nav.areaDetails(model);
     }
 }
@@ -629,7 +733,10 @@ function showAllAreas() {
     if (!FT.ajaxLock) {
         lock();
 
-        rankingsState.compareSimilar = false;
+        MT.model.similarAreaCode = null;
+        MT.model.areaCode = null;
+        ftHistory.setHistory();
+
         toggleComparisonHeader();
         reloadData();
 
@@ -659,7 +766,7 @@ function getNewRowsWithCoreData() {
         row = areaCodeToRowHash[areaCode];
 
         if (row) {
-            row.PrimaryData = isPrimaryData && new CoreDataSetInfo(primaryDataList[i]).isValue()
+            row.PrimaryData = isPrimaryData
              ? primaryDataList[i]
              : null;
 
@@ -667,9 +774,7 @@ function getNewRowsWithCoreData() {
             var supportingData = null;
             if (isSupportingData) {
                 var coreData = _.find(supportingDataList, function (data) { return data.AreaCode === areaCode });
-                if (new CoreDataSetInfo(coreData).isValue()) {
-                    supportingData = coreData;
-                }
+                supportingData = coreData;
             }
             row.SupportingData = supportingData;
         }
@@ -695,7 +800,6 @@ function displayInfoBoxes() {
     });
     var ranks = supportingAreaData.Ranks[NATIONAL_CODE];
 
-
     switch (MT.model.profileId) {
         case ProfileIds.Suicide:
             displayInfoBox1(ranks[1]);
@@ -705,7 +809,7 @@ function displayInfoBoxes() {
             displayInfoBox1(ranks[1]);
             break;
         case ProfileIds.DrugsAndAlcohol:
-            displayInfoBox2(ranks[2]);
+            // Content defined in FPM content manager
             break;
         default:
             displayInfoBox1(ranks[1]);
@@ -730,10 +834,7 @@ function displayInfoBox2(rank) {
     var templateModel = {};
     var profileId = MT.model.profileId;
 
-    if (profileId === ProfileIds.DrugsAndAlcohol) {
-        count = new CommaNumber(rank.AreaRank.Count).rounded();
-        template = '<h2>Estimated number of opiate and/or crack cocaine users in England</h2>';
-    } else if (profileId === ProfileIds.Suicide) {
+    if (profileId === ProfileIds.Suicide) {
         count = new CommaNumber(rank.AreaRank.Count).rounded();
         template = '<h2>Deaths from suicide in England</h2>';
     } else {
@@ -753,7 +854,7 @@ function displayInfoBox2(rank) {
 
 function setPrimaryDataHeader(metadata) {
 
-    if (metadata.IID == IndicatorIds.Deprivation) {
+    if (metadata.IID === IndicatorIds.Deprivation) {
         var columnHeader = getDeprivationColumnHeader();
     } else {
         var root = groupRoots[selectedRootIndex];
@@ -786,19 +887,27 @@ function assignDataLabelsToRows(primaryMetadata, supportingMetadata) {
         // Primary data
         if (row.PrimaryData) {
             var data = row.PrimaryData;
-            row.primaryDataText = getDataText(data, root.IID === IndicatorIds.Deprivation);
-            row.unitLabel = new UnitFormat(primaryMetadata, data.Val).getLabel();
-            if (sortOnPrimaryData) {
-                valToSortOn = data.Val;
+            var dataInfo = new CoreDataSetInfo(data);
+            if (dataInfo.isValue()) {
+                row.primaryDataText = getDataText(data, root.IID === IndicatorIds.Deprivation);
+                row.unitLabel = new UnitFormat(primaryMetadata, data.Val).getLabel();
+                if (sortOnPrimaryData) {
+                    valToSortOn = data.Val;
+                }
+                row.grade = gradeFunction(data.Sig[-1], root);
+            } else {
+                row.primaryDataText = 'No data';
+                row.unitLabel = '';
+                row.grade = gradeFunction(0, root);
             }
 
-            row.grade = gradeFunction(data.Sig[-1], root);
-
-            if (!new CoreDataSetInfo(data).isNote()) {
+            // Add value note
+            if (!dataInfo.isNote() || !dataInfo.isValue()/*temporarily hide value note because line is too long*/) {
                 row.primaryValueNote = '';
             } else {
                 row.primaryValueNote = '<span class="tooltip primary-value-note-tooltip"><i>' + getValueNoteText(data.NoteId) + '</i></span>';
-                if (data.NoteId === 401) {
+                if (data.NoteId === ValueNoteIds.DataQualityIssue) {
+                    // Don't display colour
                     row.grade = 'grade-99';
                 }
             }
@@ -812,20 +921,30 @@ function assignDataLabelsToRows(primaryMetadata, supportingMetadata) {
         // Supporting data
         if (row.SupportingData) {
             var supportingData = row.SupportingData;
-            row.supportingDataText = getDataText(supportingData, isDeprivation);
-            row.supportingGrade = supportingData.Sig[-1];
-            row.supportingDataUnitLabel = isSupportingDataUnit
-            ? new UnitFormat(supportingMetadata, supportingData.Val).getLabel()
-                : '';
-            if (sortOnSecondaryData) {
-                valToSortOn = supportingData.Val;
+
+            var dataInfo = new CoreDataSetInfo(supportingData);
+            if (dataInfo.isValue()) {
+                row.supportingDataText = getDataText(supportingData, isDeprivation);
+                row.supportingGrade = supportingData.Sig[-1];
+                row.supportingDataUnitLabel = isSupportingDataUnit
+                    ? new UnitFormat(supportingMetadata, supportingData.Val).getLabel()
+                    : '';
+                if (sortOnSecondaryData) {
+                    valToSortOn = supportingData.Val;
+                }
+            } else {
+                row.supportingDataText = 'No data';
+                row.supportingDataUnitLabel = '';
+                row.supportingGrade = gradeFunction(0, root);
             }
 
-            if (!new CoreDataSetInfo(supportingData).isNote()) {
+            if (!dataInfo.isNote()) {
                 row.supportingValueNote = '';
             } else {
-                row.supportingValueNote = '<span id="supporting-value-note-tooltip" class="tooltip"><i>' + getValueNoteText(supportingData.NoteId) + '</i></span>';
+                row.supportingValueNote = '<span id="supporting-value-note-tooltip" class="tooltip"><i>' +
+                    getValueNoteText(supportingData.NoteId) + '</i></span>';
             }
+
         } else {
             row.supportingValueNote = '';
             row.supportingDataText = 'No data';
@@ -848,35 +967,26 @@ function getDataText(data, isDeprivation) {
 
 function getSupportingGrade(grade) {
 
-    // Work out if this is showing Quintile (Purple) or RAG for the middle column
-    var supportingGroupRoot = supportingGroupRoots[selectedSupportingGroupRootIndex];
-    var comparatorMethodId = supportingGroupRoot.ComparatorMethodId;
+    // Middle column
+    var groupRoot = supportingGroupRoots[selectedSupportingGroupRootIndex];
+    var gradeFunction = getGradeFunctionFromGroupRoot(groupRoot);
+    var gradeName = gradeFunction(grade, groupRoot);
 
-    if (useQuintiles(comparatorMethodId)) {
-        var supportingSignificanceImage = '<img src="' + FT.url.img +
-            'Mortality/grade-quintile-' + grade + '.png" />';
-    } else {
-        //RAG middle column
-        var gradeFunction = getGradeFunctionFromGroupRoot(supportingGroupRoot);
-        var gradeName = gradeFunction(grade, supportingGroupRoot);
-        supportingSignificanceImage = '<img src="' + FT.url.img +
-            'Mortality/' + gradeName + '.png" />';
-    }
-
-    return supportingSignificanceImage;
+    return '<img class="tooltip" id="sigTooltip-' + Math.floor(Math.random() * 100) +
+        '" src="' + FT.url.img + 'Mortality/' + gradeName + '.png"  onmouseover="showSigTooltip(event,' + grade + ',0)" onmouseout="hideSigTooltip()"/>';
 }
 
-function setComparisonLink(areaCode) {
+function getCompareLinkHtml(areaCode) {
     if (rankingsState.comparisonIsAvailable) {
-        return '<div class="compare-link"><a href="javascript:selectSimilarAreas(\''
-            + areaCode + '\');">Compare similar</a></div>';
+        return '<div class="compare-link"><a href="#' + areaCode + '" onclick="selectSimilarAreas(\''
+            + areaCode + '\', this);">Compare similar</a></div>';
     }
 
     return '';
 }
 
 function setSupportingDataHeader(metadata) {
-    if (metadata.IID == IndicatorIds.Deprivation) {
+    if (metadata.IID === IndicatorIds.Deprivation) {
         var columnHeader = getDeprivationColumnHeader();
     } else {
         columnHeader = new ColumnHeader(metadata).text;
@@ -900,8 +1010,8 @@ function reloadData() {
     displayColumnHeadersAndAddDataToRows();
 
     var rows = rankingsState.rows;
-    if (rankingsState.compareSimilar) {
-        rows = setComparisonValues(rows);
+    if (MT.model.similarAreaCode) {
+        rows = getSimilarAreaRows(rows);
     }
 
     displayTable(rows);
@@ -910,50 +1020,90 @@ function reloadData() {
     unlock();
 }
 
-function setComparisonValues(rows) {
-    var practiceName = loaded.areaLists[MT.model.areaTypeId][MT.model.parentCode][rankingsState.comparisonValues.selectedAreaCode].Name;
+function getCategoryFromCategoryArea(code) {
+    return parseInt(code.split('-')[2]);
+}
 
-    $('#comparing_practice_name').html(practiceName);
+function getArea() {
+    var model = MT.model;
+    var areaList = loaded.areaLists[model.areaTypeId][model.parentCode];
+    return areaList[model.areaCode];
+}
+
+function getSimilarAreaRows(rows) {
+    var model = MT.model;
+    var areaTypeId = model.areaTypeId;
+    var areaCode = model.areaCode;
+    var areaName = getArea().Name;
+
+    $('#comparing_practice_name').html(areaName);
     toggleComparisonHeader();
 
     var similarRows = [];
-    var idx = 0;
+
+    // Set decile or neighbours if needed
+    var decileToShow, areaCodesToKeep;
+    var useNeighbours = isNearestNeighbour();
+    if (model.similarAreaCode) {
+        if (useNeighbours) {
+            // Copy array of neighbour codes
+            areaCodesToKeep = loaded.neighbours[areaCode].slice();
+
+            // Add selected area so included in table
+            areaCodesToKeep.push(areaCode);
+        } else if (doesAreaTypeCompareToOnsCluster()) {
+            areaCodesToKeep = loaded.onsClusterCodes[model.similarAreaCode];
+        } else {
+            decileToShow = getCategoryFromCategoryArea(model.similarAreaCode);
+        }
+    }
+
     _.each(rows, function (row) {
 
-        switch (MT.model.areaTypeId) {
+        switch (areaTypeId) {
             case AreaTypeIds.CountyUA:
-                var rowDecile = getDecileInfo(loaded.categories[AreaTypeIds.DeprivationDecile][row.Code]);
-                if (rankingsState.comparisonValues[rankingsState.comparisonValues.selectedAreaCode] == rowDecile.decile) {
-                    similarRows.push(row);
-                }
-                break;
-            case AreaTypeIds.CCG:
-                var areaCategory = loaded.categories[AreaTypeIds.DeprivationDecile][row.Code];
-                if (rankingsState.comparisonValues[rankingsState.comparisonValues.selectedAreaCode] == areaCategory) {
-                    similarRows.push(row);
-                }
-                break;
-            case AreaTypeIds.Practice:
-                if (isDefined(loaded.practiceCategories[row.Code])) {
-                    if (loaded.practiceCategories[row.Code].Code === rankingsState.comparisonValues.Code) {
+                if (useNeighbours) {
+                    // Get nearest neighbours
+                    if (_.contains(areaCodesToKeep, row.Code)) {
+                        similarRows.push(row);
+                    }
+                } else {
+                    // Get LAs in same decile
+                    var decile = getDecileInfo(loaded.categories[AreaTypeIds.DeprivationDecile][row.Code]);
+                    if (decileToShow === decile.decile) {
                         similarRows.push(row);
                     }
                 }
                 break;
+            case AreaTypeIds.DistrictUA:
+                if (_.contains(areaCodesToKeep, row.Code)) {
+                    similarRows.push(row);
+                }
+                break;
+            case AreaTypeIds.CCGPreApr2017:
+                // Get CCGS in same decile
+                var decileNumber = loaded.categories[AreaTypeIds.DeprivationDecile][row.Code];
+                if (decileToShow === decileNumber) {
+                    similarRows.push(row);
+                }
+                break;
+            default:
+                throw new Error('Similar areas not supported for current area type');
         }
-        idx++;
     });
 
     return similarRows;
 }
 
 function toggleComparisonHeader() {
-    if (rankingsState.compareSimilar) {
-        $('.non-similar').hide();
-        $('.similar').show();
+    var $similar = $('.similar');
+    var $nonSimilar = $('.non-similar');
+    if (MT.model.similarAreaCode) {
+        $nonSimilar.hide();
+        $similar.show();
     } else {
-        $('.non-similar').show();
-        $('.similar').hide();
+        $nonSimilar.show();
+        $similar.hide();
     }
 }
 
@@ -962,7 +1112,7 @@ function sortRankings(columnIndex) {
     changeSortState(columnIndex);
     displaySortArrowOnTableHeader(columnIndex);
 
-    if (rankingsState.compareSimilar) {
+    if (MT.model.similarAreaCode) {
         reloadData();
         hideCompareSimilarLink();
     } else {
@@ -997,7 +1147,6 @@ function displaySortArrowOnTableHeader(columnIndex) {
     if (!rankingsState.sortAscending) {
         $column.addClass('sorted-desc');
     }
-
 }
 
 function sortDisplayedRows(rows) {
@@ -1035,47 +1184,112 @@ function sortByPolarity(rowsToDisplay, polarity) {
     }
 }
 
-function selectSimilarAreas(areaCode) {
+function displayNearestNeighbours() {
+
+    getNearestNeighbours(function () {
+        // Update text header of rankings table
+        $('#comparison_category').html('(CIPFA nearest neighbours)');
+        $('#comparing_area_type').html('to similar areas');
+        $('#comparison_type').html('Nearest Neighbours');
+
+        scrollToTop();
+        reloadData();
+        hideCompareSimilarLink();
+    });
+}
+
+function getDecileFromAreaCode(areaCode) {
+    var decileLookup = loaded.categories[AreaTypeIds.DeprivationDecile];
+    return decileLookup[areaCode];
+}
+
+function displaySimilarAreas(areaCode) {
+
+    if (doesAreaTypeCompareToOnsCluster()) {
+        // Set model
+        MT.model.similarAreaCode = getOnsCodeForArea(areaCode);
+        MT.model.areaCode = areaCode;
+
+        $('#comparison_category').html('(in same ONS cluster group)');
+        $('#comparing_area_type').html('to similar areas');
+        $('#comparison_type').html('Similar areas');
+    } else {
+        var decile = getDecileFromAreaCode(areaCode);
+
+        // Set model
+        MT.model.similarAreaCode = getCategoryAreaCode(decile);
+        MT.model.areaCode = areaCode;
+
+        // Update text header of rankings table
+        $('#comparison_category').html('(in Socioeconomic decile ' + decile + ' - ' + getDecileInfo(decile).text + ')');
+        $('#comparing_area_type').html('to similar areas');
+        $('#comparison_type').html('Deprivation group');
+    }
+
+    scrollToTop();
+    reloadData();
+    hideCompareSimilarLink();
+    displayAreaDetailsLink();
+}
+
+function selectNearestNeighbours(areaCode) {
 
     if (!FT.ajaxLock) {
         lock();
 
-        switch (MT.model.areaTypeId) {
-            case AreaTypeIds.CountyUA:
-                var depDecile = loaded.categories[AreaTypeIds.DeprivationDecile][areaCode];
-                $('#comparison_category').html('(in Socioeconomic decile ' +
-                        depDecile + ' - ' + getDecileInfo(depDecile).text + ')');
-                $('#comparing_area_type').html('to similar areas');
-                $('#comparison_type').html('Similar Areas');
+        lightbox.hide();
 
-                rankingsState.comparisonValues = loaded.categories[AreaTypeIds.DeprivationDecile];
-                rankingsState.comparisonValues.selectedAreaCode = areaCode;
-                rankingsState.compareSimilar = true;
-                break;
-            case AreaTypeIds.Practice:
-                $('#comparison_category').html('(' + loaded.practiceCategories[areaCode].Name.trim() + ')');
-                $('#comparing_area_type').html('to similar practices');
-                $('#comparison_type').html('Similar Practices');
+        MT.model.areaCode = areaCode;
+        MT.model.similarAreaCode = getNearestNeighbourCode();
 
-                rankingsState.comparisonValues = loaded.practiceCategories[areaCode];
-                rankingsState.comparisonValues.selectedAreaCode = areaCode;
-                rankingsState.compareSimilar = true;
-                break;
-            case AreaTypeIds.CCG:
-                $('#comparing_area_type').html('to similar areas');
-                $('#comparison_type').html('Similar Areas');
+        ftHistory.setHistory();
 
-                rankingsState.comparisonValues = loaded.categories[AreaTypeIds.DeprivationDecile];
-                rankingsState.comparisonValues.selectedAreaCode = areaCode;
-                rankingsState.compareSimilar = true;
-                break;
-        }
-        scrollToTop();
-        reloadData();
-        hideCompareSimilarLink();
+        updatePage();
 
         logEvent(AnalyticsCategories.RANKINGS, AnalyticsAction.SIMILAR_AREAS);
     }
+}
+
+function selectSimilarAreas(areaCode, element) {
+
+    if (!FT.ajaxLock) {
+        lock();
+
+        if (isFeatureEnabled('enableNeighbourComparisonInLongerLives') && element && doesAreaTypeHaveNearestNeighbours()) {
+            // More than one compare similar option so need to show lightbox for user to choose
+            showCompareSimilarOptions(areaCode, element);
+            return;
+        }
+
+        // Hide lightbox if user has had to choose a particular compare option
+        lightbox.hide();
+
+        // Set model
+        if (doesAreaTypeCompareToOnsCluster) {
+            MT.model.similarAreaCode = getOnsCodeForArea(areaCode);
+        } else {
+            var decile = getDecileFromAreaCode(areaCode);
+            MT.model.similarAreaCode = getCategoryAreaCode(decile);
+        }
+        MT.model.areaCode = areaCode;
+
+        ftHistory.setHistory();
+
+        displaySimilarAreas(areaCode);
+
+        logEvent(AnalyticsCategories.RANKINGS, AnalyticsAction.SIMILAR_AREAS);
+    }
+}
+
+function showCompareSimilarOptions(areaCode, element) {
+    tooltipManager.init();
+    var name = loaded.areaLists[MT.model.areaTypeId][MT.model.parentCode][areaCode].Name;
+    var position = $(element).offset();
+    templates.add('compare', '<div class="compare-popup"><h3>Compare {{name}} with:</h3>\
+<a href="javascript:selectNearestNeighbours(\'{{areaCode}}\')">Similar areas</a>\
+<a href="javascript:selectSimilarAreas(\'{{areaCode}}\')">Deprivation group</a></div>');
+    var html = templates.render('compare', { areaCode: areaCode, name: name });
+    lightbox.show(html, position.top - 50, position.left - 220, 300/*width*/);
 }
 
 function hideCompareSimilarLink() {
@@ -1134,29 +1348,6 @@ function getSelectedSupportingIndicatorId() {
     return supportingGroupRoots[selectedSupportingGroupRootIndex].IID;
 }
 
-function setGlobalIndicatorIds() {
-
-    var model = MT.model;
-
-    if (!isDefined(model.indicatorId)) {
-        // No indicator specified in hash
-        model.indicatorId = getDefaultIndicator();
-        selectedRootIndex = 0;
-        selectedSupportingGroupRootIndex = 0;
-    } else if (isSupportingIndicatorSelected) {
-        // Indicator in hash is in a supporting domain
-        selectedSupportingGroupRootIndex = getIndexOfGroupRootThatContainsIndicator(
-            model, supportingGroupRoots);
-        model.indicatorId = getDefaultIndicator();
-        selectedRootIndex = 0;
-    } else {
-        // model.indicatorId already is set to an indicator in a primary domain
-        selectedSupportingGroupRootIndex = 0;
-        selectedRootIndex = getIndexOfGroupRootThatContainsIndicator(
-            model, groupRoots);
-    }
-}
-
 function createRows() {
 
     // Define rows
@@ -1170,7 +1361,7 @@ function createRows() {
         var row = {
             Name: areas[areaCode].Name,
             Code: areas[areaCode].Code,
-            compareSimilar: setComparisonLink(areaCode)
+            compareSimilar: getCompareLinkHtml(areaCode)
         };
 
         areaCodeToRowHash[areaCode] = row;
@@ -1220,6 +1411,27 @@ function getDeprivationColumnHeader() {
         : AreaTypeIds.Country;
 
     return getDeprivationLabel('Deprivation', parentAreaType);
+}
+
+function showSigTooltip(e, grade, col) {
+
+    var groupRoot;
+
+    if (col == 0) {
+        groupRoot = supportingGroupRoots[selectedSupportingGroupRootIndex];
+    } else {
+        groupRoot = groupRoots[selectedRootIndex];
+    }
+
+    if (grade > 0) {
+        var text = getSignificanceText(grade, groupRoot);
+        var html = '<div class="tooltip-two" ><div>' + text + '</div></div>';
+        tooltipManager.show(e, html);
+    }
+}
+
+function hideSigTooltip() {
+    $('.tooltip-two').hide();
 }
 
 /**
@@ -1298,6 +1510,7 @@ function AreaValuesDataManager() {
     }
 }
 
+
 templates.add('causes',
     '{{#causes}}<li id={{index}}-iid-{{id}} class="{{cssClass}}"><a href="javascript:selectPrimaryIndicator({{index}})">{{{name}}}</a></li>{{/causes}}');
 
@@ -1307,9 +1520,9 @@ templates.add('prevandriskcauses',
 templates.add('rows',
     '{{#showEnglandVal}}<tr class="england-row"><td><span class="england-label">England</span></td><td><span class="england-val">{{englandValCol1}}{{{col1Unit}}}</span></td><td><span class="england-val">{{englandValCol2}}{{{col2Unit}}}</span></td></td>{{/showEnglandVal}}\
     {{#rows}}<tr class="odd {{selected}}"><td>\
-    <a href="javascript:selectPractice(\'{{Code}}\')">{{Name}}</a></td>\
+    <a href="javascript:selectRankingsArea(\'{{Code}}\')">{{Name}}</a></td>\
     <td><span class="grade grade-quintile-{{supportingGrade}}">{{{supportingSignificanceImage}}}</span>{{supportingDataText}}<span>{{{supportingDataUnitLabel}}}</span>{{{supportingValueNote}}}</td>\
-    <td class="last-child"><span class="grade {{grade}}"><img src="' + FT.url.img + 'Mortality/{{grade}}.png" /></span><span style="max-width:170px;">{{primaryDataText}}</span><span>{{{unitLabel}}}</span>{{{primaryValueNote}}}{{{compareSimilar}}}</td></tr>{{/rows}}');
+    <td class="last-child"><span class="grade {{grade}}" onmouseover="showSigTooltip(event, {{primaryIndicatorSig}})" onmouseout="hideSigTooltip()"><img src="' + FT.url.img + 'Mortality/{{grade}}.png" /></span><span style="max-width:170px;">{{primaryDataText}}</span><span>{{{unitLabel}}}</span>{{{primaryValueNote}}}{{{compareSimilar}}}</td></tr>{{/rows}}');
 
 templates.add('bobLegend',
 '<p class="legend">Comparison with {{comparator}} average\
@@ -1324,7 +1537,7 @@ templates.add('bobLegend',
     </span>\
 </p>');
 
-templates.add('ragLegend',
+templates.add('ragAndBobLegend',
 '<p class="legend">Comparison with national average\
     <span class="grade">\
         <img src="' + FT.url.img + 'Mortality/grade-3.png" alt="worse" />worse\

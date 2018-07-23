@@ -19,7 +19,7 @@ namespace PholioVisualisation.RequestParameters
         {
             get
             {
-                return base.AreValid && !string.IsNullOrEmpty(ParentAreaCode) && AreaTypeId > 0;
+                return base.AreValid  && AreaTypeId > 0;
             }
         }
     }

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
+using System.Diagnostics;
+using System.Net;
 
 namespace PholioVisualisation.ServicesTest
 {
@@ -109,6 +106,28 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
+        public void TestGetGroupRootSummariesByProfileId()
+        {
+            var url = "grouproot_summaries/by_profile_id?" +
+                      "profile_id=" + ProfileIds.Phof +
+                      "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetGroupRootSummariesByIndicatorId()
+        {
+            var url = "grouproot_summaries/by_indicator_id?" +
+                      "indicator_ids=" + IndicatorIds.LifeExpectancyAtBirth +
+                      "&profile_id=" + ProfileIds.Phof;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
         public void TestGetPartitionTrendDataForSexes()
         {
             var url = "partition_trend_data/by_sex?" +
@@ -147,15 +166,6 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
-        public void TestGetQuinaryPopulationData()
-        {
-            byte[] data = GetData("quinary_population_data?" +
-                "group_id=" + GroupIds.PracticeProfiles_SupportingIndicators +
-                "&area_code=" + AreaCodes.Gp_MeersbrookSheffield);
-            TestHelper.IsData(data);
-        }
-
-        [TestMethod]
         public void TestGetQuinaryPopulation()
         {
             byte[] data = GetData("quinary_population?" +
@@ -170,7 +180,7 @@ namespace PholioVisualisation.ServicesTest
             byte[] data = GetData("quinary_population?" +
                 "area_type_id=" + AreaTypeIds.GpPractice +
                 "&area_code=" + AreaCodes.Gp_MeersbrookSheffield +
-                "&profile_id=" +ProfileIds.HealthProfilesSupportingIndicators +
+                "&profile_id=" + ProfileIds.HealthProfilesSupportingIndicators +
                 "&indicator_id" + IndicatorIds.PopulationProjection);
             TestHelper.IsData(data);
         }
@@ -205,6 +215,17 @@ namespace PholioVisualisation.ServicesTest
                 "&sex_id=" + SexIds.Persons +
                 "&age_id=" + AgeIds.AllAges +
                 "&profile_id=" + ProfileIds.Phof
+                );
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetGroupDataAtDataPointForSpecificArea()
+        {
+            byte[] data = GetData("latest_data/specific_indicators_for_single_area?" +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_code=" + AreaCodes.CountyUa_Cumbria +
+                "&indicator_ids=" + IndicatorIds.ExcessWinterDeaths
                 );
             TestHelper.IsData(data);
         }
@@ -287,14 +308,26 @@ namespace PholioVisualisation.ServicesTest
             TestHelper.IsData(data);
 
             // Contains PHOF ID
-            TestHelper.AssertDataContainsString(data, "\"" + ProfileIds.Phof + "\"");
+            TestHelper.AssertDataContainsString(data, "\"" + AreaTypeIds.DistrictAndUnitaryAuthority + "\"");
+        }
+
+        [TestMethod]
+        public void TestGetAvailableDataForGrouping()
+        {
+            byte[] data = GetData("available_data");
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetDataChanges()
+        {
+            byte[] data = GetData("data_changes?indicator_id=" + IndicatorIds.AdultExcessWeight);
+            TestHelper.IsData(data);
         }
 
         public static byte[] GetData(string path)
         {
-            var url = TestHelper.BaseUrl + "api/" + path;
-            Debug.WriteLine(url);
-            return new WebClient().DownloadData(url);
+            return EndPointTestHelper.GetData(path);
         }
     }
 }

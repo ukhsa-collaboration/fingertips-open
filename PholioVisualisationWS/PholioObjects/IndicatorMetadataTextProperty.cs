@@ -24,12 +24,12 @@ namespace PholioVisualisation.PholioObjects
         public bool IsMandatory { get; set; }
 
         [JsonIgnore]
-        public bool IsSearchable { get; set; }
-
-        [JsonIgnore]
         public bool IsSystemContent { get; set; }
 
         [JsonProperty(PropertyName = "Order")]
         public int DisplayOrder { get; set; }
+
+        [JsonIgnore]
+        public int SearchBoost { get; set; }
     }
 }

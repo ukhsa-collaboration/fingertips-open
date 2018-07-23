@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
-using ServicesWeb.Controllers;
+using PholioVisualisation.ServicesWeb.Controllers;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {
@@ -15,7 +15,8 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         private const string TimePeriodDirectoryName = "1900";
         private const string FileName = "test.pdf";
 
-        private string profileDirectoryPath = Path.Combine(ApplicationConfiguration.StaticReportsDirectory, ProfileDirectoryName);
+        private string profileDirectoryPath = Path.Combine(
+            ApplicationConfiguration.Instance.StaticReportsDirectory, ProfileDirectoryName);
 
         [TestInitialize]
         public void TestInitialize()

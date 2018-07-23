@@ -15,7 +15,7 @@ namespace FingertipsUploadService.UploadTest
         private const int IndicatorId = 2;
         private const int DisclosureControlId = 1;
         private const int RowId = 3;
-        private const string AreaCode = "a";
+        private const string AreaCode = UploadRowParserTest.AreaCode;
 
         private Mock<IDisclosureControlRepository> _disclosureControlRepository;
         private Mock<ProfilesReader> _profilesreader;
@@ -41,7 +41,7 @@ namespace FingertipsUploadService.UploadTest
             // Arrange: data
             var row = DataRow();
             row[UploadColumnNames.Count] = 1;
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
 
             // Arrange: dependencies
             SetupProfilesReaderWithDisclosureId(DisclosureControlId);
@@ -60,7 +60,7 @@ namespace FingertipsUploadService.UploadTest
             // Arrange: data
             var row = DataRow();
             row[UploadColumnNames.Count] = 10;
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
 
             // Arrange: dependencies
             SetupProfilesReaderWithDisclosureId(DisclosureControlId);
@@ -79,7 +79,7 @@ namespace FingertipsUploadService.UploadTest
             // Arrange: data
             var row = DataRow();
             row[UploadColumnNames.Count] = 1;
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
 
             // Arrange: dependencies
             _disclosureControlRepository = new Mock<IDisclosureControlRepository>(MockBehavior.Strict);
@@ -102,7 +102,7 @@ namespace FingertipsUploadService.UploadTest
             // Arrange: data
             var row = DataRow();
             row[UploadColumnNames.Count] = 1;
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
 
             // Arrange: dependencies
             SetupProfilesReaderWithDisclosureId(DisclosureControlIds.GreaterThan0LessThanOrEqualto5);
@@ -121,7 +121,7 @@ namespace FingertipsUploadService.UploadTest
             // Arrange: data
             var row = DataRow();
             row[UploadColumnNames.Count] = 10;
-            var batchUpload = new BatchUpload();
+            var batchUpload = new UploadJobAnalysis();
 
             // Arrange: dependencies
             SetupProfilesReaderWithDisclosureId(DisclosureControlIds.GreaterThan0LessThanOrEqualto5);
@@ -136,7 +136,7 @@ namespace FingertipsUploadService.UploadTest
 
         private static DataRow DataRow()
         {
-            var row = UploadBatchRowParserTest.GetTestDataRow();
+            var row = UploadRowParserTest.GetTestDataRow(UploadRowParserTest.GetCoreData());
             row[UploadColumnNames.IndicatorId] = IndicatorId;
             return row;
         }

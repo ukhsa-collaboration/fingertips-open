@@ -146,6 +146,18 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
+        public void TestGetAllAgeIds_When_Age_Exists()
+        {
+            Assert.IsTrue(Reader().GetAllAgeIds().Contains(AgeIds.From18To64));
+        }
+
+        [TestMethod]
+        public void TestGetAllAgeIds_When_Age_Does_Not_Exist()
+        {
+            Assert.IsFalse(Reader().GetAllAgeIds().Contains(AgeIds.NotAnActualAge));
+        }
+
+        [TestMethod]
         public void TestGetConfidenceIntervalMethod()
         {
             ConfidenceIntervalMethod method = Reader().GetConfidenceIntervalMethod(1);

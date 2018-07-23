@@ -1,12 +1,5 @@
-﻿@using Profiles.MainUI.Models
+﻿@using System.Web.Optimization
 @foreach (string file in (IEnumerable<string>)ViewBag.ExtraCssFiles)
 {
-    if (file[0] == '+')
-    {
-        @Html.Partial("_MapCss");
-    }
-    else
-    {
-    <link type="text/css" href="@(JsHelper.GetIncludePath(file, Model.CssPath))" rel="Stylesheet" />
-    }
+    @Styles.Render("~/bundles/" + file)
 }

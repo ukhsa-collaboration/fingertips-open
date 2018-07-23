@@ -33,17 +33,6 @@ namespace PholioVisualisation.Export.File
             get { return string.Format("{0}.addresses.csv", GetName()); }
         }
 
-        private string GetName()
-        {
-            string name = new Regex("[^A-Za-z0-9]").Replace(_entityName,"");
-
-            if (name.Length > CharacterLimit)
-            {
-                name = name.Substring(0, CharacterLimit);
-            }
-            return name;
-        }
-
         public static string GetAllMetadataFileNameForUser()
         {
             return new SingleEntityFileNamer("all-indicators").MetadataFileName;
@@ -55,16 +44,42 @@ namespace PholioVisualisation.Export.File
             return new SingleEntityFileNamer(profileName).MetadataFileName;
         }
 
-        public static string GetProfileDataFileNameForUser(int profileId)
+        public static string GetDataForUserbyProfileAndAreaType(int profileId, int areaTypeId)
         {
             var profileName = GetProfileName(profileId);
-            return new SingleEntityFileNamer(profileName).DataFileName;
+            var areaTypeName = GetAreaTypeName(areaTypeId);
+            var name = string.Format("{0}-{1}", profileName, areaTypeName);
+            return new SingleEntityFileNamer(name).DataFileName;
+        }
+
+        public static string GetDataForUserbyIndicatorAndAreaType(int areaTypeId)
+        {
+            var areaTypeName = GetAreaTypeName(areaTypeId);
+            var name = string.Format("indicators-{0}", areaTypeName);
+            return new SingleEntityFileNamer(name).DataFileName;
+        }
+
+        private static string GetAreaTypeName(int areaTypeId)
+        {
+            var areaTypeName = ReaderFactory.GetAreasReader().GetAreaType(areaTypeId).ShortName;
+            return new Regex("[^A-Za-z0-9]").Replace(areaTypeName, "");
         }
 
         private static string GetProfileName(int profileId)
         {
             var profileName = ReaderFactory.GetProfileReader().GetProfileConfig(profileId).Name;
             return profileName;
+        }
+
+        private string GetName()
+        {
+            string name = new Regex("[^A-Za-z0-9-]").Replace(_entityName,"");
+
+            if (name.Length > CharacterLimit)
+            {
+                name = name.Substring(0, CharacterLimit);
+            }
+            return name;
         }
     }
 }

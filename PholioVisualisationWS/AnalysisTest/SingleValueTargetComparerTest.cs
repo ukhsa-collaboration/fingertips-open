@@ -51,6 +51,74 @@ namespace PholioVisualisation.AnalysisTest
             Assert.AreEqual(Significance.Better, significance);
         }
 
+        [TestMethod]
+        public void TestCompareRagLowIsGoodForCIsComparison()
+        {
+            var config = Config(PolarityIds.RagLowIsGood);
+            config.UseCIsForLimitComparison = true;
+            var comparer = new SingleValueTargetComparer(config);
+
+            // Worse
+            var significance = comparer.CompareAgainstTarget(new CoreDataSet {LowerCI95 = 8, UpperCI95 = 9});
+            Assert.AreEqual(Significance.Better, significance);
+
+            // Within range
+            significance = comparer.CompareAgainstTarget(new CoreDataSet { LowerCI95 = 9, UpperCI95 = 11 });
+            Assert.AreEqual(Significance.Same, significance);
+
+            // Better
+            significance = comparer.CompareAgainstTarget(new CoreDataSet { LowerCI95 = 11, UpperCI95 = 12 });
+            Assert.AreEqual(Significance.Worse, significance);
+        }
+
+        [TestMethod]
+        public void TestCompareRagHighIsGoodForCIsComparison()
+        {
+            var config = Config(PolarityIds.RagHighIsGood);
+            config.UseCIsForLimitComparison = true;
+            var comparer = new SingleValueTargetComparer(config);
+
+            // Worse
+            var significance = comparer.CompareAgainstTarget(new CoreDataSet { LowerCI95 = 8, UpperCI95 = 9 });
+            Assert.AreEqual(Significance.Worse, significance);
+
+            // Within range
+            significance = comparer.CompareAgainstTarget(new CoreDataSet { LowerCI95 = 9, UpperCI95 = 11 });
+            Assert.AreEqual(Significance.Same, significance);
+
+            // Better
+            significance = comparer.CompareAgainstTarget(new CoreDataSet { LowerCI95 = 11, UpperCI95 = 12 });
+            Assert.AreEqual(Significance.Better, significance);
+        }
+
+        [TestMethod]
+        public void TestUseCIsComparisonWhenNoCIs()
+        {
+            var config = Config(PolarityIds.RagLowIsGood);
+            config.UseCIsForLimitComparison = true;
+            var comparer = new SingleValueTargetComparer(config);
+
+            // No CIs
+            var significance = comparer.CompareAgainstTarget(new CoreDataSet());
+            Assert.AreEqual(Significance.None, significance);
+        }
+
+        [TestMethod]
+        public void TestUseCIsComparisonWhenCIsEqualLimit()
+        {
+            var config = Config(PolarityIds.RagLowIsGood);
+            config.UseCIsForLimitComparison = true;
+            var comparer = new SingleValueTargetComparer(config);
+
+            // No CIs
+            var significance = comparer.CompareAgainstTarget(new CoreDataSet
+            {
+                LowerCI95 = 10.0,
+                UpperCI95 = 10.0
+            });
+            Assert.AreEqual(Significance.Worse, significance);
+        }
+
         private CoreDataSet Value(double val)
         {
             return new CoreDataSet { Value = val };

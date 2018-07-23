@@ -4,10 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Web.Mvc;
-using Profiles.DataAccess;
-using UrlHelper = Profiles.MainUI.Helpers.UrlHelper;
+using IndicatorsUI.MainUI.Helpers;
 
-namespace Profiles.MainUI.Controllers
+namespace IndicatorsUI.MainUI.Controllers
 {
     /// <summary>
     /// End points that provide a bridge between the UI and WS for 
@@ -19,63 +18,65 @@ namespace Profiles.MainUI.Controllers
         /// Gets the Swagger docs landing page
         /// </summary>
         [HttpGet]
+        [Route("api")]
         public ActionResult ApiDocsPage()
         {
-            var url = GetCoreWsUrl("swagger/ui/index");
-            var data = new WebClient().DownloadData(url);
-            var html = Encoding.UTF8.GetString(data);
+            var html = WebServiceHelper.GetHtmlDocumentFromWebServices("swagger/ui/index");
 
             // Modify asset paths
             html = html
                 .Replace("<script src='", "<script src='api/asset/")
                 .Replace("<link href='", "<link href='api/asset/");
 
-            data = Encoding.UTF8.GetBytes(html);
-            return GetFileStreamResult(data, "text/html");
+            var data = Encoding.UTF8.GetBytes(html);
+            return ResponseHelper.GetFileStreamResult(data, "text/html");
         }
 
         /// <summary>
         /// Gets the Swagger details of each service as JSON
         /// </summary>
         [HttpGet]
+        [Route("swagger/docs/v1")]
         public ActionResult ApiServiceDetails()
         {
-            var url = GetCoreWsUrl("swagger/docs/v1");
-            var data = new WebClient().DownloadData(url);
-            return GetFileStreamResult(data, "application/json");
+            var data = WebServiceHelper.GetDataFromWebServices("swagger/docs/v1");
+            return ResponseHelper.GetFileStreamResult(data, "application/json");
         }
 
         /// <summary>
         /// Gets JS and CSS Swagger assets
         /// </summary>
         [HttpGet]
+        [Route("api/asset/{part1}")]
+        public ActionResult ApiAsset(string part1)
+        {
+            var url = WebServiceHelper.GetCoreWsUrl("swagger/ui", part1);
+            var data = new WebClient().DownloadData(url);
+            var contentType = GetContentType(url);
+            return ResponseHelper.GetFileStreamResult(data, contentType);
+        }
+
+        /// <summary>
+        /// Gets JS and CSS Swagger assets
+        /// </summary>
+        [HttpGet]
+        [Route("api/asset/{part1}/{part2}")]
         public ActionResult ApiAsset(string part1, string part2 = null)
         {
-            var url = GetCoreWsUrl("swagger/ui", part1, part2);
+            var url = WebServiceHelper.GetCoreWsUrl("swagger/ui", part1, part2);
             var data = new WebClient().DownloadData(url);
+            var contentType = GetContentType(url);
+            return ResponseHelper.GetFileStreamResult(data, contentType);
+        }
 
+        private static string GetContentType(string url)
+        {
             var contentType = "text/javascript";
             if (url.EndsWith("css"))
             {
                 contentType = "text/css";
             }
-
-            return GetFileStreamResult(data, contentType);
-        }
-
-        private static FileStreamResult GetFileStreamResult(byte[] data, string contentType)
-        {
-            var stream = new MemoryStream(data);
-            return new FileStreamResult(stream, contentType);
-        }
-
-        private static string GetCoreWsUrl(params string[] urlParts)
-        {
-            var coreWsUrl = AppConfig.Instance.CoreWsUrlForAjaxBridge;
-            var partList = urlParts.ToList();
-            partList.Insert(0, coreWsUrl);
-            var url = UrlHelper.CombineUrl(partList.ToArray());
-            return url;
+            return contentType;
         }
     }
 }

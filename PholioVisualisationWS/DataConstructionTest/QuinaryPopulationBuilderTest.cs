@@ -64,7 +64,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = PopulationGroupId
             };
-            builder.BuildPopulationOnly(AreaCodes.Ccg_AireDaleWharfdaleAndCraven,AreaTypeIds.Ccg);
+            builder.BuildPopulationOnly(AreaCodes.Ccg_AireDaleWharfdaleAndCraven,AreaTypeIds.CcgsPreApr2017);
             CheckPopulationValues(builder.Values);
         }
 
@@ -77,7 +77,7 @@ namespace PholioVisualisation.DataConstructionTest
                 DataPointOffset = 0,
                 GroupId = PopulationGroupId
             };
-            builder.BuildPopulationOnly(AreaCodes.England,AreaTypeIds.Ccg);
+            builder.BuildPopulationOnly(AreaCodes.England,AreaTypeIds.CcgsPreApr2017);
             CheckPopulationValues(builder.Values);
         }
 

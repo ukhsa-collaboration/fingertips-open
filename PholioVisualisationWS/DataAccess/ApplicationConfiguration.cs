@@ -1,75 +1,129 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess
 {
-    public static class ApplicationConfiguration
+    public class ApplicationConfiguration
     {
-        public static bool UseServerInMemoryCache
+        public static NameValueCollection AppSettings
         {
-            get { return bool.Parse(ConfigurationManager.AppSettings["UseServerInMemoryCache"]); }
+            get { return ConfigurationManager.AppSettings; }
         }
 
-        public static bool UseResponseCache
+        private NameValueCollection appSettings;
+
+        public static ApplicationConfiguration Instance = new ApplicationConfiguration(AppSettings);
+
+        public ApplicationConfiguration(NameValueCollection appSettings)
         {
-            get { return bool.Parse(ConfigurationManager.AppSettings["UseResponseCache"]); }
+            this.appSettings = appSettings;
         }
 
-        public static bool UseFileCache
+        /// <summary>
+        /// Check whether a particular feature is active.
+        /// </summary>
+        public bool IsFeatureActive(string featureSwitch)
         {
-            get { return bool.Parse(ConfigurationManager.AppSettings["UseFileCache"]); }
+            return ParseCommaSeparatedStringArray("ActiveFeatures").Contains(featureSwitch);
         }
 
-        public static string ImagesDirectory
+        public bool UseServerInMemoryCache
         {
-            get { return ConfigurationManager.AppSettings["ImagesDirectory"]; }
+            get { return bool.Parse(GetAppSetting("UseServerInMemoryCache")); }
         }
 
-        public static string ExportFileDirectory
+        public bool UseResponseCache
         {
-            get { return ConfigurationManager.AppSettings["ExportFileDirectory"]; }
+            get { return bool.Parse(GetAppSetting("UseResponseCache")); }
         }
 
-        public static string SearchIndexDirectory
+        public bool UseFileCache
         {
-            get { return ConfigurationManager.AppSettings["SearchIndexDirectory"]; }
+            get { return bool.Parse(GetAppSetting("UseFileCache")); }
         }
 
-        public static string StaticReportsDirectory
+        public string ImagesDirectory
         {
-            get { return ConfigurationManager.AppSettings["StaticReportsDirectory"]; }
+            get { return GetAppSetting("ImagesDirectory"); }
         }
 
-        public static string UrlUI
+        public string ExportFileDirectory
         {
-            get { return ConfigurationManager.AppSettings["UrlUI"]; }
+            get { return GetAppSetting("ExportFileDirectory"); }
         }
 
-        public static string CoreWsUrlForLogging
+        public string SearchIndexDirectory
         {
-            get { return ConfigurationManager.AppSettings["CoreWsUrlForLogging"]; }
+            get { return GetAppSetting("SearchIndexDirectory"); }
         }
 
-        public static string ApplicationName
+        public string StaticReportsDirectory
         {
-            get { return ConfigurationManager.AppSettings["ApplicationName"]; }
+            get { return GetAppSetting("StaticReportsDirectory"); }
         }
 
-        public static string ExceptionLogFilePath
+        public string UrlUI
         {
-            get { return ConfigurationManager.AppSettings["ExceptionLogFilePath"]; }
+            get { return GetAppSetting("UrlUI"); }
         }
 
-        public static bool IsEnvironmentLive
+        public string CoreWsUrlForLogging
+        {
+            get { return GetAppSetting("CoreWsUrlForLogging"); }
+        }
+
+        /// <summary>
+        /// Only set on live
+        /// </summary>
+        public string BuildVersion
+        {
+            get { return GetAppSetting("BuildVersion"); }
+        }
+
+        public string ApplicationName
+        {
+            get { return GetAppSetting("ApplicationName"); }
+        }
+
+        public string ExceptionLogFilePath
+        {
+            get { return GetAppSetting("ExceptionLogFilePath"); }
+        }
+
+        public bool IsEnvironmentLive
         {
             get
             {
-                var env = ConfigurationManager.AppSettings["Environment"];
+                var env = GetAppSetting("Environment");
                 return string.IsNullOrEmpty(env) == false &&
                     env.Equals(ApplicationEnvironments.Live);
             }
+        }
+
+        public string GetLiveUpdateKey()
+        {
+            return GetAppSetting("LiveUpdateKey");
+        }
+
+        private IList<string> ParseCommaSeparatedStringArray(string key)
+        {
+            var configValue = GetAppSetting(key);
+
+            if (string.IsNullOrWhiteSpace(configValue))
+            {
+                return new List<string>();
+            }
+
+            return configValue.Split(',');
+        }
+
+        private string GetAppSetting(string key)
+        {
+            return appSettings[key];
         }
     }
 }

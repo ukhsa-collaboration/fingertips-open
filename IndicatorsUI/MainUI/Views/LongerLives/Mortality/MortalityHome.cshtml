@@ -1,5 +1,6 @@
-﻿@using Profiles.MainUI.Helpers
-@model Profiles.MainUI.Models.PageModel
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@model IndicatorsUI.MainUI.Models.PageModel
 @{
     Layout = "~/Views/LongerLives/Mortality/_MortalityLayoutPage.cshtml";
     var imagePath = ViewBag.ImagesUrl + "Mortality/";
@@ -13,7 +14,7 @@
 }
 
 <div id="content">
-    <div class="home_intro clearfix">
+    <div class="home-intro clearfix">
         @ContentProvider.GetContent("home-header", Model.ProfileId)
     </div>
 
@@ -79,13 +80,12 @@
             <p>Making England's mortality data accessible to everyone.</p>
         </div>
         <div class="article">
-            <h3><a href="/topic/@profileUrlKey/connect">Join the conversation</a></h3>
-            <p>Let us know what you think about Longer Lives.</p>
+            <h3><a href="/topic/" + @ProfileUrlKeys.PublicHealthDashboard>Public Health Dashboard</a></h3>
+            <p>Key measures of public health for your local area.</p>
         </div>
         <div class="article  last">
             <h3><a href="/topic/@profileUrlKey/health-intervention/liver_disease">Focus on liver disease</a></h3>
             <p>Find out what causes it and how rates can be reduced.</p>
         </div>
     </div>
-    <p class="footnote"><sup>1</sup> Office for National Statistics. Mortality Statistics: Deaths Registered in England and Wales by Area of Usual Residence, 2011.</p>
 </div>

@@ -23,7 +23,7 @@ namespace PholioVisualisation.DataConstructionTest
             indicatorMetadataProvider.CorrectLocalDocumentLink(metadata);
 
             var updatedUrl = metadata[0].Descriptive["Link"];
-            var expectUrl = @"<a href=""" + ApplicationConfiguration.UrlUI + "/documents/test.doc";
+            var expectUrl = @"<a href=""" + ApplicationConfiguration.Instance.UrlUI + "/documents/test.doc";
 
             Assert.AreEqual(expectUrl, updatedUrl);
         }

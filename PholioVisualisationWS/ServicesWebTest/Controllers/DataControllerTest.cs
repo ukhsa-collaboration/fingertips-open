@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Export.File;
-using ServicesWeb.Controllers;
 using PholioVisualisation.PholioObjects;
+using PholioVisualisation.ServicesWeb.Controllers;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.ServicesWebTest.Controllers
 {
@@ -32,21 +29,10 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         }
 
         [TestMethod]
-        public void TestGetQuinaryPopulationData()
-        {
-            var areaCode = AreaCodes.Gp_Burnham;
-
-            var data = new DataController().GetQuinaryPopulationData(areaCode,
-                GroupIds.PracticeProfiles_SupportingIndicators, 0);
-
-            Assert.AreEqual(data["Code"], areaCode);
-        }
-
-        [TestMethod]
         public void TestGetQuinaryPopulation()
         {
             var areaCode = AreaCodes.Ccg_AireDaleWharfdaleAndCraven;
-            var areaTypeId = AreaTypeIds.Ccg;
+            var areaTypeId = AreaTypeIds.CcgsPreApr2017;
 
             var data = new DataController().GetQuinaryPopulation(areaCode,
                 areaTypeId, 0);
@@ -86,7 +72,7 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         public void TestGetAllDataCsvByGroup_For_GPs()
         {
             var data = new DataController(new DummyFileBuilder())
-                .GetDataFileForGroup(AreaTypeIds.GpPractice, AreaTypeIds.Ccg, GroupIds.PracticeProfiles_Diabetes);
+                .GetDataFileForGroup(AreaTypeIds.GpPractice, AreaTypeIds.CcgsPreApr2017, GroupIds.PracticeProfiles_Diabetes);
 
             Assert.IsNotNull(data);
         }
@@ -97,6 +83,20 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
             var data = new DataController().GetIndicatorStatisticsTrendsForIndicator(IndicatorIds.LifeExpectancyAtBirth,
                 SexIds.Male, AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthority, AreaCodes.England);
 
+            Assert.IsNotNull(data);
+        }
+
+        [TestMethod]
+        public void TestGetAvailableDataForGrouping()
+        {
+            var data = new DataController().GetAvailableDataForGrouping();
+            Assert.IsNotNull(data);
+        }
+
+        [TestMethod]
+        public void TestGetDataChanges()
+        {
+            var data = new DataController().GetDataChanges(IndicatorIds.AdultUnder75MortalityRateCancer);
             Assert.IsNotNull(data);
         }
     }

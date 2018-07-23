@@ -7,38 +7,122 @@ function initPage() {
 function updatePage() {
 
     var model = MT.model;
-    var isSimilar = isSimilarAreas();
 
-    ajaxMonitor.setCalls(isSimilar ? 10 : 7);
+    if (isMapWithNoData()) {
+        // Only need to display boundaries on map
+        ajaxMonitor.setCalls(2);
 
-    // Get the data by AJAX
-    getBoundaries(model.areaTypeId);
-    getAllAreas(model);
-    loaded.areaDetails.fetchDataByAjax({ areaCode: NATIONAL_CODE });
-    getIndicatorMetadata(model.groupId, GET_METADATA_DEFINITION, GET_METADATA_SYSTEM_CONTENT);
-    getGroupRoots(model);
-    getAreaTypes();
-    getContentText('population-text');
+        // Get the data by AJAX
+        getBoundaries(model.areaTypeId);
+        getAllAreas(model);
 
-    if (isSimilar) {
-        getDecileData(model);
-        loaded.areaDetails.fetchDataByAjax();
-        loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
+        ajaxMonitor.monitor(displayPage);
+
+    } else {
+        // Map with data
+        var isSimilar = isSimilarAreas();
+
+        ajaxMonitor.setCalls(isSimilar ? 10 : 7);
+
+        // Get the data by AJAX
+        getBoundaries(model.areaTypeId);
+        getAllAreas(model);
+        loaded.areaDetails.fetchDataByAjax({ areaCode: NATIONAL_CODE });
+        getIndicatorMetadata(model.groupId, GET_METADATA_DEFINITION, GET_METADATA_SYSTEM_CONTENT);
+        getGroupRoots(model);
+        getAreaTypes();
+        getContentText('population-text');
+
+        if (isSimilar) {
+            if (isNearestNeighbour()) {
+                getNearestNeighbours();
+            } else {
+                getDecileData(model);
+            }
+            loaded.areaDetails.fetchDataByAjax();
+            loaded.areaDetails.fetchDataByAjax({ areaCode: model.parentCode });
+        }
+
+        ajaxMonitor.monitor(getSecondaryData);
     }
-
-    ajaxMonitor.monitor(getSecondaryData);
 }
 
 function getSecondaryData() {
 
+    checkGroupRootsDefined();
+    setSelectedRootIndexFromModel();
+
     ajaxMonitor.setCalls(1);
 
-    getAreaValues(groupRoots[ROOT_INDEXES.POPULATION], MT.model, getCurrentComparator().Code);
+    getAreaValues(groupRoots[selectedRootIndex], MT.model, getMapBenchmarkCode());
 
     ajaxMonitor.monitor(displayPage);
 
     initHomeElements();
     populateCauseList();
+}
+
+function displayPage() {
+
+    var model = MT.model;
+
+    initMap();
+
+    if (isMapWithNoData()) {
+        // Map only for user to choose an area
+        $('#map').css('border-style', 'none');
+        colorAllPolygonsBlue();
+    } else {
+        if (isAnyIndicatorData()) {
+
+            var root = groupRoots[selectedRootIndex];
+
+            // Set model
+            model.indicatorId = root.IID;
+            model.sexId = root.Sex.Id;
+
+            // Get area values
+            var parentCode = getMapBenchmarkCode();
+            var key = getIndicatorKey(root, model, parentCode);
+            var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
+            colorPolygons(areaValues, root);
+            displayMapLegend(root);
+
+            // Display similar area overlay
+            updateCompareBox();
+
+            $('#gmap').show();
+
+            // Only render calloutbox if we have ranking available for clicked area
+            if (mapState.isPopup) {
+                showInfoBox();
+            }
+
+        } else {
+            colorAllPolygonsGrey();
+            CallOutBox.hide();
+        }
+
+        displayDomainSelected();
+    }
+
+    unlock();
+}
+
+/**
+ * Set selectedRootIndex from model if indicator has been bookmarked
+ */
+function setSelectedRootIndexFromModel() {
+    var model = MT.model;
+    if (model.indicatorId) {
+        for (var i in groupRoots) {
+            if (groupRoots[i].IID === model.indicatorId && groupRoots[i].Sex.Id === model.sexId) {
+                selectedRootIndex = i;
+                return;
+            }
+        }
+    }
+    selectedRootIndex = 0;
 }
 
 function selectIndicator(rootIndex, indicatorId) {
@@ -51,6 +135,8 @@ function selectIndicator(rootIndex, indicatorId) {
         selectedRootIndex = rootIndex;
         model.indicatorId = indicatorId;
         model.sexId = groupRoots[selectedRootIndex].Sex.Id;
+
+        ftHistory.setHistory();
 
         // Only render calloutbox if we have ranking available for clicked area
         if (isAnyIndicatorData()) {
@@ -69,6 +155,13 @@ function selectIndicator(rootIndex, indicatorId) {
     }
 }
 
+function checkGroupRootsDefined() {
+    if (groupRoots.length === 0) {
+        throw new Error(
+            'No group roots defined. Every domain for an area type must contain indicators.');
+    }
+}
+
 function displayIndicatorSelected(index) {
     var $selectedCause = $('#' + index + '-iid-' + MT.model.indicatorId);
     var cssClass = 'active';
@@ -77,20 +170,19 @@ function displayIndicatorSelected(index) {
 }
 
 function isAnyIndicatorData() {
+    var parentCode = getMapBenchmarkCode();
 
-    var parentCode = MT.model.parentCode;
-
+    // Get data (internal working of getData need areaCode defined on model)
     var modelExtensions = (!MT.model.areaCode)
         ? { areaCode: parentCode } // No area selected 
         : {};
-
     var data = loaded.areaDetails.getData(modelExtensions);
+    if (!isDefined(data)) {
+        data = loaded.areaDetails.getData({ areaCode: parentCode });
+    }
 
     var ranks = data.Ranks[parentCode];
     return !!ranks[selectedRootIndex];
-
-
-
 }
 
 function selectDomain(groupId) {
@@ -101,7 +193,8 @@ function selectDomain(groupId) {
 
         lock();
 
-        selectedRootIndex = ROOT_INDEXES.POPULATION;
+        // Select first indicator by default
+        selectedRootIndex = 0;
 
         model.groupId = groupId;
 
@@ -132,69 +225,26 @@ function repopulateCausesAndMap() {
 
 function displayMapLegend(root) {
 
-    var prefix = '#map-legend-';
-
-    var $bobLegend = $(prefix + 'bob');
-    var $quintilesLegend = $(prefix + 'quintiles');
-    var $ragLegend = $(prefix + 'rag');
-
     // Hide all
-    $bobLegend.hide();
-    $quintilesLegend.hide();
-    $ragLegend.hide();
+    $('.map-legend').hide();
 
     // Show specific legend
+    var toShow;
+    var comparatorMethodId = root.ComparatorMethodId;
     if (root.IID === IndicatorIds.SuicidePlan) {
         // No legend
         return;
     } else if (useBlueOrangeBlue(root.PolarityId)) {
-        $bobLegend.show();
+        toShow = 'bob';
+    } else if (useQuintiles(comparatorMethodId)) {
+        toShow = 'quintiles';
+    } else if (comparatorMethodId === ComparatorMethodIds.Quartiles) {
+        toShow = 'quartiles';
     } else {
-        new MutuallyExclusiveDisplay({
-            a: $quintilesLegend,
-            b: $ragLegend
-        }).showA(useQuintiles(root.ComparatorMethodId));
-    }
-}
-
-function displayPage() {
-
-    var model = MT.model;
-
-    initMap();
-
-    // Only render calloutbox if we have ranking available for clicked area
-    if (isAnyIndicatorData()) {
-
-        var comparatorAreaCode = getCurrentComparator().Code;
-
-        // Get area values
-        var root = groupRoots[selectedRootIndex];
-        MT.model.indicatorId = root.IID;
-        MT.model.sexId = root.Sex.Id;
-        var key = getIndicatorKey(root, model, comparatorAreaCode);
-        var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
-
-        colorPolygons(areaValues, root);
-        displayMapLegend(root);
-
-        // Display similar area overlay
-        updateCompareBox();
-
-        $('#gmap').show();
-
-        if (mapState.isPopup) {
-            showInfoBox();
-        }
-
-    } else {
-        colorAllPolygonsGrey();
-        CallOutBox.hide();
+        toShow = 'rag';
     }
 
-    displayDomainSelected();
-
-    unlock();
+    $('#map-legend-' + toShow).show();
 }
 
 function getPolygonColourFunction(root) {
@@ -215,6 +265,16 @@ function getPolygonColourFunction(root) {
         };
     }
 
+    // Quartiles
+    if (root.ComparatorMethodId === ComparatorMethodIds.Quartiles) {
+
+        var quartileColors = [c.better, c.sameBetter, c.sameWorse, c.worse];
+
+        return function (sig) {
+            return getColourFromSignificance(quartileColors, sig);
+        };
+    }
+
     // No comparison
     if (polarityId === -1) {
         return function () { return noComparison; };
@@ -231,6 +291,25 @@ function getPolygonColourFunction(root) {
     return function (sig) {
         return getColourFromSignificance(ragColors, sig);
     };
+}
+
+function selectAreaType(areaTypeId) {
+    var model = MT.model;
+    setUrl('/topic/' + profileUrlKey +
+        '#par/' + NATIONAL_CODE +
+        '/ati/' + areaTypeId +
+        '/gid/' + model.groupId +
+        '/pat/' + areaTypeId);
+    // we only reload the page if we have a topic
+    // otherwise we just set the url with clicked areatype
+    var currentUrl = window.location.href;
+    if (currentUrl.indexOf("topic") > -1) {
+        window.location.reload();
+    }
+}
+
+function getMapBenchmarkCode() {
+    return isNearestNeighbour() ? NATIONAL_CODE : MT.model.parentCode;
 }
 
 function showInfoBox() {
@@ -260,14 +339,9 @@ CallOutBox.toggleDefinition = function () {
 }
 
 CallOutBox.getPopUpHtml = function () {
-    var model = MT.model;
     var areaDetails = loaded.areaDetails.getData();
-    var ranks = areaDetails.Ranks[model.parentCode];
-    var isDeprivation = selectedRootIndex === 'dep';
-
-    var showData = isDeprivation ?
-        true :
-        isDefined(ranks[selectedRootIndex].AreaRank);
+    var ranks = areaDetails.Ranks[NATIONAL_CODE];
+    var showData = ranks[selectedRootIndex].AreaRank && ranks[selectedRootIndex].AreaRank.Rank;
 
     if (showData) {
         var supportingAreaData = loaded.supportingAreaData.getData(
@@ -308,32 +382,31 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank)
     }
 
     var groupId = model.groupId;
-    var index = selectedRootIndex;
+    var groupRootIndex = selectedRootIndex;
     var imageClass = 'stat_overall';
-    var root = groupRoots[index];
+    var root = groupRoots[groupRootIndex];
     var indicatorId = root.IID;
 
     // Grade class
-    var parentCode = model.parentCode;
+    var parentCode = getMapBenchmarkCode();
     var getGrade = getGradeFunctionFromGroupRoot(root);
-    var sig = areaDetails.Significances[parentCode][index];
+    var sig = areaDetails.Significances[parentCode][groupRootIndex];
     var gradeClass = getGrade(sig, root);
-    var topLink = getTopLink('Compare with ');
 
-    var footerLink = hasPracticeData
-        ? '<span style="float: left; padding-bottom: 10px;"><a href=javascript:MT.nav.rankings();><strong style="font-size: 1em;">See local GP practice comparison table</strong></a></span>'
-        : '';
-
+    // Get metadata
     var metadataHash = loaded.indicatorMetadata[groupId];
     var metadata = metadataHash[indicatorId];
     var textMetadata = metadata.Descriptive;
 
-    var comparatorAreaCode = getCurrentComparator().Code;
-    var key = getIndicatorKey(root, model, comparatorAreaCode);
+    // Get area values
+    var key = getIndicatorKey(root, model, parentCode);
     var areaValues = getAreaCodeToCoreDataHash(loaded.areaValues[key]);
+
+    // Set area value
     var valF = areaValues[model.areaCode].ValF;
 
-    if (metadata.ValueType.Id === 2/*indirectly standardised ratio*/) {
+    if (metadata.ValueType.Id === ValueTypeIds.IndirectlyStandardisedRatio &&
+        MT.model.profileId === ProfileIds.Diabetes) {
         // e.g. Diabetes complications
         var indicatorName = textMetadata.Name;
         var indicatorDescription = '';
@@ -378,39 +451,62 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank)
 
     var unitFormat = new UnitFormat(metadata, data.Val);
 
-    var hideSupportingData = indicatorId === IndicatorIds.SuicidePlan;
+    var hideSupportingData = !MT.config.showCallOutBoxPopulation;
+
+    // Top compare links
+    var areComparingSimilarAreas = isSimilarAreas();
+    var similarAreaLabel = '';
+    var similarAreaOptions = [];
+    if (areComparingSimilarAreas) {
+        var similarAreaLabel;
+        if (isNearestNeighbour()) {
+            similarAreaLabel = 'CIPFA nearest neighbours';
+        } else if (doesAreaTypeCompareToOnsCluster()) {
+            similarAreaLabel = 'ONS cluster group';
+        } else {
+            similarAreaLabel = 'Deprivation group';
+        }
+    } else {
+        // Nearest neighbours
+        if (model.areaTypeId === AreaTypeIds.CountyUA && isFeatureEnabled('enableNeighbourComparisonInLongerLives')) {
+            similarAreaOptions.push({ func: 'viewNearestNeighbours', text: 'Similar areas' });
+        }
+
+        // Other option
+        var text = doesAreaTypeCompareToOnsCluster()
+            ? 'Similar areas'
+            : 'Deprivation group';
+        similarAreaOptions.push({ func: 'viewSimilar', text: text });
+    }
 
     // Whether or not to show the man next to the top indicators
     var showMan = profileId !== ProfileIds.Suicide;
-
+    var extendedViewModel = CallOutBox.getExtendedModel(areaPopulation, getGrade, areaValues);
     var viewModel = {
+        areComparingSimilarAreas: areComparingSimilarAreas,
+        similarAreaLabel: similarAreaLabel,
+        similarAreaOptions: similarAreaOptions,
         showMan: showMan,
         hideSupportingData: hideSupportingData,
-        rankingHtml: CallOutBox.getRankingHtml(ranks[index], indicatorId),
+        rankingHtml: CallOutBox.getRankingHtml(ranks[groupRootIndex], indicatorId),
         nameofplace: areaDetails.Area.Name,
-        indirectlyStandardisedRate: new CommaNumber(data.Count).rounded(),
+        areaCode: model.areaCode,
+        areaTypeName: getSimpleAreaTypeName(),
         ranking: rankingValF,
-        period: ranks[index].Period,
+        period: ranks[groupRootIndex].Period,
         unit: unitFormat.getLongLabel(),
         unitClass: unitFormat.getClass(),
-        areaCode: model.areaCode,
         imageclass: imageClass,
-        filterheader: metadata.ValueType.Id === 2 ? textMetadata.Definition : indicatorName,
+        filterheader: metadata.ValueType.Id === ValueTypeIds.IndirectlyStandardisedRatio ? textMetadata.Definition : indicatorName,
         rankClass: gradeClass,
         valueNote: valueNoteText,
-        topLinkText: topLink.text,
-        topLinkFunction: topLink.func,
-        footerLinkText: footerLink,
         indicatordescription: indicatorDescription,
         isdomainnormal: isDomainNormal,
         topIndicatorText: topIndicatorText,
         dataSource: textMetadata.DataSource,
         isDefinitionOpen: mapState.isDefinitionOpen,
-        area: getAreaTypeNameSingular(model.areaTypeId),
         hasPracticeData: hasPracticeData
     };
-
-    var extendedViewModel = CallOutBox.getExtendedModel(areaPopulation, getGrade, areaValues);
     jQuery.extend(viewModel, extendedViewModel);
 
     return templates.render('areaoverlay', viewModel);
@@ -441,19 +537,16 @@ CallOutBox.getRankingHtml = function (rankInfo, indicatorId) {
 }
 
 function healthChecksAlternativeModel(model) {
-    var modelForHealthCheck = {};
-    modelForHealthCheck.areaCode = model.areaCode;
-    modelForHealthCheck.areaTypeId = model.areaTypeId;
-    modelForHealthCheck.profileId = ProfileIds.HealthChecks;
-    modelForHealthCheck.groupId = GroupIds.HealthChecks.HealthCheck;
-    return modelForHealthCheck;
+    var altModel = {};
+    altModel.areaCode = model.areaCode;
+    altModel.areaTypeId = model.areaTypeId;
+    altModel.profileId = ProfileIds.HealthChecks;
+    altModel.groupId = GroupIds.HealthChecks.HealthCheck;
+    return altModel;
 }
 
-
-templates.add('areaHover',
-    '<div class="{{hoverTemplateClass}} map-info"><div class="map-info-header clearfix">{{#showSimilarLink}}<a href="javascript:viewSimilar()">{{similarText}} similar areas on map ></a>{{/showSimilarLink}}</div><div class="hover-map-info-body map-info-stats clearfix">'
-    + '<h4 class="hover-place-name">{{nameofplace}}</h4>' + '</div><div class="map-info-footer clearfix"></div><div class="{{hoverTemplateTailClass}}" onclick="pointerClicked()"><i></i></div></div>');
-
+/**
+ * Template of indicator links under a domain
+ */
 templates.add('causes',
     '{{#causes}}<li id={{index}}-iid-{{id}} class="{{cssClass}}"><a href="javascript:selectIndicator({{index}}, {{id}})">{{{name}}}</a></li>{{/causes}}');
-

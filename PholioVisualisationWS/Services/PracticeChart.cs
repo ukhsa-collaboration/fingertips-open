@@ -192,7 +192,8 @@ namespace PholioVisualisation.Services
             }
         }
 
-        private static void AddPoint(Series series, Dictionary<string, float> data1, string key, Dictionary<string, float> data2)
+        private static void AddPoint(Series series, Dictionary<string, float> data1, string key, 
+            Dictionary<string, float> data2)
         {
             if (data1.ContainsKey(key) && data2.ContainsKey(key))
             {

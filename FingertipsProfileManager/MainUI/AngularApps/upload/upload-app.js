@@ -20,6 +20,11 @@ app.config(function ($routeProvider, $httpProvider) {
         .when("/status", {
             templateUrl: "angularapps/upload/view/upload-progress.html",
             controller: "progressCtrl"
+        })
+        .when('/queue',
+        {
+            templateUrl: "angularapps/upload/view/upload-queue.html",
+            controller: "queueCtrl"
         });
 });
 
@@ -41,6 +46,9 @@ app.factory("uploadService", function ($http) {
         },
         getAllFpmUsers: function () {
             return $http.get("/user/users");
+        },
+        getJobsInQueue: function () {
+            return $http.get(url + "/progress");
         }
     };
 });
@@ -130,6 +138,27 @@ app.controller("uploadCtrl", function ($scope, $window) {
 
 });
 
+function getRowClass(job) {
+    var rowClass;
+
+    switch (job.Status) {
+        case 0:
+            rowClass = "in-queue-bg";
+            break;
+        case 200:
+            rowClass = "in-progress-bg";
+            break;
+        case 300:
+        case 310:
+            rowClass = "awaiting-confirmation-bg";
+            break;
+        default:
+            rowClass = "default-bg";
+            break;
+    }
+    return rowClass;
+};
+
 app.controller("progressCtrl", function ($scope, uploadService, $interval, $window) {
     selectTab(2);
 
@@ -150,6 +179,7 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
 
     // Calls progress web service, which contains list of jobs 
     var getJobs = function () {
+
         var userId = _.isUndefined($scope.selectedUserId) ? currentUser.Id : $scope.selectedUserId;
         uploadService.getJobs(userId).success(function (data) {
 
@@ -174,58 +204,39 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
 
     // Auto refresh jobs list
     $interval(function () {
-        getJobs();
+        // Only update tab if it is displayed
+        if ($("#progress-tab").hasClass("active")) {
+            getJobs();
+        }
     }, 2000);
 
 
     // Return the css class for row according to job status
-    $scope.getRowClass = function (job) {
-        var rowClass;
-        switch (job.Status) {
-            case 0:
-                rowClass = "in-queue-bg";
-                break;
-            case 200:
-                rowClass = "in-progress-bg";
-                break;
-            case 300:
-            case 310:
-                rowClass = "awaiting-confirmation-bg";
-                break;
-            default:
-                rowClass = "default-bg";
-                break;
-        }
-        return rowClass;
-    };
+    $scope.getRowClass = getRowClass;
 
     // Show summary as modal dialog
     $scope.showSummary = function (job) {
-        if (job.Status === 500) {
-            var unexpectedErrorSummary = {
-                ErrorJson: null,
-                ErrorText: "Sorry, this upload has unexpectedly failed. Please contact profilefeedback@phe.gov.uk.",
-                ErrorType: null,
-                JobStatus: 500
-            };
-
-            $scope.summary = unexpectedErrorSummary;
-
-            $("#summary").modal();
-        } else {
-            // Make ajax call for job summary
-            uploadService.getJobSummary(job.Guid).success(function (data) {
-                $scope.summary = data;
-                // As we store error json as string in db, convert 
-                // it into object before we can loop over it.
+        // Make ajax call for job summary
+        uploadService.getJobSummary(job.Guid).success(function (data) {
+            $scope.summary = data;
+            // As we store error json as string in db, convert 
+            // it into object before we can loop over it.
+            if (data.ErrorJson !== '') {
                 $scope.summary.ErrorJson = JSON.parse(data.ErrorJson);
-                // show summary modal with error detail.
-                $("#summary").modal();
+            } else {
+                if (data.ErrorText === null || data.ErrorText === '') {
+                    data.ErrorText =
+                        "Sorry, this upload has unexpectedly failed. Please contact profilefeedback@phe.gov.uk.";
+                }
+                $scope.summary.ErrorJson = data;
+            }
 
-            }).error(function () {
-                // do nothing
-            });
-        }
+            // show summary modal with error detail.
+            $("#summary").modal();
+
+        }).error(function () {
+            // do nothing
+        });
     };
 
     // Change status
@@ -279,6 +290,30 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
     }
 });
 
+app.controller("queueCtrl",
+    function ($scope, uploadService, $interval, $window) {
+        selectTab(3);
+        $scope.loading = true;
+        $scope.getRowClass = getRowClass;
+
+        // Display jobs currently in the queue or being processed
+        var getQueue = function () {
+            uploadService.getJobsInQueue()
+                .success(function (data) {
+                    $scope.queueData = data;
+                    $scope.areJobsInQueue = data.length > 0;
+                    $scope.loading = false;
+                });
+        }
+
+        // Refresh queue periodically
+        $interval(function () {
+            // Only refresh is queue tab is selected
+            if ($("#queue-tab").hasClass("active")) {
+                getQueue();
+            }
+        }, 2000);
+    });
 
 // Angular doesn't support onChange event  for
 // file input. This directive will capture on change 
@@ -298,11 +333,14 @@ app.directive("customOnChange", function () {
 // Make seleted tab active
 var selectTab = function (tabnumber) {
     if (tabnumber === 1) {
+        $(".active").removeClass("active");
         $("#upload-tab").addClass("active");
-        $("#progress-tab").removeClass("active");
-    } else {
+    } else if (tabnumber === 2) {
+        $(".active").removeClass("active");
         $("#progress-tab").addClass("active");
-        $("#upload-tab").removeClass("active");
+    } else {
+        $(".active").removeClass("active");
+        $("#queue-tab").addClass("active");
     }
 };
 

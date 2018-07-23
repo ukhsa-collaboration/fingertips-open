@@ -4,15 +4,12 @@ namespace IndicatorsUI.MainUISeleniumTest
     public class LongerLivesIds
     {
         public const string Map = "map";
-        public const string AreaTypeLinkCcgs = "19";
+        public const string AreaTypeLinkCcgs = "153";
         public const string AreaTypeLinkCountyUa = "102";
-        public const string AreaTypeLinkDistrictUa = "101";
         public const string InfoBox1 = "info_box_1";
         public const string InfoBox2 = "info_box_2";
         public const string RankingsHeader = "ranking-header";
         public const string RankingsNav = "rankings-nav";
-        public const string GpCount = "gp_count";
-        public const string DiabetesRankingsTable = "diabetes-rankings-table";
         public const string TartanRugIndicatorNameOnFirstRow = "rug-indicator-0";
         public const string MortalityRankingPopulation = "national-population";
         public const string MortalityPrematureDeaths = "national-overall";
@@ -31,10 +28,13 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string ListOfIndicators = "search-indicator-list";
         public const string InequalitiesTrends = "inequalities-trends";
         public const string InequalitiesLatestValues = "inequalities-values";
+        //Angular-App
+        public const string GpPracticeSearchText = "gp-practice-search-text";
+        public const string GpPracticeAutoComplete = "typeahead-container";
         // Tabs
         public const string TabDownload = "page-download";
     }
-
+    
     public class Classes
     {
         public const string MapPopUp = "map-info-box";
@@ -44,6 +44,10 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string MortalityRankingsHeader = "header";
         public const string PrimaryValueNoteTooltip = "primary-value-note-tooltip";
         public const string BarchartIndicatorTitle = "trend-title";
+        public const string InformationTooltip = "info-tooltip";
+        public const string InformationToolTipWithPosition = "info-tooltip-with-position";
+        public const string CloseIcon = "close";
+        public const string Width90 = "width-90";
     }
 
     public class AreaNames
@@ -68,7 +72,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string DiabetesRankingsTableTrs = "//*[@id='diabetes-rankings-table']/tbody/tr";
 
         // Area type links on rankings page
-        public const string AreaTypeLinkCcgs = "//*[@id='19']/a";
+        public const string AreaTypeLinkCcgs = "//*[@id='153']/a";
         public const string AreaTypeLinkDistrictUas = "//*[@id='101']/a";
         public const string AreaTypeLinkCountyUas = "//*[@id='102']/a";
 

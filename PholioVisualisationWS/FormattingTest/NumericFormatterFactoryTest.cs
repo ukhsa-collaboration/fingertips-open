@@ -22,7 +22,8 @@ namespace PholioVisualisation.FormattingTest
 
         private void WhenNumericFormatterIsCreated()
         {
-            formatter = NumericFormatterFactory.New(metadata, ReaderFactory.GetGroupDataReader());
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
         }
 
         private void ThenValuesAreFormattedTo1DecimalPlace()

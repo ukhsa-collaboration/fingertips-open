@@ -1,0 +1,14 @@
+﻿# Synonyms for Fingertips search: must be single words & comma-separated & max three words
+obesity, overweight, weight
+opiate, heroin, cocaine
+breastfeeding, breast, birth
+hypertension, pressure
+screening, diagnosis
+poverty, deprivation, deprived
+flu, influenza
+tuberculosis, tb
+smoking, tobacco, cigarette
+cvd, heart, stroke, cardiovascular
+respiratory, copd
+injuries, injured
+employment, unemployment, jobseeker

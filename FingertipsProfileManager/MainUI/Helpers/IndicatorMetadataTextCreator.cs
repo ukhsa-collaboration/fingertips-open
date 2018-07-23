@@ -7,7 +7,15 @@ using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class IndicatorMetadataTextCreator
+    public interface IIndicatorMetadataTextCreator
+    {
+        void CreateNewIndicatorTextValues(int profileId,
+            IList<IndicatorMetadataTextItem> indicatorMetadataTextItems,
+            IList<IndicatorMetadataTextProperty> properties,
+            int nextIndicatorId, string userName);
+    }
+
+    public class IndicatorMetadataTextCreator : IIndicatorMetadataTextCreator
     {
         private ProfileRepository _profileRepository;
 

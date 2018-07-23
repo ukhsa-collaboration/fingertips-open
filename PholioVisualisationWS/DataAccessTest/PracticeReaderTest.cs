@@ -133,7 +133,7 @@ namespace PholioVisualisation.DataAccessTest
                 .GetPracticeCodeToBaseDataMap(grouping,
                 new TimePeriod { Year = 2011, YearRange = 1 });
 
-            Assert.AreEqual(map[AreaCodes.Gp_Burnham].LowerCI, ValueData.NullValue);
+            Assert.AreEqual(map[AreaCodes.Gp_Burnham].LowerCI95, ValueData.NullValue);
         }
     }
 }

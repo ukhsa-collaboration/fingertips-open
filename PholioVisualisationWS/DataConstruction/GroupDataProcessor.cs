@@ -54,7 +54,7 @@ namespace PholioVisualisation.DataConstruction
         private void FormatDataAndStats(GroupRoot groupRoot, IndicatorMetadata metadata,
             TimePeriodFormatter timePeriodFormatter)
         {
-            var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+            var formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
 
             new GroupRootFormatter().
                 Format(groupRoot, metadata, timePeriodFormatter, formatter);

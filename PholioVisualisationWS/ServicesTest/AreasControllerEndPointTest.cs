@@ -82,9 +82,9 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetChildAreas_When_Parent_Is_Category()
         {
             byte[] data = GetData("areas/by_parent_area_code?" +
-                "area_type_id=" + AreaTypeIds.Ccg +
+                "area_type_id=" + AreaTypeIds.CcgsPreApr2017 +
                 "&parent_area_code=" + "cat-2-7" +
-                "&profile_id=" + ProfileIds.Diabetes);
+                "&profile_id=" + ProfileIds.DiabetesLongerLives);
 
             TestHelper.IsData(data);
         }
@@ -129,8 +129,8 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetAreasOfAreaType()
         {
             byte[] data = GetData("areas/by_area_type?" +
-                "area_type_id=" + AreaTypeIds.Ccg +
-                "&profile_id=" + ProfileIds.Diabetes);
+                "area_type_id=" + AreaTypeIds.CcgsPreApr2017 +
+                "&profile_id=" + ProfileIds.DiabetesLongerLives);
 
             TestHelper.IsData(data);
         }

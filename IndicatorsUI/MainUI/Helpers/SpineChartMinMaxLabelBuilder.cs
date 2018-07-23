@@ -1,8 +1,8 @@
 ﻿using System;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Models;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class SpineChartMinMaxLabelBuilder
     {

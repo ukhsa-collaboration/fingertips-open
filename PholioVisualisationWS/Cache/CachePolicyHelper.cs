@@ -26,7 +26,7 @@ namespace PholioVisualisation.Cache
 
         public static void SetMidnightWebCache(HttpResponse response)
         {
-            if (ApplicationConfiguration.UseResponseCache)
+            if (ApplicationConfiguration.Instance.UseResponseCache)
             {
                 response.ExpiresAbsolute = Midnight;
                 response.Cache.SetCacheability(HttpCacheability.ServerAndPrivate);
@@ -35,7 +35,7 @@ namespace PholioVisualisation.Cache
 
         public static void SetWeekWebCache(HttpResponse response)
         {
-            if (ApplicationConfiguration.UseResponseCache)
+            if (ApplicationConfiguration.Instance.UseResponseCache)
             {
                 response.ExpiresAbsolute = OneWeekFromNow;
                 response.Cache.SetCacheability(HttpCacheability.Public);

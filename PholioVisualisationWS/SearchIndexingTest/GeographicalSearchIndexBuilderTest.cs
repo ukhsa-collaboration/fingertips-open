@@ -20,7 +20,7 @@ namespace PholioVisualisation.SearchIndexingTest
         [TestMethod]
         public void TestBuildPlacePostcodes()
         {
-            var builder = new GeographicalSearchIndexBuilder(ApplicationConfiguration.SearchIndexDirectory);
+            var builder = new GeographicalSearchIndexBuilder(ApplicationConfiguration.Instance.SearchIndexDirectory);
             SearchIndexingTestHelper.BuildIndexesThenCheckIndexFolderExists(builder,
                 GeographicalSearchIndexBuilder.DirectoryPlacePlacecodes);
         }

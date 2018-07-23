@@ -3,6 +3,7 @@ function initPage() {
     updateModelFromHash();
     ftHistory.setHistory();
 
+    var onsClusterCode = getOnsCodeForArea(MT.model.areaCode);
     if (!String.isNullOrEmpty(onsClusterCode)) {
         MT.model.parentCode = onsClusterCode;
     }
@@ -187,7 +188,7 @@ function populateAreaTypes(model) {
         var templateName = 'areaFilter';
 
         templates.add(templateName, '<h5>Select Area</h5><ul class="areaFilters">\
-        {{#types}}<li id="{{Id}}" class="areaFilter {{class}}"><a href="javascript:switchAreas({{Id}});">{{Short}}</a></li>{{/types}}' + '<div class="hr"><hr /></div>');
+        {{#types}}<li id="{{Id}}" class="areaFilter {{class}}"><a href="javascript:selectAreaType({{Id}});">{{Short}}</a></li>{{/types}}' + '<div class="hr"><hr /></div>');
 
         setAreaTypeOptionHtml(templateName);
 
@@ -196,7 +197,7 @@ function populateAreaTypes(model) {
     }
 }
 
-function switchAreas(parentAreaTypeId) {
+function selectAreaType(parentAreaTypeId) {
     setUrl('/topic/' + profileUrlKey + '/comparisons#par/' + NATIONAL_CODE + '/ati/' + parentAreaTypeId + '/pat/' + parentAreaTypeId);
     window.location.reload();
 }
@@ -499,7 +500,6 @@ function assignRank(rowsToDisplay) {
 function selectSimilarAreas(areaCode) {
     if (!FT.ajaxLock) {
         lock();
-        
 
         comparatorId = DEPRIVATION_DECILE_COMPARATOR_ID;
         MT.model.areaCode = areaCode;
@@ -531,7 +531,7 @@ function selectSimilarAreas(areaCode) {
 }
 
 function waitForOnsCode() {
-    MT.model.parentCode = onsClusterCode;
+    MT.model.parentCode = getOnsCodeForArea(MT.model.areaCode);
     initPage();
 }
 
@@ -548,7 +548,6 @@ function showAllAreas() {
         MT.model.parentCode = NATIONAL_CODE;
 
         rootIndexesToGet = [selectedRootIndex];
-        onsClusterCode = '';
 
         initPage();
 

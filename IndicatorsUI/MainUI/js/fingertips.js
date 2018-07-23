@@ -153,7 +153,7 @@ function AreaTypes(areaTypesArray, areaTypesHash) {
 }
 
 function addTd(html, text, cssClass, tooltip) {
-    
+
     html.push('<td');
 
     if (cssClass) {
@@ -237,7 +237,7 @@ function getKey() {
 
 function showDataQualityLegend() {
     var $dataQuality = $('#data-quality-key');
-    if (showDataQuality) {
+    if (FT.config.showDataQuality) {
         $dataQuality.show();
     } else {
         $dataQuality.hide();
@@ -272,7 +272,7 @@ function showTargetBenchmarkOption(roots) {
 * Get AreaName from selected area Object
 */
 function getAreaNameToDisplay(area) {
-    if (area.AreaTypeId == AreaTypeIds.Practice) {
+    if (area.AreaTypeId === AreaTypeIds.Practice) {
         return area.Code + ' - ' + area.Name;
     } else {
         return area.Name;
@@ -280,7 +280,7 @@ function getAreaNameToDisplay(area) {
 }
 
 function getShortAreaNameToDisplay(area) {
-    if (area.AreaTypeId == AreaTypeIds.Practice) {
+    if (area.AreaTypeId === AreaTypeIds.Practice) {
         return area.Code + ' - ' + area.Short;
     } else {
         return area.Short;
@@ -506,7 +506,6 @@ var pages = (function () {
 * @class getIndicatorMetadata
 */
 function getIndicatorMetadata(groupId, getSystemContent) {
-
     // Establish whether metadata is already loaded
     var loadedMetadata = loaded.indicatorMetadata;
     if (isDefined(loadedMetadata[groupId])) {
@@ -520,10 +519,9 @@ function getIndicatorMetadata(groupId, getSystemContent) {
             ).add('include_system_content', getSystemContent
             ).add('include_definition', 'yes');
 
-        if (FT.model.profileId === ProfileIds.SearchResults) {
+        if (isInSearchMode()) {
             var method = 'by_indicator_id';
             parameters.add('indicator_ids', indicatorIdList.getAllIds());
-            addRestrictToProfilesIdsParameter(parameters);
         } else {
             method = 'by_group_id';
             parameters.add('group_ids', groupId);
@@ -535,19 +533,6 @@ function getIndicatorMetadata(groupId, getSystemContent) {
                 ajaxMonitor.callCompleted();
             });
     }
-};
-
-/**
-* Generic AJAX call to the GetData.ashx service.
-* @class getData
-*/
-function getData(callback, service, args) {
-
-    args = isDefined(args) && !String.isNullOrEmpty(args) ?
-        '&' + args :
-        '';
-
-    ajaxGet('GetData.ashx', 's=' + service + args, callback);
 };
 
 /**
@@ -736,6 +721,20 @@ function getAreaValues(root, model, code) {
     }
 }
 
+function getAreaValuesCallback(coreDataList) {
+
+    var hash = {};
+    for (var i in coreDataList) {
+        var data = coreDataList[i];
+        hash[data.AreaCode] = data;
+    }
+
+    loaded.areaValues[ajaxMonitor.state.indicatorKey] = hash;
+
+    ajaxMonitor.callCompleted();
+}
+
+
 function getIndicatorKey(root, model, comparatorCode) {
     return getKey(
         model.groupId,
@@ -773,22 +772,8 @@ function getValueNotesCall() {
 * Returns an array of all the relevant profile ids.
 * @class getProfileIds
 */
-function getProfileIds(profileId) {
-
-    if (profileCollectionIdList.length) {
-        return profileCollectionIdList;
-    }
-
-    return [restrictSearchProfileId
-        ? restrictSearchProfileId
-        : profileId];
-}
-
-/**Add an AJAX parameter of all the relevant profile ids.
-* @class addRestrictToProfilesIdsParameter
-*/
-function addRestrictToProfilesIdsParameter(parameters) {
-    parameters.add('restrict_to_profile_ids', getProfileIds().join(','));
+function getProfileIds() {
+    return [];
 }
 
 function SexAndAge() { }
@@ -804,19 +789,24 @@ SexAndAge.prototype = {
 
             label.push(' (');
 
-            if (groupRoot.StateSex) {
+            if (groupRoot.StateSex && groupRoot.Sex.Id !== -1) {
                 label.push(groupRoot.Sex.Name);
+
+                if (areBothLabelsRequired) {
+                    label.push(', ');
+                }
             }
 
-            if (areBothLabelsRequired) {
-                label.push(', ');
-            }
-
-            if (groupRoot.StateAge) {
+            if (groupRoot.StateAge && groupRoot.Age.Id !== -1) {
                 label.push(groupRoot.Age.Name);
             }
 
             label.push(')');
+
+            // Neither sex nor age were defined
+            if (label.length === 2) {
+                return '';
+            }
         }
 
         return label.join('');
@@ -1059,7 +1049,7 @@ function ElementManager() {
 */
 function getIndicatorDataQualityHtml(dataQualityCount) {
 
-    if (showDataQuality && dataQualityCount) {
+    if (FT.config.showDataQuality && dataQualityCount) {
         var count = parseInt(dataQualityCount);
         if (count > 0) {
 
@@ -1227,7 +1217,7 @@ function initAreaSearch(jquerySelector, excludeParentAreasFromSearchResults, ext
 */
 function ajaxAreaSearch(text, successFunction, excludeParentAreasFromSearchResults) {
 
-    var areaTypeId = AreaTypeIds.CCG; // Why CCG??
+    var areaTypeId = AreaTypeIds.CCGPreApr2017; // Why CCG??
 
     var parentAreas = [];
     if (!excludeParentAreasFromSearchResults) {
@@ -1245,7 +1235,7 @@ function getAreaSearchResults(text, successFunction, areaTypeId, shouldSearchRet
 
     var parameters = new ParameterBuilder();
     parameters.add('search_text', text);
-    parameters.add('no_cache', true);
+    parameters.setNotToCache();
     parameters.add('polygon_area_type_id', areaTypeId);
     parameters.add('include_coordinates', shouldSearchRetreiveCoordinates);
     parameters.add('parent_areas_to_include_in_results', parentAreasToIncludeInResults.join(','));
@@ -1493,20 +1483,43 @@ function getTrendMarkerImage(trendMarker, polarity) {
     return "<img src='/images/trends/" + imageName + ".png" + "'/>";
 }
 
+
+/**
+* Get the content for current profile
+* @class getContentText
+*/
+function getContentText(contentKey) {
+    var model = FT.model;
+    var parameters = new ParameterBuilder(
+      ).add('profile_id', model.profileId
+      ).add('key', contentKey);
+
+    ajaxGet('api/content',
+        parameters.build(),
+        function (obj) {
+            loaded.contentText = obj;
+            ajaxMonitor.callCompleted();
+        });
+}
+
 function exportChartAsImage(chart) {
     if (chart) {
         chart.exportChart({ type: 'image/png' }, {});
+        logEvent('ExportImage', getCurrentPageTitle());
     }
 };
 function getComparatorId() {
     return comparatorId;
 }
 
+function showTopicMenu() {
+    $('#profile-topic-menu').toggle();
+}
+
 // Constants
 var REGIONAL_COMPARATOR_ID = 1;
 var NATIONAL_COMPARATOR_ID = 4;
 var TARGET_COMPARATOR_ID = 2;
-var NOT_APPLICABLE = 'n/a';
 var NATIONAL_CODE = 'E92000001';
 var SEARCH_NO_RESULT_TOP_OFFSET = 0;
 var SEARCH_NO_RESULT_LEFT_OFFSET = 0;

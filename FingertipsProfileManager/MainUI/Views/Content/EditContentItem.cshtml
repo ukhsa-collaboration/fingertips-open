@@ -18,10 +18,10 @@
 @using (Html.BeginForm("UpdateContentItem", "Content", FormMethod.Post, new { id = "EditContent" }))
 {
     <h2 class="subheading col-md-12">Edit content</h2>
-
+    @Html.Partial("_ContentErrorMessage")
     <div class="row form-horizontal">
         <label class="col-lg-2 control-label">Profile:</label>
-        <div class="col-lg-10 form-control-static">@Model.ProfileName</div>
+        <div class="col-lg-10 form-control-static">@ViewBag.ProfileName</div>
     </div>
 
         <div class="row form-group form-horizontal">
@@ -65,9 +65,8 @@ else
     @Html.Partial("_PlainTextWarning")
     @Html.Partial("_ContentTextArea")
 
-    @Html.HiddenFor(x => x.Id)
     @Html.HiddenFor(x => x.ProfileId)
-    @Html.HiddenFor(x => x.ProfileName)
+    @Html.HiddenFor(x => x.Id)
     @Html.HiddenFor(x => x.Description)
     @Html.HiddenFor(x => x.ContentKey)
     @Html.HiddenFor(x => x.Content, new { @Id = "oldContent", @Name = "oldContent" })
@@ -87,7 +86,7 @@ else
             }
             else
             {
-                <p class="warning">You do not have permission to save changes for "@Model.ProfileName"</p>
+                <p class="warning">You do not have permission to save changes for "@ViewBag.ProfileName"</p>
             }
         </div>
     </div>

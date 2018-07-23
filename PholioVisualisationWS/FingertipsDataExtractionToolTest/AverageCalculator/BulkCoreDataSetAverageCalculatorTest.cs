@@ -5,7 +5,7 @@ using FingertipsDataExtractionTool.AverageCalculator;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
 
-namespace PholioVisualisation.FingertipsDataExtractionToolTest
+namespace PholioVisualisation.FingertipsDataExtractionToolTest.AverageCalculator
 {
     [TestClass]
     public class BulkCoreDataSetAverageCalculatorTest

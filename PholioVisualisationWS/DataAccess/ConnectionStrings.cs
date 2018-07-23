@@ -9,4 +9,15 @@ namespace PholioVisualisation.DataAccess
             get { return ConfigurationManager.ConnectionStrings["PholioConnectionString"].ConnectionString; }
         }
     }
+
+    /// <summary>
+    /// Wrapper to allow Connection strings to be injected as dependency
+    /// </summary>
+    public class ConnectionStringsWrapper
+    {
+        public virtual string PholioConnectionString
+        {
+            get { return ConnectionStrings.PholioConnectionString; }
+        }
+    }
 }

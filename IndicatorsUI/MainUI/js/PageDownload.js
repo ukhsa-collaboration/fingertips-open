@@ -48,6 +48,9 @@ function getArePdfsAvailable() {
     }
 }
 
+
+
+
 /**
 * Returns true if PDFs are available for the user to download.
 * @class isPdfAvailableForCurrentAreaType
@@ -55,7 +58,7 @@ function getArePdfsAvailable() {
 function isPdfAvailableForCurrentAreaType() {
     var areaTypes = loaded.areaTypesWithPdfs[FT.model.profileId];
     var areaTypeId = FT.model.areaTypeId;
-    return _.some(areaTypes, function(areaType) {
+    return _.some(areaTypes, function (areaType) {
         return areaType.Id === areaTypeId;
     });
 }
@@ -74,7 +77,14 @@ function PdfFileNamer(profileId) {
 function displayDownload() {
 
     pages.getContainerJq().html('<div class="row">' +
-        getCsvDownloadHtml() + getPdfHtml() + '</div>');
+        getCsvDownloadHtml() + '<div class="col-md-6">' +
+         '<div class="row col-md-12">' + getPdfHtml() + '</div>' +
+          '<div class="row col-md-12">&nbsp;</div>' +
+         '<div class="row col-md-12">' +
+          (areAtAGlanceReports() ? getAtAGlanceHtml() : "") +
+         '</div>' +
+         '</div>' +
+         '</div>');
 
     showAndHidePageElements();
 
@@ -86,6 +96,12 @@ function displayDownload() {
     });
 }
 
+function areAtAGlanceReports() {
+    var profileId = FT.model.profileId;
+    return profileId === ProfileIds.Phof || profileId === ProfileIds.Tobacco;
+}
+
+
 function getCsvDownloadHtml() {
     var model = FT.model,
     menus = FT.menus;
@@ -95,24 +111,34 @@ function getCsvDownloadHtml() {
     var showSubnational = !isParentCountry() && !FT.model.isNearestNeighbours();
     var groupName = getCurrentDomainName();
 
-    var showAllIndicators = isInSearchMode();
-    var showProfile = !showAllIndicators;
+    var showAllIndicatorsInProfile = isInSearchMode();
+    var showProfile = !showAllIndicatorsInProfile;
     var showGroup = !String.isNullOrEmpty(groupName) && showProfile;
+    var showPopulation = false;
+
+    // Too much data to download for all of practice profiles
+    if (FT.model.profileId === ProfileIds.PracticeProfiles) {
+        showProfile = false;
+        showPopulation = true;
+    }
 
     var viewModel = {
         profileName: FT.config.profileName,
         groupName: groupName,
         showGroup: showGroup,
         showProfile: showProfile,
-        showAllIndicators: showAllIndicators,
+        showAllIndicators: showAllIndicatorsInProfile,
+        showPopulation: showPopulation,
         indicatorName: getIndicatorName(getGroupRoot().IID),
         allLabel: 'Data for ' + areaTypeName + ' in England',
-        parentLabel: FT.model.isNearestNeighbours() ? '' : 'Data for ' + areaTypeName + ' in ' + getParentArea().Name,
+        parentLabel: FT.model.isNearestNeighbours() ? ''
+            : 'Data for ' + areaTypeName + ' in ' + getParentArea().Name,
         nationalCode: NATIONAL_CODE,
         parentCode: model.parentCode,
         showSubnational: showSubnational,
         showAddresses: model.areaTypeId === AreaTypeIds.Practice,
-        excelExportText: download.excelExportText
+        excelExportText: download.excelExportText,
+        apiUrl: FT.url.bridge + 'api'
     };
 
     return templates.render('excel', viewModel);
@@ -146,7 +172,13 @@ function getPdfHtml() {
         download.timePeriod = timePeriods[0];
     }
 
+    // Mental health survey
+    var showMentalHealthSurvey = _.contains([ProfileIds.Dementia, ProfileIds.ChildrenYoungPeoplesWellBeing,
+    ProfileIds.CommonMentalHealthDisorders, ProfileIds.MentalHealthJsna, ProfileIds.SevereMentalIllness,
+    ProfileIds.SuicidePrevention], model.profileId);
+
     var viewModel = {
+        showMentalHealthSurvey: showMentalHealthSurvey,
         noPdfsMessage: noPdfsMessage,
         images: imgUrl,
         fileName: new PdfFileNamer(profileId).name,
@@ -159,6 +191,43 @@ function getPdfHtml() {
     };
 
     return templates.render('pdf', viewModel);
+}
+
+function getAtAGlanceHtml() {
+
+    var config = FT.config;
+    var model = FT.model;
+
+    var areaName = areaHash[model.areaCode].Name;
+
+    // Time periods
+    var timePeriods = config.staticReportsFolders;
+    if (timePeriods.length > 0) {
+        download.timePeriod = timePeriods[0];
+    }
+
+    var parentArea = getParentArea();
+    var areaList = [];
+    areaList.push({ Name: "England", Code: NATIONAL_CODE });
+
+    // Not all parent areas have reports 
+    var parentAreaTypesWithReports = [AreaTypeIds.Region, AreaTypeIds.CombinedAuthorities, AreaTypeIds.County];
+    if (_.contains(parentAreaTypesWithReports, parentArea.AreaTypeId)) {
+        areaList.push({ Name: parentArea.Short, Code: parentArea.Code });
+    }
+
+    areaList.push({ Name: areaName, Code: model.areaCode });
+
+    var viewModel = {
+        images: FT.url.img,
+        profileId: model.profileId,
+        reportsLabel: config.staticReportsLabel,
+        showTimePeriodsMenu: timePeriods.length > 1,
+        timePeriods: timePeriods,
+        areaList: areaList
+    };
+
+    return templates.render('atAGlance', viewModel);
 }
 
 /**
@@ -175,17 +244,6 @@ function exportPdf(areaCode, area/*optional*/) {
 }
 
 /**
-* Download a child health PDF from the Chimat site.
-* @class downloadChildHealthPdf
-*/
-function downloadChildHealthPdf(areaCode, profileId) {
-    ajaxGet('api/area/chimat_resource_id', 'area_code=' + areaCode + '&profile_id=' + profileId,
-        function (resourceId) {
-            window.open('http://www.chimat.org.uk/resource/view.aspx?RID=' + resourceId, '_blank');
-        });
-}
-
-/**
 * Downloads a cached PDF. This function is only used on the live site.
 * @class downloadCachedPdf
 */
@@ -194,20 +252,16 @@ function downloadCachedPdf(areaCode) {
     var profileId = FT.model.profileId;
     var url;
 
-    // What about youth profiles are hosted on Chimat site
-    if (profileId === ProfileIds.ChiMatWAY || profileId === ProfileIds.ChildHealthBehaviours) {
-        downloadChildHealthPdf(areaCode, ProfileIds.ChiMatWAY);
-        return;
-    } else if (FT.config.hasStaticReports) {
+    if (FT.config.hasStaticReports) {
         downloadStaticReport(areaCode);
         return;
     } else if (profileId === ProfileIds.Liver) {
         // Liver profiles
         url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
-    } else if (profileId === ProfileIds.HealthProfiles) {
-        // Health profiles
-        url = FT.url.pdf + profileUrlKey /*global set elsewhere*/ + '/' + download.timePeriod + '/' + areaCode + '.pdf';
-    } else {
+    } else if (profileId === ProfileIds.PracticeProfiles) {
+        url = FT.url.practiceProfilePdf + '/gpp/index.php?' + 'CCG=' + FT.model.parentCode + '&PracCode=' + areaCode;
+    }
+    else {
         url = getPdfUrl(areaCode);
     }
 
@@ -216,6 +270,26 @@ function downloadCachedPdf(areaCode) {
 
 download.openFile = function (url) {
     window.open(url.toLowerCase(), '_blank');
+}
+
+function checkStaticReportExistsThenDownload(parametersString) {
+
+    // Check report exists
+    ajaxGet('api/static-reports/exists',
+        parametersString,
+        function (doesReportExist) {
+            if (doesReportExist) {
+                // Download report
+                var url = FT.url.corews + 'static-reports?' + parametersString;
+                window.open(url.toLowerCase(), '_blank');
+            } else {
+                var html = '<div style="padding:15px;"><h3>Sorry, this document is not available</h3></div>';
+                var popupWidth = 800;
+                var left = ($(window).width() - popupWidth) / 2;
+                var top = 500;
+                lightbox.show(html, top, left, popupWidth);
+            }
+        });
 }
 
 /**
@@ -233,31 +307,19 @@ function downloadStaticReport(areaCode) {
     }
 
     var parametersString = parameters.build();
-
-    // Check report exists
-    ajaxGet('api/static-reports/exists',
-        parametersString,
-        function (doesReportExist) {
-            if (doesReportExist) {
-                // Download report
-                var url = FT.url.corews + 'static-reports?' + parametersString;
-                window.open(url.toLowerCase(), '_blank');
-            } else {
-                var html = '<div style="padding:15px;"><h3>Sorry, this document is not available</h3></div>';
-                var popupWidth = 800;
-                var left = ($(window).width() - popupWidth) / 2;
-                var top = 200;
-                lightbox.show(html, top, left, popupWidth);
-            }
-        });
+    checkStaticReportExistsThenDownload(parametersString);
 }
 
+function downloadStaticReportAtaGlance(areaCode) {
+    var url = FT.url.bridge + 'static-reports/' + profileUrlKey + '/at-a-glance/' + areaCode + '.html';
+
+    download.openFile(url);
+    logEvent('Download', 'PhofAtAGlance', areaCode);
+}
+
+
 download.addProfileIdParameter = function (parameters) {
-    if (isInSearchMode()) {
-        if (isDefined(restrictSearchProfileId)) {
-            parameters.add('profile_id', restrictSearchProfileId);
-        }
-    } else {
+    if (!isInSearchMode()) {
         parameters.add('profile_id', FT.model.profileId);
     }
 }
@@ -327,7 +389,7 @@ download.downloadCsvMetadata = function (byTerm, parameters) {
 * Export all indicator data for specific profile.
 * @class download.exportProfileData
 */
-download.exportProfileData = function(parentCode) {
+download.exportProfileData = function (parentCode) {
     var parameters = getExportParameters(parentCode);
     download.addProfileIdParameter(parameters);
     download.downloadCsvData('by_profile_id', parameters);
@@ -338,7 +400,7 @@ download.exportProfileData = function(parentCode) {
 * Export indicator data for profile group
 * @class download.exportGroupData
 */
-download.exportGroupData = function(parentCode) {
+download.exportGroupData = function (parentCode) {
     var parameters = getExportParameters(parentCode);
     parameters.add('group_id', FT.model.groupId);
     download.downloadCsvData('by_group_id', parameters);
@@ -349,7 +411,7 @@ download.exportGroupData = function(parentCode) {
 * Export indicator data for single indicator.
 * @class download.exportIndicatorData
 */
-download.exportIndicatorData = function(parentCode) {
+download.exportIndicatorData = function (parentCode) {
     var parameters = getExportParameters(parentCode);
     download.addProfileIdParameter(parameters);
     parameters.add('indicator_ids', getGroupRoot().IID);
@@ -376,10 +438,24 @@ download.exportAllIndicatorData = function (parentCode) {
 download.exportAddresses = function (parentCode) {
     var parameters = new ParameterBuilder()
     .add('parent_area_code', parentCode)
-    .add('area_type_id',FT. model.areaTypeId).build();
+    .add('area_type_id', FT.model.areaTypeId).build();
     var url = FT.url.corews + 'api/area_addresses/csv/by_parent_area_code?' + parameters;
     download.openFile(url);
     logEvent('Download', 'Addresses', parameters);
+}
+
+/**
+* Export population data
+* @class download.exportPopulation
+*/
+download.exportPopulation = function (parentCode) {
+    var parameters = new ParameterBuilder()
+        .add('are', parentCode)
+        .add('gid', GroupIds.PracticeProfiles.Population)
+        .add('ati', FT.model.parentTypeId).build();
+    var url = FT.url.corews + 'GetData.ashx?s=db&pro=qp&' + parameters;
+    download.openFile(url);
+    logEvent('Download', 'Population', parameters);
 }
 
 function getExportParameters(parentCode) {
@@ -402,23 +478,25 @@ pages.add(PAGE_MODES.DOWNLOAD, {
 });
 
 templates.add('pdf',
-    '<div id="pdf-download-text" class="text col-md-3"><h2>Area profile</h2>\
+    '<div id="pdf-download-text" class="text col-md-6"><h2>Area profile</h2>\
 {{^noPdfsMessage}}\
 <p>Download a detailed report of the data for</p>\
 {{#showTimePeriodsMenu}}<p>{{reportsLabel}} <select id="report-time-period">{{#timePeriods}}<option>{{.}}</option>{{/timePeriods}}</select></p>{{/showTimePeriodsMenu}}\
 <a class="pdf" href="javascript:exportPdf(\'{{areaCode}}\')">{{areaName}}</a>\
 {{/noPdfsMessage}}\
-{{#noPdfsMessage}}<p>PDF profiles are not currently available for {{{noPdfsMessage}}}</p>{{/noPdfsMessage}}</div>\
-<div class="col-md-3"><img src="{{images}}download/{{fileName}}"{{#isAvailable}} class="pdf" onclick="exportPdf(\'{{areaCode}}\')"{{/isAvailable}}/></div>');
+{{#noPdfsMessage}}<p>PDF profiles are not currently available for {{{noPdfsMessage}}}</p>{{/noPdfsMessage}}\
+{{#showMentalHealthSurvey}}<br><a href="https://surveys.phe.org.uk/TakeSurvey.aspx?PageNumber=1&SurveyID=82428nlK#" target="_blank">Click here to provide feedback on the PDF</a>{{/showMentalHealthSurvey}}\
+</div>\
+<div class="col-md-6"><img src="{{images}}download/{{fileName}}"{{#isAvailable}} class="pdf" onclick="exportPdf(\'{{areaCode}}\')"{{/isAvailable}}/></div>');
 
 templates.add('excel',
     '<div id="excel-box" class="text col-md-6"><h2>Get the data</h2>\
 <p>Download indicator data and definitions</p>\
-{{#showProfile}}<h3>Profile: {{profileName}}</h3>\
+{{#showProfile}}<h3>Profile: {{{profileName}}}</h3>\
 <a class="excel" href="javascript:download.exportProfileData(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}<a class="excel" href="javascript:download.exportProfileData(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}\
 <a class="excel" href="javascript:download.exportProfileMetadata()">Indicator definitions</a>{{/showProfile}}\
-{{#showGroup}}<h3>Domain: {{groupName}}</h3>\
+{{#showGroup}}<h3>Domain: {{{groupName}}}</h3>\
 <a class="excel" href="javascript:download.exportGroupData(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}<a class="excel" href="javascript:download.exportGroupData(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}\
 <a class="excel" href="javascript:download.exportGroupMetadata()">Indicator definitions</a>{{/showGroup}}\
@@ -426,14 +504,35 @@ templates.add('excel',
 <a class="excel" href="javascript:download.exportAllIndicatorData(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}<a class="excel" href="javascript:download.exportAllIndicatorData(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}\
 <a class="excel" href="javascript:download.exportAllIndicatorMetadata()">Indicator definitions</a>{{/showAllIndicators}}\
-<h3>Indicator: {{indicatorName}}</h3>\
+<h3>Indicator: {{{indicatorName}}}</h3>\
 <a class="excel" href="javascript:download.exportIndicatorData(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}<a class="excel" href="javascript:download.exportIndicatorData(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}\
 <a class="excel" href="javascript:download.exportIndicatorMetadata()">Indicator definition</a>\
 {{#showAddresses}}<h3>GP practice addresses</h3>\
 <a class="excel" href="javascript:download.exportAddresses(\'{{nationalCode}}\')">{{allLabel}}</a>\
 {{#showSubnational}}<a class="excel" href="javascript:download.exportAddresses(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}{{/showAddresses}}\
-<br><p>{{{excelExportText}}}</p></div>');
+{{#showPopulation}}<h3>Population age distribution</h3>\
+<a class="excel" href="javascript:download.exportPopulation(\'{{nationalCode}}\')">{{allLabel}}</a>\
+{{#showSubnational}}<a class="excel" href="javascript:download.exportPopulation(\'{{parentCode}}\')">{{parentLabel}}</a>{{/showSubnational}}{{/showPopulation}}\
+<br><p>{{{excelExportText}}}</p>\
+<h2>Get the data with R</h2>\
+<p>The <a style="display:inline;" href="https://cran.r-project.org/web/packages/fingertipsR/index.html" target="_blank">fingertipsR</a> package allows you to download public health data using R</p>\
+<br/><h2>Public Health Data API</h2>\
+<p>The <a style="display:inline;" href="{{apiUrl}}" target="_blank">Fingertips API</a> (Chrome only) allows public health data to be retrieved in either JSON or CSV formats</p>\
+</div>'
+);
+
+templates.add('atAGlance',
+    '<div id="phof-html-download-text"  class="text col-md-6">' +
+    '<h2>At a Glance</h2>' +
+    '<p>View a web summary report of the data for</p>' +
+     '{{#showTimePeriodsMenu}}<p>{{reportsLabel}} <select id="report-time-period">{{#timePeriods}}<option>{{.}}</option>{{/timePeriods}}</select></p>{{/showTimePeriodsMenu}}' +
+    '{{#areaList}}' +
+    '<a class="pdf" href="javascript:downloadStaticReportAtaGlance(\'{{Code}}\', false)">{{Name}}</a>' +
+    '{{/areaList}}' +
+    '</div>' +
+    '<div class="col-md-6"><img src="{{images}}download/html{{profileId}}-at-a-glance.png"{{#isAvailable}} class="pdf" {{/isAvailable}}/></div>'
+);
 
 /**
 * Stores results of previous AJAX requests for information on what profiles PDFs are available for.

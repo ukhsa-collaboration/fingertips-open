@@ -1,0 +1,13 @@
+﻿@{ Layout = "~/Views/Shared/_LayoutPage.cshtml";}
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForDataPage")
+    <script type="text/javascript">
+        //<![CDATA[
+        FT.model.areAnyIndicators = true;
+        FT.model.indicatorListId = 1;//TODO set this from model
+        searchText = 'N/A';
+        //]]</script>
+}
+<div id="searchContents" class="full-width clearfix">
+    @Html.Partial("_DataPageBody")
+</div>

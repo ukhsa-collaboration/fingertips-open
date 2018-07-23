@@ -7,7 +7,15 @@ using System.Text;
 
 namespace PholioVisualisation.DataAccess
 {
-    public class PholioLabelReader : BaseDataAccess
+    public interface IPholioLabelReader
+    {
+        string LookUpAgeLabel(int ageId);
+        string LookUpYearTypeLabel(int yearTypeId);
+        string LookUpSexLabel(int sexId);
+        string LookUpValueNoteLabel(int valueNoteId);
+    }
+
+    public class PholioLabelReader : BaseDataAccess, IPholioLabelReader
     {
         protected static SqlConnection GetPholioConnection
         {

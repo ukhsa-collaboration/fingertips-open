@@ -23,10 +23,10 @@ namespace PholioVisualisation.DataConstructionTest
 
             var comparisonManager = GetComparisonManager();
             comparisonManager.TargetComparer = new SingleValueTargetComparer(new TargetConfig
-                {
-                    LowerLimit = 1,
-                    PolarityId = PolarityIds.RagHighIsGood
-                });
+            {
+                LowerLimit = 1,
+                PolarityId = PolarityIds.RagHighIsGood
+            });
             comparisonManager.CompareToCalculateSignficance(root, metadata);
 
             // Local data is compared against target
@@ -64,6 +64,19 @@ namespace PholioVisualisation.DataConstructionTest
                 root.Grouping[0].ComparatorData.Significance[ComparatorIds.England]);
         }
 
+
+        [TestMethod]
+        public void TestRegionalIsNotComparedToNationalForQuartiles()
+        {
+            NoRegionalToNationalComparisonMadeForSpecificBenchmarkingMethod(ComparatorMethodIds.Quartiles);
+        }
+
+        [TestMethod]
+        public void TestRegionalIsNotComparedToNationalForQuintiles()
+        {
+            NoRegionalToNationalComparisonMadeForSpecificBenchmarkingMethod(ComparatorMethodIds.Quintiles);
+        }
+
         [TestMethod]
         public void TestMinusOneComparatorsAreIgnored()
         {
@@ -72,34 +85,10 @@ namespace PholioVisualisation.DataConstructionTest
             AddRegionalData(root);
 
             root.Grouping[0].ComparatorId = -1;
-            root.Data.Add(new CoreDataSet { Value = 10, LowerCI = 9, UpperCI = 11 });
+            root.Data.Add(new CoreDataSet { Value = 10, LowerCI95 = 9, UpperCI95 = 11 });
 
             GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
             Assert.AreEqual(0, root.Data[0].Significance.Count);
-        }
-
-        private static void AddNationalData(GroupRoot root)
-        {
-            root.Grouping.Add(new Grouping
-                                  {
-                                      ComparatorId = ComparatorIds.England,
-                                      ComparatorMethodId = 1,
-                                      ComparatorConfidence = 95,
-                                      ComparatorData = new CoreDataSet { Value = 20, LowerCI = 15, UpperCI = 25 },
-                                      PolarityId = PolarityIds.RagHighIsGood
-                                  });
-        }
-
-        private static void AddRegionalData(GroupRoot root)
-        {
-            root.Grouping.Add(new Grouping
-                                  {
-                                      ComparatorId = ComparatorIds.Subnational,
-                                      ComparatorMethodId = 1,
-                                      ComparatorConfidence = 95,
-                                      ComparatorData = new CoreDataSet { Value = 50, LowerCI = 45, UpperCI = 55 },
-                                      PolarityId = PolarityIds.RagHighIsGood
-                                  });
         }
 
         [TestMethod]
@@ -136,6 +125,49 @@ namespace PholioVisualisation.DataConstructionTest
             AddNationalData(root);
             root.Grouping[0].ComparatorData = null;
             GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+        }
+
+        private static void AddNationalData(GroupRoot root)
+        {
+            root.Grouping.Add(new Grouping
+            {
+                ComparatorId = ComparatorIds.England,
+                ComparatorMethodId = 1,
+                ComparatorConfidence = 95,
+                ComparatorData = new CoreDataSet { Value = 20, LowerCI95 = 15, UpperCI95 = 25 },
+                PolarityId = PolarityIds.RagHighIsGood
+            });
+        }
+
+        private void NoRegionalToNationalComparisonMadeForSpecificBenchmarkingMethod(
+            int benchmarkingMethodId)
+        {
+            // Arrange
+            GroupRoot root = new GroupRoot();
+            AddRegionalData(root);
+            AddNationalData(root);
+            foreach (var grouping in root.Grouping)
+            {
+                grouping.ComparatorMethodId = benchmarkingMethodId;
+            }
+
+            // Act
+            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+
+            // Assert: no comparison made 
+            Assert.AreEqual(0, root.Grouping[0].ComparatorData.Significance.Count);
+        }
+
+        private static void AddRegionalData(GroupRoot root)
+        {
+            root.Grouping.Add(new Grouping
+            {
+                ComparatorId = ComparatorIds.Subnational,
+                ComparatorMethodId = 1,
+                ComparatorConfidence = 95,
+                ComparatorData = new CoreDataSet { Value = 50, LowerCI95 = 45, UpperCI95 = 55 },
+                PolarityId = PolarityIds.RagHighIsGood
+            });
         }
 
         private IndicatorMetadata GetMetadata()

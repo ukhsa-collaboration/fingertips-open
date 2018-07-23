@@ -1,8 +1,8 @@
 ﻿using NHibernate;
 using NHibernate.Criterion;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class TwitterSettingReader : BaseReader
     {

@@ -1,13 +1,12 @@
-﻿using IndicatorsUI.MainUISeleniumTest.Phof;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using System.Collections.Generic;
-using System.Threading;
+using IndicatorsUI.MainUISeleniumTest.Fingertips;
 
-namespace IndicatorsUI.MainUISeleniumTest.PHOF
+namespace IndicatorsUI.MainUISeleniumTest.Phof
 {
     [TestClass]
-    public class PhofCompareAreasTest : PhofBaseUnitTest
+    public class PhofCompareAreasTest : FingertipsBaseUnitTest
     {
         private const int Area = 1;
         private const int Value = 5;

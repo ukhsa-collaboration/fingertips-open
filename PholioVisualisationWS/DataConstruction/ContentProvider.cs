@@ -1,4 +1,5 @@
 ﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.Formatting;
 
 namespace PholioVisualisation.DataConstruction
@@ -10,18 +11,18 @@ namespace PholioVisualisation.DataConstruction
 
     public class ContentProvider : IContentProvider
     {
-        private IContentReader _contentReader;
-        private HtmlCleaner _htmlCleaner;
+        private readonly IContentItemRepository _repository;
+        private readonly HtmlCleaner _htmlCleaner;
 
-        public ContentProvider(IContentReader contentReader, HtmlCleaner htmlCleaner)
+        public ContentProvider(IContentItemRepository repository, HtmlCleaner htmlCleaner)
         {
-            _contentReader = contentReader;
+            _repository = repository;
             _htmlCleaner = htmlCleaner;
         }
 
         public string GetContentWithHtmlRemoved(int profileId, string contentKey)
         {
-            var contentItem = _contentReader.GetContentForProfile(profileId, contentKey);
+            var contentItem = _repository.GetContentForProfile(profileId, contentKey);
             if (contentItem == null)
             {
                 return string.Empty;

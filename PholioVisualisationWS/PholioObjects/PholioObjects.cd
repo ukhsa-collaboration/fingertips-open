@@ -3,9 +3,10 @@
   <Class Name="PholioVisualisation.PholioObjects.Area">
     <Position X="1" Y="7.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAABAAAAAAQBAAAAAgACQAEAAAAIAAgAAAAAEAAgA=</HashCode>
+      <HashCode>gAgAABAAQIAAQBAAAABgACQAEAgAAIQAAAAAAAEAAgA=</HashCode>
       <FileName>Area.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.CoreDataSet">
     <Position X="3.5" Y="1.5" Width="1.5" />
@@ -13,7 +14,7 @@
       <Method Name="CoreDataSet" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAEAABAoAIQAAAAAAAAQEIAMAAAAEgAAAAAgAwAA=</HashCode>
+      <HashCode>AAEAAIAARCoQKwQAAAMAICAGIAMAAAAEgRAAAAggwAA=</HashCode>
       <FileName>CoreDataSet.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -28,7 +29,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>ABAAAAAEAAIAAAIAIAAAAAAAAAAAAAAAACIEAAIAEAA=</HashCode>
+      <HashCode>ABBAgAAAAAIEAAoAIAAAAAQCAAIAAEAAACAEAAIBEAA=</HashCode>
       <FileName>IndicatorMetadata.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -36,18 +37,18 @@
       <Property Name="ValueType" />
     </ShowAsAssociation>
   </Class>
-  <Class Name="PholioVisualisation.PholioObjects.IndicatorStats">
+  <Class Name="PholioVisualisation.PholioObjects.IndicatorStatsPercentilesFormatted">
     <Position X="0.5" Y="3.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAABAIAAAAEAAEAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>IndicatorStats.cs</FileName>
+      <HashCode>AAAAAAAAABAIAAAAEAAEAAAAAAAAAAAAEAABAAAAAAQ=</HashCode>
+      <FileName>IndicatorStatsPercentilesFormatted.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.IndicatorMetadataTextColumnNames">
     <Position X="12.75" Y="0.5" Width="2.25" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAAAACgAAAAAAAAQAAAAAACAACAAAAAAAAAA=</HashCode>
-      <FileName>LookUps.cs</FileName>
+      <HashCode>AAAgAAAAAwAACggAAAAAAAQAAAAAACAACAAAAAAAAAA=</HashCode>
+      <FileName>Constants.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.IndicatorStatsFormatted">
@@ -60,7 +61,7 @@
   <Class Name="PholioVisualisation.PholioObjects.Grouping">
     <Position X="6.5" Y="0.5" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAEQoAgEAAIAIAAMgAAAgAgAJAAAAAgAAQAAAEEgggA=</HashCode>
+      <HashCode>AAEQoBgEAAIAJAAMgEAAgAgAJAAAAAgAAQIAAEEgggA=</HashCode>
       <FileName>Grouping.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
@@ -70,8 +71,8 @@
   <Class Name="PholioVisualisation.PholioObjects.ProfileIds">
     <Position X="12.75" Y="9.75" Width="2.5" />
     <TypeIdentifier>
-      <HashCode>AAAgAAAAAAAAAAAAAAAAAAAQAAAAAAIAAAAQCBAgACA=</HashCode>
-      <FileName>LookUps.cs</FileName>
+      <HashCode>gCAABAEAEEAgAAAAAIABQACdQAAAQAAAABIQSBA4ACA=</HashCode>
+      <FileName>Constants.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.GroupRoot">
@@ -84,25 +85,18 @@
         <Point X="2" Y="1.875" />
         <Point X="2.75" Y="1.875" />
         <Point X="2.75" Y="1.875" />
+        <Point X="3.167" Y="1.875" Type="JumpStart" />
+        <Point X="3.333" Y="1.875" Type="JumpEnd" />
         <Point X="3.5" Y="1.875" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.341" Y="0.089" />
       </MemberNameLabel>
     </AssociationLine>
-    <AssociationLine Name="IndicatorStatsFormatted" Type="PholioVisualisation.PholioObjects.IndicatorStatsFormatted">
-      <MemberNameLabel ManuallyPlaced="true">
-        <Position X="-0.703" Y="2.114" />
-      </MemberNameLabel>
-    </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAIAAgAAAAAABAAggAAAAAAAIAAACBAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAIAAgAAAAAAAAAAAAAAAAAAIAAACBAAAAAAAIAAAAA=</HashCode>
       <FileName>GroupRoot.cs</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Property Name="IndicatorStats" />
-      <Property Name="IndicatorStatsFormatted" />
-    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="Grouping" />
       <Property Name="Data" />
@@ -111,16 +105,17 @@
   <Class Name="PholioVisualisation.PholioObjects.Unit">
     <Position X="9.25" Y="3.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <HashCode>AAACAAAAEAAAAAAAAAAAAAEAACAAAAAAAAAgAAAAAAA=</HashCode>
       <FileName>Unit.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.ValueType">
     <Position X="11" Y="3" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAACAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>ValueType.cs</FileName>
     </TypeIdentifier>
+    <Lollipop Position="0.2" />
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.TrendRoot">
     <Position X="5.75" Y="9.75" Width="1.5" />
@@ -128,7 +123,7 @@
       <Method Name="TrendRoot" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAABAAAAAAAIAAAAAAAAQAAAAAAAAAAAAAABAAAABA=</HashCode>
+      <HashCode>AAAABAAAAAAAAAAAAAAAAQAAAAAAACgAAAAABAAAABA=</HashCode>
       <FileName>TrendRoot.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -138,7 +133,7 @@
       <Method Name="TrendDataPoint" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAQAAAAAIABAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AgAACAAAAAAACQAAAAAAAAQAAAIAAAAAABAgAAAAAAA=</HashCode>
       <FileName>TrendDataPoint.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -148,24 +143,21 @@
       <Field Name="comparators" Hidden="true" />
     </Members>
     <TypeIdentifier>
-      <HashCode>AAIAgAABAIAAAgEAAAAAAAQAAAAAAQgAAAAQAAAAAAA=</HashCode>
+      <HashCode>IAIAgAABAIAAAgAAAAAAAAQAAAAAAQEAAAAAAAAAAAA=</HashCode>
       <FileName>ComparatorMap.cs</FileName>
     </TypeIdentifier>
-    <ShowAsCollectionAssociation>
-      <Property Name="Comparators" />
-    </ShowAsCollectionAssociation>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.Comparator">
     <Position X="21.5" Y="6.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAgAgA=</HashCode>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Comparator.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="PholioVisualisation.PholioObjects.RootBase">
     <Position X="3.25" Y="8.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <HashCode>SAAQAAAAAAIAJAAAAEAAAAAAIAAAAAAAAAIAAAEAggA=</HashCode>
       <FileName>RootBase.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -236,7 +228,7 @@
   <Class Name="PholioVisualisation.PholioObjects.ValueWithCIsData">
     <Position X="6.75" Y="6.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CgAACAAAAAAAAAAEAAAAAAIAAAAAAAAAggAAAAAAAAA=</HashCode>
+      <HashCode>AAAgIAICAAAABAEFCAAAIAAQAHAAAABAoAIGQABAAAA=</HashCode>
       <FileName>ValueWithCIsData.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -250,8 +242,15 @@
   <Class Name="PholioVisualisation.PholioObjects.ValueData">
     <Position X="8.75" Y="10" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAIAAAAAAAAAAAAABAAAAAAAAAAAEAAAAgAAAAABA=</HashCode>
+      <HashCode>AAAAIAAAAAAAAAAAAABAAAQIAAAAAAEBBAAgAAAAABA=</HashCode>
       <FileName>ValueData.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PholioVisualisation.PholioObjects.GroupingData">
+    <Position X="4.75" Y="14.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>GroupingData.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Enum Name="PholioVisualisation.PholioObjects.ValueTypeId">

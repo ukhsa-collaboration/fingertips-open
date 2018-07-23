@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Helpers;
+using PholioVisualisation.ServicesWeb.Helpers;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     public class StaticReportsController : BaseController
     {
@@ -17,15 +16,16 @@ namespace ServicesWeb.Controllers
         /// </summary>
         /// <param name="profile_key">Profile URL key</param>
         /// <param name="file_name">Name of the file</param>
-        /// <param name="time_period">The time period the file is associated with (optional)</param>
+        /// <param name="time_period">The time period the file is associated with [optional]</param>
         /// <returns>Static document, e.g. PDF report</returns>
         [HttpGet]
         [Route("static-reports")]
-        public HttpResponseMessage GetStaticReport(string profile_key, string file_name, string time_period = null)
+        public HttpResponseMessage GetStaticReport(string profile_key, string file_name,
+            string time_period = null, string subfolder = null)
         {
             try
             {
-                var filePath = GetFilePath(profile_key, file_name, time_period);
+                var filePath = GetFilePath(profile_key, file_name, time_period, subfolder);
 
                 // To avoid System.UnauthorizedAccessException when reading file
                 File.SetAttributes(filePath, FileAttributes.Normal);
@@ -54,15 +54,16 @@ namespace ServicesWeb.Controllers
         /// </summary>
         /// <param name="profile_key">Profile URL key</param>
         /// <param name="file_name">Name of the file</param>
-        /// <param name="time_period">The time period the file is associated with (optional)</param>
+        /// <param name="time_period">The time period the file is associated with [optional]</param>
         /// <returns>Whether or not a static document is available</returns>
         [HttpGet]
         [Route("api/static-reports/exists")]
-        public bool IsStaticReportAvailable(string profile_key, string file_name, string time_period = null)
+        public bool IsStaticReportAvailable(string profile_key, string file_name, string time_period = null,
+            string subfolder = null)
         {
             try
             {
-                var filePath = GetFilePath(profile_key, file_name, time_period);
+                var filePath = GetFilePath(profile_key, file_name, time_period, subfolder);
                 return File.Exists(filePath);
             }
             catch (Exception ex)
@@ -72,14 +73,21 @@ namespace ServicesWeb.Controllers
             }
         }
 
-        private static string GetFilePath(string profile_key, string file_name, string time_period)
+        private static string GetFilePath(string profileKey, string fileName, string timePeriod, string subfolder)
         {
-            var path = Path.Combine(ApplicationConfiguration.StaticReportsDirectory, profile_key);
-            if (time_period != null)
+            var path = Path.Combine(ApplicationConfiguration.Instance.StaticReportsDirectory, profileKey);
+
+            if (subfolder != null)
             {
-                path = Path.Combine(path, time_period);
+                path = Path.Combine(path, subfolder);
             }
-            string filePath = Path.Combine(path, file_name);
+
+            if (timePeriod != null)
+            {
+                path = Path.Combine(path, timePeriod);
+            }
+
+            string filePath = Path.Combine(path, fileName);
             return filePath;
         }
     }

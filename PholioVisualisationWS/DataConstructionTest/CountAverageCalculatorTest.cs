@@ -39,8 +39,10 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(12, average.Count);
             Assert.AreEqual(ValueData.NullValue, average.Denominator);
             Assert.AreEqual(ValueData.NullValue, average.Denominator2);
-            Assert.AreEqual(ValueData.NullValue, average.LowerCI);
-            Assert.AreEqual(ValueData.NullValue, average.UpperCI);
+            Assert.IsNull(average.LowerCI95);
+            Assert.IsNull(average.UpperCI95);
+            Assert.IsNull(average.LowerCI99_8);
+            Assert.IsNull(average.UpperCI99_8);
         }
 
         [TestMethod]

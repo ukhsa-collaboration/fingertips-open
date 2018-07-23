@@ -14,10 +14,25 @@ namespace Fpm.MainUI.Helpers
             return properties;
         }
 
+        public static void AddTooltipLeft(IDictionary<string, object> properties, string message)
+        {
+            AddTooltip(properties, message, "left");
+        }
+
         public static void AddTooltipRight(IDictionary<string, object> properties, string message)
         {
+            AddTooltip(properties, message, "right");
+        }
+
+        public static void AddTooltipBottom(IDictionary<string, object> properties, string message)
+        {
+            AddTooltip(properties, message, "bottom");
+        }
+
+        private static void AddTooltip(IDictionary<string, object> properties, string message, string placement)
+        {
             properties.Add("data-toggle", "tooltip");
-            properties.Add("data-placement", "right");
+            properties.Add("data-placement", placement);
             properties.Add("title", message);
         }
     }

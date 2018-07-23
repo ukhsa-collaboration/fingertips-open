@@ -7,7 +7,7 @@ namespace PholioVisualisation.Analysis
     {
         public override Significance Compare(CoreDataSet data, CoreDataSet comparator, IndicatorMetadata metadata)
         {
-            if (CanComparisonGoAhead(data, comparator) == false || data.AreCIsValid == false)
+            if (CanComparisonGoAhead(data, comparator) == false || data.Are95CIsValid == false)
             {
                 return Significance.None;
             }
@@ -28,7 +28,7 @@ namespace PholioVisualisation.Analysis
 
         private static bool IsBetweenConfidenceInverval(double val, CoreDataSet data)
         {
-            return (val <= data.UpperCI && val >= data.LowerCI);
+            return (val <= data.UpperCI95 && val >= data.LowerCI95);
         }
     }
 }

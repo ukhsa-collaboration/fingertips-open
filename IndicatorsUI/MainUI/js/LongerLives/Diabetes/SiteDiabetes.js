@@ -9,13 +9,16 @@ function initSite() {
 }
 
 MT.model = {
-    area: null,
+    //area: null,
     areaCode: null,
     parentCode: null,
-    isHashRestored: false,
     areaTypeId: null,
+    groupId: null,
     indicatorId: null,
     parentAreaType: null,
+    sexId: null,
+    similarAreaCode: null,
+    isHashRestored: false,
 
     //
     // Resets the model
@@ -71,6 +74,10 @@ MT.model = {
             // Parent area type ID
             prop = pairs['pat'];
             if (prop) m.parentAreaType = parseInt(prop);
+
+            // Similar area code
+            prop = pairs['sim'];
+            if (prop) m.similarAreaCode = prop;
         }
 
         updatePage();
@@ -79,6 +86,13 @@ MT.model = {
     //
     // Generates a string representation of the model to be used as the URL hash
     //
+
+    _serialiseIdDefined: function (parameters, modelProperty, hashProperty) {
+        var m = this;
+        if (m.hasOwnProperty(modelProperty) && m[modelProperty]) {
+            parameters.push(hashProperty, m[modelProperty]);
+        }
+    },
 
     toString: function () {
         var m = this;
@@ -91,10 +105,8 @@ MT.model = {
             'pat', m.parentAreaType
         ];
 
-        var areaCode = m.areaCode;
-        if (areaCode) {
-            parameters.push('are', m.areaCode);
-        }
+        this._serialiseIdDefined(parameters, 'areaCode', 'are');
+        this._serialiseIdDefined(parameters, 'similarAreaCode', 'sim');
 
         return parameters.join('/');
     }
@@ -106,7 +118,7 @@ function setSearchText(areaTypeId) {
     var $searchBox = $('#search_text');
 
     switch (areaTypeId) {
-        case AreaTypeIds.CCG:
+        case AreaTypeIds.CCGPreApr2017:
             var areaType = 'CCG';
             var areaType2 = 'GP practice or CCG';
             break;
@@ -141,23 +153,6 @@ function getGroupRootsCallback(obj) {
     ajaxMonitor.callCompleted();
 }
 
-function switchAreas(areaTypeId) {
-    var model = MT.model;
-    setUrl('/topic/' + profileUrlKey +
-        '#par/' + model.parentCode +
-        '/ati/' + areaTypeId +
-        '/gid/' + model.groupId +
-        '/pat/' + areaTypeId);
-    // we only reload the page if we have a topic
-    // otherwise we just set the url with clicked areatype
-    var currentUrl = window.location.href;
-    if (currentUrl.indexOf("topic") > -1) {
-        window.location.reload();
-    }
-}
-
-
-
 function getSupportingAreaDetails(areaCode, areaTypeId) {
     loaded.supportingAreaData.fetchDataByAjax({
         'profileId': SupportingProfileId,
@@ -166,7 +161,6 @@ function getSupportingAreaDetails(areaCode, areaTypeId) {
         'areaTypeId': areaTypeId
     });
 }
-
 
 /*
 * Defines the indexes for specific indicator in the list of group roots
@@ -206,7 +200,7 @@ function populateCauseList() {
             lastIndicatorSex = indicatorSex;
             isIndicatorSelected = false;
         }
-       
+
         var stateSex = groupRoots[i].StateSex;
         var sex = groupRoots[i].Sex.Name;
         var indicatorName = stateSex ? metadata.Descriptive.Name + ' (' + sex + ')' : metadata.Descriptive.Name;
@@ -410,29 +404,52 @@ function getContentText(contentKey) {
         });
 }
 
+function isMapPage() {
+    return $('#map').length > 0;
+}
+
 MT.nav = {
 
+    _addIndicator: function (model) {
+
+        // Use when navigating from map page to maintain selected indicator
+        if (isMapPage() && groupRoots && groupRoots.length) {
+            var root = groupRoots[selectedRootIndex];
+            model.indicatorId = root.IID;
+            model.sexId = root.Sex.Id;
+        }
+    },
+
     //
-    // Go to the diabetes rankings page
+    // Go to the rankings page preserving the similar areas comparison if appropriate
     //
     rankings: function (model) {
         if (!model) {
             model = MT.model;
         }
 
-        // Area details
-        if (model.parentCode === NATIONAL_CODE) {
-            model.parentCode = model.areaCode;
-        }
-        model.areaCode = null;
-        model.areaTypeId = AreaTypeIds.Practice;
+        model.parentCode = NATIONAL_CODE;
+        model.areaTypeId = model.parentAreaType;
 
-        //Force in the selected indicator Id
-        if (groupRoots.length) {
-            var root = groupRoots[selectedRootIndex];
-            model.indicatorId = root.IID;
-            model.sexId = root.Sex.Id;
-        }
+        this._addIndicator(model);
+
+        setUrl('/topic/' + profileUrlKey + '/comparisons#' + model.toString());
+    },
+
+    //
+    // List practices in CCG
+    //
+    practiceRankings: function (parentCode) {
+        var model = MT.model;
+
+        model.areaTypeId = AreaTypeIds.Practice;
+        model.parentCode = parentCode;
+        this._addIndicator(model);
+
+        // Similar area not relevant
+        model.similarAreaCode = null;
+        model.areaCode = null;
+
         setUrl('/topic/' + profileUrlKey + '/comparisons#' + model.toString());
     },
 
@@ -442,14 +459,10 @@ MT.nav = {
         }
 
         model.parentCode = NATIONAL_CODE;
-        model.areaCode = null;
+        model.similarAreaCode = null;
         model.areaTypeId = model.parentAreaType;
 
-        if (isDefined(groupRoots) && groupRoots.length) {
-            var root = groupRoots[selectedRootIndex];
-            model.indicatorId = root.IID;
-            model.sexId = root.Sex.Id;
-        }
+        this._addIndicator(model);
 
         setUrl('/topic/' + profileUrlKey + '/comparisons#' + model.toString());
     },
@@ -472,6 +485,10 @@ MT.nav = {
         }
     },
 
+    _addSimilarAreaParameters: function (url, similarAreaCode) {
+        return url + '/par/' + similarAreaCode + '/sim/' + similarAreaCode;
+    },
+
     //
     // Go to the area details page
     //
@@ -479,30 +496,84 @@ MT.nav = {
         if (!isDefined(model)) {
             model = MT.model;
         }
-        setUrl('/topic/' + profileUrlKey + '/area-details#are/' + model.areaCode + '/par/' + model.parentCode);
+
+        var addSimilarAreaParameters = this._addSimilarAreaParameters;
+        var similarAreaCode;
+        var url = '/topic/' + profileUrlKey + '/area-details#are/' + model.areaCode;
+
+        if (isMapWithNoData()) {
+            // Ensure area details will be comparing similar areas
+            if (doesAreaTypeHaveNearestNeighbours() && isFeatureEnabled('enableNeighbourComparisonInLongerLives')) {
+                similarAreaCode = getNearestNeighbourCode();
+                url = addSimilarAreaParameters(url, similarAreaCode);
+                setUrl(url);
+            } else {
+                // Compare drivation group
+                ajaxMonitor.setCalls(1);
+                getDecileData(model);
+                ajaxMonitor.monitor(function() {
+                    var decileNumber = loaded.categories[AreaTypeIds.DeprivationDecile][model.areaCode];
+                    similarAreaCode = getCategoryAreaCode(decileNumber);
+                    url = addSimilarAreaParameters(url, similarAreaCode);
+                    setUrl(url);
+                });
+            }
+            return;
+        }
+
+        if (MT.model.profileId === ProfileIds.PublicHealthDashboard) {
+            // Ensure same domain as selected on map is displayed on area details
+            url += '/ati/' + model.areaTypeId + '/gid/' + model.groupId;
+        }
+        
+        // Navigate keeping similar area selection
+        if (model.similarAreaCode) {
+            url = addSimilarAreaParameters(url, model.similarAreaCode);
+        } else {
+            url += '/par/' + model.parentCode;
+        }
+
+        setUrl(url);
     },
 
+    _getParametersForMap: function() {
+
+        // Navigate keeping similar area selection
+        var data = '';
+        var model = MT.model;
+        if (model.similarAreaCode) {
+            var similarAreaCode = model.similarAreaCode;
+            data += '#par/' + similarAreaCode + '/sim/' + similarAreaCode +
+                '/are/' + model.areaCode + '/ati/' + model.areaTypeId;
+        }
+        return data;
+    },
 
     //
     // Go to the home page
     //
     home: function () {
-        // Check not already on home page
-        if (!$('.home_intro').length) {
-            setUrl('/topic/' + profileUrlKey);
-        }
+        setUrl('/topic/' + profileUrlKey + this._getParametersForMap());
     },
 
     //
-    // Go to home via bread crumbs
-    // 
-    gohome: function () {
-        setUrl('/topic/' + profileUrlKey);
+    // Go to map page that shows data
+    //
+    mapWithData: function () {
+        setUrl('/topic/' + profileUrlKey + '/map-with-data' + this._getParametersForMap());
     }
 }
 
+function doesAreaTypeHaveNearestNeighbours() {
+    return MT.model.areaTypeId === AreaTypeIds.CountyUA;
+}
+
+function getCategoryAreaCode(decile) {
+    return 'cat-' + getDecileCategoryTypeId(MT.model.areaTypeId) + '-' + decile;
+}
+
 function useQuintiles(comparatorMethodId) {
-    return comparatorMethodId === 15;
+    return comparatorMethodId === ComparatorMethodIds.Quintiles;
 }
 
 function useBlueOrangeBlue(comparatorMethodId) {
@@ -515,10 +586,19 @@ function getGradeFunctionFromGroupRoot(groupRoot) {
 
 function getGradeFunction(comparatorMethodId) {
     var noValue = 'no-data';
+
     if (useQuintiles(comparatorMethodId)) {
         return function (sig) {
             return sig > 0
                 ? 'grade-quintile-' + sig
+                : noValue;
+        };
+    }
+
+    if (comparatorMethodId === ComparatorMethodIds.Quartiles) {
+        return function (sig) {
+            return sig > 0
+                ? 'grade-' + (sig - 1)
                 : noValue;
         };
     }
@@ -640,18 +720,47 @@ function getSearchResultParameters(searchResult) {
     return builder.build();
 }
 
+/**
+ * Can current area type be compared to similar areas 
+ */
 function isComparisonAvailable(model) {
-
     return model.areaTypeId !== AreaTypeIds.Practice;
+}
+
+function getNearestNeighbours(postCallBackFunction) {
+    var areaCode = MT.model.areaCode;
+    ajaxGet('api/parent_to_child_areas',
+        'nearest_neighbour_code=' + MT.model.similarAreaCode,
+    function (data) {
+        loaded.neighbours[areaCode] = data[areaCode];
+        if (postCallBackFunction) postCallBackFunction();
+        ajaxMonitor.callCompleted();
+    });
+}
+
+function getNearestNeighbourCode() {
+    return 'nn-1-' + MT.model.areaCode;
+}
+
+function getAreaCodeOfAreaWithNeighbours() {
+    // e.g. 'E10000023' from 'nn-1-E10000023'
+    return MT.model.similarAreaCode.split('-')[2];
 }
 
 function getDeprivationLabel(label, parentAreaType) {
 
     var areaTypeLabel = parentAreaType === AreaTypeIds.CountyUA ? 'County/UA'
-        : parentAreaType === AreaTypeIds.CCG ? 'CCG'
+        : parentAreaType === AreaTypeIds.CCGPreApr2017 ? 'CCG'
         : 'England';
 
     return label + ' within ' + areaTypeLabel;
+}
+
+/**
+ * Function is overriden for map page
+ */
+function isMapWithNoData() {
+    return false;
 }
 
 deprivationDefinitions = [
@@ -670,14 +779,11 @@ loaded.supportingPracticeData = {};
 loaded.nhsId = {};
 loaded.nearbyPractices = [];
 loaded.practiceCategories = {};
+loaded.onsClusterCodes = {};
 loaded.areaDetailsForDiseaseAndDeath = new AreaDetailsDataManager();
 loaded.contentText = '';
 loaded.groupDataAtDataPoint = new GroupDataAtDataPointOfSpecificAreasDataManager(MT.model);
 
-IndicatorIds = {
-    Deprivation: 338,
-    SuicidePlan : 92607
-};
 
 groupRoots = null;
 selectedRootIndex = ROOT_INDEXES.POPULATION;
@@ -686,30 +792,10 @@ comparatorId = NATIONAL_COMPARATOR_ID;
 shouldSearchRetreiveCoordinates = true;
 NO_SUICIDE_PLAN = 'No information on current suicide plan status';
 
-GroupIds = {
-    HealthChecks: {
-        HealthCheck: 1938132782,
-        DiseaseAndDeath: 1938132785
-    },
-    Diabetes: {
-        Complications: 1938132699,
-        PrevalenceAndRisk: 1938132727
-    },
-    DrugsAndAlcohol: {
-        PrevalenceAndRisks: 1938132771,
-        TreatmentAndRecovery: 1938132772
-    },
-    Cancer: {
-        IncidenceAndMortality: 1938132749
-    },
-    Suicide: {
-        SuicideData: 1938132762,
-        RelatedRiskFactors: 1938132763,
-        RelatedServiceContacts: 1938133082
-    },
-    LAScorecard: {
-        DrugTreatment: 1938133144,
-        ChildObesity: 1938133145
-    }
-}
+var callOutBoxFooter = '</div><div class="map-info-footer clearfix">\
+<ul><li>View:</li>\
+<li><a href=javascript:MT.nav.rankings();>National comparisons table</a></li>\
+{{#hasPracticeData}}<li><a href="javascript:MT.nav.practiceRankings(\'{{areaCode}}\');">Local GP practices</a></li>{{/hasPracticeData}}\
+{{^hasPracticeData}}<li><a href="javascript:MT.nav.areaDetails();">Details for this area</a></li>{{/hasPracticeData}}\
+</ul></div><div class="map-info-tail" onclick="pointerClicked()"><i></i></div></div>';
 

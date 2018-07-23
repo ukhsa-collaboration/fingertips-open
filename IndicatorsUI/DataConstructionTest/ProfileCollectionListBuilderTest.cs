@@ -4,8 +4,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Profiles.DataConstruction;
-using Profiles.DomainObjects;
+using IndicatorsUI.DataConstruction;
+using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataConstructionTest
 {

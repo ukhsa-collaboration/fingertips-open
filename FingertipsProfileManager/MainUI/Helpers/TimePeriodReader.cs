@@ -5,13 +5,18 @@ using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class TimePeriodReader
+    public interface ITimePeriodReader
     {
-        private bool isWebServiceAvailable = true;
+        string GetPeriodString(TimePeriod timePeriod, int yearTypeId);
+    }
+
+    public class TimePeriodReader : ITimePeriodReader
+    {
+        private bool _isWebServiceAvailable = true;
 
         public string GetPeriodString(TimePeriod timePeriod, int yearTypeId)
         {
-            if (isWebServiceAvailable == false)
+            if (_isWebServiceAvailable == false)
             {
                 return "No Web Services";
             }
@@ -23,7 +28,7 @@ namespace Fpm.MainUI.Helpers
             }
             catch (Exception)
             {
-                isWebServiceAvailable = false;
+                _isWebServiceAvailable = false;
                 return "No web services";
             }
 

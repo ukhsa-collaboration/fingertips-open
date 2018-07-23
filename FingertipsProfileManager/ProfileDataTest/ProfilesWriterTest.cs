@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,11 +17,17 @@ namespace Fpm.ProfileDataTest
         private const int Sequence1 = 1;
         private const int Sequence2 = 2;
 
+        private ProfilesWriter writer;
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            writer = ReaderFactory.GetProfilesWriter();
+        }
+
         [TestMethod]
         public void TestUpdate_TargetConfig()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
-
             // Set 1
             var target = writer.GetTargetById(TargetId);
             target.Description = name1;
@@ -56,8 +61,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestUpdate_GroupingMetadataName()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
-
             // Set 1
             var metadata = writer.GetGroupingMetadata(GroupId);
             metadata.GroupName = name1;
@@ -79,7 +82,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestReorderDomainSequence()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             var profileDetails = writer.GetProfileDetailsByProfileId(ProfileIds.Phof);
             var groupIds = ReaderFactory.GetProfilesReader().GetGroupingIds(profileDetails.Id);
             writer.ReorderDomainSequence(groupIds);
@@ -95,7 +97,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestUpdate_GroupingMetadataNameWithApostrophe()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             string name = name1 + "'";
 
             // Set
@@ -111,7 +112,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestCreateAndDeleteContentItem()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             string contentKey = name1 + Guid.NewGuid();
             var profileId = ProfileIds.HealthProfiles;
 
@@ -135,8 +135,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestCreateAndDeleteTargetConfig()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
-
             var target = writer.NewTargetConfig(new TargetConfig
             {
                 Description = "Test1",
@@ -160,7 +158,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestUpdateContentItem()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             string contentKey = name1 + Guid.NewGuid();
             var profileId = ProfileIds.HealthProfiles;
 
@@ -183,7 +180,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestDeleteContentItemWithNonExistantKeyFailsSilently()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             string contentKey = name1 + Guid.NewGuid();
             writer.DeleteContentItem(contentKey, ProfileIds.HealthProfiles);
         }
@@ -191,8 +187,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestUpdate_GroupingMetadataSequence()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
-
             // Set 1
             var metadata = writer.GetGroupingMetadata(GroupId);
             metadata.Sequence = Sequence1;
@@ -214,33 +208,31 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestUpdate_Grouping()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             var groupId = GroupIds.PhofWiderDeterminantsOfHealth;
 
             // Set 1
             var grouping = writer.GetGroupings(groupId).First();
+            var groupingId = grouping.GroupingId;
             var yearRange = grouping.YearRange;
             grouping.YearRange = 20;
             writer.UpdateGroupingList(new List<Grouping> { grouping });
 
             // Check 1
-            grouping = writer.GetGroupings(groupId).First();
-            Assert.AreEqual(grouping.YearRange, 20);
+            grouping = writer.GetGroupings(groupId).First(x => x.GroupingId == groupingId);
+            Assert.AreEqual(20, grouping.YearRange);
 
             // Set 2
             grouping.YearRange = yearRange;
             writer.UpdateGroupingList(new List<Grouping> { grouping });
 
             // Check 2
-            grouping = writer.GetGroupings(groupId).First();
+            grouping = writer.GetGroupings(groupId).First(x => x.GroupingId == groupingId);
             Assert.AreEqual(yearRange, grouping.YearRange);
         }
 
         [TestMethod]
         public void TestSaveNewThenDeleteGroupingMetadata()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
-
             // Save new metadata
             var metadata = writer.NewGroupingMetadata(name1, Sequence1, ProfileIds.Diabetes);
             var groupId = metadata.GroupId;
@@ -262,7 +254,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestNewContentAudit()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             string contentKey = name1 + Guid.NewGuid();
             var profileId = ProfileIds.HealthProfiles;
 
@@ -286,7 +277,6 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestNewDocument()
         {
-            var writer = ReaderFactory.GetProfilesWriter();
             var doc = new Document
             {
                 ProfileId = ProfileIds.Diabetes,
@@ -298,17 +288,14 @@ namespace Fpm.ProfileDataTest
 
             var id = writer.NewDocument(doc);
             Assert.IsTrue(id > 0);
-            
         }
 
         [TestMethod]
         public void TestUploadDocument()
         {
-            var reader = ReaderFactory.GetProfilesReader();
-            var writer = ReaderFactory.GetProfilesWriter();
-
             // get copy from database
-            var docFromDb = reader.GetDocumentsWithoutFileData(ProfileIds.Diabetes).First();
+            var docFromDb = writer.GetDocumentsWithoutFileData(ProfileIds.SexualHealth).First();
+            var originalDate = docFromDb.UploadedOn;
            
             // clone and update fields 
             var docToUpdate = new Document
@@ -325,16 +312,17 @@ namespace Fpm.ProfileDataTest
             writer.UpdateDocument(docToUpdate);
 
             // get cloned copy from datas
-            var updatedDoc = reader.GetDocumentWithoutFileData(docToUpdate.Id);
+            writer = ReaderFactory.GetProfilesWriter();
+            var updatedDoc = writer.GetDocumentWithoutFileData(docToUpdate.Id);
 
-            Assert.AreNotEqual(updatedDoc.UploadedOn, docFromDb.UploadedOn);
+            // Assert: upload date is different between old and new versions
+            Assert.AreNotEqual(updatedDoc.UploadedOn, originalDate);
         }
 
         [TestMethod]
         public void TestCopyIndicatorMetadataTextValue()
         {
             var reader = ReaderFactory.GetProfilesReader();
-            var writer = ReaderFactory.GetProfilesWriter();
             const int targetProfile = ProfileIds.Diabetes;
             const int indicatorId = IndicatorIds.ChildrenInPoverty;
 

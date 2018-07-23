@@ -55,8 +55,8 @@ namespace Fpm.ProfileData.Repositories
             return CurrentSession
                 .CreateCriteria<UploadJob>()
                 .Add(Restrictions.Or(
-                    Restrictions.Eq("Status", UploadJobStatus.NotStart),
-                    Restrictions.Eq("Status", UploadJobStatus.ConfirmationGiven)
+                    Restrictions.Eq("Status", UploadJobStatus.NotStarted),
+                    Restrictions.Eq("Status", UploadJobStatus.OverrideDatabaseDuplicatesConfirmationGiven)
                 ))
                 .SetCacheMode(CacheMode.Refresh)
                 .SetCacheRegion("")
@@ -101,6 +101,22 @@ namespace Fpm.ProfileData.Repositories
                 HandleException(exception);
             }
             return isOk;
+        }
+
+        public IEnumerable<UploadJob> GetAllJobsProgress()
+        {
+            var statuscode = new List<int>
+            {
+               (int) UploadJobStatus.NotStarted,
+               (int) UploadJobStatus.InProgress,
+               (int) UploadJobStatus.OverrideDatabaseDuplicatesConfirmationGiven,
+               (int) UploadJobStatus.SmallNumberWarningConfirmationGiven
+            };
+
+            return CurrentSession.CreateCriteria<UploadJob>()
+                .Add(Restrictions.In("Status", statuscode))
+                .AddOrder(Order.Asc("DateCreated"))
+                .List<UploadJob>();
         }
 
         public void DeleteAllJobs()

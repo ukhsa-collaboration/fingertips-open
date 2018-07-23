@@ -1,33 +1,27 @@
-﻿using AutoMapper;
-using FingertipsUploadService.FpmFileReader;
+﻿using FingertipsUploadService.FpmFileReader;
 using FingertipsUploadService.Helpers;
 using FingertipsUploadService.ProfileData;
-using FingertipsUploadService.ProfileData.Entities.Core;
-using FingertipsUploadService.ProfileData.Entities.Job;
 using FingertipsUploadService.ProfileData.Repositories;
 using FingertipsUploadService.Upload;
 using NLog;
 using System.Collections.Generic;
+using UploadJob = FingertipsUploadService.ProfileData.Entities.Job.UploadJob;
 
 namespace FingertipsUploadService
 {
     public class UploadManager
     {
-        private IFusUploadRepository _fusUploadRepository;
-        private CoreDataRepository _coreDataRepository;
-        private LoggingRepository _loggingRepository;
-        private ProfilesReader _profilesReader;
+        private readonly IFusUploadRepository _fusUploadRepository;
+        private readonly CoreDataRepository _coreDataRepository;
+        private readonly ProfilesReader _profilesReader;
         private readonly Logger _logger = LogManager.GetLogger("UploadManager");
 
-
-        public UploadManager(IFusUploadRepository fusUploadRepository, CoreDataRepository coreDataRepository,
-            LoggingRepository loggingRepository)
+        public UploadManager(IFusUploadRepository fusUploadRepository, CoreDataRepository coreDataRepository)
         {
             _fusUploadRepository = fusUploadRepository;
             _coreDataRepository = coreDataRepository;
-            _loggingRepository = loggingRepository;
             _profilesReader = ReaderFactory.GetProfilesReader();
-            var config = new MapperConfiguration(c => c.CreateMap<CoreDataSet, CoreDataSetArchive>().ReverseMap());
+            AutoMapperConfig.RegisterMappings();
         }
 
         public UploadManager()
@@ -56,15 +50,22 @@ namespace FingertipsUploadService
 
         public void StartJob(UploadJob job)
         {
-            var validator = new WorksheetNameValidator();
-            var actualFilePath = FilePathHelper.GetActualFilePath(job);
-            var fileReader = new FileReaderFactory().Get(actualFilePath, job.JobType);
-
+            // Log job starting
             SetUsername(job);
             _logger.Info("Processing batch upload for {0} with ID '{1}'", job.Username, job.Guid);
-            var worker = new BatchJobWorker();
-            var processor = new BatchWorksheetDataProcessor(_coreDataRepository, _loggingRepository, _logger);
-            worker.ProcessJob(job, validator, processor, fileReader);
+            _logger.Debug("its debug");
+            // Create file reader
+            var filePath = FilePathHelper.GetActualFilePath(job);
+            var fileReader = new FileReaderFactory().Get(filePath);
+
+            // Create worker dependencies
+            var worksheetNameValidator = new WorksheetNameValidator();
+            var dataValidator = new DataValidator(_coreDataRepository, _logger);
+            var uploader = new DataUploader(_coreDataRepository, _logger);
+
+            // Process job
+            var worker = new UploadJobWorker();
+            worker.ProcessJob(job, worksheetNameValidator, dataValidator, fileReader, uploader);
         }
 
         private void SetUsername(UploadJob job)

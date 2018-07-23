@@ -51,7 +51,7 @@ namespace PholioVisualisation.PholioObjects
 
         public static bool IsCategoryAreaTypeId(int areaTypeId)
         {
-            return areaTypeId > IdAddition;
+            return areaTypeId > IdAddition && areaTypeId < NearestNeighbourAreaType.IdAddition;
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿using NHibernate;
 using NHibernate.Criterion;
-using Profiles.DomainObjects;
+using IndicatorsUI.DomainObjects;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     public class ProfileReader : BaseReader
     {
@@ -18,6 +18,7 @@ namespace Profiles.DataAccess
         public ProfileDetails GetProfileDetails(string urlKey)
         {
             var profileDetails = CurrentSession.CreateCriteria<ProfileDetails>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("ProfileUrlKey", urlKey))
                 .UniqueResult<ProfileDetails>();
 
@@ -27,6 +28,7 @@ namespace Profiles.DataAccess
         public ProfileDetails GetProfileDetails(int profileId)
         {
             var profileDetails = CurrentSession.CreateCriteria<ProfileDetails>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("Id", profileId))
                 .UniqueResult<ProfileDetails>();
 
@@ -36,6 +38,7 @@ namespace Profiles.DataAccess
         public IList<Domain> GetProfileDomains(IEnumerable<int> groupIds)
         {
             var domains = CurrentSession.CreateCriteria<Domain>()
+                .SetCacheable(true)
                 .Add(Restrictions.In("GroupId", groupIds.ToList()))
                 .AddOrder(Order.Asc("Number"))
                 .List<Domain>();
@@ -45,14 +48,16 @@ namespace Profiles.DataAccess
 
         public IList<int> GetDomainIds(int profileId)
         {
-            IQuery q = CurrentSession.CreateQuery("select  g.id from Domain g where g.ProfileId = :profileId");
-            q.SetParameter("profileId", profileId);
-            return q.List<int>();
+            return CurrentSession.CreateQuery("select  g.id from Domain g where g.ProfileId = :profileId")
+                .SetCacheable(true)
+                .SetParameter("profileId", profileId)
+                .List<int>();
         }
 
         public Skin GetSkin(string Environment, string host)
         {
             var skin = CurrentSession.CreateCriteria<Skin>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq(Environment + "Host", host))
                 .UniqueResult<Skin>();
             return skin;
@@ -61,6 +66,7 @@ namespace Profiles.DataAccess
         public Skin GetSkinFromName(string skinName)
         {
             var skin = CurrentSession.CreateCriteria<Skin>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("Name", skinName))
                 .UniqueResult<Skin>();
             return skin;
@@ -69,6 +75,7 @@ namespace Profiles.DataAccess
         public Skin GetSkinFromId(int skinId)
         {
             var skin = CurrentSession.CreateCriteria<Skin>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("Id", skinId))
                 .UniqueResult<Skin>();
             return skin;
@@ -82,6 +89,7 @@ namespace Profiles.DataAccess
             }
 
             var contentItem = CurrentSession.CreateCriteria<ContentItem>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("ContentKey", contentKey))
                 .Add(Restrictions.Eq("ProfileId", profileId))
                 .UniqueResult<ContentItem>();
@@ -91,6 +99,7 @@ namespace Profiles.DataAccess
         public IList<ProfileCollectionItem> GetProfileCollectionItems(int profilecollectionid)
         {
             return CurrentSession.CreateCriteria<ProfileCollectionItem>()
+                .SetCacheable(true)
                 .Add(Restrictions.Eq("ProfileCollectionId", profilecollectionid))
                 .AddOrder(new Order("Sequence", true))
                 .List<ProfileCollectionItem>();
@@ -98,16 +107,18 @@ namespace Profiles.DataAccess
 
         public ProfileCollection GetProfileCollection(int collectionId)
         {
-            IQuery q = CurrentSession.CreateQuery("from ProfileCollection pc where pc.Id = :collectionId");
-            q.SetParameter("collectionId", collectionId);
-            return q.UniqueResult<ProfileCollection>();
+            return CurrentSession.CreateQuery("from ProfileCollection pc where pc.Id = :collectionId")
+                .SetCacheable(true)
+                .SetParameter("collectionId", collectionId)
+                .UniqueResult<ProfileCollection>();
         }
 
         public IList<SkinProfileCollection> GetSkinProfileCollections(int skinId)
         {
-            IQuery q = CurrentSession.CreateQuery("from SkinProfileCollection spc where spc.SkinId = :skinId");
-            q.SetParameter("skinId", skinId);
-            return q.List<SkinProfileCollection>();
+            return CurrentSession.CreateQuery("from SkinProfileCollection spc where spc.SkinId = :skinId")
+                .SetCacheable(true)
+                .SetParameter("skinId", skinId)
+                .List<SkinProfileCollection>();
         }
     }
 }

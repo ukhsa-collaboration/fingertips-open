@@ -5,15 +5,23 @@ using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class LookUpsRepository : RepositoryBase
+    public interface ILookUpsRepository
     {
+        IEnumerable<CategoryType> GetCategoryTypes();
+        IEnumerable<Skin> GetSkins();
+        IEnumerable<KeyColour> GetKeyColours();
+        IEnumerable<Sex> GetSexes();
+        IEnumerable<Age> GetAges();
+        IEnumerable<Comparator> GetComparators();
+        IEnumerable<YearType> GetYearTypes();
+        IEnumerable<IndicatorValueType> GetIndicatorValueTypes();
+        IEnumerable<ConfidenceIntervalMethod> GetConfidenceIntervalMethods();
+        IEnumerable<Unit> GetUnits();
+        IEnumerable<DenominatorType> GetDenominatorTypes();
+    }
 
-        // poor man injection, should be removed when we use DI containers
-        public LookUpsRepository()
-            : this(NHibernateSessionFactory.GetSession())
-        {
-        }
-
+    public class LookUpsRepository : RepositoryBase, ILookUpsRepository
+    {
         public LookUpsRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {

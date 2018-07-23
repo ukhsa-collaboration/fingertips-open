@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ServicesWeb.Models
+namespace PholioVisualisation.ServicesWeb.Models
 {
     public class SSRSReportViewModel
     {

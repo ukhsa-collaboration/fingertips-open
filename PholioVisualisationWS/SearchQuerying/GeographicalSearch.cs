@@ -19,7 +19,6 @@ namespace PholioVisualisation.SearchQuerying
         PlaceNamesAndPostcodesAndParentAreas
     }
 
-
     public class GeographicalSearch : SearchEngine
     {
         public bool AreEastingAndNorthingRetrieved = true;
@@ -67,7 +66,7 @@ namespace PholioVisualisation.SearchQuerying
 
             // Perform the search
             var directory = FSDirectory.Open(new DirectoryInfo(
-                Path.Combine(ApplicationConfiguration.SearchIndexDirectory, "placePostcodes")));
+                Path.Combine(ApplicationConfiguration.Instance.SearchIndexDirectory, "placePostcodes")));
             var searcher = new IndexSearcher(directory, true);
 
             //Add the sorting parameters

@@ -4,22 +4,26 @@ using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataSorting;
+using PholioVisualisation.Formatting;
 
 namespace PholioVisualisation.DataConstruction
 {
     public class LongerLivesAreaDetailsBuilder
     {
-        private readonly IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        private readonly IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-        private IList<string> ignoredAreaCodes;
-        private IndicatorComparerFactory indicatorComparerFactory;
-        private IArea area;
+        private readonly IAreasReader _areasReader = ReaderFactory.GetAreasReader();
+        private readonly IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
+        private IList<string> _ignoredAreaCodes;
+        private IndicatorComparerFactory _indicatorComparerFactory;
+        private IArea _area;
+        private bool _isParentArea;
 
         public LongerLivesAreaDetails GetAreaDetails(int profileId, int groupId,
             int childAreaTypeId, string areaCode)
         {
-            area = AreaFactory.NewArea(areasReader, areaCode);
-            indicatorComparerFactory = new IndicatorComparerFactory
+            _area = AreaFactory.NewArea(_areasReader, areaCode);
+            _isParentArea = IsParentArea(_area);
+
+            _indicatorComparerFactory = new IndicatorComparerFactory
             {
                 PholioReader = ReaderFactory.GetPholioReader()
             };
@@ -30,13 +34,9 @@ namespace PholioVisualisation.DataConstruction
 
             InitIgnoredAreaCodes(profileId);
 
-            // Set up parent areas
-            Area country = areasReader.GetAreaFromCode(AreaCodes.England);
-            var parentAreas = new List<IArea> { country };
-            AddOnsClusterToParentAreas(childAreaTypeId, area, parentAreas);
-            Decile decile = GetDecile(parentAreas, childAreaTypeId, areaCode);
-
-            var isParentArea = IsParentArea(area);
+            // Get parent areas
+            Decile decile;
+            var parentAreas = GetParentAreas(childAreaTypeId, out decile);
 
             foreach (IArea parentArea in parentAreas)
             {
@@ -45,12 +45,8 @@ namespace PholioVisualisation.DataConstruction
                 GroupData groupData = new GroupDataAtDataPointRepository().GetGroupDataProcessed(
                     parentAreaCode, childAreaTypeId, profileId, groupId);
 
-                var rankBuilder = new AreaRankBuilder
-                {
-                    GroupDataReader = groupDataReader,
-                    AreasReader = areasReader,
-                    Area = area
-                };
+                var rankBuilder = new AreaRankBuilder(_groupDataReader,_areasReader, 
+                    new PholioLabelReader(), new NumericFormatterFactory(_groupDataReader));
 
                 var ranks = new List<AreaRankGrouping>();
                 var significances = new List<int?>();
@@ -66,11 +62,12 @@ namespace PholioVisualisation.DataConstruction
                     TimePeriod timePeriod = TimePeriod.GetDataPoint(grouping);
                     IList<CoreDataSet> childAreaDataList =
                         GetChildAreaDataList(parentArea, groupRoot, grouping, timePeriod);
-                    var areaRankGrouping = rankBuilder.BuildRank(grouping, metadata, timePeriod, childAreaDataList);
+                    var areaRankGrouping = rankBuilder
+                        .BuildRank(_area, grouping, metadata, timePeriod, childAreaDataList);
                     ranks.Add(areaRankGrouping);
 
                     // Area significance
-                    if (areaRankGrouping != null && isParentArea == false)
+                    if (areaRankGrouping != null && _isParentArea == false)
                     {
                         var significance = GetSignificance(areaCode, groupRoot, grouping, childAreaDataList);
                         significances.Add(significance);
@@ -87,7 +84,7 @@ namespace PholioVisualisation.DataConstruction
             }
 
             string url = null;
-            if (isParentArea)
+            if (_isParentArea)
             {
                 // Significances not relevant for parent areas
                 parentCodeToSignificances = null;
@@ -96,13 +93,13 @@ namespace PholioVisualisation.DataConstruction
             else
             {
                 // Only need area web site link for child areas
-                url = areasReader.GetAreaUrl(area.Code);
+                url = _areasReader.GetAreaUrl(_area.Code);
             }
 
             // Bespoke response object
             return new LongerLivesAreaDetails
             {
-                Area = area,
+                Area = _area,
                 Decile = decile,
                 Url = url,
                 Ranks = parentCodeToRanks,
@@ -111,26 +108,50 @@ namespace PholioVisualisation.DataConstruction
             };
         }
 
+        private List<IArea> GetParentAreas(int childAreaTypeId, out Decile decile)
+        {
+            Area country = _areasReader.GetAreaFromCode(AreaCodes.England);
+            var parentAreas = new List<IArea> { country };
+
+            // Add subnational parent areas
+            AddOnsClusterToParentAreas(childAreaTypeId, _area, parentAreas);
+            decile = GetDecile(parentAreas, childAreaTypeId, _area.Code);
+
+            if (ShouldHaveNearestNeighbours(childAreaTypeId) && _isParentArea == false)
+            {
+                parentAreas.Add(NearestNeighbourArea.New(NearestNeighbourTypeIds.Cipfa,
+                    _area.Code));
+            }
+
+            return parentAreas;
+        }
+
         /// <summary>
         /// Synonymous with question is this a parent area
         /// </summary>
         private static bool IsParentArea(IArea area)
         {
             return area.IsCountry ||
-                area.IsCountyAndUADeprivationDecile ||
-                area.AreaTypeId == AreaTypeIds.OnsClusterGroup2001;
+                area.IsCountyAndUADeprivationDecile || area.IsOnsClusterGroup ||
+                Area.IsNearestNeighbour(area.Code) || area is CategoryArea;
+        }
+
+        private static bool ShouldHaveNearestNeighbours(int childAreaTypeId)
+        {
+            return childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority ||
+                   childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority;
         }
 
         private int GetSignificance(string areaCode, GroupRoot groupRoot, Grouping grouping,
             IList<CoreDataSet> childAreaDataList)
         {
-            CoreDataSet areaData = AreaHelper.GetDataForAreaFromDataList(areaCode, groupRoot.Data);
+            CoreDataSet areaData = new CoreDataSetFilter(groupRoot.Data).SelectWithAreaCode(areaCode);
             if (areaData == null)
             {
                 return (int)Significance.None;
             }
 
-            var comparer = indicatorComparerFactory.New(grouping);
+            var comparer = _indicatorComparerFactory.New(grouping);
 
             if (comparer is ICategoryComparer)
             {
@@ -141,7 +162,12 @@ namespace PholioVisualisation.DataConstruction
                 return categoryComparer.GetCategory(areaData);
             }
 
-            return areaData.Significance[grouping.ComparatorId];
+            if (areaData.Significance.ContainsKey(grouping.ComparatorId))
+            {
+                return areaData.Significance[grouping.ComparatorId];
+            }
+
+            return (int)Significance.None;
         }
 
         private static Grouping GetGrouping(IArea parentArea, GroupRoot groupRoot)
@@ -165,7 +191,7 @@ namespace PholioVisualisation.DataConstruction
             IList<CoreDataSet> dataList;
             if (parentArea.IsCountry)
             {
-                if (area.IsGpPractice)
+                if (_area.IsGpPractice)
                 {
                     // No need to calculate rank of practice in whole country
                     throw new FingertipsException("Do not use for GP Practices");
@@ -173,9 +199,9 @@ namespace PholioVisualisation.DataConstruction
                 else
                 {
                     // All data in country
-                    dataList = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(grouping,
+                    dataList = new CoreDataSetListProvider(_groupDataReader).GetChildAreaData(grouping,
                         parentArea, timePeriod);
-                    dataList = new CoreDataSetFilter(dataList).RemoveWithAreaCode(ignoredAreaCodes).ToList();
+                    dataList = new CoreDataSetFilter(dataList).RemoveWithAreaCode(_ignoredAreaCodes).ToList();
                 }
             }
             else
@@ -189,17 +215,14 @@ namespace PholioVisualisation.DataConstruction
         private void AddOnsClusterToParentAreas(int childAreaTypeId, IArea area,
             List<IArea> parentAreas)
         {
-            var isParentAreaTypeOnsCluster =
-                (childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority ||
-                 childAreaTypeId == AreaTypeIds.Ccg);
+            var isParentAreaTypeOnsCluster = childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority;
 
             if (isParentAreaTypeOnsCluster &&
-                area.IsCountry == false &&
-                area.AreaTypeId != AreaTypeIds.OnsClusterGroup2001)
+                _isParentArea == false)
             {
-                var allParentAreas = areasReader.GetParentAreas(area.Code);
+                var allParentAreas = _areasReader.GetParentAreas(area.Code);
 
-                var onsCluster = allParentAreas.First(x => x.AreaTypeId == AreaTypeIds.OnsClusterGroup2001);
+                var onsCluster = allParentAreas.First(x => x.IsOnsClusterGroup);
 
                 parentAreas.Add(onsCluster);
             }
@@ -208,24 +231,31 @@ namespace PholioVisualisation.DataConstruction
         private void InitIgnoredAreaCodes(int profileId)
         {
             IProfileReader profilesReader = ReaderFactory.GetProfileReader();
-            ignoredAreaCodes = profilesReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredEverywhere;
+            _ignoredAreaCodes = profilesReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredEverywhere;
         }
 
         private static CategorisedArea GetDecileArea(int childAreaTypeId, string areaCode, IAreasReader areasReader)
         {
             CategorisedArea decileArea = null;
+            int? categoryTypeId = null;
 
             if (childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority)
             {
-                decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
-                    AreaTypeIds.DistrictAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileDistrictAndUA2015);
+                categoryTypeId = CategoryTypeIds.DeprivationDecileDistrictAndUA2015;
             }
             else if (childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority)
             {
+                categoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2015;
+            }
+            else if (childAreaTypeId == AreaTypeIds.CcgsPreApr2017)
+            {
+                categoryTypeId = CategoryTypeIds.DeprivationDecileCcg2010;
+            }
+
+            if (categoryTypeId.HasValue)
+            {
                 decileArea = areasReader.GetCategorisedArea(areaCode, AreaTypeIds.Country,
-                    AreaTypeIds.CountyAndUnitaryAuthority,
-                    CategoryTypeIds.DeprivationDecileCountyAndUA2015);
+                    childAreaTypeId, categoryTypeId.Value);
             }
 
             return decileArea;
@@ -233,7 +263,7 @@ namespace PholioVisualisation.DataConstruction
 
         private Decile GetDecile(List<IArea> parentAreas, int childAreaTypeId, string areaCode)
         {
-            CategorisedArea decileArea = GetDecileArea(childAreaTypeId, areaCode, areasReader);
+            CategorisedArea decileArea = GetDecileArea(childAreaTypeId, areaCode, _areasReader);
 
             if (decileArea != null)
             {

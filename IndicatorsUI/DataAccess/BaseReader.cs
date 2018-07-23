@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NHibernate;
 
-namespace Profiles.DataAccess
+namespace IndicatorsUI.DataAccess
 {
     /// <summary>
     /// NOTE: this class also exists in PholioVisualisation solution

@@ -12,27 +12,13 @@ using PholioVisualisation.RequestParameters;
 
 namespace PholioVisualisation.Services
 {
-    public class JsonBuilderTrendDataBySearch : JsonBuilderBase
+    public class JsonBuilderTrendDataBySearch 
     {
         private TrendDataBySearchParameters _parameters;
-
-        public JsonBuilderTrendDataBySearch(HttpContextBase context)
-            : base(context)
-        {
-            _parameters = new TrendDataBySearchParameters(context.Request.Params);
-            Parameters = _parameters;
-        }
 
         public JsonBuilderTrendDataBySearch(TrendDataBySearchParameters parameters)
         {
             _parameters = parameters;
-            Parameters = _parameters;
-        }
-
-        public override string GetJson()
-        {
-            var trendRoots = GetTrendData();
-            return JsonConvert.SerializeObject(trendRoots);
         }
 
         public IList<TrendRoot> GetTrendData()

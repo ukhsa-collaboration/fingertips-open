@@ -158,7 +158,7 @@ namespace Fpm.MainUI.Helpers
         }
 
         public static IEnumerable<SelectListItem> GetOrderedListOfDomainsWithGroupId(ProfileMembers domains,
-            SelectListItem defaultProfile, ProfileRepository profileRepository)
+            SelectListItem defaultProfile, ProfileRepository profileRepository, int? selectedGroupId = null)
         {
             if (defaultProfile != null)
             {
@@ -166,11 +166,13 @@ namespace Fpm.MainUI.Helpers
 
                 var groupingMetadataList = domains.Profile.GroupingMetadatas.OrderBy(g => g.Sequence);
                 var listOfDomains = new SelectList(groupingMetadataList, "GroupId", "GroupName");
-                var selectedDomain = new SelectList(listOfDomains, "Value", "Key", listOfDomains.FirstOrDefault().Value)
-                    .SelectedValue.ToString();
+                var groupId = selectedGroupId.HasValue 
+                    ? selectedGroupId.Value.ToString()
+                    : groupingMetadataList.First().GroupId.ToString();
+
                 return listOfDomains.Select(x => new SelectListItem
                 {
-                    Selected = (x.Value == selectedDomain),
+                    Selected = x.Value == groupId,
                     Text = x.Text,
                     Value = x.Value
                 });
@@ -479,6 +481,13 @@ namespace Fpm.MainUI.Helpers
             }
 
             return new HtmlString(HttpUtility.HtmlDecode(contentItem.Content));
+        }
+
+        public static bool IsDomainListAvailable(IEnumerable<SelectListItem> domainList)
+        {
+            return (domainList != null && domainList.Count() > 0);
+
+
         }
     }
 }

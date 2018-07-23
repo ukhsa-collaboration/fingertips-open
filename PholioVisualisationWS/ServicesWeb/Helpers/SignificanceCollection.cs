@@ -1,11 +1,24 @@
 ﻿using System.Collections.Generic;
 using PholioVisualisation.PholioObjects;
 
-namespace ServicesWeb.Helpers
+namespace PholioVisualisation.ServicesWeb.Helpers
 {
-    public class SignificanceCollection
+    public interface ISignificanceCollection
     {
-        public List<ComparatorSignificance> Significances = new List<ComparatorSignificance>();
+        List<ComparatorSignificance> Significances { get; set; }
+
+        void Add(Significance significance, string name);
+    }
+
+    public class SignificanceCollection : ISignificanceCollection
+    {
+        private List<ComparatorSignificance> significances;
+
+        public List<ComparatorSignificance> Significances
+        {
+            get { return significances ?? (significances = new List<ComparatorSignificance>()); }
+            set { significances = value; }
+        }
 
         public void Add(Significance significance, string name)
         {

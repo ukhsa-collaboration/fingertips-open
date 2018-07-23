@@ -28,5 +28,8 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         public string Description { get; set; }
+
+        [JsonProperty]
+        public bool UseCIsForLimitComparison { get; set; }
     }
 }

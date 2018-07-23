@@ -1,0 +1,16 @@
+﻿@using IndicatorsUI.MainUI.Models
+@model PageModel
+@if ((int)ViewBag.EnumParentDisplay == (int)ParentDisplay.NationalAndRegional)
+{
+    <ul id="benchmark-box" class="menu geo-menu right-menu" style="display: none;">
+        <li>
+            <select id="comparator" onchange="benchmarkChanged();">
+                <option value="4" selected="selected">England</option>
+                <option id="subnational-benchmark" value="1" class="parent-area-type"></option>
+            </select>
+        </li>
+        <li class="heading">
+            Benchmark
+        </li>
+    </ul>
+}

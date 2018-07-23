@@ -13,16 +13,16 @@ namespace PholioVisualisation.AnalysisTest
         public void TestSame()
         {
             // Overlapping CIs & data > parent
-            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI = 2.7, UpperCI = 3.6 };
-            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
+            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI95 = 2.7, UpperCI95 = 3.6 };
+            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI95 = 3.5, UpperCI95 = 4.5 };
             Assert.AreEqual(Significance.Same, Compare(d2, d1, 0));
 
             // Overlapping CIs & data < parent
             Assert.AreEqual(Significance.Same, Compare(d1, d2, 0));
 
             // Overlapping CI overlaps with value & data < parent
-            d1 = new CoreDataSet { Value = 3.0, LowerCI = 2.7, UpperCI = 4.1 };
-            d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
+            d1 = new CoreDataSet { Value = 3.0, LowerCI95 = 2.7, UpperCI95 = 4.1 };
+            d2 = new CoreDataSet { Value = 4.0, LowerCI95 = 3.5, UpperCI95 = 4.5 };
             Assert.AreEqual(Significance.Same, Compare(d1, d2, 0));
 
             // Overlapping CI overlaps with value & data > parent
@@ -33,8 +33,8 @@ namespace PholioVisualisation.AnalysisTest
         public void TestDifferent()
         {
             // Different data > parent
-            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI = 2.7, UpperCI = 3.1 };
-            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
+            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI95 = 2.7, UpperCI95 = 3.1 };
+            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI95 = 3.5, UpperCI95 = 4.5 };
             Assert.AreEqual(Significance.Worse, Compare(d2, d1, 0));
 
             // Different data < parent
@@ -44,15 +44,8 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void TestNoCIsReturnNoneSignificance()
         {
-            // No Lower CI
-            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
-            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
-            Assert.AreEqual(Significance.None, Compare(d2, d1, 0));
-            Assert.AreEqual(Significance.None, Compare(d1, d2, 0));
-
-            // No Upper CI
-            d1 = new CoreDataSet { Value = 3.0, LowerCI = ValueData.NullValue, UpperCI = ValueData.NullValue };
-            d2 = new CoreDataSet { Value = 4.0, LowerCI = 3.5, UpperCI = 4.5 };
+            CoreDataSet d1 = new CoreDataSet { Value = 3.0, LowerCI95 = null, UpperCI95 = null };
+            CoreDataSet d2 = new CoreDataSet { Value = 4.0, LowerCI95 = 3.5, UpperCI95 = 4.5 };
             Assert.AreEqual(Significance.None, Compare(d2, d1, 0));
             Assert.AreEqual(Significance.None, Compare(d1, d2, 0));
         }

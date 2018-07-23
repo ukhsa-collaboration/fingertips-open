@@ -20,7 +20,7 @@ namespace PholioVisualisation.DataAccess
             return _numberTaken < _areaCodes.Count;
         }
 
-        public IEnumerable<T> NextCodes()
+        public IEnumerable<T> NextItems()
         {
             _nextAreaCodes = _areaCodes.Skip(_numberTaken).Take(NumberOfCodesToTakeAtOnce);
             _numberTaken += NumberOfCodesToTakeAtOnce;

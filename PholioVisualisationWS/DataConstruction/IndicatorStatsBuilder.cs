@@ -11,44 +11,49 @@ namespace PholioVisualisation.DataConstruction
 {
     public class IndicatorStatsBuilder
     {
-        private IndicatorStatsProcessor indicatorStatsProcessor = new IndicatorStatsProcessor();
-        private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
-        private IAreasReader areasReader = ReaderFactory.GetAreasReader();
-        private PholioReader pholioReader = ReaderFactory.GetPholioReader();
-        private IProfileReader profileReader = ReaderFactory.GetProfileReader();
+        private IndicatorStatsProcessor _indicatorStatsProcessor = new IndicatorStatsProcessor();
+        private IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
+        private IAreasReader _areasReader = ReaderFactory.GetAreasReader();
+        private PholioReader _pholioReader = ReaderFactory.GetPholioReader();
+        private IProfileReader _profileReader = ReaderFactory.GetProfileReader();
 
         private TimePeriodTextFormatter _timePeriodFormatter;
-        private bool _isInitialised;
         private int childAreaCount;
         private CcgPopulation ccgPopulation;
         private IList<string> areaCodesToIgnore;
         private bool? shouldShowSpineChart;
         private IArea _parentArea;
+        private IndicatorMetadata _indicatorMetadata;
 
-        public IndicatorStats GetIndicatorStats(TimePeriod timePeriod, Grouping grouping, 
-            IndicatorMetadata indicatorMetadata, ParentArea parentArea, int profileId)
+        public IndicatorStatsBuilder(IndicatorMetadata indicatorMetadata,
+            ParentArea parentArea, int profileId)
         {
-            if(_isInitialised == false) Init(parentArea, profileId, indicatorMetadata);
+            _indicatorMetadata = indicatorMetadata;
+            Init(parentArea, profileId);
+        }
 
+        public IndicatorStats GetIndicatorStats(Grouping grouping, TimePeriod timePeriod)
+        {
             var formattedTimePeriod = _timePeriodFormatter.Format(timePeriod);
-            IEnumerable<double> values = GetValuesForStats(grouping, timePeriod, indicatorMetadata);
+            IEnumerable<double> values = GetValuesForStats(grouping, timePeriod, _indicatorMetadata);
 
             IndicatorStats indicatorStats;
             if (values != null)
             {
                 IndicatorStatsPercentiles statsPercentiles = new IndicatorStatsCalculator(values).GetStats();
-                var formatter = NumericFormatterFactory.New(indicatorMetadata, groupDataReader);
-                indicatorStatsProcessor.Truncate(statsPercentiles);
+                var formatter = new NumericFormatterFactory(_groupDataReader).New(_indicatorMetadata);
+                _indicatorStatsProcessor.Truncate(statsPercentiles);
 
                 indicatorStats = new IndicatorStats
                 {
-                    IID = indicatorMetadata.IndicatorId,
+                    IID = _indicatorMetadata.IndicatorId,
                     Sex = grouping.Sex,
                     Age = grouping.Age,
                     Stats = statsPercentiles,
                     StatsF = formatter.FormatStats(statsPercentiles),
                     HaveRequiredValues = shouldShowSpineChart,
-                    Period = formattedTimePeriod
+                    Period = formattedTimePeriod,
+                    Limits = new LimitsBuilder().GetLimits(values.ToList())
                 };
             }
             else
@@ -56,7 +61,7 @@ namespace PholioVisualisation.DataConstruction
                 // No stats calculated
                 indicatorStats = new IndicatorStats
                 {
-                    IID = indicatorMetadata.IndicatorId,
+                    IID = _indicatorMetadata.IndicatorId,
                     Sex = grouping.Sex,
                     Age = grouping.Age,
                     HaveRequiredValues = shouldShowSpineChart,
@@ -66,26 +71,25 @@ namespace PholioVisualisation.DataConstruction
             return indicatorStats;
         }
 
-        private void Init(ParentArea parentArea, int profileId, IndicatorMetadata indicatorMetadata)
+        private void Init(ParentArea parentArea, int profileId)
         {
-            _isInitialised = true;
-
-            _timePeriodFormatter = new TimePeriodTextFormatter(indicatorMetadata);
+            _timePeriodFormatter = new TimePeriodTextFormatter(_indicatorMetadata);
 
             // Set area codes to ignore
-            areaCodesToIgnore = profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
+            areaCodesToIgnore = _profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
 
-            _parentArea = AreaFactory.NewArea(areasReader, parentArea.AreaCode);
+            _parentArea = AreaFactory.NewArea(_areasReader, parentArea.AreaCode);
             if (_parentArea.IsCcg)
             {
-                ccgPopulation = new CcgPopulationProvider(pholioReader).GetPopulation(_parentArea.Code);
+                ccgPopulation = new CcgPopulationProvider(_pholioReader).GetPopulation(_parentArea.Code);
             }
 
-            childAreaCount = new ChildAreaCounter(areasReader)
+            childAreaCount = new ChildAreaCounter(_areasReader)
                 .GetChildAreasCount(_parentArea, parentArea.ChildAreaTypeId);
         }
 
-        private IEnumerable<double> GetValuesForStats(Grouping grouping, TimePeriod timePeriod, IndicatorMetadata metadata)
+        private IEnumerable<double> GetValuesForStats(Grouping grouping, TimePeriod timePeriod,
+            IndicatorMetadata metadata)
         {
             IList<CoreDataSet> data = null;
             IList<double> values;
@@ -93,12 +97,12 @@ namespace PholioVisualisation.DataConstruction
             if (_parentArea.IsCountry)
             {
                 // Optimisation for large number of areas
-                values = groupDataReader.GetOrderedCoreDataValidValuesForAllAreasOfType(grouping, timePeriod,
+                values = _groupDataReader.GetOrderedCoreDataValidValuesForAllAreasOfType(grouping, timePeriod,
                     areaCodesToIgnore);
             }
             else
             {
-                data = new CoreDataSetListProvider(groupDataReader).GetChildAreaData(grouping, _parentArea, timePeriod);
+                data = new CoreDataSetListProvider(_groupDataReader).GetChildAreaData(grouping, _parentArea, timePeriod);
                 data = new CoreDataSetFilter(data).RemoveWithAreaCode(areaCodesToIgnore).ToList();
                 data = data.OrderBy(x => x.Value).ToList();
                 values = new ValueListBuilder(data).ValidValues;

@@ -13,10 +13,10 @@ namespace PholioVisualisation.DataConstructionTest
     public class IndicatorMetadataCollectionTest
     {
         [TestMethod]
-        public void TestInitIndicatorMetadata()
+        public void TestInitIndicatorMetadata_For_Collection()
         {
             var indicatorId1 = IndicatorIds.LifeExpectancyAtBirth;
-            var indicatorId2 = IndicatorIds.ObeseAdults;
+            var indicatorId2 = IndicatorIds.ExcessWinterDeaths;
 
             List<Grouping> grouping = new List<Grouping>{
                 new Grouping { IndicatorId = indicatorId1},

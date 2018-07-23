@@ -72,6 +72,7 @@ namespace Fpm.MainUI.Controllers
         public ActionResult EditAreaType(int areaTypeId)
         {
             var areaType = new AreaTypeRepository().GetAreaType(areaTypeId);
+            areaType.ComponentAreaTypesString = areaType.GetComponentAreaTypesAsString();
             return View("EditAreaType", areaType);
         }
 
@@ -79,9 +80,14 @@ namespace Fpm.MainUI.Controllers
         [HttpPost]
         public ActionResult EditAreaType(AreaType areaType)
         {
+            areaType.ParseComponentAreaTypesString();
             var repo = new AreaTypeRepository();
+
+            // Copy properties to persistable area type
             var areaTypeFromDb = repo.GetAreaType(areaType.Id);
             AutoMapper.Mapper.Map(areaType, areaTypeFromDb);
+            areaTypeFromDb.ReplaceComponentAreaTypes(areaType.ComponentAreaTypes);
+
             repo.SaveAreaType(areaTypeFromDb);
             return Redirect(SiteUrls.AreaTypeIndex);
         }
@@ -101,6 +107,39 @@ namespace Fpm.MainUI.Controllers
                 Categories = _reader.GetCategoriesByCategoryTypeId(categoryTypeId)
             };
             return View("LookUpList", model);
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        [Route("edit-category")]
+        public ActionResult EditCategory(int categoryTypeId)
+        {
+            var categoryTypes = _lookUpsRepository.GetCategoryTypes()
+                .OrderBy(x => x.Name).ToList();
+
+            var categoryType = categoryTypes.FirstOrDefault(x => x.Id == categoryTypeId);
+
+            var model = new LookupModel
+            {
+                LookupType = "Categories",
+                CategoryTypes = categoryTypes,
+                CategoryTypeId = categoryTypeId,
+                Categories =  _reader.GetCategoriesByCategoryTypeId(categoryTypeId)
+            };
+
+            return View("EditCategoryType", model);
+        }
+
+        [Route("update-category")]
+        [HttpPost]
+        [ValidateInput(false)]
+        public ActionResult UpdateCategory(CategoryType categoryType)
+        {
+            var existingCategoryType = new CategoryType();
+            AutoMapper.Mapper.Map(categoryType, existingCategoryType);
+
+            _writer.UpdateCategoryType(categoryType);
+
+            return RedirectToAction("Categories", "LookUpTables", new {categoryTypeId = categoryType.Id});
         }
 
         [Route("targets")]
@@ -133,10 +172,14 @@ namespace Fpm.MainUI.Controllers
         {
             var userId = UserDetails.CurrentUser().Id;
 
-            _writer.UpdateTargetConfig(model.Target);
-            _writer.NewTargetConfigAudit(new TargetConfigAudit(model.Target, userId, "Updated"));
+            if (ModelState.IsValid)
+            {
+                _writer.UpdateTargetConfig(model.Target);
+                _writer.NewTargetConfigAudit(new TargetConfigAudit(model.Target, userId, "Updated"));
+                return Redirect(SiteUrls.TargetIndex);
+            }
 
-            return Redirect(SiteUrls.TargetIndex);
+            return View("TargetEdit", model);
         }
 
         [HttpPost]
@@ -158,7 +201,7 @@ namespace Fpm.MainUI.Controllers
             return Redirect(SiteUrls.TargetIndex);
         }
 
-        [Route("target-new")]
+        [Route("target/new")]
         public ActionResult TargetNew()
         {
             var model = new TargetEditModel
@@ -169,7 +212,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
-        [Route("target-new")]
+        [Route("target/new")]
         public ActionResult TargetNew(TargetEditModel model)
         {
             _writer.NewTargetConfig(model.Target);
@@ -179,7 +222,7 @@ namespace Fpm.MainUI.Controllers
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            if (_lookUpsRepository == null) _lookUpsRepository = new LookUpsRepository();
+            if (_lookUpsRepository == null) _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
 
             base.OnActionExecuting(filterContext);
         }

@@ -154,7 +154,7 @@ lightbox = (function () {
         },
 
         // The left position for a pop-up to appear in the middle of the window
-        leftForMiddle: function (width) {
+        getLeftForCenteredPopup: function (width) {
             return ($(window).width() - width) / 2;
         },
 

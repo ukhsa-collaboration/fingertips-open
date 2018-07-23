@@ -1,0 +1,12 @@
+.population-heading {
+    margin-top: 15px;
+    float: left;
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    position: relative;
+}
+
+.average {
+    font-size: 9px;
+}

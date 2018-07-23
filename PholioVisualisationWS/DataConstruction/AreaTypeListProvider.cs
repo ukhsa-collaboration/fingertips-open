@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using PholioVisualisation.DataAccess.Repositories;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -34,6 +35,9 @@ namespace PholioVisualisation.DataConstruction
         private IAreasReader areasReader;
         private IGroupDataReader groupDataReader;
 
+        //TODO inject via constructor
+        private IAreaTypeIdSplitter _areaTypeIdSplitter = new AreaTypeIdSplitter(new AreaTypeComponentRepository());
+
         public AreaTypeListProvider(IGroupIdProvider groupdIdProvider,
             IAreasReader areasReader, IGroupDataReader groupDataReader)
         {
@@ -47,14 +51,19 @@ namespace PholioVisualisation.DataConstruction
             return areasReader.GetAllAreaTypes();
         }
 
+        public IList<AreaType> GetSupportedAreaTypes()
+        {
+            return areasReader.GetSupportedAreaTypes();
+        }
+
         public List<int> GetAllAreaTypeIdsUsedInProfile(int profileId)
         {
             var compositeChildAreaTypeIds = GetChildAreaTypeIdsUsedInProfiles(
                 new List<int> { profileId });
-            var childAreaTypeIds = new AreaTypeIdSplitter(compositeChildAreaTypeIds).Ids;
+            var childAreaTypeIds = _areaTypeIdSplitter.GetComponentAreaTypeIds(compositeChildAreaTypeIds);
 
             var compositeParentAreaTypeIds = GetParentAreaTypeIdsUsedInProfile(profileId);
-            var parentAreaTypeIds = new AreaTypeIdSplitter(compositeParentAreaTypeIds).Ids;
+            var parentAreaTypeIds = _areaTypeIdSplitter.GetComponentAreaTypeIds(compositeParentAreaTypeIds);
 
             var allAreaTypeIds = new List<int>();
             allAreaTypeIds.AddRange(childAreaTypeIds);

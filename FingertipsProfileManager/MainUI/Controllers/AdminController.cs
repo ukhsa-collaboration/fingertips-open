@@ -92,6 +92,15 @@ namespace Fpm.MainUI.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("get-indicator-owner")]
+        public JsonResult GetIndicatorOwner(int indicatorId)
+        {
+            var profile = _reader.GetOwnerProfilesByIndicatorIds(indicatorId);
+
+            return Json(profile, JsonRequestBehavior.AllowGet);
+        }
+
         /// <summary>
         /// Required for when action methods called from other controllers
         /// </summary>
@@ -99,13 +108,13 @@ namespace Fpm.MainUI.Controllers
         {
             if (_profileRepository == null)
             {
-                _profileRepository = new ProfileRepository();
+                _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
             }
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)
         {
-            _profileRepository = new ProfileRepository();
+            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
 
             base.OnActionExecuting(filterContext);
         }

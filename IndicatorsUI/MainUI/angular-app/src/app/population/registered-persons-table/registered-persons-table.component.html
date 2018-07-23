@@ -1,0 +1,20 @@
+<div id="registered-persons">
+    <div class="population-heading">
+        <div class="right-tooltip-icon info-tooltip" (click)="showMetadata()">
+        </div>
+        <div>Registered Persons</div>
+    </div>
+    <table class="bordered-table" cellspacing="0">
+        <tbody>
+            <tr *ngFor="let row of registeredPersons">
+                <td class="header">
+                    {{row.areaName}}
+                </td>
+                <td>{{row.personCount}}
+                    <div *ngIf="!row.hasPersonCount()" class="no-data">-</div>
+                    <span *ngIf="row.isAverage" class="average">(average)</span>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

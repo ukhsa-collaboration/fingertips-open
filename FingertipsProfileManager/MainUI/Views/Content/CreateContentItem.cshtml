@@ -15,11 +15,7 @@
 @using (Html.BeginForm("InsertContentItem", "Content", FormMethod.Post, new { id = "SaveNewContent" }))
 {
     <h2 class="subheading col-md-12">New Content</h2>
-
-@*    <div class="delete-indicators">*@
-@*        <label class="content-item-detail-label">Profile:</label>@Html.DropDownList("selectedProfile", Model.ProfileList, new {@class = "create-indicator-dropdown"})*@
-@*    </div>*@
-
+    @Html.Partial("_ContentErrorMessage")
     <div class="delete-indicators">
         <label class="content-item-detail-label">Content Key:</label>
         @Html.TextBoxFor(model => model.ContentKey, new {@class = "unselected-domain"})

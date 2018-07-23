@@ -1,0 +1,63 @@
+<div id="population-info" style="float: right; width: 360px;" *ngIf="shouldDisplay()">
+    <ft-metadata-table #metadata style="display:none;" (isReady)="metadataIsReady($event)"></ft-metadata-table>
+    <ft-registered-persons-table [registeredPersons]="registeredPersons" (metadataToShow)="showMetadata($event)"></ft-registered-persons-table>
+    <div class="practice-label">{{practiceLabel}}</div>
+    <table id="further-info-table" class="bordered-table" cellspacing="0">
+        <tr *ngFor="let row of adHocIndicatorRows">
+            <td class="header">
+                <div class="fl info-tooltip" (click)="showMetadata(row.indicatorId)"></div>
+                {{row.indicatorName}}
+            </td>
+            <td [innerHTML]="row.valueText"></td>
+        </tr>
+    </table>
+    <table id="deprivation-table" class="bordered-table" cellspacing="0">
+        <thead>
+            <tr>
+                <th>
+                    <div class="w100" style="position: relative;">
+                        Deprivation
+                        <div class="right-tooltip-icon info-tooltip" (click)="showDeprivationMetadata()"></div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td id="deprivation" style="border-bottom: none;" [innerHtml]="decileLabel"></td>
+            </tr>
+            <tr>
+                <td style="border-top: none;">
+                    <table id="decile-key" cellspacing="0">
+                        <tr>
+                            <td *ngFor="let decile of decileLabels" [innerHtml]="decile.text"></td>
+                        </tr>
+                        <tr>
+                            <td *ngFor="let decile of decileLabels" [class]="decile.getClass()"></td>
+                        </tr>
+                    </table>
+                    <div class="fl deprivation-label">More deprived</div>
+                    <div class="fr deprivation-label">Less deprived</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table id="ethnicity-table" class="bordered-table" cellspacing="0">
+        <thead>
+            <tr>
+                <th>
+                    <div class="w100" style="position: relative;">
+                        Ethnicity Estimate
+                        <div class="right-tooltip-icon info-tooltip" (click)="showEthnicityMetadata()">
+                        </div>
+                    </div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td [innerHtml]="ethnicityLabel"></td>
+            </tr>
+        </tbody>
+    </table>
+</div>

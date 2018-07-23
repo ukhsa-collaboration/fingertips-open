@@ -5,7 +5,6 @@ namespace PholioVisualisation.PholioObjects
 {
     public interface ICategoryArea : IArea
     {
-        void SetNames(Category category);
         int CategoryTypeId { get; }
         int CategoryId { get; }
         string ParentAreaCode { get; }
@@ -80,7 +79,10 @@ namespace PholioVisualisation.PholioObjects
         }
 
         [JsonIgnore]
-        public virtual int? Sequence { get { return 0; } }
+        public virtual int? Sequence {
+            get { return 0; }
+            set { ; }
+        }
 
         [JsonProperty(PropertyName = "Short")]
         public string ShortName { get; set; }
@@ -150,6 +152,11 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         public bool IsGpPractice
+        {
+            get { return false; }
+        }
+
+        public bool IsOnsClusterGroup
         {
             get { return false; }
         }

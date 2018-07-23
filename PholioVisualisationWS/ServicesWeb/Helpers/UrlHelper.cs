@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace ServicesWeb.Helpers
+namespace PholioVisualisation.ServicesWeb.Helpers
 {
     public class UrlHelper
     {

@@ -178,7 +178,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetTrendDataForSpecificCategory()
         {
-            var grouping = GroupingWithTrendData();
+            var grouping = GroupingWithCategoryTrendData();
 
             IList<CoreDataSet> data = reader.GetTrendDataForSpecificCategory(grouping,
                 AreaCodes.CountyUa_Buckinghamshire,
@@ -200,6 +200,20 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         private static Grouping GroupingWithTrendData()
+        {
+            Grouping grouping = new Grouping
+            {
+                SexId = SexIds.Persons,
+                IndicatorId = IndicatorIds.DeathsFromLungCancer,
+                AgeId = AgeIds.AllAges,
+                YearRange = 3,
+                BaselineYear = 2010,
+                DataPointYear = 2012
+            };
+            return grouping;
+        }
+
+        private static Grouping GroupingWithCategoryTrendData()
         {
             Grouping grouping = new Grouping
             {

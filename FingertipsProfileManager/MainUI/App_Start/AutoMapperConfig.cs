@@ -22,6 +22,7 @@ namespace Fpm.MainUI
                 cfg.CreateMap<AreaType, AreaType>();
                 cfg.CreateMap<CoreDataSet, CoreDataSetArchive>();
                 cfg.CreateMap<Grouping, Grouping>();
+                cfg.CreateMap<IndicatorMetadataTextValue, IndicatorMetadataTextValue>();
                 cfg.CreateMap<ContentItem, ContentItem>();
             });
             Mapper.Configuration.CompileMappings();

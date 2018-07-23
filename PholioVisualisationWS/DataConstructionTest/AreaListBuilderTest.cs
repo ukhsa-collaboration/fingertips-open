@@ -152,8 +152,7 @@ namespace PholioVisualisation.DataConstructionTest
             IAreasReader areasReader = ReaderFactory.GetAreasReader();
 
             var builder = new AreaListProvider(areasReader);
-            builder.CreateAreaListFromNearestNeighbourAreaCode(
-                ProfileIds.ChildrenAndYoungPeoplesBenchmarkingTool, code);
+            builder.CreateAreaListFromNearestNeighbourAreaCode(code);
 
             // Check areas
             var areas = builder.Areas;

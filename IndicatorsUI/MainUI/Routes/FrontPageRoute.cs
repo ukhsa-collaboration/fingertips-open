@@ -1,9 +1,9 @@
 ﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Profiles.MainUI.Skins;
+using IndicatorsUI.MainUI.Skins;
 
-namespace Profiles.MainUI.Routes
+namespace IndicatorsUI.MainUI.Routes
 {
     /// <summary>
     /// Route that selects a front page based on the site Skin.
@@ -14,22 +14,19 @@ namespace Profiles.MainUI.Routes
         {
             if (httpContext.Request.FilePath == "/")
             {
-                if (httpContext.Request.FilePath == "/")
+                if (SkinFactory.GetSkin().Name == SkinNames.Mortality)
                 {
-                    if (SkinFactory.GetSkin().Name == SkinNames.Mortality)
-                    {
-                        var routeData = new RouteData(this, new MvcRouteHandler());
-                        routeData.Values.Add("controller", "LongerLives");
-                        routeData.Values.Add("action", "Home");
-                        return routeData;
-                    }
-                    else
-                    {
-                        var routeData = new RouteData(this, new MvcRouteHandler());
-                        routeData.Values.Add("controller", RouteConfig.ProfileController);
-                        routeData.Values.Add("action", "FrontPage");
-                        return routeData;
-                    }
+                    var routeData = new RouteData(this, new MvcRouteHandler());
+                    routeData.Values.Add("controller", "LongerLives");
+                    routeData.Values.Add("action", "Home");
+                    return routeData;
+                }
+                else
+                {
+                    var routeData = new RouteData(this, new MvcRouteHandler());
+                    routeData.Values.Add("controller", RouteConfig.ProfileController);
+                    routeData.Values.Add("action", "FrontPage");
+                    return routeData;
                 }
             }
             return null;

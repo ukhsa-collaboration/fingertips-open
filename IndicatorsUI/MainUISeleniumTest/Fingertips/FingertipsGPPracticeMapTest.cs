@@ -1,0 +1,104 @@
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using IndicatorsUI.DomainObjects;
+namespace IndicatorsUI.MainUISeleniumTest.Fingertips
+{
+    [TestClass]
+    public class FingertipsGpPracticeMapTest : FingertipsBaseUnitTest
+    {
+        [TestInitialize]
+        public override void TestInitialize()
+        {
+            base.TestInitialize();
+
+            OpenProfilePage(ProfileUrlKeys.PracticeProfiles);
+            SelectMapTab();
+        }
+
+        [TestMethod]
+        public void Test_Results_Displayed_Searching_For_Practice()
+        {
+            //Type camb in search box
+            SearchForPractice("cambr");
+
+            // Assert expected results are displayed in autocomplete box
+            var resultsHtml = GetResultsHtml();
+            TestHelper.AssertTextContains(resultsHtml, "Cambridge", "Cambridge should be displayed in dropdown");
+            TestHelper.AssertTextContains(resultsHtml, "Cambridge Town", "Cambridge Town should be displayed in dropdown");
+        }
+
+        [TestMethod]
+        public void Test_Practices_in_CCG_Results_Displayed_Clicking_On_ShowAllPracticesinCCG()
+        {
+            //Get selected ccg(region Menu) name
+            IWebElement ccgName = driver.FindElement(By.Id("regionMenu"));
+            SelectElement selectedValue = new SelectElement(ccgName);
+            string ccgNameText = selectedValue.SelectedOption.Text;
+
+            //Click on show all practices in CCG link
+            var ccgLink = driver.FindElement(By.Id("all_ccg_practices"));
+            ccgLink.Click();
+
+            //Make sure the practice count info element text contains currently selected ccg name. TThis element also displys practice count but we are not checking it.
+            By element = By.Id("practice-count-info");
+            new WaitFor(driver).ExpectedElementToBePresent(element);
+            var countInfoText = driver.FindElement(element).Text;
+
+            TestHelper.AssertTextContains(countInfoText, ccgNameText, "CCG Name should be present in practice count text");
+        }
+
+        [TestMethod]
+        public void Test_PopulationTab_Can_Be_Navigated_To_From_Search_Results()
+        {
+            // Type camb in search box and select first result in autocomplete box. 
+            // This will display list of practices with select link
+            SearchForPracticeAndSelectFirstResult("cambr");
+
+            //select and click first select-practice link
+            var bySelectPractice = By.Id("select-practice");
+            waitFor.ExpectedElementToBeVisible(bySelectPractice);
+            var selectLink = driver.FindElement(bySelectPractice);
+            selectLink.Click();
+            waitFor.AjaxLockToBeUnlocked();
+
+            //Assert that clicking on the link directs to the page-population tab
+            By element = By.Id("page-population");
+            new WaitFor(driver).ExpectedElementToBePresent(element);
+            var populationTab = driver.FindElement(element);
+            Assert.IsNotNull(populationTab);
+        }
+
+        private void OpenProfilePage(string profileUrlKey)
+        {
+            navigateTo.FingertipsDataForProfile(profileUrlKey);
+        }
+
+        private void SelectMapTab()
+        {
+            FingertipsHelper.SelectFingertipsTab(driver, "page-map");
+            waitFor.ExpectedElementToBePresent(By.TagName("ft-practice-search"));
+        }
+
+        private void SearchForPractice(string place)
+        {
+            FingertipsHelper.SearchForPractice(driver, place);
+        }
+
+        private void SearchForPracticeAndSelectFirstResult(string place)
+        {
+            var id = By.Id(FingertipsIds.GpPracticeSearchText);
+            var searchText = driver.FindElement(id);
+            searchText.SendKeys(place);
+            waitFor.ExpectedElementToBeVisible(By.TagName(FingertipsIds.GpPracticeAutoComplete));
+            searchText.SendKeys(Keys.Return);
+        }
+
+        private string GetResultsHtml()
+        {
+            var resultsHtml = driver.FindElement(By.TagName(FingertipsIds.GpPracticeAutoComplete)).Text;
+            return resultsHtml;
+        }
+
+    }
+}

@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace Profiles.MainUI.Helpers
+namespace IndicatorsUI.MainUI.Helpers
 {
     public class SupportingPage
     {
@@ -13,7 +13,11 @@ namespace Profiles.MainUI.Helpers
 
             var content = ContentProvider.GetContentItem(contentKey,profileId);
 
-            Link = new HtmlString("<a href=\"" + href + "\" >" + content.Description + "</a>");
+            var link = content !=null 
+                ? "<a href=\"" + href + "\" >" + content.Description + "</a>"
+                : "";
+
+            Link = new HtmlString(link);
         } 
     }
 }

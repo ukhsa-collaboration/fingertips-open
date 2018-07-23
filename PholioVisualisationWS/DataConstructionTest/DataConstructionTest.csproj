@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PholioVisualisation.DataConstructionTest</RootNamespace>
     <AssemblyName>PholioVisualisation.DataConstructionTest</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
@@ -37,23 +37,31 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Moq, Version=4.5.29.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.5.29\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Moq, Version=4.7.145.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.7.145\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.4.0\lib\portable-net45+win8+wp8+wpa81\System.Threading.Tasks.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -65,11 +73,16 @@
     <Compile Include="AreaDataBuilderTest.cs" />
     <Compile Include="AreaRankBuilderTest.cs" />
     <Compile Include="AreaTypeFactoryTest.cs" />
+    <Compile Include="AuditProviderTest.cs" />
     <Compile Include="BenchmarkDataProviderTest.cs" />
     <Compile Include="ChildAreaCounterTest.cs" />
     <Compile Include="ChildAreaListBuilderTest.cs" />
     <Compile Include="ChildAreaValuesBuilderTest.cs" />
     <Compile Include="CcgAverageCalculatorTest.cs" />
+    <Compile Include="CoreDataSetValidatorTest.cs" />
+    <Compile Include="DateChangeHelperTest.cs" />
+    <Compile Include="GroupDataBuilderByIndicatorListTest.cs" />
+    <Compile Include="GroupingValidatorTest.cs" />
     <Compile Include="IndicatorMetadataProviderTest.cs" />
     <Compile Include="ComparatorMapBuilderTest.cs" />
     <Compile Include="ContentProviderTest.cs" />
@@ -77,11 +90,14 @@
     <Compile Include="GroupDataRepositoryTest.cs" />
     <Compile Include="GroupRootComparisonManagerTest.cs" />
     <Compile Include="GroupRootSummaryTest.cs" />
+    <Compile Include="IndicatorMetaDataTextValueValidatorTest.cs" />
     <Compile Include="LimitsBuilderTest.cs" />
+    <Compile Include="MonthlyReleaseHelperTest.cs" />
     <Compile Include="NearestNeighbourAreaListBuilderTest.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilderTest.cs" />
     <Compile Include="PholioIntegrityTest.cs" />
     <Compile Include="PostcodeProviderTest.cs" />
+    <Compile Include="ProfileIdListProviderTest.cs" />
     <Compile Include="ProfileUrlTest.cs" />
     <Compile Include="SingleGroupingProviderTest.cs" />
     <Compile Include="GroupingListUniquifierTest.cs" />
@@ -105,7 +121,7 @@
     <Compile Include="AreaFactoryTest.cs" />
     <Compile Include="NearbyAreasBuilderTest.cs" />
     <Compile Include="ParentAreasOfChildAreasBuilderTest.cs" />
-    <Compile Include="GroupingDataForProfileBuilderTest.cs" />
+    <Compile Include="GroupRootSummaryBuilderTest.cs" />
     <Compile Include="ProfilePerIndicatorBuilderTest.cs" />
     <Compile Include="SubnationalAreaAverageCalculatorTest.cs" />
     <Compile Include="TrendMarkersProviderTest.cs" />
@@ -151,7 +167,7 @@
       <Project>{A9FD008C-07B0-49BF-87B2-BC1A39242282}</Project>
       <Name>DataConstruction</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DataHelpers\DataSorting.csproj">
+    <ProjectReference Include="..\DataSorting\DataSorting.csproj">
       <Project>{24500df1-56b2-425c-bde4-851561897ec2}</Project>
       <Name>DataSorting</Name>
     </ProjectReference>
@@ -166,6 +182,10 @@
     <ProjectReference Include="..\RequestParameters\RequestParameters.csproj">
       <Project>{99D1ECEB-E3A8-40A2-83C5-7FF9304B472E}</Project>
       <Name>RequestParameters</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserData\UserData.csproj">
+      <Project>{f8a2d703-7140-4ac7-80cd-2b81dec1770f}</Project>
+      <Name>UserData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

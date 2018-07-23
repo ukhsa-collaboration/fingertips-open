@@ -543,7 +543,7 @@ namespace PholioVisualisation.PdfDataTest
                 var parameters = new SpineChartDataParameters
                 {
                     ProfileId = ProfileIds.Amr,
-                    ChildAreaTypeId = AreaTypeIds.Ccg,
+                    ChildAreaTypeId = AreaTypeIds.CcgsPreApr2017,
                     AreaCodes = new List<string> { AreaCodes.Ccg_Barnet },
                     BenchmarkAreaCodes = new List<string> { AreaCodes.England }
                 };

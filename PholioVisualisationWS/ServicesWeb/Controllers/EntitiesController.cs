@@ -5,10 +5,10 @@ using System.Web.Http;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
-using ServicesWeb.Helpers;
+using PholioVisualisation.ServicesWeb.Helpers;
 using ValueType = PholioVisualisation.PholioObjects.ValueType;
 
-namespace ServicesWeb.Controllers
+namespace PholioVisualisation.ServicesWeb.Controllers
 {
     [RoutePrefix("api")]
     public class EntitiesController : BaseController
@@ -385,6 +385,83 @@ namespace ServicesWeb.Controllers
                 Log(ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Get a list of all the nearest neighbour type
+        /// </summary>
+        /// <param name="include_system_content">Whether or not to include system content</param>
+        [HttpGet]
+        [Route("nearest_neighbour_types")]
+        public IList<NearestNeighbourType> GetNearestNeighbourTypes(string include_system_content = "no")
+        {
+            IList<NearestNeighbourType> nearestNeighbourTypes = new List<NearestNeighbourType>();
+
+            try
+            {
+                nearestNeighbourTypes = ReaderFactory.GetPholioReader().GetAllNearestNeighbourTypes();
+                var includeSystemContent = ServiceHelper.ParseYesOrNo(include_system_content, false);
+                foreach (NearestNeighbourType nearestNeighbourType in nearestNeighbourTypes)
+                {
+                    nearestNeighbourType.ExtraLink = FormatExtraLink(nearestNeighbourType.ExtraLink);
+
+                    if (!includeSystemContent)
+                    {
+                        nearestNeighbourType.ClearSystemContent();
+                    }
+                }
+
+                return nearestNeighbourTypes;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a specific nearest neighbour type
+        /// </summary>
+        /// <param name="neighbour_type_id">Nearest neighbour type ID</param>
+        /// <param name="include_system_content">Whether or not to include system content</param>
+        [HttpGet]
+        [Route("nearest_neighbour_type")]
+        public NearestNeighbourType GetNearestNeighbourType(int neighbour_type_id, string include_system_content = "no")
+        {
+            try
+            {
+                NearestNeighbourType nearestNeighbourType = ReaderFactory.GetPholioReader().GetNearestNeighbourType(neighbour_type_id);
+
+                if (nearestNeighbourType == null)
+                {
+                    throw new Exception("The system could not find a nearest neighbour type for the id " + neighbour_type_id);
+                }
+
+                nearestNeighbourType.ExtraLink = FormatExtraLink(nearestNeighbourType.ExtraLink);
+
+                if (!ServiceHelper.ParseYesOrNo(include_system_content, false))
+                {
+                    nearestNeighbourType.ClearSystemContent();
+                }
+
+                return nearestNeighbourType;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        private string FormatExtraLink(string extraLink)
+        {
+            if (!extraLink.StartsWith("http"))
+            {
+                extraLink = ApplicationConfiguration.Instance.UrlUI + extraLink;
+            }
+
+            return extraLink;
         }
     }
 }

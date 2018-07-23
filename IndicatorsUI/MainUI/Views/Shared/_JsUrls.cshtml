@@ -1,10 +1,18 @@
-﻿<script type="text/javascript">
-//<![CDATA[
-FT.url = {
+﻿@using IndicatorsUI.DataAccess
+@{
+    var practiceProfilesUrl = AppConfig.Instance.IsEnvironmentLive
+    ? "http://fingertipsreports.phe.org.uk"
+    : "https://testfingertipsreports.phe.org.uk";
+}
+<script type="text/javascript">
+    //<![CDATA[
+    FT.url = {
         img: '@ViewBag.ImagesUrl',
         bridge: '@Model.BridgeServicesUrl',
         corews: '@Model.CoreServicesUrl',
         search: '@(Url.Content("~/search/"))',
-        pdf: '@ViewBag.PdfUrl'
-};
-//]]</script>
+        pdf: '@ViewBag.PdfUrl',
+        practiceProfilePdf: '@practiceProfilesUrl',
+        logging: '@AppConfig.Instance.CoreWsUrlForLogging'
+    };
+    //]]</script>

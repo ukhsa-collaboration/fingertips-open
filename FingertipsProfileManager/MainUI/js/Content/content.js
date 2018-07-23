@@ -49,6 +49,34 @@ function documentReady() {
         }
     });
 
+    $("#publish_live").click(function() {
+        var contentIds = [];
+        $('.indicator-check-box:checked').each(function () {
+            contentIds.push($(this).val());
+        });
+
+        if (contentIds.length) {
+            $.ajax({
+                cache: false,
+                type: 'post',
+                url: '/content/publish-content-item',
+                data: { contentIds: contentIds },
+                success: function(data) {
+                    showSimpleMessagePopUp('Selected content item(s) published to live site');
+                    $('.indicator-check-box').removeAttr('checked');
+                    if ($('#select-all').attr('checked')) {
+                        $('#select-all').removeAttr('checked');
+                    }
+                },
+                error: function(xhr, error) {
+                    showSimpleMessagePopUp('Sorry, that did not work');
+                }
+            });
+        } else {
+            showSimpleMessagePopUp('Please select content(s) for publishing to live site');
+        }
+    });
+
     $('#delete').click(function() {
         $.ajax({
             type: 'post',

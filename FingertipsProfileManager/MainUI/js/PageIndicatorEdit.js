@@ -1,5 +1,5 @@
 function loading() {
-    $('body').addClass('loading');
+    $('body').addClass('loading');    
 }
 
 // Also see LookUps.Frequencies in C#
@@ -19,31 +19,39 @@ function setInputSelected($menu) {
 
 function showHideComparatorConfidence() {
 
-    var comparatorConfidenceDiv = $('#comparatorConfidenceDiv'),
-        comparatorConfidence = $('#ComparatorConfidence');
+    var $comparatorConfidenceDiv = $('#comparatorConfidenceDiv'),
+        $comparatorConfidence = $('#ComparatorConfidence');
 
-    if ($('#ComparatorMethodId').val() === '-1'/*No comparison*/) {
-        setInputSelected(comparatorConfidence);
-        comparatorConfidenceDiv.hide();
-        comparatorConfidence[0].selectedIndex = 0;
+    var comparatorMethodId = parseInt($('#ComparatorMethodId').val());
+    var methodsThatDontNeedConfidenceLevel = [
+        ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
+        ComparatorMethodIds.Quartiles, ComparatorMethodIds.Quintiles];
+    if (_.contains(methodsThatDontNeedConfidenceLevel , comparatorMethodId)) {
+        // User does not need to select comparator confidence
+        setInputSelected($comparatorConfidence);
+        $comparatorConfidenceDiv.hide();
+        $comparatorConfidence[0].selectedIndex = 0;
     } else {
-        comparatorConfidenceDiv.show();
-        if (comparatorConfidence.val() === '-1') {
-            setInputNotSelected(comparatorConfidence);
+        $comparatorConfidenceDiv.show();
+        if ($comparatorConfidence.val() === '-1') {
+            setInputNotSelected($comparatorConfidence);
         }
     }
 };
 
 function checkMandatoryFields() {
-    var v1 = $('#v1').val(),
-        v2 = $('#v2').val(),
-        v3 = $('#v3').val(),
-        v6 = $('#v6').val();
-    if (v1 === '' || v2 === '' || v3 === '' || v6 === '') {
-        return false;
-    } else {
-        return true;
+
+    // Check than none of the mandatory text fields are empty or only whitespace
+    var ids = ['v1', 'v2', 'v3', 'v6'];
+    for (var i in ids) {
+        var $element = $('#' + ids[i]);
+        var text = $element.val();
+        if (text.trim().length === 0) {
+            return false;
+        }
     }
+
+    return true;
 }
 
 $(document).ready(function () {
@@ -79,7 +87,7 @@ $(document).ready(function () {
     $saveNewButton.click(function () {
         updateShowSpineChartValue();
         if (checkFieldLength()) {
-            if ($(this).hasClass('save-required')) {
+            if (checkMandatoryFields() && $(this).hasClass('save-required')) {
                 var selectedProfile = $selectedProfile.find(':selected')[0].text;
                 $('#popupDiv #popup-profile-confirm-label').text(selectedProfile);
                 var selectedDomain = $('#popup-domain-confirm-label').text($('#selectedDomain').find(':selected').text())[0].innerText;
@@ -273,25 +281,25 @@ $(document).ready(function () {
         var frequency = $('#selectedFrequency').val();
         setPeriodRanges(frequency);
 
-        $.ajax({
-            type: 'post',
-            url: '/SaveNewIndicator',
-            data: {
-                //Tab 1
-                userMTVChanges: $('#userMTVChanges').val(),
-                selectedProfileId: $('#selectedProfile').val(),
-                selectedDomain: $('#selectedDomain').val(),
+            $.ajax({
+                type: 'post',
+                url: '/SaveNewIndicator',
+                data: {
+                    //Tab 1
+                    userMTVChanges: $('#userMTVChanges').val(),
+                    selectedProfileId: $('#selectedProfile').val(),
+                    selectedDomain: $('#selectedDomain').val(),
 
-                //Tab 2                    
-                selectedValueType: $('#selectedValueType').val(),
-                selectedCIMethodType: $('#selectedCIMethodType').val(),
-                selectedCIConfidenceLevel: $('#selectedCIConfidenceLevel').val(),
-                selectedPolarityType: $('#selectedPolarityType').val(),
-                selectedUnitType: $('#selectedUnitType').val(),
-                selectedDenominatorType: $('#selectedDenominatorType').val(),
-                selectedYearType: $('#selectedYearType').val(),
-                selectedDecimalPlaces: $('#selectedDecimalPlaces').val(),
-                selectedTargetId: $('#selectedTargetId').val(),
+                    //Tab 2                    
+                    selectedValueType: $('#selectedValueType').val(),
+                    selectedCIMethodType: $('#selectedCIMethodType').val(),
+                    selectedPolarityType: $('#selectedPolarityType').val(),
+                    selectedUnitType: $('#selectedUnitType').val(),
+                    selectedDenominatorType: $('#selectedDenominatorType').val(),
+                    selectedYearType: $('#selectedYearType').val(),
+                    selectedDecimalPlaces: $('#selectedDecimalPlaces').val(),
+                    selectedTargetId: $('#selectedTargetId').val(),
+                    latestChangeTimestamp: $('#latestChangeTimestamp').val(),
 
                 //Tab 3
                 selectedAreaType: $('#selectedAreaType').val(),
@@ -340,13 +348,14 @@ $(document).ready(function () {
                 //Tab 2                    
                 selectedValueType: $('#valueTypeId').val(),
                 selectedCIMethodType: $('#CIMethodID').val(),
-                selectedCIConfidenceLevel: $('#CIComparatorConfidence').val(),
                 selectedPolarityType: $('#PolarityId').val(),
                 selectedUnitType: $('#UnitId').val(),
                 selectedDenominatorType: $('#DenominatorTypeID').val(),
                 selectedYearType: $('#YearTypeId').val(),
                 selectedDecimalPlaces: $('#DecimalPlaces').val(),
                 selectedTargetId: $('#TargetId').val(),
+                latestChangeTimestamp: $('#latestChangeTimestamp').val(),
+
 
                 //Tab 3
                 selectedAreaType: $('#AreaTypeId').val(),
@@ -378,6 +387,7 @@ $(document).ready(function () {
     });
 
     $('#created-ok').click(function () {
+        console.log('3');
         $.ajax({
             url: 'profiles'
         });
@@ -387,6 +397,14 @@ $(document).ready(function () {
     validateGenericDropdowns();
 
     $('#AgeId,#selectedAge').chosen({ search_contains: true });
+
+    // JQuery UI datepicker
+    $('#latestChangeTimestamp').datepicker({
+        dateFormat: 'dd-mm-yy',
+        onSelect:function(dateText,inst) {}
+    }).val();
+
+
 });
 
 function isPleaseSelectSelected($menu) {
@@ -494,10 +512,9 @@ function setuserOtherChanges() {
 }
 
 function checkIsReadOnly() {
-    var saveButton = $('#save'),
-        isReadOnly = $('#isReadOnly');
-    if (isReadOnly.val() == 'True') {
-        saveButton.hide();
+    if ($('#isReadOnly').val() === 'True') {
+        var $saveButton = $('#save');
+        $saveButton.hide();
     }
 };
 
@@ -519,8 +536,8 @@ function textKeyDown(e) {
 }
 
 function checkIfSaveRequired() {
-    var saveButton = $('#save');
     if (!_.size(changes)) {
+        var saveButton = $('#save');
         saveButton.removeClass('save-required').hide();
         isSaveRed = false;
     }
@@ -528,9 +545,8 @@ function checkIfSaveRequired() {
 
 function saveRequired() {
     isSaveRed = true;
-    var saveButton = $('#save');
-
     if ($('.mandatory-input').length == 0) {
+        var saveButton = $('#save');
         saveButton.show().addClass('save-required');
     }
 }
@@ -655,6 +671,7 @@ function showEditor(object) {
 }
 
 function reloadDomains($selectedProfile) {
+    console.log('4');
     var $selectedDomain = $('#selectedDomain');
     $.ajax({
         type: 'post',
@@ -700,8 +717,8 @@ function configureSaveButton() {
     var $saveNewButton = $('.save-new-indicator');
     var $notSelected = $('.dropdown-not-selected');
 
-    if (($('.mandatory-input').length == $('.mandatory-success').length) &&
-        $notSelected.length === 0) {
+    if (($('.mandatory-input').length === $('.mandatory-success').length) &&
+        $notSelected.length === 0 && checkMandatoryFields()) {
         $saveButton.show();
         $saveButton.addClass('save-required');
         $saveNewButton.attr('href', '#');
@@ -764,11 +781,7 @@ function loadDefaultTextMetadata() {
 function updateShowSpineChartValue() {
     var $showSpineChart = $('#ShouldAlwaysShowSpineChart');
     var isChecked = $showSpineChart.is(':checked');
-    if (isChecked) {
-        $('#AlwaysShowSpineChart').val(true);
-    } else {
-        $('#AlwaysShowSpineChart').val(false);
-    }
+    $('#AlwaysShowSpineChart').val(isChecked);
 }
 
 indicatorDefaultMetadata = [];

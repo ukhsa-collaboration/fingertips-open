@@ -1,6 +1,7 @@
 ﻿using Fpm.ProfileData.Repositories;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using Fpm.ProfileData;
 
 namespace Fpm.ProfileDataTest.Respositories
 {
@@ -13,18 +14,17 @@ namespace Fpm.ProfileDataTest.Respositories
         public void Init()
         {
             _uploadJobRepository = new UploadJobRepository();
-            _uploadJobRepository.DeleteAllJobs();
         }
 
         [TestMethod]
         public void TestGetJobsForCurrentUser()
         {
-            var jobs = _uploadJobRepository.GetJobsForCurrentUser(11);
-            Assert.IsTrue(jobs.ToList().Count == 0);
+            var jobs = _uploadJobRepository.GetJobsForCurrentUser(FpmUserIds.Doris);
+            Assert.IsTrue(jobs.ToList().Any());
         }
 
         [TestMethod]
-        public void TestJobByGuid()
+        public void TestGetNotStartedOrConfirmationGivenUploadJobs()
         {
             var job = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
             Assert.IsNotNull(job);

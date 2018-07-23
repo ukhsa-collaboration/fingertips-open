@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Profiles.DomainObjects;
-using Profiles.MainUI.Models;
+using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Models;
 
 namespace IndicatorsUI.MainUITest.Models
 {

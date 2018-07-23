@@ -39,8 +39,8 @@ namespace PholioVisualisation.AnalysisTest
             Significance sig = New95_0().Compare(new CoreDataSet
             {
                 Value = 10,
-                LowerCI = 11,
-                UpperCI = 12,
+                LowerCI95 = 11,
+                UpperCI95 = 12,
                 Denominator = 0
             },
             comparator, metadata
@@ -51,8 +51,8 @@ namespace PholioVisualisation.AnalysisTest
             sig = New95_0().Compare(new CoreDataSet
             {
                 Value = 10,
-                LowerCI = 11,
-                UpperCI = 12,
+                LowerCI95 = 11,
+                UpperCI95 = 12,
                 Denominator = -1
             },
             comparator, metadata
@@ -73,8 +73,8 @@ namespace PholioVisualisation.AnalysisTest
             CoreDataSet data = new CoreDataSet
             {
                 Value = 7.7065767284991562,
-                LowerCI = 7.0548320523366375,
-                UpperCI = 8.4130813590727076,
+                LowerCI95 = 7.0548320523366375,
+                UpperCI95 = 8.4130813590727076,
                 Denominator = 5930,
                 YearRange = 1
             };
@@ -85,8 +85,8 @@ namespace PholioVisualisation.AnalysisTest
             data = new CoreDataSet
             {
                 Value = 9.8988121425428961,
-                LowerCI = 8.7379055891773572,
-                UpperCI = 11.195035154784872,
+                LowerCI95 = 8.7379055891773572,
+                UpperCI95 = 11.195035154784872,
                 Denominator = 2273,
                 YearRange = 1
             };
@@ -97,8 +97,8 @@ namespace PholioVisualisation.AnalysisTest
             data = new CoreDataSet
             {
                 Value = 12.474645030425965,
-                LowerCI = 11.088798553603118,
-                UpperCI = 14.006406155616993,
+                LowerCI95 = 11.088798553603118,
+                UpperCI95 = 14.006406155616993,
                 Denominator = 1972,
                 YearRange = 1
             };
@@ -118,8 +118,8 @@ namespace PholioVisualisation.AnalysisTest
             CoreDataSet data = new CoreDataSet
             {
                 Value = 10.9783420463032,
-                LowerCI = 9.41418865607498,
-                UpperCI = 12.7657535004819,
+                LowerCI95 = 9.41418865607498,
+                UpperCI95 = 12.7657535004819,
                 Denominator = 1339,
                 YearRange = 1
             };
@@ -130,8 +130,8 @@ namespace PholioVisualisation.AnalysisTest
             data = new CoreDataSet
             {
                 Value = 15.9065628476085,
-                LowerCI = 13.6615426206213,
-                UpperCI = 18.4417082867185,
+                LowerCI95 = 13.6615426206213,
+                UpperCI95 = 18.4417082867185,
                 Denominator = 899,
                 YearRange = 1
             };

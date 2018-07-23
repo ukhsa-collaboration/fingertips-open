@@ -13,7 +13,7 @@
     <div id="progress-menu" class="tab-pane">
         <div ng-show="!loading && !nofiles ">
             <div class="row">
-                <h3 class="col-md-2">My pending files</h3>
+                <h3 class="col-md-3">Your pending files</h3>
             </div>
             <div class="row"></div>
             <div class="row">
@@ -31,7 +31,7 @@
             </div>
             <br />
             <div class="row">
-                <h3 class="col-md-2">All my files</h3>
+                <h3 class="col-md-3">All your files</h3>
             </div>
             <div class="row">
                 <div class="container">
@@ -62,7 +62,9 @@
                                     <span ng-switch-when="0">In queue</span>
                                     <span ng-switch-when="200">In progress</span>
                                     <span ng-switch-when="300">Duplicated rows found in database</span>
-                                    <span ng-switch-when="302" >Cancelled</span>
+                                    <span ng-switch-when="301">Awaiting upload</span>
+                                    <span ng-switch-when="302">Cancelled</span>
+                                    <span ng-switch-when="311">Small numbers accepted</span>
                                     <span ng-switch-when="312">Cancelled</span>
                                     <span ng-switch-when="400">Validation Failed</span>
                                     <span ng-switch-when="401">Missing Column</span>

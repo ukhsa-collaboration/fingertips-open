@@ -1,0 +1,39 @@
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+@model IndicatorsUI.MainUI.Models.PageModel
+@if (Model.ProfileId == ProfileIds.PublicHealthDashboard)
+{
+    var labels = QuartilesLabelHelper.GetLabels();
+    var i = 0;
+
+    // Quartiles
+    <div class="legend">
+        <ul>
+            <li>Summary rank indicators</li>
+            <li class="grade">
+                <img src="@(ViewBag.ImagesUrl)Mortality/grade-0.png" />
+            </li>
+            <li>
+                @Html.Raw(labels[i++])
+            </li>
+            <li class="grade">
+                <img src="@(ViewBag.ImagesUrl)Mortality/grade-1.png" />
+            </li>
+            <li>
+                @Html.Raw(labels[i++])
+            </li>
+            <li class="grade">
+                <img src="@(ViewBag.ImagesUrl)Mortality/grade-2.png" />
+            </li>
+            <li>
+                @Html.Raw(labels[i++])
+            </li>
+            <li class="grade">
+                <img src="@(ViewBag.ImagesUrl)Mortality/grade-3.png" />
+            </li>
+            <li>
+                @Html.Raw(labels[i++])
+            </li>
+        </ul>
+    </div>
+}

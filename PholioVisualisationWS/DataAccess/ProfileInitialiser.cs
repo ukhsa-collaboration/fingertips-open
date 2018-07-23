@@ -20,7 +20,7 @@ namespace PholioVisualisation.DataAccess
                     return null;
                 }
 
-                var groupIds = ReaderFactory.GetGroupDataReader().GetGroupingIds(profileConfig.ProfileId);
+                var groupIds = ReaderFactory.GetGroupDataReader().GetGroupIdsOfProfile(profileConfig.ProfileId);
 
                 return new Profile(groupIds)
                 {

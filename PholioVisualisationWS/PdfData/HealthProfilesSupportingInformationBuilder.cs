@@ -46,9 +46,9 @@ namespace PholioVisualisation.PdfData
             };
 
             // Init areas
-            Area area = areasReader.GetAreaFromCode(areaCode);
+            var area = areasReader.GetAreaFromCode(areaCode);
             coreDataSetProvider = new CoreDataSetProviderFactory().New(area);
-            Area benchmarkArea = areasReader.GetAreaFromCode(benchmarkAreaCode);
+            var benchmarkArea = areasReader.GetAreaFromCode(benchmarkAreaCode);
             benchmarkDataProvider = new CoreDataSetProviderFactory().New(benchmarkArea);
 
             // Init data
@@ -63,7 +63,7 @@ namespace PholioVisualisation.PdfData
 
             // Page 2 top
             AssignDeprivationQuintilesPopulation();
-            AssignLsoaQuintiles();
+            AssignLsoaQuintiles(area);
 
             // Population 
             AssignDependencyRatio();
@@ -233,7 +233,7 @@ namespace PholioVisualisation.PdfData
             CoreDataSet coreDataSet = coreDataSetProvider.GetData(grouping,
                 TimePeriod.GetDataPoint(grouping), metadata);
 
-            var formatter = NumericFormatterFactory.NewWithLimits(metadata, (Limits)null);
+            var formatter = new NumericFormatterFactory(null).NewWithLimits(metadata, (Limits)null);
             if (coreDataSet != null && coreDataSet.IsValueValid)
             {
                 formatter.Format(coreDataSet);
@@ -295,10 +295,15 @@ namespace PholioVisualisation.PdfData
             return dataList;
         }
 
-        private void AssignLsoaQuintiles()
+        private void AssignLsoaQuintiles(IArea area)
         {
-            data.LsoaQuintiles = groupDataReader.GetCategoriesWithinParentArea(
-                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2010, areaCode, AreaTypeIds.Lsoa);
+            data.LsoaQuintilesWithinLocalArea = groupDataReader.GetCategoriesWithinParentArea(
+                CategoryTypeIds.LsoaDeprivationQuintilesWithinArea2015, areaCode, AreaTypeIds.Lsoa,
+                area.AreaTypeId);
+
+            data.LsoaQuintilesWithinEngland = groupDataReader.GetCategoriesWithinParentArea(
+                CategoryTypeIds.LsoaDeprivationQuintilesInEngland2015, areaCode, AreaTypeIds.Lsoa,
+                AreaTypeIds.Country);
         }
 
         private void AssignPopulation()
@@ -453,7 +458,7 @@ namespace PholioVisualisation.PdfData
             Grouping grouping = groupRootSelector.HealthInequalitiesEthnicity.FirstGrouping;
             IndicatorMetadata metadata = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
             TimePeriod timePeriod = TimePeriod.GetDataPoint(grouping);
-            var formatter = NumericFormatterFactory.New(metadata, groupDataReader);
+            var formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
 
             IList<CoreDataSet> coreDataSetsLocal = groupDataReader
                 .GetCoreDataListForAllCategoryAreasOfCategoryAreaType(

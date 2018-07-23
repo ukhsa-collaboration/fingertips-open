@@ -20,8 +20,10 @@
     <property name="AreaCode" column="areacode"/>
     <property name="Count" column="count"/>
     <property name="Value" column="value"/>
-    <property name="LowerCi" column="lowerci"/>
-    <property name="UpperCi" column="upperci"/>
+    <property name="LowerCI95" column="lowerci95"/>
+    <property name="UpperCI95" column="upperci95"/>
+    <property name="LowerCI99_8" column="lowerci99_8"/>
+    <property name="UpperCI99_8" column="upperci99_8"/>
     <property name="Denominator" column="denominator"/>
     <property name="Denominator_2" column="denominator_2"/>
     <property name="ValueNoteId" column="valuenoteid"/>
@@ -48,8 +50,10 @@
     <property name="AreaCode" column="areacode"/>
     <property name="Count" column="count"/>
     <property name="Value" column="value"/>
-    <property name="LowerCi" column="lowerci"/>
-    <property name="UpperCi" column="upperci"/>
+    <property name="LowerCI95" column="lowerci95"/>
+    <property name="UpperCI95" column="upperci95"/>
+    <property name="LowerCI99_8" column="lowerci99_8"/>
+    <property name="UpperCI99_8" column="upperci99_8"/>
     <property name="Denominator" column="denominator"/>
     <property name="Denominator_2" column="denominator_2"/>
     <property name="ValueNoteId" column="valuenoteid"/>
@@ -130,15 +134,15 @@
   </sql-query>
 
   <sql-query name="GetDistinctYearsByIndicator">
-    SELECT DISTINCT CAST([year] as int) yearnum FROM coredataset  WHERE [year] > 0 AND indicatorId = :indicatorId
+    SELECT DISTINCT CAST([year] as int) yearnum FROM coredataset  WHERE indicatorId = :indicatorId
   </sql-query>
 
   <sql-query name="GetDistinctMonthsByIndicator">
-    SELECT DISTINCT CAST([month] as int) monthnum FROM coredataset  WHERE [month] > 0 AND indicatorId = :indicatorId
+    SELECT DISTINCT CAST([month] as int) monthnum FROM coredataset  WHERE indicatorId = :indicatorId
   </sql-query>
 
   <sql-query name="GetDistinctQuartersByIndicator">
-    SELECT DISTINCT CAST([quarter] as int) quarternum FROM coredataset  WHERE [quarter] > 0 AND indicatorId = :indicatorId
+    SELECT DISTINCT CAST([quarter] as int) quarternum FROM coredataset  WHERE indicatorId = :indicatorId
   </sql-query>
 
   <sql-query name="CheckIfAuthorisedUser">

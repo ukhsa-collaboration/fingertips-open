@@ -22,7 +22,7 @@ namespace PholioVisualisation.Formatting
         {
             if (data != null && data.HasFormattedValue == false)
             {
-                data.ValueFormatted = FormatNumber(data.Value);
+                data.ValueFormatted = FormatValue(data.Value);
             }
         }
 
@@ -30,8 +30,10 @@ namespace PholioVisualisation.Formatting
         {
             if (data != null && data.HasFormattedCIs == false)
             {
-                data.UpperCIF = FormatNumber(data.UpperCI);
-                data.LowerCIF = FormatNumber(data.LowerCI);
+                data.UpperCI95F = FormatNullableValue(data.UpperCI95);
+                data.LowerCI95F = FormatNullableValue(data.LowerCI95);
+                data.UpperCI99_8F = FormatNullableValue(data.UpperCI99_8);
+                data.LowerCI99_8F = FormatNullableValue(data.LowerCI99_8);
             }
         }
 
@@ -43,13 +45,13 @@ namespace PholioVisualisation.Formatting
             }
             return new IndicatorStatsPercentilesFormatted
             {
-                Min = FormatNumber(stats.Min),
-                Max = FormatNumber(stats.Max),
-                Median = FormatNumber(stats.Median),
-                Percentile5 = FormatNumber(stats.Percentile5),
-                Percentile25 = FormatNumber(stats.Percentile25),
-                Percentile75 = FormatNumber(stats.Percentile75),
-                Percentile95 = FormatNumber(stats.Percentile95)
+                Min = FormatValue(stats.Min),
+                Max = FormatValue(stats.Max),
+                Median = FormatValue(stats.Median),
+                Percentile5 = FormatValue(stats.Percentile5),
+                Percentile25 = FormatValue(stats.Percentile25),
+                Percentile75 = FormatValue(stats.Percentile75),
+                Percentile95 = FormatValue(stats.Percentile95)
             };
         }
 
@@ -64,7 +66,7 @@ namespace PholioVisualisation.Formatting
             formatString = sb.ToString();
         }
 
-        private string FormatNumber(double val)
+        private string FormatValue(double val)
         {
             if (val.Equals(ValueData.NullValue))
             {
@@ -72,6 +74,15 @@ namespace PholioVisualisation.Formatting
             }
 
             return string.Format(formatString, val);
+        }
+
+        private string FormatNullableValue(double? val)
+        {
+            if (val.HasValue)
+            {
+                return string.Format(formatString, val);
+            }
+            return NoValue;
         }
 
         protected override void SetFormatMethod() { }
