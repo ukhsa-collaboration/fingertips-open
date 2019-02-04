@@ -1,7 +1,8 @@
 import { Component, Input, ViewChild, SimpleChanges, ElementRef } from '@angular/core';
 import { Populations, PopulationMaxFinder } from '../population';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
-import { AreaCodes, SexIds, HC, Colour } from '../../shared/shared';
+import { IndicatorService } from '../../shared/service/api/indicator.service';
+import { AreaCodes, SexIds, HC, Colour, ParameterBuilder } from '../../shared/shared';
 import {
   FTModel, Population
 } from '../../typings/FT.d';
@@ -30,7 +31,7 @@ export class PopulationChartComponent {
   @ViewChild('chart') public chartEl: ElementRef;
   chart: Highcharts.ChartObject;
 
-  constructor(private ftHelperService: FTHelperService) {
+  constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) {
     this.chartTextStyle = {
       color: this.chartColours.label,
       fontWeight: 'normal',
@@ -53,7 +54,7 @@ export class PopulationChartComponent {
   }
 
   private getChartOptions(): any /*Highcharts.Options*/ {
-    var model: FTModel = this.ftHelperService.getFTModel();
+    let model: FTModel = this.ftHelperService.getFTModel();
     let max = new PopulationMaxFinder().getMaximumValue(this.populations);
 
     // Populations
@@ -62,7 +63,7 @@ export class PopulationChartComponent {
     let nationalPopulation = this.populations.nationalPopulation;
 
     // Labels
-    let subtitle = nationalPopulation.IndicatorName + " " + nationalPopulation.Period;
+    let subtitle = nationalPopulation.IndicatorName + ' ' + nationalPopulation.Period;
     let maleString = ' (Male)';
     let femaleString = ' (Female)';
     this.chartTitle = '<div style="text-align:center;">Age Profile<br><span style="font-size:12px;">' + subtitle + '</span></div>';
@@ -70,7 +71,7 @@ export class PopulationChartComponent {
     let series = [];
 
     // Area series
-    var areaName = this.ftHelperService.getAreaName(model.areaCode);
+    let areaName = this.ftHelperService.getAreaName(model.areaCode);
     series.push(
       {
         name: areaName + maleString,
@@ -86,9 +87,11 @@ export class PopulationChartComponent {
     );
 
     // Parent area series
-    var isParentNotEngland = model.parentCode.toUpperCase() !== AreaCodes.England;
-    if (isParentNotEngland) {
-      var parentAreaName = this.ftHelperService.getParentArea().Name;
+    let isParentNotEngland = model.parentCode.toUpperCase() !== AreaCodes.England;
+    let isParentNotUk = model.parentCode.toUpperCase() !== AreaCodes.Uk;
+
+    if (isParentNotEngland && isParentNotUk) {
+      let parentAreaName = this.ftHelperService.getParentArea().Name;
       let parentColour = this.chartColours.pink;
       series.push({
         name: parentAreaName,
@@ -103,20 +106,23 @@ export class PopulationChartComponent {
         });
     }
 
-    // England series
-    series.push(
-      {
-        name: 'England',
-        data: nationalPopulation.Values[SexIds.Male],
-        color: Colour.comparator
-      },
-      {
-        name: 'England' + femaleString,
-        data: nationalPopulation.Values[SexIds.Female],
-        color: Colour.comparator,
-        showInLegend: false
-      }
-    );
+    if (isParentNotUk)
+    {
+      // England series
+      series.push(
+        {
+          name: 'England',
+          data: nationalPopulation.Values[SexIds.Male],
+          color: Colour.comparator
+        },
+        {
+          name: 'England' + femaleString,
+          data: nationalPopulation.Values[SexIds.Female],
+          color: Colour.comparator,
+          showInLegend: false
+        }
+      );
+    }
 
     return (
       {
@@ -172,11 +178,11 @@ export class PopulationChartComponent {
           line: {
             // The symbol is a non-valid option here to work round a bug
             // in highcharts where only half of the markers appear on hover
-            marker: HC.noLineMarker,
+            marker: HC.NoLineMarker,
             animation: false,
             states: {
               hover: {
-                marker: HC.noLineMarker
+                marker: HC.NoLineMarker
               }
             }
           }
@@ -205,7 +211,7 @@ export class PopulationChartComponent {
               'Population: ' + Math.abs(this.point.y) + '%';
           }
         },
-        credits: HC.credits,
+        credits: HC.Credits,
         exporting: {
           enabled: false
         },
@@ -240,5 +246,28 @@ export class PopulationChartComponent {
     });
 
     this.ftHelperService.logEvent('ExportImage', 'Population');
+  }
+
+  public exportChartAsCsv(){
+
+    var urls = this.ftHelperService.getURL();
+    var model = this.ftHelperService.getFTModel();
+
+    var parameters = new ParameterBuilder()
+    .add('parent_area_type_id', model.parentTypeId)
+    .add('child_area_type_id', model.areaTypeId)
+    .add('areas_code', model.areaCode)
+    .add('parent_area_code', this.getParentAreaCode(model));
+
+    var url = urls.corews + 'api/latest/population/csv?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+  }
+
+  private getParentAreaCode(model){
+    
+    if (model.nearestNeighbour !== null){
+        return AreaCodes.England;
+    }
+    return model.parentCode;
   }
 }

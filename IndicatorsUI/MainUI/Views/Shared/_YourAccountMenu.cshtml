@@ -1,14 +1,21 @@
-﻿<li id="your-account" class="dropdown site-link">
+﻿@using IndicatorsUI.DataAccess
+<li id="your-account" class="dropdown site-link">
     <a id="your-account-button" href="#" class="dropdown-toggle" role="button"
        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Your data</a>
     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="your-account-button">
-        @if (User.Identity.IsAuthenticated == false)
+        @if (ViewBag.IsUserSignedIn == false)
         {
             @Html.ActionLink("Sign in", "Login", "UserAccount", new { }, new { @class = "dropdown-item" })
         }
         else
         {
             @Html.ActionLink("Your indicator lists", "Index", "indicatorlist", new { }, new { @class = "dropdown-item" })
+
+            if (AppConfig.Instance.IsFeatureActive("yourAreaListsEnabled"))
+            {
+                @Html.ActionLink("Your area lists", "Index", "arealist", new {}, new {@class = "dropdown-item"})
+            }
+
             @Html.ActionLink("Your details", "EditMyAccount", "UserAccount", new { }, new { @class = "dropdown-item" })
             @Html.ActionLink("Sign out", "Logout", "UserAccount", new { }, new { @class = "dropdown-item" })
         }

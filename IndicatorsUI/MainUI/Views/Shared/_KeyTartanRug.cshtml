@@ -1,114 +1,83 @@
 ﻿@model IndicatorsUI.MainUI.Models.PageModel
-<div class="key-container" id="keyTartanRug" style="display: none;">
-    <table class="key-table" cellspacing="0">
-        <tr>
-            <td class="key-text key-label"></td>
-            @if (Model.DisplayRagKey)
-            {
-                <td class="key-spacer"></td>
-                <td class='better key'>
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)better.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Better
-                        </div>
-                    </div>
-                </td>
-                <td class='same key'>
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Similar
-                        </div>
-                    </div>
-                </td>
-                <td class='worse key'>
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)red.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Worse
-                        </div>
-                    </div>
-                </td>
-            }
-            @if (Model.DisplayBlueKey)
-            {
-                <td class="key-spacer"></td>
-                <td class='bobLower key'>
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobLower.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Lower
-                        </div>
-                    </div>
-                </td>
-                <td class='same key'>
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)same.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Similar
-                        </div>
-                    </div>
-                </td>
-                <td class="bobHigher key">
-                    <div class="tartan-box key-box">
-                        <img class="tartan-fill print-only" src="@(ViewBag.ImagesUrl)bobHigher.png"
-                             alt=""/>
-                        <div class="tartan-text">
-                            Higher
-                        </div>
-                    </div>
-                </td>
-            }@*Show quintile legend*@<td class='grade-quintile-1 key quintile-key'>
-            <td class="key-spacer "></td>
-            <td class='grade-quintile-1 key quintile-key'>
-                <div class="tartan-box key-box">
-                    <div class="tartan-text">
-                        Low
-                    </div>
-                </div>
-            </td>
-            <td class='grade-quintile-2 key quintile-key'>
-                <div class="tartan-box key-box">
-                    <div class="tartan-text">
-                    </div>
-                </div>
-            </td>
-            <td class='grade-quintile-3 key quintile-key'>
-                <div class="tartan-box key-box">
-                    <div class="tartan-text">
-                    </div>
-                </div>
-            </td>
-            <td class='grade-quintile-4 key quintile-key'>
-                <div class="tartan-box key-box">
-                    <div class="tartan-text">
-                    </div>
-                </div>
-            </td>
-            <td class='grade-quintile-5 key quintile-key'>
-                <div class="tartan-box key-box">
-                    <div class="tartan-text">
-                        High
-                    </div>
-                </div>
-            </td>
-            <td class="key-spacer"></td>
-            <td id="tartan-key-part" class="none key key-box-right" style="display: none;">
-                <div class="tartan-box key-box">
+<div id="keyTartanRug" style="display: none;">
+    <div class="row">
+        <div id="value-note-legend" class="col-md-12">
+            <span>*</span> a note is attached to the value, hover over to see more details
+        </div>
+    </div>
+    <div id="tartan-rag-and-bob-section" class="row" style="display: none">
+        <div class="col-md-12">
+            <div class="tartan-compared-with-text">
+                <i>Compared with benchmark:</i>
+            </div>
+            <div id="tartan-legend-rag-5" class="outer-tartan-legend-box">
+                <div class="tartan-legend-box better-99">Better 99.8%</div>
+                <div class="tartan-legend-box better-95">Better 95%</div>
+                <div class="tartan-legend-box similar">Similar</div>
+                <div class="tartan-legend-box worse-95">Worse 95%</div>
+                <div class="tartan-legend-box worse-99">Worse 99.8%</div>
+            </div>
+            <div id="tartan-legend-rag-3" class="outer-tartan-legend-box">
+                <div class="tartan-legend-box better-95">Better</div>
+                <div class="tartan-legend-box similar">Similar</div>
+                <div class="tartan-legend-box worse-95">Worse</div>
+            </div>
+            <div id="tartan-legend-bob" class="outer-tartan-legend-box left-margin">
+                <div class="tartan-legend-box bob-lower">Lower</div>
+                <div class="tartan-legend-box bob-similar">Similar</div>
+                <div class="tartan-legend-box bob-higher">Higher</div>
+            </div>
+            <div class="outer-tartan-legend-box left-margin">
+                <div class="tartan-legend-box not-compared">
                     Not compared
                 </div>
-            </td>
-            <td id="map-key-part2" class="none key key-box-right" style="display: none;">
-                <div class="tartan-box key-box">
-                    Not compared
+            </div>
+        </div>
+    </div>
+    <div id="tartan-quintile-key-table" class="row" style="display: none">
+        <div class="col-md-12">
+            <span class="tartan-compared-with-text">
+                <i>Quintiles:</i>
+            </span>
+            <div id="tartan-quintile-rag" class="outer-tartan-legend-box left-margin">
+                <div class="tartan-legend-box rag-quintiles-1">
+                    Best
                 </div>
-            </td>
-        </tr>
-    </table>
+                <div class="tartan-legend-box rag-quintiles-2">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box rag-quintiles-3">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box rag-quintiles-4">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box rag-quintiles-5">
+                    Worst
+                </div>
+            </div>
+            <div id="tartan-quintile-bob" class="outer-tartan-legend-box left-margin">
+                <div class="tartan-legend-box bob-quintiles-1">
+                    Low
+                </div>
+                <div class="tartan-legend-box bob-quintiles-2">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box bob-quintiles-3">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box bob-quintiles-4">
+                    &nbsp;
+                </div>
+                <div class="tartan-legend-box bob-quintiles-5">
+                    High
+                </div>
+            </div>
+            <div class="outer-tartan-legend-box left-margin">
+                <div class="tartan-legend-box not-compared">
+                    Not applicable
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

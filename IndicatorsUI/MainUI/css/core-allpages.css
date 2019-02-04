@@ -26,6 +26,15 @@ a.btn-primary {
     text-decoration: none;
 }
 
+.btn-outline-primary {
+    color: #2e3191 !important;
+    border-color: #2e3191 !important;
+}
+
+    .btn-outline-primary:hover {
+        color: white !important;
+    }
+
 /********************************************Bootstrap End*************************************************/
 
 .clearfix:before,
@@ -51,19 +60,8 @@ a.btn-primary {
     cursor: pointer;
 }
 
-#playbutton-video span.playbutton {
-    position: absolute;
-    display: block;
-    background: transparent url(../images/image-video/play_large.png) no-repeat center;
-    background-size: 50px 50px;
-    height: 50px;
-    width: 50px;
-    top: 20%;
-    left: 40%;
-}
-
 #phe-logo a {
-background: url(../images/logos/phe-white-48.png) no-repeat;
+    background: url(../images/logos/phe-white-48.png) no-repeat;
     height: 48px;
     width: 260px;
     display: block;
@@ -87,7 +85,6 @@ background: url(../images/logos/phe-white-48.png) no-repeat;
 
 .data-column li {
     margin-bottom: 10px;
-    line-height: 1.3rem;
     list-style: none;
     float: left;
     width: 100%;
@@ -475,19 +472,6 @@ th.pLink, th.rotate, th.comparator-header
     background-image: url(../images/excel16.gif);
 }
 
-#no-spine-box 
-{
-    width:200px;
-    top:6px;
-    left:10px;
-    position:absolute;
-    border:2px solid #ddd;
-    background:#FFFFF0;
-    z-index:10;
-    box-shadow:0 0 10px #888;
-}
-
-
 /*----------------------------------------
     Profile title bar 
 ------------------------------------------*/
@@ -635,17 +619,21 @@ p, #introduction p, #recent-updates p {
 }
 
 #area-search-text {
-    display: none; 
-    width: 198px;
-    height: 19px;
-    border:1px solid #ccc; 
-    font-size: 15px;
+    width: 300px;
+    padding: 8px 5px 8px 8px;
+    border: 2px solid #000;
+    border-radius: 0;
+    font-size: 16px;
     background: #FFF url(../images/search2.jpg) right center no-repeat;
 }
 
 #area-search-link-box {
     text-align: right; 
     color:#1f0aa1;
+}
+
+.ui-autocomplete {
+    z-index: 1003 !important;
 }
 
 /*hide area search help text*/
@@ -695,6 +683,10 @@ p, #introduction p, #recent-updates p {
     color: white;
     background-color: #02ae94;
 }
+
+.hidden {
+    display: none;
+}
 /*----------------------------------------
     Address 
 ------------------------------------------*/
@@ -719,7 +711,7 @@ p, #introduction p, #recent-updates p {
     opacity: 0.50; /*IE9, etc*/
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
     filter: alpha(opacity=50); /*IE6-7*/
-    z-index: 1;
+    z-index: 1001;
 }
 #infoBox
 {
@@ -727,7 +719,7 @@ p, #introduction p, #recent-updates p {
     background: white;
     border: 5px solid #eee;
     padding: 6px;
-    z-index: 1000;
+    z-index: 1002;
     border-radius: 5px;
 }
 
@@ -748,3 +740,22 @@ p, #introduction p, #recent-updates p {
     cursor: pointer;
 }
 
+/*----------------------------------------
+    Videos
+------------------------------------------*/
+
+#playbutton-video span.playbutton {
+    position: absolute;
+    display: block;
+    background: transparent url(../images/image-video/play_large.png) no-repeat center;
+    background-size: 50px 50px;
+    height: 50px;
+    width: 50px;
+    top: 20%;
+    left: 40%;
+}
+
+#image-figure img {
+    margin-bottom: 0;
+    border: 1px #ccc solid;
+}

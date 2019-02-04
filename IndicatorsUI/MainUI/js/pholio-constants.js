@@ -14,8 +14,6 @@ var AreaTypeIds = {
     Country: 15,
     UnitaryAuthority: 16,
     GpShape: 18,
-    CCGPostApr2017: 152,
-    CCGPreApr2017: 153,
     DeprivationDecile: 23,
     Subregion: 46,
     DistrictUA: 101,
@@ -25,7 +23,12 @@ var AreaTypeIds = {
     OnsClusterGroup2001: 110,
     OnsClusterGroup2011: 115,
     AcuteTrusts: 118,
-    CombinedAuthorities: 126
+    CombinedAuthorities: 126,
+    CCGPostApr2017: 152,
+    CCGPreApr2017: 153,
+    CCGSince2018: 154,
+    Uk: 159,
+    AreaList: 30000
 };
 
 /**
@@ -59,9 +62,11 @@ var ValueTypeIds = {
 * @class ComparatorMethodIds
 */
 var ComparatorMethodIds = {
+    SingleOverlappingCIsForOneCiLevel: 1,
     SuicidePlan: 14,
     Quintiles: 15,
-    Quartiles: 16
+    Quartiles: 16,
+    SingleOverlappingCIsForTwoCiLevels: 17
 };
 
 /**
@@ -69,6 +74,7 @@ var ComparatorMethodIds = {
 * @class PolarityIds
 */
 var PolarityIds = {
+    NotApplicable: -1,
     RAGLowIsGood: 0,
     RAGHighIsGood: 1,
     BlueOrangeBlue: 99

@@ -3,7 +3,6 @@ using IndicatorsUI.DataConstruction;
 using IndicatorsUI.DomainObjects;
 using IndicatorsUI.MainUI.Caching;
 using IndicatorsUI.MainUI.Helpers;
-using System.Globalization;
 using System.Web.Mvc;
 
 namespace IndicatorsUI.MainUI.Controllers
@@ -14,6 +13,8 @@ namespace IndicatorsUI.MainUI.Controllers
         private readonly string _defaultProfileKey;
 
         private readonly ProfileReader _profileReader;
+
+        private const string ProfileKey = "public-health-dashboard";
 
         public LongerLivesController(ProfileReader profileReader, IAppConfig appConfig) : base(appConfig)
         {
@@ -27,8 +28,6 @@ namespace IndicatorsUI.MainUI.Controllers
 
             // Called here because the Request object is not available in the constructor
             InitPageModel();
-
-            SetMetaTagContent();
         }
 
         /// <summary>
@@ -36,160 +35,73 @@ namespace IndicatorsUI.MainUI.Controllers
         /// </summary>
         public ActionResult Home()
         {
-            return Home(null);
+            return Home(ProfileKey);
         }
 
-        [Route("topic/{profileKey}")]
-        public ActionResult Home(string profileKey)
+        [Route("topic/{profile}")]
+        public ActionResult Home(string profile)
         {
-            profileKey = GetProfileKey(profileKey);
-            InitPage(profileKey, "Home");
-            return GetProfileView(profileKey, "Home");
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
+
+            InitPage(ProfileKey, "Home");
+            return GetProfileView("Home");
         }
 
-        [Route("topic/{profileKey}/map-with-data")]
-        public ActionResult MapWithData(string profileKey = null)
+        [Route("topic/{profile}/map-with-data")]
+        public ActionResult MapWithData(string profile)
         {
-            profileKey = GetProfileKey(profileKey);
-            InitPage(profileKey, "Map");
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
+
+            InitPage(ProfileKey, "Map");
             ViewBag.MapNoData = true;
-            return GetProfileView(profileKey, "Home");
+            return GetProfileView("Home");
         }
 
-        [Route("topic/{profileKey}/about-project")]
-        [Route("about-project")]
-        public ActionResult AboutProject(string profileKey = null)
+        [Route("topic/{profile}/about-data")]
+        public ActionResult AboutData(string profile)
         {
-            profileKey = GetProfileKey(profileKey);
-            InitPage(profileKey, "About The Project");
-            return View("AboutProject", PageModel);
-        }
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
 
-        [Route("topic/{profileKey}/about-data")]
-        [Route("about-data")]
-        public ActionResult AboutData(string profileKey = null)
-        {
-            profileKey = GetProfileKey(profileKey);
-            InitPage(profileKey, "About The Data");
+            InitPage(ProfileKey, "About The Data");
             return View("AboutData", PageModel);
         }
 
-        [Route("topic/mortality/comparisons")]
-        public ActionResult MortalityRankings()
+        [Route("topic/{profile}/comparisons")]
+        public ActionResult PracticeRankings(string profile)
         {
-            var profileKey = "mortality";
-            InitPage(profileKey, "Mortality Rankings");
-            return GetProfileView(profileKey, "Rankings");
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
+
+            InitPage(ProfileKey, "National comparisons");
+            return GetProfileView("Rankings");
         }
 
-        [Route("topic/mortality/area-details")]
-        public ActionResult MortalityAreaDetails()
+        [Route("topic/{profile}/area-details")]
+        public ActionResult AreaDetails(string profile)
         {
-            var profileKey = "mortality";
-            InitPage(profileKey, "Mortality Rankings");
-            return GetProfileView(profileKey, "AreaDetails");
-        }
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
 
-        [Route("topic/{profileKey}/health-intervention/{intervention}")]
-        public ActionResult HealthIntervention(string intervention)
-        {
-            InitPage(ProfileUrlKeys.LongerLives, "Health Interventions");
-            ViewBag.Intervention = intervention;
-            return View("Mortality/MortalityHealthIntervention" + intervention.ToLower(), PageModel);
-        }
-
-        [Route("topic/{profileKey}/comparisons")]
-        public ActionResult PracticeRankings(string profileKey)
-        {
-            InitPage(profileKey, "National comparisons");
-            return GetProfileView(profileKey, "Rankings");
-        }
-
-        [Route("topic/{profileKey}/practice-details")]
-        public ActionResult PracticeDetails(string profileKey)
-        {
-            InitPage(profileKey, "Practice Details");
-            return GetProfileView(profileKey, "PracticeDetails");
-        }
-
-        [Route("topic/{profileKey}/area-details")]
-        public ActionResult AreaDetails(string profileKey)
-        {
-            InitPage(profileKey, "Area Details");
+            InitPage(ProfileKey, "Area Details");
             return View("Diabetes/DiabetesAreaDetails", PageModel);
         }
 
-        [Route("topic/{profileKey}/connect")]
-        [Route("connect")]
-        public ActionResult Connect(string profileKey = null)
-        {
-            profileKey = GetProfileKey(profileKey);
-            InitPage(profileKey, "Connect");
-            return GetProfileView(profileKey, "Connect");
-        }
 
-        [Route("topic/{profileKey}/area-search-results")]
-        public ActionResult AreaSearchResults(string profileKey = null)
+        [Route("topic/{profile}/area-search-results")]
+        public ActionResult AreaSearchResults(string profile)
         {
-            profileKey = GetProfileKey(profileKey);
+            if (!IsCallingPublicHealthDashboard(profile))
+                return SentToNotFoundPage();
+
             var parameters = Request.QueryString;
             ViewBag.Area = parameters["place_name"];
             ViewBag.Easting = parameters["easting"];
             ViewBag.Northing = parameters["northing"];
-            InitPage(profileKey, "Search Results");
-            return GetProfileView(profileKey, "AreaSearchResults");
-        }
-
-        public ActionResult GetProfileView(string profileKey, string viewName)
-        {
-            TextInfo textInfo = new CultureInfo("en-GB", false).TextInfo;
-
-            string prefix = textInfo.ToTitleCase(profileKey);
-            if (prefix.Equals("Mortality") == false)
-            {
-                prefix = "Diabetes";
-            }
-
-            return View(prefix + "/" + prefix + viewName, PageModel);
-        }
-
-        public void InitPage(string profileKey, string pageName)
-        {
-            var profileDetails = new ProfileDetailsBuilder(profileKey).Build();
-            ConfigureWithProfile(profileDetails);
-            PageModel.PageTitle = pageName;
-        }
-
-        private void SetMetaTagContent()
-        {
-            ViewBag.MetaDescription = ContentHelper.RemoveHtmlTags(
-                _profileReader.GetContentItem(ContentKeys.MetaDescription, ProfileIds.LongerLives).Content);
-
-            ViewBag.MetaKeywords = ContentHelper.RemoveHtmlTags(
-                _profileReader.GetContentItem(ContentKeys.MetaKeywords, ProfileIds.LongerLives).Content);
-        }
-
-        public ActionResult Get404Error()
-        {
-            return GetErrorView("Page not found", "Sorry, but the page you were trying to view does not exist.");
-        }
-
-        public ActionResult Get500Error()
-        {
-            return GetErrorView("Error", "Sorry, a unexpected error has occured.");
-        }
-
-        private ActionResult GetErrorView(string title, string message)
-        {
-            if (PageModel == null)
-            {
-                InitPageModel();
-            }
-
-            ConfigureWithProfile(new ProfileDetailsBuilder(_defaultProfileKey).Build());
-            PageModel.PageTitle = title;
-            ViewBag.ErrorMessage = message;
-            return View("../LongerLives/Error", PageModel);
+            InitPage(ProfileKey, "Search Results");
+            return GetProfileView("AreaSearchResults");
         }
 
         [Route("policy/{policyType}")]
@@ -215,14 +127,58 @@ namespace IndicatorsUI.MainUI.Controllers
             return Get404Error();
         }
 
-        private string GetProfileKey(string profileKey)
+
+        [Route("about-data")]
+        public ActionResult SendToAboutData()
         {
-            if (profileKey == null)
+            return AboutData(ProfileKey);
+        }
+
+        public ActionResult SentToNotFoundPage()
+        {
+            return Get404Error();
+        }
+
+        public ActionResult GetProfileView(string viewName)
+        {
+            return View("Diabetes/Diabetes" + viewName, PageModel);
+        }
+
+        public void InitPage(string profileKey, string pageName)
+        {
+            var profileDetails = new ProfileDetailsBuilder(profileKey).Build();
+            ConfigureWithProfile(profileDetails);
+            PageModel.PageTitle = pageName;
+        }
+
+        public ActionResult Get404Error()
+
+        {
+            return GetErrorView("Page not found", "Sorry, but the page you were trying to view does not exist.");
+        }
+
+        public ActionResult Get500Error()
+        {
+            return GetErrorView("Error", "Sorry, a unexpected error has occured.");
+        }
+
+        private ActionResult GetErrorView(string title, string message)
+        {
+            if (PageModel == null)
             {
-                return _defaultProfileKey;
+                InitPageModel();
             }
 
-            return profileKey;
+            ConfigureWithProfile(new ProfileDetailsBuilder(_defaultProfileKey).Build());
+            PageModel.PageTitle = title;
+            ViewBag.ErrorMessage = message;
+            return View("../LongerLives/Error", PageModel);
         }
+
+        private bool IsCallingPublicHealthDashboard(string profile)
+        {
+            return ProfileKey.Equals(profile);
+        }
+
     }
 }

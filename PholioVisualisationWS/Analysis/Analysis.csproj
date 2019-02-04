@@ -56,6 +56,7 @@
     <Compile Include="DoubleOverlappingCIsComparer.cs" />
     <Compile Include="ControlLimitsBuilderSpcForDsr.cs" />
     <Compile Include="ControlLimits.cs" />
+    <Compile Include="SingleOverlappingCIsForTwoCILevelsComparer.cs" />
     <Compile Include="ICategoryComparer.cs" />
     <Compile Include="IndicatorComparer.cs" />
     <Compile Include="IndicatorComparerFactory.cs" />
@@ -68,7 +69,7 @@
     <Compile Include="QuintilesCalculator.cs" />
     <Compile Include="QuintilesComparer.cs" />
     <Compile Include="RangeTargetComparer.cs" />
-    <Compile Include="SingleOverlappingCIsComparer.cs" />
+    <Compile Include="SingleOverlappingCIsForOneCILevelComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SpcForDsrComparer.cs" />
     <Compile Include="SpcForProportionsComparer.cs" />

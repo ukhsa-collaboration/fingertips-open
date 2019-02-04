@@ -1,11 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewInit, AfterViewChecked, ChangeDetectorRef, Input, OnChanges, SimpleChanges } from '@angular/core';
+import {
+    Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Input, OnChanges, SimpleChanges
+} from '@angular/core';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { AreaService } from '../../shared/service/api/area.service';
-import { AreaCodes, AreaTypeIds, CategoryTypeIds } from '../../shared/shared';
-import { AreaTextSearchResult, NearByAreas, LatitudeLongitude, AreaAddress } from '../../typings/FT.d';
+import { AreaTypeIds } from '../../shared/shared';
+import { AreaTextSearchResult, NearByAreas, AreaAddress } from '../../typings/FT.d';
 import { Observable } from 'rxjs/Observable';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
-import { autoCompleteResult, Practice } from './practice-search';
+import { AutoCompleteResult, Practice } from './practice-search';
 import * as _ from 'underscore';
 @Component({
     selector: 'ft-practice-search',
@@ -15,9 +17,9 @@ import * as _ from 'underscore';
 export class PracticeSearchComponent implements OnInit, OnChanges {
 
     @ViewChild('scrollPracticeTable') practiceTable: ElementRef;
-    @ViewChild('googleMapNew') mapEl: ElementRef;;
-    @Input() IsMapUpdateRequired: boolean = false;
-    @Input() searchMode: boolean = false;
+    @ViewChild('googleMapNew') mapEl: ElementRef;
+    @Input() IsMapUpdateRequired = false;
+    @Input() searchMode = false;
 
     // Instance equivalent of searchMode which is more reliable
     localSearchMode: boolean;
@@ -26,15 +28,15 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
     public typeaheadLoading: boolean;
     public typeaheadNoResults: boolean;
     public dataSource: Observable<any>;
-    public height: number = 0;
+    public height = 0;
 
     practiceMap: google.maps.Map;
-    isVisible: boolean = false;
+    isVisible = false;
     searchResults: AreaTextSearchResult[] = [];
     selectedArea: AreaTextSearchResult;
     nearByPractices: Practice[] = [];
     practiceCountText: string;
-    showCcgPractices: boolean = false;
+    showCcgPractices = false;
     displayCCGPracticeLink: boolean;
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -67,7 +69,7 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
                 .subscribe((result: any) => {
                     this.searchResults = <AreaTextSearchResult[]>result;
                     let newResult = _.map(this.searchResults, function (result) {
-                        return new autoCompleteResult(result.PolygonAreaCode, result.PlaceName,
+                        return new AutoCompleteResult(result.PolygonAreaCode, result.PlaceName,
                             result.PolygonAreaName);
                     });
                     observer.next(newResult);
@@ -108,7 +110,7 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
             bounds.extend(position);
             this.practiceMap.setCenter(bounds.getCenter());
             let thisCom = this;
-            //This is needed as on initial load map was not visible
+            // This is needed as on initial load map was not visible
             google.maps.event.addListener(this.practiceMap, 'idle', function () {
                 let bound = thisCom.practiceMap.getCenter();
                 google.maps.event.trigger(thisCom.practiceMap, 'resize');
@@ -125,7 +127,7 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
     }
 
     public typeaheadOnSelect(e: TypeaheadMatch): void {
-        let polygonAreaCode = (<autoCompleteResult>e.item).polygonAreaCode;
+        let polygonAreaCode = (<AutoCompleteResult>e.item).polygonAreaCode;
         this.selectedArea = _.find(this.searchResults, function (obj) { return obj.PolygonAreaCode === polygonAreaCode; });
         this.areaService.getAreaSearchByProximity(this.selectedArea.Easting, this.selectedArea.Northing, AreaTypeIds.Practice)
             .subscribe((result: any) => {
@@ -141,11 +143,10 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
             });
     }
     displayNumberOfPracticesFound(practiceCount, IsCCG: boolean): void {
-        let placeName: string = '';
+        let placeName = '';
         if (IsCCG) {
             placeName = ' in ' + this.ftHelperService.getParentArea().Name;
-        }
-        else {
+        } else {
             placeName = ' within 5 miles of ' + this.selectedArea.PlaceName;
         }
         let html: string;
@@ -191,10 +192,10 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
             marker.set('marker_id', this.nearByPractices[i].areaCode);
 
             // Create pop up text
-            let boxText = document.createElement("a");
+            let boxText = document.createElement('a');
             boxText.id = i.toString();
-            boxText.className = "select-area-link";
-            boxText.style.cssText = "color: #2e3191; text-decoration: underline; font-size:16px;";
+            boxText.className = 'select-area-link';
+            boxText.style.cssText = 'color: #2e3191; text-decoration: underline; font-size:16px;';
             boxText.innerHTML = this.nearByPractices[i].areaName;
             linkList.push(boxText);
 

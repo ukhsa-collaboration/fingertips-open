@@ -13,11 +13,13 @@ var scatterplot = {};
 function goToScatterPlotPage() {
 
     setPageMode(PAGE_MODES.SCATTER_PLOT);
+    var sp = scatterplot;
 
     if (!areIndicatorsInDomain()) {
         displayNoData();
+        sp.showHideElementsForNoData();
+
     } else {
-        var sp = scatterplot;
         sp.init();
         sp.showHideElements();
         sp.loadPrimaryIndicatorMenu();
@@ -29,6 +31,7 @@ scatterplot.showHideElements = function () {
     if (FT.model.areaTypeId === AreaTypeIds.Practice) {
         $('#scatterplot-filters').hide();
         $('#export-chart-box').hide();
+        $('#export-chart-box-csv').hide();
         $('#scatter-key-box').show();
         $('#scatter-plot-gp-chart').show();
         $('#scatter-plot-chart').hide().html('');
@@ -36,19 +39,37 @@ scatterplot.showHideElements = function () {
     else {
         $('#scatterplot-filters').show();
         $('#export-chart-box').show();
+        $('#export-chart-box-csv').show();
         $('#scatter-key-box').hide();
         $('#scatter-plot-chart').show();
         $('#scatter-plot-gp-chart').hide().html('');
+    }
+    $('#supporting-indicators-wrapper').show();
+};
+
+scatterplot.showHideElementsForNoData = function () {
+
+    if (isEnglandAreaType()) {
+        $('#scatterplot-filters').hide();
+        $('#export-chart-box').hide();
+        $('#export-chart-box-csv').hide();
+        $('#scatter-key-box').hide();
+        $('#scatter-plot-gp-chart').hide();
+        $('#supporting-indicators-wrapper').hide();
+        $('#indicator-menu-div').hide();
+    }else{
+        $('#supporting-indicators-wrapper').show();
     }
 };
 
 scatterplot.displayGraph = function () {
 
     scatterplot.loadSecondaryIndicatorMenu();
-    if (FT.model.areaTypeId === AreaTypeIds.Practice)
+    if (FT.model.areaTypeId === AreaTypeIds.Practice) {
         scatterplot.getGpDataForSelectedArea();
-    else
+    } else {
         scatterplot.getDataForSelectedArea();
+    }
 };
 
 scatterplot.loadPrimaryIndicatorMenu = function () {
@@ -97,6 +118,41 @@ scatterplot.init = function () {
     }
 };
 
+scatterplot.getParentAreaCode = function () {
+    if (FT.model.isNearestNeighbours()) {
+        return FT.model.nearestNeighbour;
+    } 
+    return getCurrentComparator().Code;
+}
+
+scatterplot.getAreasCode = function (){
+    if (getCurrentComparator().Name === 'England') {
+        return null;
+    }
+
+    return getAreasCodeDisplayed();
+}
+
+scatterplot.getParentAreaCode = function () {
+
+    if (FT.model.isNearestNeighbours() || getCurrentComparator().Name === 'England'){
+        return NATIONAL_CODE;
+    }
+    return FT.model.parentCode;
+}
+
+scatterplot.getIidsString = function () {
+    var iidsString = getIid();
+    var iidComparasionString = getComparasionIndicatorId();
+
+    if (iidsString != iidComparasionString)
+    {
+        iidsString = iidsString + "," + iidComparasionString;
+    }
+
+    return iidsString;
+}
+
 /**
 * Create a configuration object for the service call to get area values
 * @class scatterplot.getAreaValueModel
@@ -104,7 +160,7 @@ scatterplot.init = function () {
 scatterplot.getAreaValueModel = function(groupRoot) {
     var model = FT.model;
 
-    scatterplotState.tempIndicatorKey =  getIndicatorKey(groupRoot, model) + getCurrentComparator().Code;
+    scatterplotState.tempIndicatorKey = getIndicatorKey(groupRoot, model) + scatterplot.getParentAreaCode();
 
     var groupId = groupRoot.hasOwnProperty('GroupId')
         ? groupRoot.GroupId
@@ -209,10 +265,11 @@ scatterplot.displayPage = function () {
     showAndHidePageElements();
     unlock();
 
-    if (_.size(scatterplot.dataSeries[0].data) > 0) {
+    if (!isEnglandAreaType() && _.size(scatterplot.dataSeries[0].data) > 0) {
         viewManager.createScatterPlot();
     } else {
         viewManager.displayNoData();
+        scatterplot.showHideElementsForNoData();
     }
 
     var areaName = getAreaNameToDisplay(areaHash[FT.model.areaCode]);
@@ -263,7 +320,8 @@ scatterplot.ViewManager = function ($container) {
                 '<input type="checkbox" id="r2Filter" onchange="scatterplot.addR2(this);">Add regression line & R\xB2' +
                 ' <br></div>';
 
-            var exportTypes = '<div id="export-chart-box" class="export-chart-box"><a class="export-link" href="javascript:scatterplot.viewManager.exportChart()">Export chart as image</a></div>';
+            var exportTypes = '<div id="export-chart-box" class="export-chart-box"><a class="export-link" href="javascript:scatterplot.viewManager.exportChart()">Export chart as image</a></div>'+
+            '<div id="export-chart-box-csv" class="export-chart-box-csv"><a id="export-link-csv-scatter" class="export-link-csv" href="javascript:scatterplot.viewManager.exportChartAsCsv()">Export chart as csv file</a></div>';
 
             $chartBox = $('<div id="scatter-plot-chart-box-wrapper">' + exportTypes + '<div id="scatter-plot-chart-box" class="clearfix"><div id="scatter-plot-chart"></div></div>' + $filters + '</div>');
             scatterplot.addSupportingIndicatorsMenu($container, $chartBox);
@@ -276,6 +334,19 @@ scatterplot.ViewManager = function ($container) {
         chart.exportChart({ type: 'image/png' }, {});
         logEvent('ExportImage', getCurrentPageTitle());
     };
+
+    this.exportChartAsCsv = function (){
+        
+        var parameters = new ParameterBuilder()
+        .add('parent_area_type_id', FT.model.parentTypeId)
+        .add('child_area_type_id', FT.model.areaTypeId)
+        .add('profile_id', FT.model.profileId)
+        .add('areas_code', scatterplot.getAreasCode())
+        .add('parent_area_code', scatterplot.getParentAreaCode())
+        .add('indicator_ids', scatterplot.getIidsString());
+        
+        downloadLatestNoInequalitiesDataCsvFileByIndicator(FT.url.corews, parameters);
+    }
 
     /**
     * Sets the HTML to display above the chart
@@ -291,9 +362,7 @@ scatterplot.ViewManager = function ($container) {
     */
     this.displayNoData = function () {
 
-        scatterplot.getNoDataIndicatorName();
-        var noDataText = '<p style="text-align: center; padding:150px 0 150px 0;">' +
-            scatterplot.getNoDataIndicatorName() + '</p>';
+        var noDataText = '<p style="text-align: center; padding:150px 0 150px 0;">' + getMessageForNoDataText() + '</p>';  
 
         $('#scatter-plot-chart').html(noDataText);
         $('#scatterplot-filters').hide();
@@ -486,10 +555,11 @@ scatterplot.getAreaValues = function (model) {
     if (areaValues.hasOwnProperty(model.key)) {
         ajaxMonitor.callCompleted();
     } else {
+
         var parameters = new ParameterBuilder(
             ).add('group_id', model.groupId
             ).add('area_type_id', model.areaTypeId
-            ).add('parent_area_code', getCurrentComparator().Code
+            ).add('parent_area_code', scatterplot.getParentAreaCode()
             ).add('profile_id', model.profileId
             ).add('comparator_id', comparatorId
             ).add('indicator_id', model.indicatorId
@@ -518,7 +588,8 @@ scatterplot.getAreaValuesCallback = function (coreDataList) {
 */
 scatterplot.transformDataForIndicator = function () {
 
-    var selectedAreaCode = $('#areaMenu :selected').val();
+    var selectedAreaCode = FT.model.areaCode;
+
     var isAreaHighlight = $('#selectedAreaFilter').is(':checked');
     var isR2Selected = $('#r2Filter').is(':checked');
 
@@ -810,7 +881,7 @@ loaded.groupRootSecondary = {};
         'goto': goToScatterPlotPage,
         gotoName: 'goToScatterPlotPage',
         needsContainer: true,
-        jqIds: ['.geo-menu', 'indicator-menu-div', 'nearest-neighbour-link'],
+        jqIds: ['.geo-menu', 'indicator-menu-div', 'nearest-neighbour-link', 'area-list-wrapper', 'filter-indicator-wrapper'],
         jqIdsNotInitiallyShown: []
     });
 
@@ -858,14 +929,14 @@ scatterplot.ViewManagerGpScatterPlot = function ($container) {
     */
     this.displayNoData = function () {
 
-        scatterplot.getNoDataIndicatorName();
         var noDataText = '<p style="text-align: center; padding:150px 0 150px 0;">' +
-            scatterplot.getNoDataIndicatorName() +
+            getMessageForNoDataText() +
             '</p>';
 
         $('#scatter-plot-chart').html(noDataText);
     };
 };
+
 function updateScatterParentLegendLabel() {
     var label = getParentArea().Name;
     setScatterKeyImg('scatterParent', 'parent', label);
@@ -885,3 +956,21 @@ function updateScatterOtherPracticeLegendLabel() {
 function setScatterKeyImg(id, item, label) {
     $('#' + id).html('<img src="' + FT.url.img + 'scatter-' + item + '.png" />' + label);
 };
+
+function getMessageForNoDataText(){
+    var noDataText = '';
+
+        if (isEnglandAreaType())
+        {
+            noDataText = 'Not applicable for England data' ;
+        }else{
+            noDataText = scatterplot.getNoDataIndicatorName() ;
+        }  
+
+    return noDataText;
+}
+
+function getComparasionIndicatorId(){
+    var comparasionIids = $('#supporting-indicators option:selected', this).attr('key');
+    return comparasionIids.substr(0, comparasionIids.indexOf('-'));
+}

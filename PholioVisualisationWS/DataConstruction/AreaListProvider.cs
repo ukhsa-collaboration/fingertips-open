@@ -3,6 +3,8 @@ using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
 using PholioVisualisation.DataSorting;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -27,9 +29,31 @@ namespace PholioVisualisation.DataConstruction
             Areas = areaCodes.Select(areaCode => AreaFactory.NewArea(_areasReader, areaCode)).ToList();
         }
 
-        public void CreateAreaListFromAreaTypeId(int profileId, int areaTypeId)
+        public void CreateAreaListFromAreaTypeId(int profileId, int areaTypeId, string userId)
         {
-            if (areaTypeId > NearestNeighbourAreaType.IdAddition) 
+            if (AreaListAreaType.IsAreaListAreaType(areaTypeId))
+            {
+                IAreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
+                var areaLists = areaListRepository.GetAll(userId);
+
+                IList<Area> areas = new List<Area>();
+
+                foreach (var areaList in areaLists)
+                {
+                    Area area = new Area()
+                    {
+                        Code = areaList.PublicId,
+                        Name = areaList.ListName,
+                        ShortName = areaList.ListName,
+                        AreaTypeId = areaList.AreaTypeId
+                    };
+
+                    areas.Add(area);
+                }
+
+                Areas = areas.Cast<IArea>().ToList();
+            }
+            else if (areaTypeId > NearestNeighbourAreaType.IdAddition) 
             {
                 IList<Area> areas = new List<Area>
                     {
@@ -55,6 +79,12 @@ namespace PholioVisualisation.DataConstruction
 
                 Areas = areas.Cast<IArea>().ToList();
             }
+        }
+
+        public void GetAreaListFromAreaTypeIdAndAreaNameSearchText(int areaTypeId, string areaNameSearchText)
+        {
+            IList<IArea> areas = _areasReader.GetAreasByAreaTypeIdAndAreaNameSearchText(areaTypeId, areaNameSearchText);
+            Areas = areas.Cast<IArea>().ToList();
         }
 
         public void CreateAreaListFromNearestNeighbourAreaCode(string parentAreaCode)

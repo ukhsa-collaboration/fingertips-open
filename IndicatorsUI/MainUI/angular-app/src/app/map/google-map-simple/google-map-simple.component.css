@@ -1,0 +1,153 @@
+.googleMapNg {
+    position: relative;
+    background-color: #fff;
+    border: 1px solid #CCC;
+    width: 500px;
+    height: 600px;
+    float: left;
+    margin-bottom: 10px;
+    margin-top: 0px;
+    clear: both;
+}
+
+#floating-panel {
+    position: absolute;
+    margin-top: 92px;
+    z-index: 5;
+    padding-left: 8px;
+    margin-left: 10px;
+}
+
+#wrapper {
+    position: relative;
+}
+
+.map-control {
+    float: left;
+    clear: both;
+    position: relative;
+    z-index: 7;
+    pointer-events: auto;
+}
+
+.map-control-layers-toggle {
+    background-image: url(/images/layers.png);
+    background-repeat: no-repeat;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    margin-right: 3px
+}
+
+.layerControl p {
+    margin-left: 5px;
+}
+
+.layerControl div.basemap {
+    margin: 3px 0;
+    padding-right: 3px;
+}
+
+.layerControl label.basemapLabel {
+    display: block;
+    margin-bottom: 5px;
+    height: 40px;
+}
+
+.layerControl div.basemap:hover,
+.layerControl div.opacity:hover {
+    cursor: pointer;
+}
+
+.layerControl div.selected span {
+    border: 1px solid #66F;
+}
+
+.layerControl div.basemap span {
+    margin: 0 5px;
+}
+
+.layerControl div.None span {
+    background: #FFF;
+}
+
+.layerControl div.Streets span {
+    background-position: -6px -113px;
+}
+
+.layerControl div#opacity {
+    margin-left: 5px;
+}
+
+.layerControl div.opacity {
+    display: inline-block;
+    width: 34px;
+    text-align: center;
+}
+
+.layerControl div.opacity span {
+    border: 1px solid #CCC;
+    display: inline-block;
+    width: 30px;
+    height: 25px;
+}
+
+.layerControl div.opacity:hover span,
+.layerControl div.opacity.selected span {
+    border-color: #666;
+    cursor: pointer;
+}
+
+.layerControl div.opacity label {
+    font-size: .65em;
+}
+
+.layerControl div.opacity span {
+    background: url(/images/opacity.jpg) no-repeat;
+}
+
+.layerControl input {
+    display: none;
+}
+
+.layerControl>label {
+    display: block;
+    height: 100%;
+    width: 100%;
+}
+
+.info {
+    padding: 2px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0;
+    color: #777;
+    padding: 0;
+}
+
+.export-chart-box {
+    margin: 0;
+}
+
+.label-name {
+    background: #FFF;
+    width: 60px;
+    height: 30px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.label-image {
+    background: url(/images/basemaps.jpg) no-repeat;
+    width: 60px;
+    height: 30px;
+    display: inline-block;
+    border: 1px solid;
+    vertical-align: middle;
+}

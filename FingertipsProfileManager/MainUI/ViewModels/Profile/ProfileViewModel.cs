@@ -29,7 +29,6 @@ namespace Fpm.MainUI.ViewModels.Profile
         public int ContactUserId { get; set; }
         public string ExtraCssFiles { get; set; }
         public string AreasIgnoredForSpineChart { get; set; }
-        public int KeyColourId { get; set; }
         public int DefaultFingertipsTabId { get; set; }
 
         public bool StartZeroYAxis { get; set; }
@@ -61,7 +60,7 @@ namespace Fpm.MainUI.ViewModels.Profile
         public IEnumerable<ProfileUser> ProfileUsers { get; set; }
         public SelectList AllUsers { get; set; }
 
-        public int NewDataTimeSpanInDays { get; set; }
+        public int NewDataDeploymentCount { get; set; }
 
         // Tab options
         public bool IsMapTab { get; set; }

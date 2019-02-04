@@ -21,7 +21,7 @@ pages.add(PAGE_MODES.POPULATION, {
     gotoName: 'goToPopulationPage',
     needsContainer: false,
     jqIds: ['population-container', 'areaMenuBox', 'parentTypeBox', 'areaTypeBox',
-        'region-menu-box', 'nearest-neighbour-link']
+        'region-menu-box', 'nearest-neighbour-link', 'area-list-wrapper']
 });
 
 function showIndicatorMetadataInLightbox(element) {

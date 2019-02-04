@@ -18,5 +18,5 @@ pages.add(PAGE_MODES.ENGLAND, {
     goto: goToEnglandPage,
     gotoName: 'goToEnglandPage',
     needsContainer: false,
-    jqIds: ['england-container', 'value-note-legend', 'trend-marker-legend']
+    jqIds: ['england-container', 'value-note-legend', 'trend-marker-legend', 'filter-indicator-wrapper']
 });

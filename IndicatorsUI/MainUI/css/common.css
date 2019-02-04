@@ -13,14 +13,18 @@ a {
 .lightbox-button-box {
     float: left;
     width: 100%;
-    padding: 20px 0 15px 130px;
+    padding: 20px 0;
     clear: both;
 }
 
-h2.lightbox-title {
-    text-align: center;
-    font-family: Arial, Helvetica, sans-serif;
-}
+    .lightbox-button-box .btn {
+        min-width: 70px;
+    }
+
+    h2.lightbox-title {
+        text-align: center;
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
 #infoBox select {
     font-family: Arial, Helvetica, sans-serif;
@@ -131,24 +135,23 @@ div.close {
     font-style: italic;
 }
 
-.tooltipValueNote-spine-chart {
-    margin-top: 10px;
-}
-
-
-#tooltipQualifier {
-    clear: left;
-    float: left;
-    width: 100%;
-    font-style: italic;
-}
-
 #tooltipData {
     width: 100%;
     float: left;
     font-weight: bold;
 }
 
+
+.tooltip-value-vote-spine-chart {
+    margin-top: 10px;
+}
+
+#range-text {
+    clear: left;
+    float: left;
+    width: 100%;
+    font-style: italic;
+}
 
 div#main {
     padding-top: 9px;
@@ -161,7 +164,15 @@ div#main {
     clear: both;
 }
 
-.bordered-table td, .bordered-table th, .key {
+.bordered-table th {
+    border-spacing: 0;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #eeeeee;
+    text-align: center;
+}
+
+.bordered-table td, .key {
     border-spacing: 0;
     border-style: solid;
     border-width: 1px;
@@ -227,6 +238,7 @@ th.numericHeader, th.numericWideHeader {
 
 
 .tall-central-message {
+    font-size: 17px;
     margin-top: 140px;
     height: 180px;
     width: 100%;
@@ -417,40 +429,72 @@ a.rowSort, a.rowSort:visited, a.columnSort, a.columnSort:visited {
     margin-right: 3px;
 }
 
-td.worse, td.same, td.better, td.none, .bobLower, .bobHigher, .grade-quintile-1, .grade-quintile-2, .grade-quintile-3, .grade-quintile-4, .grade-quintile-5  {
+td.worse, td.worst, td.same, td.better, td.best, td.none,.bobLower, .bobHigher, 
+    .grade-rag-quintile-1, .grade-rag-quintile-2, .grade-rag-quintile-3, .grade-rag-quintile-4, .grade-rag-quintile-5, 
+    .grade-bob-quintile-1, .grade-bob-quintile-2, .grade-bob-quintile-3, .grade-bob-quintile-4, .grade-bob-quintile-5 {
     margin: 0 0 0 0;
     padding: 0 0 0 0;
     text-align: center;
     cursor: default;
 }
 
-td.grade-quintile-1, span.grade-quintile-1 {
+td.grade-rag-quintile-1, span.grade-rag-quintile-1 {
     background-color: #DED3EC;
     color: Black;
 }
 
-td.grade-quintile-2, span.grade-quintile-2 {
+td.grade-rag-quintile-2, span.grade-rag-quintile-2 {
     background-color: #BEA7DA;
     color: Black;
 }
 
-td.grade-quintile-3, span.grade-quintile-3 {
+td.grade-rag-quintile-3, span.grade-rag-quintile-3 {
     background-color: #9E7CC8;
     color: White;
 }
 
-td.grade-quintile-4, span.grade-quintile-4 {
+td.grade-rag-quintile-4, span.grade-rag-quintile-4 {
     background-color: #7E50B6;
     color: White;
 }
 
-td.grade-quintile-5, span.grade-quintile-5 {
+td.grade-rag-quintile-5, span.grade-rag-quintile-5 {
     background-color: #5E25A4;
     color: White;
 }
 
+td.grade-bob-quintile-1, span.grade-bob-quintile-1 {
+    background-color: #254BA4;
+    color: White;
+}
+
+td.grade-bob-quintile-2, span.grade-bob-quintile-2 {
+    background-color: #506EB6;
+    color: White;
+}
+
+td.grade-bob-quintile-3, span.grade-bob-quintile-3 {
+    background-color: #7C93C8;
+    color: White;
+}
+
+td.grade-bob-quintile-4, span.grade-bob-quintile-4 {
+    background-color: #A7B6DA;
+    color: Black;
+}
+
+td.grade-bob-quintile-5, span.grade-bob-quintile-5 {
+    background-color: #D3DBEC;
+    color: Black;
+}
+
 td.worse, span.worse {
     background-color: #c00000;
+    color: White;
+}
+
+td.worst, span.worst {
+    background-color: #821733;
     color: White;
 }
 
@@ -462,6 +506,15 @@ td.same, span.same {
 td.better, span.better {
     background-color: #92d050;
         color: #333;
+}
+
+td.best, span.best {
+    background-color: #00b092;
+    color: #333;
+}
+
+.quintile-overview-spacer {
+    width: 147px;
 }
 
 span.target {
@@ -530,13 +583,6 @@ td.none {
     text-decoration: underline;
 }
 
-#indicator-profile-origin-link {
-    padding: 10px 0;
-}
-
-#indicator-profile-origin-link a {
-    color: #1f0aa1;
-}
 
 /* ------------------------------------------------------------
 	Tabs
@@ -619,18 +665,21 @@ background-image: url('../images/tabs/inequalities.gif');
 
 #page-download div {
     background-image: url('../images/tabs/download.gif');
+    opacity: 0.45;
 }
 
 #page-england div {
     background-image: url('../images/tabs/england.gif');
+    opacity: 0.4;
 }
 
 #page-population div {
     background-image: url('../images/tabs/population.gif');
+    opacity: 0.6;
 }
 
 div.page-selected div {
-    opacity:1.0;
+    opacity:1.0 !important;
 }
 
 div.page-selected
@@ -785,4 +834,51 @@ a.start, a.start:active, a.start:visited {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+/*----------------------------------------
+    Tabbed Header
+------------------------------------------*/
+h2.tab {
+    padding-bottom: 0;
+    min-height: 50px;
+}
+
+.tab-selected {
+    background-color: #02ae94;
+    color: #ffffff !important;
+    padding: 10px 10px 4px 10px;
+    float: left;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.tab-selected:hover {
+    text-decoration: underline;
+    cursor: auto;
+}
+
+.tab-not-selected {
+    background-color: #ffffff;
+    color: #02ae94 !important;
+    padding: 10px 10px 2px 10px;
+    float: left;
+    text-decoration: none;
+    font-weight: normal;
+}
+
+.tab-not-selected:hover {
+    cursor: pointer;
+    text-decoration: underline #02ae94;
+}
+
+.tab-selected:focus,
+.tab-not-selected:focus {
+    outline: 0;
+}
+
+.tab-button {
+    color: #02ae94;
+    padding: 10px 10px 4px 10px;
+    float: left;
 }

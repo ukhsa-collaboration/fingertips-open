@@ -50,6 +50,7 @@ namespace Fpm.MainUITest.Helpers
 
             SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.Definition);
             SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.Rationale);
+            SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.SpecificRationale);
             SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.Methodology);
             SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.Caveats);
             SetLargeStringToProperty(indicatorMetadataTextItems, IndicatorTextMetadataPropertyIds.Notes);

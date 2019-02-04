@@ -1,0 +1,69 @@
+<div class="row">
+    <div class="col-md-5">
+        <b>Domain </b><span [innerHtml]="this.domainName"></span>
+    </div>
+    <div class="col-md-4">
+        <b>Area type </b><span [innerHtml]="this.areaTypeName"></span>
+    </div>
+    <div class="col-md-3">
+        <button id="reorder-indicator-save" class="btn btn-primary save-button" (click)="save()">Save</button>
+        <button id="reorder-indicator-cancel" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <button id="reorder-add-subheading" class="btn btn-secondary" (click)="addSubHeadingConfirmation()">Add
+            subheading</button>
+    </div>
+</div>
+<app-spinner></app-spinner>
+<div class="row">
+    <div class="col-md-12">
+        <span [innerHtml]="errorMessage" class="error-message"></span>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <table id="table" class="grid sortable">
+            <thead>
+                <tr class="tablesorter-headerRow">
+                    <th scope="col" class="hidden">Is Subheading</th>
+                    <th scope="col">Seq</th>
+                    <th scope="col">Id</th>
+                    <th scope="col">Indicator name</th>
+                    <th scope="col">Sex</th>
+                    <th scope="col">Age</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let indicator of reorderIndicators;" class="tablesorter-dataRow">
+                    <td class="hidden">{{indicator.IsSubheading}}</td>
+                    <td class="col-seq" [ngClass]="{white: indicator.IsSubheading}">
+                        {{indicator.Sequence}}
+                    </td>
+                    <td class="col-id" [ngClass]="{white: indicator.IsSubheading}">
+                        {{indicator.IndicatorId}}
+                    </td>
+                    <td class="col-indicator-name">
+                        <div *ngIf="(indicator.IsSubheading == true)">
+                            <span class="subheading-name">
+                                {{indicator.IndicatorName}}
+                            </span>
+                            <span class="subheading-action-buttons">
+                                <button class="btn btn-link" (click)="editSubheadingConfirmation(indicator.IndicatorId)">Edit</button>
+                                <button class="btn btn-link" (click)="deleteSubheadingConfirmation(indicator.IndicatorId)">Delete</button>
+                            </span>
+                        </div>
+                        <span *ngIf="(indicator.IsSubheading == false)">{{indicator.IndicatorName}}</span>
+                    </td>
+                    <td class="col-sex">{{indicator.Sex}}</td>
+                    <td class="col-age">{{indicator.Age}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxInputText)="updateLightBoxInputText($event)"
+        (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
+    <ft-light-box-indicator-reorder [lightBoxIndicatorReorderConfig]="lightBoxIndicatorReorderConfig"
+        (emitLightBoxInputText)="updateLightBoxInputText($event)" (emitLightBoxActionConfirmed)="updateLightBoxIndicatorReorderActionConfirmed($event)"></ft-light-box-indicator-reorder>
+</div>

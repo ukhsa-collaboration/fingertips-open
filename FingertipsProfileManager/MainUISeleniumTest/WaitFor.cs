@@ -83,6 +83,12 @@ namespace Fpm.MainUISeleniumTest
                 By.Id("tinymce"));
         }
 
+        public void BatchUploadForm()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("batchUploadForm"));
+        }
+
         /// <summary>
         /// Wait for an element to be present on the page.
         /// </summary>

@@ -46,5 +46,21 @@ namespace IndicatorsUI.MainUISeleniumTest
             drivers.ForEach(x => x.Quit());
             drivers.ForEach(x => x.Dispose());
         }
+
+        public static void ClickLinkText(IWebDriver driver, string linkText)
+        {
+            try
+            {
+                var byLink = By.LinkText(linkText);
+                var link = driver.FindElement(byLink);
+                new WaitFor(driver).ExpectedElementToBeVisible(byLink);
+                
+                link.Click();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("There was an error during clicking." + e.Message);
+            }
+        }
     }
 }

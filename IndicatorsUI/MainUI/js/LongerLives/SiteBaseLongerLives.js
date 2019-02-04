@@ -126,6 +126,7 @@ function getAllAreas(model) {
         parameters.add('area_type_id', model.areaTypeId);
         parameters.add('profile_id', model.profileId);
         parameters.add('retrieve_ignored_areas', 'yes');
+        parameters.add('no_cache', 'true');
 
         ajaxGet('api/areas/by_area_type',
             parameters.build(), function (obj) {
@@ -289,7 +290,7 @@ function highlightSelectedTab() {
 
     var lookUp = {
         'home': 'home-nav',
-        'project': 'about-project-nav',
+        'found': 'error-nav',
         'data': 'about-data-nav',
         'connect': 'connect-nav',
         'map': 'map-with-data'
@@ -299,7 +300,9 @@ function highlightSelectedTab() {
         lookUp[lastWord] :
         'rankings-nav';
 
-    $('#' + id).addClass('selected');
+    if (id !== 'error-nav') {
+        $('#' + id).addClass('selected');
+    }
 }
 
 function getDecileCategoryTypeId(areaTypeId) {
@@ -706,11 +709,11 @@ function getSignificanceText(sig, groupRoot) {
         case PolarityIds.BlueOrangeBlue:
             switch (sig) {
                 case 1:
-                    return 'lower' + suffix;;
+                    return 'lower' + suffix;
                 case 2:
                     return 'consistent with average'; // Amber;
                 case 3:
-                    return 'higher' + suffix;;
+                    return 'higher' + suffix;
             }
         default:
             // Polarity handled in web services re: HighIsGood/LowIsGood

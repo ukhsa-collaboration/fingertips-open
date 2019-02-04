@@ -1,8 +1,11 @@
 ﻿using IndicatorsUI.MainUI.Routes;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Web.Mvc;
 using System.Web.Routing;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataAccess.Repository;
 
 namespace IndicatorsUI.MainUI
 {
@@ -104,7 +107,14 @@ namespace IndicatorsUI.MainUI
                 "administrator",
                 "{page}.php",
                 "wp-admin",
-                "{.*}/wp-admin"
+                "wp",
+                "wordpress",
+                "{.*}/wp-admin",
+                "site.webmanifest",
+                "angular-app-dist/webpack.config.js", // Requested by angular code but does not exist
+                "webpack.config.js", // Requested by angular code but does not exist
+                "safari-pinned-tab.svg", // Apple fav icon - don't have SVG version yet
+                "profile"
             };
 
             foreach (var ignoredRoute in ignoredRoutes)
@@ -162,30 +172,43 @@ namespace IndicatorsUI.MainUI
         /// </summary>
         private static void Redirects(RouteCollection routes)
         {
-            var redirects = new Dictionary<string, string>
-            {
-                // What about youth profiles renamed
-                {"profile/what-aboutyouth", "/profile-group/child-health"},
-                {"profile/what-about-youth", "/profile-group/child-health"},
-                // Common route not handled in live logs
-                {"profile/local-alcohol", "/profile/local-alcohol-profiles"},
-                // CHMP profile retired
-                {"profile-group/mental-health/profile/cmhp", "/profile-group/mental-health"},
-                //FIN-1574 Redirect now separate profiles for Diabetes in Longer Lives and Fingertips
-                {"profile/diabetes", "/profile/diabetes-ft"},
-                {"diabetes", "/profile/diabetes-ft"},
-                {"profile/diabetes/data", "/profile/diabetes-ft/data"}
-            };
+            // Redirection will affect tests. Because of that is off in test environment.
+            // If you will need test with redirections change web.confing->appsetting->allowRedirection to true
+            if (!AppConfig.Instance.isAllowingRedirection) return;
+
+            var redirects = new RelativeUrlRedirectRepository().GetAllRelativeUrlRedirects();
 
             foreach (var redirect in redirects)
             {
+                // Ensure to URL starts with "/"
+                var toUrl = redirect.ToUrl.Trim();
+                if (toUrl.StartsWith("/") == false)
+                {
+                    toUrl = "/" + toUrl;
+                }
+
+                // Change hash so can be added back later in browser
+                if (toUrl.Contains("#"))
+                {
+                    var bits = toUrl.Split('#');
+
+                    toUrl = bits[0] + "?redirectHash=" + bits[1];
+                }
+
+                // Prepend with hostname if absolute path required
+                if (redirect.useFingertipsHostnameForAbsolutePath)
+                {
+                    toUrl = ConfigurationManager.AppSettings["DomainUrl"] + toUrl;
+                }
+
+                // Redirect action
                 routes.MapRoute("Redirect" + Guid.NewGuid(),
-                    redirect.Key,
+                    redirect.FromUrl.Trim(),
                     new
                     {
                         controller = "Redirect",
                         action = "RedirectToUrl",
-                        newUrl = redirect.Value
+                        newUrl = toUrl
                     });
             }
         }

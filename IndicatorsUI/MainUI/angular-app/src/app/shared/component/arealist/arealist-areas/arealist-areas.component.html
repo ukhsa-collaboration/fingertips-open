@@ -1,0 +1,6 @@
+<div id="areas-list" class="areas-list top-margin">
+  <div *ngFor="let area of areas" #elem [attr.id]="area.Code" class="areas areas-{{area.Code}}" (mouseover)="mouseOverArea(area)"
+    (mouseout)="mouseOutArea(area)" (click)="selectArea(area.Code)">
+    {{area.Name}}
+  </div>
+</div>

@@ -2,24 +2,24 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { PracticeSearchComponent } from './practice-search.component';
 
-// describe('PracticeSearchComponent', () => {
-//   let component: PracticeSearchComponent;
-//   let fixture: ComponentFixture<PracticeSearchComponent>;
+describe('PracticeSearchComponent', () => {
+    let component: PracticeSearchComponent;
+    let fixture: ComponentFixture<PracticeSearchComponent>;
 
-//   beforeEach(async(() => {
-//     TestBed.configureTestingModule({
-//       declarations: [ PracticeSearchComponent ]
-//     })
-//     .compileComponents();
-//   }));
+    beforeEach(async(() => {
+        TestBed.configureTestingModule({
+            declarations: [PracticeSearchComponent]
+        })
+            .compileComponents();
+    }));
 
-//   beforeEach(() => {
-//     fixture = TestBed.createComponent(PracticeSearchComponent);
-//     component = fixture.componentInstance;
-//     fixture.detectChanges();
-//   });
+    beforeEach(() => {
+        fixture = TestBed.createComponent(PracticeSearchComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-//   it('should create', () => {
-//     expect(component).toBeTruthy();
-//   });
-// });
+    // it('should create', () => {
+    //     expect(component).toBeTruthy();
+    // });
+});

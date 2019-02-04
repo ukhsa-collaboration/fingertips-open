@@ -51,6 +51,78 @@ namespace FingertipsUploadService.ProfileData.Repositories
             CloseSession();
         }
 
+        /// <summary>
+        /// Open and close session before and after query
+        /// </summary>
+        /// <typeparam name="T">Type of returning</typeparam>
+        /// <param name="query">Code with the query to execute</param>
+        /// <returns>Any "T" type</returns>
+        public T SecureExecuteQuery<T>(Func<T> query)
+        {
+            try
+            {
+                OpenSession();
+
+                var queryResult = query.Invoke();
+
+                CloseSession();
+                
+                return queryResult;
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Open and close session before and after a transaction
+        /// </summary>
+        /// <typeparam name="I">Type passing parameter</typeparam>
+        /// <typeparam name="T">Type of returning</typeparam>
+        /// <param name="sqlAction">Action to execute</param>
+        /// <param name="data">Data that it wants to be the action</param>
+        /// <returns></returns>
+        public T SecureExecuteSqlAction<I,T>(Func<I,T> sqlAction, I data)
+        {
+            try
+            {
+                OpenSession();
+
+                var queryResult = sqlAction.Invoke(data);
+
+                CloseSession();
+                
+                return queryResult;
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Open and close session before and after transaction
+        /// </summary>
+        /// <param name="transaction">Code within transactions</param>
+        public void SecureExecuteTransaction(Action transaction)
+        {
+            try
+            {
+                OpenSession();
+
+                transaction.Invoke();
+
+                CloseSession();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
         internal void HandleException(Exception exception)
         {
             if (transaction != null && transaction.WasRolledBack == false)

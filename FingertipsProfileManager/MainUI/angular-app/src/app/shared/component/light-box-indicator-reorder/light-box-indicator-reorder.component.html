@@ -1,0 +1,33 @@
+<div class="light-box" *ngIf="showLightBox">
+</div>
+<div class="info-box" *ngIf="showLightBox" [style.height]="this.lightBoxIndicatorReorderConfig.Height + 'px'">
+  <h2>{{this.lightBoxIndicatorReorderConfig.Title}}</h2>
+  <div *ngIf="isInfoBox">
+    <div class="form-group">
+      <label for="txt-light-box" class="col-form-label" [innerHtml]="this.lightBoxIndicatorReorderConfig.InputBoxLabelName">
+      </label>
+      <div>
+        <input type="text" id="txt-light-box" class="form-control" [value]="this.lightBoxInputText" maxlength="200" />
+      </div>
+    </div>
+    <div>
+      Click below to use one defined for another area type
+      <div class="grouping-subheading-list">
+        <div *ngFor="let groupingSubheading of this.lightBoxIndicatorReorderConfig.GroupingSubheadings;">
+          <a (click)="setSubheading(groupingSubheading.Subheading)">
+            {{groupingSubheading.Subheading }}
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button class="btn btn-primary active ok" (click)="setLightBoxInputText()" [innerHtml]="this.lightBoxIndicatorReorderConfig.OkButtonText">OK</button>
+      <button class="btn btn-link active" (click)="cancel()" [innerHtml]="this.lightBoxIndicatorReorderConfig.CancelButtonText">Cancel</button>
+    </div>
+    <div class="error-message" [innerHtml]="this.errorMessage">
+      &nbsp;
+    </div>
+  </div>
+
+  <div class="close" (click)="cancel()"></div>
+</div>

@@ -1,5 +1,8 @@
-﻿using PholioVisualisation.DataAccess;
+﻿using System.Linq;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -22,6 +25,22 @@ namespace PholioVisualisation.DataConstruction
             if (areaCode == null)
             {
                 throw new FingertipsException("Area code was null");
+            }
+
+            // AreaList areas
+            if (Area.IsAreaListAreaCode(areaCode))
+            {
+                IAreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
+                var areaList = areaListRepository.GetAreaListByPublicId(areaCode);
+                var areaListArea = new Area
+                {
+                    Name = areaList.ListName,
+                    ShortName = areaList.ListName,
+                    Code = areaList.PublicId,
+                    AreaTypeId = areaList.AreaTypeId
+                };
+
+                return areaListArea;
             }
 
             // Category areas

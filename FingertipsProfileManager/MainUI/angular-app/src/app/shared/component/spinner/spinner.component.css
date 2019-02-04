@@ -1,0 +1,19 @@
+#app-spinner {
+    height: 500px;
+    width: 100%;
+    position: relative;
+}
+
+#app-spinner img {
+    position: absolute;
+    top: 186px;
+    left: 500px;
+}
+
+#app-spinner-label {
+    color: #666;
+    font-weight: bold;
+    position: absolute;
+    top: 242px;
+    left: 497px;
+}

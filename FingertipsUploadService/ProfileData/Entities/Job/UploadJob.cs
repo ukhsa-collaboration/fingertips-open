@@ -25,5 +25,6 @@ namespace FingertipsUploadService.ProfileData.Entities.Job
         public bool IsCellValidationPerRowDone { get; set; }
         public bool IsSmallNumberOverrideApplied { get; set; }
         public bool IsDuplicateOverrideApplied { get; set; }
+        public bool IsConfirmationRequiredToOverrideDatabaseDuplicates { get; set; }
     }
 }

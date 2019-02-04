@@ -19,3 +19,11 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+#boundryNotSupported {
+    width:100%; 
+    height:400px;
+    padding-top:190px; 
+    text-align:center;
+    font-size:17px;
+}

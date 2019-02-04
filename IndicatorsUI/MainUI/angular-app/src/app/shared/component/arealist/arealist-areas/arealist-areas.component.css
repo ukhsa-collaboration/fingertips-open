@@ -1,0 +1,15 @@
+.areas {
+    border-top: 1px solid #ccc;
+    margin: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.top-margin {
+    margin-top: 10px;
+}
+
+.areas-list {
+    height: 400px;
+    overflow-y: scroll;
+}

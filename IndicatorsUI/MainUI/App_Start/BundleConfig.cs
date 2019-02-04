@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using IndicatorsUI.DataAccess;
+using System.Collections.Generic;
 using System.Web.Optimization;
-using IndicatorsUI.DataAccess;
 
 namespace IndicatorsUI.MainUI
 {
@@ -46,6 +46,10 @@ namespace IndicatorsUI.MainUI
             // Styles: Indicator lists
             AddStyles(bundles, cssPath, "css-indicator-list-edit", "IndicatorList/indicator-list-edit.css");
             AddStyles(bundles, cssPath, "css-indicator-list-index", "IndicatorList/indicator-list-index.css");
+
+            // Styles: Area lists
+            AddStyles(bundles, cssPath, "css-area-list-edit", "AreaList/area-list-edit.css");
+            AddStyles(bundles, cssPath, "css-area-list-index", "AreaList/area-list-index.css");
 
             // Add TranspiledFiles
             AddScripts(bundles, angularPath, "js-angular", GetAngularFiles());
@@ -118,14 +122,8 @@ namespace IndicatorsUI.MainUI
                 "PageDownload.js",
                 "AreaSearch/area-search.js"
             };
-            AddEnvironmentFiles(jsFiles);
-            return jsFiles.ToArray();
-        }
 
-        private static void AddEnvironmentFiles(List<string> jsFiles)
-        {
-            if (AppConfig.Instance.IsEnvironmentTest)
-                jsFiles.Add("EnvironmentTest.js");
+            return jsFiles.ToArray();
         }
 
         private static string[] GetJsLongerLives()
@@ -188,7 +186,6 @@ namespace IndicatorsUI.MainUI
                 "common.js",
                 "tooltip.js",
                 "TooltipRecentTrends.js",
-                "spineChart.js",
                 "vendor/jquery.floatThead/jquery.floatThead.min.js",
                 "vendor/js-cookie/js.cookie.js"
             };

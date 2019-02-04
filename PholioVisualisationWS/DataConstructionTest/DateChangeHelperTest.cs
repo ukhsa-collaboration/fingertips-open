@@ -12,165 +12,116 @@ namespace PholioVisualisation.DataConstructionTest
     {
         private Mock<IMonthlyReleaseHelper> _monthlyReleaseHelper;
         private Mock<ICoreDataAuditRepository> _coreDataAuditRepository;
+        private Mock<ICoreDataSetRepository> _coreDataSetRepository;
 
         private DateChangeHelper _dateChangeHelper;
-        private int indicatorID = 1;
+        private readonly TimePeriod _timePeriod = GetNewTimePeriod();
 
         [TestInitialize]
         public void Initialize()
         {
             _monthlyReleaseHelper = new Mock<IMonthlyReleaseHelper>(MockBehavior.Strict);
             _coreDataAuditRepository = new Mock<ICoreDataAuditRepository>(MockBehavior.Strict);
+            _coreDataSetRepository = new Mock<ICoreDataSetRepository>(MockBehavior.Strict);
         }
 
         [TestMethod]
-        public void Test_ShouldNewDataBeHighlighted_False_Suppresses_Change()
+        public void Test_ShouldNewDataBeHighlighted_False()
         {
             InitDateChangeHelper();
-            var metadata = GetIndicatorMetadata(null);
-            metadata.ShouldNewDataBeHighlighted = false;
-            var data = _dateChangeHelper.AssignDateChange(metadata, 90);
+            var metadata = GetIndicatorMetadata(IndicatorIds.DeprivationScoreIMD2010, null, false);
+
+            var dateChange = _dateChangeHelper.GetIndicatorDateChange(_timePeriod, metadata, 1);
 
             // Assert: data has not changed recently because no upload info
-            AssertDataNotChangedRecently(data);
+            AssertDataNotChangedRecently(dateChange);
 
             VerifyAll();
         }
 
         [TestMethod]
-        public void TestAssignDateChangeWhereNoUploadInfo()
+        public void Test_ShouldNewDataBeHighlighted_True()
         {
-            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorID))
-                .Returns((CoreDataUploadAudit)null);
+            var indicatorId = IndicatorIds.LearningDisabilityQofPrevalence;
+            var deploymentCount = 12;
+            var dateUploaded = new DateTime(2018, 04, 06);
+            var dateOfLastRelease = new DateTime(2018, 04, 01);
+            var dateOfNextRelease = new DateTime(2018, 05, 02);
 
-            InitDateChangeHelper();
-
-            var data = _dateChangeHelper.AssignDateChange(GetIndicatorMetadata(null), 0);
-
-            // Assert: data has not changed recently because no upload info
-            AssertDataNotChangedRecently(data);
-
-            VerifyAll();
-        }
-
-        [TestMethod]
-        public void TestAssignDateChangeWhereOverrideDateIsSetGreaterThanReleaseDate()
-        {
-            var dateUploaded = new DateTime(2018, 03, 01);
-            var dateOfLastRelease = new DateTime(2018, 03, 06);
-            var latestChangeTimestampOverride = new DateTime(2018, 03, 25); // Future date
-
-            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorID))
+            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorId))
                 .Returns(new CoreDataUploadAudit
                 {
                     DateCreated = dateUploaded
                 });
 
-            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUploaded)).Returns(dateOfLastRelease);
-            SetDateTimeNow();
+            // Arrange: Monthly release helper
+            _monthlyReleaseHelper.Setup(x => x.GetReleaseDate(deploymentCount)).Returns(dateOfLastRelease);
+            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUploaded)).Returns(dateOfNextRelease);
+
+            SetUpGetLastestTimePeriodOfCoreData(indicatorId, _timePeriod.YearRange);
 
             InitDateChangeHelper();
 
-            var indicatorMetadata = GetIndicatorMetadata(latestChangeTimestampOverride);
+            var metadata = GetIndicatorMetadata(indicatorId, dateOfLastRelease, true);
 
-            var data = _dateChangeHelper.AssignDateChange(indicatorMetadata, 0);
+            // Act 
+            var dateChange = _dateChangeHelper.GetIndicatorDateChange(_timePeriod, metadata, deploymentCount);
 
-            // Assert: Date in future has changed
-            Assert.IsTrue(data.HasDataChangedRecently);
-            Assert.AreEqual(data.DateOfLastChange, latestChangeTimestampOverride);
-
-            VerifyAll();
-        }
-
-        [TestMethod]
-        public void TestAssignDateChangeWhereOverrideDateIsSetLessThanReleaseDate()
-        {
-            var dateUploaded = new DateTime(2018, 03, 01);
-            var dateOfLastRelease = new DateTime(2018, 03, 06);
-            var latestChangeTimestampOverride = new DateTime(2018, 2, 25);
-
-            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorID))
-                .Returns(new CoreDataUploadAudit
-                {
-                    DateCreated = dateUploaded
-                });
-
-
-            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUploaded)).Returns(dateOfLastRelease);
-            SetDateTimeNow();
-
-            InitDateChangeHelper();
-
-            var indicatorMetadata = GetIndicatorMetadata(latestChangeTimestampOverride);
-
-            var data = _dateChangeHelper.AssignDateChange(indicatorMetadata, 0);
-
-            // Assert
-            Assert.IsFalse(data.HasDataChangedRecently);
-            Assert.AreEqual(data.DateOfLastChange, dateOfLastRelease);
+            // Assert: data has changed recently
+            AssertDataChangedRecently(dateChange);
 
             VerifyAll();
-        }
-
-        [TestMethod]
-        public void TestAssignDateChangeWhereOverrideDateIsSetLessThanReleaseDateWithNewDateTimeSpanInDays30()
-        {
-            var dateUploaded = new DateTime(2018, 03, 01);
-            var dateOfLastRelease = new DateTime(2018, 03, 06);
-            var latestChangeTimestampOverride = new DateTime(2018, 2, 25);
-
-            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorID))
-                .Returns(new CoreDataUploadAudit
-                {
-                    DateCreated = dateUploaded
-                });
-
-            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUploaded)).Returns(dateOfLastRelease);
-            SetDateTimeNow();
-
-            InitDateChangeHelper();
-
-            var indicatorMetadata = GetIndicatorMetadata(latestChangeTimestampOverride);
-
-            var data = _dateChangeHelper.AssignDateChange(indicatorMetadata, 30);
-
-            // Assert
-            Assert.IsTrue(data.HasDataChangedRecently);
-            Assert.AreEqual(data.DateOfLastChange, dateOfLastRelease);
-
-            VerifyAll();
-        }
-
-        private void SetDateTimeNow()
-        {
-            _monthlyReleaseHelper.Setup(x => x.GetDateTimeNow()).Returns(new DateTime(2018, 03, 10));
         }
 
         private void InitDateChangeHelper()
         {
             _dateChangeHelper = new DateChangeHelper(_monthlyReleaseHelper.Object,
-                _coreDataAuditRepository.Object);
+                _coreDataAuditRepository.Object, _coreDataSetRepository.Object);
         }
 
-        private static void AssertDataNotChangedRecently(IndicatorDateChange data)
+        private void SetUpGetLastestTimePeriodOfCoreData(int indicatorId, int yearRange)
         {
-            Assert.IsFalse(data.HasDataChangedRecently);
-            Assert.IsNull(data.DateOfLastChange);
+            _coreDataSetRepository.Setup(x => x.GetLastestTimePeriodOfCoreData(indicatorId, yearRange))
+                .Returns(_timePeriod);
+        }
+
+        private static void AssertDataNotChangedRecently(IndicatorDateChange dateChange)
+        {
+            Assert.IsFalse(dateChange.HasDataChangedRecently);
+            Assert.IsNull(dateChange.DateOfLastChange);
+        }
+
+        private static void AssertDataChangedRecently(IndicatorDateChange dateChange)
+        {
+            Assert.IsTrue(dateChange.HasDataChangedRecently);
+            Assert.IsNotNull(dateChange.DateOfLastChange);
         }
 
         private void VerifyAll()
         {
             _monthlyReleaseHelper.VerifyAll();
             _coreDataAuditRepository.VerifyAll();
+            _coreDataSetRepository.VerifyAll();
         }
 
-        public IndicatorMetadata GetIndicatorMetadata(DateTime? latestChangeTimestampOverride)
+        public IndicatorMetadata GetIndicatorMetadata(int indicatorId, DateTime? latestChangeTimestampOverride, bool newDataBeHighLighted)
         {
             return new IndicatorMetadata
             {
-                IndicatorId = indicatorID,
+                IndicatorId = indicatorId,
                 LatestChangeTimestampOverride = latestChangeTimestampOverride,
-                ShouldNewDataBeHighlighted = true
+                ShouldNewDataBeHighlighted = newDataBeHighLighted
+            };
+        }
+
+        private static TimePeriod GetNewTimePeriod()
+        {
+            return new TimePeriod
+            {
+                Year = 2018,
+                YearRange = 1,
+                Quarter = TimePoint.Undefined,
+                Month = TimePoint.Undefined
             };
         }
     }

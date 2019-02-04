@@ -31,8 +31,9 @@ namespace IndicatorsUI.MainUI.Models.UserAccess
         [Compare("Password", ErrorMessage = "The password and confirmation do not match.")]
         public string ConfirmPassword { get; set; }
 
-        [RegularExpression(@"^[a-zA-Z''-'\s]{1,40}$", ErrorMessage = "Special characters or numbers are not allowed.")]
+        [RegularExpression(@"^[a-zA-Z0-9&''-'\s]{1,80}$", ErrorMessage = "You job title is either too long or contains characters that are not allowed")]
         public string JobTitle { get; set; }
+
         public int? OrganisationId { get; set; }
 
         /// <summary>

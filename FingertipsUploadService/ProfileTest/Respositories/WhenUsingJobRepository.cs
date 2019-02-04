@@ -33,10 +33,10 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             AddNewJob(job);
 
             var notStartedUploadJobs = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
-            var first = notStartedUploadJobs.FirstOrDefault();
+            var insertedJob = notStartedUploadJobs.Last(x => x.Guid == job.Guid);
 
-            Assert.AreEqual(job.Guid, first.Guid);
-            Assert.AreEqual(UploadJobStatus.NotStarted, first.Status);
+            Assert.AreEqual(job.Guid, insertedJob.Guid);
+            Assert.AreEqual(UploadJobStatus.NotStarted, insertedJob.Status);
         }
 
         [TestMethod]

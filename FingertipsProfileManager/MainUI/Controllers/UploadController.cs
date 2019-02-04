@@ -53,9 +53,9 @@ namespace Fpm.MainUI.Controllers
         /// Returns list of jobs for current user
         /// </summary>
         [HttpGet]
-        public ActionResult CurrentUserJobProgress(int userId)
+        public ActionResult CurrentUserJobProgress(int userId, int numberOfRecords)
         {
-            var jobs = _fpmUploadRepository.GetJobsForCurrentUser(userId);
+            var jobs = _fpmUploadRepository.GetJobsForCurrentUser(userId, numberOfRecords);
             var response = new UploadProgressViewModel
             {
                 InProgress = jobs.Count(x => x.Status == UploadJobStatus.InProgress),
@@ -84,7 +84,8 @@ namespace Fpm.MainUI.Controllers
                     Filename = uploadJob.OriginalFile,
                     Username = fpmUsers.FirstOrDefault(x => x.Id == uploadJob.UserId).DisplayName,
                     StatusText = UploadHelper.GetTextFromStatusCodeForActiveJobs(uploadJob.Status),
-                    Status = uploadJob.Status
+                    Status = uploadJob.Status,
+                    Guid = uploadJob.Guid
                 });
             }
 
@@ -194,6 +195,7 @@ namespace Fpm.MainUI.Controllers
                 // Save file
                 var guid = Guid.NewGuid();
                 var file = Request.Files[0];
+                var selectionValue = Request.Form[0];
                 var actualFileName = file.FileName;
                 var fileName = guid + Path.GetExtension(file.FileName);
                 file.SaveAs(Path.Combine(AppConfig.UploadFolder, fileName));
@@ -205,7 +207,8 @@ namespace Fpm.MainUI.Controllers
                     Filename = actualFileName,
                     JobType = jobType,
                     Status = UploadJobStatus.NotStarted,
-                    UserId = UserDetails.CurrentUser().Id
+                    UserId = UserDetails.CurrentUser().Id,
+                    IsConfirmationRequiredToOverrideDatabaseDuplicates = Convert.ToBoolean(selectionValue)
                 };
 
                 _fpmUploadRepository.CreateJob(uploadJob);

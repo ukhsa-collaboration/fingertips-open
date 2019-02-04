@@ -1,4 +1,5 @@
-﻿using PholioVisualisation.DataAccess;
+﻿using System.Collections.Generic;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
@@ -25,6 +26,18 @@ namespace PholioVisualisation.ServiceActions
             areaAddress.CleanAddress();
             areaAddress.LatitudeLongitude = MapCoordinateConverter.GetLatitudeLongitude(areaAddress.EastingNorthing);
             return areaAddress;
+        }
+
+        public IList<AreaAddress> GetAreaAddressList(IList<string> areaCodes)
+        {
+            var areaAddressList = new List<AreaAddress>();
+
+            foreach (var areaCode in areaCodes)
+            {
+                areaAddressList.Add(GetAreaAddress(areaCode));
+            }
+
+            return areaAddressList;
         }
     }
 }

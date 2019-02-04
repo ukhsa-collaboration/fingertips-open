@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using NHibernate;
 using NHibernate.Criterion;
-using PholioVisualisation.DataAccess.Repositories.Fpm.ProfileData.Repositories;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess.Repositories

@@ -21,5 +21,6 @@ namespace Fpm.ProfileData.Entities.User
         }
 
         public bool IsAdministrator { get; set; }
+        public bool IsCurrent { get; set; }
     }
 }

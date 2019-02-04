@@ -114,6 +114,17 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
+        /// Gets profile group subheadings for a specific area type and profile group
+        /// </summary>
+        [HttpGet]
+        [Route("group_subheadings")]
+        public IList<GroupingSubheading> GetGroupingSubheadings(int area_type_id, int group_id)
+        {
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            return groupDataReader.GetGroupingSubheadings(area_type_id, group_id);
+        }
+
+        /// <summary>
         /// For each indicator lists the profiles that it is included in
         /// </summary>
         /// <remarks>A dictionary of indicator ID to a list of profiles
@@ -122,7 +133,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="area_type_id">Area type ID</param>
         [HttpGet]
         [Route("profiles_containing_indicators")]
-        public Dictionary<int, List<ProfilePerIndicator>> GetProfilesPerIndicator(string indicator_ids, int area_type_id)
+        public Dictionary<int, List<ProfilePerIndicator>> GetProfilesPerIndicator(string indicator_ids, int area_type_id = AreaTypeIds.Undefined)
         {
             try
             {

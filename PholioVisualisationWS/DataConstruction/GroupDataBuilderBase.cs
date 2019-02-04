@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstruction
         protected IAreasReader AreasReader = ReaderFactory.GetAreasReader();
         protected IGroupDataReader GroupDataReader = ReaderFactory.GetGroupDataReader();
         private CoreDataProcessor _coreDataProcessor = new CoreDataProcessor(null);
-        private DateChangeHelper _dateChangeHelper;
+        private IDateChangeHelper _dateChangeHelper;
         private IProfileReader _profileReader;
         private ProfileConfig _profileConfig;
 
@@ -27,16 +27,14 @@ namespace PholioVisualisation.DataConstruction
         protected IList<Grouping> Groupings;
         public int ProfileId;
 
-
         /// <summary>
         ///     The specific time point at which to assign core data and comparator data.
         /// </summary>
         public TimePeriod TimePeriodOfData;
 
-
         public GroupDataBuilderBase()
         {
-            _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository());
+            _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository(), new CoreDataSetRepository());
             _profileReader = ReaderFactory.GetProfileReader();
         }
 
@@ -71,9 +69,9 @@ namespace PholioVisualisation.DataConstruction
                         AssignRecentTrends();
                     }
 
-                    if (ApplicationConfiguration.Instance.IsFeatureActive("recentlyChangedData"))
+                    if (_profileConfig != null && ApplicationConfiguration.Instance.IsFeatureActive("recentlyChangedData"))
                     {
-                        AssignDataChanges();
+                        AssignDataChanges(_profileConfig.NewDataDeploymentCount);
                     }
                 }
                 else
@@ -174,15 +172,16 @@ namespace PholioVisualisation.DataConstruction
                 .ReadChildAreas(parentAreaCode, ProfileId, childAreaTypeId);
         }
 
-        private void AssignDataChanges()
+        private void AssignDataChanges(int newDataDeploymentCount)
         {
             var metadataCollection = new IndicatorMetadataCollection(GroupData.IndicatorMetadata);
             foreach (var groupRoot in GroupData.GroupRoots)
             {
                 var indicatorMetadata = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
+                var timePeriod = TimePeriod.GetDataPoint(groupRoot.FirstGrouping);
 
-                groupRoot.DateChanges = _dateChangeHelper.AssignDateChange(
-                    indicatorMetadata, _profileConfig.NewDataTimeSpanInDays);
+                groupRoot.DateChanges = _dateChangeHelper.GetIndicatorDateChange(timePeriod,
+                    indicatorMetadata, newDataDeploymentCount);
             }
         }
 

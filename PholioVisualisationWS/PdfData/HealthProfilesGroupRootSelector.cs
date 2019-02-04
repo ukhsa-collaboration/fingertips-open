@@ -33,7 +33,7 @@ namespace PholioVisualisation.PdfData
 
         public GroupRoot Population
         {
-            get { return GetGroupRoot(IndicatorIds.Population); }
+            get { return GetGroupRoot(IndicatorIds.OnsMidYearPopulationEstimates); }
         }
 
         public GroupRoot ChildrenInLowIncomeFamilies
@@ -71,7 +71,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.SlopeIndexOfInequalityForLifeExpectancy, SexIds.Female); }
         }
 
-
         public GroupRoot PercentageEthnicMinoritiesCombined
         {
             get { return GetGroupRoot(IndicatorIds.PercentageEthnicMinorities, SexIds.Persons); }
@@ -86,7 +85,6 @@ namespace PholioVisualisation.PdfData
         {
             get { return GetGroupRoot(IndicatorIds.PercentageEthnicMinorities, SexIds.Female); }
         }
-
 
         public GroupRoot PopulationCombined
         {
@@ -118,11 +116,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.PopulationProjection, SexIds.Female); }
         }
 
-        public GroupRoot DependencyRatio
-        {
-            get { return GetGroupRoot(IndicatorIds.DependencyRatio); }
-        }
-
         public GroupRoot ObesityYear6
         {
             get { return GetGroupRoot(IndicatorIds.ObesityYear6); }
@@ -151,11 +144,6 @@ namespace PholioVisualisation.PdfData
         public GroupRoot SmokingAtTimeOfDelivery
         {
             get { return GetGroupRoot(IndicatorIds.SmokingAtTimeOfDelivery); }
-        }
-
-        public GroupRoot ObesityAdult
-        {
-            get { return GetGroupRoot(IndicatorIds.ObeseAdults); }
         }
 
         public GroupRoot AdultAlcoholAdmissions
@@ -208,11 +196,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.IncidenceOfTB); }
         }
 
-        public GroupRoot EstimatedDementiaDiagnosisRate
-        {
-            get { return GetGroupRoot(IndicatorIds.EstimatedDementiaDiagnosisRate); }
-        }
-
         public GroupRoot AdultStatutoryHomelessness
         {
             get { return GetGroupRoot(IndicatorIds.StatutoryHomelessness2); }
@@ -243,11 +226,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.AdultUnder75MortalityRateCancer); }
         }
 
-        public GroupRoot HealthInequalitiesEthnicity
-        {
-            get { return GetGroupRoot(IndicatorIds.HealthInequalitiesEmergencyHospitalAdmissionsByEthnicGroup); }
-        }
-
         public GroupRoot PercentageOfPeoplePerDeprivationQuintile
         {
             get { return GetGroupRoot(IndicatorIds.PercentageOfPeoplePerDeprivationQuintile); }
@@ -258,11 +236,6 @@ namespace PholioVisualisation.PdfData
             get { return GetGroupRoot(IndicatorIds.DeprivationScoreIMD2015); }
         }
 
-        public GroupRoot OverallPrematureDeaths
-        {
-            get { return GetGroupRoot(IndicatorIds.OverallPrematureDeaths); }
-        }
-
         public GroupRoot OverallPrematureDeathsMale
         {
             get { return GetGroupRoot(IndicatorIds.OverallPrematureDeaths, SexIds.Male); }
@@ -271,11 +244,6 @@ namespace PholioVisualisation.PdfData
         public GroupRoot OverallPrematureDeathsFemale
         {
             get { return GetGroupRoot(IndicatorIds.OverallPrematureDeaths, SexIds.Female); }
-        }
-
-        public void AddRange(IList<GroupRoot> groupRoots)
-        {
-            this.groupRoots.AddRange(groupRoots);
         }
 
         public GroupRoot GetGroupRoot(int indicatorId, int sexId)

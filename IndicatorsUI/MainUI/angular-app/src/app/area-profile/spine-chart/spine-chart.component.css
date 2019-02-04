@@ -1,0 +1,41 @@
+.spine250 {
+    width: 274px;
+    /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
+    position: relative;
+    text-align: center;
+}
+
+.average250 {
+    width: 2px;
+    left: 136px;
+    /*half spine250 width - 1(i.e. half average bar width)*/
+    position: absolute;
+    height: 23px;
+}
+
+.no-spine {
+    height: 23px;
+    line-height: 23px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.q1,
+.q2,
+.q4,
+.spine {
+    height: 23px;
+    float: left;
+}
+
+.spine {
+    overflow: hidden;
+    padding: 0 0 0 0;
+}
+
+.marker {
+    position: absolute;
+    top: 2px;
+}

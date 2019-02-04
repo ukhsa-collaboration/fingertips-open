@@ -39,6 +39,9 @@
       <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\NHibernate.4.0.0.4000\lib\net40\NHibernate.dll</HintPath>
       <Private>True</Private>
@@ -62,7 +65,24 @@
     <Compile Include="CategoryComparisonManager.cs" />
     <Compile Include="CoreDataSetExportFormatter.cs" />
     <Compile Include="DataFileBuilder.cs" />
+    <Compile Include="FileBuilder\Containers\BodyPeriodComparisonContainer.cs" />
+    <Compile Include="FileBuilder\Containers\BodyPeriodSearchContainer.cs" />
+    <Compile Include="FileBuilder\Containers\BodyPeriodSignificanceContainer.cs" />
+    <Compile Include="FileBuilder\Containers\BodyPeriodTrendContainer.cs" />
+    <Compile Include="FileBuilder\Containers\BodyPeriodWriterContainer.cs" />
+    <Compile Include="FileBuilder\Containers\IndicatorDataBodyContainer.cs" />
+    <Compile Include="FileBuilder\DataFileBuilderBase.cs" />
+    <Compile Include="FileBuilder\IDataFileBuilder.cs" />
     <Compile Include="ExportAreaHelper.cs" />
+    <Compile Include="FileBuilder\IndicatorDataCsvFileBuilder.cs" />
+    <Compile Include="FileBuilder\Containers\CsvBuilderAttributesForBodyContainer.cs" />
+    <Compile Include="FileBuilder\Wrappers\CsvBuilderAttributesForIndicatorsWrapper.cs" />
+    <Compile Include="FileBuilder\Wrappers\CsvBuilderAttributesForPeriodsWrapper.cs" />
+    <Compile Include="FileBuilder\Wrappers\OnDemandQueryParametersWrapper.cs" />
+    <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyPeriodWriter.cs" />
+    <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyWriter.cs" />
+    <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataHeaderWriter.cs" />
+    <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataWriter.cs" />
     <Compile Include="File\BaseExcelFileInfo.cs" />
     <Compile Include="ColumnHeader.cs" />
     <Compile Include="CoreDataCollector.cs" />

@@ -25,7 +25,15 @@ namespace IndicatorsUI.MainUI.Controllers
             var details = ConfigureFingertipsProfileAndPageModelWithProfileDetails(profileKey);
 
             ViewBag.AreaCodes = areaCodeList;
-            ViewBag.PlaceName = place_name;
+
+            ViewBag.PlaceNameToDisplay = place_name;
+
+            if (place_name != null)
+            {
+                // Replace apostrophe followed by s (e.g. Acock's green => Acock green)
+                ViewBag.PlaceName = place_name.ToLower().Replace("'s", " ");
+            }
+            
             ViewBag.SearchType = search_type;
             ViewBag.AreasToIgnoreEverywhere = details.AreasToIgnoreEverywhere;
             PageModel.PageType = PageType.AreaSearchResultsOfProfileWithFrontPage;

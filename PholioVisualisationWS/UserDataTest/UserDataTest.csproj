@@ -96,6 +96,7 @@
     <Compile Include="IndicatorLists\IndicatorListRepositoryTest.cs" />
     <Compile Include="IndicatorLists\IndicatorListProviderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="AreaListRepositoryTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.config">

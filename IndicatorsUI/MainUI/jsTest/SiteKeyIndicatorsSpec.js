@@ -1,26 +1,30 @@
 ﻿
 
-describe('IndicatorFormatter', function () {
+describe('IndicatorFormatter', function() {
 
     NO_DATA = "x";
     ui = null;
     correctForPolarity = null;
 
+    var groupRoot = { PolarityId :
+    1
+};
+
     it('getVal', function () {
 
-        var formatter = new IndicatorFormatter(null, null, null, null);
+        var formatter = new IndicatorFormatter(groupRoot, null, null, null);
         expect(formatter.getVal({ ValF: 1 }, 'ValF')).toBe('1');
     });
 
     it('getVal for null CoreDataSet object', function () {
 
-        var formatter = new IndicatorFormatter(null, null, null, null);
+        var formatter = new IndicatorFormatter(groupRoot, null, null, null);
         expect(formatter.getVal(null, 'ValF')).toBe(NO_DATA);
     });
 
     it('getVal for "-" ValF', function () {
 
-        var formatter = new IndicatorFormatter(null, null, null, null);
+        var formatter = new IndicatorFormatter(groupRoot, null, null, null);
         expect(formatter.getVal({ ValF: '-' }, 'ValF')).toBe(NO_DATA);
     });
 });
@@ -303,21 +307,6 @@ describe('AreaCollection', function () {
     it('findAll', function () {
         expect(new AreaCollection(areas).findAll(['a-code', 'c-code']).length).toBe(2);
     });
-});
-
-describe('ParentMenu', function () {
-
-    it('count', function () {
-
-        var model = { parentCode: 'a', parentTypeId: 1 };
-        var loadedData = { 1: [{ Name: 'A', Code: 'a' }, { Name: 'B', Code: 'b' }] };
-        var menu = new ParentMenu('<select><option/></select>', model, loadedData);
-
-        menu.setOptions();
-
-        expect(menu.count()).toBe(2);
-    });
-
 });
 
 describe('ValueDisplayer', function () {

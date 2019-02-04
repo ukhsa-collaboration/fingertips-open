@@ -26,6 +26,24 @@ namespace PholioVisualisation.ServicesTest
         }
 
         [TestMethod]
+        public void TestGetProfilesPerIndicatorWithAreaTypeId()
+        {
+            byte[] data = EndPointTestHelper.GetData("profiles_containing_indicators?indicator_ids=" +
+                                                     IndicatorIds.DeprivationScoreIMD2010 + "&AreaTypeId=" +
+                                                     AreaTypeIds.GpPractice);
+            TestHelper.IsData(data);
+        }
+
+        [TestMethod]
+        public void TestGetProfilesPerIndicator()
+        {
+            byte[] data = EndPointTestHelper.GetData("profiles_containing_indicators?indicator_ids=" +
+                                                     IndicatorIds.DeprivationScoreIMD2010);
+            TestHelper.IsData(data);
+        }
+
+
+        [TestMethod]
         public void TestGetAreaTypesWithPdfs()
         {
             byte[] data = EndPointTestHelper.GetData("profile/area_types_with_pdfs?" +

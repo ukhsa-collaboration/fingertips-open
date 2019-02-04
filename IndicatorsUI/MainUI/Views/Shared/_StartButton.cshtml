@@ -1,9 +1,11 @@
-﻿@using IndicatorsUI.MainUI.Models
+﻿@using IndicatorsUI.MainUI.Helpers
+@using IndicatorsUI.MainUI.Models
 @model PageModel
 @if (Model.HasAnyData)
 {
     var urlKey = ViewBag.ProfileUrlKey;
     string href;
+
     if (Model.DefaultFingertipsTabId == -1)
     {
         href = string.Format("/profile/{0}/data", urlKey);

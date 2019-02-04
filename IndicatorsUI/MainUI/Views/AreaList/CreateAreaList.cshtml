@@ -1,0 +1,25 @@
+﻿@using System.Web.Optimization
+@model IndicatorsUI.MainUI.Models.AreaList.AreaListViewModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForContentPage")
+    @Styles.Render("~/bundles/css-area-list-edit")
+    @Styles.Render("~/bundles/css-login")
+}
+@Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/js-angular")
+@Html.Partial("_GoogleMaps")
+<div class="title-divider"></div>
+<div id="create-area-list" class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Create new area list</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div id="spinner" class="col-md-12">
+            <img src="/images/spinner.gif" alt="" class="spinner" />
+            <div id="spinnerLabel">loading</div>
+        </div>
+    </div>
+    <ft-arealist-manage id="ft-arealist-manage" user-id="@Model.UserId" action-type="create"></ft-arealist-manage>
+</div>

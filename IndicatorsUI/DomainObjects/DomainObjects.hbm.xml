@@ -18,7 +18,6 @@
     <property name="ExtraJavaScriptFilesString" column="extra_js_files"/>
     <property name="ExtraCssFilesString" column="extra_css_files"/>
     <property name="EnumParentDisplay" column="enum_parent_display"/>
-    <property name="RagColourId" column="key_colour_id"/>
     <property name="AreasToIgnoreForSpineCharts" column="areas_ignored_for_spine_chart"/>
     <property name="AreasToIgnoreEverywhere" column="areas_ignored_everywhere"/>
     <property name="SkinId" column="skin_id"/>
@@ -39,7 +38,6 @@
     <property name="IsChangeFromPreviousPeriodShown" column="is_change_from_previous_period_shown"/>
 
     <many-to-one name="LongerLivesProfileDetails" column="id" lazy="false" not-found="ignore"/>
-    <many-to-one name="SpineChartMinMaxLabel" column="spinechart_minmax_label_id" lazy="false" not-found="ignore"/>
 
   </class>
 
@@ -161,11 +159,17 @@
     <property name="UploadedBy" column="uploadedby"/>
   </class>
 
-
-  <class name="SpineChartMinMaxLabel" table="UI_SpineChartMinMaxLabel">
-    <id name="Id" column="LabelId" type="int" unsaved-value="-1"/>
+  <!-- RelativeUrlRedirect class-->
+  <class name="RelativeUrlRedirect" table="UI_RelativeUrlRedirects">
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="FromUrl" column="from_url"/>
+    <property name="ToUrl" column="to_url"/>
+    <property name="useFingertipsHostnameForAbsolutePath" column="use_fingertips_hostname_for_absolute_path"/>
   </class>
 
+  <!-- ProfileNearestNeighbourAreaTypeMapping class-->
   <class name="ProfileNearestNeighbourAreaTypeMapping" table="ui_profilenearestneighbourareatypemapping">
     <id name="Id" column="id" type="int" unsaved-value="-1">
       <generator class="identity"/>
@@ -175,6 +179,7 @@
     <property name="AreaTypeId" column="areatypeid" />
   </class>
 
+  <!-- NeighbourType class-->
   <class name="NeighbourType" table="l_areacodeneighbourtypes">
     <id name="NeighbourTypeId" column="neighbourtypeid" type="int" unsaved-value="-1">
       <generator class="identity"/>

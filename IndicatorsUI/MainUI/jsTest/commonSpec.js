@@ -224,4 +224,125 @@ describe('getTrendMarkerImage', function () {
 
 });
 
+describe('Posting to web api for csv downloading',  function(){
+    
+    var corews, parameters;
+    beforeEach(function() {
+        corews = 'fakeURL/';
+
+        parameters = new ParameterBuilder()
+        .add('fakeParameterInt', 1)
+        .add('fakeParameterString', 'fakeString')
+        .add('fakeParameterBoolean', true);
+        
+        spyOn( window, 'open' ).and.callFake( function() {
+            return true;
+        });
+    });
+    
+    it ('should create call by window for latest no inequalities data by group ', function (){
+        var expectedUrl = 'fakeurl/api/latest/no_inequalities_data/csv/by_group_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadLatestNoInequalitiesDataCsvFileByGroup(corews, parameters)
+
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+    
+    it ('should create call by window for latest no inequalities data by indicator ', function (){
+        var expectedUrl = 'fakeurl/api/latest/no_inequalities_data/csv/by_indicator_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadLatestNoInequalitiesDataCsvFileByIndicator(corews, parameters)
+        
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+    
+    it ('should create call by window for all periods no inequalities data by indicator ', function (){
+        var expectedUrl = 'fakeurl/api/allperiods/no_inequalities_data/csv/by_indicator_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadAllPeriodsNoInequalitiesDataCsvFileByIndicator(corews, parameters)
+        
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+    
+    it ('should create call by window for all data data by group ', function (){
+        var expectedUrl = 'fakeurl/api/all_data/csv/by_group_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadCsvFileByGroup(corews, parameters)
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+    
+    it ('should create call by window for all data data by group ', function (){
+        var expectedUrl = 'fakeurl/api/all_data/csv/by_indicator_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadCsvFileByIndicator(corews, parameters)
+
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+    
+    it ('should create call by window for latest data with inequalities by indicator ', function (){
+        var expectedUrl = 'fakeurl/api/latest/with_inequalities_data/csv/by_indicator_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadLatestWithInequalitiesDataCsvFileByIndicator(corews, parameters)
+
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+
+    it ('should create call by window for all periods data with inequalities by indicator ', function (){
+        var expectedUrl = 'fakeurl/api/allperiods/with_inequalities_data/csv/by_indicator_id?fakeparameterint=1&fakeparameterstring=fakestring&fakeparameterboolean=true'
+        downloadAllPeriodsWithInequalitiesDataCsvFileByIndicator(corews, parameters)
+
+        expect( window.open ).toHaveBeenCalled();
+        expect( window.open ).toHaveBeenCalledWith( expectedUrl, '_blank' );
+    });
+});
+
+fdescribe('Testing global methods',  function(){
+
+    beforeEach(function() {
+        FT.model.groupRoots=[{IID: 1},{IID: 2},{IID: 3}];
+        FT.model.areaCode = "mainFakeAreaCode";
+        spyOn(jQuery.fn, 'prop').and.callFake(function() { return 0 });
+        spyOn(window, 'getChildAreas').and.returnValue([{Code: "fakeAreaCode"}]);
+    });
+
+    it ('should get indicator id', function (){
+        var resultIid = getIid();
+
+        expect(resultIid).toBe(1);
+    });
+
+    it ('should get areas code displayed', function (){
+        FT.model.isNearestNeighbours = function () { return false; };
+        var resultIid = getAreasCodeDisplayed();
+
+        expect(resultIid.length).toBe(1);
+        expect(resultIid[0]).toBe("fakeAreaCode");
+    });
+
+    it ('should get areas code displayed for nearest neighbours', function (){
+        FT.model.isNearestNeighbours = function () { return true; };
+        var resultIid = getAreasCodeDisplayed();
+
+        expect(resultIid.length).toBe(2);
+        expect(resultIid[0]).toBe("fakeAreaCode");
+        expect(resultIid[1]).toBe("mainFakeAreaCode");
+    });
+
+    it ('should get parent area code', function (){
+        FT.model.parentCode = "fakeParentAreaCode";
+        FT.model.isNearestNeighbours = function () { return false; };
+        var resultIid = getParentAreaCode();
+
+        expect(resultIid).toBe("fakeParentAreaCode");
+    });
+
+    it ('should get England as parent area code', function (){
+        FT.model.parentCode = "fakeParentAreaCode";
+        FT.model.isNearestNeighbours = function () { return true; };
+        var resultIid = getParentAreaCode();
+
+        expect(resultIid).toBe(NATIONAL_CODE);
+    });
+});
+
 

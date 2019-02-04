@@ -30,6 +30,7 @@
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile />
     <TypeScriptToolsVersion>2.0</TypeScriptToolsVersion>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -151,8 +152,10 @@
       <HintPath>..\lib\Svg.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Services.Client" />
     <Reference Include="System.DirectoryServices.AccountManagement" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
@@ -229,6 +232,7 @@
     <Compile Include="App_Start\AutoMapperConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Controllers\AreaListController.cs" />
     <Compile Include="Controllers\UserFeedbackController.cs" />
     <Compile Include="Helpers\AreaSearchHelper.cs" />
     <Compile Include="Helpers\EmailSender.cs" />
@@ -243,11 +247,12 @@
     <Compile Include="Helpers\AjaxUrl.cs" />
     <Compile Include="Helpers\ContentProvider.cs" />
     <Compile Include="Helpers\ExceptionLoggerWrapper.cs" />
+    <Compile Include="Helpers\MeasurementProtocolDownloadFiles.cs" />
+    <Compile Include="Helpers\GoogleAnalyticsEventLogger.cs" />
     <Compile Include="Helpers\NearestNeighbourHelper.cs" />
     <Compile Include="Helpers\PublicIdGenerator.cs" />
     <Compile Include="Helpers\QuartilesLabelHelper.cs" />
     <Compile Include="Helpers\ResponseHelper.cs" />
-    <Compile Include="Helpers\SpineChartMinMaxLabelBuilder.cs" />
     <Compile Include="Controllers\AreaSearchController.cs" />
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -262,6 +267,7 @@
     <Compile Include="Helpers\ContentHelper.cs" />
     <Compile Include="Helpers\RowAssigner.cs" />
     <Compile Include="Helpers\ExceptionLogger.cs" />
+    <Compile Include="Helpers\SsrsFormat.cs" />
     <Compile Include="Helpers\SupportingPage.cs" />
     <Compile Include="Helpers\UrlHelper.cs" />
     <Compile Include="Helpers\UserAccountHelper.cs" />
@@ -283,6 +289,8 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\WebServiceHelper.cs" />
+    <Compile Include="Models\AreaList\AreaListAreaCodeViewModel.cs" />
+    <Compile Include="Models\AreaList\AreaListViewModel.cs" />
     <Compile Include="Models\PageType.cs" />
     <Compile Include="Models\UserAccess\ForgotPasswordViewModel.cs" />
     <Compile Include="Models\UserAccess\LoginViewModel.cs" />
@@ -296,6 +304,7 @@
     <Compile Include="Models\UserList\IndicatorListsViewModel.cs" />
     <Compile Include="Models\UserList\IndicatorListViewModel.cs" />
     <Compile Include="Models\UserList\ViewIndicatorListViewModel.cs" />
+    <Compile Include="Models\VideoLink.cs" />
     <Compile Include="OWIN\Startup.cs" />
     <Compile Include="Models\SearchLabels.cs" />
     <Compile Include="Models\TitleFont.cs" />
@@ -356,6 +365,7 @@
     <Content Include="images\image-video\introduction-fingertips-tool.png" />
     <Content Include="images\image-video\phof-video.png" />
     <Content Include="images\image-video\play_large.png" />
+    <Content Include="images\image-video\wider-determinants-video.png" />
     <Content Include="images\latest-news\suicide-prevention.png" />
     <Content Include="images\map_width.png" />
     <Content Include="images\Mortality\arrow-down.png" />
@@ -479,22 +489,18 @@
     <Content Include="jsTest\jasmine-1.3.1\jasmine.css" />
     <Content Include="jsTest\jasmine-1.3.1\jasmine.js" />
     <Content Include="jsTest\jasmine-jquery.js" />
-    <Content Include="jsTest\LongerLives\Diabetes\PageDiabetesPracticeDetailsSpec.js" />
     <Content Include="jsTest\LongerLives\Diabetes\PageDiabetesRankingsSpec.js" />
     <Content Include="jsTest\LongerLives\Diabetes\SiteDiabetesSpec.js" />
     <Content Include="jsTest\PageAreaTrendsSpec.js" />
-    <Content Include="jsTest\PageDownloadSpec.js" />
     <Content Include="jsTest\PageInequalitiesSpec.js" />
     <Content Include="jsTest\PagePopulationSpec.js" />
     <Content Include="jsTest\PageTartanRugSpec.js" />
     <Content Include="jsTest\SiteKeyIndicatorsSpec.js" />
     <Content Include="jsTest\SiteBaseLongerLivesSpec.js" />
     <Content Include="jsTest\SiteSearchSpec.js" />
-    <Content Include="jsTest\spineChartSpec.js" />
     <Content Include="jsTest\testHelper.js" />
     <Content Include="js\AreaSearch\area-search.js" />
     <Content Include="js\common.js" />
-    <Content Include="js\EnvironmentTest.js" />
     <Content Include="js\fingertipsGlobal.js" />
     <Content Include="js\Indicatorlist\indicator-list-edit.js" />
     <Content Include="js\Indicatorlist\indicator-list-index.js" />
@@ -512,7 +518,6 @@
     <Content Include="js\PageReports.js" />
     <Content Include="js\PageScatterPlot.js" />
     <Content Include="js\PageTwitterFeed.js" />
-    <Content Include="js\LongerLives\Diabetes\PageDiabetesPracticeDetails.js" />
     <Content Include="js\LongerLives\Diabetes\PageDiabetesRankings.js" />
     <Content Include="js\LongerLives\SiteBaseLongerLives.js" />
     <Content Include="js\LongerLives\Diabetes\SiteDiabetes.js" />
@@ -526,17 +531,11 @@
     <Content Include="js\PageDownload.js" />
     <Content Include="js\PageInequalities.js" />
     <Content Include="js\PageMap.js" />
-    <Content Include="js\LongerLives\Mortality\PageMortalityAreaDetails.js" />
-    <Content Include="js\LongerLives\Mortality\PageMortalityHome.js" />
-    <Content Include="js\LongerLives\Mortality\PageMortalityIntervention.js" />
-    <Content Include="js\LongerLives\Mortality\PageMortalityRankings.js" />
     <Content Include="js\PageTartanRug.js" />
     <Content Include="js\pholio-constants.js" />
     <Content Include="js\TooltipRecentTrends.js" />
     <Content Include="js\SiteKeyIndicators.js" />
-    <Content Include="js\LongerLives\Mortality\SiteMortality.js" />
     <Content Include="js\SiteSearch.js" />
-    <Content Include="js\spineChart.js" />
     <Content Include="js\TestPage.js" />
     <Content Include="js\tooltip.js" />
     <Content Include="Views\Search\Data.cshtml" />
@@ -547,18 +546,6 @@
     <None Include=".bin\bower.cmd" />
     <None Include=".bin\git.cmd" />
     <None Include=".bin\node.cmd" />
-    <Content Include="Views\LongerLives\Mortality\_MortalityLayoutPage.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityHome.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityRankings.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityConnect.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityAreaDetails.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventioncancer.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionheart_disease_and_stroke.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionliver_disease.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\MortalityHealthInterventionlung_disease.cshtml" />
-    <Content Include="Views\LongerLives\Mortality\_MortalityDataFilter.cshtml" />
-    <Content Include="Views\LongerLives\_BestWorstNationally.cshtml" />
-    <Content Include="Views\LongerLives\_InterventionHead.cshtml" />
     <Content Include="Views\LongerLives\Error.cshtml" />
     <Content Include="Views\LongerLives\_PhofLink.cshtml" />
     <Content Include="Views\LongerLives\_DeprivationTooltip.cshtml" />
@@ -566,7 +553,6 @@
     <Content Include="Views\LongerLives\PolicyPrivacy.cshtml" />
     <Content Include="Views\LongerLives\PolicyCookies.cshtml" />
     <Content Include="Views\LongerLives\PolicyAccessibility.cshtml" />
-    <Content Include="Views\LongerLives\_CampaignLink.cshtml" />
     <Content Include="Views\Search\_JavaScriptForSearch.cshtml" />
     <Content Include="jsTest\jasmine-1.3.1\MIT.LICENSE" />
     <Content Include="Views\Shared\_AreaTypeMenu.cshtml" />
@@ -583,11 +569,7 @@
     <Content Include="Views\LongerLives\_DiabetesHeader.cshtml" />
     <Content Include="Views\LongerLives\_DiabetesFooter.cshtml" />
     <Content Include="Views\LongerLives\Diabetes\DiabetesRankings.cshtml" />
-    <Content Include="Views\LongerLives\Diabetes\DiabetesPracticeDetails.cshtml" />
-    <Content Include="Views\LongerLives\Diabetes\_DiabetesPracticeDetailsSummary.cshtml" />
     <Content Include="Views\LongerLives\AboutData.cshtml" />
-    <Content Include="Views\LongerLives\AboutProject.cshtml" />
-    <Content Include="Views\LongerLives\Diabetes\DiabetesConnect.cshtml" />
     <Content Include="Views\LongerLives\Diabetes\DiabetesKeyMessages.cshtml" />
     <Content Include="Views\Shared\_SearchNoMatches.cshtml" />
     <Content Include="Views\LongerLives\Diabetes\DiabetesAreaSearchResults.cshtml" />
@@ -632,6 +614,9 @@
     <Content Include="Views\LongerLives\_LegendDetailedQuartiles.cshtml" />
     <Content Include="Views\UserAccount\ForgotPassword.cshtml" />
     <Content Include="Views\IndicatorList\_IndicatorListHeader.cshtml" />
+    <Content Include="Views\AreaList\AreaListIndex.cshtml" />
+    <Content Include="Views\AreaList\CreateAreaList.cshtml" />
+    <Content Include="Views\AreaList\EditAreaList.cshtml" />
     <None Include="Views\Shared\_Banner.cshtml" />
     <Content Include="Views\Shared\_KeyBarChart.cshtml" />
     <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
@@ -660,12 +645,6 @@
     <Content Include="Views\Static\ReportContainer.html" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
@@ -699,9 +678,7 @@
     <Content Include="Views\ProfileCollectionWithFrontPage\ProfileFrontPage.cshtml" />
     <Content Include="Views\Shared\_StartButton.cshtml" />
     <Content Include="Views\Shared\_MenuEmpty.cshtml" />
-    <Content Include="Views\Shared\_MortalityHeader.cshtml" />
     <Content Include="Views\Shared\_Header.cshtml" />
-    <Content Include="Views\Shared\_MortalityFooter.cshtml" />
     <Content Include="Views\Shared\_Breadcrumbs.cshtml" />
     <Content Include="Views\Test\DiabetesRankingsTest.cshtml" />
     <Content Include="Views\Shared\_UpdateDelayedMessage.cshtml" />
@@ -726,6 +703,8 @@
     <Content Include="Views\UserAccount\EmailError.cshtml" />
     <Content Include="Views\UserAccount\_JavaScriptAndCssForUserAccount.cshtml" />
     <Content Include="Views\Shared\_UserFeedback.cshtml" />
+    <Content Include="Views\Shared\_TabbedListHeader.cshtml" />
+    <Content Include="Views\Shared\_VideoLink.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_LayoutPage.cshtml" />

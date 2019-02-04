@@ -55,6 +55,7 @@ namespace PholioVisualisation.ServicesWeb
             {
                 var omitedControllers = new List<string>
                 {
+                    "AreaList",
                     "Content",
                     "Documents",
                     "Home",
@@ -64,7 +65,6 @@ namespace PholioVisualisation.ServicesWeb
                     "Pholio",
                     "StaticReports",
                     "SSRSReport",
-                    "Upload",
                     "UserFeedback"
                 };
 

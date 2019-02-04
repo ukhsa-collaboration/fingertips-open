@@ -34,36 +34,21 @@ namespace IndicatorsUI.MainUISeleniumTest
             GoToUrl("test/" + testPage);
         }
 
-        public void MortalityHome()
+        public void PublicHealthDashboardMap()
         {
-            GoToUrl("topic/mortality");
+            GoToUrl("topic/public-health-dashboard/map-with-data");
             waitFor.GoogleMapToLoad();
         }
 
-        public void MortalityRankings()
+        public void PublicHealthDashboardRankings()
         {
-            GoToUrl("topic/mortality/comparisons");
+            GoToUrl("topic/public-health-dashboard/comparisons");
         }
 
-        public void DiabetesRankings()
+        public void PublicHealthDashboardHome()
         {
-            GoToUrl("topic/diabetes/comparisons");
-        }
-
-        public void DiabetesHome()
-        {
-            GoToUrl("topic/diabetes");
+            GoToUrl("topic/public-health-dashboard");
             waitFor.GoogleMapToLoad();
-        }
-
-        public void DiabetesPracticeDetails(string hashParameters)
-        {
-            GoToUrl("topic/diabetes/practice-details" + hashParameters);
-        }
-
-        public void HypertensionPracticeDetails(string hashParameters)
-        {
-            GoToUrl("topic/hypertension/practice-details" + hashParameters);
         }
 
         public void FingertipsIndicatorSearchResults(string searchText)
@@ -100,6 +85,60 @@ namespace IndicatorsUI.MainUISeleniumTest
             waitFor.FingertipsSpineChartToLoad();
         }
 
+        public void FingertipsTartanRug()
+        {
+            DeveloperTestProfile(TabIds.TartanRug);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsScatterplot()
+        {
+            DeveloperTestProfile(TabIds.ScatterPlot);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsMap()
+        {
+            DeveloperTestProfile(TabIds.Map);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsTrends()
+        {
+            DeveloperTestProfile(TabIds.Trends);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsCompareAreas()
+        {
+            DeveloperTestProfile(TabIds.CompareAreas);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsAreaProfiles()
+        {
+            DeveloperTestProfile(TabIds.AreaProfile);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsPopulation()
+        {
+            DeveloperTestProfile(TabIds.Population);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsInequalities()
+        {
+            DeveloperTestProfile(TabIds.Inequalities);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
+        public void FingertipsEngland()
+        {
+            DeveloperTestProfile(TabIds.England);
+            waitFor.FingertipsAreaTypeToLoad();
+        }
+
         public void GoToUrl(string relativeUrl)
         {
             driver.Navigate().GoToUrl(BaseUrl + relativeUrl);
@@ -108,6 +147,11 @@ namespace IndicatorsUI.MainUISeleniumTest
         private void PhofDataTab(int tabId)
         {
             GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/" + tabId);
+        }
+
+        private void DeveloperTestProfile(int tabId)
+        {
+            GoToUrl("profile/" + ProfileUrlKeys.DeveloperTestProfile + "/data#page/" + tabId);
         }
     }
 }

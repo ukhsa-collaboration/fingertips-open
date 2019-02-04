@@ -28,12 +28,13 @@
             areasToIgnore : '@ViewBag.AreasToIgnoreEverywhere'.split(',')
         };
 
+        state.placeName = state.placeName.replace(/&#39;/g, "'");
+
         // Initialisation
         $(document).ready(function() {
             areaSearchResults.init();
         });
     </script>
-
 }
 <div class="full-width title-divider"></div>
 <div class="standard-width clearfix">
@@ -46,7 +47,7 @@
         </ul>
    </div>
 
-    <h2>Profiles for @ViewBag.PlaceName</h2>
+    <h2>Profiles for @ViewBag.PlaceNameToDisplay</h2>
 
     <div id="area-results-box" class="standard-width clearfix">
         <p id="no-data-message" style="display: none;">No data is available for this area</p>

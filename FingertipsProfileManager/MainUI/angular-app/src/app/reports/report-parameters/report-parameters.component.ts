@@ -1,5 +1,6 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import * as _ from 'underscore';
+import { FormGroup, FormControl } from '@angular/forms';
 
 
 @Component({
@@ -15,17 +16,22 @@ export class ReportParametersComponent implements OnInit {
   @Input() selectedParameters: string[] = [];
   @Output() getParameters: EventEmitter<string[]> = new EventEmitter<string[]>();
 
+  parametersForm: FormGroup;
 
   constructor() {
+    this.parametersForm = new FormGroup({
+      parameterControl: new FormControl(null)
+    });
   }
 
   ngOnInit() {
   }
 
-  addParameter() {    
+  addParameter() {
 
-    
-    if (!_.contains(this.selectedParameters,this.selectedParameter) && this.selectedParameter) {
+    this.selectedParameter = this.parametersForm.get('parameterControl').value;
+
+    if (!_.contains(this.selectedParameters, this.selectedParameter) && this.selectedParameter) {
       this.selectedParameters.push(this.selectedParameter);
       this.getParameters.emit(this.selectedParameters);
     }

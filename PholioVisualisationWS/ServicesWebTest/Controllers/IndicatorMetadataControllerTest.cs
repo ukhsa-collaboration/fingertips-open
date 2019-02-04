@@ -67,5 +67,12 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
             Assert.IsNotNull(indicatorIdToMetadata);
             Assert.IsTrue(indicatorIdToMetadata.Count > 0);
         }
+
+        [TestMethod]
+        public void Test_Get_Indicator_Names_By_GroupId()
+        {
+            var response = new IndicatorMetadataController().GetIndicatorNamesByGroupId(GroupIds.Phof_WiderDeterminantsOfHealth.ToString());
+            Assert.IsNotNull(response);
+        }
     }
 }

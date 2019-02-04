@@ -20,7 +20,7 @@ namespace PholioVisualisation.DataConstructionTest
                 SexId = SexIds.Persons,
                 IndicatorId = IndicatorIds.PatientsThatWouldRecommendPractice,
                 GroupId = 2000002,
-                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIs
+                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel
             };
 
             PracticeAreaValuesBuilder builder = new PracticeAreaValuesBuilder(ReaderFactory.GetGroupDataReader())

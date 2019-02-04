@@ -10,7 +10,7 @@ import {
 } from '../../typings/FT.d';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import * as _ from 'underscore';
-declare var $: JQueryStatic;
+declare let $: JQueryStatic;
 
 @Component({
   selector: 'ft-map-table',

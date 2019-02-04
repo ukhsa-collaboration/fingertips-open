@@ -32,8 +32,8 @@ app.config(function ($routeProvider, $httpProvider) {
 app.factory("uploadService", function ($http) {
     var url = "/upload/";
     return {
-        getJobs: function (userId) {
-            return $http.get(url + "progress/" + userId);
+        getJobs: function (userId, displayCount) {
+            return $http.get(url + "progress/" + userId + "/" + displayCount);
         },
         getJobSummary: function (guid) {
             return $http.get(url + "summary/" + guid);
@@ -66,7 +66,7 @@ app.controller("uploadCtrl", function ($scope, $window) {
     // Check if the file Ext is csv or excel
     var isFileTypeAllowed = function (filePath) {
         var isAllowed = true;
-        if (filePath.length > 0) {
+        if (filePath.length >= 0) {
             var ext = filePath.substring(filePath.lastIndexOf(".") + 1).toLowerCase();
             if (ext !== "xlsx" && ext !== "xls" && ext !== "csv") {
                 isAllowed = false;
@@ -75,10 +75,10 @@ app.controller("uploadCtrl", function ($scope, $window) {
         return isAllowed;
     };
 
-
     // Upload batch file
     $scope.batchFileSelected = function (event) {
         uploadFilter(this.value);
+        addTextToInput("uploadingFileName",getInputFileName("batch-excel-file"));
     };
 
     // Make the UI changes according to upload file type
@@ -136,6 +136,9 @@ app.controller("uploadCtrl", function ($scope, $window) {
         $('.upload-batch').removeClass("selected unselected");
     };
 
+    $scope.hideBatchUploadFormElements = function () {
+        $scope.fileReadyForUpload = false;
+    };
 });
 
 function getRowClass(job) {
@@ -166,6 +169,7 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
 
     $scope.loading = true;
     $scope.nofiles = false;
+    $scope.displayCount = 30;
     $scope.selectedUserId = currentUser.Id;
     $scope.isCurrentUserAdmin = isUserAdmin;
 
@@ -181,7 +185,7 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
     var getJobs = function () {
 
         var userId = _.isUndefined($scope.selectedUserId) ? currentUser.Id : $scope.selectedUserId;
-        uploadService.getJobs(userId).success(function (data) {
+        uploadService.getJobs(userId, $scope.displayCount).success(function (data) {
 
             if ($scope.progress !== data) {
                 $scope.loading = false;
@@ -288,11 +292,17 @@ app.controller("progressCtrl", function ($scope, uploadService, $interval, $wind
         getJobs();
 
     }
+
+    $scope.updateDisplayCount = function() {
+        $scope.displayCount += 30;
+    }
 });
 
 app.controller("queueCtrl",
     function ($scope, uploadService, $interval, $window) {
         selectTab(3);
+
+        $scope.isCurrentUserAdmin = currentUser.IsAdministrator;
         $scope.loading = true;
         $scope.getRowClass = getRowClass;
 
@@ -313,6 +323,14 @@ app.controller("queueCtrl",
                 getQueue();
             }
         }, 2000);
+
+        $scope.setJobToUnexpectedError = function(job) {
+            console.log(job);
+            uploadService.updateJobStatus(job.Guid, 500).success(function (data) {
+            }).error(function () {
+                // do nothing
+            });
+        }
     });
 
 // Angular doesn't support onChange event  for
@@ -356,3 +374,11 @@ function uploadBatch() {
     $(".upload-batch").addClass("selected").removeClass("unselected");
     $("#upload-batch-browse-control").removeClass("hidden");
 }
+
+function getInputFileName(inputId) {
+    return $("#"+inputId).val().replace(/C:\\fakepath\\/i, '');
+};
+
+function addTextToInput(inputId, text) {
+    $("#"+inputId).val(text);
+};

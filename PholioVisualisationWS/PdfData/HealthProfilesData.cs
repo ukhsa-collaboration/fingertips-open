@@ -38,14 +38,6 @@ namespace PholioVisualisation.PdfData
         public LocalAndEnglandChartData EarlyDeathCvd { get; set; }
         public LocalAndEnglandChartData EarlyDeathCancer { get; set; }
 
-        public CoreDataSet EmergencyAdmissionsLocal { get; set; }
-        public CoreDataSet EmergencyAdmissionsEngland { get; set; }
-
-        public Dictionary<string, CoreDataSet> EmergencyAdmissionsLocalByEthnicity { get; set; }
-        public Dictionary<string, CoreDataSet> EmergencyAdmissionsEnglandByEthnicity { get; set; }
-
-        public string DependencyRatio { get; set; }
-
         public string PercentageEthnicMinoritesMale { get; set; }
         public string PercentageEthnicMinoritesFemale { get; set; }
         public string PercentageEthnicMinoritesCombined { get; set; }

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2"
+                   assembly="Fpm.ProfileData"
+                   namespace="Fpm.ProfileData.Entities.MonthlyRelease">
+
+  <!--Job class -->
+  <class name="MonthlyRelease" table="monthlyrelease">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="ReleaseDate" column="releasedate"/>
+
+  </class>
+</hibernate-mapping>

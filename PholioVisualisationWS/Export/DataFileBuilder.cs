@@ -16,7 +16,7 @@ namespace PholioVisualisation.Export
         private ExportAreaHelper _areaHelper;
         private IndicatorMetadataProvider _indicatorMetadataProvider;
         private IAreasReader _areasReader;
-        private IFileBuilder _fileBuilder;
+        private IFileBuilder<byte[]> _fileBuilder;
 
         private IndicatorComparer _comparer;
         private IndicatorExportParameters _parameters;
@@ -26,7 +26,7 @@ namespace PholioVisualisation.Export
         private LookUpManager _lookUpManager;
 
         public DataFileBuilder(IndicatorMetadataProvider indicatorMetadataProvider, ExportAreaHelper areaHelper,
-            IAreasReader areasReader, IFileBuilder fileBuilder)
+            IAreasReader areasReader, IFileBuilder<byte[]> fileBuilder)
         {
             _indicatorMetadataProvider = indicatorMetadataProvider;
             _areaHelper = areaHelper;
@@ -73,7 +73,7 @@ namespace PholioVisualisation.Export
 
                 // Find the grouping with the latest data
                 var grouping = singleGroupingProvider.GetGroupingWithLatestDataPoint(groupIds,
-                    indicatorId, childAreaTypeId);
+                    indicatorId, childAreaTypeId, _parameters.ProfileId);
 
                 // Ignore the indicator if no grouping found
                 if (grouping == null) continue;
@@ -81,14 +81,14 @@ namespace PholioVisualisation.Export
                 // Lazy initialisation (would not be necessary if cached files are available)
                 _areaHelper.Init();
 
-                InitFileWriter(grouping, fileWriter);
+                var indicatorMetadata = _indicatorMetadataProvider.GetIndicatorMetadata(
+                    new List<Grouping> { grouping }, indicatorMetadataTextOption).First();
+
+                InitFileWriter(grouping, indicatorMetadata, fileWriter);
                 InitComparer(grouping);
 
                 // Category comparers (e.g. quintiles)
                 var categoryComparer = _comparer as ICategoryComparer;
-
-                var indicatorMetadata = _indicatorMetadataProvider.GetIndicatorMetadata(
-                    new List<Grouping> { grouping }, indicatorMetadataTextOption).First();
 
                 var timePeriodFormatter = new TimePeriodTextFormatter(indicatorMetadata);
                 var timePeriods = grouping.GetTimePeriodIterator(indicatorMetadata.YearType).TimePeriods;
@@ -141,7 +141,7 @@ namespace PholioVisualisation.Export
                             }
 
                             // Write England data
-                            fileWriter.WriteData(indicatorMetadata, coreData, timeString, null, trendMarkerResult,
+                            fileWriter.WriteData(coreData, timeString, null, trendMarkerResult,
                                 toEnglandSignificance, Significance.None, sortableTimePeriod);
                         }
                         coreDataCollector.AddEnglandDataList(englandCoreDatas);
@@ -171,7 +171,7 @@ namespace PholioVisualisation.Export
                                     coreData.YearRange, trendDataList);
                             }
 
-                            fileWriter.WriteData(indicatorMetadata, coreData, timeString, england, trendMarkerResult,
+                            fileWriter.WriteData(coreData, timeString, england, trendMarkerResult,
                                 toEnglandSignificance, Significance.None, sortableTimePeriod);
                         }
                         coreDataCollector.AddParentDataList(parentCoreDatas);
@@ -253,8 +253,7 @@ namespace PholioVisualisation.Export
                                     coreData.YearRange, trendDataList);
                             }
 
-                            fileWriter.WriteData(indicatorMetadata, coreData, timeString,
-                                parentArea, trendMarkerResult,
+                            fileWriter.WriteData(coreData, timeString, parentArea, trendMarkerResult,
                                 toEnglandSignificance, toSubnationalParentSignificance, sortableTimePeriod);
                         }
                         coreDataCollector.AddChildDataList(childCoreDatas);
@@ -296,11 +295,11 @@ namespace PholioVisualisation.Export
             }
         }
 
-        private void InitFileWriter(Grouping grouping, SingleIndicatorFileWriter fileWriter)
+        private void InitFileWriter(Grouping grouping, IndicatorMetadata indicatorMetadata, SingleIndicatorFileWriter fileWriter)
         {
             var trendMarkerLabelProvider = new TrendMarkerLabelProvider(grouping.PolarityId);
             var significanceFormatter = new SignificanceFormatter(grouping.PolarityId, grouping.ComparatorMethodId);
-            fileWriter.Init(LookUpManager, trendMarkerLabelProvider, significanceFormatter);
+            fileWriter.Init(LookUpManager, trendMarkerLabelProvider, significanceFormatter, indicatorMetadata);
         }
 
         /// <summary>
@@ -374,9 +373,10 @@ namespace PholioVisualisation.Export
                 "Count", "Denominator",
                 "Value note", "Recent Trend",
                 "Compared to England value or percentiles",
-                "Compared to subnational parent value or percentiles",
+                GetComparedToSubnationalParentHeading(),
                 "Time period Sortable",
-                "New data"
+                "New data",
+                "Compared to goal"
             };
 
             csvWriter.AddHeader(headings.ToArray());
@@ -384,5 +384,14 @@ namespace PholioVisualisation.Export
             return bytes;
         }
 
+        private string GetComparedToSubnationalParentHeading()
+        {
+            var areaType = AreaTypeFactory.New(_areasReader, _parameters.ParentAreaTypeId);
+
+            var heading = areaType.Id == AreaTypeIds.Country
+                     ? "Compared to percentiles"
+                     : "Compared to " + areaType.ShortName + " value or percentiles";
+            return heading;
+        }
     }
 }

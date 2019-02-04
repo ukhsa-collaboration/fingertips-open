@@ -48,3 +48,9 @@ thead tr th:first-child,
 tbody tr td:first-child {
     width: 40em;
 }
+
+.indicator-list-name {
+    border: 1px solid;
+    padding: 10px;
+    width: 300px;
+}

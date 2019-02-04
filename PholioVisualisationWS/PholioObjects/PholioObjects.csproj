@@ -60,10 +60,12 @@
     <Compile Include="Age.cs" />
     <Compile Include="Area.cs" />
     <Compile Include="AreaAddress.cs" />
+    <Compile Include="AreaCodeAreaListMapping.cs" />
     <Compile Include="AreaCodeNeighbourMapping.cs" />
     <Compile Include="AreaCodeNhsMapping.cs" />
     <Compile Include="AreaHierarchy.cs" />
     <Compile Include="AreaLink.cs" />
+    <Compile Include="AreaListAreaType.cs" />
     <Compile Include="AreaRank.cs" />
     <Compile Include="AreaType.cs" />
     <Compile Include="AreaTypeComponent.cs" />
@@ -84,6 +86,7 @@
     <Compile Include="CoreDataDeleteAudit.cs" />
     <Compile Include="FpmUser.cs" />
     <Compile Include="GroupingData.cs" />
+    <Compile Include="GroupingSubheading.cs" />
     <Compile Include="GroupRootSummary.cs" />
     <Compile Include="IArea.cs" />
     <Compile Include="IAreaType.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="IndicatorDateChange.cs" />
     <Compile Include="IndicatorMetadataSearchExpectations.cs" />
     <Compile Include="IndicatorMetadataTextValue.cs" />
+    <Compile Include="DomainIndicatorName.cs" />
     <Compile Include="InequalitiesTrendOption.cs" />
     <Compile Include="InequalitiesTrendPoint.cs" />
     <Compile Include="InequalitiesTrendRoot.cs" />

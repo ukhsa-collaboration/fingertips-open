@@ -128,6 +128,7 @@
     <Compile Include="Entities\Core\Area.cs" />
     <Compile Include="Entities\LookUps\AreaTypeComponent.cs" />
     <Compile Include="Entities\LookUps\Skin.cs" />
+    <Compile Include="Entities\MonthlyRelease\MonthlyRelease.cs" />
     <Compile Include="Entities\Profile\Category.cs" />
     <Compile Include="Entities\LookUps\CategoryType.cs" />
     <Compile Include="Entities\LookUps\Comparator.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Entities\LookUps\Unit.cs" />
     <Compile Include="Entities\LookUps\YearType.cs" />
     <Compile Include="Entities\Profile\DisclosureControl.cs" />
+    <Compile Include="Entities\Profile\GroupingSubheading.cs" />
     <Compile Include="Entities\Profile\Indicator.cs" />
     <Compile Include="Entities\Report\Report.cs" />
     <Compile Include="Entities\Report\ReportsProfileMapping.cs" />
@@ -169,6 +171,7 @@
     <Compile Include="Repositories\CoreDataRepository.cs" />
     <Compile Include="Repositories\IRepositoryBase.cs" />
     <Compile Include="NHibernateSessionFactory.cs" />
+    <Compile Include="Repositories\MonthlyReleaseRepository.cs" />
     <Compile Include="Repositories\ProfileRepository.cs" />
     <Compile Include="Repositories\ReportRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
@@ -250,6 +253,7 @@
     <Content Include="Client Scripts\MvcFoolproofJQueryValidation.min.js" />
     <Content Include="Client Scripts\MvcFoolproofValidation.js" />
     <Content Include="Client Scripts\MvcFoolproofValidation.min.js" />
+    <EmbeddedResource Include="Entities\MonthlyRelease\monthlyrelease.hbm.xml" />
     <EmbeddedResource Include="Entities\UserFeedback\userfeedback.hbm.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.Analysis;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.AnalysisTest
@@ -48,6 +49,44 @@ namespace PholioVisualisation.AnalysisTest
             comparer.SetDataForCategories(DataList1To10());
             Assert.AreEqual(1, comparer.GetCategory(new CoreDataSet { Value = 1 }));
             Assert.AreEqual(5, comparer.GetCategory(new CoreDataSet { Value = 10 }));
+        }
+
+        [TestMethod]
+        public void Test_GetCategoriesRagHighIsGood()
+        {
+            var comparer = (QuintilesComparer)new IndicatorComparerFactory { PholioReader = ReaderFactory.GetPholioReader() }.New(
+                new Grouping
+                {
+                    ComparatorMethodId = ComparatorMethodIds.Quintiles,
+                    PolarityId = PolarityIds.RagHighIsGood
+                });
+
+            comparer.SetDataForCategories(DataList1To10());
+
+            Assert.AreEqual(5, comparer.GetCategory(new CoreDataSet { Value = 1 }));
+            Assert.AreEqual(4, comparer.GetCategory(new CoreDataSet { Value = 3 }));
+            Assert.AreEqual(3, comparer.GetCategory(new CoreDataSet { Value = 5 }));
+            Assert.AreEqual(2, comparer.GetCategory(new CoreDataSet { Value = 7 }));
+            Assert.AreEqual(1, comparer.GetCategory(new CoreDataSet { Value = 9 }));
+        }
+
+        [TestMethod]
+        public void Test_GetCategoriesRagLowIsGood()
+        {
+            var comparer = (QuintilesComparer)new IndicatorComparerFactory { PholioReader = ReaderFactory.GetPholioReader() }.New(
+                new Grouping
+                {
+                    ComparatorMethodId = ComparatorMethodIds.Quintiles,
+                    PolarityId = PolarityIds.RagLowIsGood
+                });
+
+            comparer.SetDataForCategories(DataList1To10());
+
+            Assert.AreEqual(1, comparer.GetCategory(new CoreDataSet { Value = 1 }));
+            Assert.AreEqual(2, comparer.GetCategory(new CoreDataSet { Value = 3 }));
+            Assert.AreEqual(3, comparer.GetCategory(new CoreDataSet { Value = 5 }));
+            Assert.AreEqual(4, comparer.GetCategory(new CoreDataSet { Value = 7 }));
+            Assert.AreEqual(5, comparer.GetCategory(new CoreDataSet { Value = 9 }));
         }
 
         [TestMethod]

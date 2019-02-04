@@ -2,12 +2,13 @@ import { Component, HostListener } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import {
   FTModel, FTRoot, GroupRoot, IndicatorMetadata, CoreDataSetInfo,
-  TrendMarkerResult, TrendMarker, TooltipManager
+  GroupingSubheading, TrendMarkerResult, TrendMarker, TooltipManager
 } from '../typings/FT.d';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
-import { TooltipHelper } from '../shared/shared';
+import { TooltipHelper, ParameterBuilder, AreaCodes } from '../shared/shared';
 import { IndicatorService } from '../shared/service/api/indicator.service';
 import { DatePipe } from '@angular/common';
+import { LegendType, KeyType } from 'app/shared/component/legend/legend.component';
 
 @Component({
   selector: 'ft-england',
@@ -16,9 +17,13 @@ import { DatePipe } from '@angular/common';
 })
 export class EnglandComponent {
 
-  public isChangeFromPreviousPeriodShown: boolean = false;
+  keyType: KeyType = KeyType.None;
+  legendType: LegendType = LegendType.None;
+  showRecentTrends: Boolean = true;
+
+  public isChangeFromPreviousPeriodShown = false;
   public rows: Array<EnglandRow>;
-  public hasRecentTrends: boolean = false;
+  public hasRecentTrends = false;
   private tooltip: TooltipHelper;
 
   constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) { }
@@ -27,54 +32,97 @@ export class EnglandComponent {
   public onOutsideEvent(event) {
 
     let ftHelper = this.ftHelperService;
-    let model = ftHelper.getFTModel();
-    let groupRootsObservable = this.indicatorService.getLatestDataForAllIndicatorsInProfileGroupForChildAreas(model.groupId, model.areaTypeId, model.parentCode, model.profileId);
-    let metadataObservable = this.indicatorService.getIndicatorMetadata(model.groupId);
 
-    Observable.forkJoin([groupRootsObservable, metadataObservable]).subscribe(results => {
-      let groupRoots: GroupRoot[] = results[0];
-      let metadataHash: Map<number, IndicatorMetadata> = results[1];
+    this.setConfig();
+    this.tooltip = new TooltipHelper(this.ftHelperService.newTooltipManager());
 
-      this.setConfig();
-      this.tooltip = new TooltipHelper(this.ftHelperService.newTooltipManager());
+    let groupingSubheadings = ftHelper.getGroupingSubheadings();
+    let metadataHash = ftHelper.getMetadataHash();
+    let groupRoots = ftHelper.getAllGroupRoots();
 
-      this.rows = [];
-      for (let rootIndex in groupRoots) {
-        let root = groupRoots[rootIndex];
-        let indicatorId = root.IID;
-        let metadata: IndicatorMetadata = metadataHash[indicatorId];
-        let unit = !!metadata ? metadata.Unit : null;
+    this.rows = [];
+    for (let rootIndex in groupRoots) {
+      let root = groupRoots[rootIndex];
+      let indicatorId = root.IID;
+      let metadata: IndicatorMetadata = metadataHash[indicatorId];
+      let unit = !!metadata ? metadata.Unit : null;
 
-        let row: EnglandRow = new EnglandRow();
-        this.rows.push(row)
-        row.rootIndex = rootIndex;
-        row.period = root.Grouping[0].Period;
-        row.indicatorName = metadata.Descriptive['Name'] + ftHelper.getSexAndAgeLabel(root);
-        row.hasNewData = root.DateChanges && root.DateChanges.HasDataChangedRecently;
+      let subheadings = groupingSubheadings.filter(x => x.Sequence === root.Sequence);
+      if (subheadings !== undefined) {
+        subheadings.forEach(subheading => {
+          let row: EnglandRow = new EnglandRow();
+          this.rows.push(row);
 
-        // Data
-        let englandData = ftHelper.getNationalComparatorGrouping(root).ComparatorData;
-        let dataInfo = ftHelper.newCoreDataSetInfo(englandData);
-        row.value = ftHelper.newValueDisplayer(unit).byDataInfo(dataInfo);
-        row.count = ftHelper.formatCount(dataInfo);
-        row.hasValueNote = dataInfo.isNote();
-        row.noteId = englandData.NoteId;
-
-        // Recent trend
-        if (!!root.RecentTrends) {
-          this.setUpRecentTrendOnRow(row, root, englandData.AreaCode, dataInfo);
-        }
+          row.indicatorName = subheading.Subheading;
+          row.isSubheading = true;
+        });
       }
 
-      ftHelper.showAndHidePageElements();
-      ftHelper.unlock();
-    });
+      let row: EnglandRow = new EnglandRow();
+      this.rows.push(row);
+
+      row.rootIndex = rootIndex;
+      row.period = root.Grouping[0].Period;
+      row.indicatorName = metadata.Descriptive['Name'] + ftHelper.getSexAndAgeLabel(root);
+      row.hasNewData = root.DateChanges && root.DateChanges.HasDataChangedRecently;
+
+      // Data
+      let englandData = ftHelper.getNationalComparatorGrouping(root).ComparatorData;
+      let dataInfo = ftHelper.newCoreDataSetInfo(englandData);
+      row.value = ftHelper.newValueDisplayer(unit).byDataInfo(dataInfo);
+      row.count = ftHelper.formatCount(dataInfo);
+      row.hasValueNote = dataInfo.isNote();
+      row.noteId = englandData.NoteId;
+
+      // Recent trend
+      if (!!root.RecentTrends) {
+        this.setUpRecentTrendOnRow(row, root, englandData.AreaCode, dataInfo);
+      }
+
+      row.isSubheading = false;
+    }
+
+    ftHelper.showAndHidePageElements();
+    ftHelper.unlock();
+
+    // Enable tooltip
+    setTimeout(() => {
+      (<any>$('[data-toggle="tooltip"]')).tooltip();
+    }, 0);
+  }
+
+  public showValueNoteTooltip(event: MouseEvent, row: EnglandRow) {
+    if (row.hasValueNote) {
+      let tooltipProvider = this.ftHelperService.newValueNoteTooltipProvider();
+      this.tooltip.displayHtml(event, tooltipProvider.getHtmlFromNoteId(row.noteId));
+    }
+  }
+
+  public showRecentTrendTooltip(event: MouseEvent, row: EnglandRow) {
+    let tooltipProvider = this.ftHelperService.newRecentTrendsTooltip();
+    this.tooltip.displayHtml(event, tooltipProvider.getTooltipByData(row.recentTrend));
+  }
+
+  public positionTooltip(event: MouseEvent) {
+    this.tooltip.reposition(event);
+  }
+
+  public recentTrendClicked(row: EnglandRow) {
+    this.ftHelperService.recentTrendSelected().byGroupRoot(row.rootIndex)
+  }
+
+  public hideTooltip() {
+    this.tooltip.hide();
+  }
+
+  public indicatorNameClicked(row: EnglandRow) {
+    this.ftHelperService.goToMetadataPage(row.rootIndex);
   }
 
   private setUpRecentTrendOnRow(row: EnglandRow, root: GroupRoot, areaCode: string, dataInfo: CoreDataSetInfo) {
 
     let ftHelper = this.ftHelperService;
-    var polarityId = root.PolarityId;
+    let polarityId = root.PolarityId;
 
     if (dataInfo.isValue() && root.RecentTrends[areaCode]) {
       ''
@@ -91,36 +139,8 @@ export class EnglandComponent {
     }
   }
 
-  private hideTooltip() {
-    this.tooltip.hide();
-  }
-
-  private indicatorNameClicked(row: EnglandRow) {
-    this.ftHelperService.goToMetadataPage(row.rootIndex);
-  }
-
-  private showValueNoteTooltip(event: MouseEvent, row: EnglandRow) {
-    if (row.hasValueNote) {
-      var tooltipProvider = this.ftHelperService.newValueNoteTooltipProvider();
-      this.tooltip.displayHtml(event, tooltipProvider.getHtmlFromNoteId(row.noteId));
-    }
-  }
-
-  private showRecentTrendTooltip(event: MouseEvent, row: EnglandRow) {
-    var tooltipProvider = this.ftHelperService.newRecentTrendsTooltip();
-    this.tooltip.displayHtml(event, tooltipProvider.getTooltipByData(row.recentTrend));
-  }
-
-  private positionTooltip(event: MouseEvent) {
-    this.tooltip.reposition(event);
-  }
-
-  private recentTrendClicked(row: EnglandRow) {
-    this.ftHelperService.recentTrendSelected().byGroupRoot(row.rootIndex)
-  }
-
   private setConfig() {
-    var config = this.ftHelperService.getFTConfig();
+    let config = this.ftHelperService.getFTConfig();
     this.hasRecentTrends = config.hasRecentTrends;
     this.isChangeFromPreviousPeriodShown = config.isChangeFromPreviousPeriodShown;
   }
@@ -146,6 +166,22 @@ export class EnglandComponent {
     // Log event for analytics
     this.ftHelperService.logEvent('ExportImage', 'England');
   }
+
+  onExportCsvFileClick(event: MouseEvent) {
+    event.preventDefault();
+
+    var urls = this.ftHelperService.getURL();
+    var model = this.ftHelperService.getFTModel();
+
+    var parameters = new ParameterBuilder()
+    .add('parent_area_type_id', model.parentTypeId)
+    .add('child_area_type_id', model.areaTypeId)
+    .add('group_id', model.groupId)
+    .add('areas_code', AreaCodes.England);
+  
+    var url = urls.corews + 'api/latest/no_inequalities_data/csv/by_group_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+  }
 }
 
 class EnglandRow {
@@ -161,4 +197,5 @@ class EnglandRow {
   recentTrendHtml: string;
   /** Change from the previous time point */
   changeFromPreviousHtml: string;
+  isSubheading: boolean;
 }

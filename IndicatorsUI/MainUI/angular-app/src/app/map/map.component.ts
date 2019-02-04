@@ -1,53 +1,40 @@
 import {
   Component,
-  OnInit,
   HostListener,
-  ViewChild,
-  ChangeDetectorRef,
-  ChangeDetectionStrategy,
-  AfterViewInit,
-  Inject
-} from "@angular/core";
-import { FTHelperService } from "../shared/service/helper/ftHelper.service";
-import { IndicatorService } from "../shared/service/api/indicator.service";
-import { CoreDataHelperService } from "../shared/service/helper/coreDataHelper.service";
-import { AreaService } from "../shared/service/api/area.service";
-import { MapChartComponent } from "../map/map-chart/map-chart.component";
-import { MapTableComponent } from "../map/map-table/map-table.component";
-import { LegendDisplay } from "../map/map-legend/map-legend.component";
-
+  ChangeDetectorRef
+} from '@angular/core';
+import { FTHelperService } from '../shared/service/helper/ftHelper.service';
+import { IndicatorService } from '../shared/service/api/indicator.service';
+import { CoreDataHelperService } from '../shared/service/helper/coreDataHelper.service';
+import { AreaService } from '../shared/service/api/area.service';
 import {
   Colour,
-  AreaCodes,
   AreaTypeIds,
-  CategoryTypeIds,
   ProfileIds,
   ComparatorMethodIds,
-  PolarityIds
-} from "../shared/shared";
+  PolarityIds,
+  ComparatorIds
+} from '../shared/shared';
 import {
   FTModel,
   FTRoot,
   Area,
   GroupRoot,
   CoreDataSet,
-  CoreDataHelper,
-  Unit,
-  IndicatorMetadataHash,
   IndicatorMetadata,
   ComparisonConfig,
   ParentAreaType
-} from "../typings/FT.d";
-import * as _ from "underscore";
-import { PracticeSearchComponent } from "app/map/practice-search/practice-search.component";
+} from '../typings/FT.d';
+import * as _ from 'underscore';
+import { PageType } from 'app/shared/component/legend/legend.component';
 
 @Component({
-  selector: "ft-map",
-  templateUrl: "./map.component.html",
-  styleUrls: ["./map.component.css"]
+  selector: 'ft-map',
+  templateUrl: './map.component.html',
+  styleUrls: ['./map.component.css']
 })
 export class MapComponent {
-  isInitialised: boolean = false;
+  isInitialised = false;
   map: google.maps.Map;
   areaTypeId: number = null;
   coreDataSet: CoreDataSet;
@@ -56,8 +43,15 @@ export class MapComponent {
   counter: number;
 
   // Legend display flags
-  legendDisplay: number = LegendDisplay.NoLegendRequired;
-  showAdhocKey: boolean = false;
+  pageType = PageType.Map;
+  showRAG3 = false;
+  showRAG5 = false;
+  showBOB = false;
+  showQuartiles = false;
+  showQuintilesRAG = false;
+  showQuintilesBOB = false;
+  showContinuous = false;
+  showAdhocKey = false;
 
   selectedAreaList: Array<string> = new Array<string>();
   areaCodeSignificance: Map<string, number> = new Map();
@@ -65,15 +59,18 @@ export class MapComponent {
   comparisonConfig: ComparisonConfig;
   areaCodeColour: Map<string, string> = new Map();
   areaCodeColourValue: Map<string, MapColourData> = new Map();
-  refreshColour: number = 0;
-  htmlAdhocKey: string = "";
-  IsPracticeAreaType: boolean = false;
-  isBoundaryNotSupported: boolean = false;
-  mapColourSelectedValue: string = "benchmark";
+  refreshColour = 0;
+  htmlAdhocKey = '';
+  IsPracticeAreaType = false;
+  isBoundaryNotSupported = false;
+  mapColourSelectedValue = 'benchmark';
   updateMap: boolean;
   searchMode: boolean;
   searchModeNoDisplay: boolean;
   profileId: number;
+  ftModel: FTModel;
+  comparatorId: number;
+  benchmarkIndex: number;
 
   constructor(
     private ftHelperService: FTHelperService,
@@ -82,12 +79,13 @@ export class MapComponent {
     private ref: ChangeDetectorRef,
     private areaService: AreaService
   ) {
-    this.profileId = this.ftHelperService.getFTModel().profileId;
+    this.ftModel = this.ftHelperService.getFTModel();
+    this.profileId = this.ftModel.profileId;
   }
 
-  @HostListener("window:MapEnvReady-Event", [
-    "$event",
-    "$event.detail.searchMode"
+  @HostListener('window:MapSelected', [
+    '$event',
+    '$event.detail.searchMode'
   ])
 
   public onOutsideEvent(event, searchMode) {
@@ -102,13 +100,13 @@ export class MapComponent {
         // Practice profiles search
         this.searchMode = true;
       } else {
-        //HOW can get here???
+        // HOW can get here???
         this.searchModeNoDisplay = true;
       }
       newAreaTypeId = AreaTypeIds.Practice;
     } else {
       // Not in search mode
-      newAreaTypeId = this.ftHelperService.getFTModel().areaTypeId;
+      newAreaTypeId = this.ftModel.areaTypeId;
     }
 
     this.areaService.getParentAreas(this.profileId).subscribe((result: any) => {
@@ -163,17 +161,19 @@ export class MapComponent {
     } else {
       // Get data for all other area types
       const currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-      const currentComparator: Area = this.ftHelperService.getCurrentComparator();
-      const ftModel: FTModel = this.ftHelperService.getFTModel();
-      const comparatorId = this.ftHelperService.getComparatorId();
+
+      let currentComparator: Area;
+      currentComparator = this.ftHelperService.getCurrentComparator();
+      this.comparatorId = this.ftHelperService.getComparatorId();
+      this.benchmarkIndex = this.comparatorId;
 
       this.indicatorService
         .getSingleIndicatorForAllArea(
           currentGrpRoot.Grouping[0].GroupId,
-          ftModel.areaTypeId,
+          this.ftModel.areaTypeId,
           currentComparator.Code,
-          ftModel.profileId,
-          comparatorId,
+          this.ftModel.profileId,
+          this.comparatorId,
           currentGrpRoot.IID,
           currentGrpRoot.Sex.Id,
           currentGrpRoot.Age.Id
@@ -210,11 +210,11 @@ export class MapComponent {
     });
     areaOrder
       .sort(
-        (leftside, righside): number => {
-          if (leftside.Val < righside.Val) {
+        (leftside, rightside): number => {
+          if (leftside.Val < rightside.Val) {
             return -1;
           }
-          if (leftside.Val > righside.Val) {
+          if (leftside.Val > rightside.Val) {
             return 1;
           }
           return 0;
@@ -223,7 +223,7 @@ export class MapComponent {
       .reverse();
     let numAreas = 0;
     $.each(areaOrder, function (i, coreData) {
-      if (coreData.ValF !== "-") {
+      if (coreData.ValF !== '-') {
         numAreas++;
       }
     });
@@ -231,8 +231,8 @@ export class MapComponent {
     let sortedCoreData = this.sortedCoreData;
     let localAreaCodeColourValue: Map<string, MapColourData> = new Map();
     $.each(areaOrder, function (i, coreData) {
-      var data = sortedCoreData[coreData.AreaCode];
-      if (coreData.ValF === "-") {
+      let data = sortedCoreData[coreData.AreaCode];
+      if (coreData.ValF === '-') {
         let colourData: MapColourData = new MapColourData();
         colourData.order = -1;
         colourData.orderFrac = -1;
@@ -263,7 +263,6 @@ export class MapComponent {
     );
     if (this.comparisonConfig) {
       if (this.comparisonConfig.useTarget) {
-        this.legendDisplay = LegendDisplay.NoLegendRequired;
         let targetLegend = this.ftHelperService.getTargetLegendHtml(
           this.comparisonConfig,
           indicatorMetadata
@@ -271,7 +270,7 @@ export class MapComponent {
         this.htmlAdhocKey =
           '<div><table class="key-table" style="width: 85%;height:50px;"><tr><td class="key-text">Benchmarked against goal:</td><td class="key-spacer"></td><td>' +
           targetLegend +
-          "</td></tr></table></div>";
+          '</td></tr></table></div>';
         this.showAdhocKey = true;
       } else {
         this.showAdhocKey = false;
@@ -283,15 +282,21 @@ export class MapComponent {
   onMapInit(mapInfo: { map: google.maps.Map }) {
     this.map = mapInfo.map;
   }
+
   onhoverAreaCodeChangedMap(eventDetail: { areaCode: string }) {
     this.currentAreaCode = eventDetail.areaCode;
     this.ref.detectChanges();
   }
-  onSelectedAreaCodeChanged(eventDetail: { areaCode: string }) { }
+
+  onSelectedAreaCodeChanged(eventDetail: { areaCode: string }) {
+
+  }
+
   onhoverAreaCodeChangedChart(eventDetail: { areaCode: string }) {
     this.currentAreaCode = eventDetail.areaCode;
     this.ref.detectChanges();
   }
+
   onhoverAreaCodeChangedData(eventDetail: { areaCode: string }) {
     this.currentAreaCode = eventDetail.areaCode;
     this.ref.detectChanges();
@@ -315,27 +320,60 @@ export class MapComponent {
     this.ref.detectChanges();
   }
 
+  OnBenchMarkIndexChanged(eventDetail: { benchmarkIndex: number }) {
+    this.benchmarkIndex = eventDetail.benchmarkIndex;
+
+    if (this.benchmarkIndex === ComparatorIds.National) {
+      this.ftHelperService.setComparatorId(this.benchmarkIndex);
+    } else {
+      this.loadData();
+    }
+
+    this.ref.detectChanges();
+  }
+
+  resetLegends() {
+    this.showRAG3 = false;
+    this.showRAG5 = false;
+    this.showBOB = false;
+    this.showQuartiles = false;
+    this.showQuintilesRAG = false;
+    this.showQuintilesBOB = false;
+    this.showContinuous = false;
+  }
+
   onMapColourBoxChange(selectedColour): void {
+    // Reset legend flags
+    this.resetLegends();
+
     switch (selectedColour) {
-      case "quartile": {
-        this.legendDisplay = LegendDisplay.Quartiles;
+      case 'quartile': {
+        this.showQuartiles = true;
         this.showAdhocKey = false;
         this.getQuartileColorData();
         break;
       }
-      case "quintile": {
-        this.legendDisplay = LegendDisplay.Quintiles;
+      case 'quintile': {
+        let root = this.ftHelperService.getCurrentGroupRoot();
+
+        if (root.PolarityId === PolarityIds.NotApplicable) {
+          this.showQuintilesBOB = true;
+        } else {
+          this.showQuintilesRAG = true;
+        }
+
         this.showAdhocKey = false;
-        this.getQuintileColorData();
+
+        this.getQuintileColorData(root);
         break;
       }
-      case "continuous": {
-        this.legendDisplay = LegendDisplay.Continuous;
+      case 'continuous': {
+        this.showContinuous = true;
         this.showAdhocKey = false;
         this.getContinuousColorData();
         break;
       }
-      case "benchmark": {
+      case 'benchmark': {
         let root = this.ftHelperService.getCurrentGroupRoot();
         this.setBenchmarkLegendDisplay(root);
         this.showHideAdHocKey();
@@ -351,26 +389,41 @@ export class MapComponent {
   }
 
   setBenchmarkLegendDisplay(root: GroupRoot) {
-    if (root.ComparatorMethodId === ComparatorMethodIds.Quintiles) {
-      this.legendDisplay = LegendDisplay.Quintiles;
-    } else {
-      this.setLegendDisplayByPolarity(root.PolarityId);
+    switch (root.ComparatorMethodId) {
+      case ComparatorMethodIds.Quintiles:
+        if (root.PolarityId === PolarityIds.NotApplicable) {
+          // Quintile BOB
+          this.showQuintilesBOB = true;
+        } else {
+          // Quintile RAG
+          this.showQuintilesRAG = true;
+        }
+        break;
+      case ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel:
+        this.showRAG3 = true;
+        break;
+      case ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels:
+        this.showRAG5 = true;
+        break;
+      default:
+        this.setLegendDisplayByPolarity(root.PolarityId);
+        break;
     }
   }
 
   setLegendDisplayByPolarity(polarityId): void {
     switch (polarityId) {
       case PolarityIds.BlueOrangeBlue:
-        this.legendDisplay = LegendDisplay.BOB;
+        this.showBOB = true;
         break;
       case PolarityIds.RAGHighIsGood:
-        this.legendDisplay = LegendDisplay.RAG;
+        this.showRAG3 = true;
         break;
       case PolarityIds.RAGLowIsGood:
-        this.legendDisplay = LegendDisplay.RAG;
+        this.showRAG3 = true;
         break;
       default:
-        this.legendDisplay = LegendDisplay.NotCompared;
+        break;
     }
   }
 
@@ -419,8 +472,10 @@ export class MapComponent {
 
       localAreaCodeColour.set(key, colour);
     });
+
     this.areaCodeColour = localAreaCodeColour;
   }
+
   getContinuousColorData(): void {
     let localAreaCodeColour: Map<string, string> = new Map();
     for (let key of Array.from(this.areaCodeColourValue.keys())) {
@@ -430,15 +485,17 @@ export class MapComponent {
     }
     this.areaCodeColour = localAreaCodeColour;
   }
-  getQuintileColorData(): void {
+
+  getQuintileColorData(root: GroupRoot): void {
     let localAreaCodeColour: Map<string, string> = new Map();
     for (let key of Array.from(this.areaCodeColourValue.keys())) {
       let value: MapColourData = this.areaCodeColourValue.get(key);
-      let colour = Colour.getColorForQuintile(value.quintile);
+      let colour = Colour.getColorForQuintile(value.quintile, root.PolarityId);
       localAreaCodeColour.set(key, colour);
     }
     this.areaCodeColour = localAreaCodeColour;
   }
+
   getQuartileColorData(): void {
     let localAreaCodeColour: Map<string, string> = new Map();
     for (let key of Array.from(this.areaCodeColourValue.keys())) {

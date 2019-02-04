@@ -116,6 +116,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets an indicator list
+        /// </summary>
+        /// <param name="id">Indicator list ID</param>
         [HttpGet]
         [Route("indicator-list")]
         public object GetIndicatorList(string id)

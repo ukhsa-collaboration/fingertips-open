@@ -52,6 +52,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="NeighbourType.cs" />
     <Compile Include="ProfileNearestNeighbourAreaTypeMapping.cs" />
+    <Compile Include="RelativeUrlRedirect.cs" />
     <Compile Include="ResetPasswordTracker.cs" />
     <Compile Include="SkinProfileCollection.cs" />
     <Compile Include="ProfileCollection.cs" />
@@ -63,7 +64,6 @@
     <Compile Include="ProfileCollectionItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Skin.cs" />
-    <Compile Include="SpineChartMinMaxLabel.cs" />
     <Compile Include="Tweet.cs" />
     <Compile Include="TwitterAccountSetting.cs" />
   </ItemGroup>

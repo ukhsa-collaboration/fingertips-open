@@ -19,7 +19,7 @@ namespace Fpm.ProfileDataTest.Respositories
         [TestMethod]
         public void TestGetJobsForCurrentUser()
         {
-            var jobs = _uploadJobRepository.GetJobsForCurrentUser(FpmUserIds.Doris);
+            var jobs = _uploadJobRepository.GetJobsForCurrentUser(FpmUserIds.Doris, 30);
             Assert.IsTrue(jobs.ToList().Any());
         }
 

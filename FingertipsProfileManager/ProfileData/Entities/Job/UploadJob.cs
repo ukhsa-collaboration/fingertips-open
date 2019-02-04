@@ -37,5 +37,6 @@ namespace Fpm.ProfileData.Entities.Job
         public int TotalSmallNumberWarnings { get; set; }
         public bool IsSmallNumberOverrideApplied { get; set; }
         public bool IsDuplicateOverrideApplied { get; set; }
+        public bool IsConfirmationRequiredToOverrideDatabaseDuplicates { get; set; }
     }
 }

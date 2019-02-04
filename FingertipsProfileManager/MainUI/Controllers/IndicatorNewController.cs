@@ -29,7 +29,8 @@ namespace Fpm.MainUI.Controllers
         public ActionResult IndicatorNew()
         {
             // Get text properties of selected indicator
-            var properties = _reader.GetIndicatorMetadataTextProperties();
+            var properties = _reader.GetIndicatorMetadataTextProperties()
+                .OrderBy(x => x.DisplayOrder).ToList();
 
             var userId = _reader.GetUserByUserName(UserDetails.CurrentUser().Name).Id;
             var permissionIds = _reader.GetUserGroupPermissionsByUserId(userId).Select(x => x.ProfileId);

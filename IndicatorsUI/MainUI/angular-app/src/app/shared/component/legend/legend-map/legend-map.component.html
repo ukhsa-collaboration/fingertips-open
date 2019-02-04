@@ -1,0 +1,148 @@
+<div class="row" *ngIf="showTartanLegends">
+    <div class="col-md-12">
+        <div class="compared-with-text">
+            <i>Compared with benchmark:</i>
+        </div>
+        <div class="map-legend-box" *ngIf="showRAG5">
+            <div class="tartan-legend-box better-99">
+                Better 99.8%
+            </div>
+            <div class="tartan-legend-box better-95">
+                Better 95%
+            </div>
+            <div class="tartan-legend-box similar">
+                Similar
+            </div>
+            <div class="tartan-legend-box worse-95">
+                Worse 95%
+            </div>
+            <div class="tartan-legend-box worse-99">
+                Worse 99.8%
+            </div>
+        </div>
+        <div class="map-legend-box" *ngIf="showRAG3">
+            <div class="tartan-legend-box better-95">
+                Better
+            </div>
+            <div class="tartan-legend-box similar">
+                Similar
+            </div>
+            <div class="tartan-legend-box worse-95">
+                Worse
+            </div>
+        </div>
+        <div class="map-legend-box left-margin" *ngIf="showBOB">
+            <div class="tartan-legend-box bob-lower">
+                Lower
+            </div>
+            <div class="tartan-legend-box bob-similar">
+                Similar
+            </div>
+            <div class="tartan-legend-box bob-higher">
+                Higher
+            </div>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box not-compared">
+                Not Compared
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="showQuartiles">
+    <div class="col-md-12">
+        <div class="compared-with-text">
+            <i>Quartiles:</i>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box quartiles-low">
+                Low
+            </div>
+            <div class="tartan-legend-box quartiles-medium-1">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box quartiles-medium-2">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box quartiles-high">
+                High
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="showQuintilesRAG">
+    <div class="col-md-12">
+        <div class="compared-with-text">
+            <i>Quintiles:</i>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box rag-quintiles-1">
+                Best
+            </div>
+            <div class="tartan-legend-box rag-quintiles-2">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box rag-quintiles-3">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box rag-quintiles-4">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box rag-quintiles-5">
+                Worst
+            </div>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box not-compared">
+                Not applicable
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="showQuintilesBOB">
+    <div class="col-md-12">
+        <div class="compared-with-text">
+            <i>Quintiles:</i>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box bob-quintiles-1">
+                Low
+            </div>
+            <div class="tartan-legend-box bob-quintiles-2">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box bob-quintiles-3">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box bob-quintiles-4">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box bob-quintiles-5">
+                High
+            </div>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box not-compared">
+                Not applicable
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row" *ngIf="showContinuous">
+    <div class="col-md-12">
+        <div class="compared-with-text">
+            <i>Continuous:</i>
+        </div>
+        <div class="map-legend-box left-margin">
+            <div class="tartan-legend-box continuous-lowest">
+                Lowest
+            </div>
+            <div class="tartan-legend-box continuous-range">
+                &nbsp;
+            </div>
+            <div class="tartan-legend-box continuous-highest">
+                Highest
+            </div>
+        </div>
+    </div>
+</div>

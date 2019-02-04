@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Lucene.Net.Analysis;
+﻿using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.SearchIndexing
 {
@@ -10,11 +9,11 @@ namespace PholioVisualisation.SearchIndexing
     /// </summary>
     public class SynonymFilter : TokenFilter
     {
-        private Queue<string> splittedQueue = new Queue<string>();
+        private readonly Queue<string> _splittedQueue = new Queue<string>();
         private readonly TermAttribute _termAttr;
         private readonly PositionIncrementAttribute _posAttr;
-        private State _currentState;
-        private IList<IList<string>> _synonymLists;
+        private State CurrentState { get; set; }
+        private readonly IList<IList<string>> _synonymLists;
 
         public SynonymFilter(TokenStream input)
             : base(input)
@@ -26,10 +25,10 @@ namespace PholioVisualisation.SearchIndexing
 
         public override bool IncrementToken()
         {
-            if (splittedQueue.Count > 0)
+            if (_splittedQueue.Count > 0)
             {
-                string splitted = splittedQueue.Dequeue();
-                RestoreState(_currentState);
+                string splitted = _splittedQueue.Dequeue();
+                RestoreState(CurrentState);
                 _termAttr.SetTermBuffer(splitted);
                 _posAttr.SetPositionIncrement(0);
                 return true;
@@ -50,7 +49,7 @@ namespace PholioVisualisation.SearchIndexing
             {
                 if (!currentTerm.Equals(syn))
                 {
-                    splittedQueue.Enqueue(syn);
+                    _splittedQueue.Enqueue(syn);
                 }
             }
 

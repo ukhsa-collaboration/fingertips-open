@@ -1,4 +1,4 @@
-﻿<div ng-controller="queueCtrl" class="container">
+﻿<div ng-controller="queueCtrl" class="col-md-12">
     <div ng-show="loading" class="text-center">
         <br />
         <br />
@@ -26,6 +26,9 @@
                 <th>
                     File
                 </th>
+                <th ng-show="isCurrentUserAdmin">
+                    Admin
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -34,6 +37,10 @@
                 <td>{{job.Username}}</td>
                 <td>{{job.StatusText}}</td>
                 <td>{{job.Filename}}</td>
+                <td ng-show="isCurrentUserAdmin">
+                    <small>{{job.Guid}}</small>
+                    <button ng-show="job.Status === 200" class="btn btn-danger" ng-click="setJobToUnexpectedError(job)">Set as failed job</button>
+                </td>
             </tr>
         </tbody>
     </table>

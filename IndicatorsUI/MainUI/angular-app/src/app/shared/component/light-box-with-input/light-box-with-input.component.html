@@ -1,0 +1,23 @@
+<div class="light-box" *ngIf="showLightBox" (click)="cancel()">
+</div>
+<div class="info-box" *ngIf="showLightBox" [style.height]="this.lightBoxWithInputConfig.Height + 'px'">
+  <h2>{{this.lightBoxWithInputConfig.Title}}</h2>
+  <div class="info-text" [innerHtml]="this.lightBoxWithInputConfig.Html"></div>
+  <div class="info-text-box">
+    <input type="text" id="info-box-text-input" [value]="this.lightBoxWithInputConfig.InputText" class="info-box-text-input">
+  </div>
+  <div class="error-message" [innerHtml]="this.errorMessage">
+    &nbsp;
+  </div>
+
+  <div *ngIf="isInfoBoxOkCancel" class="control-buttons-container">
+    <button class="btn btn-primary active ok" (click)="confirm()">OK</button>
+    <button class="btn btn-link active" (click)="cancel()">Cancel</button>
+  </div>
+
+  <div *ngIf="isInfoBoxOk">
+    <button class="btn btn-primary active ok" (click)="confirm()">OK</button>
+  </div>
+
+  <div class="close" (click)="cancel()"></div>
+</div>

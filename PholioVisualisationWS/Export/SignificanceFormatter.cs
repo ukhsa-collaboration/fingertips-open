@@ -18,7 +18,7 @@ namespace PholioVisualisation.Export
             // Comparator method first because it overrides polarity if quintiles
             if (_comparatorMethodId == ComparatorMethodIds.Quintiles)
             {
-                switch ((int)significance)
+                switch ((int) significance)
                 {
                     case 1:
                         return "Lowest quintile";
@@ -40,7 +40,7 @@ namespace PholioVisualisation.Export
                     case Significance.Worse:
                         return "Lower";
                     case Significance.Same:
-                        return "Same";
+                        return "Similar";
                     case Significance.Better:
                         return "Higher";
                 }
@@ -53,12 +53,27 @@ namespace PholioVisualisation.Export
                     case Significance.Worse:
                         return "Worse";
                     case Significance.Same:
-                        return "Same";
+                        return "Similar";
                     case Significance.Better:
                         return "Better";
                 }
             }
 
+            return "Not compared";
+        }
+
+        public string GetTargetLabel(Significance significance)
+        {
+            switch (significance)
+            {
+                case Significance.Worse:
+                    return "Red";
+                case Significance.Same:
+                    return "Amber";
+                case Significance.Better:
+                    return "Green";
+            }
+            
             return "Not compared";
         }
     }

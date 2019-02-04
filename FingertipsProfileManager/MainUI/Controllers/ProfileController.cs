@@ -302,13 +302,12 @@ namespace Fpm.MainUI.Controllers
             profile.ContactUserId = profileViewModel.ContactUserId;
             profile.DefaultFingertipsTabId = profileViewModel.DefaultFingertipsTabId;
             profile.SpineChartMinMaxLabelId = profileViewModel.SpineChartMinMaxLabelId;
-            profile.KeyColourId = profileViewModel.KeyColourId;
             profile.StartZeroYAxis = profileViewModel.StartZeroYAxis;
             profile.ShowDataQuality = profileViewModel.ShowDataQuality;
             profile.HasTrendMarkers = profileViewModel.HasTrendMarkers;
             profile.UseTargetBenchmarkByDefault = profileViewModel.UseTargetBenchmarkByDefault;
             profile.IsChangeFromPreviousPeriodShown = profileViewModel.IsChangeFromPreviousPeriodShown;
-            profile.NewDataTimeSpanInDays = profileViewModel.NewDataTimeSpanInDays;
+            profile.NewDataDeploymentCount = profileViewModel.NewDataDeploymentCount;
 
             SetExtraJsFiles(profileViewModel, profile);
             SetFrontPageAreaSearchAreaTypes(profileViewModel, profile);
@@ -337,6 +336,14 @@ namespace Fpm.MainUI.Controllers
                 .ToList();
             // Only return the required properties 
             var result = profiles.Select(x => new { x.Id, x.Name });
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [Route("profile/all-profiles")]
+        public ActionResult GetAllProfiles()
+        {
+            var result = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -516,11 +523,10 @@ namespace Fpm.MainUI.Controllers
             ViewBag.DefaultFingertipsTabId = new SelectList(GetListOfFingertipsTabs(), "Value", "Text");
             ViewBag.ContactUserId = GetFpmUserList();
             ViewBag.SpineChartMinMaxLabelId = new SelectList(_reader.GetSpineChartMinMaxLabelOptions(), "Id", "Description");
-            ViewBag.KeyColourId = new SelectList(_lookUpsRepository.GetKeyColours(), "Id", "Description");
             ViewBag.FrontPageAreaSearchAreaTypes = new FrontPageAreaSearchOptions().GetOptions(
                 viewModel.FrontPageAreaSearchAreaTypes);
-            ViewBag.NewDataTimeSpanInDays = new NewDataTimeSpanInDaysOptions()
-                .GetOptions(viewModel.NewDataTimeSpanInDays.ToString());
+            ViewBag.NewDataDeploymentCount = new NewDataDeploymentCount()
+                .GetOptions(viewModel.NewDataDeploymentCount.ToString());
 
             // To maintain profile between pages
             ViewBag.ProfileId = profileId;

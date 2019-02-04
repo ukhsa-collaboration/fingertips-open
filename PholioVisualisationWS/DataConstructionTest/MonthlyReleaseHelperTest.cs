@@ -7,7 +7,7 @@ namespace PholioVisualisation.DataConstructionTest
     [TestClass]
     public class MonthlyReleaseHelperTest
     {
-        private MonthlyReleaseHelper _helper;
+        private IMonthlyReleaseHelper _helper;
 
         [TestInitialize]
         public void Initialize()
@@ -16,10 +16,17 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void TestGetLatestReleaseDate()
+        public void Test_Get_Release_Date()
         {
-            var latestRelaseDate = _helper.GetFollowingReleaseDate(new DateTime(2018, 3, 1));
-            Assert.AreEqual(latestRelaseDate, new DateTime(2018, 3, 6));
+            var releaseDate = _helper.GetReleaseDate(3);
+            Assert.IsNotNull(releaseDate);
+
+        }
+
+        [TestMethod]
+        public void Test_Are_More_Release_Dates()
+        {
+            var latestRelaseDate = _helper.GetFollowingReleaseDate(DateTime.Now);
         }
     }
 }

@@ -14,11 +14,17 @@ namespace PholioVisualisation.DataAccessTest.Repositories
             _repository = new MonthlyReleaseRepository();
         }
 
-
         [TestMethod]
         public void TestGetReleaseDatas()
         {
             var dates = _repository.GetReleaseDates();
+            Assert.IsNotNull(dates);
+        }
+
+        [TestMethod]
+        public void TestGetPastReleaseDates()
+        {
+            var dates = _repository.GetPastReleaseDates();
             Assert.IsNotNull(dates);
         }
     }

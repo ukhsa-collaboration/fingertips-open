@@ -16,12 +16,12 @@
 
         public bool IsItemFirstOfRow
         {
-            get { return (indexOfCurrentItem%columnCount) == 0; }
+            get { return (indexOfCurrentItem % columnCount) == 0; }
         }
 
         public bool IsItemLastOfRow
         {
-            get { return (indexOfCurrentItem%columnCount) == columnCount - 1; }
+            get { return (indexOfCurrentItem % columnCount) == columnCount - 1; }
         }
 
         public void ItemAdded()

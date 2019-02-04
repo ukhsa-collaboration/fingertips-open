@@ -43,7 +43,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorId = IndicatorIds.HIVLateDiagnosis, // an indicator with a target
                 GroupId = GroupIds.SexualAndReproductiveHealth,
                 ComparatorId = ComparatorIds.England,
-                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIs,
+                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
                 AreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2011
@@ -72,12 +72,12 @@ namespace PholioVisualisation.DataConstructionTest
         {
             Grouping grouping = new Grouping
             {
-                AgeId = AgeIds.Under75,
+                AgeId = AgeIds.AllAges,
                 SexId = SexIds.Persons,
-                IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                GroupId = GroupIds.LongerLives,
+                IndicatorId = IndicatorIds.IncidenceOfTB,
+                GroupId = GroupIds.Phof_HealthProtection,
                 ComparatorId = ComparatorIds.England,
-                ComparatorMethodId = (int) ComparatorMethodIds.SingleOverlappingCIs,
+                ComparatorMethodId = (int) ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2010
@@ -93,9 +93,9 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.Under75,
                 SexId = SexIds.Persons,
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                GroupId = GroupIds.LongerLives,
+                GroupId = GroupIds.Phof_HealthcarePrematureMortality,
                 ComparatorId = ComparatorIds.Subnational,
-                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIs,
+                ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 YearRange = 3,
                 DataPointYear = 2010
@@ -125,7 +125,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.Under75,
                 SexId = SexIds.Persons,
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                GroupId = GroupIds.LongerLives,
+                GroupId = GroupIds.Phof_HealthcarePrematureMortality,
                 ComparatorId = ComparatorIds.Subnational,
                 ComparatorMethodId = ComparatorMethodIds.Quintiles,
                 AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,

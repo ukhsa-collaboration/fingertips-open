@@ -1,5 +1,6 @@
 ﻿@using Fpm.MainUI
 @using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
 @using Fpm.ProfileData.Entities.Profile
 @model IList<IndicatorMetadataTextProperty>
 @{
@@ -87,14 +88,16 @@
                 <tr>
                     @if (textProperty.IsMandatory)
                     {
-                        <td class="property-heading mandatory-label">
-                            * @textProperty.DisplayName
-                        </td>
+                    <td class="property-heading mandatory-label">
+                        * @textProperty.DisplayName
+                        @Html.Partial("_IndicatorMetadataComments", textProperty)
+                    </td>
                     }
                     else
                     {
                         <td class="property-heading">
                             @textProperty.DisplayName
+                            @Html.Partial("_IndicatorMetadataComments", textProperty)
                         </td>
                     }
                     <td>
@@ -220,7 +223,7 @@
             <label class="associated-detail-label">
                 Comparator Methods
             </label>
-            @Html.DropDownList("selectedComparatorMethod", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected" })
+            @Html.DropDownList("selectedComparatorMethod", null, "Please select...", new { @class = "create-indicator-dropdown dropdown-not-selected", onchange = "dropdownChanged_IndicatorNew(this)" })
         </div>
         <div>
             <label class="associated-detail-label">

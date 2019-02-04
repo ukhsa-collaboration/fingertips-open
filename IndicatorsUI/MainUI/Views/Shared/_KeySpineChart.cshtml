@@ -1,50 +1,58 @@
 ﻿@model IndicatorsUI.MainUI.Models.PageModel
-<div class="key-container" id="key-spine-chart" style="display: none;">
-    <table id="spine-table" class="key-table @(Model.DisplayBothKeyColorings ? "" : "key-one-triplet")" cellspacing="0">
-        <tr>
-            <td class="key-text key-label"></td>
-            @if (Model.DisplayRagKey)
-            {
-                <td class="key-spacer"></td>
-                <td class='key-spine'>
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_green_mini.png" alt="" />
-                    Better
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" />
-                    Similar
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_red_mini.png" alt="" />
-                    Worse
-                </td>
-            }
-            @if (Model.DisplayBlueKey)
-            {
-                <td class="key-spacer"></td>
-                <td class="key-spine">
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_darkblue_mini.png"
-                         alt="" />
-                    Lower
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" />
-                    Similar
-                    <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt="" />
-                    Higher
-                </td>
-            }
-
-            <td class='key-spine'>
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt="" />
-                Not Compared
-            </td>
-
-            @*Show quintile legend*@
-            <td class="key-spacer"></td>
-            <td id="quintile-key" class='key-spine quintile-key' colspan="5">
+<div id="key-spine-chart" class="key-container" style="display: none;">
+    <div id="spine-rag-and-bob-section" class="row">
+        <div class="col-md-12">
+            <div class="spine-compared-with-text">
+                <i>Compared with benchmark:</i>
+            </div>
+            <div id="spine-chart-legend-rag-5" class="spine-chart-legend-outer-box">
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_dark_green_mini.png" alt="" /> Better 99.8%
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_green_mini.png" alt="" /> Better 95%
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" /> Similar
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_red_mini.png" alt="" /> Worse 95%
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_dark_red_mini.png" alt="" /> Worse 99.8%
+            </div>
+            <div id="spine-chart-legend-rag-3" class="spine-chart-legend-outer-box">
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_green_mini.png" alt="" /> Better
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" /> Similar
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_red_mini.png" alt="" /> Worse
+            </div>
+            <div id="spine-chart-legend-bob" class="spine-chart-legend-outer-box">
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_darkblue_mini.png" alt="" /> Lower
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_orange_mini.png" alt="" /> Similar
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_lightblue_mini.png" alt="" /> Higher
+            </div>
+            <div id="spine-chart-legend-not-compared" class="spine-chart-legend-outer-box">
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt="" /> Not compared
+            </div>
+        </div>
+    </div>
+    <div id="spine-quintile-key-table" class="row">
+        <div class="col-md-12">
+            <span class="spine-compared-with-text">
+                <i>Quintiles:</i>
+            </span>
+            <div id="spine-quintile-rag" class="spine-chart-legend-outer-box">
+                Best
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_rag_quintile1_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_rag_quintile2_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_rag_quintile3_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_rag_quintile4_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_rag_quintile5_mini.png" alt="" />&nbsp;
+                Worst
+            </div>
+            <div id="spine-quintile-bob" class="spine-chart-legend-outer-box">
                 Low
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile1_mini.png" alt="" />&nbsp;
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile2_mini.png" alt="" />&nbsp;
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile3_mini.png" alt="" />&nbsp;
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile4_mini.png" alt="" />&nbsp;
-                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_quintile5_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_bob_quintile1_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_bob_quintile2_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_bob_quintile3_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_bob_quintile4_mini.png" alt="" />&nbsp;
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_bob_quintile5_mini.png" alt="" />&nbsp;
                 High
-            </td>
-        </tr>
-    </table>
+            </div>
+            <div class="spine-chart-legend-outer-box">
+                <img class="key-circle" src="@(ViewBag.ImagesUrl)circle_white_mini.png" alt="" /> Not applicable
+            </div>
+        </div>
+    </div>
 </div>

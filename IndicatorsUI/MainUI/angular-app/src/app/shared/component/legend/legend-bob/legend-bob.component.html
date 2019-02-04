@@ -1,0 +1,41 @@
+<div *ngIf="showBob">
+  <table class="key-table" cellspacing="0">
+    <tr>
+      <td class="key-text key-label">Compared with benchmark</td>
+      <td class="key-spacer"></td>
+      <td class="bobLower key">
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/bobLower.png" alt="">
+          <div class="tartan-text">
+            Lower
+          </div>
+        </div>
+      </td>
+      <td class="same key">
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/same.png" alt="">
+          <div class="tartan-text">
+            Similar
+          </div>
+        </div>
+      </td>
+      <td class="bobHigher key">
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/bobHigher.png" alt="">
+          <div class="tartan-text">
+            Higher
+          </div>
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table id="not-compared" class="key-table" cellspacing="0" *ngIf="showBenchmark">
+    <tr>
+      <td id="map-key-part2" class="none key key-box-right" style="display: table-cell;">
+        <div class="tartan-box key-box">
+          Not compared
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

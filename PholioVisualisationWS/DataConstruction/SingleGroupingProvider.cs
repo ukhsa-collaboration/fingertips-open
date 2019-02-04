@@ -13,6 +13,11 @@ namespace PholioVisualisation.DataConstruction
         private GroupIdProvider groupIdProvider;
 
         /// <summary>
+        /// Where a particular profile is not specified then use the commmonest polarity for an indicator
+        /// </summary>
+        private bool useCommonestPolarity = true;
+
+        /// <summary>
         /// Parameterless constructor for mocking
         /// </summary>
         public SingleGroupingProvider()
@@ -29,6 +34,7 @@ namespace PholioVisualisation.DataConstruction
         public virtual Grouping GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int groupId,
             int areaTypeId, int indicatorId, int sexId, int ageId)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = GetGroupIds(groupId, profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
         }
@@ -36,6 +42,7 @@ namespace PholioVisualisation.DataConstruction
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId,
             GroupingDifferentiator groupingDifferentiator)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGrouping(groupIds, areaTypeId, groupingDifferentiator.IndicatorId, groupingDifferentiator.SexId, groupingDifferentiator.AgeId);
         }
@@ -43,17 +50,20 @@ namespace PholioVisualisation.DataConstruction
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int profileId, int areaTypeId,
             int indicatorId, int sexId, int ageId)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGrouping(groupIds, areaTypeId, indicatorId, sexId, ageId);
         }
 
         public virtual Grouping GetGroupingByGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int groupId, int areaTypeId, int indicatorId, int sexId, int ageId)
         {
+            useCommonestPolarity = false;
             return GetGrouping(new List<int> { groupId }, areaTypeId, indicatorId, sexId, ageId);
         }
 
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexId(int profileId, int areaTypeId, int indicatorId, int sexId)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingBySexId(groupIds, areaTypeId, indicatorId, sexId);
         }
@@ -61,13 +71,15 @@ namespace PholioVisualisation.DataConstruction
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndAgeId(
             int profileId, int areaTypeId, int indicatorId, int ageId)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = groupIdProvider.GetGroupIds(profileId);
             return GetGroupingByAgeId(groupIds, areaTypeId, indicatorId, ageId);
         }
 
         public virtual Grouping GetGroupingWithLatestDataPoint(
-            IList<int> groupIds, int indicatorId, int childAreaTypeId)
+            IList<int> groupIds, int indicatorId, int childAreaTypeId, int profileId)
         {
+            SetWhetherToUseCommonestPolarity(profileId);
             var groupings = groupDataReader
                 .GetGroupingsByGroupIdsAndIndicatorIds(groupIds, new List<int> { indicatorId })
                 .Where(x => x.AreaTypeId == childAreaTypeId)
@@ -145,7 +157,7 @@ namespace PholioVisualisation.DataConstruction
             return null;
         }
 
-        private static Grouping ReduceGroupings(IList<Grouping> groupings)
+        private Grouping ReduceGroupings(IList<Grouping> groupings)
         {
             if (groupings.Any() == false) return null;
 
@@ -154,8 +166,11 @@ namespace PholioVisualisation.DataConstruction
             var grouping = sortedGroupings.First();
 
             // Use most common polarity for consistency
-            var polarityId = groupingSorter.GetMostCommonPolarityId();
-            grouping.PolarityId = polarityId;
+            if (useCommonestPolarity)
+            {
+                var polarityId = groupDataReader.GetCommonestPolarityForIndicator(grouping.IndicatorId);
+                grouping.PolarityId = polarityId;
+            }
 
             return grouping;
         }
@@ -167,6 +182,11 @@ namespace PholioVisualisation.DataConstruction
                 return groupIdProvider.GetGroupIds(profileIdToSelectGroupingsFrom);
             }
             return new List<int> { groupId };
+        }
+
+        private void SetWhetherToUseCommonestPolarity(int profileId)
+        {
+            useCommonestPolarity = profileId == ProfileIds.Search || profileId == ProfileIds.Undefined;
         }
     }
 }

@@ -1,11 +1,14 @@
 ﻿@using System.Web.Optimization
 @using System.Web.Script.Serialization
 @using IndicatorsUI.DataAccess
+@using IndicatorsUI.MainUI.Helpers
 @using IndicatorsUI.MainUI.Models;
+@using Microsoft.AspNet.Identity
 @model PageModel
 @Styles.Render("~/bundles/css-core-data-page")
 <script type="text/javascript">
     //<![CDATA[
+
     profileUrlKey = '@ViewBag.ProfileUrlKey';
     FT.model.profileId = @Model.ProfileId;
     indicatorIds = @Html.Raw(ViewData.ContainsKey("indicatorIds") ? ("'" + ViewData["indicatorIds"] + "'") : "null");
@@ -20,19 +23,26 @@
     FT.config.nearestNeighbour = @(ViewBag.NNConfig == null ? "{}" : Html.Raw(ViewBag.NNConfig));
     FT.config.profileName = '@Model.PageTitle';
     FT.config.isChangeFromPreviousPeriodShown = @JsHelper.GetJsBool(ViewBag.IsChangeFromPreviousPeriodShown);
-    isInitRequired = true;    
+    FT.config.environment = @Html.Raw(ViewBag.IsEnvironmentLive ? "'live'" : "'test'");
+    isInitRequired = true;
     groupIds = @Html.Raw(new JavaScriptSerializer().Serialize(ViewData["groupIds"]));
     defaultAreaType = @(ViewBag.DefaultAreaType);
     enumParentDisplay = @ViewBag.EnumParentDisplay;
-    ignoredSpineChartAreas = '@Model.IgnoredSpineChartAreas';
+    FT.config.ignoredSpineChartAreas = '@Model.IgnoredSpineChartAreas';
     FT.model.areAnyIndicators = true;
-    spineHeaders = { min: '@Model.SpineChartMinMaxLabel.Min',
-        max: '@Model.SpineChartMinMaxLabel.Max'
+    FT.config.spineHeaders = { min: 'Worst/ Lowest',
+        max: 'Best/ Highest'
     };
     templateProfileId = @Model.TemplateProfileId;
     FT.version = '@ViewBag.JavaScriptVersion';
     FT.config.showDataQuality = @(ViewBag.ShowDataQuality);
     isNational = @JsHelper.GetJsBool(ViewBag.IsNational);
+    FT.config.isSignedIn = @JsHelper.GetJsBool(ViewBag.IsUserSignedIn);
+    FT.config.signInUrl = '@Url.Action("Login", "UserAccount")';
+    FT.config.userId = '@UserAccountHelper.GetUserId(User)';
+    FT.config.createNewAreaListUrl = '@Url.Action("Create", "AreaList")';
+    FT.config.editAreaListUrl = '@Url.Action("Edit", "AreaList")';
+    FT.config.spineChartMinMaxLabelId = 3;
 
 //]]</script>
 @* Not included in bundle because the minification breaks the page *@
@@ -40,7 +50,4 @@
 @Scripts.Render("~/bundles/js-html-2-canvas")
 @Html.Partial("_ProfileSpecificCssFiles")
 @Html.Partial("_ProfileSpecificJsFiles")
-@if (AppConfig.Instance.IsEnvironmentTest)
-{
-    <script src="@(Model.JsPath)EnvironmentTest.js" type="text/javascript"></script>
-}
+

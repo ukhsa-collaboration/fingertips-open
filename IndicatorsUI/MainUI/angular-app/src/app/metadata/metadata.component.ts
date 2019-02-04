@@ -19,7 +19,6 @@ export class MetadataComponent {
   @HostListener('window:MetadataSelected', ['$event'])
   public onOutsideEvent(event): void {
     let root: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-    var grouping = root.Grouping[0];
     this.table.displayMetadataForGroupRoot(root);
   }
 }

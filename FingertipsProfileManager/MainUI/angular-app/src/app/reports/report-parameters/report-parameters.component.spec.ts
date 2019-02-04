@@ -1,6 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReportParametersComponent } from './report-parameters.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 describe('ReportParametersComponent', () => {
   let component: ReportParametersComponent;
@@ -8,9 +9,11 @@ describe('ReportParametersComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ReportParametersComponent ]
+      declarations: [ReportParametersComponent],
+      imports: [FormsModule, ReactiveFormsModule],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

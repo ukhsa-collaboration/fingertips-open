@@ -82,12 +82,22 @@
     }
     else if (pageType == PageType.IndicatorListDataPage)
     {
-        if (User.Identity.IsAuthenticated)
+        if (ViewBag.IsUserSignedIn)
          {
              <li class="breadcrumb-separator">></li>
              <li class="site-link">
                  @Html.ActionLink("Your indicator lists", "Index", "IndicatorList")
              </li>
-         }
+        }
+    }
+    else if (pageType == PageType.AreaListPage)
+    {
+        if (ViewBag.IsUserSignedIn)
+        {
+            <li class="breadcrumb-separator">></li>
+            <li class="site-link">
+                @Html.ActionLink("Your area lists", "Index", "AreaList")
+            </li>
+        }
     }
 </ul>

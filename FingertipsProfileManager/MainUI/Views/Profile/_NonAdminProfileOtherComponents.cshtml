@@ -1,6 +1,20 @@
 ﻿@using Fpm.MainUI.Helpers
 @model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
 
+
+@{
+    var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+}
+
+@if (isUserAdmin) {
+<div class="row form-group">
+    <label class="col-md-3 col-form-label">ID:</label>
+    <div class="col-md-4">
+        @Model.Id
+    </div>
+</div>
+}
+
 <div class="row form-group" id="edit-profile-non-admin">
     <label class="col-md-3 col-form-label">Name:</label>
     @if (Model.IsProfileViewable)
@@ -33,7 +47,7 @@
     <label class="col-md-3 col-form-label">Default Fingertips tab:</label>
     <div class="col-md-4">
         @Html.DropDownListFor(model => model.DefaultFingertipsTabId, null,
-            TooltipHelper.GetTooltipRight("The tab that will be displayed when the user first navigates to the data page"))
+                           TooltipHelper.GetTooltipRight("The tab that will be displayed when the user first navigates to the data page"))
     </div>
 </div>
 
@@ -41,14 +55,7 @@
     <label class="col-md-3 col-form-label">Spine chart min/max header label:</label>
     <div class="col-md-4">
         @Html.DropDownListFor(model => model.SpineChartMinMaxLabelId, null,
-            TooltipHelper.GetTooltipRight("The headings that will be displayed in the spine chart table under the 'Area profiles' tab in Fingertips"))
-    </div>
-</div>
-
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Colours included in legend:</label>
-    <div class="col-md-4">
-        @Html.DropDownListFor(model => model.KeyColourId, null)
+                           TooltipHelper.GetTooltipRight("The headings that will be displayed in the spine chart table under the 'Area profiles' tab in Fingertips"))
     </div>
 </div>
 
@@ -56,14 +63,14 @@
     <label class="col-md-3 col-form-label">Area search on front page?</label>
     <div class="col-md-4">
         @Html.DropDownListFor(model => model.FrontPageAreaSearchAreaTypes, null,
-            TooltipHelper.GetTooltipRight("Allows the user to search for areas of specific types"))
+                           TooltipHelper.GetTooltipRight("Allows the user to search for areas of specific types"))
     </div>
 </div>
 
 <div class="row form-group">
-    <label class="col-md-3 col-form-label">Period to highlight new data:</label>
+    <label class="col-md-3 col-form-label">Monthly updates to highlight new data:</label>
     <div class="col-md-4">
-        @Html.DropDownListFor(model => model.NewDataTimeSpanInDays, null,
-            TooltipHelper.GetTooltipRight("The period of time during which indicators will be highlighted as having been recently updated in Fingertips"))
+        @Html.DropDownListFor(model => model.NewDataDeploymentCount, null,
+                           TooltipHelper.GetTooltipRight("The period of time during which indicators will be highlighted as having been recently updated in Fingertips"))
     </div>
 </div>

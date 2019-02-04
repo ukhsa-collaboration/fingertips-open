@@ -1,5 +1,4 @@
-﻿@using IndicatorsUI.DataAccess
-@if (AppConfig.Instance.IsEnvironmentLive)
+﻿@if (ViewBag.IsEnvironmentLive)
 {
     // Force users to HTTPS on live site
     <script type="text/javascript">

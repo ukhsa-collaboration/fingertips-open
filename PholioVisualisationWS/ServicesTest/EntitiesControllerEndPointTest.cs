@@ -97,7 +97,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetComparatorMethod()
         {
             byte[] data = GetData("comparator_method?id=" +
-                ComparatorMethodIds.SingleOverlappingCIs);
+                ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel);
             TestHelper.IsData(data);
         }
 

@@ -1,0 +1,55 @@
+<div id="keyTartanRug" class="key-container" *ngIf="showRag">
+  <table class="key-table" *ngIf="showTartanRug">
+    <tr>
+      <td class="key-text key-label">Compared with benchmark</td>
+      <td class="key-spacer"></td>
+      <td id="td-better-key" class='better key'>
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/better.png" alt="" />
+          <div class="tartan-text">
+            Better
+          </div>
+        </div>
+      </td>
+      <td id="td-same-key" class='same key'>
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/same.png" alt="" />
+          <div class="tartan-text">
+            Similar
+          </div>
+        </div>
+      </td>
+      <td id="td-worse-key" class='worse key'>
+        <div class="tartan-box key-box">
+          <img class="tartan-fill print-only" src="/images/red.png" alt="" />
+          <div class="tartan-text">
+            Worse
+          </div>
+        </div>
+      </td>
+      <td id="map-key-part2" class="none key key-box-right" style="display: table-cell;" *ngIf="showBenchmark">
+        <div class="tartan-box key-box">
+          Not compared
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table class="key-table" *ngIf="showSpineChart">
+    <tr>
+      <td class="key-text key-label">Compared with benchmark</td>
+      <td class="key-spacer"></td>
+      <td class='key-spine'>
+        <img class="key-circle" src="/images/circle_green_mini.png" alt="" />
+        Better
+        <img class="key-circle" src="/images/circle_orange_mini.png" alt="" />
+        Similar
+        <img class="key-circle" src="/images/circle_red_mini.png" alt="" />
+        Worse
+      </td>
+      <td class='key-spine' *ngIf="showBenchmark">
+        <img class="key-circle" src="/images/circle_white_mini.png" alt="" />
+        Not Compared
+      </td>
+    </tr>
+  </table>
+</div>

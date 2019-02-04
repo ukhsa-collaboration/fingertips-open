@@ -46,5 +46,5 @@ pages.add(PAGE_MODES.METADATA, {
     goto: goToMetadataPage,
     gotoName: 'goToMetadataPage',
     needsContainer: false,
-    jqIds: ['metadata-container', 'indicator-menu-div', 'areaTypeBox']
+    jqIds: ['metadata-container', 'indicator-menu-div', 'areaTypeBox', 'filter-indicator-wrapper']
 });

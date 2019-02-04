@@ -1,10 +1,7 @@
-﻿@using IndicatorsUI.DomainObjects
-@using IndicatorsUI.MainUI.Models;
+﻿@using IndicatorsUI.MainUI.Models;
 @model PageModel
 <a href="/content" class="visuallyhidden">Skip to content</a>
-@{
-    bool includeAboutProject = (Model.ProfileId != ProfileIds.SuicidePrevention) && (Model.ProfileId != ProfileIds.PublicHealthDashboard);
-}
+
 <div id="header">
     @Html.Partial("_Header")
     <div id="header_nav">
@@ -13,14 +10,8 @@
                 <ul>
                     @{var stem = "/topic/" + ViewBag.ProfileUrlKey + "/";}
                     <li id="home-nav"><a href="javascript:MT.nav.home();">Home</a></li>
-                    @if (Model.ProfileId == ProfileIds.PublicHealthDashboard){
-                        <li id="map-with-data"><a href="javascript:MT.nav.mapWithData();">Map</a></li>
-                    }
+                    <li id="map-with-data"><a href="javascript:MT.nav.mapWithData();">Map</a></li>
                     <li id="rankings-nav"><a href="javascript:MT.nav.rankings();">National comparisons</a></li>
-                    @if (includeAboutProject)
-                    {
-                        <li id="about-project-nav"><a href="@(stem)about-project">About the project</a></li>
-                    }
                     <li id="about-data-nav"><a href="@(stem)about-data">About the data</a></li>                  
                 </ul>
             </div>

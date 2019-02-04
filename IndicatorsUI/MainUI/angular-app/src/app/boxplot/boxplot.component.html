@@ -3,7 +3,7 @@
             <a class="export-link" (click)="onExportClick($event)"
                 >Export chart as image</a>
         </div> -->
-    <div id="indicator-details-boxplot-data" class="standard-width">
+    <div id="indicator-details-boxplot-data" class="standard-width" [hidden]="!isAvailable">
         <ft-indicator-header [header]="header"></ft-indicator-header>
         <div id="boxplot-legend-img" *ngIf="isAnyData()"></div>
 
@@ -11,5 +11,8 @@
 
         <ft-boxplot-table *ngIf="isAnyData()" [boxplotData]="boxplotData"></ft-boxplot-table>
         <div id="boxplot-no-data" class="no-indicator-data" *ngIf="!isAnyData()">No Data</div>
+    </div>
+    <div [hidden]="isAvailable" id="boxplot-not-available" class="standard-width">
+       Not applicable for England data
     </div>
 </div>

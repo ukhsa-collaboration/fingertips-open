@@ -147,5 +147,31 @@ namespace PholioVisualisation.PholioObjects
 
             return areaCode.ToLower().StartsWith("nn-");
         }
+
+        /// <summary>
+        /// Whether or not the area code is an area list.
+        /// </summary>
+        public static bool IsAreaListAreaCode(string areaCode)
+        {
+            if (string.IsNullOrWhiteSpace(areaCode))
+            {
+                return false;
+            }
+
+            return areaCode.ToLower().StartsWith("al-");
+        }
+
+        /// <summary>
+        /// Whether or not the area is an area list.
+        /// </summary>
+        public static bool IsAreaListArea(IArea area)
+        {
+            if (area == null)
+            {
+                return false;
+            }
+
+            return IsAreaListAreaCode(area.Code);
+        }
     }
 }

@@ -17,6 +17,7 @@ namespace PholioVisualisation.DataAccess
         IList<int> GetGroupIdsFromSpecificProfiles(IList<int> profileIds);
         Profile GetProfile(int profileId);
         IList<ProfileConfig> GetAllProfiles();
+        IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds);
         IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds, int areaTypeId);
         ProfileConfig GetProfileConfig(int profileId);
         IList<int> GetAllProfileIds();
@@ -73,9 +74,17 @@ namespace PholioVisualisation.DataAccess
             return q.List<int>();
         }
 
-        public virtual IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds, int areaTypeId)
+        public virtual IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds)
         {
             var q = CurrentSession.GetNamedQuery("GetProfilesForIndicatorIds");
+            q.SetParameterList("indicatorIds", indicatorIds);
+            q.SetResultTransformer(Transformers.AliasToBean<ProfilePerIndicator>());
+            return q.List<ProfilePerIndicator>();
+        }
+
+        public virtual IList<ProfilePerIndicator> GetProfilesForIndicators(List<int> indicatorIds, int areaTypeId)
+        {
+            var q = CurrentSession.GetNamedQuery("GetProfilesForIndicatorIdsAndAreaTypeId");
             q.SetParameterList("indicatorIds", indicatorIds);
             q.SetParameter("areaTypeId", areaTypeId);
             q.SetResultTransformer(Transformers.AliasToBean<ProfilePerIndicator>());

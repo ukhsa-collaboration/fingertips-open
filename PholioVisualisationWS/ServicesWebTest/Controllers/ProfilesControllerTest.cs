@@ -11,19 +11,27 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
     public class ProfilesControllerTest
     {
         [TestMethod]
+        public void TestGetProfilesPerIndicatorWithAreaTypeId()
+        {
+            var response = new ProfilesController().GetProfilesPerIndicator(
+                IndicatorIds.Aged0To4Years.ToString(), AreaTypeIds.GpPractice);
+            Assert.IsTrue(response.Count > 0);
+        }
+
+        [TestMethod]
         public void TestGetProfilesPerIndicator()
         {
             var response = new ProfilesController().GetProfilesPerIndicator(
-                IndicatorIds.DeprivationScoreIMD2010.ToString(), AreaTypeIds.CountyAndUnitaryAuthority);
+                IndicatorIds.Aged0To4Years.ToString());
             Assert.IsTrue(response.Count > 0);
         }
 
         [TestMethod]
         public void TestGetAreaTypesWithPdfsForProfile()
         {
-            var areaTypes = new ProfilesController().GetAreaTypesWithPdfsForProfile(ProfileIds.PracticeProfiles);
+            var areaTypes = new ProfilesController().GetAreaTypesWithPdfsForProfile(ProfileIds.ChildAndMaternalHealth);
 
-            Assert.AreEqual(AreaTypeIds.GpPractice, areaTypes.First().Id);
+            Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthority, areaTypes.First().Id);
         }
     }
 }

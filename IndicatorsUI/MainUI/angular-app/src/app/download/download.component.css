@@ -1,0 +1,14 @@
+#download-container {
+    color: #666;
+    padding: 60px 0 120px 0;
+}
+
+ft-download-data {
+    border-right: 2px solid #eee;
+}
+
+#download-container p {
+line-height: 1.4em;
+margin: 0;
+}
+

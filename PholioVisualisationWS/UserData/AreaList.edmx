@@ -1,0 +1,145 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="fingertips_usersModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="AreaList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ListName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="AreaTypeId" Type="int" Nullable="false" />
+          <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="CreatedOn" Type="datetime" Nullable="false" />
+          <Property Name="UpdatedOn" Type="datetime" Nullable="false" />
+          <Property Name="PublicId" Type="nchar" MaxLength="13" Nullable="false" />
+        </EntityType>
+        <EntityType Name="AreaListAreaCodes">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AreaListId" Type="int" Nullable="false" />
+          <Property Name="AreaCode" Type="nvarchar" MaxLength="20" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_AreaListAreaCodes_AreaList">
+          <End Role="AreaList" Type="Self.AreaList" Multiplicity="1" />
+          <End Role="AreaListAreaCodes" Type="Self.AreaListAreaCodes" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AreaList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AreaListAreaCodes">
+              <PropertyRef Name="AreaListId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="fingertips_usersModelStoreContainer">
+          <EntitySet Name="AreaList" EntityType="Self.AreaList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="AreaListAreaCodes" EntityType="Self.AreaListAreaCodes" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_AreaListAreaCodes_AreaList" Association="Self.FK_AreaListAreaCodes_AreaList">
+            <End Role="AreaList" EntitySet="AreaList" />
+            <End Role="AreaListAreaCodes" EntitySet="AreaListAreaCodes" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="fingertips_usersModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="AreaList">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" />
+          <Property Name="ListName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="AreaTypeId" Type="Int32" Nullable="false" />
+          <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedOn" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="PublicId" Type="String" MaxLength="13" FixedLength="true" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="AreaListAreaCodes" Relationship="Self.FK_AreaListAreaCodes_AreaList" FromRole="AreaList" ToRole="AreaListAreaCodes" />
+        </EntityType>
+        <EntityType Name="AreaListAreaCode">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AreaListId" Type="Int32" Nullable="false" />
+          <Property Name="AreaCode" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="AreaList" Relationship="Self.FK_AreaListAreaCodes_AreaList" FromRole="AreaListAreaCodes" ToRole="AreaList" />
+        </EntityType>
+        <Association Name="FK_AreaListAreaCodes_AreaList">
+          <End Role="AreaList" Type="Self.AreaList" Multiplicity="1" />
+          <End Role="AreaListAreaCodes" Type="Self.AreaListAreaCode" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="AreaList">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="AreaListAreaCodes">
+              <PropertyRef Name="AreaListId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="fingertips_usersEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="AreaLists" EntityType="Self.AreaList" />
+          <EntitySet Name="AreaListAreaCodes" EntityType="Self.AreaListAreaCode" />
+          <AssociationSet Name="FK_AreaListAreaCodes_AreaList" Association="Self.FK_AreaListAreaCodes_AreaList">
+            <End Role="AreaList" EntitySet="AreaLists" />
+            <End Role="AreaListAreaCodes" EntitySet="AreaListAreaCodes" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="fingertips_usersModelStoreContainer" CdmEntityContainer="fingertips_usersEntities">
+          <EntitySetMapping Name="AreaLists">
+            <EntityTypeMapping TypeName="fingertips_usersModel.AreaList">
+              <MappingFragment StoreEntitySet="AreaList">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="ListName" ColumnName="ListName" />
+                <ScalarProperty Name="AreaTypeId" ColumnName="AreaTypeId" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="UpdatedOn" ColumnName="UpdatedOn" />
+                <ScalarProperty Name="PublicId" ColumnName="PublicId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="AreaListAreaCodes">
+            <EntityTypeMapping TypeName="fingertips_usersModel.AreaListAreaCode">
+              <MappingFragment StoreEntitySet="AreaListAreaCodes">
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="AreaListId" ColumnName="AreaListId" />
+                <ScalarProperty Name="AreaCode" ColumnName="AreaCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -62,7 +62,7 @@ function documentReady() {
                 url: '/content/publish-content-item',
                 data: { contentIds: contentIds },
                 success: function(data) {
-                    showSimpleMessagePopUp('Selected content item(s) published to live site');
+                    showSimpleMessagePopUp('Selected content item(s) published to live site. Due to caching it may take several hours before this change is apparent.');
                     $('.indicator-check-box').removeAttr('checked');
                     if ($('#select-all').attr('checked')) {
                         $('#select-all').removeAttr('checked');

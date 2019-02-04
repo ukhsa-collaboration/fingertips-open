@@ -3,12 +3,12 @@ using System.Web.Mvc;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface INewDataTimeSpanInDaysOptions
+    public interface INewDataDeploymentCount
     {
         IList<SelectListItem> GetOptions(string selectedValue);
     }
 
-    public class NewDataTimeSpanInDaysOptions : INewDataTimeSpanInDaysOptions
+    public class NewDataDeploymentCount : INewDataDeploymentCount
     {
         public const string None = "NONE";
 
@@ -17,13 +17,13 @@ namespace Fpm.MainUI.Helpers
             var list = new List<SelectListItem>
             {
                 new SelectListItem { Text = None, Value = "0"},
-                new SelectListItem { Text = "1 month", Value = "30" },
-                new SelectListItem { Text = "2 months", Value = "60" },
-                new SelectListItem { Text = "3 months", Value = "90" },
-                new SelectListItem { Text = "4 months", Value = "120" },
-                new SelectListItem { Text = "6 months", Value = "180" },
-                new SelectListItem { Text = "9 months", Value = "270" },
-                new SelectListItem { Text = "1 year", Value = "365" }
+                new SelectListItem { Text = "1", Value = "1" },
+                new SelectListItem { Text = "2", Value = "2" },
+                new SelectListItem { Text = "3", Value = "3" },
+                new SelectListItem { Text = "4", Value = "4" },
+                new SelectListItem { Text = "6", Value = "6" },
+                new SelectListItem { Text = "9", Value = "9" },
+                new SelectListItem { Text = "12", Value = "12" }
             };
 
             foreach (var selectListItem in list)

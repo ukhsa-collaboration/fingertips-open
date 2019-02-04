@@ -7,6 +7,7 @@
     ViewBag.Title = "FPM - Content Manager";
     var hasUserAccessToProfile = UserDetails.CurrentUser().HasWritePermissionsToProfile(Model.ProfileId);
     var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
+    var canPublishToLive = hasUserAccessToProfile || isAdministrator;
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 @Scripts.Render("~/content.js")
@@ -37,7 +38,7 @@
             </button>
         }
         
-        @if (isAdministrator)
+        @if (canPublishToLive)
         {
             <button type="button" class="btn btn-secondary right" id="publish_live" title="Select content item(s) and click to publish live">Publish to live site</button>
         }

@@ -24,6 +24,24 @@
             var timePeriodHelper = new TimePeriodHelper(item);
             var later = timePeriodHelper.GetPeriodIfLaterThanDatapoint();
 
+            if (Model.GroupingSubheadings != null)
+            {
+                var groupingSubheadings = Model.GroupingSubheadings.Where(x => x.Sequence == @item.Sequence);
+                if (groupingSubheadings != null)
+                {
+                    foreach (var groupingSubheading in groupingSubheadings)
+                    {
+                        <tr class="subheading">
+                            <td></td>
+                            <td></td>
+                            <td colspan="8">
+                                <h3>@groupingSubheading.Subheading</h3>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+
             <tr>
                 <td class="center">
                     @item.Sequence

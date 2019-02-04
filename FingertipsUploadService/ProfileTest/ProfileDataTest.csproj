@@ -79,6 +79,8 @@
     <Compile Include="AllowedDataTest.cs" />
     <Compile Include="Respositories\WhenUsingAreaTypeRepository.cs" />
     <Compile Include="Respositories\WhenUsingDisclosureControl.cs" />
+    <Compile Include="UnitTests\CoreDataRepositoryTests.cs" />
+    <Compile Include="UnitTests\RepositoryBaseTests.cs" />
     <Compile Include="Respositories\WhenUsingLoggingRepository.cs" />
     <Compile Include="Respositories\WhenUsingFusUploadRepository.cs" />
     <Compile Include="Respositories\WhenUsingJobErrorRepository.cs" />

@@ -75,6 +75,7 @@
     <Compile Include="ChartAxisIntervalCalculatorTest.cs" />
     <Compile Include="BespokeTargetPercentileRangeComparerTest.cs" />
     <Compile Include="DoubleOverlappingCIsComparerTest.cs" />
+    <Compile Include="SingleOverlappingCIsForTwoCILevelsComparerTest.cs" />
     <Compile Include="IndicatorStatsCalculatorTest.cs" />
     <Compile Include="MinMaxRounderTest.cs" />
     <Compile Include="NoComparisonComparerTest.cs" />
@@ -83,7 +84,7 @@
     <Compile Include="QuartilesComparerTest.cs" />
     <Compile Include="QuintilesComparerTest.cs" />
     <Compile Include="RangeTargetComparerTest.cs" />
-    <Compile Include="SingleOverlappingCIsComparatorTest.cs" />
+    <Compile Include="SingleOverlappingCIsForOneCILevelComparatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleValueTargetComparerTest.cs" />
     <Compile Include="SpcForDsrComparerTest.cs" />

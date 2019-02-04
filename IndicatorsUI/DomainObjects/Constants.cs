@@ -43,11 +43,6 @@ namespace IndicatorsUI.DomainObjects
         /// Description of the site that appears in the meta description tag in the web page.
         /// </summary>
         public const string MetaDescription = "meta-description";
-
-        /// <summary>
-        /// Description of the site that appears in the meta keywords tag in the web page.
-        /// </summary>
-        public const string MetaKeywords = "meta-keywords";
     }
 
     public class ProfileUrlKeys
@@ -64,6 +59,7 @@ namespace IndicatorsUI.DomainObjects
         public const string PracticeProfiles = "general-practice";
         public const string MarmotIndicatorsForLocalAuthorities = "marmot-indicators";
         public const string PublicHealthDashboard = "public-health-dashboard";
+        public const string DeveloperTestProfile = "devtestprofile";
     }
 
     public class ProfileIds
@@ -72,15 +68,11 @@ namespace IndicatorsUI.DomainObjects
         public const int Tobacco = 18;
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
-        public const int LongerLives = 22;
         public const int HealthProfiles = 26;
         public const int SevereMentalIllness = 41;
         public const int SexualHealth = 45;
-        public const int DiabetesLongerLives = 51;
         public const int LiverDisease = 55;
-        public const int Hypertension = 67;
         public const int SuicidePrevention = 73;
-        public const int DrugsAndAlcohol = 75;
         public const int HealthChecks = 77;
         public const int LocalAlcoholProfiles = 87;
         public const int ChildHealth = 105;
@@ -124,12 +116,12 @@ namespace IndicatorsUI.DomainObjects
     public class AreaTypeIds
     {
         public const int Region = 6;
-        public const int GpPractice = 7;
-        public const int CcgPreApr2017 = 153;
-        public const int CcgPostApr2017 = 152;
-        public const int DistrictAndUnitaryAuthority = 101;
+        public const int Ward = 8;
         public const int CountyAndUnitaryAuthority = 102;
-        public const int PheCentresFrom2015 = 104;
+        public const int AcuteTrusts = 118;
+        public const int CcgPostApr2017 = 152;
+        public const int CcgPreApr2017 = 153;
+        public const int CcgSince2018 = 154;
     }
 
     public class AreaCodes
@@ -167,14 +159,6 @@ namespace IndicatorsUI.DomainObjects
         public const int HighlightedProfiles = 11;
     }
 
-    public class SpineChartMinMaxLabels
-    {
-        public const int DeriveFromLegendColours = 0;
-        public const int LowestAndHighest = 1;
-        public const int WorstAndBest = 2;
-        public const int WorstLowestAndBestHighest = 3;
-    }
-
     public class TabIds
     {
         public const int TartanRug = 0;
@@ -184,6 +168,9 @@ namespace IndicatorsUI.DomainObjects
         public const int Map = 8;
         public const int ScatterPlot = 10;
         public const int Reports = 13;
+        public const int Trends = 4;
+        public const int Population = 12;
+        public const int England = 11;
     }
 
     public class NeighbourTypes
@@ -208,5 +195,14 @@ namespace IndicatorsUI.DomainObjects
     public class FeatureFlags
     {
         public const string EmailVerification = "emailVerification";
+    }
+
+    public class GoogleAnalytics
+    {
+        public const string EventCollectionUrl = "https://www.google-analytics.com/collect";
+        public const int CodeFromAnonymousClient = 555;
+        public const string TrackingLiveId = "UA-43455403-1";
+        public const string TrackingDevelopmentId = "UA-43455403-16";
+        public const int GoogleAnalyticsVersion = 1;
     }
 }

@@ -8,48 +8,7 @@
         <img src="@(ViewBag.ImagesUrl)logos/PHE30.png" height="30px" />
     </a>
     <div id="profile-topic">
-        <div id="profile-topic-text" onclick="showTopicMenu()">Profiles & Topics
-            <i class="fa fa-chevron-down fa-lg"></i>
-        </div>
         <div id="selected-topic"></div>
     </div>
-    <div id="profile-topic-menu">
-        <div id="topic-list">
-            <div class="row">
-                <div class="col">
-                    <a href="/topic/public-health-dashboard">Public Health Dashboard</a>
-                    <div>
-                        @ContentProvider.GetContent("description", ProfileIds.PublicHealthDashboard)
-                    </div>
-                </div>
-                <div class="col">
-                    <a href="/topic/mortality">Premature Mortality</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.LongerLives)</div>
-                </div>
-                <div class="col">
-                    <a href="/topic/suicide-prevention">Suicide Prevention</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.SuicidePrevention)</div>
-                </div>
-                <div class="col">
-                    <a href="/topic/diabetes">Diabetes</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.DiabetesLongerLives)</div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <a href="/topic/hypertension">High Blood Pressure</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.Hypertension)</div>                    
-                </div>
-                <div class="col">
-                    <a href="/topic/nhs-health-check">NHS Health Check</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.HealthChecks)</div>
-                </div>
-                <div class="col">
-                    <a href="/topic/drugs-and-alcohol">Alcohol And Drugs</a>
-                    <div>@ContentProvider.GetContent("description", ProfileIds.DrugsAndAlcohol)</div>
-                </div>
-            </div>
-        </div>
-    </div>   
 </div>
 

@@ -6,10 +6,10 @@
 */
 
 
-function goToIndicatorDetailsPage(rootIndex) {
+function goToBarChartPage(rootIndex) {
     setPageMode(PAGE_MODES.INDICATOR_DETAILS);
 
-    if (!areIndicatorsInDomain()) {
+    if (isEnglandAreaType() || !areIndicatorsInDomain()) {
         displayNoData();
     } else {
 
@@ -96,6 +96,13 @@ function initBarChart(root) {
                     ev.preventDefault();
                     exportTableAsImage('indicators-container', 'bar-chart');
                 }
+            },
+            exportCsvFile: {
+                label: 'Export table as CSV file',
+                clickHandler: function (ev){
+                    ev.preventDefault();
+                    saveAsCsvFile();
+                }
             }
         });
 
@@ -108,6 +115,81 @@ function initBarChart(root) {
 
         state.isInitialised = true;
     }
+}
+
+function saveAsCsvFile() {
+
+    var parameters = new ParameterBuilder()
+    .add('parent_area_type_id', getParentTypeId())
+    .add('child_area_type_id', FT.model.areaTypeId)
+    .add('profile_id', FT.model.profileId)
+    .add('areas_code', getChildAreaCode())
+    .add('indicator_ids', getIid())
+    .add('parent_area_code', getParentAreaCodeByBenchmark());
+      
+    downloadLatestNoInequalitiesDataCsvFileByIndicator(FT.url.corews, parameters);
+}
+
+function getChildAreaCode() {
+
+    if (barChartState.areaDisplayed === BAR_CHART_VIEW_MODES.ENGLAND) {
+        return null;
+    }
+
+    return FT.data.sortedAreas.map(area => area['Code'] );
+}
+
+function getParentAreaCodeByBenchmark() {
+
+    if (FT.model.isNearestNeighbours() || 
+        barChartState.areaDisplayed === BAR_CHART_VIEW_MODES.ENGLAND ||
+        isEnglandSelectedBenchmark() ||
+        !isSelectedBenchmarkOptionIntoBorder()) {
+        return NATIONAL_CODE;
+    }
+    return FT.model.parentCode;
+}
+
+function getParentTypeId() {
+    var optionsElements = $("#parentAreaTypesMenu option");
+
+    if (isSelectedOptionIntoBorder(FT.model.parentTypeId))
+    {
+        return FT.model.parentTypeId;
+    }
+    return optionsElements.first().attr("value");
+}
+
+function isSelectedOptionIntoBorder(value) {
+        
+    var optionsElements = $("#parentAreaTypesMenu option");
+    var selectedElement =  $("#parentAreaTypesMenu option[value="+ value +"]");
+    var borderOptionElement = $("#parentAreaTypesMenu option[value='-98']"); //-98 is a index used to separate values into the list
+    
+    var borderOptionElementIndex = getSelectedElementIndex(optionsElements, borderOptionElement);
+    var selectedElementIndex = getSelectedElementIndex(optionsElements, selectedElement);
+    
+    return borderOptionElementIndex > selectedElementIndex;
+}
+
+function isSelectedBenchmarkOptionIntoBorder() {
+    var optionsElements = $("#parentAreaTypesMenu option");
+    var benchmarkSelected = $("#comparator option:selected").text();
+    var areasGroupedBySelected = $("#parentAreaTypesMenu option:contains("+ benchmarkSelected + ")");
+    var selectedElementIndex = optionsElements.index(areasGroupedBySelected);
+
+    var borderOptionElement = $("#parentAreaTypesMenu option[value='-98']"); //-98 is a index used to separate values into the list   
+    var borderOptionElementIndex = getSelectedElementIndex(optionsElements, borderOptionElement);
+
+    return borderOptionElementIndex > selectedElementIndex;
+}
+
+function getSelectedElementIndex(optionsElements, selectedOptionElement) {
+    return optionsElements.index(selectedOptionElement);
+}
+
+function isEnglandSelectedBenchmark() {
+    return $("#comparator option:selected").text() === 'England';
 }
 
 function configureStateAffectedByNearestNeighbours() {
@@ -264,12 +346,79 @@ function displayBarChartLegend() {
         var $keyAdHoc = $('#key-ad-hoc');
         var $keyBarChart = $('#key-bar-chart');
 
-        if (barChartState.comparisonConfig.useTarget) {
+        if (isEnglandAreaType() || barChartState.comparisonConfig && barChartState.comparisonConfig.useTarget) {
             $keyAdHoc.show();
             $keyBarChart.hide();
         } else {
             $keyAdHoc.hide();
             $keyBarChart.show();
+
+            var $rag3 = $('#bar-chart-legend-rag-3'),
+                $rag5 = $('#bar-chart-legend-rag-5'),
+                $bob = $('#bar-chart-legend-bob'),
+                $quintileRag = $('#bar-chart-quintile-rag'),
+                $quintileBob = $('#bar-chart-quintile-bob'),
+                $ragAndBobSection = $('#bar-chart-rag-and-bob-section'),
+                $quintileSection = $('#bar-chart-quintile-key-table');
+
+            $rag3.hide();
+            $rag5.hide();
+            $bob.hide();
+            $quintileRag.hide();
+            $quintileBob.hide();
+            $ragAndBobSection.hide();
+            $quintileSection.hide();
+
+            if ($keyBarChart.is(':visible')) {
+
+                var groupRoot = getGroupRoot();
+                var polarityId = groupRoot.PolarityId,
+                    comparatorMethodId = groupRoot.ComparatorMethodId;
+
+                switch (comparatorMethodId) {
+                    // Quintiles
+                    case ComparatorMethodIds.Quintiles:
+                        if (polarityId === PolarityIds.NotApplicable) {
+                            // Quintile BOB
+                            $quintileBob.show();
+                        } else {
+                            // Quintile RAG
+                            $quintileRag.show();
+                        }
+
+                        $quintileSection.show();
+                        break;
+
+                    // RAG3
+                    case ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel:
+                        $rag3.show();
+                        $ragAndBobSection.show();
+                        break;
+
+                    // RAG5
+                    case ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels:
+                        $rag5.show();
+                        $ragAndBobSection.show();
+                        break;
+
+                    default:
+                        switch (polarityId) {
+                            // BOB
+                            case PolarityIds.BlueOrangeBlue:
+                                $bob.show();
+                                break;
+
+                            // RAG
+                            case PolarityIds.RAGLowIsGood:
+                            case PolarityIds.RAGHighIsGood:
+                                $rag3.show();
+                                break;
+                        }
+
+                        $ragAndBobSection.show();
+                        break;
+                }
+            }
         }
     }
 }
@@ -729,11 +878,11 @@ FT.data.highlightedRowCells = null;
 pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     id: 'indicators',
     title: 'Compare areas',
-    goto: goToIndicatorDetailsPage,
-    gotoName: 'goToIndicatorDetailsPage',
+    goto: goToBarChartPage,
+    gotoName: 'goToBarChartPage',
     needsContainer: true,
     showHide: displayBarChartLegend,
-    jqIds: ['indicator-menu-div', '.geo-menu', 'tab-specific-options', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
+    jqIds: ['indicator-menu-div', '.geo-menu', 'tab-specific-options', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend', 'area-list-wrapper', 'filter-indicator-wrapper'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-ad-hoc', 'key-bar-chart', 'key-spine-chart']
 });
 

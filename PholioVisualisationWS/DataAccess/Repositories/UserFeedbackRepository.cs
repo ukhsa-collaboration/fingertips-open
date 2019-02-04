@@ -1,6 +1,5 @@
 ﻿using NHibernate;
 using NHibernate.Criterion;
-using PholioVisualisation.DataAccess.Repositories.Fpm.ProfileData.Repositories;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 

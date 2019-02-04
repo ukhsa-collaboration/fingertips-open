@@ -1,6 +1,6 @@
 'use strict';
 
-function goToIndicatorDetailsPage(rootIndex) {
+function goToBarChartPage(rootIndex) {
 
     setPageMode(PAGE_MODES.INDICATOR_DETAILS);
 
@@ -883,11 +883,11 @@ templates.add('indicators',
 pages.add(PAGE_MODES.INDICATOR_DETAILS, {
     id: 'indicators',
     title: 'Compare areas',
-    goto: goToIndicatorDetailsPage,
-    gotoName: 'goToIndicatorDetailsPage',
+    goto: goToBarChartPage,
+    gotoName: 'goToBarChartPage',
     needsContainer: true,
     showHide: displayBarChartLegend,
-    jqIds: ['indicator-menu-div', '.geo-menu', 'nearest-neighbour-link'],
+    jqIds: ['indicator-menu-div', '.geo-menu', 'nearest-neighbour-link', 'area-list-wrapper', 'filter-indicator-wrapper'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-ad-hoc',
         'key-bar-chart', 'key-spine-chart', 'value-note-legend']
 });

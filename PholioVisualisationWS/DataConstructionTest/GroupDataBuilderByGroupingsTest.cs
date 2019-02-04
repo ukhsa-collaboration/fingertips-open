@@ -67,8 +67,8 @@ namespace PholioVisualisation.DataConstructionTest
 
             Assert.IsTrue(data.GroupRoots.Count > 15);
             Assert.IsTrue(data.Areas.Count > 10);
-            Assert.AreEqual(AreaCodes.Gor_EastOfEngland, 
-                data.GroupRoots.First().Grouping.First().ComparatorData.AreaCode);
+            Assert.IsTrue(
+                data.GroupRoots.First().Grouping.Any(x => x.ComparatorData.AreaCode == AreaCodes.Gor_EastOfEngland));
         }
 
         [TestMethod]

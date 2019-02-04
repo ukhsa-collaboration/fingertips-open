@@ -1,21 +1,27 @@
 var gulp = require('gulp'),
+    exec = require('child_process').exec,
+    shell = require('gulp-shell'),
     del = require('del'),
-    shell = require('gulp-shell');
+    fs = require('fs');
 
-// Clean up distribution folder
+// Remove folder with compiled files
 gulp.task('clean', function() {
-    console.log('Clean up');
-    return del('[../angular-app-dist]', {force: true});
+    console.log('Clean the Distribution folder');
+    return del(['../angular-app-dist'], { force: true });
 });
 
-// Build for prodction
-gulp.task('prod', ['clean'], shell.task([
-    'ng build --prod --output-hashing=none --aot=false'
+gulp.task('test', [], shell.task([
+    'ng test --watch=false --reporters=junit'
 ]));
 
-// Build for development
+// Build production
+gulp.task('prod', ['clean'], shell.task([
+    'ng build --prod --output-hashing none'
+]));
+
+// Build development
 gulp.task('dev', ['clean'], shell.task([
-    'ng build -w'
+    'ng build --watch'
 ]));
 
 // Default task

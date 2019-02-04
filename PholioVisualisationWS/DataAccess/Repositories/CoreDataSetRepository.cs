@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using NHibernate;
-using PholioVisualisation.DataAccess.Repositories.Fpm.ProfileData.Repositories;
+using NHibernate.Criterion;
+using NHibernate.Transform;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataAccess.Repositories
@@ -9,6 +10,7 @@ namespace PholioVisualisation.DataAccess.Repositories
     public interface ICoreDataSetRepository
     {
         void Save(CoreDataSet coreDataSet);
+        TimePeriod GetLastestTimePeriodOfCoreData(int indicatorId, int yearRange);
     }
 
     public class CoreDataSetRepository : RepositoryBase, ICoreDataSetRepository
@@ -73,5 +75,31 @@ namespace PholioVisualisation.DataAccess.Repositories
                 throw;
             }
         }
+
+        public TimePeriod GetLastestTimePeriodOfCoreData(int indicatorId, int yearRange)
+        {
+            var data = CurrentSession.QueryOver<CoreDataSet>()
+                .Where(x => x.IndicatorId == indicatorId && x.YearRange == yearRange)
+                .OrderBy(x => x.Year).Desc
+                .OrderBy(x => x.Quarter).Desc
+                .OrderBy(x => x.Month).Desc
+                .Take(1)
+                .Cacheable()
+                .SingleOrDefault<CoreDataSet>();
+
+            if (data == null)
+            {
+                return null;
+            }
+
+            return new TimePeriod
+            {
+                Year = data.Year,
+                YearRange = data.YearRange,
+                Quarter = data.Quarter,
+                Month = data.Month
+            };
+        }
+
     }
 }

@@ -14,9 +14,8 @@ namespace PholioVisualisation.ServicesWebTest.Helpers
     [TestClass]
     public class RequestContentParserHelperTest
     {
-        private const int IndicatorId = IndicatorIds.DeprivationScoreIMD2010;
+        private const int IndicatorId = IndicatorIds.DeprivationScoreIMD2015;
         private const int ProfileId = ProfileIds.Phof;
-        private const string ContentKey = "contact-us";
 
         private readonly string _liveUpdateKey = ApplicationConfiguration.Instance.GetLiveUpdateKey();
         private readonly IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
@@ -145,7 +144,7 @@ namespace PholioVisualisation.ServicesWebTest.Helpers
 
                 case ParseTypes.ContentItems:
                     var contentItems = new List<ContentItem>();
-                    var contentItem = _contentItemRepository.GetContentForProfile(ProfileId, ContentKey);
+                    var contentItem = _contentItemRepository.GetContentForProfile(ProfileId, ContentKeys.ContactUs);
                     contentItems.Add(contentItem);
 
                     formData = new MultipartFormDataContent

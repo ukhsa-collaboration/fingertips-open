@@ -1,0 +1,122 @@
+<form [formGroup]="arealistForm" *ngIf="isAnyData()">
+    <div formGroupName="arealist">
+        <div class="row top-margin">
+            <div class="col-md-6">
+                <h6 class="font-weight-bold">Area type</h6>
+                <select id="areaTypeList" formControlName="areaTypeList" class="form-control" (change)="changeAreaTypeList()"
+                    *ngIf="isCreate()">
+                    <option [value]="-1">SELECT AREA TYPE</option>
+                    <option *ngFor="let areaType of areaTypes; let last=last" [value]="areaType.Id">
+                        {{areaType.Short}} {{last? setDefaultOption() : ''}}
+                    </option>
+                </select>
+                <h6 id="areaTypeName" [innerHtml]="areaTypeName" *ngIf="!isCreate()">
+                </h6>
+            </div>
+            <div class="col-md-6">
+                <h6 class="font-weight-bold">List name</h6>
+                <input type="text" id="areaListName" formControlName="areaListName" class="form-control" [value]="this.areaListName">
+            </div>
+        </div>
+        <div class="row top-margin">
+            <div class="col-md-6">
+                &nbsp;
+            </div>
+            <div class="col-md-6">
+                <button id="btn-save-area-list" class="btn btn-primary" (click)="saveAreaList()">Save list</button>
+                <button id="btn-cancel" class="btn btn-default" (click)="cancel()">Cancel</button>
+                <br />
+                <div id="error-details" class="top-margin text-danger">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row" *ngIf="isPracticeSearch()">
+            <div class="col-md-12" id="practice-search-map">
+                <ft-practice-search-simple [IsMapUpdateRequired]="updateMap" [areaTypeId]="areaTypeId"
+                    [selectedAreaAddresses]="selectedAreaAddresses" [searchMode]="searchMode" #practiceSearch
+                    (emitSelectedPractices)="updateSelectedPractices($event)" (emitShowPracticesAsList)="showPracticesAsList($event)"></ft-practice-search-simple>
+            </div>
+        </div>
+        <div id="area-list-details" class="row" *ngIf="isCreateAndAreaTypeSelected()">
+            <div class="col-md-6">
+                <div *ngIf="isList()">
+                    <h3>Select an area to add it to your list</h3>
+                </div>
+                <div id="area-list-table" class="top-margin" *ngIf="isList()">
+                    <div class="top-margin">
+                        Map is not available for
+                        <span [innerHtml]="areaTypeName"></span>
+                    </div>
+                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)"
+                        (emitSelectedArea)="updateSelectedArea($event)" (emitDeSelectedArea)="updateDeSelectedArea($event)"
+                        (emitMouseOverArea)="updateMouseOverArea($event)" (emitMouseOutArea)="updateMouseOutArea($event)">
+                    </ft-arealist-areas>
+                </div>
+                <div id="area-list-map" *ngIf="isMap()">
+                    <h3>Select an area on the map to add it to your list</h3>
+                    <button class="btn btn-link clear-list-button" (click)="showMapList()">Show all areas as a list</button>
+                    <div id="map-container" class="standard-width clearfix">
+                        <div class="top-margin" style="display: none">
+                            <button id="toggleMapHeading" class="btn btn-link clear-list-button" (click)="toggleMap()">
+                                Show all areas as list
+                            </button>
+                        </div>
+                        <ft-google-map-simple (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [areaCode]="areaCode"
+                            [selectedAreas]="selectedAreas" [availableAreas]="availableAreas" [mapAreaCodes]="mapAreaCodes"
+                            [mapPolygonSelected]="mapPolygonSelected" [areaSearchText]="areaSearchText"
+                            (selectedAreaChanged)="onSelectedAreaChanged($event)">
+                        </ft-google-map-simple>
+                    </div>
+                </div>
+                <div id="area-list-list" *ngIf="isMapList()">
+                    <h3>Select an area to add it to your list</h3>
+                    <button class="btn btn-link clear-list-button" (click)="showMap()">Show all areas as a map</button>
+                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)"
+                        (emitSelectedArea)="updateSelectedArea($event)" (emitDeSelectedArea)="updateDeSelectedArea($event)"
+                        (emitMouseOverArea)="updateMouseOverArea($event)" (emitMouseOutArea)="updateMouseOutArea($event)">
+                    </ft-arealist-areas>
+                </div>
+            </div>
+            <div class="col-md-3" *ngIf="displaySelectedAreasSection">
+                <h3>Search for an area</h3>
+                <div>
+                    <input type="text" id="areaSearchText" formControlName="areaSearchText" class="form-control"
+                        (keyup)="searchArea()" [value]="areaSearchText">
+                </div>
+                <div class="top-margin">
+                    <span *ngIf="searchedAreas.length > 0">
+                        Select area to add it to your list
+                    </span>
+                    <div class="top-margin">
+                        <div *ngFor="let area of searchedAreas; let last=last" #elem [attr.id]="area.Code" class="searched-areas searched-areas-{{area.Code}}"
+                            (mouseover)="mouseOverArea('searched-areas', area.Code)" (mouseout)="mouseOutArea('searched-areas', area.Code)"
+                            (click)="moveArea(area.Code)">
+                            {{area.Name}} {{last ? decorateSearchedAreasAfterInitialLoad() : ''}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3" *ngIf="displaySelectedAreasSection">
+                <h3>
+                    Areas in your list
+                    <br />
+                    <button class="btn btn-link clear-list-button" (click)="clearList()">Clear list</button>
+                </h3>
+                <div class="top-margin">
+                    <span *ngIf="selectedAreas.length > 0">
+                        Select an area below to remove it from your list
+                    </span>
+                    <div class="top-margin">
+                        <div *ngFor="let area of selectedAreas; let last=last" #elem [attr.id]="area.Code" class="selected-areas selected-areas-{{area.Code}}"
+                            (mouseover)="mouseOverArea('selected-areas', area.Code)" (mouseout)="mouseOutArea('selected-areas', area.Code)"
+                            (click)="moveAreaOut('selected-areas', area.Code)">
+                            {{area.Name}} {{last ? decorateAvailableAreasAfterInitialLoad() : ''}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
+</form>

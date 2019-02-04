@@ -77,6 +77,7 @@
         public const int MentalHealthTrustsIncludingCombinedAcuteTrusts = 119;
         public const int CcgsPostApr2017 = 152;
         public const int CcgsPreApr2017 = 153;
+        public const int CcgsSinceApr2018 = 154;
     }
 
     public class AreaCodes
@@ -98,6 +99,7 @@
     {
         public const int TobaccoControlProfiles_KeyIndicators = 1938132885;
         public const int PhofWiderDeterminantsOfHealth = 1000041;
+        public const int PeopleWithCareAndSupportNeeds = 1000105;
         public const int GpProfileSupportingIndicators = 1200006;
         public const int ArchivedIndicators = 3006000;
         public const int SevereMentalIllness_RiskFactors = 8000027;
@@ -144,11 +146,12 @@
 
     public class UrlKeys
     {
-        public const string Tobacco = "tobacco-control";
-        public const string Hypertension = "hypertension";
+        public const string AdultSocialCare = "adultsocialcare";
         public const string HealthProfiles = "health-profiles";
+        public const string Hypertension = "hypertension";
         public const string Phof = "public-health-outcomes-framework";
         public const string SevereMentalIllness = "severe-mental-illness";
+        public const string Tobacco = "tobacco-control";
     }
 
     public class Frequencies
@@ -196,12 +199,15 @@
     public class IndicatorTextMetadataPropertyIds
     {
         public const int Name = 1;
+        public const int FullName = 2;
         public const int Definition = 3;
         public const int Rationale = 4;
+        public const int Policy = 5;
         public const int Methodology = 9;
         public const int Caveats = 17;
         public const int Notes = 22;
         public const int DataQuality = 25;
+        public const int SpecificRationale = 27;
     }
 
     public class IndicatorTextMetadataColumnNames
@@ -218,6 +224,19 @@
         /// This is internal application constant and should not be saved to the database
         /// </summary>
         public const int NationalAndSubnational = 999;
+    }
+
+    public class ComparatorMethodIds
+    {
+        public const int NoComparison = -1;
+        public const int SingleOverlappingCIsForOneCiLevel = 1;
+        public const int SpcForProportions = 5;
+        public const int SpcForDsr = 6;
+        public const int DoubleOverlappingCIs = 12;
+        public const int SuicidePreventionPlan = 14;
+        public const int Quintiles = 15;
+        public const int Quartiles = 16;
+        public const int SingleOverlappingCIsForTwoCiLevels = 17;
     }
 
     public class DocumentIds

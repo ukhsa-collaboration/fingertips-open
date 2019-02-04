@@ -75,6 +75,16 @@ namespace PholioVisualisation.ServicesTest
             TestHelper.IsData(data);
         }
 
+        [TestMethod]
+        public void TestGetIndicatorNamesByGroupId()
+        {
+            var url = "indicator_names/by_group_id?" +
+                      "group_ids=" + GroupIds.Phof_WiderDeterminantsOfHealth;
+            byte[] data = TestHelper.GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
         public static byte[] GetData(string path)
         {
             return DataControllerEndPointTest.GetData(path);

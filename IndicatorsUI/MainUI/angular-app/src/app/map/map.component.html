@@ -3,10 +3,15 @@
         <div *ngIf="isInitialised">
             <div *ngIf="!IsPracticeAreaType">
                 <div id="key-ad-hoc" class="key-container" *ngIf="showAdhocKey" [innerHtml]="htmlAdhocKey" style="display: block;overflow: hidden;"></div>
-                <ft-map-legend [legendDisplay]="legendDisplay"></ft-map-legend>
+                <ft-legend [pageType]="pageType" [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB"
+                    [showQuartiles]="showQuartiles" [showQuintilesRAG]="showQuintilesRAG" [showQuintilesBOB]="showQuintilesBOB"
+                    [showContinuous]="showContinuous"></ft-legend>
                 <br>
-                <ft-google-map (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [currentAreaCode]="currentAreaCode" [areaCodeColour]="areaCodeColour" [refreshColour]="refreshColour" (hoverAreaCodeChanged)="onhoverAreaCodeChangedMap($event)"
-                    (selectedAreaChanged)="onSelectedAreaChanged($event)" [isBoundaryNotSupported]="isBoundaryNotSupported" [selectedAreaList]="selectedAreaList">
+                <ft-google-map (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData"
+                    [currentAreaCode]="currentAreaCode" [areaCodeColour]="areaCodeColour" [refreshColour]="refreshColour"
+                    (hoverAreaCodeChanged)="onhoverAreaCodeChangedMap($event)" (selectedAreaChanged)="onSelectedAreaChanged($event)"
+                    (benchmarkChanged)="OnBenchMarkIndexChanged($event)" [isBoundaryNotSupported]="isBoundaryNotSupported"
+                    [selectedAreaList]="selectedAreaList" [benchmarkIndex]="benchmarkIndex">
                 </ft-google-map>
                 <div id="maps_info">
                     <div id='map_colour_box'>Map colour&nbsp;
@@ -17,18 +22,20 @@
                             <option value='continuous'>Continuous</option>
                         </select>
                     </div>
-                    <ft-map-table [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [selectedAreaList]="selectedAreaList" [areaCodeColour]="areaCodeColour" [isBoundaryNotSupported]="isBoundaryNotSupported" (hoverAreaCodeChanged)="onhoverAreaCodeChangedData($event)"
-                        (selectedAreaChanged)="onSelectedAreaChanged($event)"></ft-map-table>
+                    <ft-map-table [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [selectedAreaList]="selectedAreaList"
+                        [areaCodeColour]="areaCodeColour" [isBoundaryNotSupported]="isBoundaryNotSupported"
+                        (hoverAreaCodeChanged)="onhoverAreaCodeChangedData($event)" (selectedAreaChanged)="onSelectedAreaChanged($event)"></ft-map-table>
                 </div>
-                <ft-map-chart [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [currentAreaCode]="currentAreaCode" [isBoundaryNotSupported]="isBoundaryNotSupported" [areaCodeColour]="areaCodeColour" (selectedAreaCodeChanged)="onSelectedAreaCodeChanged($event)"
-                    (hoverAreaCodeChanged)="onhoverAreaCodeChangedChart($event)"></ft-map-chart>
+                <ft-map-chart [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [currentAreaCode]="currentAreaCode"
+                    [isBoundaryNotSupported]="isBoundaryNotSupported" [areaCodeColour]="areaCodeColour"
+                    (selectedAreaCodeChanged)="onSelectedAreaCodeChanged($event)" (hoverAreaCodeChanged)="onhoverAreaCodeChangedChart($event)"></ft-map-chart>
             </div>
             <div *ngIf="IsPracticeAreaType">
                 <ft-practice-search [IsMapUpdateRequired]="updateMap" [searchMode]="searchMode" #practiceSearch></ft-practice-search>
             </div>
         </div>
     </div>
-    <div [hidden]="!isBoundaryNotSupported" style="width:100%; height:400px; padding-top:190px; text-align:center" id="boundryNotSupported">
+    <div [hidden]="!isBoundaryNotSupported" id="boundryNotSupported">
         Maps are not available for this area type
     </div>
 </div>

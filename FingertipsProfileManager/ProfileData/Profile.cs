@@ -29,7 +29,7 @@ namespace Fpm.ProfileData
 
         public GroupingMetadata GetSelectedGroupingMetadata(int selectedDomainNumber)
         {
-            return GroupingMetadatas.Where(x => x.Sequence == selectedDomainNumber).FirstOrDefault();
+                return GroupingMetadatas.Where(x => x.Sequence == selectedDomainNumber).FirstOrDefault();
         }
     }
 }

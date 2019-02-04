@@ -58,8 +58,12 @@ namespace IndicatorsUI.UserAccess.UserList.Repository
             var indicator = _dbContext.IndicatorLists.Include("IndicatorListItems").FirstOrDefault(x => x.Id == id);
             if (indicator != null)
             {
-                _dbContext.IndicatorLists.Remove(indicator);
-                _dbContext.SaveChanges();
+                // Delete using dbcontext did not work
+                // and as an alternative using raw sql
+                //_dbContext.IndicatorLists.Remove(indicator);
+                //_dbContext.SaveChanges();
+
+                _dbContext.Database.ExecuteSqlCommand(@"Delete from IndicatorList where Id = {0}", id);
             }
         }
 

@@ -5,13 +5,13 @@ using System.Text;
 
 namespace PholioVisualisation.Export.File
 {
-    public interface IFileBuilder
+    public interface IFileBuilder<T>
     {
-        void AddContent(byte[] content);
-        byte[] GetFileContent();
+        void AddContent(T content);
+        T GetFileContent();
     }
 
-    public class FileBuilder : IFileBuilder
+    public class CsvFileBuilder : IFileBuilder<byte[]>
     {
         private List<byte[]> _contents = new List<byte[]>();
 
@@ -33,7 +33,7 @@ namespace PholioVisualisation.Export.File
         }
     }
 
-    public class DummyFileBuilder : IFileBuilder
+    public class DummyFileBuilder : IFileBuilder<byte[]>
     {
         public void AddContent(byte[] content)
         {

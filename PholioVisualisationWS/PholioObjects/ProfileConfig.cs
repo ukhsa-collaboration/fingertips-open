@@ -38,7 +38,13 @@ namespace PholioVisualisation.PholioObjects
         public bool HasTrendMarkers { get; set; }
 
         [JsonIgnore]
-        public int NewDataTimeSpanInDays { get; set; }
+        public int NewDataDeploymentCount { get; set; }
 
+        [JsonIgnore]
+        public int DefaultAreaTypeId { get; set; }
+
+        [JsonIgnore]
+        public bool HasAnyData { get; set; }
+        
     }
 }

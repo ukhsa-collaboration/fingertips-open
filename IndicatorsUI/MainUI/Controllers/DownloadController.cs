@@ -5,11 +5,19 @@ using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
 using IndicatorsUI.DomainObjects;
 using System.Net.Mime;
+using IndicatorsUI.MainUI.Helpers;
 
 namespace IndicatorsUI.MainUI.Controllers
 {
     public class DownloadController : Controller
     {
+        private IGoogleAnalyticsEventLogger _googleAnalyticsEventLogger;
+
+        public DownloadController(IGoogleAnalyticsEventLogger googleAnalyticsEventLogger)
+        {
+            _googleAnalyticsEventLogger = googleAnalyticsEventLogger;
+        }
+
         [Route("documents/{filename}.{ext}")]
         public ActionResult Index(string filename, string ext)
         {
@@ -29,7 +37,12 @@ namespace IndicatorsUI.MainUI.Controllers
             };
             Response.AppendHeader("Content-Disposition", cd.ToString());
             var contentType = GetContentType(document.FileName);
-            return File(document.FileData, contentType);
+            var returnedFile = File(document.FileData, contentType);
+
+            //It will send the information asynchronously when a download has been done
+            _googleAnalyticsEventLogger.RegisterDocumentDownload(filename, Request.UserAgent);
+
+            return returnedFile;
         }
 
         private static string GetContentType(string fileName)
@@ -107,6 +120,5 @@ namespace IndicatorsUI.MainUI.Controllers
             string mime;
             return mappings.TryGetValue(ext, out mime) ? mime : "application/octet-stream";
         }
-
     }
 }

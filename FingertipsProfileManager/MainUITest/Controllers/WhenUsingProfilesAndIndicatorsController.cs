@@ -93,6 +93,28 @@ namespace Fpm.MainUITest.Controllers
                 );
         }
 
+        [TestMethod]
+        public void ReorderIndicators_For_Profile()
+        {
+            // Arrange
+            _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
+
+            // Act
+            var result = (ViewResult)_controller.ReorderIndicators(ProfileIds.Phof, UrlKeys.AdultSocialCare, 1,
+                AreaTypeIds.CountyAndUnitaryAuthority, GroupIds.PeopleWithCareAndSupportNeeds);
+
+            // Assert
+            Assert.IsTrue(result != null);
+
+            var model = result.Model as ReorderIndicatorsViewModel;
+
+            Assert.IsTrue(model != null
+              && model.GroupId == GroupIds.PeopleWithCareAndSupportNeeds
+              && model.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority
+              && model.ProfileUrlKey == UrlKeys.AdultSocialCare
+            );
+        }
+
         public void BrowseIndicatorData_Returns_Empty_Data_For_Invalid_IndicatorId()
         {
             // Arrange
@@ -115,7 +137,5 @@ namespace Fpm.MainUITest.Controllers
 
             Assert.IsTrue(model != null && model.Results.DataSet.Any() == false);
         }
-
-
     }
 }

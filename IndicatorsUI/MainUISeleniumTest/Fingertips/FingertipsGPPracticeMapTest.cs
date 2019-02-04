@@ -7,18 +7,32 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     [TestClass]
     public class FingertipsGpPracticeMapTest : FingertipsBaseUnitTest
     {
+        private const string PracticeProfileUrlKey = ProfileUrlKeys.PracticeProfiles;
+
         [TestInitialize]
         public override void TestInitialize()
         {
             base.TestInitialize();
 
-            OpenProfilePage(ProfileUrlKeys.PracticeProfiles);
-            SelectMapTab();
+            OpenPracticeProfilesFrontPage();
+        }
+
+        [TestMethod]
+        public void Test_Search_On_Practice_Profiles_Front_Page()
+        {
+            // Population tab can be navigated to from search results
+            PopulationTabCanBeNavigatedToFromSearchResults();
         }
 
         [TestMethod]
         public void Test_Results_Displayed_Searching_For_Practice()
         {
+            // Navigate to profile data page
+            OpennPracticeProfilesDataPage();
+
+            // Select map tab
+            SelectMapTab();
+            
             //Type camb in search box
             SearchForPractice("cambr");
 
@@ -31,6 +45,12 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         [TestMethod]
         public void Test_Practices_in_CCG_Results_Displayed_Clicking_On_ShowAllPracticesinCCG()
         {
+            // Navigate to profile data page
+            OpennPracticeProfilesDataPage();
+
+            // Select map tab
+            SelectMapTab();
+
             //Get selected ccg(region Menu) name
             IWebElement ccgName = driver.FindElement(By.Id("regionMenu"));
             SelectElement selectedValue = new SelectElement(ccgName);
@@ -51,6 +71,18 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         [TestMethod]
         public void Test_PopulationTab_Can_Be_Navigated_To_From_Search_Results()
         {
+            // Navigate to profile data page
+            OpennPracticeProfilesDataPage();
+
+            // Select map tab
+            SelectMapTab();
+
+            // Population tab can be navigated to from search results
+            PopulationTabCanBeNavigatedToFromSearchResults();
+        }
+
+        private void PopulationTabCanBeNavigatedToFromSearchResults()
+        {
             // Type camb in search box and select first result in autocomplete box. 
             // This will display list of practices with select link
             SearchForPracticeAndSelectFirstResult("cambr");
@@ -69,9 +101,17 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             Assert.IsNotNull(populationTab);
         }
 
-        private void OpenProfilePage(string profileUrlKey)
+        private void OpenPracticeProfilesFrontPage()
         {
-            navigateTo.FingertipsDataForProfile(profileUrlKey);
+            navigateTo.FingertipsFrontPageForProfile(PracticeProfileUrlKey);
+
+            // Wait for practice search
+            waitFor.ExpectedElementToBeVisible(By.Id("gp-practice-search-text"));
+        }
+
+        private void OpennPracticeProfilesDataPage()
+        {
+            navigateTo.FingertipsDataForProfile(PracticeProfileUrlKey);
         }
 
         private void SelectMapTab()

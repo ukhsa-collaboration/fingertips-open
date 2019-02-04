@@ -3,6 +3,8 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.ServicesWeb.Helpers;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
 using Unity;
 using Unity.Injection;
 
@@ -22,6 +24,10 @@ namespace PholioVisualisation.ServicesWeb.DependencyResolver
 
             container.RegisterType<IIndicatorMetadataRepository>(new InjectionFactory(x => new IndicatorMetadataRepository()));
             container.RegisterType<IContentItemRepository>(new InjectionFactory(x => new ContentItemRepository()));
+            container.RegisterType<IAreaListRepository>(new InjectionFactory(x => new AreaListRepository(new fingertips_usersEntities())));
+
+            container.RegisterType<IPublicIdGenerator>(new InjectionFactory(x =>
+                new PublicIdGenerator(new AreaListRepository(new fingertips_usersEntities()))));
 
             container.RegisterType<IRequestContentParserHelper, RequestContentParserHelper>();
             container.RegisterType<ICoreDataSetValidator, CoreDataSetValidator>();

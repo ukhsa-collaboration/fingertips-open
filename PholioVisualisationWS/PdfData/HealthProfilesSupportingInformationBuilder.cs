@@ -66,7 +66,6 @@ namespace PholioVisualisation.PdfData
             AssignLsoaQuintiles(area);
 
             // Population 
-            AssignDependencyRatio();
             AssignEthnicMinorities();
             AssignPopulationChange();
 
@@ -78,9 +77,6 @@ namespace PholioVisualisation.PdfData
             AssignEarlyDeathFromAllCauses();
             AssignEarlyDeathCvd();
             AssignEarlyDeathCancer();
-
-            // Page 3 bottom
-            AssignHealthInequalitiesEthnicity();
 
             return supportingInformation;
         }
@@ -191,11 +187,6 @@ namespace PholioVisualisation.PdfData
                 .ToString(CultureInfo.CurrentCulture);
         }
 
-        public void AssignDependencyRatio()
-        {
-            Grouping grouping = groupRootSelector.DependencyRatio.FirstGrouping;
-            data.DependencyRatio = GetFormattedValue(grouping);
-        }
 
         public void AssignEthnicMinorities()
         {
@@ -450,35 +441,6 @@ namespace PholioVisualisation.PdfData
         {
             coreDataProcessor.TruncateList(data);
             return data.Select(x => x.Value).ToList();
-        }
-
-        private void AssignHealthInequalitiesEthnicity()
-        {
-            const int categoryTypeId = CategoryTypeIds.EthnicGroups7;
-            Grouping grouping = groupRootSelector.HealthInequalitiesEthnicity.FirstGrouping;
-            IndicatorMetadata metadata = indicatorMetadataCollection.GetIndicatorMetadataById(grouping.IndicatorId);
-            TimePeriod timePeriod = TimePeriod.GetDataPoint(grouping);
-            var formatter = new NumericFormatterFactory(groupDataReader).New(metadata);
-
-            IList<CoreDataSet> coreDataSetsLocal = groupDataReader
-                .GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                    grouping, timePeriod, categoryTypeId, areaCode);
-
-            data.EmergencyAdmissionsLocalByEthnicity = AddEthnicityLabelToCoreDataSet(coreDataSetsLocal,
-                formatter);
-
-            IList<CoreDataSet> coreDataSetsEngland = groupDataReader.
-                GetCoreDataListForAllCategoryAreasOfCategoryAreaType(
-                    grouping, timePeriod, categoryTypeId, benchmarkAreaCode);
-
-            data.EmergencyAdmissionsEnglandByEthnicity = AddEthnicityLabelToCoreDataSet(coreDataSetsEngland,
-                formatter);
-
-            data.EmergencyAdmissionsLocal = coreDataSetProvider.GetData(grouping, timePeriod, metadata);
-            data.EmergencyAdmissionsEngland = benchmarkDataProvider.GetData(grouping, timePeriod, metadata);
-
-            formatter.Format(data.EmergencyAdmissionsLocal);
-            formatter.Format(data.EmergencyAdmissionsEngland);
         }
 
         private Dictionary<string, CoreDataSet> AddEthnicityLabelToCoreDataSet(

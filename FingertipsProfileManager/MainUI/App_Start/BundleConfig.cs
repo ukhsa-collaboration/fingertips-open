@@ -11,11 +11,11 @@ namespace Fpm.MainUI
             var angularDist = "~/" + AppConfig.AngularAppDistPath;
 
             bundles.Add(new ScriptBundle("~/angular-dist")
-                .Include(angularDist + "inline.bundle.js")
-                .Include(angularDist + "polyfills.bundle.js")
-                .Include(angularDist + "styles.bundle.js")
-                .Include(angularDist + "vendor.bundle.js")
-                .Include(angularDist + "main.bundle.js")
+                .Include(angularDist + "main.js")
+                .Include(angularDist + "polyfills.js")
+                .Include(angularDist + "runtime.js")
+                .Include(angularDist + "styles.js")
+                .Include(angularDist + "vendor.js")
                 );
 
             bundles.Add(new StyleBundle("~/css/site")
@@ -26,8 +26,8 @@ namespace Fpm.MainUI
                );
 
             bundles.Add(new ScriptBundle("~/js/jquery")
-                .Include(jsPath + "jquery-1.12.1.js")
-                .Include(jsPath + "jquery-ui-1.9.2.js")
+                .Include(jsPath + "jquery-3.3.1.min.js")
+                .Include(jsPath + "jquery-ui-1.12.1.min.js")
                 .Include(jsPath + "jquery-migrate-1.3.0.js")
                 .Include(jsPath + "jquery.validate.min.js")
                 .Include(jsPath + "jquery.validate.unobtrusive.min.js")

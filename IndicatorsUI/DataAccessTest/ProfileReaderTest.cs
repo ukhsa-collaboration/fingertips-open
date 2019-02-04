@@ -75,12 +75,6 @@ namespace IndicatorsUI.DataAccessTest
         }
 
         [TestMethod]
-        public void TestGetProfileDetailsRagColourId()
-        {
-            Assert.AreEqual(0, PhofProfile().RagColourId);
-        }
-
-        [TestMethod]
         public void TestGetProfileDomains()
         {
             var domains = GetDomains(new[] { GroupIds.SevereMentalIllness_Finance });
@@ -216,7 +210,7 @@ namespace IndicatorsUI.DataAccessTest
         public void TestGetDomainIds()
         {
             var profileReader = ReaderFactory.GetProfileReader();
-            var domainIds = profileReader.GetDomainIds(ProfileIds.DiabetesLongerLives);
+            var domainIds = profileReader.GetDomainIds(ProfileIds.PublicHealthDashboard);
             Assert.IsTrue(domainIds.Count > 0);
         }
 
@@ -230,26 +224,9 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetProfileDetailsById()
         {
-            var details = ReaderFactory.GetProfileReader().GetProfileDetails(ProfileIds.Phof);
-            Assert.AreEqual(ProfileIds.Phof, details.Id);
-        }
-
-        [TestMethod]
-        public void TestGetProfileDetailsWithLongerLivesProfileDetails()
-        {
-            var reader = Reader();
-            Assert.IsNull(reader.GetProfileDetails(ProfileIds.Phof).LongerLivesProfileDetails);
-
-            var details = reader.GetProfileDetails(ProfileIds.DiabetesLongerLives).LongerLivesProfileDetails;
-
-            Assert.IsNotNull(details);
-            Assert.IsNotNull(details.Title);
-        }
-
-        private static ProfileReader Reader()
-        {
-            var reader = ReaderFactory.GetProfileReader();
-            return reader;
+            var profileId = ProfileIds.PublicHealthDashboard;
+            var details = ReaderFactory.GetProfileReader().GetProfileDetails(profileId);
+            Assert.AreEqual(profileId, details.Id);
         }
 
         private static ProfileDetails PhofProfile()

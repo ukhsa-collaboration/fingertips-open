@@ -37,7 +37,8 @@ namespace Fpm.MainUI.Controllers
             model.ProfileList = ProfileMenuHelper.GetProfileListForCurrentUser();
             model.ProfileId = profileId;
             ViewBag.ProfileId = profileId;
-            model.ContentItems = _reader.GetProfileContentItems(profileId);
+            model.ContentItems = _reader.GetProfileContentItems(profileId)
+                .OrderBy(x => x.Description).ToList();
             return View(model);
         }
 
@@ -78,7 +79,14 @@ namespace Fpm.MainUI.Controllers
                 return View("CreateContentItem", contentItem);
             }
 
+            // Check content
             var content = contentItem.IsPlainText ? formatPlainText(contentItem.Content) : contentItem.Content;
+            if (content == null)
+            {
+                content = String.Empty;
+            }
+
+            // Save new content item
             var newContentItem = _writer.NewContentItem(contentItem.ProfileId,
                 contentItem.ContentKey, contentItem.Description, contentItem.IsPlainText, content);
             AuditContentChange(newContentItem, "CREATED");
@@ -115,6 +123,12 @@ namespace Fpm.MainUI.Controllers
                 ViewBag.ProfileName = _reader.GetProfileDetailsByProfileId(contentItem.ProfileId).Name;
 
                 return View("EditContentItem", contentItem);
+            }
+
+            // Check content
+            if (newContentItem.Content == null)
+            {
+                newContentItem.Content = string.Empty;
             }
 
             _writer.UpdateContentItem(newContentItem);

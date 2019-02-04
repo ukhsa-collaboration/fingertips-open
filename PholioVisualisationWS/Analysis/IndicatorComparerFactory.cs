@@ -26,8 +26,8 @@ namespace PholioVisualisation.Analysis
                 case ComparatorMethodIds.NoComparison:
                     _comparer = new NoComparisonComparer();
                     break;
-                case ComparatorMethodIds.SingleOverlappingCIs:
-                    _comparer = new SingleOverlappingCIsComparer();
+                case ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel:
+                    _comparer = new SingleOverlappingCIsForOneCILevelComparer();
                     break;
                 case ComparatorMethodIds.SpcForProportions:
                     _comparer = new SpcForProportionsComparer();
@@ -48,6 +48,9 @@ namespace PholioVisualisation.Analysis
                     break;
                 case ComparatorMethodIds.SuicidePreventionPlan:
                     _comparer = new SuicidePreventPlanComparer();
+                    break;
+                case ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels:
+                    _comparer = new SingleOverlappingCIsForTwoCILevelsComparer();
                     break;
                 default:
                     throw new FingertipsException("Invalid comparator method ID: " + grouping.ComparatorMethodId);

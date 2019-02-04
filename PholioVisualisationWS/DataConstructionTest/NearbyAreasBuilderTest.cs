@@ -26,8 +26,8 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestDistanceFormattedTo1DP()
         {
             var areas = NearByAreas();
-            Assert.AreEqual("0.5", areas[1].DistanceValF);
-            Assert.AreEqual("0.6", areas[2].DistanceValF);
+            Assert.AreEqual("0.6", areas[1].DistanceValF);
+            Assert.AreEqual("0.7", areas[2].DistanceValF);
         }
 
         private static IList<NearByAreas> NearByAreas()

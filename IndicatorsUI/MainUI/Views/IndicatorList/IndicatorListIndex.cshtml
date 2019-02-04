@@ -10,15 +10,23 @@
 <div class="container">
     <div class="row">
         <div id="div-content" class="col-md-12">
-            <h2>Your indicator lists</h2>
+            @Html.Partial("_TabbedListHeader")
             <p>Indicator lists allow you to view data for specific indicators and share links to those views with others</p>
             @Html.ActionLink("Create new indicator list", "create", "indicatorlist", new { },
-                new { @class = "btn btn-primary" })
+                new { id = "lnk-create-new-indicator-list", @class = "btn btn-primary" })
         </div>
+
         @if (Model.IndicatorLists.Any())
         {
             <div id="grid-content" class="col-md-12">
                 @{
+                    if (ViewBag.Error != null)
+                    {
+                        <div class="error-message">
+                            @ViewBag.Error
+                        </div>
+                    }
+
                     WebGrid grid = new WebGrid(
                         source: Model.IndicatorLists,
                         canPage: true,
@@ -41,19 +49,26 @@
                         grid.Column(header: "View", style: "center", format: (item) =>
                         {
                             var link = Html.ActionLink("View", "ViewIndicatorList", "Search",
-                                new { listId = item.PublicId }, new { @class = "btn btn-primary" });
+                                new { listId = item.PublicId }, new { id = "lnk-view-indicator-list", @class = "btn btn-outline-primary indicator-list-button" });
 
                             return link;
                         }),
                         grid.Column(header: "Edit", style: "center", format: (item) =>
                         {
                             var link = Html.ActionLink("Edit", "edit", "indicatorlist",
-                                new { listId = item.PublicId }, new { @class = "btn btn-primary" });
+                                new { listId = item.PublicId }, new { id = "lnk-edit-indicator-list", @class = "btn btn-outline-primary indicator-list-button" });
+                            return link;
+                        }),
+                        grid.Column(header: "Copy", style: "center", format: (item) =>
+                        {
+                            var link = Html.ActionLink("Copy", "Copy", "indicatorlist",
+                                new { listid = item.PublicId, listName = item.ListName },
+                                new { id = "lnk-copy-indicator-list", @class = "btn btn-outline-primary indicator-list-button", onclick = "return copyConfirm(this, '" + item.PublicId + "', '" + item.ListName + "');" });
                             return link;
                         }),
                         grid.Column(header: "Share by email", style: "center", format: (item) =>
                         {
-                            var link = Html.Raw("<a href=\"#\" class=\"btn btn-primary\" onclick=\"return openEmailDialog(this,'" + item.PublicId + 
+                            var link = Html.Raw("<a href=\"#\" class=\"btn btn-outline-primary indicator-list-button\" onclick=\"return openEmailDialog(this,'" + item.PublicId + 
                                 "','" + item.ListName + "')\">Share</a> ");
                             return link;
                         }),
@@ -61,7 +76,7 @@
                         {
                             var link = Html.ActionLink("Delete", "Delete", "indicatorlist",
                                 new { listid = item.PublicId },
-                                new { @class = "btn btn-primary", onclick = "return deleteConfirm(this);" });
+                                new { @class = "btn btn-outline-primary  indicator-list-button", onclick = "return deleteConfirm(this);" });
                             return link;
                         })
                         ))

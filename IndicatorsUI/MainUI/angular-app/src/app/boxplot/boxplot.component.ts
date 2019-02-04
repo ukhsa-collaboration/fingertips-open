@@ -8,6 +8,7 @@ import { BoxplotData } from './boxplot';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import { IndicatorService } from '../shared/service/api/indicator.service';
 import { IndicatorHeader } from '../shared/component/indicator-header/indicator-header.component';
+import { AreaTypeIds } from 'app/shared/shared';
 
 @Component({
   selector: 'ft-boxplot',
@@ -17,7 +18,8 @@ import { IndicatorHeader } from '../shared/component/indicator-header/indicator-
 export class BoxplotComponent {
 
   public header: IndicatorHeader;
-  private boxplotData: BoxplotData;
+  public boxplotData: BoxplotData;
+  public isAvailable = true;
 
   constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) { }
 
@@ -29,18 +31,17 @@ export class BoxplotComponent {
     let groupRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
     let model = ftHelper.getFTModel();
 
+    this.isAvailable = model.areaTypeId !== AreaTypeIds.Country;
+
     // Get data
-    let groupRootsObservable = this.indicatorService.getLatestDataForAllIndicatorsInProfileGroupForChildAreas(model.groupId,
-      model.areaTypeId, model.parentCode, model.profileId);
     let metadataObservable = this.indicatorService.getIndicatorMetadata(model.groupId);
     let statsObservable = this.indicatorService.getIndicatorStatisticsTrendsForSingleIndicator(
       groupRoot.IID, groupRoot.Sex.Id, groupRoot.Age.Id, model.areaTypeId,
       this.ftHelperService.getCurrentComparator().Code);
 
-    Observable.forkJoin([groupRootsObservable, metadataObservable, statsObservable]).subscribe(results => {
-      let groupRoots: GroupRoot[] = results[0];
-      let metadataHash: Map<number, IndicatorMetadata> = results[1];
-      let statsArray: IndicatorStats[] = results[2];
+    Observable.forkJoin([metadataObservable, statsObservable]).subscribe(results => {
+      let metadataHash: Map<number, IndicatorMetadata> = results[0];
+      let statsArray: IndicatorStats[] = results[1];
 
       this.displayBoxplot(metadataHash[groupRoot.IID], groupRoot, statsArray);
 
@@ -55,10 +56,10 @@ export class BoxplotComponent {
     this.displayHeader(metadata, groupRoot);
 
     // Define data
-    var data = new BoxplotData(metadata, this.ftHelperService.getAreaTypeName(),
+    let data = new BoxplotData(metadata, this.ftHelperService.getAreaTypeName(),
       this.ftHelperService.getCurrentComparator().Name);
-    for (var i = 0; i < statsArray.length; i++) {
-      var indicatorStats = statsArray[i];
+    for (let i = 0; i < statsArray.length; i++) {
+      let indicatorStats = statsArray[i];
       if (indicatorStats.Stats) {
         data.addStats(indicatorStats);
       }
@@ -67,14 +68,15 @@ export class BoxplotComponent {
   }
 
   displayHeader(metadata: IndicatorMetadata, groupRoot: GroupRoot): void {
-    var unitLabel = metadata.Unit.Label;
+    let unitLabel = metadata.Unit.Label;
     if (unitLabel !== '') {
       unitLabel = ' - ' + unitLabel;
     }
 
-    var hasDataChangedRecently = groupRoot.DateChanges && groupRoot.DateChanges.HasDataChangedRecently;
+    let hasDataChangedRecently = groupRoot.DateChanges && groupRoot.DateChanges.HasDataChangedRecently;
 
-    this.header = new IndicatorHeader(metadata.Descriptive['Name'], hasDataChangedRecently, this.ftHelperService.getCurrentComparator().Name,
+    this.header = new IndicatorHeader(metadata.Descriptive['Name'], hasDataChangedRecently,
+      this.ftHelperService.getCurrentComparator().Name,
       metadata.ValueType.Name, unitLabel, this.ftHelperService.getSexAndAgeLabel(groupRoot));
   }
 

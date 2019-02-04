@@ -1,0 +1,68 @@
+.light-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: #000;
+    height: 1500px;
+    width: 100%;
+    opacity: 0.50;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    filter: alpha(opacity=50);
+    z-index: 1;
+}
+
+.info-box {
+    position: absolute;
+    background: white;
+    border: 5px solid #eee;
+    padding: 6px;
+    z-index: 1000;
+    border-radius: 5px;
+    top: 30%;
+    left: calc(50% - 250px);
+    width: 500px;
+}
+
+.info-text {
+    padding-bottom: 20px;
+}
+
+.close-button {
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+    margin-top: 6px;
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 27;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+    cursor: pointer;
+}
+
+.ok {
+    width: 90px;
+}
+
+h2 {
+    border-bottom: none;
+    margin: 0 0 3px 0 !important;
+}
+
+.error-message {
+    color: #ff0000;
+    margin-top: 5px;
+}
+
+.additional-html {
+    height: 140px;
+    overflow-y: scroll;
+    margin-top: 10px;
+}
+
+.buttons {
+    position: absolute;
+    bottom: 30px;
+}

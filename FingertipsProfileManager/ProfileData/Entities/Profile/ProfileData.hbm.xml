@@ -31,7 +31,6 @@
     <property name="IsNational" column="is_national"/>
     <property name="HasOwnFrontPage" column="has_own_front_page"/>
     <property name="DefaultAreaTypeId" column="default_area_type_id"/>
-    <property name="KeyColourId" column="key_colour_id"/>
     <property name="SkinId" column="skin_id"/>
     <property name="AreasIgnoredForSpineChart" column="areas_ignored_for_spine_chart"/>
     <property name="AreasIgnoredEverywhere" column="areas_ignored_everywhere"/>
@@ -54,7 +53,7 @@
     <property name="IsChangeFromPreviousPeriodShown" column="is_change_from_previous_period_shown"/>
     
     <property name="LeadProfileForCollectionIds" column="lead_profile_for_collection_ids"/>
-    <property name="NewDataTimeSpanInDays" column="new_data_time_span_in_days"/>
+    <property name="NewDataDeploymentCount" column="new_data_deployment_count"/>
   </class>
   
   <!-- GroupingMetadata class -->
@@ -134,7 +133,7 @@
     <property name="IsHtml" column="ishtml"/>
     <property name="IsMandatory" column="ismandatory"/>
     <property name="IsSearchable" column="issearchable"/>
-    <property name="DisplayOrder" column="displayorder"/>
+    <property name="DisplayOrder" column="displayorderinfpm"/>
     <property name="IsOverridable" column="isoverridable"/>
 
   </class>
@@ -184,7 +183,9 @@
     <property name="Rounding" column="[24_Rounding]" />
     <property name="DataQuality" column="[25_DataQuality]" />
     <property name="IndicatorContent" column="[26_IndicatorContent]" />
-    
+    <property name="SpecificRationale" type="StringClob">
+      <column name="[27_SpecificRationale]" sql-type="text"/>
+    </property>
   </class>
 
   <!-- Indicator Audit class -->
@@ -329,6 +330,17 @@
     <property name="Description" column="description"/>
   </class>
 
+  <!-- GroupingSubheading class -->
+  <class name="GroupingSubheading" table="GroupingSubheadings">
+    <id name="SubheadingId" column="subheadingid" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="GroupId" column="groupid"/>
+    <property name="AreaTypeId" column="areatypeid"/>
+    <property name="Subheading" column="subheading"/>
+    <property name="Sequence" column="sequence"/>
+  </class>
+  
   <!-- SQL Queries -->
   <sql-query name="GetIndicatorMetadataTextValues">
     SELECT * FROM IndicatorMetadataTextValues 
@@ -387,6 +399,18 @@
     AND (imtv.ProfileId =  :ProfileId   OR  imtv.ProfileId IS NULL)
     AND (g.AreaTypeID =  :AreaTypeId )
     ORDER BY g.GroupID DESC
+  </sql-query>
+
+  <sql-query name="Insert_GroupingSubheading">
+    INSERT INTO GroupingSubheadings(GroupId, AreaTypeId, Subheading, Sequence) VALUES (:GroupId, :AreaTypeId, :Subheading, :Sequence)
+  </sql-query>
+
+  <sql-query name="Update_GroupingSubheading">
+    UPDATE GroupingSubheadings SET GroupId = :GroupId, AreaTypeId = :AreaTypeId, Subheading = :Subheading, Sequence = :Sequence WHERE SubheadingId = :SubheadingId
+  </sql-query>
+
+  <sql-query name="Delete_GroupingSubheading">
+    DELETE FROM GroupingSubheadings WHERE SubheadingId = :SubheadingId
   </sql-query>
 
 </hibernate-mapping>

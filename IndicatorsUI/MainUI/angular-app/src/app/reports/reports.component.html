@@ -1,0 +1,32 @@
+<div id="reports-container" style="display:none;">
+    <div *ngIf="hasReports">
+        <h2>Related reports</h2>
+        <table class="bordered-table table-hover">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="width:400px;">Notes</th>
+                    <th colspan="3" style="text-align:center;width:400px;">Download</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let report of reports">
+                    <td>{{report.Name}}</td>
+                    <td>{{report.Notes}}</td>
+                    <td class="format">
+                        <button class="btn btn-link" (click)="openReport(report, 'pdf')">PDF</button>
+                    </td>
+                    <td class="format">
+                        <button class="btn btn-link" (click)="openReport(report, 'word')">Word</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br><br>
+        <div>Please note reports open in a separate tab or window. Reports may take a minute or two to load.</div>
+        <br>
+        <div [innerHtml]="extraNotes"></div>
+    </div>
+
+    <div *ngIf="isInitialised && !hasReports">There are no reports available for this profile</div>
+</div>

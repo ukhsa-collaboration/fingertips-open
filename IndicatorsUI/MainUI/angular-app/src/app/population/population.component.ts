@@ -28,7 +28,7 @@ export class PopulationComponent {
     this.showSummary = model.areaTypeId === AreaTypeIds.Practice;
 
     // Get populations
-    let observables = [];
+    const observables = [];
     observables.push(
       this.indicatorService.getPopulation(model.areaCode, model.areaTypeId),
       this.indicatorService.getPopulation(model.parentCode, model.areaTypeId),
@@ -46,7 +46,7 @@ export class PopulationComponent {
     Observable.forkJoin(observables).subscribe(results => {
 
       // Init populations
-      var populations = new Populations();
+      let populations = new Populations();
       populations.areaPopulation = <Population>results[0];
       populations.areaParentPopulation = <Population>results[1];
       populations.nationalPopulation = <Population>results[2];
@@ -55,8 +55,8 @@ export class PopulationComponent {
 
       // Summary
       if (this.showSummary) {
-        let deprivationDeciles = <Category[]>results[4];
-        let populationSummary = <PopulationSummary>results[3];
+        const deprivationDeciles = <Category[]>results[4];
+        const populationSummary = <PopulationSummary>results[3];
         this.allPopulationData = new AllPopulationData(this.populations,
           populationSummary, deprivationDeciles);
       }

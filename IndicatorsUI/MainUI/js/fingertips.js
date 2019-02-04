@@ -29,7 +29,8 @@ var loaded = {
     boundaries: {}, // Boundary coordinates for maps: Key -> areaTypeId, Value -> [] of area coordinates
     valueNotes: {},
     groupDataAtDataPoint: {},
-    trendMarkers: {}
+    trendMarkers: {},
+    groupingSubheadings: {}
 };
 
 /**
@@ -268,9 +269,7 @@ function showTargetBenchmarkOption(roots) {
     }
 }
 
-/*
-* Get AreaName from selected area Object
-*/
+// In angular see AreaHelper
 function getAreaNameToDisplay(area) {
     if (area.AreaTypeId === AreaTypeIds.Practice) {
         return area.Code + ' - ' + area.Name;
@@ -279,6 +278,7 @@ function getAreaNameToDisplay(area) {
     }
 }
 
+// In angular see AreaHelper
 function getShortAreaNameToDisplay(area) {
     if (area.AreaTypeId === AreaTypeIds.Practice) {
         return area.Code + ' - ' + area.Short;
@@ -576,6 +576,8 @@ FT.model = {
     ageId: null,
     sexId: null,
     nearestNeighbour: null,
+    groupRoots: null,
+    filterIndicatorPeriod: null,
 
     /**
     * Resets the model.
@@ -1105,12 +1107,43 @@ function getAddressText(address) {
     return a.join(', ');
 }
 
-function getColourFromSignificance(significance, useRag, colours, useQuintileColouring) {
+function getColourFromSignificance(significance, useRag, colours, useQuintileColouring, indicatorId, sexId, ageId) {
+
+    if(isEnglandAreaType() && pages.getDefault() === PAGE_MODES.AREA_TRENDS) {
+        return colours.comparator;
+    }
+
     if (useQuintileColouring) {
-        switch (true) {
-            case (significance > 0 && significance < 6):
-                var quintile = 'quintile' + significance;
-                return colours[quintile];
+        if (significance > 0 && significance < 6) {
+            var quintile = 'quintile' + significance;
+            var groupRoot = getGroupRootByIndicatorSexAndAge(indicatorId, sexId, ageId);
+            if (groupRoot.PolarityId === PolarityIds.NotApplicable) {
+                switch (quintile) {
+                case 'quintile1':
+                    return colours['bobQuintile1'];
+                case 'quintile2':
+                    return colours['bobQuintile2'];
+                case 'quintile3':
+                    return colours['bobQuintile3'];
+                case 'quintile4':
+                    return colours['bobQuintile4'];
+                case 'quintile5':
+                    return colours['bobQuintile5'];
+                }
+            } else {
+                switch (quintile) {
+                case 'quintile1':
+                    return colours['ragQuintile1'];
+                case 'quintile2':
+                    return colours['ragQuintile2'];
+                case 'quintile3':
+                    return colours['ragQuintile3'];
+                case 'quintile4':
+                    return colours['ragQuintile4'];
+                case 'quintile5':
+                    return colours['ragQuintile5'];
+                }
+            }
         }
     } else {
         if (useRag) {
@@ -1121,6 +1154,10 @@ function getColourFromSignificance(significance, useRag, colours, useQuintileCol
                     return colours.same;
                 case 3:
                     return colours.better;
+                case 4:
+                    return colours.worst;
+                case 5:
+                    return colours.best;
             }
         } else {
             switch (significance) {
@@ -1197,6 +1234,7 @@ function initAreaSearch(jquerySelector, excludeParentAreasFromSearchResults, ext
         autoFocus: true,
         minLength: 3,
         select: function (event, ui) {
+            lightbox.hide();
             event.preventDefault();
             areaSearchResultSelected($noMatches, ui.item.result);
 
@@ -1481,25 +1519,6 @@ function getTrendMarkerImage(trendMarker, polarity) {
             break;
     }
     return "<img src='/images/trends/" + imageName + ".png" + "'/>";
-}
-
-
-/**
-* Get the content for current profile
-* @class getContentText
-*/
-function getContentText(contentKey) {
-    var model = FT.model;
-    var parameters = new ParameterBuilder(
-      ).add('profile_id', model.profileId
-      ).add('key', contentKey);
-
-    ajaxGet('api/content',
-        parameters.build(),
-        function (obj) {
-            loaded.contentText = obj;
-            ajaxMonitor.callCompleted();
-        });
 }
 
 function exportChartAsImage(chart) {

@@ -21,6 +21,7 @@
     <IISExpressUseClassicPipelineMode />
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -216,11 +217,14 @@
     <Compile Include="App_Start\AutoMapperConfig.cs" />
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\AreaListController.cs" />
     <Compile Include="Controllers\ContentController.cs" />
+    <Compile Include="Controllers\DownloadDataFileController.cs" />
     <Compile Include="Controllers\PholioController.cs" />
     <Compile Include="Controllers\UserFeedbackController.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
     <Compile Include="Helpers\HttpHelper.cs" />
+    <Compile Include="Helpers\PublicIdGenerator.cs" />
     <Compile Include="Helpers\RequestContentParserHelper.cs" />
     <Compile Include="Helpers\ServiceHelper.cs" />
     <Compile Include="Controllers\AreasController.cs" />
@@ -252,7 +256,9 @@
       <SubType>Designer</SubType>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Views\AreaList\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Analysis\Analysis.csproj">
       <Project>{6c6f1c27-953f-4b31-8b0b-6a998e57cb68}</Project>

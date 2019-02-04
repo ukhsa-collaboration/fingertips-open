@@ -1,22 +1,7 @@
 ﻿@using System.Globalization
+@using Fpm.ProfileData.Repositories
 @{
-    var dates = new List<DateTime>
-            {
-                new DateTime(2017, 11, 7),
-                new DateTime(2017, 12, 5),
-                new DateTime(2018, 1, 9),
-                new DateTime(2018, 2, 6),
-                new DateTime(2018, 3, 6),
-                new DateTime(2018, 4, 4),
-                new DateTime(2018, 5, 1),
-                new DateTime(2018, 6, 5),
-                new DateTime(2018, 7, 3),
-                new DateTime(2018, 8, 7),
-                new DateTime(2018, 9, 4),
-                new DateTime(2018, 10, 2),
-                new DateTime(2018, 11, 6),
-                new DateTime(2018, 12, 4),
-            };
+    var dates = new MonthlyReleaseRepository().GetUpcomingMonthlyReleases(6).Select(x => x.ReleaseDate);
 }
 <ul class="list-unstyled">
     @foreach (var date in dates.Where(x => x > DateTime.Now).Take(6))

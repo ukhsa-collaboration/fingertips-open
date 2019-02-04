@@ -167,7 +167,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Controllers\AreaListControllerTest.cs" />
     <Compile Include="Controllers\ContentControllerTest.cs" />
+    <Compile Include="Controllers\DownloadDataFileControllerTest.cs" />
     <Compile Include="Controllers\DocumentsControllerTest.cs" />
     <Compile Include="Controllers\PholioControllerTest.cs" />
     <Compile Include="Helpers\RequestContentParserHelperTest.cs" />
@@ -206,6 +208,10 @@
     <ProjectReference Include="..\ServicesWeb\ServicesWeb.csproj">
       <Project>{4241a7e2-0530-43b9-9db9-ccd0d5585811}</Project>
       <Name>ServicesWeb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserData\UserData.csproj">
+      <Project>{F8A2D703-7140-4AC7-80CD-2B81DEC1770F}</Project>
+      <Name>UserData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

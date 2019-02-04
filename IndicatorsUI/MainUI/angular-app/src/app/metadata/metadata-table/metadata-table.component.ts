@@ -5,11 +5,12 @@ import {
 import { Observable } from 'rxjs/Observable';
 import {
   FTModel, FTRoot, GroupRoot, IndicatorMetadata, TooltipManager, IndicatorMetadataTextProperty,
-  KeyValuePair, ComparatorMethod
+  KeyValuePair, ComparatorMethod, ProfilePerIndicator
 } from '../../typings/FT.d';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { TooltipHelper } from '../../shared/shared';
 import { IndicatorService } from '../../shared/service/api/indicator.service';
+import { ProfileService } from '../../shared/service/api/profile.service';
 import * as _ from 'underscore';
 import { DatePipe } from '@angular/common';
 
@@ -28,9 +29,12 @@ export class MetadataTableComponent {
   private tempRows: MetadataRow[];
   private showDataQuality: boolean;
   private readonly NotApplicable: string = 'n/a';
-  private metadataProperties: IndicatorMetadataTextProperty[]
+  private metadataProperties: IndicatorMetadataTextProperty[];
+  private indicatorProfiles: Map<number, ProfilePerIndicator[]>;
 
-  constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) {
+  constructor(private ftHelperService: FTHelperService,
+    private indicatorService: IndicatorService,
+    private profileService: ProfileService) {
     this.showDataQuality = ftHelperService.getFTConfig().showDataQuality;
   }
 
@@ -38,6 +42,9 @@ export class MetadataTableComponent {
     this.ftHelperService.showIndicatorMetadataInLightbox(this.table.nativeElement);
   }
 
+  /**
+   * For displaying metadata on the Definitions tab
+   */
   public displayMetadataForGroupRoot(root: GroupRoot): void {
 
     this.isReady.emit(false);
@@ -45,13 +52,15 @@ export class MetadataTableComponent {
     // Get data by AJAX
     let metadataPropertiesObservable = this.indicatorService.getIndicatorMetadataProperties();
     let metadataObservable = this.indicatorService.getIndicatorMetadata(root.Grouping[0].GroupId);
+    let indicatorProfilesObservable = this.profileService.getIndicatorProfiles([root.IID]);
 
-    Observable.forkJoin([metadataPropertiesObservable, metadataObservable]).subscribe(results => {
+    Observable.forkJoin([metadataPropertiesObservable, metadataObservable, indicatorProfilesObservable]).subscribe(results => {
 
       this.metadataProperties = results[0];
       let metadataHash: Map<number, IndicatorMetadata> = results[1];
+      this.indicatorProfiles = results[2];
 
-      var indicatorMetadata = metadataHash[root.IID];
+      let indicatorMetadata = metadataHash[root.IID];
       this.displayMetadata(indicatorMetadata, root);
 
       this.ftHelperService.showAndHidePageElements();
@@ -60,6 +69,9 @@ export class MetadataTableComponent {
     });
   }
 
+  /**
+   * For displaying metadata in a pop up
+   */
   public displayMetadataForIndicator(indicatorId: number, restrictToProfileIds: number[]): void {
 
     this.isReady.emit(false);
@@ -72,11 +84,16 @@ export class MetadataTableComponent {
 
       this.metadataProperties = results[0];
       let metadataHash: Map<number, IndicatorMetadata> = results[1];
+      this.indicatorProfiles = null;
 
-      var indicatorMetadata = metadataHash[indicatorId];
+      let indicatorMetadata = metadataHash[indicatorId];
       this.displayMetadata(indicatorMetadata);
       this.isReady.emit(true);
     });
+  }
+
+  private displayMetadataForAjaxResults() {
+
   }
 
   private displayMetadata(indicatorMetadata: IndicatorMetadata, root?: GroupRoot): void {
@@ -97,7 +114,7 @@ export class MetadataTableComponent {
 
     this.addMetadataRow('Indicator ID', indicatorMetadata.IID);
 
-   if(root){
+    if (root) {
       if (root.DateChanges && root.DateChanges.DateOfLastChange && root.DateChanges.DateOfLastChange !== '') {
         let dateOfLastChange = new DatePipe('en-GB').transform(root.DateChanges.DateOfLastChange, 'dd MMM yyyy')
         if (root.DateChanges.HasDataChangedRecently) {
@@ -105,11 +122,11 @@ export class MetadataTableComponent {
         }
         this.addMetadataRow('Date updated', dateOfLastChange);
       }
-   }
+    }
 
     // Initial indicator text properties
     for (propertyIndex = 0; propertyIndex < this.metadataProperties.length; propertyIndex++) {
-      var property = this.metadataProperties[propertyIndex];
+      let property = this.metadataProperties[propertyIndex];
       if (property.Order > 59) {
         break;
       }
@@ -127,7 +144,7 @@ export class MetadataTableComponent {
     this.addMetadataRowByProperty(descriptive, this.metadataProperties[propertyIndex++]);
 
     // Unit
-    var unit = indicatorMetadata.Unit.Label;
+    let unit = indicatorMetadata.Unit.Label;
     if (unit) {
       this.addMetadataRow('Unit', indicatorMetadata.Unit.Label);
     }
@@ -165,20 +182,20 @@ export class MetadataTableComponent {
     }
 
     // Confidence interval method
-    var ciMethod = indicatorMetadata.ConfidenceIntervalMethod;
+    let ciMethod = indicatorMetadata.ConfidenceIntervalMethod;
     if (ciMethod) {
 
       this.addMetadataRow('Confidence interval method', ciMethod.Name);
 
       // Display CI method description
-      var cimDescription = ciMethod.Description;
+      let cimDescription = ciMethod.Description;
       if (cimDescription) {
         this.addMetadataRow('Confidence interval methodology', cimDescription);
       }
     }
 
     // Confidence level
-    var confidenceLevel = indicatorMetadata.ConfidenceLevel;
+    let confidenceLevel = indicatorMetadata.ConfidenceLevel;
     if (confidenceLevel > -1) {
       this.addMetadataRow('Confidence level', confidenceLevel + '%');
     }
@@ -189,8 +206,25 @@ export class MetadataTableComponent {
       propertyIndex++;
     }
 
+    this.addIndicatorProfiles(indicatorMetadata.IID);
+
     // Trigger view refresh
     this.rows = this.tempRows;
+  }
+
+  private addIndicatorProfiles(indicatorId: number) {
+
+    let indicatorProfiles = this.indicatorProfiles;
+
+    if (indicatorProfiles) {
+      let profiles: string[] = [];
+      for (let i = 0; i < indicatorProfiles[indicatorId].length; i++) {
+        let profilePerIndicator: ProfilePerIndicator = indicatorProfiles[indicatorId][i];
+        profiles.push('<a href="' + profilePerIndicator.Url + '" target="_blank">' + profilePerIndicator.ProfileName + '</a>')
+      }
+
+      this.addMetadataRow('Profiles included in', profiles.join(', '));
+    }
   }
 
   private addMetadataRow(header: string, text: string | number): void {
@@ -199,17 +233,18 @@ export class MetadataTableComponent {
 
   private addMetadataRowByProperty(textMetadata: KeyValuePair<string, string>[], property: IndicatorMetadataTextProperty): void {
 
-    var columnName = property.ColumnName;
+    let columnName = property.ColumnName;
 
     if (textMetadata !== null && textMetadata.hasOwnProperty(columnName)) {
-      var text = textMetadata[columnName];
+      let text = textMetadata[columnName];
 
       if (!_.isUndefined(text) && text !== '') {
 
+        let displayText: string;
         if ((columnName === 'DataQuality') && this.showDataQuality) {
           // Add data quality flags instead of number
-          var dataQualityCount = parseInt(text);
-          var displayText = this.ftHelperService.getIndicatorDataQualityHtml(text) + ' ' +
+          let dataQualityCount = parseInt(text);
+          displayText = this.ftHelperService.getIndicatorDataQualityHtml(text) + ' ' +
             this.ftHelperService.getIndicatorDataQualityTooltipText(dataQualityCount);
         } else {
           displayText = text;

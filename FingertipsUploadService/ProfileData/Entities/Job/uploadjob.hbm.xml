@@ -23,5 +23,6 @@
     <property name="IsCellValidationPerRowDone" column="IsCellValidationPerRowDone"/>
     <property name="IsSmallNumberOverrideApplied" column="IsSmallNumberOverrideApplied"/>
     <property name="IsDuplicateOverrideApplied" column="IsDuplicateOverrideApplied"/>
+    <property name="IsConfirmationRequiredToOverrideDatabaseDuplicates" column="IsConfirmationRequiredToOverrideDatabaseDuplicates"/>
   </class>
 </hibernate-mapping>

@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
 using IndicatorsUI.MainUI.Caching;
 using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.MainUI.Results;
+using Newtonsoft.Json;
 
 namespace IndicatorsUI.MainUI.Controllers
 {
@@ -56,6 +60,28 @@ namespace IndicatorsUI.MainUI.Controllers
             return new AjaxBridgeJsonResult(json);
         }
 
+        [HttpPost]
+        public JsonResult ApiPath(string serviceAction)
+        {
+            using (var client = new WebClient())
+            {
+                var request = HttpContext.Request;
+                var ajaxUrl = new AjaxUrl(request).WebServicesUrl;
+
+                var response = client.UploadValues(ajaxUrl, "POST", request.Form);
+                using (var responseReader = new StreamReader(new MemoryStream(response)))
+                {
+                    Object deserializeObject = JsonConvert.DeserializeObject<Object>(responseReader.ReadToEnd());
+                }
+
+                return new JsonResult()
+                {
+                    Data = "success",
+                    JsonRequestBehavior = JsonRequestBehavior.AllowGet
+                };
+            }
+        }
+
         /// <summary>
         /// General logging action
         /// </summary>
@@ -80,6 +106,17 @@ namespace IndicatorsUI.MainUI.Controllers
             WebClient wc = new WebClient();
             byte[] json = wc.DownloadData(url);
             return json;
+        }
+
+        private JsonResult PostJsonToWebServices(string url, string jsonData)
+        {
+            WebClient wc = new WebClient();
+            string result = wc.UploadString(url, jsonData);
+            return new JsonResult()
+            {
+                Data = result,
+                JsonRequestBehavior = JsonRequestBehavior.AllowGet
+            };
         }
 
         private void SetCachePolicyForCacheableResponse()

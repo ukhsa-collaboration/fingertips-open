@@ -53,7 +53,7 @@ namespace Fpm.MainUI
             container.RegisterType<IIndicatorMetadataTextCreator, IndicatorMetadataTextCreator>();
             container.RegisterType<IIndicatorMetadataTextParser, IndicatorMetadataTextParser>();
             container.RegisterType<IIndicatorOwnerChanger, IndicatorOwnerChanger>();
-            container.RegisterType<INewDataTimeSpanInDaysOptions, NewDataTimeSpanInDaysOptions>();
+            container.RegisterType<INewDataDeploymentCount, NewDataDeploymentCount>();
             container.RegisterType<IProfileDetailsCopier, ProfileDetailsCopier>();
             container.RegisterType<IProfileMenuHelper, ProfileMenuHelper>();
             container.RegisterType<ITimePeriodHelper, TimePeriodHelper>();

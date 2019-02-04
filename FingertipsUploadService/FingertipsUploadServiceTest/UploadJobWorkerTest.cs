@@ -10,9 +10,11 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Moq;
 
 namespace FingertipsUploadServiceTest
 {
@@ -114,7 +116,7 @@ namespace FingertipsUploadServiceTest
         {
             var job = ProcessUploadJob("upload-new-data-old-ci-names.csv");
             Assert.IsTrue(job.Status == UploadJobStatus.SuccessfulUpload ||
-                job.Status == UploadJobStatus.ConfirmationAwaited);
+                          job.Status == UploadJobStatus.ConfirmationAwaited);
         }
 
         [TestMethod]
@@ -247,7 +249,7 @@ namespace FingertipsUploadServiceTest
             var uploader = new DataUploader(CoreDataRepository, _logger);
             var processor = new DataValidator(CoreDataRepository, _logger);
 
-            var wrongWorksheets = new List<string> { "Fus", "FPM" };
+            var wrongWorksheets = new List<string> {"Fus", "FPM"};
             var fileReader = new Moq.Mock<IUploadFileReader>();
             fileReader.Setup(f => f.GetWorksheets()).Returns(wrongWorksheets);
 
@@ -266,7 +268,7 @@ namespace FingertipsUploadServiceTest
             var validator = new WorksheetNameValidator();
             var processor = new DataValidator(CoreDataRepository, _logger);
 
-            var correctWorksheet = new List<string> { WorksheetNames.Pholio };
+            var correctWorksheet = new List<string> {WorksheetNames.Pholio};
 
             var batchDataTable = UploadDataSchema.CreateEmptyTable();
             batchDataTable.Rows.Add(IndicatorIds.GeneralHealthExcellent, 2030, 1, -1, -1,
@@ -365,6 +367,7 @@ namespace FingertipsUploadServiceTest
             {
                 worker.ProcessJob(job, validator, processor, fileReader, uploader);
             }
+
             return job;
         }
 
@@ -395,19 +398,21 @@ namespace FingertipsUploadServiceTest
                 DateCreated = DateTime.Now,
                 Filename = @"fake.xls",
                 UserId = UserIds.Doris,
-                Username = UserNames.Doris
+                Username = UserNames.Doris,
+                IsConfirmationRequiredToOverrideDatabaseDuplicates = true
             };
             return job;
         }
 
         private string GetDataRow(CoreDataSet data)
         {
-            return string.Join(",", new List<object> {
+            return string.Join(",", new List<object>
+            {
                 IndicatorIds.GeneralHealthExcellent, 2030, 1, -1, -1,
                 AgeIds.Aged15,
                 SexIds.Persons,
                 AreaCodes.England,
-                -1,//Count
+                -1, //Count
                 35.3,
                 data.LowerCI95.HasValue ? data.LowerCI95.ToString() : "",
                 data.UpperCI95.HasValue ? data.UpperCI95.ToString() : "",
@@ -425,6 +430,121 @@ namespace FingertipsUploadServiceTest
         {
             var data = CoreDataRepository.GetCoreDataSetByUploadJobId(_jobGuid).First();
             return data;
+        }
+    }
+
+    [TestClass]
+    public class UploadJobWorkerUnitTest
+    {
+        public Logger _logger = LogManager.GetLogger("BatchJobWorker");
+
+        public Mock<IWorksheetNameValidator> _mockNameValidator;
+        public Mock<IDataValidator> _mockValidator;
+        public Mock<IUploadFileReader> _mockFileReader;
+        public Mock<IDataTableUploader> _mockUploader;
+
+        public UploadJobRepository JobRepository;
+
+        [TestInitialize]
+        public void RunBeforeEachTest()
+        {
+            _mockNameValidator = new Mock<IWorksheetNameValidator>();
+            _mockValidator = new Mock<IDataValidator>(MockBehavior.Strict);
+            _mockFileReader = new Mock<IUploadFileReader>();
+            _mockUploader = new Mock<IDataTableUploader>();
+
+            JobRepository = new UploadJobRepository();
+            AutoMapperConfig.RegisterMappings();
+        }
+
+        [TestMethod]
+        public void Should_Check_Duplicates_When_Confirmation_Is_Required_In_Db()
+        {
+            // Arrange 
+            var uploadJobWithConfirmationRequired = new UploadJob()
+            {
+                Guid = Guid.NewGuid(),
+                Status = UploadJobStatus.NotStarted,
+                DateCreated = DateTime.Now,
+                Filename = @"fake.xls",
+                UserId = UserIds.Doris,
+                Username = UserNames.Doris,
+                IsCellValidationPerRowDone = true,
+                IsSmallNumberOverrideApplied = true,
+                IsConfirmationRequiredToOverrideDatabaseDuplicates = true
+            };
+
+            ArrangeCheckDuplicates();
+
+            // Act
+            var job = JobRepository.SaveJob(uploadJobWithConfirmationRequired);
+            ActCheckDuplicates(job);
+
+            //Assert
+            AssertCheckDuplicates();
+        }
+
+        [TestMethod]
+        public void Should_Check_Duplicates_When_Confirmation_Is_Not_Required_In_Db()
+        {
+            // Arrange
+            var uploadJobSkipConfirmation = new UploadJob()
+            {
+                Guid = Guid.NewGuid(),
+                Status = UploadJobStatus.NotStarted,
+                DateCreated = DateTime.Now,
+                Filename = @"fake.xls",
+                UserId = UserIds.Doris,
+                Username = UserNames.Doris,
+                IsCellValidationPerRowDone = true,
+                IsSmallNumberOverrideApplied = true,
+                IsConfirmationRequiredToOverrideDatabaseDuplicates = false
+            };
+
+            ArrangeCheckDuplicates();
+
+            // Act
+            var job = JobRepository.SaveJob(uploadJobSkipConfirmation);
+            ActCheckDuplicates(job);
+
+            //Assert
+            AssertCheckDuplicates();
+        }
+
+        private void ArrangeCheckDuplicates()
+        {
+            var correctWorksheet = new List<string> { WorksheetNames.Pholio };
+            _mockValidator.Setup(x => x.ValidateRows(It.IsAny<DataTable>(), It.IsAny<UploadJobAnalysis>(), It.IsAny<bool>()));
+            _mockNameValidator.Setup(x => x.Validate(correctWorksheet)).Returns(true);
+            _mockValidator.Setup(x => x.CheckDuplicatesInFile(It.IsAny<UploadJobAnalysis>())).Returns(false);
+            _mockValidator.Setup(x => x.CheckGetDuplicatesInDb(It.IsAny<DataTable>(), It.IsAny<UploadJobAnalysis>()))
+                .Verifiable("CheckGetDuplicatesInDB hasn't been reached when it should");
+
+            var batchDataTable = UploadDataSchema.CreateEmptyTable();
+            batchDataTable.Rows.Add(IndicatorIds.GeneralHealthExcellent, 2030, 1, -1, -1,
+                AgeIds.Aged15, SexIds.Persons, AreaCodes.England,
+                -1, 35.3, 34.9, 35.7, 1, 1, 56704, -1, 0, -1, -1);
+
+            _mockFileReader.Setup(f => f.GetWorksheets()).Returns(correctWorksheet);
+            _mockFileReader.Setup(f => f.ReadData()).Returns(batchDataTable);
+
+            _mockUploader.Setup(x =>
+                x.ArchiveDuplicates(It.IsAny<IEnumerable<DuplicateRowInDatabaseError>>(), It.IsAny<UploadJob>()));
+            _mockUploader.Setup(x => x.UploadData(It.IsAny<UploadJob>(), It.IsAny<UploadJobAnalysis>()));
+        }
+
+        private void ActCheckDuplicates(UploadJob job)
+        {
+            var uploadJobWorker = new UploadJobWorker();
+            uploadJobWorker.ProcessJob(job, _mockNameValidator.Object, _mockValidator.Object, _mockFileReader.Object,
+                _mockUploader.Object);
+        }
+
+        private void AssertCheckDuplicates()
+        {
+            _mockValidator.Verify(
+                validator => validator.CheckGetDuplicatesInDb(It.IsAny<DataTable>(), It.IsAny<UploadJobAnalysis>()),
+                Times.Once);
         }
     }
 }

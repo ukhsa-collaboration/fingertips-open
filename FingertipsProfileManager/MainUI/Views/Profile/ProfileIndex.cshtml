@@ -15,6 +15,8 @@
 
     <h2 class="subheading">Profiles in Fingertips</h2>
 
+    <input type="button" class="btn btn-primary" value="New Profile" onclick="location.href='@Url.Action("CreateProfile", "Profile")'" />
+
     @if (Model.ProfileGrid.Count > 0)
     {
     <table id="tbl-profiles" class="grid sortable">
@@ -63,7 +65,4 @@
     <label>No content items have been created for this profile.</label>
     }
 
-    <div class="button-box">
-        <input type="button" value="New Profile" onclick="location.href='@Url.Action("CreateProfile", "Profile")'" />
-    </div>
 </div>

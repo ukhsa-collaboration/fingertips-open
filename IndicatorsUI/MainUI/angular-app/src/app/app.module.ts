@@ -1,40 +1,50 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, ComponentFactoryResolver, ApplicationRef, Type  } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { NgModule, ComponentFactoryResolver, ApplicationRef, Type } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
-import { AppComponent } from './app.component';
-import {MapComponent} from './map/map.component';
+import { TypeaheadModule } from 'ngx-bootstrap';
+import { MapComponent } from './map/map.component';
 import { MapModule } from './map/map.module';
-import { BoxplotModule } from './boxplot/boxplot.module';
 import { SharedModule } from './shared/shared.module';
-import { CoreDataHelperService } from './shared/service/helper/coreDataHelper.service';
-import { FTHelperService } from './shared/service/helper/ftHelper.service';
+import { BoxplotModule } from './boxplot/boxplot.module';
 import { EnglandComponent } from './england/england.component';
 import { MetadataModule } from './metadata/metadata.module';
 import { PopulationModule } from './population/population.module';
-import { MetadataTableComponent } from './metadata/metadata-table/metadata-table.component';
-import { TypeaheadModule } from 'ngx-bootstrap';
+import { ArealistModule } from './arealist/arealist.module';
+import { ArealistIndexComponent } from './arealist/arealist-index/arealist-index.component';
+import { ArealistManageComponent } from './arealist/arealist-manage/arealist-manage.component';
+import { DownloadModule } from './download/download.module';
+import { DataViewComponent } from './data-view/data-view.component';
+import { ReportsComponent } from './reports/reports.component';
+import { AreaProfileModule } from './area-profile/area-profile.module';
+import { EnglandModule } from './england/england.module';
 
-const components = [AppComponent, MapComponent];
+const rootComponents = [MapComponent, ArealistIndexComponent, ArealistManageComponent,
+  DataViewComponent];
+
 @NgModule({
   declarations: [
-    AppComponent,
-    EnglandComponent,
+    DataViewComponent,
+    ReportsComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
+    ReactiveFormsModule,
     HttpModule,
     MapModule,
     BoxplotModule,
+    DownloadModule,
     PopulationModule,
+    AreaProfileModule,
     SharedModule,
     MetadataModule,
-    TypeaheadModule.forRoot()
+    ArealistModule,
+    EnglandModule,
+    TypeaheadModule.forRoot(),
   ],
-  providers: [CoreDataHelperService, FTHelperService],
-  entryComponents: components
-  // Instead of bootstraping a single component, with overriding mechnisam, multiple componenta are bootstrapped
+  entryComponents: rootComponents
+  // Instead of bootstraping a single component, with overriding mechanism, multiple components are bootstrapped
   // bootstrap: [AppComponent]
 })
 export class AppModule {
@@ -42,11 +52,11 @@ export class AppModule {
   // Overriding angular original behaviour, This will bootsttrap all the component defined
   // in the array if the component tag is found on the document
   ngDoBootstrap(appRef: ApplicationRef) {
-      components.forEach((componentDef: Type<{}>) => {
-          const factory = this.resolver.resolveComponentFactory(componentDef);
-          if (document.querySelector(factory.selector)) {
-              appRef.bootstrap(factory);
-          }
-      });
+    rootComponents.forEach((componentDef: Type<{}>) => {
+      const factory = this.resolver.resolveComponentFactory(componentDef);
+      if (document.querySelector(factory.selector)) {
+        appRef.bootstrap(factory);
+      }
+    });
   }
 }

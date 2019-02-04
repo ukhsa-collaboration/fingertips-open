@@ -177,6 +177,21 @@ lightbox = (function () {
                 jqLightbox.show();
             }
 
+            // Default width
+            if (!width) {
+                width = 500;
+            }
+
+            // Default centered
+            if (!left) {
+                left = this.getLeftForCenteredPopup(width);
+            }
+
+            // Default top
+            if (!top) {
+                top = 200;
+            }
+
             // Show content
             this.setHtml(html);
             jqInfo.css({ 'top': top, 'left': left, 'width': width });

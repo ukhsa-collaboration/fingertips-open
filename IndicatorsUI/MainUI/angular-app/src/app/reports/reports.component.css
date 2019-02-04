@@ -1,0 +1,22 @@
+.btn-link {
+    color: #2e3191;
+}
+
+table tr td {
+    font-size: 17px;
+    padding-left: 3px;
+}
+
+table tr th {
+    font-size: 17px;
+    padding-left: 3px;
+}
+
+table tr td.format {
+    width: 90px;
+    text-align: center;
+}
+
+table tr td:first-child {
+    width: 300px;
+}

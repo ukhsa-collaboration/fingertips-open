@@ -73,6 +73,8 @@ inequalities.getDataForValues = function () {
     ajaxMonitor.monitor(ns.determinePartitionToDisplay);
 };
 
+
+
 /**
 * Gets category data by AJAX
 * @class getDataForAllCategories
@@ -110,9 +112,9 @@ inequalities.getDataForAllCategories = function (model, groupRoot) {
 */
 inequalities.getCategoryAjaxParameters = function (model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add("profile_id",
-            model.profileId
-        )
+    ).add("profile_id",
+        model.profileId
+    )
         .add("area_code",
             areaCode
         )
@@ -165,9 +167,9 @@ inequalities.getDataForAllSexes = function (model, groupRoot) {
 */
 inequalities.getSexAjaxParameters = function (model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add("profile_id",
-            model.profileId
-        )
+    ).add("profile_id",
+        model.profileId
+    )
         .add("area_code",
             areaCode
         )
@@ -217,9 +219,9 @@ inequalities.getDataForAllAges = function (model, groupRoot) {
 */
 inequalities.getAgeAjaxParameters = function (model, groupRoot, areaCode) {
     return new ParameterBuilder(
-        ).add("profile_id",
-            model.profileId
-        )
+    ).add("profile_id",
+        model.profileId
+    )
         .add("area_code",
             areaCode
         )
@@ -312,7 +314,7 @@ inequalities.determinePartitionToDisplay = function () {
     if (state.isViewModeValues || !isAnyData) {
         ns.displayValues();
     } else {
-        // change the header
+        // Change the header
         ns.updateTrendHeader();
         ns.displayOptions();
         ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
@@ -357,14 +359,49 @@ inequalities.displayValues = function () {
     ns.updateTrendHeader();
     var comparisonConfig = new ComparisonConfig(groupRoot, metadata);
     setTargetLegendHtml(comparisonConfig, metadata);
+
     showAndHidePageElements();
+
+    ns.showMessageThatNoLatestValues(groupRoot);
+
+    hideSpinner();
+
     showBarChartLegend(comparisonConfig.useTarget);
-    $("#benchmark-box").hide();
+    $('#benchmark-box').hide();
     ns.displayOptions();
     ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
 
     unlock();
 };
+
+/**
+ * When there are no values for the DataPoint time period but there is still trend data for earlier
+ * periods then we show a special message so the user knows they can still view trends
+ */
+inequalities.showMessageThatNoLatestValues = function(groupRoot) {
+
+    var ns = inequalities;
+    var areaCode = ns.getSelectedAreaCode();
+    var areaTypeId = FT.model.areaTypeId;
+    var categoryDataAnalyser = ns.categoryDataManager.getData(groupRoot, areaCode, areaTypeId);
+
+    var yearToShow = categoryDataAnalyser.getDataYear();
+
+    var $chart = $('#inequalities-chart');
+    if (categoryDataAnalyser.isAnyData && yearToShow !== groupRoot.Grouping[0].DataPointYear) {
+        // No values for most recent year
+        $chart.hide();
+
+        // Display no values message
+        var html = 'Values are not available for latest time period<br>Only trends are available';
+        $('#main-info-message').html(html).show();
+        $('#inequalities-partition-menu').html('');
+    } else {
+        // Values are available for most recent year
+        $chart.show();
+    }
+
+}
 
 /**
 * Gets the category type ID that should be displayed
@@ -512,11 +549,11 @@ inequalities.renderTrendOptions = function (labels, hasAverage, average) {
         "</div>");
 
     return templates.render("inequalitiesTrendOptions",
-    {
-        trendFilters: labels,
-        average: average,
-        hasAverage: hasAverage
-    });
+        {
+            trendFilters: labels,
+            average: average,
+            hasAverage: hasAverage
+        });
 };
 
 /**
@@ -524,13 +561,18 @@ inequalities.renderTrendOptions = function (labels, hasAverage, average) {
 * @class displayTrends
 */
 inequalities.displayTrends = function (data) {
+
+
     var ns = inequalities;
     var state = ns.state;
     state.trendData = data;
-    var chartOptions, hasAverage;
-    var average = {};
+    var $trendBox = $("#inequalities-trend-box");
 
-    switch (state.preferredPartition) {
+    if (data.Limits) {
+        var chartOptions, hasAverage;
+        var average = {};
+
+        switch (state.preferredPartition) {
         case ns.PartitionsTypes.BySex:
             // Check if person exists
             var person = _.findWhere(data.Labels, { Id: SexIds.Person });
@@ -571,23 +613,21 @@ inequalities.displayTrends = function (data) {
                 chartOptions = data.Labels;
             }
             break;
+        }
+
+        var html = '<div id="inequalities-trend-chart"></div>' +
+            ns.renderTrendOptions(chartOptions, hasAverage, average);
+
+        $trendBox.html(html);
+
+        ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
+
+        ns.createTrendChart(data);
+
+        ns.viewManager.restoreTrendSeriesVisibility();
     }
 
-    var html = '<div id="inequalities-trend-chart"></div>' +
-        ns.renderTrendOptions(chartOptions, hasAverage, average);
-
-    var $trendBox = $("#inequalities-trend-box");
-    $trendBox.html(html);
-
-    ns.toggleDisplayOptionCss(ns.state.isViewModeValues);
-
-    ns.createTrendChart(data);
-
-    ns.viewManager.restoreTrendSeriesVisibility();
-
     showAndHidePageElements();
-
-    $("#benchmark-box").hide();
 
     $trendBox.show();
 
@@ -646,7 +686,7 @@ inequalities.AreaTrendSeriesData = function (data) {
     _.each(areaData.data,
         function (data) {
             var point = (data.Val !== -1)
-                        ? { y: data.Val, ValF: data.ValF } : null;
+                ? { y: data.Val, ValF: data.ValF } : null;
             points.push(point);
         });
     var seriesData = {
@@ -780,6 +820,7 @@ function getSeriesByName(name) {
 * @class createTrendChart
 */
 inequalities.createTrendChart = function (data) {
+
     var ns = inequalities;
     var groupRoot = getGroupRoot();
 
@@ -937,6 +978,7 @@ inequalities.CategoryDataAnalyser = function (data) {
     * Gets array of category types for which there is data
     * @property categoryTypes
     */
+
     this.categoryTypes = categoryTypesWithData;
 
     /**
@@ -946,6 +988,13 @@ inequalities.CategoryDataAnalyser = function (data) {
     this.getDataByCategoryTypeId = function (categoryTypeId) {
         return categoryTypeIdToData[categoryTypeId];
     };
+
+    this.getDataYear = function() {
+        if (this.isAnyData) {
+            return categoryData[0].Year;
+        }
+        return null;
+    }
 
     /**
     * Get a category type by its ID
@@ -994,7 +1043,7 @@ inequalities.getIndicatorSpecialCases = function () {
 * Build data for categories
 * @class CategoryDataBuilder
 */
-inequalities.CategoryDataBuilder = function (categoryDataAnalyser, categoryTypeId, average, useRagColours) {
+inequalities.CategoryDataBuilder = function (categoryDataAnalyser, categoryTypeId, average, useRagColours, useQuintileColouring) {
 
     // Set special cases
     var specialCases = inequalities.getIndicatorSpecialCases();
@@ -1027,7 +1076,7 @@ inequalities.CategoryDataBuilder = function (categoryDataAnalyser, categoryTypeI
 
             data.color = sig === 0
                 ? colours.noComparison
-                : getColourFromSignificance(sig, useRagColours, colours);
+                : getColourFromSignificance(sig, useRagColours, colours, useQuintileColouring, data.IndicatorId, data.SexId, data.AgeId);
         } else {
             // Show no bar
             data = { Val: 0, y: 0 };
@@ -1114,7 +1163,7 @@ inequalities.SexDataAnalyser = function (data) {
 * Build data for Sex
 * @class SexDataBuilder
 */
-inequalities.SexDataBuilder = function (sexDataAnalyser) {
+inequalities.SexDataBuilder = function (sexDataAnalyser, useQuintileColouring) {
     var sexData = sexDataAnalyser.sexData,
         sexes = sexDataAnalyser.sexes,
         dataSeries = [],
@@ -1147,7 +1196,7 @@ inequalities.SexDataBuilder = function (sexDataAnalyser) {
 
         data.color = sig === 0
             ? colours.noComparison
-            : getColourFromSignificance(sig, useRagColours(), colours);
+            : getColourFromSignificance(sig, useRagColours(), colours, useQuintileColouring, data.IndicatorId, data.SexId, data.AgeId);
 
         dataSeries.push(data);
         // If person object exists, set its value to average series data.
@@ -1208,7 +1257,7 @@ inequalities.AgeDataAnalyser = function (data) {
 * Build data for Ages
 * @class AgeDataBuilder
 */
-inequalities.AgeDataBuilder = function (ageDataAnalyser) {
+inequalities.AgeDataBuilder = function (ageDataAnalyser, useQuintileColouring) {
 
     var average = {},
         ageData = ageDataAnalyser.ageData,
@@ -1238,7 +1287,7 @@ inequalities.AgeDataBuilder = function (ageDataAnalyser) {
 
             data.color = sig === 0
                 ? colours.noComparison
-                : getColourFromSignificance(sig, useRagColours(), colours);
+                : getColourFromSignificance(sig, useRagColours(), colours, useQuintileColouring, data.IndicatorId, data.SexId, data.AgeId);
 
             dataSeries.push(data);
             averageSeries.push(average);
@@ -1307,8 +1356,10 @@ inequalities.selectAge = function () {
 
         var metadata = ui.getMetadataHash()[groupRoot.IID],
             areaCode = ns.getSelectedAreaCode(),
-            ageDataAnalyser = ns.ageDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
-            data = new ns.AgeDataBuilder(ageDataAnalyser).getData();
+            ageDataAnalyser = ns.ageDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId);
+
+        var comparisonConfig = new ComparisonConfig(groupRoot, metadata);
+        var data = new ns.AgeDataBuilder(ageDataAnalyser, comparisonConfig.useQuintileColouring).getData();
 
         ns.viewManager.createBarChart(data, metadata);
     }
@@ -1335,11 +1386,17 @@ inequalities.selectSex = function () {
 
         var metadata = ui.getMetadataHash()[groupRoot.IID],
             areaCode = ns.getSelectedAreaCode(),
-            sexDataAnalyser = ns.sexDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId),
-            data = new ns.SexDataBuilder(sexDataAnalyser).getData();
-        /*Check if y=0 then show no data message*/
-        if (data.averageDataSeries.length === 0
-            || (data.averageDataSeries.length > 1 && data.averageDataSeries[0].y === 0 && data.averageDataSeries[1].y === 0)) {
+            sexDataAnalyser = ns.sexDataManager.getData(groupRoot, areaCode, FT.model.areaTypeId);
+
+        var comparisonConfig = new ComparisonConfig(groupRoot, metadata);
+        var data = new ns.SexDataBuilder(sexDataAnalyser, comparisonConfig.useQuintileColouring, comparisonConfig.useQuintileColouring).getData();
+
+        // Assess whether there is sex data to display
+        var isNoAverageOrMaleFemale = data.averageDataSeries.length === 0 && data.dataSeries.length === 0;
+        var isNoAverageAndMaleFemaleInvalid = data.averageDataSeries.length === 0 && data.dataSeries.length > 0 && data.dataSeries[0].y === 0;
+        var isAverageButItIsZero = data.averageDataSeries.length > 1 && data.averageDataSeries[0].y === 0 && data.averageDataSeries[1].y === 0;
+
+        if (isNoAverageOrMaleFemale || isNoAverageAndMaleFemaleInvalid || isAverageButItIsZero) {
             ns.viewManager.displayNoData();
         } else {
             ns.viewManager.createBarChart(data, metadata);
@@ -1530,22 +1587,22 @@ inequalities.ViewManager = function ($container) {
     templates.add("inequalitiesMenu",
         '<p>Partition data by:</p>' +
         '{{#types}}' +
-            '<div class="full-width">' +
-                '<div id="category-type-description-for-id-{{Id}}" style="display:none">{{Description}}</div>' +
-                '<div id="category-type-name-for-id-{{Id}}" style="display:none">{{Name}}</div>' +
-                '<div class="fl {{#Description}}info-tooltip-with-position{{/Description}} width-10" {{#Description}}onclick="showCategoryTypeDescription({{Id}})"{{/Description}}>&nbsp;</div>' +
-                '<div class="fl width-90">' +
-                    '<a id="partition-category-type-{{Id}}" categoryTypeId="{{Id}}" {{#isSelected}}class="selected" {{/isSelected}}href="javascript:inequalities.selectCategoryType({{Id}})">' +
-                        '{{Name}}' +
-                    '</a>' +
-                '</div>' +
-            '</div>' +
+        '<div class="full-width">' +
+        '<div id="category-type-description-for-id-{{Id}}" style="display:none">{{Description}}</div>' +
+        '<div id="category-type-name-for-id-{{Id}}" style="display:none">{{Name}}</div>' +
+        '<div class="fl {{#Description}}info-tooltip-with-position{{/Description}} width-10" {{#Description}}onclick="showCategoryTypeDescription({{Id}})"{{/Description}}>&nbsp;</div>' +
+        '<div class="fl width-90">' +
+        '<a id="partition-category-type-{{Id}}" categoryTypeId="{{Id}}" {{#isSelected}}class="selected" {{/isSelected}}href="javascript:inequalities.selectCategoryType({{Id}})">' +
+        '{{Name}}' +
+        '</a>' +
+        '</div>' +
+        '</div>' +
         '{{/types}}' +
         '{{#hasAgeData}}' +
-            '<div class="full-width"><div class="fl width-10">&nbsp;</div><div class="fl width-90"><a id="byAge" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectAge()">Age</a></div></div>' +
+        '<div class="full-width"><div class="fl width-10">&nbsp;</div><div class="fl width-90"><a id="byAge" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectAge()">Age</a></div></div>' +
         '{{/hasAgeData}}' +
         '{{#hasSexData}}' +
-            '<div class="full-width"><div class="fl width-10">&nbsp;</div><div class="fl width-90"><a id="bySex" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectSex()">Sex</a></div></div>' +
+        '<div class="full-width"><div class="fl width-10">&nbsp;</div><div class="fl width-90"><a id="bySex" {{#isSelected}}class="selected"{{/isSelected}} href="javascript:javascript:inequalities.selectSex()">Sex</a></div></div>' +
         '{{/hasSexData}}');
 
     /**
@@ -1585,11 +1642,11 @@ inequalities.ViewManager = function ($container) {
     this.displayMenu = function (categoryDataAnalyser, ageDataAnalyser, sexDataAnalyser) {
 
         $partitionMenu.html(templates.render("inequalitiesMenu",
-        {
-            types: categoryDataAnalyser.categoryTypes,
-            hasAgeData: ageDataAnalyser.isAnyData,
-            hasSexData: sexDataAnalyser.isAnyData
-        }));
+            {
+                types: categoryDataAnalyser.categoryTypes,
+                hasAgeData: ageDataAnalyser.isAnyData,
+                hasSexData: sexDataAnalyser.isAnyData
+            }));
 
         var exportTypes =
             '<div class="export-chart-box"><a class="export-link" href="javascript:inequalities.exportSelectedChart()">Export chart as image</a>';
@@ -1599,10 +1656,14 @@ inequalities.ViewManager = function ($container) {
             : 'Show confidence intervals';
         var errorBars = '<a id="inequalities-toggle-cis">' + showHide + "</a></div>";
 
+        var exportCsvFile = 
+            '<div id="export-link-csv-inequalities-pos" class="export-chart-box-csv"><a id="export-link-csv-inequalities" class="export-link-csv" href="javascript:inequalities.exportSelectedChartCsvFile()">Export chart as CSV file</a></div>';
+
         $chartBox.html('<div id="inequalities-chart"></div><div id="inequalities-trend-box"></div>');
         $("#export-link-inequalities").remove();
+
         $($header)
-            .after('<div id="export-link-inequalities" style="margin-top:10px;">' + exportTypes + errorBars + "</div>");
+            .after('<div id="export-link-inequalities" style="margin-top:10px;">' + exportTypes + errorBars + exportCsvFile +"</div>");
 
         this.bindToggleConfidenceIntervals();
     };
@@ -1687,12 +1748,12 @@ inequalities.ViewManager = function ($container) {
         var partition = $.parseHTML(selectedPartitionName.innerHTML)[0].data;
 
         chart.exportChart({ type: "image/png" },
-        {
-            chart: {
-                spacingTop: 70,
-                events: {
-                    load: function () {
-                        this.renderer.text("<b>" +
+            {
+                chart: {
+                    spacingTop: 70,
+                    events: {
+                        load: function () {
+                            this.renderer.text("<b>" +
                                 indicatorName +
                                 " - " +
                                 inequalities.getSelectedAreaName() +
@@ -1703,19 +1764,19 @@ inequalities.ViewManager = function ($container) {
                                 "</b>",
                                 350,
                                 15)
-                            .attr({
-                                align: "center"
-                            })
-                            .css({
-                                color: "#333",
-                                fontSize: "10px",
-                                width: "650px"
-                            })
-                            .add();
+                                .attr({
+                                    align: "center"
+                                })
+                                .css({
+                                    color: "#333",
+                                    fontSize: "10px",
+                                    width: "650px"
+                                })
+                                .add();
+                        }
                     }
                 }
-            }
-        });
+            });
 
         logEvent('ExportImage', 'InequalitiesLatestValues');
     };
@@ -1725,7 +1786,7 @@ inequalities.ViewManager = function ($container) {
     * @method displayNoData
     */
     this.displayNoData = function () {
-        $chartBox.html('<div class="no-indicator-data">Inequality data is not available for this indicator</div>');
+        $chartBox.html('<div class="no-indicator-data">Inequality data is not available for this indicator and area</div>');
         $partitionMenu.html("");
         this.tabSpecificOptions.clearHtml();
     };
@@ -1743,9 +1804,15 @@ inequalities.ViewManager = function ($container) {
     };
 
     this.updateTabSpecificOptionsOptions = function () {
+        var optionsList = ["England"];
+        
+        if (!isEnglandAreaType()) {
+            optionsList.push(areaHash[FT.model.areaCode].Name);
+        }
+
         this.tabSpecificOptions.setHtml({
             label: "Inequalities for",
-            optionLabels: ["England", areaHash[FT.model.areaCode].Name]
+            optionLabels: optionsList
         });
     };
 
@@ -1949,15 +2016,18 @@ inequalities.selectCategoryType = function (categoryTypeId) {
         // Keep state for next view
         state.preferredPartition = preferredPartition;
 
+        var metadata = ui.getMetadataHash()[groupRoot.IID];
+        var comparisonConfig = new ComparisonConfig(groupRoot, metadata);
+
         // Get data to display
         var average = ns.getAverage(groupRoot);
         var data = new ns.CategoryDataBuilder(categoryDataAnalyser,
             preferredPartition,
             average,
-            useRagColours()).getData();
+            useRagColours(),
+            comparisonConfig.useQuintileColouring).getData();
 
         // Display bar chart
-        var metadata = ui.getMetadataHash()[groupRoot.IID];
         ns.viewManager.createBarChart(data, metadata);
     }
 };
@@ -2006,8 +2076,154 @@ inequalities.unselectPartitionOptions = function () {
 */
 inequalities.exportSelectedChart = function () {
     inequalities.state.isViewModeValues
-    ? inequalities.viewManager.exportChart()
-    : inequalities.exportTrendChart();
+        ? inequalities.viewManager.exportChart()
+        : inequalities.exportTrendChart();
+};
+
+/**
+* Exports a csv file with data of the displayed chart
+* @class exportSelectedChartCsvFile
+*/
+inequalities.exportSelectedChartCsvFile = function () {
+
+    var indicatorId = getIid();
+
+    var parameters = new ParameterBuilder()
+    .add('parent_area_type_id', FT.model.parentTypeId)
+    .add('child_area_type_id', FT.model.areaTypeId)
+    .add('profile_id', FT.model.profileId)
+    .add('areas_code', inequalities.getChildAreaCode())
+    .add('indicator_ids', indicatorId)
+    .add('parent_area_code', inequalities.getParentAreaCode())
+    .add('inequalities', inequalities.getInequalities(indicatorId))
+
+    if (inequalities.isDisplayedInequalitiesTrends())
+    {
+        downloadAllPeriodsWithInequalitiesDataCsvFileByIndicator(FT.url.corews, parameters);
+    }else{
+        downloadLatestWithInequalitiesDataCsvFileByIndicator(FT.url.corews, parameters);
+    }
+};
+
+/**
+* Gets the elements selected in the menu as inequalities
+* @class getInequalities
+*/
+inequalities.getInequalities =  function (indicatorid) {
+
+    var partitionSelectedId = inequalities.getPartitionIdSelected();
+
+    if (inequalities.isDisplayedInequalitiesTrends())
+    {
+        // send only selected categoriesId
+        return inequalities.getInequalitiesListForTrends(partitionSelectedId, indicatorid);
+    }
+    // send all categoriesId
+    return inequalities.getInequalitiesListForValues(partitionSelectedId, indicatorid);
+}
+
+/**
+* Gets all elements inequalities for a partition id in latest values
+* @class getInequalitiesListForValues
+*/
+inequalities.getInequalitiesListForValues = function(partitionSelectedId, indicatorid){
+
+    var ns = inequalities;
+    var areaCode = ns.getSelectedAreaCode();
+    var areaTypeId = FT.model.areaTypeId;
+    var groupRoot = getGroupRoot();
+
+    var categoryDataAnalyser = ns.categoryDataManager.getData(groupRoot, areaCode, areaTypeId);
+    var ageDataAnalyser = ns.ageDataManager.getData(groupRoot, areaCode, areaTypeId);
+    var sexDataAnalyser = ns.sexDataManager.getData(groupRoot, areaCode, areaTypeId);
+
+    if (partitionSelectedId === 'byAge')
+    {
+        var dictionaryInequality = ageDataAnalyser.ages.map(age =>({ Age: age.Id, Sex: groupRoot.Sex.Id }));
+        return JSON.stringify({[indicatorid]: dictionaryInequality} );
+    }
+
+    if (partitionSelectedId === 'bySex')
+    {
+        var dictionaryInequality = sexDataAnalyser.sexData.map(item =>({ Sex: item.SexId, Age: groupRoot.Age.Id }));
+        return JSON.stringify({[indicatorid]: dictionaryInequality} );
+    }
+
+    var categoryIdList = categoryDataAnalyser.categoryTypes
+                                                    .map(categoryType => categoryType.Categories
+                                                        .map(category => ({ CategoryTypeId: category.CategoryTypeId,
+                                                                            CategoryId: category.Id,
+                                                                            Sex: groupRoot.Sex.Id,
+                                                                            Age: groupRoot.Age.Id }))).flat();
+
+    var filteredValues = categoryIdList.filter(list =>  list.CategoryTypeId === partitionSelectedId );
+
+    // Adding general inequality
+    filteredValues.push({ Sex: groupRoot.Sex.Id, Age: groupRoot.Age.Id });
+
+    return JSON.stringify({[indicatorid]: filteredValues});
+}
+
+/**
+* Gets selected elements inequalities for a partition id in trends
+* @class getInequalitiesListForTrends
+*/
+inequalities.getInequalitiesListForTrends = function(partitionSelectedId, indicatorid){
+
+    var groupRoot = getGroupRoot();
+    var selectedInequalities = inequalities.getSelectedInequalitiesChartBoxesIdArray();
+
+        if (partitionSelectedId === 'byAge')
+        {
+            var dictionaryInequality = selectedInequalities.map(id => ({ Age: id, Sex: groupRoot.Sex.Id }) );
+            return JSON.stringify({[indicatorid]: dictionaryInequality} );
+        }
+        if (partitionSelectedId === 'bySex')
+        {
+            var dictionaryInequality = selectedInequalities.map(id => ({ Sex: id, Age: groupRoot.Age.Id }) );
+            return JSON.stringify({[indicatorid]: dictionaryInequality} );
+        }
+
+        var dictionaryInequality = selectedInequalities.map(id => ({ CategoryTypeId: partitionSelectedId,
+                                                                                        CategoryId: id,
+                                                                                        Sex: groupRoot.Sex.Id,
+                                                                                        Age: groupRoot.Age.Id }) );
+        return JSON.stringify({[indicatorid]: dictionaryInequality} );
+}
+
+/**
+* Gets the partition id currently selected
+* @class getPartitionIdSelected
+*/
+inequalities.getPartitionIdSelected = function(){
+    var categoryTypeIdSelected = inequalities.getSelectedPartition().attr("categorytypeid");
+
+    if (categoryTypeIdSelected !== undefined)
+    {
+        return parseInt(categoryTypeIdSelected);
+    }else{
+        return inequalities.getSelectedPartition().attr("id");
+    }
+}
+
+/**
+* Gets the currently selected id from chart boxes
+* @class getSelectedInequalitiesChartBoxesIdArray
+*/
+inequalities.getSelectedInequalitiesChartBoxesIdArray = function(){
+    var selected = [];
+    $("#inequalities-chart-box input[class='trend-option-checkbox']:checked").each((index, element) => {
+        selected.push(element.id.match(/\w[^-]*$/)[0]);
+    });
+    return selected;
+}
+
+/**
+* Gets the link element of the selected display
+* @class getSelectedDisplay
+*/
+inequalities.getSelectedDisplay = function () {
+    return $("#area-options-inequalities button.button-selected");
 };
 
 /**
@@ -2017,6 +2233,17 @@ inequalities.exportSelectedChart = function () {
 inequalities.getSelectedPartition = function () {
     return $("#inequalities-partition-menu a.selected");
 };
+
+/**
+* Returns true if inequalities trends is selected
+* @class isdisplayedInequalitiesTrends
+*/
+inequalities.isDisplayedInequalitiesTrends = function() {
+
+    if ( inequalities.getSelectedDisplay().attr("id") == 'inequalities-trends' )
+        return true;
+    return false;
+}
 
 /**
 * Export trend chart to an image
@@ -2032,12 +2259,12 @@ inequalities.exportTrendChart = function () {
     var partition = $.parseHTML($option[0].innerHTML)[0].data;
 
     ns.trendChart.exportChart({ type: "image/png" },
-    {
-        chart: {
-            spacingTop: 70,
-            events: {
-                load: function () {
-                    this.renderer.text("<b>" +
+        {
+            chart: {
+                spacingTop: 70,
+                events: {
+                    load: function () {
+                        this.renderer.text("<b>" +
                             indicatorName +
                             " - " +
                             ns.getSelectedAreaName() +
@@ -2047,22 +2274,48 @@ inequalities.exportTrendChart = function () {
                             "</b>",
                             350,
                             15)
-                        .attr({
-                            align: "center"
-                        })
-                        .css({
-                            color: "#333",
-                            fontSize: "7px",
-                            width: "450px"
-                        })
-                        .add();
+                            .attr({
+                                align: "center"
+                            })
+                            .css({
+                                color: "#333",
+                                fontSize: "7px",
+                                width: "450px"
+                            })
+                            .add();
+                    }
                 }
             }
-        }
-    });
+        });
 
     logEvent('ExportImage', 'InequalitiesTrends');
 };
+
+inequalities.getParentAreaCode = function()
+{
+    if (FT.model.isNearestNeighbours()) {
+        return FT.model.nearestNeighbour;
+    }
+
+    if (inequalities.getCurrentAreaIndex() === 'England') {
+        return NATIONAL_CODE;
+    }
+
+    return FT.model.parentCode;
+}
+
+inequalities.getChildAreaCode  = function () {
+
+    if (inequalities.getCurrentAreaIndex() === 'England') {
+        return NATIONAL_CODE;
+    }
+
+    return FT.model.areaCode;
+}
+
+inequalities.getCurrentAreaIndex = function() {
+    return $("#tab-option-0.button-selected, #tab-option-1.button-selected").text();
+}
 
 /**
 * Whether or not to use RAG colours
@@ -2095,16 +2348,16 @@ inequalities.state = {
 };
 
 pages.add(PAGE_MODES.INEQUALITIES,
-{
-    id: "inequalities",
-    title: "Inequalities",
-    icon: "inequalities",
-    'goto': goToInequalitiesPage,
-    gotoName: "goToInequalitiesPage",
-    needsContainer: true,
-    jqIds: [".geo-menu", "indicator-menu-div", "tab-specific-options", "nearest-neighbour-link"],
-    jqIdsNotInitiallyShown: ["key-ad-hoc", "key-bar-chart", "inequalities-trend-box"]
-});
+    {
+        id: "inequalities",
+        title: "Inequalities",
+        icon: "inequalities",
+        'goto': goToInequalitiesPage,
+        gotoName: "goToInequalitiesPage",
+        needsContainer: true,
+        jqIds: [".geo-menu", "indicator-menu-div", "tab-specific-options", "nearest-neighbour-link", 'area-list-wrapper', 'filter-indicator-wrapper'],
+        jqIdsNotInitiallyShown: ["key-ad-hoc", "key-bar-chart", "inequalities-trend-box", "benchmark-box"]
+    });
 
 function showCategoryTypeDescription(id) {
     var name = document.getElementById("category-type-name-for-id-" + id).innerText;
@@ -2112,11 +2365,11 @@ function showCategoryTypeDescription(id) {
 
     tooltipManager.init();
     var html = '<div style="padding:15px;"><h3>' +
-                name +
-                '</h3></div>' +
-                '<div style="padding:15px;">' +
-                description +
-                '</div>';
+        name +
+        '</h3></div>' +
+        '<div style="padding:15px;">' +
+        description +
+        '</div>';
     var popupWidth = 500;
     var left = lightbox.getLeftForCenteredPopup(popupWidth);
     var top = document.getElementById("partition-category-type-" + id).offsetTop - 20;

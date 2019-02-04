@@ -1,6 +1,7 @@
 ﻿using Fpm.ProfileData.Entities.UserFeedback;
 using NHibernate;
 using NHibernate.Criterion;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -37,6 +38,20 @@ namespace Fpm.ProfileData.Repositories
                 .CreateCriteria<UserFeedback>()
                 .Add(Restrictions.Eq("Id", id))
                 .UniqueResult<UserFeedback>();
+        }
+
+        public void UdateFeedback(UserFeedback feedback)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+                CurrentSession.Update(feedback);
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
         }
 
         public void DeleteUserFeedback(int id)

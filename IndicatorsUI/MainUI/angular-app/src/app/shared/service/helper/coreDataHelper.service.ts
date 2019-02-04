@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { FTRoot, CoreDataSet, Unit, ValueWithUnit } from '../../../typings/FT.d';
-declare var FTWrapper: FTRoot;
+declare let FTWrapper: FTRoot;
 
 @Injectable()
 export class CoreDataHelperService {

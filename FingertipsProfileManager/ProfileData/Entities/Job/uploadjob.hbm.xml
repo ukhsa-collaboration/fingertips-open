@@ -22,5 +22,6 @@
     <property name="TotalSmallNumberWarnings" column="TotalSmallNumberWarnings"/>
     <property name="IsSmallNumberOverrideApplied" column="IsSmallNumberOverrideApplied"/>
     <property name="IsDuplicateOverrideApplied" column="IsDuplicateOverrideApplied"/>
+    <property name="IsConfirmationRequiredToOverrideDatabaseDuplicates" column="IsConfirmationRequiredToOverrideDatabaseDuplicates"/>
   </class>
 </hibernate-mapping>

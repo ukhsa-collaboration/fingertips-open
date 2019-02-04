@@ -28,26 +28,52 @@ export class PopulationSummaryComponent implements OnChanges {
   decileLabel: string;
   decileLabels: DecileLabel[];
   adHocIndicatorRows: AdHocIndicatorRow[];
+  ftModel: FTModel;
 
-  constructor(private ftHelperService: FTHelperService) { }
+  constructor(private ftHelperService: FTHelperService) {
+    this.ftModel = this.ftHelperService.getFTModel();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.allPopulationData) {
-      let model = this.ftHelperService.getFTModel();
-      let areaName = this.ftHelperService.getAreaName(model.areaCode);
+      let areaName = this.ftHelperService.getAreaName(this.ftModel.areaCode);
 
       this.defineRegisteredPersons(areaName);
-      this.practiceLabel = model.areaCode + ' - ' + areaName;
+      this.practiceLabel = this.ftModel.areaCode + ' - ' + areaName;
       this.defineAdHocIndicatorRows();
       this.defineDeprivationDecile();
       this.defineEthnicityLabel();
     }
   }
 
+  public showDeprivationMetadata() {
+    this.showMetadata(IndicatorIds.DeprivationScore);
+  }
+
+  public showEthnicityMetadata() {
+    this.showMetadata(IndicatorIds.EthnicityEstimates);
+  }
+
+  public showMetadata(indicatorId: number) {
+    this.metadata.displayMetadataForIndicator(indicatorId, [ProfileIds.PracticeProfileSupportingIndicators]);
+  }
+
+  public metadataIsReady(isReady: boolean) {
+    if (isReady) {
+      let metadata = this.metadata;
+      // Set timeout so metadata table view will have finished rendering
+      setTimeout(function () { metadata.showInLightbox(); });
+    }
+  }
+
+  public shouldDisplay(): boolean {
+    return this.ftModel.areaTypeId === AreaTypeIds.Practice;
+  }
+
   private defineDeprivationDecile() {
 
     // Decile label
-    var decileNumber = this.allPopulationData.populationSummary.GpDeprivationDecile;
+    let decileNumber = this.allPopulationData.populationSummary.GpDeprivationDecile;
     if (_.isUndefined(decileNumber)) {
       this.decileLabel = '<i>Data not available for current practice</i>';
     } else {
@@ -73,8 +99,8 @@ export class PopulationSummaryComponent implements OnChanges {
     let values = this.allPopulationData.populationSummary.AdHocValues;
 
     // QOF achievement
-    var qof = values.Qof;
-    var text = _.isUndefined(qof)
+    let qof = values.Qof;
+    let text = _.isUndefined(qof)
       ? this.noData
       : NumberHelper.roundNumber(qof.Count, 1) + ' (out of ' + qof.Denom + ')';
     rows.push(new AdHocIndicatorRow(IndicatorIds.QofPoints, 'QOF achievement', text));
@@ -84,12 +110,12 @@ export class PopulationSummaryComponent implements OnChanges {
     rows.push(this.getLifeExpectancy('Female', values.LifeExpectancyFemale));
 
     // Patients that recommend practice
-    var recommend = values.Recommend;
+    let recommend = values.Recommend;
     text = _.isUndefined(recommend) ?
       this.noData
       : recommend.ValF + '%';
     rows.push(new AdHocIndicatorRow(IndicatorIds.WouldRecommendPractice,
-      '% of patients that would recommend their practice', text));
+      '% having a positive experience of their practice', text));
 
     this.adHocIndicatorRows = rows;
   }
@@ -106,10 +132,6 @@ export class PopulationSummaryComponent implements OnChanges {
     this.ethnicityLabel = _.isUndefined(ethnicity)
       ? '<i>Insufficient data to provide accurate summary</i>'
       : ethnicity;
-  }
-
-  public shouldDisplay(): boolean {
-    return this.ftHelperService.getFTModel().areaTypeId === AreaTypeIds.Practice;
   }
 
   private defineRegisteredPersons(areaName: string) {
@@ -136,26 +158,6 @@ export class PopulationSummaryComponent implements OnChanges {
       ? new CommaNumber(listSize.Val).rounded()
       : null;
   }
-
-  private showDeprivationMetadata() {
-    this.showMetadata(IndicatorIds.DeprivationScore);
-  }
-
-  private showEthnicityMetadata() {
-    this.showMetadata(IndicatorIds.EthnicityEstimates);
-  }
-
-  private showMetadata(indicatorId: number) {
-    this.metadata.displayMetadataForIndicator(indicatorId, [ProfileIds.PracticeProfileSupportingIndicators]);
-  }
-
-  private metadataIsReady(isReady: boolean) {
-    if (isReady) {
-      let metadata = this.metadata;
-      // Set timeout so metadata table view will have finished rendering
-      setTimeout(function () { metadata.showInLightbox(); });
-    }
-  }
 }
 
 class AdHocIndicatorRow {
@@ -166,7 +168,7 @@ class AdHocIndicatorRow {
 
 class DecileLabel {
   constructor(public num: number) { }
-  public text: string = '';
+  public text = '';
   public getClass(): string {
     return 'decile' + this.num;
   }

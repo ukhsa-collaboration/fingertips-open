@@ -1,61 +1,68 @@
-import { Component, OnInit } from '@angular/core';
-import { Report } from '../model/report';
-import { Profile } from '../model/profile';
-import { ReportsService } from '../services/reports.service';
-import { ProfileService } from '../services/profile.service';
-import { ProfileListComponent } from '../shared/profile-list/profile-list.component';
+import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Profile } from 'app/model/profile';
+import { ProfileService } from 'app/services/profile.service';
+import { Report } from 'app/model/report';
+import { ReportsService } from 'app/services/reports.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
   templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.css']
+  styleUrls: ['./reports.component.css'],
 })
 
 export class ReportsComponent implements OnInit {
 
-  userProfilesHash: { [id: number]: Profile } = {};
-  reports: Report[];
-  isInit: boolean = false;
-  private status: number;
-  // TODO: should have status enum
-  private StatusNew: number = 0;
-  private StatusEdit: number = 1;
-  private StatusList: number = 2;
+  status: number;
+  profiles: Profile[];
   userProfiles: Profile[];
-  private editProfileId: number;
+  reports: Report[];
+  selectedReport: Report;
 
-  constructor(private profileService: ProfileService) {
-    this.status = this.StatusList;
+  constructor(private profileService: ProfileService,
+    private reportsService: ReportsService,
+    private ref: ChangeDetectorRef) {
   }
 
   ngOnInit() {
-    this.getUserProfiles();
-    this.isInit = true;
+    this.status = ReportStatus.List;
+    this.loadData(false);
+  }
+
+  loadData(reload: boolean) {
+
+    if (reload) {
+      this.profiles = undefined;
+      this.userProfiles = undefined;
+      this.reports = undefined;
+    }
+
+    const profilesObservable = this.profileService.getAllProfiles();
+    const userProfilesObservable = this.profileService.getUserProfiles();
+    const reportsObservable = this.reportsService.getReports();
+
+    Observable.forkJoin([profilesObservable, userProfilesObservable, reportsObservable]).subscribe(results => {
+      this.profiles = <Profile[]>results[0];
+      this.userProfiles = <Profile[]>results[1];
+      this.reports = <Report[]>results[2];
+
+      this.ref.detectChanges();
+    });
   }
 
   getReportViewStatus(status) {
     this.status = status;
+    this.loadData(true);
   }
 
   getListViewStatus(listViewState) {
     this.status = listViewState.status;
-    this.editProfileId = listViewState.profileId;
+    this.selectedReport = listViewState.selectedReport;
   }
+}
 
-  getUserProfiles() {
-    this.profileService.getProfiles()
-      .subscribe(data => {
-        this.userProfiles = data         
-        this.buildUserProfileHash();
-      }
-      );
-  }
-
-  buildUserProfileHash() {
-    if (this.userProfiles != null) {
-      this.userProfiles.forEach(profile => {
-        this.userProfilesHash[profile.Id] = profile;
-      });    
-    }
-  }
+export enum ReportStatus {
+  New = 0,
+  Edit = 1,
+  List = 2
 }

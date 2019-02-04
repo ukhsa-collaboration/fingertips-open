@@ -11,6 +11,7 @@
         IndicatorSearchResultsDataPage = 6,
         SupportingInformation = 8,
         AreaSearchResultsOfProfileWithFrontPage = 9,
-        IndicatorListDataPage = 10
+        IndicatorListDataPage = 10,
+        AreaListPage = 11
     }
 }

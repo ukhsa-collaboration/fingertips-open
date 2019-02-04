@@ -1,32 +1,24 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 import {
-  Http,
-  Response,
-  RequestOptions,
-  URLSearchParams,
-  Headers
-} from "@angular/http";
-import "rxjs/rx";
-import { Observable } from "rxjs/Observable";
-import {
-  FTRoot,
+  Area,
+  AreaType,
   AreaTextSearchResult,
   NearByAreas,
   AreaAddress,
   ParentAreaType
-} from "../../../typings/FT.d";
-import { FTHelperService } from "../../service/helper/ftHelper.service";
-import { Parameters } from "./parameters";
+} from '../../../typings/FT.d';
+import { FTHelperService } from '../../service/helper/ftHelper.service';
+import { Parameters } from './parameters';
+import { HttpService } from './http.service'
+
 @Injectable()
 export class AreaService {
 
-  /** Observables for calls that have previously been made */
-  private observables: any = {};
-
-  private baseUrl: string = this.ftHelperService.getURL().bridge;
   private version: string = this.ftHelperService.version();
 
-  constructor(private http: Http, private ftHelperService: FTHelperService) { }
+  constructor(private httpService: HttpService, private ftHelperService: FTHelperService) {
+  }
 
   getAreaSearchByText(
     text: string,
@@ -36,12 +28,12 @@ export class AreaService {
   ): Observable<AreaTextSearchResult> {
     let params = new Parameters(this.version);
     params.addPolygonAreaTypeId(areaTypeId);
-    params.addNoCache(true);
+    params.addNoCache();
     params.addIncludeCoordinates(shouldSearchRetreiveCoordinates);
     params.addParentAreasToIncludeInResults(parentAreasToIncludeInResults);
     params.addSearchText(text);
 
-    return this.getObservable("api/area_search_by_text", params);
+    return this.httpService.httpGet('api/area_search_by_text', params);
   }
 
   getAreaSearchByProximity(
@@ -52,9 +44,9 @@ export class AreaService {
     let params = new Parameters(this.version);
     params.addAreaTypeId(areaTypeId);
     params.addEasting(easting);
-    params.addNorhing(northing);
+    params.addNorthing(northing);
 
-    return this.getObservable("api/area_search_by_proximity", params);
+    return this.httpService.httpGet('api/area_search_by_proximity', params);
   }
 
   getAreaAddressesByParentAreaCode(
@@ -65,43 +57,27 @@ export class AreaService {
     params.addAreaTypeId(areaTypeId);
     params.addParentAreaCode(parentAreaCode);
 
-    return this.getObservable("api/area_addresses/by_parent_area_code", params);
+    return this.httpService.httpGet('api/area_addresses/by_parent_area_code', params);
   }
 
   getParentAreas(profileId: number): Observable<ParentAreaType[]> {
     let params = new Parameters(this.version);
     params.addProfileId(profileId);
 
-    return this.getObservable("api/area_types/parent_area_types", params);
+    return this.httpService.httpGet('api/area_types/parent_area_types', params);
   }
 
-  private getObservable(serviceUrl: string, params?: Parameters): Observable<any> {
+  getAreaTypes(): Observable<AreaType[]> {
+    let params = new Parameters(this.version);
 
-    // Ensure paramaters is defined
-    if (!params) {
-      params = new Parameters(this.version);
-    }
-
-    // Check whether call has already been made and cached observable is available
-    let parameterString = params.getParameterString();
-    let serviceKey = serviceUrl + parameterString;
-    if (this.observables[serviceKey]) {
-      return this.observables[serviceKey];
-    }
-
-    let observable = this.http.get(this.baseUrl + serviceUrl, params.getRequestOptions())
-      .publishReplay(1).refCount() // Call once then use same response for repeats
-      .map(res => res.json())
-      .catch(this.handleError);
-
-    this.observables[serviceKey] = observable;
-    return observable;
+    return this.httpService.httpGet('api/area_types/with_data', params);
   }
 
-  private handleError(error: any) {
-    console.error(error);
-    const errorMessage = "AJAX call failed";
-    return Observable.throw(errorMessage);
-  }
+  getAreas(areaTypeId: number): Observable<Area[]> {
+    const params = new Parameters(this.version);
+    params.addAreaTypeId(areaTypeId);
+    params.addNoCache();
 
+    return this.httpService.httpGet('api/areas/by_area_type', params);
+  }
 }

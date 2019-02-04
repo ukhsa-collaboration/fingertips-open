@@ -38,12 +38,13 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
-        public IEnumerable<UploadJob> GetJobsForCurrentUser(int userId)
+        public IEnumerable<UploadJob> GetJobsForCurrentUser(int userId, int numberOfRecords)
         {
             return CurrentSession
                 .CreateCriteria<UploadJob>()
                 .Add(Restrictions.Eq("UserId", userId))
                 .AddOrder(Order.Desc("DateCreated"))
+                .SetMaxResults(numberOfRecords)
                 .List<UploadJob>();
         }
 

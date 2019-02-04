@@ -86,11 +86,12 @@ namespace FingertipsUploadService
                     UpdateJobProgress(job, ProgressStage.SmallNumberCheckIsDone);
                 }
 
-                // Check dupliates in the file
+                // Check duplicates in the file
                 _logger.Debug("Checking duplicates in file");
                 validator.CheckDuplicatesInFile(jobAnalysis);
 
-                // Check dupliate in database
+
+                // Check duplicate in database
                 _logger.Debug("Checking duplicates in db");
                 validator.CheckGetDuplicatesInDb(dataTable, jobAnalysis);
 
@@ -107,13 +108,16 @@ namespace FingertipsUploadService
                     if (AreAnyValidationFailures(job, jobAnalysis)) return;
                 }
 
+                _jobStatus.InProgress(job);
+
                 // Duplicate rows have not been accepted
                 _logger.Debug("Checking for the duplicate rows");
-                if (originalStatus != UploadJobStatus.ConfirmationGiven)
+                if (originalStatus != UploadJobStatus.ConfirmationGiven && job.IsConfirmationRequiredToOverrideDatabaseDuplicates)
                 {
-                    _jobStatus.InProgress(job);
                     if (AreAnyDuplicateRowsInDatabase(job, jobAnalysis)) return;
                 }
+
+                UpdateJobProgress(job, ProgressStage.WritingToDb);
 
                 // Remove duplicate data 
                 _logger.Debug("Removing the duplicate rows");
@@ -132,6 +136,7 @@ namespace FingertipsUploadService
                 LogUnexpectedError(job, ex);
             }
         }
+
 
         private void LogUnexpectedError(UploadJob job, Exception ex)
         {
@@ -181,7 +186,7 @@ namespace FingertipsUploadService
             _jobStatus.SmallNumbersFound(job);
             var warning = ErrorBuilder.GetSmallNumberWarning(job, uploadJobAnalysis.SmallNumberWarnings);
             _jobErrorRepository.Log(warning);
-            _logger.Info("Job ID {0}, Small number cound in row", job.Guid);
+            _logger.Info("Job ID {0}, Small number found in row", job.Guid);
 
             return true;
         }

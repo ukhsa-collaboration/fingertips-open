@@ -28,6 +28,7 @@
     <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
     <TargetFrameworkProfile />
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -243,7 +244,10 @@
     <Compile Include="ViewModels\ProfilesAndIndicators\CoreDataSetViewModel.cs" />
     <Compile Include="ViewModels\ProfileAreaType.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseIndicatorDataFullPageViewModel.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\GroupingPlusNameViewModel.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\GroupingSubheadingViewModel.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\ProfileIndicatorMetadataTextValues.cs" />
+    <Compile Include="ViewModels\ProfilesAndIndicators\ReorderIndicatorsViewModel.cs" />
     <Compile Include="ViewModels\ProfileUser.cs" />
     <Compile Include="ViewModels\ProfileUserViewModel.cs" />
     <Compile Include="ViewModels\Profile\ProfileViewModel.cs" />
@@ -297,7 +301,8 @@
     <Content Include="js\angular.js" />
     <Content Include="js\es5-sham.min.js" />
     <Content Include="js\es5-shim.min.js" />
-    <Content Include="js\jquery-1.12.1.js" />
+    <Content Include="js\jquery-3.3.1.min.js" />
+    <Content Include="js\jquery-ui-1.12.1.min.js" />
     <Content Include="js\jquery.form.js" />
     <Content Include="js\LiveUpdate\live-update.js" />
     <Content Include="js\PageCoreData.js" />
@@ -305,7 +310,6 @@
     <Content Include="js\lookup-tables.js" />
     <Content Include="js\PageAdmin.js" />
     <Content Include="js\PageSearchResults.js" />
-    <Content Include="js\jquery-ui-1.9.2.js" />
     <Content Include="js\chosen.jquery.min.js" />
     <Content Include="js\common-functions.js" />
     <Content Include="js\Content\content.js" />
@@ -460,7 +464,6 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\IndicatorEdit\IndicatorEdit.cshtml" />
-    <Content Include="Views\ProfilesAndIndicators\_ReorderIndicators.cshtml" />
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_DeleteSelectedIndicators.cshtml" />
@@ -499,14 +502,18 @@
     <Content Include="Views\UserFeedback\Index.cshtml" />
     <Content Include="Views\LookUpTables\EditCategoryType.cshtml" />
     <Content Include="Views\LiveUpdate\ProfileLiveUpdate.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\ReorderIndicators.cshtml" />
+    <Content Include="Views\Shared\_IndicatorMetadataComments.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="js\Areas\Api\Controllers\" />
     <Folder Include="js\Areas\Api\Models\" />
     <Folder Include="js\Areas\Api\Views\Shared\" />
     <Folder Include="js\css\" />
     <Folder Include="Upload Templates\" />
     <Folder Include="Uploads\" />
+    <Folder Include="Views\ProfilesAndIndicatorsApi\" />
     <Folder Include="Views\ReportsApi\" />
   </ItemGroup>
   <ItemGroup>

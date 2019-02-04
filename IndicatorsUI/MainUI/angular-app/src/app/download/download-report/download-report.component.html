@@ -1,0 +1,90 @@
+<div *ngIf="areAnyPdfsForProfile" class="row col-md-12">
+    <div id="pdf-download-text" class="text col-md-6">
+        <h2>{{title}}</h2>
+
+        <div *ngIf="arePdfsForCurrentAreaType">
+            <p>Download a detailed report of the data for</p>
+
+            <p *ngIf="showTimePeriodsMenu">
+                {{reportsLabel}}
+                <select (change)="timePeriodChange($event.target.value)">
+                    <option *ngFor="let period of timePeriods">{{period}}</option>
+                </select>
+            </p>
+
+            <button class="bnt btn-link pdf" (click)="exportPdf()">{{areaName}}</button>
+        </div>
+
+        <p [hidden]="arePdfsForCurrentAreaType">PDF profiles are not currently available for {{noPdfsMessage}}</p>
+
+        <br>
+        <p *ngIf="showMentalHealthSurvey">Please note the PDF reports are not updated with the profile. Consequently,
+            many of the indicators in the PDF reports will be based on older data than the profile data. We will be
+            developing downloadable dynamic reports which will address this
+            problem but it is likely to be several months before these are available.</p>
+    </div>
+    <div class="col-md-6">
+        <img src="{{imagesUrl}}download/{{fileName}}" class="pdf" (click)="exportPdf()" />
+    </div>
+</div>
+<div class="row col-md-12">&nbsp;</div>
+
+<!-- At a glance reports -->
+<div *ngIf="areAtAGlanceReports" class="row col-md-12">
+    <div id="phof-html-download-text" class="text col-md-6">
+        <h2>At a Glance</h2>
+        <p>View a web summary report of the data for</p>
+        <p *ngIf="showTimePeriodsMenu">
+            {{reportsLabel}}
+            <select (change)="timePeriodChange($event.target.value)">
+                <option *ngFor="let period of timePeriods">{{period}}</option>
+            </select>
+        </p>
+        <button class="bnt btn-link pdf" *ngFor="let area of areasWithPdfs" (click)="downloadStaticReportAtaGlance(area.Code)">{{area.Name}}</button>
+    </div>
+    <div class="col-md-6"><img src="{{imagesUrl}}download/html{{profileId}}-at-a-glance.png" class="pdf" /></div>
+</div>
+
+<!-- Child health behaviours -->
+<div *ngIf="isChildHealthProfile" class="row col-md-12">
+    <div id="pdf-download-text" class="text col-md-6">
+        <h2>Health behaviours in young people</h2>
+
+        <div *ngIf="arePdfsForCurrentAreaType">
+            <p>Download a detailed report of the data for</p>
+            <button class="bnt btn-link pdf" (click)="exportChildHealthBehavioursPdf()">{{areaName}}</button>
+        </div>
+
+        <p [hidden]="arePdfsForCurrentAreaType">PDF profiles are not curently available for {{noPdfsMessage}}</p>
+
+    </div>
+    <div class="col-md-6">
+        <img src="{{imagesUrl}}download/{{childHealthBehavioursFileName}}" class="pdf" (click)="exportChildHealthBehavioursPdf()" />
+    </div>
+</div>
+<div class="row col-md-12">&nbsp;</div>
+
+<!-- Child health dental report -->
+<div *ngIf="isChildHealthProfile" class="row col-md-12">
+    <div id="pdf-download-text" class="text col-md-6">
+        <h2>Oral health profile of five year olds</h2>
+
+        <div *ngIf="arePdfsForCurrentAreaType">
+            <p>Download a detailed report of the data for</p>
+            <p>
+                Report year
+                <select (change)="timePeriodChangeForDentalHealth($event.target.value)">
+                    <option>2015</option>
+                    <option>2012</option>
+                </select>
+            </p>
+            <button class="bnt btn-link pdf" (click)="exportChildHealthDentalReport()">{{areaName}}</button>
+        </div>
+
+        <p [hidden]="arePdfsForCurrentAreaType">PDF profiles are not curently available for {{noPdfsMessage}}</p>
+
+    </div>
+    <div class="col-md-6">
+        <img src="{{imagesUrl}}download/pdf-dental-health.png" class="pdf" (click)="exportChildHealthDentalReport()" />
+    </div>
+</div>

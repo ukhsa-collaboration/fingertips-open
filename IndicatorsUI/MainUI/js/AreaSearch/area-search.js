@@ -33,7 +33,7 @@ areaSearch.init = function () {
 
     // Set parent area
     ns.state.parentAreaType = areaTypeId === AreaTypeIds.CCGPreApr2017 ||
-        areaTypeId === AreaTypeIds.CCGPostApr2017
+        areaTypeId === AreaTypeIds.CCGPostApr2017 || areaTypeId === AreaTypeIds.CCGSince2018
         ? AreaTypeIds.Subregion
         : AreaTypeIds.Region;
 
@@ -201,7 +201,7 @@ areaSearchResults.getDataForPlaceNameSearch = function (areaTypeIds) {
         ns.getParentAreaOfPlaceName(areaTypeIds[i]);
     }
 
-    getArePdfsAvailable();
+    areaSearchResults.getArePdfsAvailable();
 
     ajaxMonitor.monitor(ns.prepareViewModel);
 }
@@ -233,7 +233,7 @@ areaSearchResults.getDataForParentArea = function (areaTypeIds) {
         });
 
     // Area PDFs available
-    getArePdfsAvailable();
+    areaSearchResults.getArePdfsAvailable();
 
     ajaxMonitor.monitor(ns.prepareViewModel);
 }
@@ -247,7 +247,7 @@ areaSearchResults.getDataForListOfAreas = function (areaTypeIds) {
     }
 
     // Area PDFs available
-    getArePdfsAvailable();
+    areaSearchResults.getArePdfsAvailable();
 
     ajaxMonitor.monitor(ns.prepareViewModel);
 }
@@ -261,7 +261,7 @@ areaSearchResults.initTimePeriod = function () {
     var timePeriods = FT.config.staticReportsFolders;
     if (timePeriods.length) {
         // Use first as default until these are options the user can select
-        download.timePeriod = timePeriods[0];
+        areaSearchResults.timePeriod = timePeriods[0];
     }
 }
 
@@ -473,8 +473,89 @@ areaSearchResults.ensureParentAreaCodeIsDefined = function (areaLists) {
 areaSearchResults.exportPdf = function (areaCode, areaTypeId) {
     FT.model.areaTypeId = areaTypeId;
     var area = areaSearchResults.findAreaFromCode(loaded.areaLists[areaTypeId], areaCode);
-    exportPdf(areaCode, area);
+
+    downloadCachedPdf(areaCode);
+
+    // areaHash will not be defined from area search result but area will be 
+    var areaName = isDefined(area) ? area.Name : areaHash[areaCode].Name;
+
+    logEvent('Download', 'PDF', areaName);
 }
+
+/**
+* Downloads a cached PDF. DUPLICATED IN ANGULAR DOWNLOAD COMPONENTS.
+*/
+function downloadCachedPdf(areaCode) {
+
+    var profileId = FT.model.profileId;
+    var url;
+
+    if (FT.config.hasStaticReports) {
+        downloadStaticReport(areaCode);
+        return;
+    } else if (profileId === ProfileIds.Liver) {
+        // Liver profiles
+        url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
+    } 
+    else {
+        url = getPdfUrl(areaCode);
+    }
+
+    areaSearchResults.openFile(url);
+}
+
+areaSearchResults.openFile = function (url) {
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function getPdfUrl(areaCode) {
+
+    var profileId = FT.model.profileId;
+
+    // Determine host
+    var url = FT.url.pdf + profileUrlKey;
+    if (profileId === ProfileIds.HealthProfiles) {
+        url = url + '/' + areaSearchResults.timePeriod;
+    }
+
+    // Return URL with parameters
+    return url + '/' + areaCode + '.pdf';
+}
+
+function downloadStaticReport(areaCode) {
+    var parameters = new ParameterBuilder(
+    ).add('profile_key', profileUrlKey
+    ).add('file_name', areaCode + '.pdf');
+
+    // Time period (if required)
+    if (areaSearchResults.timePeriod) {
+        parameters.add('time_period', areaSearchResults.timePeriod);
+    }
+
+    var parametersString = parameters.build();
+    checkStaticReportExistsThenDownload(parametersString);
+}
+
+function checkStaticReportExistsThenDownload(parametersString) {
+
+    // Check report exists
+    ajaxGet('api/static-reports/exists',
+        parametersString,
+        function (doesReportExist) {
+            if (doesReportExist) {
+                // Download report
+                var url = FT.url.corews + 'static-reports?' + parametersString;
+                window.open(url.toLowerCase(), '_blank');
+            } else {
+                var html = '<div style="padding:15px;"><h3>Sorry, this document is not available</h3></div>';
+                var popupWidth = 800;
+                var left = ($(window).width() - popupWidth) / 2;
+                var top = 500;
+                lightbox.show(html, top, left, popupWidth);
+            }
+        });
+}
+
 
 /**
 * Displays the view model for the area search results.
@@ -556,8 +637,36 @@ areaSearchResults.displayTimePeriodOptions = function () {
 * @class areaSearchResults.changeTimePeriod
 */
 areaSearchResults.changeTimePeriod = function ($option) {
-    download.timePeriod = $option.html();
+    areaSearchResults.timePeriod = $option.html();
 }
+
+// Selected time period
+areaSearchResults.timePeriod = null;
+
+/**
+* AJAX call to determine whether or not PDFs are available for the current profile and area type.
+* @class areaSearchResults.getArePdfsAvailable
+*/
+areaSearchResults.getArePdfsAvailable = function() {
+    var model = FT.model;
+    var profileId = model.profileId;
+
+    if (!loaded.areaTypesWithPdfs[profileId]) {
+        var parameters = new ParameterBuilder(
+        ).add('profile_id', profileId);
+
+        ajaxGet('api/profile/area_types_with_pdfs',
+            parameters.build(),
+            function (obj) {
+                loaded.areaTypesWithPdfs[profileId] = obj;
+                ajaxMonitor.callCompleted();
+            });
+    } else {
+        ajaxMonitor.callCompleted();
+    }
+}
+
+loaded.areaTypesWithPdfs = {};
 
 // Constants for positioning of search suggestions
 SEARCH_NO_RESULT_TOP_OFFSET = 30;

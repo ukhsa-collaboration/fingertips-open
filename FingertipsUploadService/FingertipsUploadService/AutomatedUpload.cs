@@ -3,6 +3,7 @@ using FingertipsUploadService.ProfileData.Repositories;
 using NLog;
 using System;
 using System.IO;
+using FingertipsUploadService.Helpers;
 
 namespace FingertipsUploadService
 {
@@ -22,26 +23,29 @@ namespace FingertipsUploadService
         {
             var files = Directory.GetFiles(AppConfig.GetAutoUploadFolder());
             if (files.Length > 0)
-                _copyFileToUploadFolder(files[0]);
+                CopyFileToUploadFolder(files[0]);
 
         }
 
-        private void _copyFileToUploadFolder(string filePath)
+        private void CopyFileToUploadFolder(string filePath)
         {
             var guid = Guid.NewGuid();
-            var actualFilename = Path.GetFileName(filePath);
-            var uniqueFilename = string.Format("{0}.csv", guid);
+
+            var fileNameHelper = new FileNameHelper(filePath, guid);
+
             try
             {
                 // Copy the file to archive directory
-                File.Copy(filePath, AppConfig.GetAutoUploadArchiveFolder() + "\\" + actualFilename);
+                File.Copy(filePath, AppConfig.GetAutoUploadArchiveFolder() + "\\" + fileNameHelper.GetFileNameForArchiveFolder());
+
                 // Move the file to upload directory
-                File.Move(filePath, AppConfig.GetUploadFolder() + "\\" + uniqueFilename);
+                File.Move(filePath, AppConfig.GetUploadFolder() + "\\" + fileNameHelper.GetFileNameForUploadFolder());
+
                 var newUploadJob = new UploadJob
                 {
                     DateCreated = DateTime.Now,
                     Guid = guid,
-                    Filename = actualFilename,
+                    Filename = fileNameHelper.GetFileName(),
                     Status = UploadJobStatus.NotStarted,
                     UserId = AppConfig.GetAutoUploadUserId(),
                 };

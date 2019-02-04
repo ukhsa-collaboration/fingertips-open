@@ -1,57 +1,60 @@
 <div *ngIf="validationError" class="alert alert-warning">
-  <strong>Warning!</strong> {{validationError}}
+    <strong>Warning!</strong> {{validationError}}
 </div>
 <div class="col-lg-12 pull-right">
-  <div class="pull-left">    
-    <button class="btn btn-primary" (click)="saveReport()">Save</button>    
-    <button class="btn btn-default" (click)="cancelReport()">Cancel</button>
-  </div>
-  <div class="pull-right">
-    <button *ngIf="editProfileId" class="btn btn-danger" (click)="deleteReport(editProfileId)">Delete</button>
-  </div>
-  <br/>
-  <br/>
-  <br/>
+    <div class="pull-left">
+        <button class="btn btn-primary" (click)="saveReport()">Save</button>
+        <button class="btn btn-default" (click)="cancelReport()">Cancel</button>
+    </div>
+    <div class="pull-right">
+        <button *ngIf="selectedReport.id > 0" class="btn btn-danger" (click)="deleteReportConfirmation(selectedReport)">Delete</button>
+    </div>
+    <br />
+    <br />
+    <br />
 </div>
-<div >
-  <form class="form-horizontal">
-    <!-- Notes -->
-    <div class="form-group">
-      <label for="reportName" class="control-label col-xs-2">Report Name</label>
-      <div class="col-xs-8">
-        <input name="reportName"  [(ngModel)]="report.name"  class="form-control" type="text" />
-      </div>
-    </div>
-    <!-- Filename -->
-    <div class="form-group">
-      <label for="fileName" class="control-label col-xs-2">File Name</label>
-      <div class="col-xs-8">
-        <input name="fileName"  [(ngModel)]="report.file"  class="form-control" type="text" />
-      </div>
-    </div>
-     <!-- Notes -->
-     <div class="form-group">
-      <label for="notes" class="control-label col-xs-2">Notes</label>
-      <div class="col-xs-8">
-        <textarea  name="notes"  [(ngModel)]="report.notes"  class="form-control" type="text"></textarea>
-      </div>
-    </div>
-    <br/>
-    <br/>
-    <!--Profiles -->
-    <app-report-profiles (getProfiles)="getProfiles($event)" [selectedProfiles]="report.profiles" [userProfilesHash]="userProfilesHash" ></app-report-profiles>
-    <br/>
-    <br/>
-    
-    <!--Parameters -->
-    <app-report-parameters (getParameters)="getParameters($event)" [selectedParameters]="report.parameters"></app-report-parameters>
+<div>
+    <form class="form-horizontal">
+        <!-- Notes -->
+        <div class="form-group">
+            <label for="reportName" class="control-label col-xs-2">Report Name</label>
+            <div class="col-xs-8">
+                <input name="reportName" [(ngModel)]="selectedReport.name" class="form-control" type="text" />
+            </div>
+        </div>
+        <!-- Filename -->
+        <div class="form-group">
+            <label for="fileName" class="control-label col-xs-2">File Name</label>
+            <div class="col-xs-8">
+                <input name="fileName" [(ngModel)]="selectedReport.file" class="form-control" type="text" />
+            </div>
+        </div>
+        <!-- Notes -->
+        <div class="form-group">
+            <label for="notes" class="control-label col-xs-2">Notes</label>
+            <div class="col-xs-8">
+                <textarea name="notes" [(ngModel)]="selectedReport.notes" class="form-control" type="text"></textarea>
+            </div>
+        </div>
 
-    <!-- IsLive -->
-    <div class="form-group">
-      <label for="isLive" class="control-label col-xs-2">Live</label>
-      <div class="col-xs-8">       
-        <input  name="isLive"  [(ngModel)]="report.isLive"  class="form-control" type="checkbox" />
-      </div>
-    </div>
-  </form>
+        <!-- IsLive -->
+        <div class="form-group">
+            <label for="isLive" class="control-label col-xs-2">Live</label>
+            <div class="col-xs-8">
+                <input name="isLive" [(ngModel)]="selectedReport.isLive" class="form-control" type="checkbox" />
+            </div>
+        </div>
+
+        <br />
+        <br />
+        <!--Profiles -->
+        <app-report-profiles (getProfiles)="getProfiles($event)" [selectedProfiles]="selectedReport.profiles"
+            [userProfiles]="userProfiles"></app-report-profiles>
+
+        <br />
+        <br />
+        <!--Parameters -->
+        <app-report-parameters (getParameters)="getParameters($event)" [selectedParameters]="selectedReport.parameters"></app-report-parameters>
+    </form>
+    <ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
 </div>

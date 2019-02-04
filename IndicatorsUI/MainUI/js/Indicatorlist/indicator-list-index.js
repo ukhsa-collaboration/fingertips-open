@@ -33,10 +33,56 @@ function deleteConfirm(e) {
     var html = templates.render(template, { href: href });
     var popupWidth = 500;
     var left = lightbox.getLeftForCenteredPopup(popupWidth);
-    var top = 200;
+    var top = 400;
     lightbox.show(html, top, left, popupWidth);
 
     // Ignore initial link click
     return false;
 }
 
+function copyConfirm(e, publicId, listName) {
+    // URL of delete action
+    var href = $(e).prop('href');
+
+    console.log(e);
+
+    // Display pop up asking to confirm copying of the indicator list
+    tooltipManager.init();
+    var template = 'copyconfirm';
+    templates.add(template,
+        '<div style="padding:15px;">' +
+        '<h3>Copy indicator list</h3>' +
+        '<div style="margin-bottom: 10px;">' +
+            'Name of new list' +
+            '<br><br>' +
+            '<input type="hidden" id="hdn-public-id" value="' + publicId + '">' +
+            '<input type="text" id="indicator-list-name" class="indicator-list-name" value="' + listName + ' copy">' +
+        '</div>' +
+        '<div>' +
+            '<button id="btn-copy-indicator-list" style="width:70px;" class="btn btn-primary" onclick="copyIndicatorList()";>OK</button>' +
+            '<a class="btn" href="javascript:lightbox.hide();">Cancel</a>' +
+        '</div>' +
+        '</div>');
+
+    var html = templates.render(template, { href: href });
+    var popupWidth = 500;
+    var left = lightbox.getLeftForCenteredPopup(popupWidth);
+    var top = 400;
+        lightbox.show(html, top, left, popupWidth);
+
+    // Ignore initial link click
+    return false;
+}
+
+function copyIndicatorList() {
+    var publicId = $("#hdn-public-id").val(),
+        listName = $("#indicator-list-name").val();
+
+    console.log(publicId);
+    console.log(listName);
+
+    window.location.href = "/user-account/indicator-list/copy?listId=" +
+        publicId +
+        '&listName=' +
+        listName;
+}

@@ -146,6 +146,7 @@ td {
     float: left;
     width: 100% !important;
     text-align: center;
+    padding-bottom: 20px;
 }
 
 .start-button a {

@@ -1,0 +1,55 @@
+<div class="row" *ngIf="showRAG3 || showRAG5 || showBOB">
+  <div class="col-md-12 spine-table key-table">
+    <div class="spine-compared-with-text">
+      <i>Compared with benchmark:</i>
+    </div>
+    <div class="key-spine spine-rag-5" *ngIf="showRAG5">
+      <img class="key-circle" src="/images/circle_dark_green_mini.png" alt="" /> Better 99.8%
+      <img class="key-circle" src="/images/circle_green_mini.png" alt="" /> Better 95%
+      <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar
+      <img class="key-circle" src="/images/circle_red_mini.png" alt="" /> Worse 95%
+      <img class="key-circle" src="/images/circle_dark_red_mini.png" alt="" /> Worse 99.8%
+    </div>
+    <div class="key-spine spine-rag-3" *ngIf="showRAG3">
+      <img class="key-circle" src="/images/circle_green_mini.png" alt="" /> Better
+      <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar
+      <img class="key-circle" src="/images/circle_red_mini.png" alt="" /> Worse
+    </div>
+    <div class="key-spine spine-bob" *ngIf="showBOB">
+      <img class="key-circle" src="/images/circle_darkblue_mini.png" alt="" /> Lower
+      <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar
+      <img class="key-circle" src="/images/circle_lightblue_mini.png" alt="" /> Higher
+    </div>
+    <div class="key-spine spine-not-compared">
+      <img class="key-circle" src="/images/circle_white_mini.png" alt="" /> Not compared
+    </div>
+  </div>
+</div>
+<div class="row margin-top-10" *ngIf="showQuintilesRAG || showQuintilesBOB">
+  <div class="col-md-12">
+    <span class="spine-compared-with-text">
+      <i>Quintiles:</i>
+    </span>
+    <div class="spine-chart-legend-outer-box" *ngIf="showQuintilesRAG">
+      Best
+      <img class="key-circle" src="/images/circle_rag_quintile1_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_rag_quintile2_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_rag_quintile3_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_rag_quintile4_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_rag_quintile5_mini.png" alt="" />&nbsp;
+      Worst
+    </div>
+    <div class="spine-chart-legend-outer-box" *ngIf="showQuintilesBOB">
+      Low
+      <img class="key-circle" src="/images/circle_bob_quintile1_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_bob_quintile2_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_bob_quintile3_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_bob_quintile4_mini.png" alt="" />&nbsp;
+      <img class="key-circle" src="/images/circle_bob_quintile5_mini.png" alt="" />&nbsp;
+      High
+    </div>
+    <div class="spine-chart-legend-outer-box">
+      <img class="key-circle" src="/images/circle_white_mini.png" alt="" /> Not applicable
+    </div>
+  </div>
+</div>

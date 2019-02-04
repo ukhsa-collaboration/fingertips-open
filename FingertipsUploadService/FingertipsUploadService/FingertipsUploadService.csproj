@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="AppConfig.cs" />
     <Compile Include="AutomatedUpload.cs" />
+    <Compile Include="Helpers\FileNameHelper.cs" />
     <Compile Include="UploadJobWorker.cs" />
     <Compile Include="FpmFileReader\CsvFileReader.cs" />
     <Compile Include="FpmFileReader\FileReaderFactory.cs" />

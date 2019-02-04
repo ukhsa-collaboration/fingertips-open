@@ -1,0 +1,24 @@
+﻿@using Fpm.MainUI
+@model Fpm.MainUI.ViewModels.ProfilesAndIndicators.ReorderIndicatorsViewModel
+@{
+    ViewBag.Title = "ReorderIndicators";
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+@section ExtraScripts
+{
+    <script src="@(AppConfig.AngularAppDistPath)main.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)polyfills.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)runtime.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)styles.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)vendor.js" type="text/javascript" defer></script>
+}
+
+@section AngularApp
+{
+}
+
+<h2 class="subheading">Reorder Indicators</h2>
+<div class="container">
+    <app-indicators-reorder-view id="app-root" profile-id="@Model.ProfileId" profile-key="@Model.ProfileUrlKey" group-id="@Model.GroupId" domain-seq="@Model.DomainSequence" area-type-id="@Model.AreaTypeId"></app-indicators-reorder-view>
+</div>

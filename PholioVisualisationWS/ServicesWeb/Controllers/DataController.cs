@@ -4,6 +4,7 @@ using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export;
 using PholioVisualisation.Export.File;
 using PholioVisualisation.Formatting;
+using PholioVisualisation.Parsers;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.ServiceActions;
@@ -15,33 +16,15 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using PholioVisualisation.Parsers;
 
 namespace PholioVisualisation.ServicesWeb.Controllers
 {
+    /// <summary>
+    /// Data generator controller
+    /// </summary>
     [RoutePrefix("api")]
     public class DataController : BaseController
     {
-        /// <summary>
-        /// The maximum number of indicators a user is allowed to download at once.
-        /// </summary>
-        public const int MaxIndicatorsForCsvDownload = 100;
-
-        private IFileBuilder _fileBuilder;
-
-        public DataController()
-        {
-
-        }
-
-        /// <summary>
-        /// Constructor to allow alternative dependencies
-        /// </summary>
-        public DataController(IFileBuilder fileBuilder)
-        {
-            _fileBuilder = fileBuilder;
-        }
-
         /// <summary>
         /// Gets the most recent data for a profile group
         /// </summary>
@@ -81,8 +64,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         [HttpGet]
         [Route("latest_data/specific_indicators_for_child_areas")]
-        public IList<GroupRoot> GetGroupDataAtDataPoint(int area_type_id, string parent_area_code,
-            string indicator_ids, string restrict_to_profile_ids = "")
+        public IList<GroupRoot> GetGroupDataAtDataPoint(int area_type_id, string parent_area_code, string indicator_ids, int profile_id, string restrict_to_profile_ids = "")
         {
             try
             {
@@ -90,7 +72,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 var builder = new GroupDataBuilderByIndicatorIds
                 {
                     IndicatorIds = new IntListStringParser(indicator_ids).IntList,
-                    ProfileId = ProfileIds.Undefined,
+                    ProfileId = profile_id,
                     RestrictSearchProfileIds = GetProfileIds(restrict_to_profile_ids),
                     ComparatorMap = comparatorMap,
                     AreaCode = null,
@@ -111,7 +93,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
-        /// <param name="parent_area_code">Parent area code</param>
+        /// <param name="area_code">Area code</param>
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         [HttpGet]
         [Route("latest_data/specific_indicators_for_single_area")]
@@ -910,144 +892,13 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Get data for specific indicators in CSV format.
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
-        /// </summary>
-        /// <param name="indicator_ids">Comma separated list of indicator IDs [Maximum 100]</param>
-        /// <param name="child_area_type_id">Child area type ID</param>
-        /// <param name="parent_area_type_id">Parent area type ID</param>
-        /// <param name="profile_id">Profile ID [optional]</param>
-        /// <param name="parent_area_code">The parent area code [default is England]</param>
-        [HttpGet]
-        [Route("all_data/csv/by_indicator_id")]
-        public HttpResponseMessage GetDataFileForIndicatorList(string indicator_ids,
-            int child_area_type_id, int parent_area_type_id, int profile_id = ProfileIds.Undefined,
-            string parent_area_code = AreaCodes.England)
-        {
-            try
-            {
-                var indicatorIds = new IntListStringParser(indicator_ids).IntList;
-
-                // Limit number of indicators
-                if (indicatorIds.Count > MaxIndicatorsForCsvDownload)
-                {
-                    indicatorIds = indicatorIds.Take(MaxIndicatorsForCsvDownload).ToList();
-                }
-
-                var exportParameters = new IndicatorExportParameters
-                {
-                    ProfileId = profile_id,
-                    ChildAreaTypeId = child_area_type_id,
-                    ParentAreaTypeId = parent_area_type_id,
-                    ParentAreaCode = parent_area_code
-                };
-
-                return GetIndicatorDataResponse(indicatorIds, exportParameters);
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Get data for all the indicators in a profile group in CSV format
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
-        /// </summary>
-        /// <param name="child_area_type_id">Child area type ID</param>
-        /// <param name="parent_area_type_id">Parent area type ID</param>
-        /// <param name="group_id">Profile group ID</param>
-        /// <param name="parent_area_code">The parent area code [default is England]</param>
-        [HttpGet]
-        [Route("all_data/csv/by_group_id")]
-        public HttpResponseMessage GetDataFileForGroup(int child_area_type_id,
-            int parent_area_type_id, int group_id, string parent_area_code = AreaCodes.England)
-        {
-            try
-            {
-                // Get profile ID of group
-                var groupDataReader = ReaderFactory.GetGroupDataReader();
-                var profileId = groupDataReader
-                    .GetGroupingMetadataList(new List<int> { group_id })
-                    .First()
-                    .ProfileId;
-
-                // Get indicator IDs in group
-                var indicatorIds = GetIndicatorIdListProvider().GetIdsForGroup(group_id);
-
-                var exportParameters = new IndicatorExportParameters
-                {
-                    ProfileId = profileId,
-                    ChildAreaTypeId = child_area_type_id,
-                    ParentAreaTypeId = parent_area_type_id,
-                    ParentAreaCode = parent_area_code
-                };
-
-                return GetIndicatorDataResponse(indicatorIds, exportParameters);
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Get data for all the indicators in a profile in CSV format
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
-        /// </summary>
-        /// <param name="child_area_type_id">Child area type ID</param>
-        /// <param name="parent_area_type_id">Parent area type ID</param>
-        /// <param name="profile_id">Profile ID</param>
-        /// <param name="parent_area_code">The parent area code [default is England]</param>
-        [HttpGet]
-        [Route("all_data/csv/by_profile_id")]
-        public HttpResponseMessage GetDataFileForProfile(int child_area_type_id,
-            int parent_area_type_id, int profile_id, string parent_area_code = AreaCodes.England)
-        {
-            try
-            {
-                var filename = SingleEntityFileNamer.GetDataForUserbyProfileAndAreaType(profile_id, child_area_type_id);
-                var fileManager = new ExportFileManager(filename);
-
-                // Parameters
-                var exportParameters = new IndicatorExportParameters
-                {
-                    ProfileId = profile_id,
-                    ChildAreaTypeId = child_area_type_id,
-                    ParentAreaTypeId = parent_area_type_id,
-                    ParentAreaCode = parent_area_code
-                };
-
-                // Check whether file is already cached
-                byte[] content = fileManager.TryGetFile();
-                if (content == null)
-                {
-                    // Get indicatorIDs in profile
-                    var indicatorIds = GetIndicatorIdListProvider().GetIdsForProfile(profile_id);
-
-                    // Create file
-                    content = GetIndicatorFileContent(indicatorIds, exportParameters);
-                }
-
-                return FileResponseBuilder.NewMessage(content, filename);
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Returns the available data for each combination of indicator ID and area type ID.
         /// </summary>
         /// <remarks>If only the indicator ID is specified then the results will be returned
         /// for every area type for which data is available.
         /// </remarks>
         /// <param name="indicator_id">Filter by indicator ID</param>
-        /// <param name="areaType_id">Filter by area type ID [optional]</param>
+        /// <param name="area_type_id">Filter by area type ID [optional]</param>
         [HttpGet]
         [Route("available_data")]
         public IList<GroupingData> GetAvailableDataForGrouping(int? indicator_id = null, int? area_type_id = null)
@@ -1094,52 +945,6 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <summary>
         /// Remove when have DI framework
         /// </summary>
-        private IIndicatorIdListProvider GetIndicatorIdListProvider()
-        {
-            var groupDataReader = ReaderFactory.GetGroupDataReader();
-            var groupIdProvider = new GroupIdProvider(ReaderFactory.GetProfileReader());
-            return new IndicatorIdListProvider(groupDataReader, groupIdProvider);
-        }
-
-        private HttpResponseMessage GetIndicatorDataResponse(IList<int> indicatorIds,
-            IndicatorExportParameters exportParameters)
-        {
-            var fileContent = GetIndicatorFileContent(indicatorIds, exportParameters);
-            if (fileContent != null)
-            {
-                var filename = SingleEntityFileNamer.GetDataForUserbyIndicatorAndAreaType(exportParameters.ChildAreaTypeId);
-                return FileResponseBuilder.NewMessage(fileContent, filename);
-            }
-
-            return null;
-        }
-
-        private byte[] GetIndicatorFileContent(IList<int> indicatorIds, IndicatorExportParameters exportParameters)
-        {
-            var areasReader = ReaderFactory.GetAreasReader();
-
-            var areaHelper = new ExportAreaHelper(areasReader, exportParameters, new AreaFactory(areasReader));
-            var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                areaHelper, areasReader, FileBuilder);
-            var fileContent = fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, exportParameters);
-            return fileContent;
-        }
-
-        private IFileBuilder FileBuilder
-        {
-            get
-            {
-                if (_fileBuilder == null)
-                {
-                    return new FileBuilder();
-                }
-                return _fileBuilder;
-            }
-        }
-
-        /// <summary>
-        /// Remove when have DI framework
-        /// </summary>
         private static SingleGroupingProvider GetSingleGroupingProvider(IGroupDataReader groupDataReader)
         {
             var groupIdProvider = new GroupIdProvider(ReaderFactory.GetProfileReader());
@@ -1147,12 +952,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             return singleGroupingProvider;
         }
 
-
         public static ComparatorMap GetComparatorMapForParentArea(int area_type_id, string parent_area_code)
         {
             var parentArea = new ParentArea(parent_area_code, area_type_id);
             return new ComparatorMapBuilder(parentArea).ComparatorMap;
         }
-
     }
 }

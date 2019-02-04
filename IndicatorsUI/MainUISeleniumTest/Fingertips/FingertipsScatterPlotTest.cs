@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -14,6 +15,8 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         [TestMethod]
         public void TestScatterPlotChangingAreaTypeRepopulatesButRetainsSelectedSupportingIndicator()
         {
+            const string indicatorText = "fuel poverty";
+
             // Navidate to scatter plot
             var parameters = new HashParameters();
             parameters.AddAreaTypeId(AreaTypeIds.CountyAndUnitaryAuthority);
@@ -29,7 +32,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             // Choose supporting indicator
             driver.FindElement(By.CssSelector("div.chosen-container a.chosen-single")).Click();
             var searchText = driver.FindElement(By.CssSelector("div.chosen-search input"));
-            searchText.SendKeys("pupil absence");
+            searchText.SendKeys(indicatorText);
             searchText.SendKeys(Keys.Return);
             waitFor.AjaxLockToBeUnlocked();
 
@@ -39,6 +42,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             clickThis.SelectByText("District & UA");
 
             // Wait for scatter plot to reload
+            Thread.Sleep(500);
             waitFor.AjaxLockToBeUnlocked();
 
             // Assert: area count is different
@@ -48,7 +52,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             // Assert: indicator is as expected
             var selectedSupportingIndicator = driver.FindElement(
                 By.CssSelector("div.chosen-container a.chosen-single span"));
-            TestHelper.AssertTextContains(selectedSupportingIndicator.Text, "Pupil absence");
+            TestHelper.AssertTextContains(selectedSupportingIndicator.Text, indicatorText);
         }
 
         private int GetSupportingIndicatorCount()

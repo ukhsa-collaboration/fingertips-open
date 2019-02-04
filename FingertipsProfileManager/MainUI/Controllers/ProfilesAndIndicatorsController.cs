@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Net;
+using System.Net.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -117,6 +118,8 @@ namespace Fpm.MainUI.Controllers
                     .OrderBy(model.SortExpression)
                     .Skip((model.CurrentPageIndex - 1) * model.PageSize)
                     .Take(model.PageSize);
+
+                model.GroupingSubheadings = _profileRepository.GetGroupingSubheadings(profile.SelectedAreaType, model.SelectedGroupId);
             }
 
             return View(IndexView, model);
@@ -197,6 +200,8 @@ namespace Fpm.MainUI.Controllers
                     model.IndicatorNamesGrid = indicators
                         .Skip((model.CurrentPageIndex - 1) * model.PageSize)
                         .Take(model.PageSize);
+
+                    model.GroupingSubheadings = _profileRepository.GetGroupingSubheadings(profile.SelectedAreaType, model.SelectedGroupId);
                 }
             }
 
@@ -214,22 +219,6 @@ namespace Fpm.MainUI.Controllers
             IList<GroupingMetadata> groupingMetadatas = model.Profile.GroupingMetadatas;
 
             return groupingMetadatas.FirstOrDefault(x => x.Sequence == domainNumber).GroupId;
-        }
-
-        public ActionResult ReorderIndicators(int selectedDomain, string urlKey, int selectedGroupId, int selectedAreaType)
-        {
-            var model = new ProfileMembers
-            {
-                UrlKey = urlKey,
-                Profile = GetProfile(urlKey, selectedDomain, selectedAreaType)
-            };
-
-            if (Request.IsAjaxRequest())
-            {
-                return PartialView("_ReorderIndicators", model);
-            }
-
-            return View(IndexView);
         }
 
         /// <summary>
@@ -524,42 +513,6 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
-        [HttpPost]
-        public ActionResult SaveReorderedIndicators(FormCollection fc, int? currentDomainId, string indicatorOrder)
-        {
-            if (currentDomainId.HasValue)
-            {
-                var indicatorSpecifierStrings = indicatorOrder.Split('¬').ToList();
-                indicatorSpecifierStrings.RemoveAt(indicatorSpecifierStrings.Count - 1);
-                var sequenceNumber = 1;
-
-                var areaTypeId = Convert.ToInt32(fc["AreaType"]);
-
-                var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
-                foreach (var indicatorSpecifier in indicatorSpecifiers)
-                {
-                    var groupings = _reader.GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId(currentDomainId.Value,
-                        areaTypeId, indicatorSpecifier.IndicatorId, indicatorSpecifier.SexId);
-
-                    foreach (var grouping in groupings)
-                    {
-                        grouping.Sequence = sequenceNumber;
-                    }
-
-                    _writer.UpdateGroupingList(groupings);
-
-                    sequenceNumber++;
-                }
-            }
-
-            if (Request.UrlReferrer != null)
-            {
-                return Redirect(Request.UrlReferrer.AbsoluteUri);
-            }
-
-            return View(IndexView);
-        }
-
         public ActionResult ConfirmCopyIndicators(CopyIndicatorsModel cim,
             string indicatorTransferDetails, bool copyMetadataOption)
         {
@@ -820,6 +773,216 @@ namespace Fpm.MainUI.Controllers
             }
 
             return PartialView("_CoreData", coreDataSetViewModel);
+        }
+
+        [Route("ReorderIndicators")]
+        public ActionResult ReorderIndicators(int profileId, string profileUrlKey, int domainSequence, int areaTypeId, int groupId)
+        {
+            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+            {
+                ProfileId = profileId,
+                ProfileUrlKey = profileUrlKey,
+                DomainSequence = domainSequence,
+                AreaTypeId = areaTypeId,
+                GroupId = groupId
+            };
+
+            return View("ReorderIndicators", reorderIndicatorsViewModel);
+        }
+
+        [Route("DomainName")]
+        public ActionResult GetDomainName(int groupId, int domainSequence)
+        {
+            string domainName = _profileRepository.GetDomainName(groupId, domainSequence);
+            return Json(domainName, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get the indicators with names for profile, area type and grouping sequence
+        /// </summary>
+        /// <param name="profileUrlKey">Profile url key</param>
+        /// <param name="sequenceNumber">Sequence number of the group associated with the profile</param>
+        /// <param name="areaTypeId">Area type id</param>
+        /// <returns>List of grouping plus name objects</returns>
+        [Route("ProfileGroupingIndicators")]
+        public ActionResult GetGroupingPlusNames(string profileUrlKey, int sequenceNumber, int areaTypeId)
+        {
+            Profile profile = new ProfileBuilder(_profileRepository).Build(profileUrlKey, sequenceNumber, areaTypeId);
+            IList<GroupingPlusName> groupingPlusNames = profile.IndicatorNames;
+
+            return Json(groupingPlusNames, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("grouping-subheadings/by-area-type-and-group")]
+        public ActionResult GetGroupingSubheadings(int areaTypeId, int groupId)
+        {
+            IList<GroupingSubheading> groupingSubheadings = _profileRepository.GetGroupingSubheadings(areaTypeId, groupId);
+            return Json(groupingSubheadings, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("grouping-subheadings/by-profile")]
+        public ActionResult GetGroupingSubheadingsForProfile(int profileId)
+        {
+            var groupIds = _reader.GetGroupingIds(profileId);
+
+            IList<GroupingSubheading> groupingSubheadings = _profileRepository.GetGroupingSubheadingsByGroupIds(groupIds);
+            return Json(groupingSubheadings, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        [Route("ProfileGroupingIndicators/AddGroupingSubheadings")]
+        public ActionResult AddGroupingSubheadings(FormCollection formCollection)
+        {
+            var profileId = Convert.ToInt32(formCollection["profileId"]);
+            var profileUrlKey = formCollection["profileUrlKey"];
+            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
+            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
+            var groupId = Convert.ToInt32(formCollection["groupId"]);
+            var subheading = formCollection["subheading"];
+            var sequence = -1;
+
+            var groupingSubheading = new GroupingSubheading
+            {
+                GroupId = groupId,
+                AreaTypeId = areaTypeId,
+                Sequence = sequence,
+                Subheading = subheading
+            };
+
+            _profileRepository.SaveGroupingSubheading(groupingSubheading);
+
+            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+            {
+                ProfileId = profileId,
+                ProfileUrlKey = profileUrlKey,
+                DomainSequence = domainSequence,
+                AreaTypeId = areaTypeId,
+                GroupId = groupId
+            };
+
+            return View("ReorderIndicators", reorderIndicatorsViewModel);
+        }
+
+        [HttpPost]
+        [Route("ProfileGroupingIndicators/EditGroupingSubheadings")]
+        public ActionResult EditGroupingSubheadings(FormCollection formCollection)
+        {
+            var profileId = Convert.ToInt32(formCollection["profileId"]);
+            var profileUrlKey = formCollection["profileUrlKey"];
+            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
+            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
+            var groupId = Convert.ToInt32(formCollection["groupId"]);
+            var sequence = Convert.ToInt32(formCollection["sequence"]);
+            var subheading = formCollection["subheading"];
+            var subheadingId = Convert.ToInt32(formCollection["subheadingId"]);
+
+            var groupingSubheading = new GroupingSubheading
+            {
+                GroupId = groupId,
+                AreaTypeId = areaTypeId,
+                Sequence = sequence,
+                Subheading = subheading,
+                SubheadingId = subheadingId
+            };
+
+            _profileRepository.UpdateGroupingSubheading(groupingSubheading);
+
+            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+            {
+                ProfileId = profileId,
+                ProfileUrlKey = profileUrlKey,
+                DomainSequence = domainSequence,
+                AreaTypeId = areaTypeId,
+                GroupId = groupId
+            };
+
+            return View("ReorderIndicators", reorderIndicatorsViewModel);
+        }
+
+        [HttpPost]
+        [Route("ProfileGroupingIndicators/DeleteGroupingSubheadings")]
+        public ActionResult DeleteGroupingSubheadings(FormCollection formCollection)
+        {
+            var profileId = Convert.ToInt32(formCollection["profileId"]);
+            var profileUrlKey = formCollection["profileUrlKey"];
+            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
+            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
+            var groupId = Convert.ToInt32(formCollection["groupId"]);
+            var groupingSubheadingId = Convert.ToInt32(formCollection["groupingSubheadingId"]);
+
+            _profileRepository.DeleteGroupingSubheading(groupingSubheadingId);
+
+            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+            {
+                ProfileId = profileId,
+                ProfileUrlKey = profileUrlKey,
+                DomainSequence = domainSequence,
+                AreaTypeId = areaTypeId,
+                GroupId = groupId
+            };
+
+            return View("ReorderIndicators", reorderIndicatorsViewModel);
+        }
+
+        [HttpPost]
+        [Route("ProfileGroupingIndicators/SaveReorderedIndicators")]
+        public ActionResult SaveReorderedIndicators(FormCollection formCollection)
+        {
+            var profileId = Convert.ToInt32(formCollection["profileId"]);
+            var profileUrlKey = formCollection["profileUrlKey"];
+            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
+            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
+            var groupId = Convert.ToInt32(formCollection["groupId"]);
+            var groupingPlusNames = JsonConvert.DeserializeObject<IList<GroupingPlusName>>(formCollection["groupingPlusNames"]);
+            var groupingSubheadings = JsonConvert.DeserializeObject<IList<GroupingSubheading>>(formCollection["groupingSubheadings"]);
+
+            // Update groupings
+            foreach (var groupingPlusName in groupingPlusNames)
+            {
+                var groupings = _reader.GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId(groupId,
+                    groupingPlusName.AreaTypeId, groupingPlusName.IndicatorId, groupingPlusName.SexId);
+
+                foreach (var grouping in groupings)
+                {
+                    grouping.Sequence = groupingPlusName.Sequence;
+                }
+
+                _writer.UpdateGroupingList(groupings);
+            }
+
+            // Update grouping subheadings
+            foreach (var groupingSubheading in groupingSubheadings)
+            {
+                if (groupingSubheading.SubheadingId == -1)
+                {
+                    _profileRepository.SaveGroupingSubheading(groupingSubheading);
+                }
+                else
+                {
+                    _profileRepository.UpdateGroupingSubheading(groupingSubheading);
+                }
+            }
+
+            // Delete grouping subheadings
+            var groupingSubheadingsInDb = _profileRepository.GetGroupingSubheadings(areaTypeId, groupId);
+            foreach (var groupingSubheadingInDb in groupingSubheadingsInDb)
+            {
+                if (groupingSubheadings.FirstOrDefault(x => x.Subheading == groupingSubheadingInDb.Subheading) == null)
+                {
+                    _profileRepository.DeleteGroupingSubheading(groupingSubheadingInDb.SubheadingId);
+                }
+            }
+
+            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+            {
+                ProfileId = profileId,
+                ProfileUrlKey = profileUrlKey,
+                DomainSequence = domainSequence,
+                AreaTypeId = areaTypeId,
+                GroupId = groupId
+            };
+
+            return View("ReorderIndicators", reorderIndicatorsViewModel);
         }
 
         protected override void OnActionExecuting(ActionExecutingContext filterContext)

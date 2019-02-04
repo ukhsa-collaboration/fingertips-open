@@ -31,6 +31,17 @@
                 @Html.Partial("_StartButton")
                 @ContentProvider.GetContent(ContentKeys.IntroductionSidebar, Model.ProfileId)
             </div>
+            <div>
+                @if (Model.ProfileId == ProfileIds.WiderDeterminantsOfHealth)
+                {
+                    @Html.Partial("_VideoLink", new VideoLink
+                    {
+                        ImgSrc = "/images/image-video/wider-determinants-video.png",
+                        VideoUrl = "https://www.youtube.com/embed/eF7ZstmCgVs",
+                        Alt = "An introduction to the Wider Determinants of Health"
+                    })
+                }
+            </div>
             <div id="recent-updates">
                 @if (areUpdates)
                 {

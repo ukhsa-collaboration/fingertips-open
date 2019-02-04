@@ -17,6 +17,7 @@ namespace PholioVisualisation.DataAccess
         Area GetAreaFromCode(string code);
         IList<IArea> GetAreasFromCodes(IEnumerable<string> codes);
         IList<IArea> GetAreasByAreaTypeId(int areaTypeId);
+        IList<IArea> GetAreasByAreaTypeIdAndAreaNameSearchText(int areaTypeId, string areaNameSearchText);
         AreaAddress GetAreaWithAddressFromCode(string code);
 
         /// <summary>
@@ -190,6 +191,15 @@ namespace PholioVisualisation.DataAccess
                 .SetCacheable(true)
                 .Add(Restrictions.In("AreaTypeId", GetComponentAreaTypeIds(areaTypeId).ToArray()))
                 .Add(Restrictions.Eq("IsCurrent", true))
+                .List<IArea>();
+        }
+
+        public IList<IArea> GetAreasByAreaTypeIdAndAreaNameSearchText(int areaTypeId, string areaNameSearchText)
+        {
+            return CurrentSession.CreateCriteria<IArea>()
+                .SetCacheable(true)
+                .Add(Restrictions.In("AreaTypeId", GetComponentAreaTypeIds(areaTypeId).ToArray()))
+                .Add(Restrictions.InsensitiveLike("Name", areaNameSearchText, MatchMode.Anywhere))
                 .List<IArea>();
         }
 

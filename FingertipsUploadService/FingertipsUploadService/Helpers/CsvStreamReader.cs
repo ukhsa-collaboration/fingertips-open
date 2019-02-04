@@ -71,7 +71,8 @@ namespace FingertipsUploadService.Helpers
                     }
                     catch (Exception ex)
                     {
-                        var errorMessage = "Invalid value \"" + fieldValue + "\" in column \"" + columnName + "\" at row number " + count;
+                        var errorMessage = "Invalid value \"" + fieldValue + "\" in column \"" + 
+                                           columnName + "\" at row number " + count;
                         throw new FpmException(errorMessage, ex);
                     }
                 }
@@ -97,12 +98,6 @@ namespace FingertipsUploadService.Helpers
             return columnNameLower == UploadColumnNames.ValueNoteId
                 ? ValueNoteIds.NoNote
                 : -1 /* -1 is default for all other numeric columns */;
-        }
-
-        // Check empty row
-        private bool isEmptyRow()
-        {
-            return false;
         }
     }
 }

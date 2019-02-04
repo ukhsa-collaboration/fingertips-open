@@ -40,7 +40,7 @@ export class PopulationModifier {
         let values = population.Values;
         if (!_.isUndefined(values[SexIds.Male]) || !_.isUndefined(SexIds.Female)) {
             let maleValues = values[SexIds.Male];
-            for (var i in maleValues) {
+            for (let i in maleValues) {
                 maleValues[i] = -Math.abs(maleValues[i]);
             }
         }
@@ -61,9 +61,9 @@ export class PopulationMaxFinder {
     }
 
     private getPopulationMax(populations: Population[]): number {
-        var max = 5;
-        var min = -max;
-        for (var i in populations) {
+        let max = 5;
+        let min = -max;
+        for (let i in populations) {
             if (populations[i] != null) {
                 min = _.min([min, _.min(populations[i].Values[SexIds.Male])]);
                 max = _.max([max, _.max(populations[i].Values[SexIds.Female])]);

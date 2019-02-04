@@ -12,7 +12,7 @@ namespace PholioVisualisation.ExportTest.File
         [TestMethod]
         public void TestGetFileContent()
         {
-            var builder = new FileBuilder();
+            var builder = new CsvFileBuilder();
             builder.AddContent(new byte[] {1});
             builder.AddContent(new byte[] {2});
 
@@ -24,7 +24,7 @@ namespace PholioVisualisation.ExportTest.File
         [TestMethod]
         public void TestGetFileContent_When_No_Content()
         {
-            var builder = new FileBuilder();
+            var builder = new CsvFileBuilder();
 
             var content = builder.GetFileContent();
 

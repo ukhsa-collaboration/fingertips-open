@@ -27,13 +27,14 @@ namespace PholioVisualisation.ServicesTest
             TestHelper.IsData(data);
         }
 
-        [TestMethod]
-        public void TestPdfSupportingInformation_HealthProfiles()
-        {
-            byte[] data = GetData("supporting_information?profile_id=" + ProfileIds.HealthProfiles +
-                "&area_code=" + AreaCodes.CountyUa_Buckinghamshire);
-            TestHelper.IsData(data);
-        }
+        // Health Profiles call commented out
+//        [TestMethod]
+//        public void TestPdfSupportingInformation_HealthProfiles()
+//        {
+//            byte[] data = GetData("supporting_information?profile_id=" + ProfileIds.HealthProfiles +
+//                "&area_code=" + AreaCodes.CountyUa_Buckinghamshire);
+//            TestHelper.IsData(data);
+//        }
 
         private byte[] GetData(string path)
         {

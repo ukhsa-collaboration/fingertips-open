@@ -260,7 +260,7 @@ namespace Fpm.ProfileDataTest
             // Create new item to get valid content ID
             var contentItem = writer.NewContentItem(profileId, contentKey, "description", false, "content");
 
-            var contentaudit = new ContentAudit
+            var contentAudit1 = new ContentAudit
             {
                 ContentId = contentItem.Id,
                 ContentKey = contentKey,
@@ -270,8 +270,8 @@ namespace Fpm.ProfileDataTest
                 UserName = name1
             };
 
-            var contentAudit = writer.NewContentAudit(contentaudit);
-            Assert.IsTrue(contentAudit.Id > 0);
+            var contentAudit2 = writer.NewContentAudit(contentAudit1);
+            Assert.IsTrue(contentAudit2.Id > 0);
         }
 
         [TestMethod]
@@ -358,7 +358,9 @@ namespace Fpm.ProfileDataTest
                 Notes = indicatorTextValues.Notes,
                 Frequency = indicatorTextValues.Frequency,
                 Rounding = indicatorTextValues.Rounding,
-                DataQuality = indicatorTextValues.DataQuality
+                DataQuality = indicatorTextValues.DataQuality,
+                IndicatorContent = indicatorTextValues.IndicatorContent,
+                SpecificRationale = indicatorTextValues.SpecificRationale
             };
 
             // Delete existing metadata text values

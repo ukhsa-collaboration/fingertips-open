@@ -30,8 +30,8 @@ namespace PholioVisualisation.DataAccessTest
             var dataList = _groupDataReader.GetDataIncludingInequalities(
                 IndicatorIds.Under16Conceptions, timePeriod, new List<int>(), AreaCodes.England);
 
-            // Assert: ethnicity data found
-            Assert.IsTrue(dataList.Any(x => x.CategoryTypeId == CategoryTypeIds.EthnicGroups7));
+            // Assert: category data found
+            Assert.IsTrue(dataList.Any(x => x.CategoryTypeId == CategoryTypeIds.DeprivationDecileCountyAndUA2015));
 
             // Assert: age data found
             Assert.IsTrue(dataList.Any(x => x.AgeId == AgeIds.Under16));
@@ -187,7 +187,7 @@ namespace PholioVisualisation.DataAccessTest
 
             Assert.AreEqual(IndicatorIds.OverallPrematureDeaths,
                 metadataList.FirstOrDefault(x => x.Name.ToLower()
-                    .Contains("overall premature deaths")).IndicatorId
+                    .Contains("mortality rate")).IndicatorId
                 );
 
             Assert.AreEqual(IndicatorIds.DeathsFromLungCancer,
@@ -213,23 +213,6 @@ namespace PholioVisualisation.DataAccessTest
                 _groupDataReader.GetIndicatorMetadataTextProperties());
             Assert.AreEqual(indicatorId, metadata.IndicatorId);
             AssertIndicatorMetadataIsOk(metadata);
-        }
-
-        [TestMethod]
-        public void TestGetIndicatorMetaDataContainsIndicatorContent()
-        {
-            // Assert Indicator Metadata for an expected diabetes indicator is present
-            IList<IndicatorMetadata> metadataList = _groupDataReader.GetGroupSpecificIndicatorMetadataTextValues(
-                new List<Grouping> { new Grouping { GroupId = GroupIds.Diabetes_TreatmentTargets } },
-                _groupDataReader.GetIndicatorMetadataTextProperties());
-
-            Assert.IsTrue(metadataList.Any());
-
-            const int indicatorId = IndicatorIds.Population;
-            IndicatorMetadata genericMetadata = _groupDataReader.GetIndicatorMetadata(indicatorId,
-                _groupDataReader.GetIndicatorMetadataTextProperties());
-
-            Assert.IsNotNull(genericMetadata.Descriptive[IndicatorMetadataTextColumnNames.IndicatorContent]);
         }
 
         [TestMethod]
@@ -686,7 +669,7 @@ namespace PholioVisualisation.DataAccessTest
                 new List<int>
                 {
                     GroupIds.Phof_HealthProtection,
-                    GroupIds.LongerLives
+                    GroupIds.SexualAndReproductiveHealth
                 });
             Assert.AreEqual(2, list.Count);
         }
@@ -723,6 +706,22 @@ namespace PholioVisualisation.DataAccessTest
                 });
             Assert.IsTrue(areaTypeIds.Any());
             Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.CountyAndUnitaryAuthority));
+        }
+
+        [TestMethod]
+        public void Test_GetCoreDataMaxYear()
+        {
+            var year = _groupDataReader.GetCoreDataMaxYear(IndicatorIds.Aged0To4Years);
+
+            Assert.IsTrue(year > 2015);
+        }
+       
+        [TestMethod]
+        public void Test_GetCommonestPolarityForIndicator()
+        {
+            var polarityId = _groupDataReader.GetCommonestPolarityForIndicator(IndicatorIds.Aged0To4Years);
+
+            Assert.AreEqual(PolarityIds.BlueOrangeBlue, polarityId);
         }
 
         [TestMethod]
@@ -881,7 +880,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataForIndicatorId()
         {
-            var coreDataSets = _groupDataReader.GetCoreDataForIndicatorId(IndicatorIds.Population);
+            var coreDataSets = _groupDataReader.GetCoreDataForIndicatorId(IndicatorIds.OnsMidYearPopulationEstimates);
             Assert.IsTrue(coreDataSets.Count > 1);
 
             var coreDataSet = coreDataSets.First();
@@ -892,7 +891,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetIndicatorMetadataTextValues()
         {
-            var indicatorMetadataTextValues = _groupDataReader.GetIndicatorMetadataTextValues(IndicatorIds.Population);
+            var indicatorMetadataTextValues = _groupDataReader.GetIndicatorMetadataTextValues(IndicatorIds.OnsMidYearPopulationEstimates);
             Assert.IsTrue(indicatorMetadataTextValues.Count > 0);
         }
 
@@ -915,19 +914,10 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
-        public void GetIndicatorMetadataTextValues()
-        {
-            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
-            var indicatorMetadataTextValues = _groupDataReader.GetIndicatorMetadataTextValues(indicatorId);
-
-            Assert.IsTrue(indicatorMetadataTextValues.Count > 0);
-        }
-
-        [TestMethod]
         public void TestGetGroupings()
         {
-            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
-            var groupIds = new List<int> { GroupIds.Phof_SupportingInformation };
+            var indicatorId = IndicatorIds.DeprivationScoreIMD2015;
+            var groupIds = new List<int> { GroupIds.PracticeProfiles_SupportingIndicators };
             var groupings = _groupDataReader.GetGroupingsByGroupIdsAndIndicatorId(groupIds, indicatorId);
 
             Assert.IsTrue(groupings.Count > 0);
@@ -936,7 +926,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCoreDataSets()
         {
-            var indicatorId = IndicatorIds.DeprivationScoreIMD2010;
+            var indicatorId = IndicatorIds.DeprivationScoreIMD2015;
             var coreDataSets = _groupDataReader.GetCoreDataForIndicatorId(indicatorId);
 
             Assert.IsTrue(coreDataSets.Count > 0);

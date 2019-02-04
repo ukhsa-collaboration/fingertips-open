@@ -1,0 +1,10 @@
+<div *ngIf="dimensions && dimensions.isSufficientData && dimensions.isAnyData" class="spine spine250">
+    <img src="{{dimensions.imgUrl}}lightgrey.png" class="q1" [style.width]="dimensions.q1 + 'px'" [style.marginLeft]="dimensions.q1Offset + 'px'" alt="" (mouseover)="showLeftQuartileTooltip($event)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)"
+    />
+    <img src="{{dimensions.imgUrl}}darkgrey.png" class="q2" [style.width]="dimensions.q2 + 'px'" alt="" (mouseover)="showInnerQuartilesTooltip($event)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)" />
+    <img src="{{dimensions.imgUrl}}lightgrey.png" class="q4" [style.width]="dimensions.q4 + 'px'" alt="" (mouseover)="showRightQuartileTooltip($event)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)" />
+    <img src="{{dimensions.imgUrl}}red.png" class="average250" alt="" (mouseover)="showBenchmarkTooltip($event)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)" />
+    <img src="{{dimensions.imgUrl}}{{dimensions.markerImage}}" class="marker" [style.left]="dimensions.markerOffset + 'px'" alt="" (mouseover)="showMarkerTooltip($event)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)" />
+</div>
+<div *ngIf="dimensions && dimensions.isAnyData && !dimensions.isSufficientData" class="no-spine">Insufficient number of values for a spine chart</div>
+<div *ngIf="dimensions && !dimensions.isAnyData" class="no-spine">-</div>

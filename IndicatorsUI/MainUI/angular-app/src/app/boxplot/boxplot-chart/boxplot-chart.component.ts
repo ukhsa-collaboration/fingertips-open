@@ -36,11 +36,11 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
 
   private getChartOptions(): Highcharts.Options {
 
-    var metadata = this.boxplotData.metadata;
-    var unitLabel = metadata.Unit.Label;
+    let metadata = this.boxplotData.metadata;
+    let unitLabel = metadata.Unit.Label;
 
     // Series
-    var seriesName = this.boxplotData.areaTypeName + ' in ' + this.boxplotData.comparatorName;
+    let seriesName = this.boxplotData.areaTypeName + ' in ' + this.boxplotData.comparatorName;
     let series: any[] /*Highcharts.IndividualSeriesOptions[]*/ = [
       {
         name: seriesName,
@@ -49,7 +49,7 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
     ];
 
     // So accessible from tooltip
-    var boxplotData = this.boxplotData;
+    let boxplotData = this.boxplotData;
 
     return (
       {
@@ -95,10 +95,10 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
           formatter: function () {
 
             let period = this.x;
-            var index = boxplotData.periods.indexOf(period);
+            let index = boxplotData.periods.indexOf(period);
             let stats = boxplotData.statsFormatted[index];
 
-            var tooltipContent = [
+            let tooltipContent = [
               '<b>', period, '</b><br/>',
               '<b>', seriesName, '</b><br/>',
               '95th Percentile: ', stats.P95, '<br/>',
@@ -120,7 +120,7 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
 
     let chartDataGrid: number[][] = [];
 
-    for (var stats of this.boxplotData.stats) {
+    for (let stats of this.boxplotData.stats) {
 
       let pointData: number[] = [];
       pointData[0] = this.getValue(stats.P5);

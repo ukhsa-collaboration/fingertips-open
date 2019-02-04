@@ -26,7 +26,14 @@ namespace PholioVisualisation.DataConstruction
         public AreaRankGrouping BuildRank(IArea area, Grouping grouping, IndicatorMetadata indicatorMetadata,
             TimePeriod timePeriod, IList<CoreDataSet> dataList)
         {
-            var validDataList = RankDataList.ValidDataList(dataList, grouping.PolarityId);
+            var polarityId = grouping.PolarityId;
+            if (grouping.IndicatorId == IndicatorIds.TotalPrescribedLarc)
+            {
+                // LARC is BOB even though high is good
+                polarityId = PolarityIds.RagHighIsGood;
+            }
+
+            var validDataList = RankDataList.ValidDataList(dataList, polarityId);
 
             if (validDataList.Count == 0)
             {
@@ -142,7 +149,7 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        public static int? GetRank(List<CoreDataSet> validDataList, CoreDataSet areaData)
+        public static int? GetRank(IList<CoreDataSet> validDataList, CoreDataSet areaData)
         {
             var index = validDataList.IndexOf(areaData);
 

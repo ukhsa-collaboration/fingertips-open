@@ -1,6 +1,6 @@
 ﻿@using IndicatorsUI.DataAccess
 @{
-    var practiceProfilesUrl = AppConfig.Instance.IsEnvironmentLive
+    var practiceProfilesUrl = ViewBag.IsEnvironmentLive
     ? "http://fingertipsreports.phe.org.uk"
     : "https://testfingertipsreports.phe.org.uk";
 }

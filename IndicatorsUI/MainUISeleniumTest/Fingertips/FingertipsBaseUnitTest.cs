@@ -17,7 +17,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
         public static void CheckTartanRugHasLoaded(IWebDriver driver)
         {
-            IList<IWebElement> firstRow = driver.FindElements(By.Id(LongerLivesIds.TartanRugIndicatorNameOnFirstRow));
+            IList<IWebElement> firstRow = driver.FindElements(By.Id(PublicHealthDashboardIds.TartanRugIndicatorNameOnFirstRow));
             Assert.IsTrue(firstRow.Any());
         }
     }

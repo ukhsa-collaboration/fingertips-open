@@ -25,10 +25,6 @@ namespace IndicatorsUI.MainUI.Controllers
 
             switch (page)
             {
-                case "practice-profiles":
-                    viewName = "PracticeProfilesTest";
-                    break;
-
                 case "fingertips":
                     viewName = "FingertipsTest";
                     break;

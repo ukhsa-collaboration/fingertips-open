@@ -69,15 +69,6 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         }
 
         [TestMethod]
-        public void TestGetAllDataCsvByGroup_For_GPs()
-        {
-            var data = new DataController(new DummyFileBuilder())
-                .GetDataFileForGroup(AreaTypeIds.GpPractice, AreaTypeIds.CcgsPreApr2017, GroupIds.PracticeProfiles_Diabetes);
-
-            Assert.IsNotNull(data);
-        }
-
-        [TestMethod]
         public void TestGetIndicatorStatisticsForBoxPlot()
         {
             var data = new DataController().GetIndicatorStatisticsTrendsForIndicator(IndicatorIds.LifeExpectancyAtBirth,

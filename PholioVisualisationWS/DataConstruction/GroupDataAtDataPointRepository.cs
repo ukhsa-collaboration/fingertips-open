@@ -24,6 +24,7 @@ namespace PholioVisualisation.DataConstruction
                     GroupId = groupId,
                     ProfileId = profileId,
                     ComparatorMap = comparatorMap,
+                    ParentAreaCode = parentAreaCode,
                     ChildAreaTypeId = childAreaTypeId
                 }.Build();
         }

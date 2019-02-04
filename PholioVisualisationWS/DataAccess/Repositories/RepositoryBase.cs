@@ -1,71 +1,103 @@
-﻿namespace PholioVisualisation.DataAccess.Repositories
+﻿using System;
+using NHibernate;
+
+namespace PholioVisualisation.DataAccess.Repositories
 {
-    using System;
-    using NHibernate;
-
-    namespace Fpm.ProfileData.Repositories
+    public interface IRepositoryBase
     {
-        public class RepositoryBase : IRepositoryBase, IDisposable
+        /// <summary>
+        /// Opens a data access session
+        /// </summary>
+        /// <exception cref="Exception">Thrown if an error occurs while opening the session</exception>
+        void OpenSession();
+
+        /// <summary>
+        /// IDisposable.Dispose implementation (closes and disposes of the encapsulated session)
+        /// </summary>
+        void Dispose();
+    }
+
+    public class RepositoryBase : IRepositoryBase, IDisposable
+    {
+        /// <summary>
+        /// The session factory, used to create new sessions as required
+        /// </summary>
+        private ISessionFactory sessionFactory;
+
+        /// <summary>
+        /// The current session (if any)
+        /// </summary>
+        internal ISession CurrentSession;
+
+        public RepositoryBase(ISessionFactory sessionFactory)
         {
-            /// <summary>
-            /// The session factory, used to create new sessions as required
-            /// </summary>
-            private ISessionFactory sessionFactory;
+            this.sessionFactory = sessionFactory;
+            OpenSession();
+        }
 
-            /// <summary>
-            /// The current session (if any)
-            /// </summary>
-            internal ISession CurrentSession;
-
-            internal ITransaction transaction = null;
-
-            public RepositoryBase(ISessionFactory sessionFactory)
+        /// <summary>
+        /// Opens a data access session
+        /// </summary>
+        /// <exception cref="Exception">Thrown if an error occurs while opening the session</exception>
+        public void OpenSession()
+        {
+            if (CurrentSession == null)
             {
-                this.sessionFactory = sessionFactory;
-                OpenSession();
-            }
-
-            /// <summary>
-            /// Opens a data access session
-            /// </summary>
-            /// <exception cref="Exception">Thrown if an error occurs while opening the session</exception>
-            public void OpenSession()
-            {
-                if (CurrentSession == null)
+                try
                 {
-                    try
-                    {
-                        CurrentSession = sessionFactory.OpenSession();
-                    }
-                    catch (Exception ex)
-                    {
-                        CurrentSession = null;
-                        throw new Exception("Cannot open session", ex);
-                    }
+                    CurrentSession = sessionFactory.OpenSession();
+                }
+                catch (Exception ex)
+                {
+                    CurrentSession = null;
+                    throw new Exception("Cannot open session", ex);
                 }
             }
+        }
 
-            /// <summary>
-            /// IDisposable.Dispose implementation (closes and disposes of the encapsulated session)
-            /// </summary>
-            public void Dispose()
+        /// <summary>
+        /// IDisposable.Dispose implementation (closes and disposes of the encapsulated session)
+        /// </summary>
+        public void Dispose()
+        {
+            CloseSession();
+        }
+
+        protected int SaveNewObject(object objectToSave)
+        {
+            if (objectToSave == null)
             {
-                CloseSession();
+                return -1;
             }
 
-            protected int SaveNewObject(object objectToSave)
+            int id;
+            ITransaction transaction = null;
+            try
             {
-                if (objectToSave == null)
+                transaction = CurrentSession.BeginTransaction();
+                id = (int)CurrentSession.Save(objectToSave);
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                if (transaction != null && transaction.WasRolledBack == false)
                 {
-                    return -1;
+                    transaction.Rollback();
                 }
+                throw;
+            }
+            return id;
+        }
 
-                int id;
+        protected void DeleteObject(object objectToDelete)
+        {
+            if (objectToDelete != null)
+            {
                 ITransaction transaction = null;
                 try
                 {
                     transaction = CurrentSession.BeginTransaction();
-                    id = (int)CurrentSession.Save(objectToSave);
+                    CurrentSession.Delete(objectToDelete);
                     transaction.Commit();
                 }
                 catch (Exception)
@@ -76,52 +108,20 @@
                     }
                     throw;
                 }
-                return id;
             }
+        }
 
-            protected void DeleteObject(object objectToDelete)
+        /// <summary>
+        /// Closes a data access session
+        /// </summary>
+        private void CloseSession()
+        {
+            // Can always close (used by Dipose method, so mustn't throw an exception)
+            if (CurrentSession != null && CurrentSession.IsOpen)
             {
-                if (objectToDelete != null)
-                {
-                    ITransaction transaction = null;
-                    try
-                    {
-                        transaction = CurrentSession.BeginTransaction();
-                        CurrentSession.Delete(objectToDelete);
-                        transaction.Commit();
-                    }
-                    catch (Exception)
-                    {
-                        if (transaction != null && transaction.WasRolledBack == false)
-                        {
-                            transaction.Rollback();
-                        }
-                        throw;
-                    }
-                }
-            }
-
-            internal void HandleException(Exception exception)
-            {
-                if (transaction != null && transaction.WasRolledBack == false)
-                {
-                    transaction.Rollback();
-                }
-                throw exception;
-            }
-
-            /// <summary>
-            /// Closes a data access session
-            /// </summary>
-            private void CloseSession()
-            {
-                // Can always close (used by Dipose method, so mustn't throw an exception)
-                if (CurrentSession != null && CurrentSession.IsOpen)
-                {
-                    CurrentSession.Close();
-                    CurrentSession.Dispose();
-                    CurrentSession = null;
-                }
+                CurrentSession.Close();
+                CurrentSession.Dispose();
+                CurrentSession = null;
             }
         }
     }

@@ -372,9 +372,6 @@ function groupColour(imgUrl, grade) {
 function getCauseBars(area, causeInfo, rankInfo, causeClass,
     metadata, comparatorMethodId, indicatorSex, significanceText) {
 
-    // Whether or not to flip the data
-    var displayMaxFirst = false;
-
     // Statement to left of bars, e.g. 41st of 150 local authorities
     var comparisonStatement = '';
     if (rankInfo) {
@@ -382,17 +379,6 @@ function getCauseBars(area, causeInfo, rankInfo, causeClass,
             comparisonStatement = getComparisonStatement(rankInfo.AreaRank.Rank,
                 rankInfo.Max.Rank,
                 true);
-        }
-
-        // Display best value first for PHD
-        if (MT.model.profileId === ProfileIds.PublicHealthDashboard) {
-            if (isFeatureEnabled('useLongerLivesBestWorstLabels')) {
-                // Larc indicator is BOB but high is good
-                displayMaxFirst = rankInfo.IID === IndicatorIds.LarcPrescribed;
-            } else {
-                // Display minimum first and reverse the polarity switch made in WS
-                displayMaxFirst = rankInfo.PolarityId === PolarityIds.RAGHighIsGood;
-            }
         }
 
         var period = rankInfo.Period;
@@ -406,7 +392,7 @@ function getCauseBars(area, causeInfo, rankInfo, causeClass,
         causeKey: causeInfo.key,
         causeSig: causeClass,
         indicatorName: replacePercentageWithArialFont(metadata.Descriptive.Name),
-        barsHtml: getBars(rankInfo, area, false, displayMaxFirst, metadata),
+        barsHtml: getBars(rankInfo, area, false, false, metadata),
         rankHtml: comparisonStatement,
         indicatorSex: indicatorSex,
         period: period

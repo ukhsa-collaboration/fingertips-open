@@ -199,7 +199,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("profiles_containing_indicators?" +
                 "area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
-                "&indicator_ids=" + IndicatorIds.TeenagePregnancy);
+                "&indicator_ids=" + IndicatorIds.AdultSmokingPrevalence2);
             TestHelper.IsData(data);
         }
 

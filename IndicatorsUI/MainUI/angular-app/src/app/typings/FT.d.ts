@@ -1,5 +1,5 @@
 // Type definitions for ./src/fingertipsGlobal.js
-import { ElementRef } from "@angular/core";
+import { ElementRef } from '@angular/core';
 
 export interface FTModel {
   areaTypeId: number;
@@ -12,27 +12,7 @@ export interface FTModel {
   ageId: number;
   sexId: number;
   nearestNeighbour: string;
-}
-
-export interface FTDisplay {
-  // 		 getBenchmarkAreaName(): string;
-
-  getAreaName(areaCode: string): string;
-  getAreaList(): Array<Area>;
-  // 		 getparentAreaName(): string;
-
-  // 		 getParentTypeName(): string;
-
-  getAreaTypeName(): string;
-  getComparatorId(): number;
-  getValueNotes(): Array<ValueNote>;
-  getValueNoteById(id: number): ValueNote;
-
-  // 		 getIndicatorName(): string;
-
-  // 		 getGroupName(): string;
-
-  // 		 getCurrentTabId(): string;
+  isNearestNeighbours(): boolean;
 }
 
 export interface FTIndicatorSearch {
@@ -40,67 +20,125 @@ export interface FTIndicatorSearch {
   isIndicatorList(): boolean;
   isInSearchMode(): boolean;
   getIndicatorIdList(): IndicatorIdList;
+  getIndicatorIdsParameter(): string;
   getProfileIdsForSearch(): Array<number>;
 }
+
 export interface IndicatorIdList {
   getAllIds(): Array<number>;
 }
+
 export interface IndicatorMetadataHash {
   data: Map<number, IndicatorMetadata>;
 }
+
 export interface ValueWithUnit {
   getFullLabel(value: string, options?: any): string;
 }
+
 export interface CoreDataHelper {
   addOrderandPercentilesToData(
     coreDataSet: CoreDataSet
   ): Map<string, CoreDataSet>;
   valueWithUnit(unit: Unit): ValueWithUnit;
 }
+
 export interface IndicatorHelper {
   getMetadataHash(): Map<number, IndicatorMetadata>;
   getIndicatorIndex(): number;
 }
+
 export interface BridgeDataHelper {
   getGroopRoot(): GroupRoot;
   getAllGroupRoots(): GroupRoot[];
   getComparatorId(): number;
   getCurrentComparator(): Area;
 }
-export interface Url {
+
+export interface FTUrls {
   img: string;
   bridge: string;
   corews: string;
   search: string;
   pdf: string;
+  practiceProfilePdf: string;
 }
+
 export interface FTConfig {
-  hasRecentTrends: boolean;
-  isChangeFromPreviousPeriodShown: boolean;
-  profileCollectionUrlKey: string;
-  startZeroYAxis: boolean;
   areAnyPdfsForProfile: boolean;
+  environment: string;
+  hasRecentTrends: boolean;
   hasStaticReports: boolean;
+  ignoredSpineChartAreas: string;
+  isChangeFromPreviousPeriodShown: boolean;
   nearestNeighbour: any;
+  profileCollectionUrlKey: string;
   profileName: string;
   showDataQuality: boolean;
+  startZeroYAxis: boolean;
+  staticReportsFolders: string[];
+  staticReportsLabel: string;
+  spineChartMinMaxLabelId: number;
+  spineHeaders: SpineHeaders;
 }
+
+export interface SpineHeaders {
+  min: string;
+  max: string;
+}
+
 export interface FTRoot {
   config(): FTConfig;
+  exportTableAsImage(containerId: string, fileNamePrefix: string, legends: string);
   formatCount(dataInfo: CoreDataSetInfo): string;
+  getAreaName(areaCode: string): string;
+  getAreaList(): Array<Area>;
+  getAreaTypeId(): number;
+  getAreaTypeName(): string;
+  getCurrentDomainName(): string;
+  getComparatorId(): number;
+  getParentAreaName(): string;
+  getParentTypeId(): number;
+  getParentTypeName(): string;
+  getValueNotes(): Array<ValueNote>;
+  getValueNoteById(id: number): ValueNote;
+  getAllGroupRoots(): GroupRoot[];
+  getArea(areaCode: string): Area;
+  getAreaNameToDisplay(area: Area): string;
+  getComparatorById(comparatorId: number): Area;
+  getRegionalComparatorGrouping(root: GroupRoot): Grouping;
+  getGroupingSubheadings(): GroupingSubheading[];
   getNationalComparatorGrouping(root: GroupRoot): Grouping;
+  getComparatorId(): number;
+  getCurrentComparator(): Area;
+  getGroopRoot(): GroupRoot;
+  getMarkerImageFromSignificance(significance: number, useRag: boolean, suffix: string, useQuintileColouring: boolean,
+    indicatorId: number, sexId: number, ageId: number): string;
+  getNationalComparator(): Area;
   getSexAndAgeLabel(groupRoot: GroupRoot): string;
   getTrendMarkerImage(trendMarker: TrendMarker, polarity: number): string;
+  getIndicatorNameTooltip(rootIndex: number, area: Area): string;
   getIndicatorDataQualityHtml(text: string): string;
   getIndicatorDataQualityTooltipText(dataQualityCount: number): string;
   getParentArea(): Area;
+  getProfileUrlKey(): string;
   goToMetadataPage(rootIndex: number | string): void;
+  goToAreaTrendsPage(rootIndex: number | string): void;
+  goToBarChartPage(rootIndex: number | string): void;
+  hasDataChanged(groupRoot: GroupRoot): boolean;
+  initBootstrapTooltips(): void;
+  isNearestNeighbours(model: FTModel): boolean;
+  isParentCountry(model: FTModel): boolean;
+  isSubnationalColumn(): boolean;
+  lightboxShow(html, top, left, popupWidth);
   lock(): void;
   logEvent(category: string, action: string, label: string): void;
   model(): FTModel;
   newCoreDataSetInfo(data: CoreDataSet): CoreDataSetInfo;
   newValueDisplayer(unit: Unit): ValueDisplayer;
   newCommaNumber(n: number): CommaNumber;
+  newIndicatorFormatter(groupRoot: GroupRoot, metadata: IndicatorMetadata,
+    coreDataSet: CoreDataSet, indicatorStatsF: IndicatorStatsPercentilesFormatted): IndicatorFormatter;
   newValueNoteTooltipProvider(): ValueNoteTooltipProvider;
   newTooltipManager(): TooltipManager;
   newRecentTrendsTooltip(): RecentTrendsTooltip;
@@ -110,18 +148,21 @@ export interface FTRoot {
   ): ComparisonConfig;
   recentTrendSelected(): RecentTrendSelected;
   setAreaCode(areaCode: string): void;
+  showDataQualityLegend(): void;
   showIndicatorMetadataInLightbox(elementRef: ElementRef): void;
   showAndHidePageElements(): void;
   showTargetBenchmarkOption(roots): void;
   getTargetLegendHtml(comparisonConfig, metadata): string;
   unlock(): void;
-  url(): Url;
+  url(): FTUrls;
   version(): string;
   saveElementAsImage(element, outputFilename): void;
   redirectToPopulationPage(): void;
+  setComparatorId(id: number): void;
+  getAreaMappingsForParentCode(key: string): string[];
+  showTrendInfo(): void;
   bridgeDataHelper: BridgeDataHelper;
   coreDataHelper: CoreDataHelper;
-  display: FTDisplay;
   indicatorHelper: IndicatorHelper;
   search: FTIndicatorSearch;
   valueWithUnit: ValueWithUnit;
@@ -139,7 +180,7 @@ export interface CommaNumber {
   rounded(): number;
 }
 export interface ValueDisplayer {
-  byDataInfo(dataInfo: CoreDataSetInfo): string;
+  byDataInfo(dataInfo: CoreDataSetInfo, options?: any): string;
   byNumberString(num: any): string;
 }
 export interface ValueNoteTooltipProvider {
@@ -161,10 +202,12 @@ export interface ComparisonConfig {
   useQuintileColouring: boolean;
   showQuintileLegend: boolean;
   useBlueOrangeBlue: boolean;
+  useRagColours: boolean;
   c: boolean;
   comparatorId: number;
 }
 export interface CoreDataSetInfo {
+  data: CoreDataSet;
   areCIs(): boolean;
   areValueAndCIsZero(): boolean;
   getNoteId(): number;
@@ -200,7 +243,7 @@ export interface Area {
   AreaTypeId: number;
   Code: string;
   Name: string;
-  ShortName: string;
+  Short: string;
 }
 export interface ConfidenceIntervalMethod {
   Description: string;
@@ -238,6 +281,7 @@ export interface GroupRoot extends RootBase {
   Data: CoreDataSet[];
   Grouping: Grouping[];
   DateChanges: DateChanges;
+  Sequence: number;
 }
 export interface DateChanges {
   HasDataChangedRecently: boolean;
@@ -447,7 +491,75 @@ export interface ParentAreaType {
   ParentAreaTypes: ParentAreaType[];
 }
 
-declare module "fingertips" {
+export interface AreaListAreaCode {
+  Id: number;
+  AreaListId: number;
+  AreaCode: string;
+}
+
+export interface AreaList {
+  Id: number;
+  ListName: string;
+  AreaTypeId: number;
+  UserId: string;
+  CreatedOn: any;
+  UpdatedOn: any;
+  PublicId: string;
+  AreaListAreaCodes: AreaListAreaCode[];
+}
+
+export interface AreaType {
+  Id: number;
+  Name: string;
+  Short: string;
+  IsCurrent: boolean;
+  IsSupported: boolean;
+  IsSearchable: boolean;
+  CanBeDisplayedOnMap: boolean;
+}
+
+export interface SSRSReport {
+  Id: number;
+  Name: string;
+  File: string;
+  Parameters: string;
+  Notes: string;
+  IsLive: boolean;
+}
+
+export interface IndicatorFormatter {
+  averageData: CoreDataSet;
+  getAreaCount(): string;
+  getAreaValue(): string;
+  getIndicatorName(): string;
+  getDataQuality(): string;
+  getMin(): string;
+  getMax(): string;
+  getSuffixIfNoShort(): string;
+  get25(): string;
+  get75(): string;
+  getAverage(): string;
+}
+
+export interface GroupingSubheading {
+  SubheadingId: number;
+  GroupId: number;
+  AreaTypeId: number;
+  Subheading: string;
+  Sequence: number;
+}
+
+export interface ProfilePerIndicator {
+  ProfileName: string;
+  Url: string;
+}
+
+export interface IndicatorProfile {
+  Profile: KeyValuePair<number, ProfilePerIndicator[]>;
+}
+
+declare var FT: FTRoot;
+declare module 'fingertips' {
   export = FT;
 }
-declare var FT: FTRoot;
+

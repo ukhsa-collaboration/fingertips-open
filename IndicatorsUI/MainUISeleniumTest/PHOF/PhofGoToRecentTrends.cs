@@ -1,4 +1,5 @@
-﻿using IndicatorsUI.MainUISeleniumTest.Fingertips;
+﻿using System.Linq;
+using IndicatorsUI.MainUISeleniumTest.Fingertips;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
@@ -32,7 +33,10 @@ namespace IndicatorsUI.MainUISeleniumTest.Phof
             waitFor.FingertipsSpineChartToLoad();
 
             // Click on recent trend cell
-            driver.FindElement(By.Id("spine-trend_0")).Click();
+            driver.FindElement(By.Id("single-area-table"))
+                .FindElement(By.TagName("tbody"))
+                .FindElements(By.TagName("tr")).First()
+                .FindElements(By.TagName("td"))[2].Click();
 
             // Success if trends table loads
             waitFor.FingertipsTrendsTableToLoad();

@@ -52,7 +52,7 @@ function getTrendData() {
         showSpinner();
 
         var parameters = new ParameterBuilder(
-            ).add('group_id', model.groupId
+        ).add('group_id', model.groupId
             ).add('area_type_id', model.areaTypeId
             ).add('parent_area_code', parentCode);
 
@@ -91,9 +91,89 @@ function getTrendDataCallback(trendRoots) {
 
     displayChartOptions();
 
+    overrideLegend();
+
     unlock();
 
     loadValueNoteToolTips();
+}
+
+function overrideLegend() {
+    if ($('#key-spine-chart').is(':visible')) {
+
+        var $rag3 = $('#spine-chart-legend-rag-3'),
+            $rag5 = $('#spine-chart-legend-rag-5'),
+            $bob = $('#spine-chart-legend-bob'),
+            $quintileRag = $('#spine-quintile-rag'),
+            $quintileBob = $('#spine-quintile-bob'),
+            $ragAndBobSection = $('#spine-rag-and-bob-section'),
+            $quintileSection = $('#spine-quintile-key-table');
+
+        $rag3.hide();
+        $rag5.hide();
+        $bob.hide();
+        $quintileRag.hide();
+        $quintileBob.hide();
+        $ragAndBobSection.hide();
+        $quintileSection.hide();
+
+        if (areaTrendsState.showAll) {
+            for (var i = 0; i < groupRoots.length; i++) {
+                overrideLegendForGroupRoot(groupRoots[i], $rag3, $rag5, $bob, $quintileRag, $quintileBob, $ragAndBobSection, $quintileSection);
+            }
+        } else {
+            overrideLegendForGroupRoot(getGroupRoot(), $rag3, $rag5, $bob, $quintileRag, $quintileBob, $ragAndBobSection, $quintileSection);
+        }
+    }
+}
+
+function overrideLegendForGroupRoot(groupRoot, rag3, rag5, bob, quintileRag, quintileBob, ragAndBobSection, quintileSection) {
+    var polarityId = groupRoot.PolarityId,
+        comparatorMethodId = groupRoot.ComparatorMethodId;
+
+    switch (comparatorMethodId) {
+        // Quintiles
+        case ComparatorMethodIds.Quintiles:
+            if (polarityId === PolarityIds.NotApplicable) {
+                // Quintile BOB
+                quintileBob.show();
+            } else {
+                // Quintile RAG
+                quintileRag.show();
+            }
+
+            quintileSection.show();
+            break;
+
+        // RAG3
+        case ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel:
+            rag3.show();
+            ragAndBobSection.show();
+            break;
+
+        // RAG5
+        case ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels:
+            rag5.show();
+            ragAndBobSection.show();
+            break;
+
+        default:
+            switch (polarityId) {
+                // BOB
+                case PolarityIds.BlueOrangeBlue:
+                    bob.show();
+                    break;
+
+                // RAG
+                case PolarityIds.RAGLowIsGood:
+                case PolarityIds.RAGHighIsGood:
+                    rag3.show();
+                    break;
+            }
+
+            ragAndBobSection.show();
+            break;
+    }
 }
 
 function initTabSpecificOptions() {
@@ -115,7 +195,7 @@ function initTabSpecificOptions() {
 
 }
 
-areaTrends.displayIndicatorsOptions = function() {
+areaTrends.displayIndicatorsOptions = function () {
 
     // Define template
     var singleOrAllOption = '<span id="tab-specific-more-options">' +
@@ -132,7 +212,7 @@ areaTrends.displayIndicatorsOptions = function() {
     // Create view model
     var selectedClass = 'button-selected';
     var singleIndicatorSelected = selectedClass,
-        showAllSelected='';
+        showAllSelected = '';
     if (areaTrendsState.showAll) {
         singleIndicatorSelected = '';
         showAllSelected = selectedClass;
@@ -172,10 +252,18 @@ function displayChartOptions() {
     var area = areaHash[areaCode];
 
     // Display area options
+    var labels = [getAreaNameToDisplay(area)]
     var label2 = model.isNearestNeighbours()
         ? 'All nearest neighbours for ' + area.Short
         : 'All in ' + getParentArea().Name;
-    var labels = [getAreaNameToDisplay(area), label2];
+
+    if (!isEnglandAreaType()) {
+        labels.push(label2);
+    } else {
+        // When england area type it forces to preview the area model state
+        viewModeState = VIEW_MODES.AREA;
+    }
+
     tabSpecificOptions.setHtml({
         label: 'Trends for',
         optionLabels: labels
@@ -208,7 +296,7 @@ function displayChartOptions() {
 
 }
 
-function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig) {
+function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig, indicatorId, sexId, ageId) {
 
     var regionalData = comparatorData[REGIONAL_COMPARATOR_ID];
     var nationalData = comparatorData[NATIONAL_COMPARATOR_ID];
@@ -218,17 +306,17 @@ function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig) {
 
     var isValue = dataInfo.isValue();
 
-    // Omit row if now data for any area
+    // Omit row if no data for any area
     if (!isValue && !regionalDataInfo.isValue() && !nationalDataInfo.isValue()) {
         return;
     }
 
     h.push('<tr>');
-    addTd(h, period);
+    addTd(h, period, CSS_CENTER);
 
     // Significance marker
     var marker = isValue ?
-        getTrendMarkerHtml(dataPoint, comparisonConfig) :
+        getTrendMarkerHtml(dataPoint, comparisonConfig, indicatorId, sexId, ageId) :
         EMPTY_TD_CONTENTS;
     addTd(h, marker, CSS_CENTER);
 
@@ -240,15 +328,15 @@ function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig) {
     addTd(h, valueDisplayer.byNumberString(dataPoint.U), CSS_NUMERIC);
 
     // Subnational column
-    if (!FT.model.isNearestNeighbours()) {
-        if (isSubnationalColumn()) {
-            addTd(h, valueDisplayer.byDataInfo(regionalDataInfo), CSS_NUMERIC, null, regionalDataInfo.getNoteId());
-        }
+    if (isSubnationalColumn()) {
+        addTd(h, valueDisplayer.byDataInfo(regionalDataInfo), CSS_NUMERIC, null, regionalDataInfo.getNoteId());
     }
 
-    // National column
-    if (enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY) {
-        addTd(h, valueDisplayer.byDataInfo(nationalDataInfo), CSS_NUMERIC, null, nationalDataInfo.getNoteId());
+    if (!isEnglandAreaType()) {
+        // National column
+        if (enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY) {
+            addTd(h, valueDisplayer.byDataInfo(nationalDataInfo), CSS_NUMERIC, null, nationalDataInfo.getNoteId());
+        }
     }
 
     h.push('</tr>');
@@ -256,13 +344,13 @@ function addTrendRow(h, dataPoint, comparatorData, period, comparisonConfig) {
     return;
 }
 
-function getTrendMarkerHtml(data, comparisonConfig) {
+function getTrendMarkerHtml(data, comparisonConfig, indicatorId, sexId, ageId) {
     var sig = data.Sig[comparisonConfig.comparatorId],
-    useRag = comparisonConfig.useRagColours,
-    useQuintileColouring = comparisonConfig.useQuintileColouring;
+        useRag = comparisonConfig.useRagColours,
+        useQuintileColouring = comparisonConfig.useQuintileColouring;
 
     var marker = ['<img src="', FT.url.img,
-        getMiniMarkerImageFromSignificance(sig, useRag, useQuintileColouring), '"'];
+        getMiniMarkerImageFromSignificance(sig, useRag, useQuintileColouring, indicatorId, sexId, ageId), '"'];
 
     if (comparisonConfig.useTarget) {
         marker.push(' onmouseover="highlightTrendValueWithTarget(this);" onmouseout="unhighlightValueAndComparator();"');
@@ -351,15 +439,14 @@ function addTrendTableHeader(h, useWide) {
     addTh(h, 'Lower CI', null, 'Lower Confidence Interval');
     addTh(h, 'Upper CI', null, 'Upper Confidence Interval');
 
-    // Don't add Region column for NN
-    if (!FT.model.isNearestNeighbours()) {
-        if (isSubnationalColumn()) {
-            addTh(h, getParentArea().Short);
-        }
+    if (isSubnationalColumn()) {
+        addTh(h, getParentArea().Short);
     }
 
-    if (enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY) {
-        addTh(h, getNationalComparator().Name);
+    if (!isEnglandAreaType()) {
+        if (enumParentDisplay !== PARENT_DISPLAY.REGIONAL_ONLY) {
+            addTh(h, getNationalComparator().Name);
+        }
     }
 
     h.push('</tr></thead>');
@@ -368,7 +455,7 @@ function addTrendTableHeader(h, useWide) {
 function setTrendRowCss(e, cssClasses, isComparatorInSameRow) {
 
     var tds = $(e).parent().parent().children(),
-    isNationalComparator = comparatorId === NATIONAL_COMPARATOR_ID;
+        isNationalComparator = comparatorId === NATIONAL_COMPARATOR_ID;
 
     // Select elements
     if (isComparatorInSameRow) {
@@ -415,9 +502,9 @@ function getLargeTrendChartOptions(id, root, areaCode, comparatorName) {
     for (var j in dataList) {
 
         var data = dataList[j],
-        significance = data.Sig[comparisonConfig.comparatorId],
-        markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours,
-            colours, comparisonConfig.useQuintileColouring);
+            significance = data.Sig[comparisonConfig.comparatorId],
+            markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours,
+                colours, comparisonConfig.useQuintileColouring, root.IID, root.Sex.Id, root.Age.Id);
 
         trendData.addAreaPoint(data, markerColor);
 
@@ -523,16 +610,16 @@ function getLargeTrendChartOptions(id, root, areaCode, comparatorName) {
         },
         credits: HC.credits,
         series: [
-        {
-            data: trendData.getBenchmarkPoints(),
-            color: colours.comparator,
-            name: comparatorName
-        },
-        {
-            data: trendData.getAreaPoints(),
-            name: area.Name,
-            showInLegend: false
-        },
+            {
+                data: trendData.getBenchmarkPoints(),
+                color: colours.comparator,
+                name: comparatorName
+            },
+            {
+                data: trendData.getAreaPoints(),
+                name: area.Name,
+                showInLegend: false
+            },
             {
                 name: area.Name,
                 type: 'errorbar',
@@ -584,6 +671,40 @@ function exportChart(groupRootIndex) {
     });
 
     logEvent('ExportImage', getCurrentPageTitle());
+}
+
+function exportChartAsCsv(iidIndex) {
+
+    var parameters = new ParameterBuilder()
+    .add('parent_area_type_id', FT.model.parentTypeId)
+    .add('child_area_type_id', FT.model.areaTypeId)
+    .add('profile_id', FT.model.profileId)
+    .add('areas_code', getAreaCode())
+    .add('indicator_ids', getTrendsIid(iidIndex))
+    .add('parent_area_code', FT.model.parentCode);
+      
+    downloadAllPeriodsNoInequalitiesDataCsvFileByIndicator(FT.url.corews, parameters);
+}
+
+function getTrendsIid(index) {
+    var trendLinknumber = $(".trend-link").length;
+
+    if (trendLinknumber === 1) {
+        index = $('#indicatorMenu').prop('selectedIndex');
+    }
+
+    return FT.model.groupRoots[index].IID;
+}
+
+function getAreaCode() {
+    if (FT.model.isNearestNeighbours()) {        
+        var neighbourSelectedName = $("#tab-option-0").text();
+        
+        var selectedArea = FT.data.sortedAreas.find(area => area.Name === neighbourSelectedName );
+        return selectedArea["Code"];  
+    }
+
+    return FT.model.areaCode;
 }
 
 function toggleCIBars(groupRootIndex) {
@@ -723,8 +844,8 @@ function getComparatorCellIndex() {
 
     var upperCIIndex = trendTableColumnIndexes.upperCI;
     return (comparatorId === REGIONAL_COMPARATOR_ID ||
-            enumParentDisplay !== PARENT_DISPLAY.NATIONAL_AND_REGIONAL ||
-            FT.model.parentTypeId === AreaTypeIds.Country) ?
+        enumParentDisplay !== PARENT_DISPLAY.NATIONAL_AND_REGIONAL ||
+        FT.model.parentTypeId === AreaTypeIds.Country) ?
         upperCIIndex + 1 :
         upperCIIndex + 2;
 }
@@ -766,10 +887,10 @@ function hasWidePeriodLabel(metadata) {
 
 function chartTooltip() {
     var state = areaTrendsState,
-    series = this.series,
-    period = this.x,
-    dataPoint = series.data[this.point.x],
-    rootIndex = $(series.chart.container).parent().attr('id').match(/\d+/);
+        series = this.series,
+        period = this.x,
+        dataPoint = series.data[this.point.x],
+        rootIndex = $(series.chart.container).parent().attr('id').match(/\d+/);
 
     // Determine value column index,
     var isComparator = dataPoint.isBenchmark;
@@ -835,7 +956,7 @@ function getLargeTrendChartAndTableHtml(indexesDisplayed) {
     for (var i in displayedGroupRoots) {
 
         var groupRoot = displayedGroupRoots[i];
-                
+
         var trendRoot = areaTrends.findMatchingTrendRoot(groupRoot, currentTrendRoots);
 
         if (isDefined(trendRoot)) {
@@ -853,7 +974,8 @@ function getLargeTrendChartAndTableHtml(indexesDisplayed) {
 
             var exportTypes = '<div class="export-chart-box" ><a class="export-link"  href="javascript:exportChart(' +
                 i + ')">Export chart as image</a>' + '<a  id="showCI' + i +
-                '" class="show-ci" href="javascript:showErrorBar(' + i + ')">' + showCIText + '</a></div>';
+                '" class="show-ci" href="javascript:showErrorBar(' + i + ')">' + showCIText + '</a></div>'+
+                '<div class="export-chart-box-csv"><a id="export-link-csv-trend" class="export-link-csv" href="javascript:exportChartAsCsv(' + i + ')">Export chart as csv file</a></div>';
 
             h.push('<div class="trend-container">', exportTypes, '<div id="trendChart', i, '" class="trendChart"></div>');
 
@@ -898,7 +1020,7 @@ function getLargeTrendChartAndTableHtml(indexesDisplayed) {
                 if (isDefined(areaData)) {
                     var data = areaData[j];
                     var comparatorData = trendRoot.ComparatorData[j];
-                    addTrendRow(h, data, comparatorData, period, comparisonConfig);
+                    addTrendRow(h, data, comparatorData, period, comparisonConfig, trendRoot.IID, trendRoot.Sex.Id, trendRoot.Age.Id);
                 }
                 areAnyRows = true;
             }
@@ -960,28 +1082,28 @@ function displayTrends() {
 }
 
 
-function getSmallMultipleTrendChartsHtml() {    
+function getSmallMultipleTrendChartsHtml() {
     var h = [],
-    index = getIndicatorIndex(),
-    root = currentTrendRoots[index];
-    var chartCount = 0;    
+        index = getIndicatorIndex(),
+        root = currentTrendRoots[index];
+    var chartCount = 0;
     if (root) {
         var comparatorVals = [],
-        vals = root.ComparatorValue;
+            vals = root.ComparatorValue;
 
         var hasDataChanged = false;
         var currentRoot = getGroupRootsToDisplay();
         if (currentRoot && currentRoot[0].DateChanges) {
             hasDataChanged = currentRoot[0].DateChanges.HasDataChangedRecently;
         }
-              
+
         for (var i in vals) {
             comparatorVals.push(vals[i][comparatorId]);
         }
 
         var cssClass = getSparkBoxClass(),
-        metadata = ui.getMetadataHash()[root.IID];
-        
+            metadata = ui.getMetadataHash()[root.IID];
+
         h.push(getTrendHeader(metadata, root, '',
             'goToMetadataPage(' + i + ')', hasDataChanged));
 
@@ -1042,14 +1164,18 @@ function getSmallMultipleTrendChartsHtml() {
 
 function createSmallTrendChart(id, root, areaCode, comparatorName, comparisonConfig) {
     var labels = [], data,
-    trendData = new TrendData(),
-    dataList = root.Data[areaCode];
+        trendData = new TrendData(),
+        dataList = root.Data[areaCode];
 
     for (var j in dataList) {
         var data = dataList[j];
         var significance = data.Sig[comparisonConfig.comparatorId];
         var markerColor = getColourFromSignificance(significance, comparisonConfig.useRagColours, colours,
-            comparisonConfig.useQuintileColouring);
+            comparisonConfig.useQuintileColouring, root.IID, root.Sex.Id, root.Age.Id);
+
+        if (root.ComparatorMethodId === ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels) {
+            markerColor = '#FFF000';
+        }
         trendData.addAreaPoint(data, markerColor);
         trendData.addBenchmarkPoint(root.ComparatorData[j][comparatorId]);
         labels.push(root.Periods[j]);
@@ -1237,7 +1363,7 @@ function sortSparklines() {
         // NN ranks are based on areaHash, extract the areaCodes and loop over for sorting
         _.each(areaHash, function (value, key) { areaCodesByNearestNeighboursRank.push(key); });
 
-        for (var i = 0; i < _.size(areaCodesByNearestNeighboursRank) ; i++) {
+        for (var i = 0; i < _.size(areaCodesByNearestNeighboursRank); i++) {
             sortedAreasList.push(_.findWhere(FT.data.sortedAreas, { Code: areaCodesByNearestNeighboursRank[i] }));
         }
 
@@ -1362,8 +1488,8 @@ var trendTableColumnIndexes = {
 function TrendTableRow() {
 
     var _this = this,
-    ciCells, rowCells, cells,
-    ciCssClass = 'light';
+        ciCells, rowCells, cells,
+        ciCssClass = 'light';
 
     _this.getValF = function () {
         return cells.text();
@@ -1382,7 +1508,7 @@ function TrendTableRow() {
     _this.setRowFromElement = function (e) {
         var tds = $(e).parent().parent().children();
         cells = $([tds[trendTableColumnIndexes.value],
-            tds[getComparatorCellIndex()]]);
+        tds[getComparatorCellIndex()]]);
     };
 
     _this.highlightValue = function (columnIndex) {
@@ -1429,7 +1555,7 @@ pages.add(PAGE_MODES.AREA_TRENDS, {
     jqIds: [
         'indicator-select-all-td', 'indicator-menu-div',
         'sparkline-views', '.geo-menu', 'trends-chart-sorter-az',
-        'tab-specific-options', 'key-spine-chart', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend'],
+        'tab-specific-options', 'key-spine-chart', 'value-note-legend', 'nearest-neighbour-link', 'trend-marker-legend', 'area-list-wrapper', 'filter-indicator-wrapper'],
     jqIdsNotInitiallyShown: ['data-quality-key', 'target-benchmark-box', 'key-spine-chart'],
     showHide: hideAndShowSparklineMenus
 });

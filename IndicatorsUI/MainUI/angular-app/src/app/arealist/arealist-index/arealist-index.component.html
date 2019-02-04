@@ -1,0 +1,57 @@
+<div class="row" *ngIf="displayPage()">
+    <div class="col-md-12">
+        <button id="help-view-area-list-on-data-page" class="btn btn-link help-link-button" (click)="helpViewAreaListOnDataPage()">
+            How do I view my area lists?
+        </button>
+    </div>
+</div>
+<div class="row">
+    <div id="grid-content" class="col-md-12" *ngIf="isAnyData()">
+        <table class="webgrid-table">
+            <thead>
+                <tr class="webgrid-header">
+                    <th scope="col">
+                        <button class="btn btn-link list-name" (click)="sort(1)">
+                            <u>List name</u>
+                        </button>
+                    </th>
+                    <th scope="col">
+                        <button class="btn btn-link list-name" (click)="sort(2)">
+                            <u>Area type</u>
+                        </button>
+                    </th>
+                    <th scope="col">
+                        Edit
+                    </th>
+                    <th scope="col">
+                        Copy
+                    </th>
+                    <th scope="col">
+                        Delete
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let areaListRow of areaListRows; let last=last" class="webgrid-row-style">
+                    <td>
+                        {{areaListRow.AreaListName}} {{last? hideSpinner() : ''}}
+                    </td>
+                    <td>
+                        {{areaListRow.AreaTypeName}}
+                    </td>
+                    <td class="center">
+                        <a id="edit-area-list" href="area-list/edit?list_id={{areaListRow.PublicId}}" class="btn btn-outline-primary edit-link-button">Edit</a>
+                    </td>
+                    <td class="center">
+                        <button id="copy-area-list" class="btn btn-outline-primary" (click)="copyAreaListConfirmation(areaListRow.AreaListId)">Copy</button>
+                    </td>
+                    <td class="center">
+                        <button id="delete-area-list" class="btn btn-outline-primary" (click)="deleteAreaListConfirmation(areaListRow)">Delete</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
+<ft-light-box-with-input [lightBoxWithInputConfig]="lightBoxWithInputConfig" (emitLightBoxWithInputActionConfirmed)="updateLightBoxWithInputActionConfirmed($event)" (emitLightBoxInputText)="updateLightBoxInputText($event)"></ft-light-box-with-input>

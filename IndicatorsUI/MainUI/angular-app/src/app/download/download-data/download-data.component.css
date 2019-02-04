@@ -1,0 +1,21 @@
+h2 {
+    padding: 0;
+    color: #555;
+    padding-bottom: 0 !important;
+}
+
+.btn-link {
+    color: #2e3191;
+    padding: 0;
+    width: 100%;
+    text-align: left;
+    margin: 1px 0;
+}
+
+h2.secondary-heading {
+    margin-top: 30px;
+}
+
+ h3 {
+    margin: 20px 0 0 0;
+    }

@@ -130,7 +130,7 @@ TEXTAREA {
 
 .property-heading {
     color: #666;
-    width: 10%;
+    width: 15%;
     text-align: right;
 }
 
@@ -198,12 +198,17 @@ TEXTAREA {
 
 .indicator-text {
     width: 100%;
+    margin: 2px 0;
 }
 
 .indicator-text-editor {
     width: 100%;
     padding-bottom: 10px;
     margin-bottom: 20px;
+}
+
+.indicator-text-editor textarea {
+    margin: 2px 0;
 }
 
 .text-entered {
@@ -1773,8 +1778,6 @@ body.loading {
     position: absolute;
     background: #000;
     opacity: 0.40; /*IE9, etc*/
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=40)"; /*IE8*/
-    filter: alpha(opacity=40); /*IE6-7*/
 }
 
 img.spinner {
@@ -2319,11 +2322,11 @@ LI.site-link {
 }
 
     #content-index .sortable tr td:nth-child(2) {
-        width: 250px;
+        width: 350px;
     }
 
     #content-index .sortable tr td:last-child {
-        width: 200px;
+        width: 100px;
     }
 
 #content-index-button-box {
@@ -2668,4 +2671,14 @@ LI.site-link {
     color: #0000FF;
     font-weight: bold;
     font-style: italic;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+#ui-datepicker-div {
+    background: white;
+    border: 1px solid #333;
 }

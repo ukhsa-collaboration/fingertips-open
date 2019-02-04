@@ -17,7 +17,6 @@
           <Property Name="OrganisationId" Type="int" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="UpdatedOn" Type="datetime" Nullable="false" />
-          <Property Name="Salt" Type="nvarchar(max)" />
           <Property Name="Email" Type="nvarchar" MaxLength="256" />
           <Property Name="EmailConfirmed" Type="bit" Nullable="false" />
           <Property Name="PasswordHash" Type="nvarchar(max)" />
@@ -37,7 +36,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="ListName" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="ListName" Type="nvarchar" MaxLength="100" Nullable="false" />
           <Property Name="UserId" Type="nvarchar" MaxLength="128" Nullable="false" />
           <Property Name="CreatedOn" Type="datetime" Nullable="false" />
           <Property Name="UpdatedOn" Type="datetime" Nullable="false" />
@@ -66,18 +65,6 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_IndicatorListItem_IndicatorList">
-          <End Role="IndicatorList" Type="Self.IndicatorList" Multiplicity="1" />
-          <End Role="IndicatorListItem" Type="Self.IndicatorListItem" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="IndicatorList">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="IndicatorListItem">
-              <PropertyRef Name="ListId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="FINGERTIPS_USERSModelStoreContainer">
           <EntitySet Name="AspNetUsers" EntityType="Self.AspNetUsers" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="IndicatorList" EntityType="Self.IndicatorList" Schema="dbo" store:Type="Tables" />
@@ -85,10 +72,6 @@
           <AssociationSet Name="FK_IndicatorList_AspNetUsers" Association="Self.FK_IndicatorList_AspNetUsers">
             <End Role="AspNetUsers" EntitySet="AspNetUsers" />
             <End Role="IndicatorList" EntitySet="IndicatorList" />
-          </AssociationSet>
-          <AssociationSet Name="FK_IndicatorListItem_IndicatorList" Association="Self.FK_IndicatorListItem_IndicatorList">
-            <End Role="IndicatorList" EntitySet="IndicatorList" />
-            <End Role="IndicatorListItem" EntitySet="IndicatorListItem" />
           </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
@@ -127,7 +110,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="ListName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="ListName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="UserId" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="CreatedOn" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="UpdatedOn" Type="DateTime" Nullable="false" Precision="3" />

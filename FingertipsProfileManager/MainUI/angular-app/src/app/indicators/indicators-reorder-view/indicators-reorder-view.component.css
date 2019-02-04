@@ -1,0 +1,71 @@
+.hidden {
+    display: none;
+}
+
+.error-message {
+    color: #ff0000;
+}
+
+.save-button {
+    margin-right: 6px;
+}
+
+#table {
+    width: 1016px;
+}
+
+.col-seq {
+    width: 6%;
+    text-align: left !important;
+}
+
+.col-id {
+    width: 8%;
+    text-align: left;
+}
+
+.col-indicator-name {
+    width: 56%;
+    text-align: left;
+}
+
+.col-sex {
+    width: 10%;
+    text-align: left;
+}
+
+.col-age {
+    width: 20%;
+    text-align: left;
+}
+
+.subheading-name {
+    float: left;
+    font-weight: bold;
+}
+
+.subheading-action-buttons {
+    float: right;
+}
+
+tbody.ui-sortable td {
+    cursor: pointer;
+}
+
+
+/* Column of the row the user is moving */
+
+.ui-sortable-helper .col-indicator-name {
+    width: 550px;
+}
+
+
+/* Row the user is moving */
+
+.ui-sortable-helper td {
+    background: #fffce4;
+}
+
+td.white {
+    color: white;
+}

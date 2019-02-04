@@ -5,6 +5,7 @@ using Fpm.MainUI.Helpers;
 using Fpm.MainUI.ViewModels.Areas;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Core;
+using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Controllers
@@ -13,6 +14,7 @@ namespace Fpm.MainUI.Controllers
     public class AreasController : Controller
     {
         private CoreDataRepository _coreDataRepository;
+        private AreaTypeRepository _areaTypeRepository;
 
         [Route("")]
         public ActionResult AreasIndex(AreasIndexViewModel viewModel)
@@ -60,6 +62,15 @@ namespace Fpm.MainUI.Controllers
             viewModel.SearchText = searchText;
 
             return View("AreasIndex", viewModel);
+        }
+
+        [Route("all-area-types")]
+        public ActionResult GetAllAreaTypes()
+        {
+            _areaTypeRepository = new AreaTypeRepository(NHibernateSessionFactory.GetSession());
+            var areaTypes = _areaTypeRepository.GetAllAreaTypes();
+
+            return Json(areaTypes, JsonRequestBehavior.AllowGet);
         }
 
         private void HydrateGridFromDBLookup(AreasIndexViewModel viewModel, string searchText, int areaTypeId)

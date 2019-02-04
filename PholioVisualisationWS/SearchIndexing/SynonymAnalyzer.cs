@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Util;
 
 namespace PholioVisualisation.SearchIndexing
 {
@@ -9,11 +10,10 @@ namespace PholioVisualisation.SearchIndexing
     /// </summary>
     public class SynonymAnalyzer : Analyzer
     {
-        public override TokenStream TokenStream
-        (string fieldName, TextReader reader)
+        public override TokenStream TokenStream (string fieldName, TextReader reader)
         {
             //create the tokenizer
-            TokenStream tokenStream = new StandardTokenizer(reader);
+            TokenStream tokenStream = new StandardTokenizer(Version.LUCENE_29, AttributeSource.AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, reader);
 
             //add in filters
             // first normalize the StandardTokenizer
@@ -23,7 +23,7 @@ namespace PholioVisualisation.SearchIndexing
             tokenStream = new LowerCaseFilter(tokenStream);
 
             // use the default list of Stop Words, provided by the StopAnalyzer class.
-            tokenStream = new StopFilter(tokenStream, StopAnalyzer.ENGLISH_STOP_WORDS);
+            tokenStream = new StopFilter(false, tokenStream, StopAnalyzer.ENGLISH_STOP_WORDS_SET);
 
             // injects the synonyms. 
             tokenStream = new SynonymFilter(tokenStream);

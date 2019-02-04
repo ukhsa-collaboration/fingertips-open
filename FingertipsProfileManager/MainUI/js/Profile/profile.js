@@ -43,29 +43,31 @@ $(document).ready(function () {
 });
 
 function LoadProfileDetail(profileId) {
-    $.get('/profile/NonAdminProfileDetails?profileId=' + profileId)
-        .success(function (response) {
+    $.ajax({
+        type: 'GET',
+        url: '/profile/NonAdminProfileDetails?profileId=' + profileId,
+        success: function(response) {
             $('#divDetail').html(response);
-            console.log('!!');
             $('[data-toggle="tooltip"]').tooltip();
-        })
-        .error(function (err) {
+        },
+        error: function(err) {
             console.log(err);
-        });
+        }
+    });
 }
 
 function SaveProfileDetail() {
     var name = $('#Name').val();
     var data = $('#frmProfile').serialize();
-    console.log(data);
+
     $.post('/profile/NonAdminProfileDetails', data)
-        .success(function (response) {
+        .done(function (response) {
             if (response) {
                 $('#alert-success').show();
                 $('#profile-menu :selected').text(name);
             }
         })
-        .error(function (err) {
+        .fail(function (err) {
             console.log(err);
         });
 }
@@ -81,10 +83,10 @@ function addProfileUser() {
         FpmUserId: $("[name=userId]").val()
     };
     $.post('/Profile/AddProfileUser', data)
-        .success(function (result) {
+        .done(function (result) {
             $('#user-listing').html(result);
         })
-        .error(function (err) {
+        .fail(function (err) {
             console.log(err);
         });
 }
@@ -95,10 +97,10 @@ function removeProfileUser() {
         FpmUserId: $("[name=userId]").val()
     };
     $.post('/Profile/RemoveProfileUser', data)
-        .success(function (result) {
+        .done(function (result) {
             $('#user-listing').html(result);
         })
-        .error(function (err) {
+        .fail(function (err) {
             console.log(err);
         });
 }

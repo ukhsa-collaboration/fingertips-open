@@ -34,9 +34,6 @@ a.home-header, a.home-header:hover, a.home-header:visited {
 /*----------------------------------------
     Twitter box on front page
 ------------------------------------------*/
-#related_content {
-    margin-top: 17px;
-}
 
 #related_content a {
     text-decoration: none;   
@@ -52,7 +49,7 @@ a.home-header, a.home-header:hover, a.home-header:visited {
 #recent-updates {
     width: 100%;
     margin-top: 5px;
-    padding-bottom: 100px;
+    padding-bottom: 40px;
 }
 
 /*----------------------------------------
@@ -85,12 +82,89 @@ a.home-header, a.home-header:hover, a.home-header:visited {
     line-height: 2;
 }
 
-/*----------------------------------------
+.phof-domains-top {
+    margin-top: 10px;
+}
+
+.phof-domains-indicators-header-link {
+    text-decoration: none !important;
+}
+    .phof-domains-indicators-header-link:hover {
+        text-decoration: underline !important;
+        background-color: #8e3947 !important;
+    }
+
+.phof-domains-indicators-header {
+    padding: 15px;
+    text-align: center;
+    background-color: rgb(130,36,51);
+    text-decoration: none !important;
+    color: white !important;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+    .phof-domains-indicators-header:hover {
+        text-decoration: underline !important;
+        background-color: #8e3947 !important;
+    }
+
+.phof-domains-indicators-middle-top {
+        border-top: 1px solid white !important;
+        border-bottom: 1px solid white !important;
+        background-color: rgb(130,36,51);
+    }
+
+.phof-domains-indicators-middle-elements {
+    border-right: 1px solid white;
+    padding: 20px;
+    background-color: rgb(130,36,51);
+    line-height: 25px;
+    font-size: 20px;
+    text-decoration: none !important;
+    color: white !important;
+    text-align: center;
+    font-weight: bold;
+}
+
+    .phof-domains-indicators-middle-elements:hover {
+        text-decoration: underline !important;
+        background-color: #8e3947 !important;
+    }
+
+.phof-domains-indicators-bottom-top {
+    text-align: center;
+    background-color: rgb(130,36,51);
+}
+
+.phof-domains-indicators-bottom-link {
+    text-decoration: none !important;
+}
+    .phof-domains-indicators-bottom-link :hover {
+        text-decoration: underline !important;
+        background-color: #8e3947 !important;
+    }
+
+.phof-domains-indicators-bottom {
+    padding: 10px;
+    text-align: center;
+    background-color: rgb(130,36,51);
+    text-decoration: none !important;
+    color: white !important;
+    font-weight: bold;
+}
+    .phof-domains-indicators-bottom:hover {
+        text-decoration: underline !important;
+        background-color: #8e3947 !important;
+    }
+
+
+/*-----------------------------------------
     PHOF start button on front page
 ------------------------------------------*/
 .start-button {
     padding-top: 10px;
-    margin: 0 0 60px 0; /*needed for tobacco home page*/
+    margin: 30px 0 10px 0; /*needed for tobacco home page*/
 }
 .start-button a {
     color: #ffffff;
@@ -120,4 +194,18 @@ a.home-header, a.home-header:hover, a.home-header:visited {
 .start-button .btn:hover {
   background: #048874;
   text-decoration: none;
+}
+
+/*-----------------------------------------
+    PHOF video link on front page
+------------------------------------------*/
+.phof-side-section {
+    padding-top: 30px;
+}
+
+/*-----------------------------------------
+    Area search
+------------------------------------------*/
+#area-search input {
+    width: 313px !important;
 }

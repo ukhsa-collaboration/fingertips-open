@@ -487,3 +487,82 @@ function clearFeedbackForm() {
         this.reset();
     });
 }
+
+function downloadLatestNoInequalitiesDataCsvFileByGroup(corews, parameters){
+    var url = corews + 'api/latest/no_inequalities_data/csv/by_group_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadLatestNoInequalitiesDataCsvFileByIndicator(corews, parameters){
+    var url = corews + 'api/latest/no_inequalities_data/csv/by_indicator_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadAllPeriodsNoInequalitiesDataCsvFileByIndicator(corews, parameters){
+    var url = corews + 'api/allPeriods/no_inequalities_data/csv/by_indicator_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadCsvFileByGroup(corews, parameters){
+    var url = corews + 'api/all_data/csv/by_group_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadCsvFileByIndicator(corews, parameters){
+    var url = corews + 'api/all_data/csv/by_indicator_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadLatestWithInequalitiesDataCsvFileByIndicator(corews, parameters){
+    var url = corews + 'api/latest/with_inequalities_data/csv/by_indicator_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function downloadAllPeriodsWithInequalitiesDataCsvFileByIndicator(corews, parameters){
+    var url = corews + 'api/allPeriods/with_inequalities_data/csv/by_indicator_id?' + parameters.build();
+    window.open(url.toLowerCase(), '_blank');
+}
+
+function getIid(){
+    var index = $('#indicatorMenu').prop('selectedIndex');
+    return FT.model.groupRoots[index].IID;
+}
+
+function getAreasCodeDisplayed() {
+
+    var allDisplayedAreas = getChildAreas().map(area => area["Code"]);
+
+    if (FT.model.isNearestNeighbours()){
+        allDisplayedAreas.push(FT.model.areaCode);
+        return allDisplayedAreas;
+    }
+    return allDisplayedAreas;
+}
+
+function getParentAreaCode() {
+
+    if (FT.model.isNearestNeighbours()){
+        return NATIONAL_CODE;
+    }
+    return FT.model.parentCode;
+}
+
+
+function PostRequestDownloadCsvFile(url, data){
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        dataType: 'text',
+        success: function(result){
+            var blob = new Blob([result]);
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download="myFileName.csv";
+            link.click();
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+            // alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+        } 
+      });
+}

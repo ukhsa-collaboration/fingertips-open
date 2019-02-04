@@ -11,7 +11,7 @@
     }
 </ul>
 <div id="btn-my-indicator-lists">
-    @if (Model.IndicatorLists.Count > 0) {
+    @if (Model.IndicatorLists.ToList().Count > 0) {
         @Html.ActionLink("Manage your indicator lists", "Index", "IndicatorList", new {}, new {@class = "btn btn-primary"})
     } else {
         @Html.ActionLink("Create your first indicator list", "Create", "IndicatorList", new { }, new { @class = "btn btn-primary" })

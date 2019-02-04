@@ -23,28 +23,30 @@
     var updatesCssClass = updateLength > 700 ? "scrollable-box" : "";
     var areUpdates = updateLength > 0;
 }
-<div id="public-health-outcomes-framework" class="container">
+<div id="introduction" class="container">
     <div class="row">
         @Html.Partial("_UpdateDelayedMessage")
         <div class="col-md-8">
+
             @Html.Partial("~/Views/Phof/_PhofDomains.cshtml")
             <div>
-                <div id="introduction">
-                    @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
-                    @ContentProvider.GetIntroduction(Model.ProfileId)
+                <div id="introduction-after-domains">
+                    @ContentProvider.GetContentString("introduction2", Model.ProfileId)
+                </div>
+                <div id="introduction2">
+                    @ContentProvider.GetContentString("introduction3", Model.ProfileId)
                 </div>
             </div>
         </div>
+
         <div class="col-md-4">
-            <div style="padding-top: 20px;">
-                <figure id="image-figure" class="figure">
-                    <a href="https://www.youtube.com/watch?v=UL3Q_cqWKvs&feature=youtu.be" target="_blank">
-                        <img src="~/images/image-video/phof-video.png" class="figure-img img-fluid rounded img-responsive" alt="An introduction to using the Fingertips Tool">
-                    </a>
-                    <figcaption class="figure-caption"></figcaption>
-                </figure>
+            <div class="phof-domains">
+                @Html.Partial("_StartButton")
             </div>
-            <div class="row">
+            <div id="introductionAreaSearch">
+                @Html.Partial("~/Views/AreaSearch/_IntroductionAreaSearch.cshtml")
+            </div>
+            <div class="">
                 @if (areUpdates)
                 {
                     <div style="width: 100%;">
@@ -57,9 +59,17 @@
                     </div>
                 }
             </div>
-            <div class="row">
+            <div class="phof-side-section">
+                @Html.Partial("_VideoLink", new VideoLink
+                {
+                    ImgSrc = "/images/image-video/phof-video.png",
+                    VideoUrl = "https://www.youtube.com/watch?v=UL3Q_cqWKvs&feature=youtu.be",
+                    Alt = "An introduction to the Public Health Outcomes Framework"
+                })
+            </div>
+            <div class="row col-md-12 phof-side-section">
                 @Html.Partial("_TwitterFeed")
             </div>
         </div>
-    </div>   
+    </div>
 </div>

@@ -2,8 +2,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { MapChartComponent } from './map-chart.component';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
-import { MockFTHelperService } from '../../mock/ftHelper.service.mock';
-import { MockCoreDataHelperService } from '../../mock/coreDataHelper.service.mock';
 import { CoreDataHelperService } from '../../shared/service/helper/coreDataHelper.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -20,8 +18,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 //             declarations: [MapChartComponent],
 //             schemas: [CUSTOM_ELEMENTS_SCHEMA],
 //             providers: [
-//                 { provide: FTHelperService, useClass: MockFTHelperService },
-//                 { provide: CoreDataHelperService, useClass: MockCoreDataHelperService }]
+//                 { provide: FTHelperService, useValue: null },
+//                 { provide: CoreDataHelperService, useValue: null }]
 //         })
 //             .compileComponents();
 //     }));

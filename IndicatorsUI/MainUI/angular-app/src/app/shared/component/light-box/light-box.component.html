@@ -1,0 +1,17 @@
+<div class="light-box" *ngIf="showLightBox" (click)="cancel()">
+</div>
+<div class="info-box" *ngIf="showLightBox" [style.height]="lightBoxConfig.Height + 'px'" [style.top]="lightBoxConfig.Top + 'px'">
+    <h2>{{this.lightBoxConfig.Title}}</h2>
+    <p class="info-text" [innerHtml]="this.lightBoxConfig.Html"></p>
+
+    <div *ngIf="isInfoBoxOkCancel">
+        <button class="btn btn-primary active ok" (click)="confirm()">OK</button>
+        <button class="btn btn-link active" (click)="cancel()">Cancel</button>
+    </div>
+
+    <div *ngIf="isInfoBoxOk">
+        <button class="btn btn-primary active ok" (click)="confirm()">OK</button>
+    </div>
+
+    <div class="close" (click)="cancel()"></div>
+</div>

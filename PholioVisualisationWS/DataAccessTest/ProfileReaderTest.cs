@@ -50,9 +50,9 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetProfilePdfs()
         {
-            var areaTypes = Reader().GetProfilePdfs(ProfileIds.PracticeProfiles);
+            var areaTypes = Reader().GetProfilePdfs(ProfileIds.ChildAndMaternalHealth);
 
-            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.GpPractice));
+            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority));
             Assert.IsNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.Subregion));
         }
 
@@ -113,11 +113,16 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetProfilesForIndicatorsWithMultipleIndicators()
         {
-            var indicators = new List<int> { IndicatorIds.LifeExpectancyAtBirth, IndicatorIds.DeprivationScoreIMD2010 };
+            const int indicator1 = IndicatorIds.DeprivationScoreIMD2015;
+            const int indicator2 = IndicatorIds.LifeExpectancyAtBirth;
+
+            var indicators = new List<int> { indicator1, indicator2};
             var profilesForIndicators = Reader().GetProfilesForIndicators(indicators, AreaTypeIds.CountyAndUnitaryAuthority);
+
+            // Assert
             Assert.IsTrue(profilesForIndicators.Count > 0);
-            Assert.IsTrue(profilesForIndicators.FirstOrDefault(x => x.IndicatorId == IndicatorIds.LifeExpectancyAtBirth) != null);
-            Assert.IsTrue(profilesForIndicators.FirstOrDefault(x=> x.IndicatorId == IndicatorIds.DeprivationScoreIMD2010) != null);
+            Assert.IsNotNull(profilesForIndicators.FirstOrDefault(x => x.IndicatorId == indicator2));
+            Assert.IsNotNull(profilesForIndicators.FirstOrDefault(x=> x.IndicatorId == indicator1));
         }
 
         private static IProfileReader Reader()

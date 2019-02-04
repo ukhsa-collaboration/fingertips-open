@@ -62,7 +62,8 @@
 
     @*Contact us*@
     @if (isSiteFrontPage == false && (
-                profileId == ProfileIds.HealthProfiles || profileId == ProfileIds.Tobacco || profileId == ProfileIds.Phof))
+                profileId == ProfileIds.HealthProfiles || profileId == ProfileIds.Tobacco ||
+                profileId == ProfileIds.Phof || profileId == ProfileIds.ChildHealth))
     {
         // Profiles with their own contact us pages
         <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.ContactUs, profileId).Link)</li>

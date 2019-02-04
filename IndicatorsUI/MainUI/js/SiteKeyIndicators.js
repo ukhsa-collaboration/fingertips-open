@@ -14,7 +14,7 @@ function IndicatorFormatter(groupRoot, metadata, coreDataSet, indicatorStatsF) {
     var dataInfo = new CoreDataSetInfo(coreDataSet),
 		unit = !!metadata ? metadata.Unit : null,
 		valueAndUnit = new ValueWithUnit(unit),
-		isInverted = correctForPolarity && groupRoot.PolarityId === 0;
+		isInverted = groupRoot.PolarityId === 0;
 
     this.getIndicatorName = function () {
         return metadata.Descriptive.Name + new SexAndAge().getLabel(groupRoot);
@@ -150,6 +150,7 @@ function getGroupingDataCallback(obj) {
         addLoadedData(obj);
         try {
             groupRoots = obj;
+            FT.model.groupRoots = obj;
         } catch (e) {
             handleAjaxFailure(e);
             return;
@@ -159,6 +160,20 @@ function getGroupingDataCallback(obj) {
         groupRoots = [];
     }
 
+    ajaxMonitor.callCompleted();
+}
+
+function getGroupingSubheadings() {
+    var parameters = new ParameterBuilder();
+    parameters.add('area_type_id', FT.model.areaTypeId);
+    parameters.add('group_id', FT.model.groupId);
+
+    ajaxGet('api/group_subheadings', parameters.build(),
+        getGroupingSubheadingsCallback, handleAjaxFailure);
+}
+
+function getGroupingSubheadingsCallback(obj) {
+    new GroupingSubheadings(FT.model).set(obj);
     ajaxMonitor.callCompleted();
 }
 
@@ -187,15 +202,50 @@ function showAndHidePageElements() {
     menus.parent.setVisibility();
     menus.benchmark.setSubnationalOptionVisibility();
 
+    // Initializing menus up whether is England areaType or not
+    setBenchmarkMenuVisibility();
+    setAreaDropDownBoxMenuVisibility();
+    setfilterIndicatorsPositionIntoMenu();
+
     // Specific UI updates to do everytime
     showMessageIfIndicatorNotAvailableForNewAreaType();
     updateNearestNeighbourElements();
     updatePreferredState();
     showHideAreaAddress();
-    $('#no-domain-data').hide();
+    showHideManageAreaListLinks();
+    applyFilterIndicatorsLinkStyle();
+
+    // Set visibility into scrollable panel
+    setScrollablePanelTartanRugVisibility()
+
+    $('#main-info-message').hide();
 
     hideSpinner();
     main.show();
+}
+
+function showHideManageAreaListLinks() {
+    $('#create-new-area-list-link').hide();
+    $('#edit-new-area-list-link').hide();
+    $('#sign-in-link-wrapper').hide();
+
+    if (FT.model.parentTypeId === AreaTypeIds.AreaList) {
+        if (FT.config.isSignedIn) {
+            $('#create-new-area-list-link').show();
+            $('#edit-new-area-list-link').show();
+        } else {
+            $('#sign-in-link-wrapper').show();
+        }
+    }
+}
+
+function applyFilterIndicatorsLinkStyle() {
+    var $filter = $('#filter-indicator-wrapper');
+    if (FT.model.filterIndicatorPeriod > 0) {
+        $filter.addClass('bold');
+    } else {
+        $filter.removeClass('bold');
+    }
 }
 
 function showMessageIfIndicatorNotAvailableForNewAreaType() {
@@ -442,7 +492,8 @@ function TabSpecificOptions(options) {
         '<span>{{label}} </span>' +
         '{{#options}}<button id="tab-option-{{index}}" class="{{cssClass}}">{{text}}</button>{{/options}}' +
         '</div>{{/label}}' +
-        '{{#isExport}}<div class="export-chart-box"><a href="">{{exportLabel}}</a></div>{{/isExport}}';
+        '{{#isExport}}<div class="export-chart-box"><a class="export-link" href="">{{exportLabel}}</a></div>{{/isExport}}'+
+        '{{#isExportCsvFile}}<div class="export-chart-box-csv"><a id="export-link-csv-{{pageName}}" class="export-link-csv" href="">{{exportCsvLabel}}</a></div>{{/isExportCsvFile}}';
 
     /**
     * Show or hide the options. 
@@ -496,8 +547,12 @@ function TabSpecificOptions(options) {
 
         // Export
         var isExport = isDefined(options.exportImage);
+        var isExportCsvFile = isDefined(options.exportCsvFile);
         viewModel.exportLabel = isExport ? options.exportImage.label : '';
+        viewModel.exportCsvLabel = isExport ? options.exportCsvFile.label : '';
         viewModel.isExport = isExport;
+        viewModel.isExportCsvFile = isExportCsvFile;
+        viewModel.pageName = pages.getDefault() === PAGE_MODES.TARTAN ? 'tartan' : 'compare-areas';
 
         // Buttons
         if (model.label) {
@@ -512,6 +567,11 @@ function TabSpecificOptions(options) {
                 });
             viewModel.options = optionConfigs;
 
+            // Reset to selected option to 0 if we are in area type England
+            if(viewModel.options.length <= selectedOption){
+                selectedOption = 0;
+            }
+
             // Selected option is highlighted
             viewModel.options[selectedOption].cssClass = selectedClass;
         }
@@ -524,7 +584,11 @@ function TabSpecificOptions(options) {
 
         // Bind export
         if (isExport) {
-            $tabSpecificOptions.find('a').bind('click', options.exportImage.clickHandler);
+            $tabSpecificOptions.find('.export-link').bind('click', options.exportImage.clickHandler);
+        }
+
+        if (isExportCsvFile) {
+            $tabSpecificOptions.find('.export-link-csv').bind('click', options.exportCsvFile.clickHandler);
         }
     };
 
@@ -548,7 +612,7 @@ function TabSpecificOptions(options) {
                     function (e) {
 
                         $option = $(this);
-                        var index = $option.attr(indexAttr);;
+                        var index = $option.attr(indexAttr);
 
                         if (selectedOption != index) {
                             selectedOption = index;
@@ -655,11 +719,16 @@ function documentReady() {
     var f = 'function';
     if (isInitRequired) {
 
+        // Set hash after server side redirect
+        var href = window.location.href;
+        if (href.indexOf('redirectHash') > -1) {
+            window.location.href = href.replace('?redirectHash=', '#');
+        }
+
         comparatorId = NATIONAL_COMPARATOR_ID;
 
         // Init model
         var model = FT.model;
-  
         ftHistory.init(model);
         model.update();
 
@@ -681,7 +750,6 @@ function documentReady() {
             initAreaSearch('#area-search-text', true);
         }
 
-        stems = new SpineChartStems(spineHeaders);
         getValueNotesCall();
 
         // Log initial state
@@ -699,8 +767,10 @@ function handleAjaxFailure(e) {
 function refreshCurrentPage() {
     lock();
     // Get data from server
-    ajaxMonitor.setCalls(2);
+    ajaxMonitor.setCalls(3);
     getGroupingData();
+    applyPeriodFilter(FT.model.filterIndicatorPeriod);
+    getGroupingSubheadings();
     getIndicatorMetadata(FT.model.groupId, GET_METADATA_SYSTEM_CONTENT);
     ajaxMonitor.monitor(refreshCurrentPage2);
 }
@@ -713,10 +783,10 @@ function executeWithLock(code) {
     }
 }
 
-function clearSpineTables() {
-    // Necessary to do both so tooltips work
-    $('#spine-body').html('');
-}
+//function clearSpineTables() {
+//    // Necessary to do both so tooltips work
+//    $('#spine-body').html('');
+//}
 
 function AreaAndDataSorter(order, data, areas, areaCodeToAreaHash) {
 
@@ -779,14 +849,14 @@ function getComparatorGroupingWithId(groupRoot, comparatorId) {
 
     for (var i = 0; i < count; i++) {
         var g = groupings[i];
-        if (g.ComparatorId == comparatorId) {
+        if (g.ComparatorId === comparatorId) {
             return g;
         }
     }
 
     for (i = 0; i < count; i++) {
         var g = groupings[i];
-        if (g.ComparatorId == -1) {
+        if (g.ComparatorId === -1) {
             return g;
         }
     }
@@ -819,6 +889,10 @@ function getGroupRootByIndicatorId(id, groupRootsAlt) {
             return g[i];
         }
     }
+}
+
+function getGroupRootByIndicatorSexAndAge(indicatorId, sexId, ageId) {
+    return _.find(FT.model.groupRoots, function (groupRoot) { return groupRoot.IID === indicatorId && groupRoot.Sex.Id === sexId && groupRoot.Age.Id === ageId; });
 }
 
 function getNationalComparatorGrouping(groupRoot) {
@@ -859,8 +933,10 @@ function getCurrentComparator() {
 var colours = {
     chart: '#a8a8cc',
     better: '#92d050',
+    best: '#00b092',
     same: '#ffc000',
     worse: '#c00000',
+    worst: '#821733',
     none: '#ffffff',
     limit99: '#a8a8cc',
     limit95: '#444444',
@@ -870,11 +946,16 @@ var colours = {
     bobHigher: '#C2CCFF',
     bodyText: '#333',
     noComparison: '#c9c9c9',
-    quintile1: '#DED3EC',
-    quintile2: '#BEA7DA',
-    quintile3: '#9E7CC8',
-    quintile4: '#7E50B6',
-    quintile5: '#5E25A4'
+    ragQuintile1: '#DED3EC',
+    ragQuintile2: '#BEA7DA',
+    ragQuintile3: '#9E7CC8',
+    ragQuintile4: '#7E50B6',
+    ragQuintile5: '#5E25A4',
+    bobQuintile1: '#254BA4',
+    bobQuintile2: '#506EB6',
+    bobQuintile3: '#7C93C8',
+    bobQuintile4: '#A7B6DA',
+    bobQuintile5: '#D3DBEC'
 };
 
 function getComparatorFromAreaCode(areaCode) {
@@ -895,8 +976,8 @@ function getComparatorById(id) {
     return { Name: name, Code: NATIONAL_CODE, Short: name };
 }
 
-function getMiniMarkerImageFromSignificance(significance, useRag, useQuintileColouring) {
-    return getMarkerImageFromSignificance(significance, useRag, '_mini', useQuintileColouring);
+function getMiniMarkerImageFromSignificance(significance, useRag, useQuintileColouring, indicatorId, sexId, ageId) {
+    return getMarkerImageFromSignificance(significance, useRag, '_mini', useQuintileColouring, indicatorId, sexId, ageId);
 }
 
 function getNationalComparator() {
@@ -964,8 +1045,16 @@ function addGroupDataParameters(parameters) {
 * @class getParentCode
 */
 function getParentCode() {
-    var model = FT.model;
-    return !model.isNearestNeighbours() ? model.parentCode : model.nearestNeighbour;
+    var model = FT.model,
+        config = FT.config;
+
+    if (model.isNearestNeighbours()) {
+        return model.nearestNeighbour;
+    } else if (config.isSharedAreaList && config.isSharedAreaListLoaded) {
+        return config.sharedParentCode;
+    } else {
+        return model.parentCode;
+    }
 }
 
 function doSearch() {
@@ -1015,17 +1104,42 @@ function addProfileOrIndicatorsParameters(parameters) {
 
 function populateIndicatorMenu() {
 
-    var root, i;
-    var selectElement = $('#indicatorMenu')[0],
-		options = selectElement.options;
-    options.length = 0;
-    var metadataHash = ui.getMetadataHash();
+    var root,
+        i,
+        selectElement = $('#indicatorMenu')[0],
+        metadataHash = ui.getMetadataHash(),
+        groupingSubheadings = ui.getGroupingSubheadings(),
+        options = [];
+
+    // Reset the drop down
+    selectElement.options.length = 0;
 
     for (i in groupRoots) {
-        root = groupRoots[i];
-        var indicator = metadataHash[root.IID];
-        options[i] = new Option(indicator.Descriptive.Name +
-			new SexAndAge().getLabel(root), i);
+        if (groupRoots.hasOwnProperty(i)) {
+            root = groupRoots[i];
+
+            if (_.some(groupingSubheadings, function(x) { return x.Sequence === root.Sequence })) {
+                var subheading = _.find(groupingSubheadings, function(x) { return x.Sequence === root.Sequence }).Subheading;
+                options.push({ name: subheading, value: -1 });
+            }
+
+            var indicator = metadataHash[root.IID];
+            var opt = indicator.Descriptive.Name + new SexAndAge().getLabel(root);
+            options.push({ name: opt, value: i });
+        }
+    }
+
+    for (i in options) {
+        if (options.hasOwnProperty(i)) {
+            var option = new Option(options[i].name, options[i].value);
+
+            selectElement.options[i] = option;
+
+            if (options[i].value === -1) {
+                $(option).prop('disabled', 'disabled');
+                $(option).prop('class', 'indicator-subheading');
+            }
+        }
     }
 
     // Select preferred group root if user has already viewed this domain
@@ -1036,11 +1150,13 @@ function populateIndicatorMenu() {
 
         // By IID and SexId
         for (i in groupRoots) {
-            root = groupRoots[i];
-            if (preferredRoot.IID === root.IID &&
-				preferredRoot.Sex.Id === root.Sex.Id) {
-                index = i;
-                break;
+            if (groupRoots.hasOwnProperty(i)) {
+                root = groupRoots[i];
+                if (preferredRoot.IID === root.IID &&
+                    preferredRoot.Sex.Id === root.Sex.Id) {
+                    index = i;
+                    break;
+                }
             }
         }
 
@@ -1048,6 +1164,8 @@ function populateIndicatorMenu() {
             var s = 'selected';
             $(options[index]).attr(s, s);
         }
+    } else {
+        setIndicatorIndex(0);
     }
 }
 
@@ -1079,12 +1197,11 @@ function getIndicatorIndex() {
         if (isDefined(matchingIndex)) {
             setIndicatorIndex(matchingIndex);
             return matchingIndex;
-        } else {
-            return $('#indicatorMenu')[0].value;
         }
     }
 
-    return $('#indicatorMenu')[0].value;
+    // Default group root index
+    return 0;
 }
 
 function getDataValues(data, attribute) {
@@ -1106,6 +1223,11 @@ function getTrendHeader(metadata, root, areaName, clickHandler, isNewData) {
 		unitLabel = unit !== '' ?
 			' - ' + unit :
 			'';
+
+    // Override click handler
+    // The parameter must be the current indicator index
+    var currentIndicatorIndex = getIndicatorIndex();
+    clickHandler = 'goToMetadataPage(' + currentIndicatorIndex + ')';
 
     return ['<div class="trend-header"><div class="trend-title"><a class="trend-link" title="More about this indicator" href="javascript:',
 		clickHandler, ';">', metadata.Descriptive.Name, new SexAndAge().getLabel(root), '</a>' + getNewDataBadge(isNewData),
@@ -1191,11 +1313,20 @@ function canDataBeDisplayed() {
     return true;
 }
 
-function getSignificanceImg(sig, useRag, useQuintileColouring) {
+function getSignificanceImg(sig, useRag, useQuintileColouring, indicatorId, sexId, ageId) {
+
+    if(isEnglandAreaType() && pages.getDefault() === PAGE_MODES.TARTAN) {
+        return null;
+    }
+
     if (useQuintileColouring) {
-        switch (true) {
-            case (sig > 0 && sig < 6):
-                return 'quintile' + sig + '.png';
+        if (sig > 0 && sig < 6) {
+            var groupRoot = getGroupRootByIndicatorSexAndAge(indicatorId, sexId, ageId);
+            if (groupRoot.PolarityId === PolarityIds.NotApplicable) {
+                return 'bob-quintile-' + sig + '.png';
+            } else {
+                return 'rag-quintile-' + sig + '.png';
+            }
         }
     } else {
         if (useRag) {
@@ -1207,6 +1338,10 @@ function getSignificanceImg(sig, useRag, useQuintileColouring) {
                     return 'same.png';
                 case 3:
                     return 'better.png';
+                case 4:
+                    return 'best.png';
+                case 5:
+                    return 'worst.png';
             }
         } else {
             switch (sig) {
@@ -1250,7 +1385,7 @@ function refreshCurrentPage2() {
     // Continuation of refreshCurrentPage now data has been loaded
     if (canDataBeDisplayed()) {
 
-        populateIndicatorMenus();
+        populateIndicatorMenu();
 
         if (FT.model.isNearestNeighbours()) {
             toggleNearestNeighboursControls(false);
@@ -1264,8 +1399,6 @@ function refreshCurrentPage2() {
 
 function initPageElements() {
 
-    spineChart.init(250, 18);
-
     var model = FT.model;
 
     // Init menus
@@ -1277,10 +1410,10 @@ function initPageElements() {
 
     // Key heading
     var benchmark = enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY ?
-		'England' :
-		'benchmark';
+        'England' :
+        'benchmark';
     $('.key-text').html('Compared with ' + benchmark);
-
+    
     // Selected domain
     $('#domain' + model.groupId).addClass('selected-domain');
     var $domainMenu = $('#domain-dropdown');
@@ -1299,9 +1432,27 @@ function initPageElements() {
 }
 
 function initAreaData() {
-    ajaxMonitor.setCalls(2);
+    if (FT.config.isSignedIn && isFeatureEnabled('yourAreaListsEnabled')) {
+        // User signed in and area lists feature enabled, increase the calls to 4 as
+        // we need to get all areas for user area lists
+        ajaxMonitor.setCalls(4);
+    } else {
+        ajaxMonitor.setCalls(3);
+    }
+
     getParentAreaGroups(); // parent area types
     getAllAreas(FT.model.areaTypeId); // need all for map
+
+    if (FT.config.isSignedIn && isFeatureEnabled('yourAreaListsEnabled')) {
+        // User signed in and area lists feature enabled, get all areas for user area lists
+        getAllAreas(AreaTypeIds.AreaList);
+    }
+
+    // Identifies shared area list and updates the config
+    // which will then gets used in other places to check
+    // whether the area list is shared
+    isAreaListShared();
+
     ajaxMonitor.monitor(initAreaData2);
 }
 
@@ -1369,13 +1520,21 @@ function getAreaListKey() {
     return FT.model.parentCode + '-' + FT.model.areaTypeId;
 }
 
-function getMarkerImageFromSignificance(significance, useRag, suffix, useQuintileColouring) {
-
+function getMarkerImageFromSignificance(significance, useRag, suffix, useQuintileColouring, indicatorId, sexId, ageId) {
     var tail = suffix + '.png';
+    if(isEnglandAreaType())
+    {
+        return 'circle_black' + tail;
+    }
+
     if (useQuintileColouring) {
-        switch (true) {
-            case (significance > 0 && significance < 6):
-                return 'circle_quintile' + significance + tail;
+        if (significance > 0 && significance < 6) {
+            var groupRoot = getGroupRootByIndicatorSexAndAge(indicatorId, sexId, ageId);
+            if (groupRoot.PolarityId === PolarityIds.NotApplicable) {
+                return 'circle_bob_quintile' + significance + tail;
+            } else {
+                return 'circle_rag_quintile' + significance + tail;
+            }
         }
     } else {
         if (useRag) {
@@ -1386,6 +1545,10 @@ function getMarkerImageFromSignificance(significance, useRag, suffix, useQuintil
                     return 'circle_orange' + tail;
                 case 3:
                     return 'circle_green' + tail;
+                case 4:
+                    return 'circle_dark_green' + tail;
+                case 5:
+                    return 'circle_dark_red' + tail;
             }
         } else {
             switch (significance) {
@@ -1402,8 +1565,30 @@ function getMarkerImageFromSignificance(significance, useRag, suffix, useQuintil
     return 'circle_white' + tail;
 }
 
-function getAllAreas(areaTypeId) {
+function getSharedAreaList() {
+    var parameters = new ParameterBuilder();
+    parameters.add('area_type_id', AreaTypeIds.AreaList);
+    parameters.add('parent_code', FT.config.sharedParentCode);
+    parameters.add('profile_id', FT.model.profileId);
 
+    ajaxGet('api/area/by_area_type_and_parent_code',
+        parameters.build(),
+        function(area) {
+            if (isDefined(area)) {
+                if (_.find(loaded.areaLists[AreaTypeIds.AreaList], function(data) { return data.Code === area.Code }) === undefined) {
+                    if (loaded.areaLists[AreaTypeIds.AreaList] === undefined) {
+                        loaded.areaLists[AreaTypeIds.AreaList] = area;
+                    } else {
+                        loaded.areaLists[AreaTypeIds.AreaList][loaded.areaLists[AreaTypeIds.AreaList].length] = area;
+                    }
+                }
+            }
+        });
+
+    ajaxMonitor.callCompleted();
+}
+
+function getAllAreas(areaTypeId) {
     if (FT.model.areAnyIndicators && !loaded.areaLists[areaTypeId]) {
         showSpinner();
 
@@ -1411,24 +1596,35 @@ function getAllAreas(areaTypeId) {
         parameters.add('area_type_id', areaTypeId);
         parameters.add('profile_id', FT.model.profileId);
         parameters.add('template_profile_id', templateProfileId);
+        parameters.add('no_cache', 'true');
+
+        if (FT.config.isSignedIn) {
+            parameters.add('user_id', FT.config.userId);
+        }
 
         ajaxGet('api/areas/by_area_type',
-			parameters.build(),
-			function (areas) {
+            parameters.build(),
+            function(areas) {
 
-			    if (isDefined(areas)) {
-			        loaded.areaLists[areaTypeId] = areas;
-			        // If missing for one area then will be missing for all, e.g. practices
-			        if (!areas[0].Short) {
-			            for (var i in areas) {
-			                // Ensure Short name is set, may need to trim this if too long
-			                areas[i].Short = areas[i].Name;
-			            }
-			        }
-			    }
+                if (isDefined(areas)) {
 
-			    ajaxMonitor.callCompleted();
-			});
+                    loaded.areaLists[areaTypeId] = areas;
+                    
+                    if (areas.length) {
+
+                        // Check Short name is defined: if missing for one area 
+                        // then will be missing for all, e.g.practices
+                        if (!areas[0].Short) {
+                            for (var i in areas) {
+                                // Ensure Short name is set, may need to trim this if too long
+                                areas[i].Short = areas[i].Name;
+                            }
+                        }
+                    }
+                }
+
+                ajaxMonitor.callCompleted();
+            });
     } else {
         ajaxMonitor.callCompleted();
     }
@@ -1441,7 +1637,14 @@ function getChildAreas() {
 }
 
 function getParentArea() {
-    var parentAreas = loaded.areaLists[FT.model.parentTypeId];
+    var parentTypeId = FT.model.parentTypeId;
+
+    var parentAreas = loaded.areaLists[parentTypeId];
+    if (parentTypeId === AreaTypeIds.AreaList) {
+        var areaTypeId = FT.model.areaTypeId;
+        parentAreas = _.filter(parentAreas, function (x) { return x.AreaTypeId === areaTypeId; });
+    } 
+
     return new AreaCollection(parentAreas).find(FT.model.parentCode);
 }
 
@@ -1570,14 +1773,17 @@ function CoreDataSetList(list) {
     };
 };
 
-function isParentCountry() {
-    return FT.model.parentTypeId === AreaTypeIds.Country;
+function isSubnationalColumn() {
+    var model = FT.model;
+    return enumParentDisplay !== PARENT_DISPLAY.NATIONAL_ONLY &&
+        !isEnglandAreaType() &&
+        model.parentTypeId !== AreaTypeIds.Country &&
+		!model.isNearestNeighbours();
 }
 
-function isSubnationalColumn() {
-    return enumParentDisplay !== PARENT_DISPLAY.NATIONAL_ONLY &&
-		!isParentCountry() &&
-		!FT.model.isNearestNeighbours();
+function isEnglandAreaType()
+{
+    return FT.model.areaTypeId === AreaTypeIds.Country;
 }
 
 function BarScale(dataList) {
@@ -1636,6 +1842,74 @@ function showBarChartLegend(useTarget) {
         a: $('#key-ad-hoc'),
         b: $('#key-bar-chart')
     }).showA(useTarget);
+
+    var $keyBarChart = $('#key-bar-chart'),
+        $rag3 = $('#bar-chart-legend-rag-3'),
+        $rag5 = $('#bar-chart-legend-rag-5'),
+        $bob = $('#bar-chart-legend-bob'),
+        $quintileRag = $('#bar-chart-quintile-rag'),
+        $quintileBob = $('#bar-chart-quintile-bob'),
+        $ragAndBobSection = $('#bar-chart-rag-and-bob-section'),
+        $quintileSection = $('#bar-chart-quintile-key-table');
+
+    $rag3.hide();
+    $rag5.hide();
+    $bob.hide();
+    $quintileRag.hide();
+    $quintileBob.hide();
+    $ragAndBobSection.hide();
+    $quintileSection.hide();
+
+    if ($keyBarChart.is(':visible')) {
+
+        var groupRoot = getGroupRoot();
+        var polarityId = groupRoot.PolarityId,
+            comparatorMethodId = groupRoot.ComparatorMethodId;
+
+        switch (comparatorMethodId) {
+            // Quintiles
+            case ComparatorMethodIds.Quintiles:
+                if (polarityId === PolarityIds.NotApplicable) {
+                    // Quintile BOB
+                    $quintileBob.show();
+                } else {
+                    // Quintile RAG
+                    $quintileRag.show();
+                }
+
+                $quintileSection.show();
+                break;
+
+                // RAG3
+            case ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel:
+                $rag3.show();
+                $ragAndBobSection.show();
+                break;
+
+                // RAG5
+            case ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels:
+                $rag5.show();
+                $ragAndBobSection.show();
+                break;
+
+            default:
+                switch (polarityId) {
+                    // BOB
+                    case PolarityIds.BlueOrangeBlue:
+                        $bob.show();
+                        break;
+
+                        // RAG
+                    case PolarityIds.RAGLowIsGood:
+                    case PolarityIds.RAGHighIsGood:
+                        $rag3.show();
+                        break;
+                }
+
+                $ragAndBobSection.show();
+                break;
+        }
+    }
 }
 
 //
@@ -1851,8 +2125,6 @@ function getParentAreaGroups() {
 
                 loaded.parentAreaGroups = areaTypeMap;
 
-                new ParentTypes(FT.model).setDefault();
-
                 ajaxMonitor.callCompleted();
             });
 
@@ -1865,26 +2137,73 @@ function initAreaData2() {
     var model = FT.model;
 
     if (!loaded.areaTypes[model.areaTypeId]) {
-        // Area type id that was restored from cookie is not available for current profile anymore
+        /* Area type id not available for current profile anymore. Possibly:
+         (a) restored from cookie
+         (b) bookmarked by user    
+         */
+
+        // Tell user changing area type
+        tooltipManager.init();
+        var html = '<div style="padding:15px;"><h3>Area type not available</h3>' +
+            'The bookmarked area type is not available for this profile any more.<br>Changing to ' +
+            loaded.areaTypes[defaultAreaType].Short + '.</div>';
+        lightbox.show(html);
+
+        // Change area type and refresh
         FT.model.areaTypeId = defaultAreaType;
         initAreaData();
         return;
     }
 
-    ajaxMonitor.setCalls(2);
+    // Init parent types menu
+    new ParentTypes(FT.model).setDefault();
+
+    if (FT.config.isSharedAreaList && !FT.config.isSharedAreaListLoaded) {
+        ajaxMonitor.setCalls(4);
+    } else {
+        ajaxMonitor.setCalls(2);
+    }
+
     getAreaMappings(model);
     getAllAreas(model.parentTypeId);
+
+    if (FT.config.isSharedAreaList && !FT.config.isSharedAreaListLoaded) {
+        getSharedAreaList();
+        getSharedAreaListMappings();
+        FT.config.isSharedAreaListLoaded = true;
+    }
+
+    ajaxMonitor.monitor(initAreaElements);
+}
+
+function getSharedAreaListMappings() {
+    var parameters = new ParameterBuilder();
+    parameters.add('profile_id', FT.model.profileId);
+    parameters.add('parent_area_type_id', FT.model.parentTypeId);
+    parameters.add('parent_code', FT.config.sharedParentCode);
+
+    // Get parent areas
+    ajaxGet('api/parent_to_child_areas_by_parent_code', parameters.build(), getSharedAreaListMappingsCallback);
+
+    ajaxMonitor.callCompleted();
+}
+
+function getSharedAreaListMappingsCallback(obj) {
+    new AreaMappings(FT.model).append(obj);
     ajaxMonitor.monitor(initAreaElements);
 }
 
 function getAreaMappings(model) {
-
     if (model.areAnyIndicators && !new AreaMappings(model).areDefined()) {
         var parameters = new ParameterBuilder();
         parameters.add('profile_id', model.profileId);
         parameters.add('child_area_type_id', model.areaTypeId);
         parameters.add('parent_area_type_id', model.parentTypeId);
         parameters.add('nearest_neighbour_code', model.nearestNeighbour);
+
+        if (FT.config.isSignedIn) {
+            parameters.add('user_id', FT.config.userId);
+        }
 
         // Get parent areas
         ajaxGet('api/parent_to_child_areas', parameters.build(), getAreaMappingsCallback);
@@ -1896,6 +2215,33 @@ function getAreaMappings(model) {
 function getAreaMappingsCallback(obj) {
 
     new AreaMappings(FT.model).set(obj);
+
+    ajaxMonitor.callCompleted();
+}
+
+function getAreaMappings(model) {
+    if (model.areAnyIndicators && !new AreaMappings(model).areDefined()) {
+        var parameters = new ParameterBuilder();
+        parameters.add('profile_id', model.profileId);
+        parameters.add('child_area_type_id', model.areaTypeId);
+        parameters.add('parent_area_type_id', model.parentTypeId);
+        parameters.add('nearest_neighbour_code', model.nearestNeighbour);
+
+        if (FT.config.isSignedIn) {
+            parameters.add('user_id', FT.config.userId);
+        }
+
+        // Get parent areas
+        ajaxGet('api/parent_to_child_areas', parameters.build(), getAreaMappingsCallback);
+    } else {
+        ajaxMonitor.callCompleted();
+    }
+}
+
+function getAreaMappingsCallback(obj) {
+
+    new AreaMappings(FT.model).set(obj);
+
     ajaxMonitor.callCompleted();
 }
 
@@ -1909,18 +2255,43 @@ function ParentTypeMenu(jquerySelector, model) {
 		};
 
     $menu.change(function () {
+        if (_this.getId() === -99) {
+            if (!FT.config.isSharedAreaList && !FT.config.isSharedAreaListLoaded) {
+                location.href = FT.config.signInUrl;
+            }
+        } else {
+            if (_this.getId() === AreaTypeIds.AreaList && loaded.areaLists[AreaTypeIds.AreaList] === null) {
+                // Display create new area list pop-up
+                // if your area list option is selected but not loaded
+                displayCreateNewAreaListPopup();
+            } else {
+                if (_this.getId() === AreaTypeIds.AreaList &&
+                        (_.find(loaded.areaLists[AreaTypeIds.AreaList], function(data) { return data.AreaTypeId === model.areaTypeId }) === undefined)) {
+                    // Display create new area list pop-up
+                    // if your area list option is selected but the data for
+                    // area type selected is not loaded
+                    displayCreateNewAreaListPopup();
+                    return false;
+                }
+            }
+        }
+
         // Lock test required so change is only fired by the user selecting a different option
         if (!FT.ajaxLock) {
             lock();
-            model.parentTypeId = _this.getId();
-            model.parentCode = null;
+
+            if (FT.config.isSharedAreaList && FT.config.isSharedAreaListLoaded && _this.getId() === -99) {
+                model.parentTypeId = AreaTypeIds.AreaList;
+                model.parentCode = FT.config.sharedParentCode;
+            } else {
+                model.parentTypeId = _this.getId();
+                model.parentCode = null;
+            }
             ftHistory.setHistory();
             initAreaData2();
-
             logEvent('ParentAreaTypeSelected', _this.getName());
         }
-    }
-	);
+    });
 
     _this.setOptions = function () {
 
@@ -1928,22 +2299,94 @@ function ParentTypeMenu(jquerySelector, model) {
         if ($menu.length) {
 
             var parentTypes = new ParentTypes(model).getTypes(),
-				options = $menu[0].options;
+                options = $menu[0].options;
+
+            // When it has not parent type and is England set parent to country
+            if (isCountryWithoutParentType(parentTypes, model.areaTypeId))
+            {
+                parentTypes[0] = {
+                    CanBeDisplayedOnMap: false,
+                    Id: AreaTypeIds.Uk,
+                    IsSearchable: false,
+                    Name: "United Kingdom",
+                    Short: "UK"
+                };
+            }
 
             options.length = 0;
 
             var parentTypeId = model.parentTypeId,
 				optionIndex = 0;
 
+            // If area list configuration is enabled add a disabled border option to the array
+            // and if the user signed in then add an option 'your area lists', else if the user
+            // is not signed in then add an option 'sign in to use area list'
+
+            
+            if (!isEnglandAreaType() &&
+                 isFeatureEnabled('yourAreaListsEnabled') &&
+                (
+                (FT.config.isSignedIn && !_.some(parentTypes, function (x) { return x.Id === AreaTypeIds.AreaList; })) ||
+                (!FT.config.isSignedIn && !_.some(parentTypes, function (x) { return x.Id === -99; }))
+                )) {
+                var parentType;
+
+                parentType = {
+                    CanBeDisplayedOnMap: false,
+                    Id: -98,
+                    IsSearchable: false,
+                    Name: '',
+                    Short: ''
+                };
+
+                parentTypes[parentTypes.length] = parentType;
+
+                if (FT.config.isSignedIn) {
+                    parentType = {
+                        CanBeDisplayedOnMap: false,
+                        Id: AreaTypeIds.AreaList,
+                        IsSearchable: false,
+                        Name: 'Your area list',
+                        Short: 'Your area list'
+                    };
+                } else if (!FT.config.isSignedIn && FT.model.parentTypeId === AreaTypeIds.AreaList) {
+                    parentType = {
+                        CanBeDisplayedOnMap: false,
+                        Id: -99,
+                        IsSearchable: false,
+                        Name: 'Your area list',
+                        Short: 'Your area list'
+                    };
+                } else {
+                    parentType = {
+                        CanBeDisplayedOnMap: false,
+                        Id: -99,
+                        IsSearchable: false,
+                        Name: 'Sign in to use area lists',
+                        Short: 'Sign in to use area lists'
+                    };
+                }
+
+                parentTypes[parentTypes.length] = parentType;
+            }
+
             for (var i in parentTypes) {
                 var areaType = parentTypes[i],
 					id = areaType.Id,
 					option = new Option(areaType.Short, id);
+
                 options[optionIndex++] = option;
 
                 // Select option
-                if (parentTypeId && id === parentTypeId) {
+                if (parentTypeId && id === parentTypeId || (!FT.config.isSignedIn && parentTypeId === AreaTypeIds.AreaList)) {
                     $(option).prop(selected, selected);
+                }
+
+                // Border option styling to display above 'your area lists'
+                // or 'sign in to use area list' options
+                if (id === -98) {
+                    $(option).prop('style', 'font-size: 1px; background-color: #bbb;');
+                    $(option).prop('disabled', 'disabled');
                 }
             }
         }
@@ -1968,7 +2411,7 @@ function ParentTypeMenu(jquerySelector, model) {
 
     _this.setVisibility = function () {
         // If visible then only display if multiple options
-        $box.filter(':visible').toggle(_this.count() > 1);
+        $box.filter(':visible').toggle(_this.count() > 1 && !isEnglandAreaType());
     };
 }
 
@@ -1980,6 +2423,18 @@ function AreaMappings(model) {
     this.set = function (mappings) {
         loadedMappings[key] = mappings;
     };
+
+    this.append = function (mappings) {
+        if (loadedMappings[key] === undefined) {
+            loadedMappings[key] = mappings;
+        } else {
+            for (var i in mappings) {
+                if (loadedMappings[key][i] !== mappings[i]) {
+                    loadedMappings[key][i] = mappings[i];
+                }
+            }
+        }
+    }
 
     this.areDefined = function () {
         return !!loadedMappings[key];
@@ -2004,6 +2459,24 @@ function AreaMappings(model) {
         }
 
         return model.parentCode;
+    };
+}
+
+function GroupingSubheadings(model) {
+    var key = getKey(model.groupId, model.areaTypeId),
+        loadedGroupingSubheadings = loaded.groupingSubheadings;
+
+    this.set = function(groupingSubheadings) {
+        loadedGroupingSubheadings[key] = groupingSubheadings;
+    }
+}
+
+function AreaListsForLoggedInUser(model) {
+    var key = getKey(model.parentTypeId, model.areaTypeId, model.nearestNeighbour),
+        loadedAreaLists = loaded.areaLists;
+
+    this.set = function(areaLists) {
+        loadedAreaLists[key] = areaLists;
     };
 }
 
@@ -2035,17 +2508,23 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
     _this.setOptions = function () {
 
         var parentTypeId = model.parentTypeId;
+        var areaTypeId = model.areaTypeId;
 
         // Change parentAreaCode to keep same child area
         var parentAreaCode = new AreaMappings(model).getParentAreaCode(model.areaCode);
         if (parentAreaCode) {
             model.parentCode = parentAreaCode;
+            ftHistory.setHistory();
         }
 
         // Populate parent menu
-        var parents = loadedAreas[parentTypeId],
-			j = 0,
+        var j = 0,
 			options = $menu[0].options;
+
+        var parents = loadedAreas[parentTypeId];
+        if (parentTypeId === AreaTypeIds.AreaList) {
+            parents = _.filter(parents, function (x) {return x.AreaTypeId === areaTypeId});
+        }
 
         options.length = 0;
 
@@ -2062,7 +2541,9 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
 
         // Set default parent if not specified in hash
         if (!new AreaCollection(parents).containsAreaCode(model.parentCode)) {
-            model.parentCode = parents[0].Code;
+            if (parents.length > 0) {
+                model.parentCode = parents[0].Code;
+            }
         }
 
         $menu.val(model.parentCode);
@@ -2074,7 +2555,7 @@ function ParentMenu(jquerySelector, model, loadedAreas) {
     };
 
     _this.setVisibility = function () {
-        var hide = _this.count() === 1 && model.parentTypeId === AreaTypeIds.Country;
+        var hide = _this.count() === 1 && isEnglandAreaType();
         $box.filter(':visible').toggle(!hide);
     }
 
@@ -2089,7 +2570,18 @@ function ParentTypes(model) {
 
     this.setDefault = function () {
         if (!model.parentTypeId) {
-            model.parentTypeId = types[0].Id;
+            if (!types) {
+                throw Error('No parents for area type ' + model.areaTypeId +'. Check WS_ProfileParentAreaOptions');
+            }
+
+            // Setting parentTypeId to country number as country cannot be set in db as itself
+            if (isCountryWithoutParentType(types, model.areaTypeId))
+            {
+                model.parentTypeId = AreaTypeIds.Uk;
+            }else
+            {
+                model.parentTypeId = types[0].Id;
+            }
         }
     };
 
@@ -2172,6 +2664,14 @@ function AreaMenu(jquerySelector, model) {
 			this.getCode()
 		);
     };
+
+    _this.hide = function (){
+        $("#areaMenuBox").parent().hide();
+    };
+
+    _this.show = function(){
+        $("#areaMenuBox").parent().show();
+    };
 }
 
 function BenchmarkMenu(jquerySelector, model) {
@@ -2190,7 +2690,7 @@ function BenchmarkMenu(jquerySelector, model) {
     }
 
     this.setSubnationalOptionVisibility = function () {
-        if (model.parentTypeId === AreaTypeIds.Country ||
+        if (isEnglandAreaType() ||
 			model.isNearestNeighbours() ||
 			enumParentDisplay === PARENT_DISPLAY.NATIONAL_ONLY) {
             $subnationalOption.hide();
@@ -2198,6 +2698,14 @@ function BenchmarkMenu(jquerySelector, model) {
         else {
             $subnationalOption.show();
         }
+    };
+
+    this.hide = function (){
+        $("#benchmark-box").parent().hide();
+    };
+
+    this.show = function(){
+        $("#benchmark-box").parent().show();
     };
 }
 
@@ -2245,8 +2753,17 @@ function AreaTypeMenu(model, areaTypes) {
             groupRootBeforeAreaTypeChange = getGroupRoot();
 
             var areaTypeId = parseInt(selectedOption().val());
-            setAreaType(areaTypeId);
             displayAreaSearchOptions(areaTypeId);
+
+            if (model.parentTypeId === AreaTypeIds.AreaList &&
+                    (_.find(loaded.areaLists[AreaTypeIds.AreaList],
+                        function (data) { return data.AreaTypeId === areaTypeId }) === undefined)) {
+                // Parent type is your area list but no data for the associated area type
+                // select the first option of the parent area type drop down
+                $('#parentAreaTypesMenu option:first').attr('selected', 'selected');
+            }
+
+            setAreaType(areaTypeId);
 
             logEvent('AreaTypeSelected', _this.getName());
         }
@@ -2372,12 +2889,8 @@ function getCurrentDomainName() {
         return $.trim($('#domain' + groupId).text());
 }
 
-function populateIndicatorMenus() {
-    populateIndicatorMenu();
-}
-
 function indicatorNameClicked(id) {
-    goToIndicatorDetailsPage(id);
+    goToBarChartPage(id);
 }
 
 var VIEW_MODES = {
@@ -2465,7 +2978,12 @@ var ui = (function () {
         },
 
         getMetadataHash: function () {
-            return loaded.indicatorMetadata[FT.model.groupId];
+        return loaded.indicatorMetadata[FT.model.groupId];
+        },
+
+        getGroupingSubheadings: function () {
+            var key = getKey(FT.model.groupId, FT.model.areaTypeId);
+            return loaded.groupingSubheadings[key];
         }
     };
 })();
@@ -2517,31 +3035,37 @@ function advanceAreaMenuClicked(step) {
 function searchOptionClicked() {
 
     if (!FT.ajaxLock) {
+        var html =
+            '<div style="padding:15px;">' +
+                '<h3>Search for an area</h3>' +
+                '<div style="margin-top: 20px; margin-bottom: 40px;">' +
+                    '<h6>Search by postcode, town or local authority</h6>' +
+                    '<input id="area-search-text" class="search-watermark" title="Find a place or postcode" />' +
+                    '<ul id="no-matches-found" class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" tabindex="0" style="display: none;">' +
+                        '<li class="ui-menu-item" role="presentation">' +
+                            '<span id="ui-id-2" class="ui-corner-all" tabindex="-1"><i>No matches found</i></span>' +
+                        '</li>' +
+                    '</ul>' +
+                '</div>' +
+                '<div >' +
+                    '<button class="btn btn-tertiary" onclick="javascript:lightbox.hide();">Cancel</button>' +
+                '</div>' +
+            '</div>' +
+            '<script>initAreaSearchAutoComplete();</script>';
 
-        // Elements
-        var $searchOption = $('#area-search-link');
-        var $searchText = $('#area-search-text');
-        var $areaMenu = $('#areaMenu');
-        var $areaNextOrBack = $('.area-next-back');
-
-        // Text labels
-        var searchLabel = 'Search for an area';
-        var returnToMenuLabel = 'Return to area menu';
-        var currentText = $searchOption.text();
-
-        if (currentText === searchLabel) {
-            $searchOption.text(returnToMenuLabel);
-            $areaNextOrBack.hide();
-            $areaMenu.hide();
-            $searchText.show().focus();
-
-        } else if (currentText === returnToMenuLabel) {
-            $searchOption.text(searchLabel);
-            $areaNextOrBack.show();
-            $areaMenu.show();
-            $searchText.hide().val('');
-        }
+        var popupWidth = 500;
+        var left = lightbox.getLeftForCenteredPopup(popupWidth);
+        var top = 200;
+        lightbox.show(html, top, left, popupWidth);
     }
+}
+
+function initAreaSearchAutoComplete() {
+    var id = '#area-search-text';
+    initAreaSearch(id, false);
+
+    // Ensure user can start typing straight away
+    setTimeout(function() { $(id).focus() },0);
 }
 
 function displayAreaSearchOptions(areaTypeId) {
@@ -2549,7 +3073,7 @@ function displayAreaSearchOptions(areaTypeId) {
     var $searchOption = $('#area-search-link');
     var $span = $('#area-search-link-box span');
 
-    if (areaTypeId === AreaTypeIds.Practice) {
+    if (areaTypeId === AreaTypeIds.Practice || FT.model.parentTypeId === AreaTypeIds.AreaList) {
         // Hide all - search is on map tab
         $searchOption.hide();
         $span.hide();
@@ -2562,6 +3086,48 @@ function displayAreaSearchOptions(areaTypeId) {
         $searchOption.hide();
         $span.show();
     }
+}
+
+function displayCreateNewAreaListPopup() {
+    var popupWidth = 450,
+        left = lightbox.getLeftForCenteredPopup(popupWidth),
+        top = $('body').scrollTop() + 200,
+        html = '<h2><b>Create area list</b></h2>' +
+            '<div style="margin-left: 9px">' +
+            'You have not created any area list for <b>' +
+            $('#areaTypes option:selected').text() +
+            '</b> area type.' +
+            '<br><br>' +
+            'Would you like to create one now?' +
+            '<br><br>' +
+            '<button id="create-new-area-list" class="btn btn-primary active" onclick="redirectToCreateNewAreaList();">Create new area list</button>' +
+            '<button id="cancel" class="btn btn-link active" onclick="cancelCreateNewAreaListPopup();">Cancel</button>' +
+            '</div>';
+
+    lightbox.show(html, top, left, popupWidth);
+}
+
+function redirectToCreateNewAreaList() {
+    var areaTypeId = $('#areaTypes option:selected').val(),
+        parentUrl = location.href;
+
+    location.href = FT.config.createNewAreaListUrl + '?area-type-id=' + areaTypeId + '&parent-url=' + parentUrl;
+}
+
+function redirectToSignIn() {
+    location.href = FT.config.signInUrl;
+}
+
+function cancelCreateNewAreaListPopup() {
+    $('#parentAreaTypesMenu').val(FT.model.parentTypeId);
+    lightbox.hide();
+}
+
+function redirectToEditAreaList() {
+    var publicId = $('#regionMenu option:selected').val(),
+        parentUrl = location.href;
+
+    location.href = FT.config.editAreaListUrl + '?list_id=' + publicId + '&parent-url=' + parentUrl;
 }
 
 function incArrayIndex(array, index, step) {
@@ -2587,7 +3153,10 @@ function setAreaType(areaTypeId) {
         lock();
 
         FT.menus.areaType.setTypeId(areaTypeId);
-        new ParentTypes(model).matchTypeNameOrChange(FT.menus.parentType.getName());
+
+        if (areaTypeId !== AreaTypeIds.Country) {
+            new ParentTypes(model).matchTypeNameOrChange(FT.menus.parentType.getName());
+        }
 
         ftHistory.setHistory();
         // Get all areas for new area type ID
@@ -2596,6 +3165,8 @@ function setAreaType(areaTypeId) {
         getAllAreas(areaTypeId);
 
         ajaxMonitor.monitor(initAreaData2);
+
+        unlock();
     }
 }
 
@@ -2624,7 +3195,7 @@ function getSignificanceFunction(polarityId) {
         return function () { return noComparison; };
     }
 
-    var ragColors = [c.worse, c.better];
+    var ragColors = [c.worse, c.better, c.worst, c.best];
 
     if (polarityId === 0) {
         // High is good
@@ -2639,6 +3210,10 @@ function getSignificanceFunction(polarityId) {
                 return same;
             case 3:
                 return ragColors[0];
+            case 4:
+                return ragColors[2];
+            case 5:
+                return ragColors[3];
         }
         return noComparison;
     };
@@ -2660,7 +3235,7 @@ function SearchTextValidator(textEnteredByUser) {
         this.text = textEnteredByUser.replace(
 			/*valid word separators*//[-]/g, ' ').replace(
 			/*valid word combiners*//[+&]/g, ' and ').replace(
-			/*nonalphanumerics*//[^A-Za-z0-9 ]/g, '');
+			/*nonalphanumerics*//[^A-Za-z0-9 ]/g, '').trim();
     }
 }
 
@@ -2775,47 +3350,60 @@ function nearestNeighboursSelected() {
 }
 
 function showAndHideNearestNeighboursMenu() {
+    var $neighbourHeader = $('#nearest-neighbour-header'),
+        $neighbourLinks = $('#nearest-neighbour-links'),
+        $neighbourSelect = $('#nearest-neighbour-wrapper'),
+        $areaListWrapper = $('#area-list-wrapper');
 
-    var $neighbourHeader = $('#nearest-neighbour-header');
-    var $neighbourLinks = $('#nearest-neighbour-links');
-    var $neighbourSelect = $('#nearest-neighbour-wrapper');
-
-    if (FT.model.isNearestNeighbours()) {
-        // Nearest neighbours displayed
-
-        var config = getNearestNeighboursConfig();
-
-        // Display neighbours explanation
-        var headerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
-            areaHash[FT.model.areaCode].Name + ' ' + nnSelectedText + '</h2></span>';
-        $neighbourHeader.html(headerHtml).show();
-
-        // Back text
-        var viewModel = {};
-        viewModel.text = config.altText
-            ? config.altText
-            : 'nearest neighbours';
-
-        // More information link
-        viewModel.isLink = config.ExtraLink.length > 0;
-        if (viewModel.isLink) {
-            viewModel.link = config.ExtraLink;
-        }
-
-        // Render links
-        var templateName = 'neighbours';
-        templates.add(templateName, '<a id="exit-nearest-neighbours" onclick="exitNearestNeighboursSelected()" class="a-link">Exit {{text}}</a>' +
-            '{{#isLink}}<a href="{{{link}}}" class="a-link" target="_blank">More information</a>{{/isLink}}');
-        var linksHtml = templates.render(templateName, viewModel);
-
-        $neighbourLinks.html(linksHtml).show();
-        $neighbourSelect.hide();
-    } else {
-        // Nearest neighbours not displayed
-        $neighbourHeader.hide();
+    if (FT.model.parentTypeId === AreaTypeIds.AreaList) {
         $neighbourLinks.hide();
-        $neighbourSelect.show();
-        $neighbourSelect.css("visibility", "visible");
+        $neighbourSelect.hide();
+        $neighbourHeader.hide();
+    } else {
+        if (FT.model.isNearestNeighbours()) {
+            // Nearest neighbours displayed
+
+            var config = getNearestNeighboursConfig();
+
+            // Display neighbours explanation
+            var headerHtml = '<span class="nearest-neighbour-selected-area"><h2>' +
+                areaHash[FT.model.areaCode].Name +
+                ' ' +
+                nnSelectedText +
+                '</h2></span>';
+            $neighbourHeader.html(headerHtml).show();
+
+            // Back text
+            var viewModel = {};
+            viewModel.text = config.altText
+                ? config.altText
+                : 'nearest neighbours';
+
+            // More information link
+            viewModel.isLink = config.ExtraLink.length > 0;
+            if (viewModel.isLink) {
+                viewModel.link = config.ExtraLink;
+            }
+
+            // Render links
+            var templateName = 'neighbours';
+            templates.add(templateName,
+                '<a id="exit-nearest-neighbours" onclick="exitNearestNeighboursSelected()" class="a-link">Exit {{text}}</a>' +
+                '{{#isLink}}<a href="{{{link}}}" class="a-link" target="_blank">More information</a>{{/isLink}}');
+            var linksHtml = templates.render(templateName, viewModel);
+
+            $neighbourLinks.html(linksHtml).show();
+            $neighbourSelect.hide();
+        } else {
+            // Nearest neighbours not displayed
+            $neighbourHeader.hide();
+            $neighbourLinks.hide();
+
+            $neighbourSelect.show();
+            $neighbourSelect.css("visibility", "visible");
+
+            $areaListWrapper.hide();
+        }
     }
 }
 
@@ -2839,10 +3427,11 @@ function exitNearestNeighboursSelected() {
 
 function toggleNearestNeighboursControls(state) {
     var $areaMenuBox = $('#areaMenuBox'),
-		$regionMenuBox = $('#region-menu-box'),
-		$areaTypeBox = $('#areaTypeBox'),
-		$parentTypeBox = $('#parentTypeBox'),
-		$nearestNeighboursLink = $('#nearest-neighbour-link');
+        $regionMenuBox = $('#region-menu-box'),
+        $areaTypeBox = $('#areaTypeBox'),
+        $parentTypeBox = $('#parentTypeBox'),
+        $nearestNeighboursLink = $('#nearest-neighbour-link'),
+        $areaListWrapper = $('#area-list-wrapper');
 
     if (state) {
         pages.displayElements();
@@ -2853,6 +3442,7 @@ function toggleNearestNeighboursControls(state) {
         $areaTypeBox.hide();
         $parentTypeBox.hide();
         $nearestNeighboursLink.hide();
+        $areaListWrapper.hide();
     }
 }
 
@@ -2928,7 +3518,11 @@ function displayNoData() {
     $('#' + pages.getCurrentPage().id + '-container').hide();
 
     // Show no data message
-    $('#no-domain-data').show();
+    if (isEnglandAreaType()){
+        $('#main-info-message').html('Not applicable for England data').show();
+    }else{
+        $('#main-info-message').html('No indicators for current area type').show();
+    }
 
     // No indicators to display so hide menu
     $('#indicator-menu-div,#tab-specific-options').hide();
@@ -3034,7 +3628,7 @@ var barChart = {
         imgUrl = FT.url.img;
 
         var img = getSignificanceImg(data.Sig[comparisonConfig.comparatorId],
-            comparisonConfig.useRagColours, comparisonConfig.useQuintileColouring);
+            comparisonConfig.useRagColours, comparisonConfig.useQuintileColouring, data.IndicatorId, data.SexId, data.AgeId);
         if (!img) { img = 'lightGrey.png'; }
 
         var width = parseInt(barScale.pixelsPerUnit * data.Val, 10);
@@ -3142,10 +3736,6 @@ function addOrderandPercentilesToData(coreDataList) {
     return hash;
 }
 
-function getIndicatorName(indicatorId) {
-    return ui.getMetadataHash()[indicatorId].Descriptive.Name;
-}
-
 var nnLinkText = '';
 var nnSelectedText = '';
 
@@ -3171,13 +3761,12 @@ var groupRoots = null;
 var comparatorId = null;
 var areaHash = null;
 var preferredGroupRoots = {};
-var correctForPolarity = true;
 var chart;
 
 $(document).ready(documentReady);
 
 function showHideAreaAddress() {
-    var id = "#gp-address-placeholder";
+    var id = '#gp-address-placeholder';
     var $addressBox = $(id);
 
     if (FT.model.areaTypeId === AreaTypeIds.Practice
@@ -3188,7 +3777,7 @@ function showHideAreaAddress() {
         ajaxGet('api/area_address',
             parameters.build(),
             function (result) {
-                $address.html(result.Name + ", " + getAddressText(result));
+                $address.html(result.Name + ', ' + getAddressText(result));
             },
             handleAjaxFailure);
         $addressBox.show();
@@ -3196,3 +3785,214 @@ function showHideAreaAddress() {
         $addressBox.hide();
     }
 }
+
+// Function to determine whether an area list is shared
+function isAreaListShared() {
+    FT.config.isSharedAreaList = false;
+    FT.config.isSharedAreaListLoaded = false;
+
+    if (FT.model.parentCode !== null && FT.model.parentCode !== undefined) {
+        // Proceed only if it is an area list
+        if (FT.model.parentTypeId === AreaTypeIds.AreaList &&
+            FT.model.parentCode.indexOf('al-') > -1) {
+
+            // Store the shared parent code
+            FT.config.sharedParentCode = FT.model.parentCode;
+
+            // User not signed in and trying to view an area list
+            // then it is a shared area list, return true
+            if (!FT.config.isSignedIn) {
+                FT.config.isSharedAreaList = true;
+            } else {
+                // User signed in and trying to view an area list
+                // Determine whether area list belongs to the user
+                var parameters = new ParameterBuilder().add('user_id', FT.config.userId);
+                ajaxGet('api/arealists',
+                    parameters.build(),
+                    function(areaLists) {
+                        if (isDefined(areaLists)) {
+                            var areaList = _.filter(areaLists, function(x) { return x.Code === FT.model.parentCode });
+                            if (areaList.length === 0) {
+                                FT.config.isSharedAreaList = true;
+                            }
+                        } else {
+                            FT.config.isSharedAreaList = true;
+                        }
+                    });
+            }
+        }
+    }
+
+    ajaxMonitor.callCompleted();
+}
+
+function showFilterIndicatorsLightBox() {
+    var indicatorDataFilterOptions = [
+        { key: "Any time", value: "0", select: false },
+        { key: "1 month", value: "1", select: false },
+        { key: "2 months", value: "2", select: false },
+        { key: "3 months", value: "3", select: false },
+        { key: "6 months", value: "6", select: false },
+        { key: "12 months", value: "12", select: false }
+    ];
+
+    if (FT.model.filterIndicatorPeriod != undefined) {
+        _.find(indicatorDataFilterOptions, function(x) { return Number(x.value) === FT.model.filterIndicatorPeriod }).select = true;
+    } else {
+        _.find(indicatorDataFilterOptions, function (x) { return Number(x.value) === 0 }).select = true;
+    }
+
+    var popupWidth = 750,
+        left = lightbox.getLeftForCenteredPopup(popupWidth),
+        top = $('body').scrollTop() + 200;
+
+    templates.add('filterIndicators',
+            '<h2><b>Filter indicators</b></h2>' +
+            '<div style="margin: 0px 0px 12px 10px; font-size: 16px; font-weight: bold;">' +
+            'Only show indicators where new data has been added within' +
+            '</div>' +
+            '{{#indicatorDataFilterOptions}}' +
+                '<div style="margin: 10px 0px 0px 9px;" class="custom-control custom-radio">' +
+                    '<input type="radio" name="rdoIndicatorsFilter" id="rdoIndicatorsFilter{{value}}" value="{{value}}"{{#select}} checked{{/select}} class="custom-control-input">' +
+                    '<label for="rdoIndicatorsFilter{{value}}" class="custom-control-label" style="margin-top: 2px;">{{{key}}}</label>' +
+                '</div>' +
+            '{{/indicatorDataFilterOptions}}' +
+            '<br><br>' +
+            '<button id="create-new-area-list" class="btn btn-primary active" onclick="applyIndicatorsFilter();">OK</button>' +
+            '<button id="cancel" class="btn btn-link active" onclick="closeIndicatorsFilterPopup();">Cancel</button>');
+
+    var html = templates.render('filterIndicators', { 'indicatorDataFilterOptions': indicatorDataFilterOptions });
+
+    lightbox.show(html, top, left, popupWidth);
+}
+
+function applyIndicatorsFilter() {
+    // Get the value of the selected radio button
+    var filterPeriod = Number($('input[name=rdoIndicatorsFilter]:checked').val());
+
+    // Save the selected filter period to FT model
+    FT.model.filterIndicatorPeriod = filterPeriod;
+
+    // Refresh the page
+    refreshCurrentPage();
+
+    // Hide the popup
+    closeIndicatorsFilterPopup();
+}
+
+function applyPeriodFilter(filterPeriod) {
+    if (filterPeriod > 0) {
+        // Load the group roots
+        groupRoots = FT.model.groupRoots;
+
+        // Filter the group roots
+        if (filterPeriod > 0) {
+            var date = getFilteredDate(filterPeriod),
+                filteredGroupRoots = [];
+
+            for (var i in groupRoots) {
+                if (groupRoots.hasOwnProperty(i)) {
+                    var root = groupRoots[i];
+                    var dateOfLastChange = new Date(root.DateChanges.DateOfLastChange);
+                    if (date < formatDate(dateOfLastChange)) {
+                        filteredGroupRoots.push(root);
+                    }
+                }
+            }
+
+            groupRoots = filteredGroupRoots;
+        }
+    }
+}
+
+function closeIndicatorsFilterPopup() {
+    // Hide the popup
+    lightbox.hide();
+}
+
+function getFilteredDate(filterPeriod) {
+
+    // Get days
+    var months = Number(filterPeriod);
+    var days;
+    switch (months) {
+        case 12:
+            days = 365;
+            break;
+        default:
+            days = months * 30;
+            
+    }
+
+    // Return formatted date
+    var date = new Date();
+    date.setDate(date.getDate() - days);
+    return formatDate(date);
+}
+
+function formatDate(date) {
+    var year = date.getFullYear(),
+        month = Number(date.getMonth()) + 1,
+        day = date.getDate();
+
+    if (month < 10) {
+        month = '0' + month.toString();
+    }
+
+    if (day < 10) {
+        day = '0' + day.toString();
+    }
+
+    return year.toString() + month + day;
+}
+
+function isCountryWithoutParentType(types, areaTypeId){
+   return types[0] == null && areaTypeId === AreaTypeIds.Country;
+}
+function setBenchmarkMenuVisibility() {
+    // Check whether we are selecting England as a AreaType or page
+    if (isEngland()) {
+        FT.menus.benchmark.hide();
+    }else{
+        FT.menus.benchmark.show();
+    }
+}
+
+function setAreaDropDownBoxMenuVisibility() {
+    // Check whether we are selecting England as a AreaType or page
+    if (isEngland()) {
+        FT.menus.area.hide();
+    }else{
+        FT.menus.area.show();
+    }
+}
+
+// This function set the correct position in case that areaType is England 
+function setfilterIndicatorsPositionIntoMenu() {
+    
+    // For population there is not filters
+    if (pages.getDefault() !== PAGE_MODES.POPULATION){
+        if (isEngland()) {
+            $('#filter-indicator-wrapper').addClass('filter-indicator-wrapper-england').removeClass('filter-indicator-wrapper');
+        }else{
+            $('#filter-indicator-wrapper').addClass('filter-indicator-wrapper').removeClass('filter-indicator-wrapper-england');
+        }
+    }    
+}
+
+// Check is area type is England or any other in England page
+function isEngland()
+{
+    return isEnglandAreaType() || 
+            pages.getDefault() === PAGE_MODES.ENGLAND || 
+            pages.getDefault() === PAGE_MODES.METADATA;
+}
+
+// Visibility for scrollable-pane should be off when England area type
+function setScrollablePanelTartanRugVisibility() {
+    if (isEnglandAreaType()) {
+        $('#scrollable-pane').hide();
+    }else{
+        $('#scrollable-pane').show();
+    }
+} 

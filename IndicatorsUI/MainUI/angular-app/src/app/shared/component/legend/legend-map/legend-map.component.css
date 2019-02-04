@@ -1,0 +1,29 @@
+.compared-with-text {
+    float: left;
+    font-size: 11px;
+    margin-right: 5px;
+}
+
+.map-legend-box {
+    float: left;
+    font-size: 11px;
+}
+
+.tartan-legend-box {
+    float: left;
+    margin-left: 2px;
+    padding: 2px 0px 2px 0px;
+    width: 70px;
+    text-align: center;
+}
+
+.not-compared {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 80px;
+    height: 19px;
+}
+
+.left-margin {
+    margin-left: 18px;
+}

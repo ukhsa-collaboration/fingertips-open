@@ -54,6 +54,11 @@ namespace Fpm.MainUISeleniumTest
             GoToUrl("lookup-tables/categories");
         }
 
+        public void UploadFilePage()
+        {
+            GoToUrl("upload");
+        }
+
         public void GoToUrl(string relativeUrl)
         {
             driver.Navigate().GoToUrl(BaseUrl + relativeUrl);

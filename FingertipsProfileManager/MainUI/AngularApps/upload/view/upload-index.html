@@ -14,13 +14,44 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-8">
+                    <div class="col-md-10">
                         <form id="batchUploadForm" class="form-inline" method="POST" action="/UploadBatchUpload" enctype="multipart/form-data">
-                            <label class="btn btn-primary btn-file">
-                                Browse for file<input type="file" style="display: none;" id="batch-excel-file" name="excelFile"
-                                              size="47" custom-on-change="batchFileSelected"/>
-                            </label>
-                            <input type="submit" value="Upload" class="btn btn-success" ng-show="fileReadyForUpload"/>
+                            <div class="row">
+                                <div class="col-md-8" ng-hide="fileReadyForUpload">
+                                    <label id="BrowseForFileButton" class="btn btn-primary btn-file">
+                                        Browse for file<input type="file" style="display: none;" id="batch-excel-file" name="excelFile"
+                                                            size="47" custom-on-change="batchFileSelected"/>
+                                    </label>
+                                </div>
+                                <div ng-show="fileReadyForUpload">
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-8 vertical-align">
+                                            <div class="col-md-8">
+                                                <label for="uploadingFileName">File name</label>
+                                            </div>
+                                            <input class="form-control" id="uploadingFileName" type="text" name="fileNamebox" style="width: 100%;" disabled>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="row">
+                                        <div class="col-md-8 vertical-align">
+                                            <div class="col-md-8">
+                                                <label for="uploadSelectPickerOptions">Action if rows in uploaded file would replace existing rows in PHOLIO</label>
+                                            </div>
+                                            <select name="selectedOption" class="selectpicker" id="uploadSelectPickerOptions" style="width: 100%;">
+                                                <option value="true">Ask for confirmation</option>
+                                                <option value="false">Automatically replace existing PHOLIO data</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <div class="col-md-8">
+                                        <input type="submit" value="Upload" class="btn btn-success"/>
+                                        <input type="reset" value="Cancel" class="btn btn-danger" ng-click="hideBatchUploadFormElements()"/>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
                 </div>

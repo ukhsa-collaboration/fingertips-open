@@ -19,13 +19,18 @@ function setInputSelected($menu) {
 
 function showHideComparatorConfidence() {
 
+
+    var comparatorMethodId = parseInt($('#ComparatorMethodId').val());
+
+    // Display comparator confidence
     var $comparatorConfidenceDiv = $('#comparatorConfidenceDiv'),
         $comparatorConfidence = $('#ComparatorConfidence');
 
-    var comparatorMethodId = parseInt($('#ComparatorMethodId').val());
     var methodsThatDontNeedConfidenceLevel = [
         ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
-        ComparatorMethodIds.Quartiles, ComparatorMethodIds.Quintiles];
+        ComparatorMethodIds.Quartiles, ComparatorMethodIds.Quintiles,
+        ComparatorMethodIds.SingleOverlappingCIsForTwoCILevels];
+
     if (_.contains(methodsThatDontNeedConfidenceLevel , comparatorMethodId)) {
         // User does not need to select comparator confidence
         setInputSelected($comparatorConfidence);
@@ -37,6 +42,24 @@ function showHideComparatorConfidence() {
             setInputNotSelected($comparatorConfidence);
         }
     }
+
+    // Display polarity
+    var $polarity = $('#polarity-container');
+
+    var methodsThatDontNeedPolarity = [
+        ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
+        ComparatorMethodIds.Quartiles];
+
+    if (_.contains(methodsThatDontNeedPolarity, comparatorMethodId)) {
+        // User does not need to select polarity
+        $polarity.hide();
+
+        // Select "Not applicable"
+        $('#PolarityId option[value="-1"]').prop('selected', true);
+    } else {
+        $polarity.show();
+    }
+
 };
 
 function checkMandatoryFields() {
@@ -77,7 +100,7 @@ $(document).ready(function () {
                 $('form#IndicatorEditForm').submit();
                 configurePermissions();
             } else {
-                showSimpleMessagePopUp('Please complete all the required fields');
+                showSimpleMessagePopUp('Please complete all the required text fields');
             }
         }
     });
@@ -404,7 +427,9 @@ $(document).ready(function () {
         onSelect:function(dateText,inst) {}
     }).val();
 
-
+    if ($('#ComparatorMethodId').val() === ComparatorMethodIds.Quintiles.toString()) {
+        $('#PolarityId').children('option[value="99"]').hide();
+    }
 });
 
 function isPleaseSelectSelected($menu) {
@@ -419,17 +444,23 @@ function toggleShowEmpty() {
 
 function setUpEmptyFields() {
 
+    var textAreas = $('.mtvArea');
+
     if (areEmptyShown) {
         showEmpty.html('Hide empty fields');
-        $('.mtvArea').parent().parent().show();
+
+        // Show all rows
+        textAreas.parent().parent().show();
     } else {
         showEmpty.html('Show empty fields');
-        var textAreas = $('.mtvArea');
+
         for (var i in textAreas) {
-            var jq = $(textAreas[i]);
-            var val = jq.attr('value');
-            if (val === '') {
-                jq.parent().parent().hide();
+            var $textArea = $(textAreas[i]);
+            var val = $textArea.attr('value');
+            if (val === '' &&
+                $textArea.parent().parent().length === 1/*so that all rows are not hidden*/) {
+                // Hide the row
+                $textArea.parent().parent().hide();
             }
         }
     }
@@ -486,6 +517,7 @@ function dropdownChanged(e) {
     var profileName = $('.profile-title').text();
     var domainName = $('#domainName').val();
     var indicatorName = $('#indicatorName').val();
+    var $polarity = $('#PolarityId');
 
     if (dropdownValue !== startDropdownValue) {
         // Changed
@@ -496,6 +528,21 @@ function dropdownChanged(e) {
         // Text unaltered
         $menu.removeClass(CHANGED);
         delete otherChanges[key];
+    }
+
+    if ($('#ComparatorMethodId').val() === ComparatorMethodIds.Quintiles.toString()) {
+        if ($polarity.val() === PolarityIds.UseBlues.toString()) {
+            $polarity.val(PolarityIds.NotApplicable);
+        }
+        $polarity.children('option[value="99"]').hide();
+        $polarity.children('option[value="-1"]').text("No judgement");
+        $polarity.children('option[value="1"]').text("High is good");
+        $polarity.children('option[value="0"]').text("Low is good");
+    } else {
+        $polarity.children('option[value="99"]').show();
+        $polarity.children('option[value="-1"]').text("Not applicable");
+        $polarity.children('option[value="1"]').text("RAG - High is good");
+        $polarity.children('option[value="0"]').text("RAG - Low is good");
     }
 
     setuserOtherChanges();
@@ -509,6 +556,24 @@ function setuserOtherChanges() {
     }
 
     $('#userOtherChanges').val(val.join('¬'));
+}
+
+function dropdownChanged_IndicatorNew(e) {
+
+    var $menu = $(e),
+        $polarity = $('#selectedPolarityType');
+
+    if ($menu.val() === ComparatorMethodIds.Quintiles.toString()) {
+        $polarity.children('option[value="99"]').hide();
+        $polarity.children('option[value="-1"]').text("No judgement");
+        $polarity.children('option[value="1"]').text("High is good");
+        $polarity.children('option[value="0"]').text("Low is good");
+    } else {
+        $polarity.children('option[value="99"]').show();
+        $polarity.children('option[value="-1"]').text("Not applicable");
+        $polarity.children('option[value="1"]').text("RAG - High is good");
+        $polarity.children('option[value="0"]').text("RAG - Low is good");
+    }
 }
 
 function checkIsReadOnly() {
@@ -772,9 +837,17 @@ function loadDefaultTextMetadata() {
 
     // Indicator ID will not be defined if new indicator is being created
     if (!_.isUndefined(selectedIndicatorId)) {
-        $.get('/indicator/metadata/' + selectedIndicatorId, function (data) {
-            indicatorDefaultMetadata = data;
+        $.ajax({
+            type: 'GET',
+            url: '/indicator/metadata/' + selectedIndicatorId,
+            success: function (data) {
+                indicatorDefaultMetadata = data;
+            },
+            error: function (err) {
+                console.log(err);
+            }
         });
+
     }
 }
 

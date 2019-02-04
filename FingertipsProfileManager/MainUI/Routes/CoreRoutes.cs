@@ -93,13 +93,13 @@ namespace Fpm.MainUI.Routes
 
             routes.MapRoute(
                 "CurrentUserJobProgress",
-                "upload/progress/{userId}",
+                "upload/progress/{userId}/{numberOfRecords}",
                 new
                 {
                     controller = "Upload",
                     action = "CurrentUserJobProgress"
                 }
-                );
+            );
             routes.MapRoute(
                 "GetAllActiveJobProgress",
                 "upload/progress",
@@ -292,16 +292,6 @@ namespace Fpm.MainUI.Routes
                 );
 
             routes.MapRoute(
-                "ReorderIndicators", // Route name
-                "ReorderIndicators", // URL with parameters
-                new
-                {
-                    controller = "ProfilesAndIndicators",
-                    action = "ReorderIndicators",
-                }
-                );
-
-            routes.MapRoute(
                 "DeleteIndicators", // Route name
                 "DeleteIndicators", // URL with parameters
                 new
@@ -365,16 +355,6 @@ namespace Fpm.MainUI.Routes
                     areaType = UrlParameter.Optional
                 }
                 );
-
-            routes.MapRoute(
-               "UserFeedback", // Route name
-               "userfeedback", // URL with parameters
-               new
-               {
-                   controller = "UserFeedback",
-                   action = "Index"
-               }
-               );
         }
 
     }

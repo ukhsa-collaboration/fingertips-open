@@ -65,7 +65,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areaTypeIds = AreaTypeListProvider()
                 .GetParentAreaTypeIdsUsedInProfile(ProfileIds.CancerServices, AreaTypeIds.GpPractice);
 
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.CcgsPreApr2017));
+            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.CcgsPostApr2018));
         }
 
         [TestMethod]

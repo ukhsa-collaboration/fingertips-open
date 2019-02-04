@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using Fpm.MainUI.Helpers;
 using Fpm.ProfileData;
@@ -14,6 +15,7 @@ namespace Fpm.ProfileDataTest.Respositories
     public class WhenUsingProfileRepository
     {
         private ProfileRepository _profileRepository;
+        private string _subheadingGuid;
 
         /*a profile we can change which won't interfere with tests in other solutions*/
         private const string ProfileUrlKey = UrlKeys.SevereMentalIllness;
@@ -22,6 +24,7 @@ namespace Fpm.ProfileDataTest.Respositories
         public void Init()
         {
             _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
+            _subheadingGuid = Guid.NewGuid().ToString();
         }
 
         [TestCleanup]
@@ -108,9 +111,6 @@ namespace Fpm.ProfileDataTest.Respositories
             bool areIndicatorsExcludedFromSearch = !details.AreIndicatorsExcludedFromSearch;
             details.AreIndicatorsExcludedFromSearch = areIndicatorsExcludedFromSearch;
 
-            int keyColourId = details.KeyColourId == 0 ? 1 : 0;
-            details.KeyColourId = keyColourId;
-
             int defaultAreaTypeId = details.DefaultAreaTypeId == 0 ? 1 : 0;
             details.DefaultAreaTypeId = defaultAreaTypeId;
 
@@ -132,7 +132,6 @@ namespace Fpm.ProfileDataTest.Respositories
             Assert.AreEqual(isNational, details.IsNational);
             Assert.AreEqual(hasOwnFrontPage, details.HasOwnFrontPage);
             Assert.AreEqual(areIndicatorsExcludedFromSearch, details.AreIndicatorsExcludedFromSearch);
-            Assert.AreEqual(keyColourId, details.KeyColourId);
             Assert.AreEqual(defaultAreaTypeId, details.DefaultAreaTypeId);
             Assert.AreEqual(areasIgnoredForSpineChart, details.AreasIgnoredForSpineChart);
             Assert.AreEqual(areasIgnoredEverywhere, details.AreasIgnoredEverywhere);
@@ -287,29 +286,27 @@ namespace Fpm.ProfileDataTest.Respositories
         public void UpdateProfileCollection_Update_a_Collection()
         {
             // Arrange
-            const string assignedProfilesToInsert = @"53,39";
-            const string assignedProfilesToUpdate = @"53~true,39~false,72~false";
-
+            var assignedProfilesToInsert = ProfileIds.Phof + "," + ProfileIds.SexualHealth;
+            var assignedProfilesToUpdate = ProfileIds.Phof + "~true," + ProfileIds.SexualHealth + "~false";
             var randomNumber = new Random().Next();
 
+            // Act: create the profile collection
             var profileCollectionToInsert = new ProfileCollection()
             {
                 CollectionName = "Test Collection " + randomNumber,
                 CollectionSkinTitle = "Test Skin" + randomNumber
             };
-
-
-            var collectionNameToUpdate = "Test Update Collection " + randomNumber;
-            var collectionSkinTitleToUpdate = "Test Update Skin" + randomNumber;
-
-            // Act
-            var profileCollectionid = _profileRepository.CreateProfileCollection(profileCollectionToInsert,
+            var profileCollectionId = _profileRepository.CreateProfileCollection(profileCollectionToInsert,
               assignedProfilesToInsert);
-            _profileRepository.Dispose();
 
+            // Refresh repo to be sure that the insert has been done
+            _profileRepository.Dispose();
             _profileRepository.OpenSession();
 
-            var result = _profileRepository.UpdateProfileCollection(profileCollectionid, assignedProfilesToUpdate,
+            // Act: update the profile collection
+            var collectionNameToUpdate = "Test Update Collection " + randomNumber;
+            var collectionSkinTitleToUpdate = "Test Update Skin" + randomNumber;
+            var result = _profileRepository.UpdateProfileCollection(profileCollectionId, assignedProfilesToUpdate,
                 collectionNameToUpdate, collectionSkinTitleToUpdate);
 
             // Assert
@@ -370,9 +367,92 @@ namespace Fpm.ProfileDataTest.Respositories
             Assert.IsTrue(result == true);
         }
 
+        [TestMethod]
+        public void Get_Domain_Name()
+        {
+            var domainName = _profileRepository.GetDomainName(GroupIds.PeopleWithCareAndSupportNeeds, 1);
+            Assert.IsTrue(domainName.ToLower().StartsWith("people with"));
+        }
+
+        [TestMethod]
+        public void Get_Grouping_Plus_Names()
+        {
+            Profile profile = new ProfileBuilder(_profileRepository).Build(UrlKeys.AdultSocialCare, 1, AreaTypeIds.CountyAndUnitaryAuthority);
+            Assert.IsTrue(profile.IndicatorNames.Any());
+        }
+
+        [TestMethod]
+        public void Get_Grouping_Subheadings()
+        {
+            Assert.IsTrue(_profileRepository.GetGroupingSubheadings(
+                AreaTypeIds.CountyAndUnitaryAuthority, GroupIds.PeopleWithCareAndSupportNeeds).Any());
+        }
+
+        [TestMethod]
+        public void Get_All_Grouping_Subheadings()
+        {
+            Assert.IsNotNull(_profileRepository.GetGroupingSubheadingsByGroupIds(new List<int>
+            {
+                GroupIds.PeopleWithCareAndSupportNeeds
+            }));
+        }
+
+        [TestMethod]
+        public void Add_Grouping_Subheadings()
+        {
+            var groupingSubheading = new GroupingSubheading
+            {
+                GroupId = GroupIds.PeopleWithCareAndSupportNeeds,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                Sequence = 1,
+                Subheading = _subheadingGuid
+            };
+
+            _profileRepository.SaveGroupingSubheading(groupingSubheading);
+
+            var groupingSubheadings = _profileRepository.GetGroupingSubheadings(AreaTypeIds.CountyAndUnitaryAuthority,
+                GroupIds.PeopleWithCareAndSupportNeeds);
+
+            Assert.AreEqual(_subheadingGuid, groupingSubheadings.FirstOrDefault(x => x.Subheading == _subheadingGuid).Subheading);
+        }
+
+        [TestMethod]
+        public void Edit_Grouping_Subheadings()
+        {
+            var groupingSubheading = new GroupingSubheading
+            {
+                GroupId = GroupIds.PeopleWithCareAndSupportNeeds,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                Sequence = 1,
+                Subheading = _subheadingGuid
+            };
+
+            _profileRepository.SaveGroupingSubheading(groupingSubheading);
+
+            var newSubheadingGuid = Guid.NewGuid().ToString();
+
+            groupingSubheading.SubheadingId = _profileRepository
+                .GetGroupingSubheadings(AreaTypeIds.CountyAndUnitaryAuthority, GroupIds.PeopleWithCareAndSupportNeeds)
+                .FirstOrDefault(x => x.Subheading == groupingSubheading.Subheading).SubheadingId;
+            groupingSubheading.Subheading = newSubheadingGuid;
+
+            _profileRepository.UpdateGroupingSubheading(groupingSubheading);
+
+            _profileRepository.RefreshObject(groupingSubheading);
+
+            Assert.AreEqual(newSubheadingGuid,
+                GetGroupingSubheadings(AreaTypeIds.CountyAndUnitaryAuthority, GroupIds.PeopleWithCareAndSupportNeeds)
+                    .FirstOrDefault(x => x.Subheading == newSubheadingGuid).Subheading);
+        }
+
         private static string GuidSortedLast()
         {
             return "z" + Guid.NewGuid();
+        }
+
+        private IList<GroupingSubheading> GetGroupingSubheadings(int areaTypeId, int groupId)
+        {
+            return _profileRepository.GetGroupingSubheadings(areaTypeId, groupId);
         }
     }
 }

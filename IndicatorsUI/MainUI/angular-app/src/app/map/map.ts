@@ -1,4 +1,4 @@
-declare namespace geoBoundry{
+declare namespace geoBoundry {
 
     export interface Properties {
         AreaCode: string;

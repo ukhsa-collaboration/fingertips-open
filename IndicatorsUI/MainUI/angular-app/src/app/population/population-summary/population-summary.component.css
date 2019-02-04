@@ -13,11 +13,16 @@
 
 :host /deep/ #registered-persons td.header,
 #further-info-table td.header {
-    width: 200px;
+    width: 220px;
     background: #fafafa;
     padding: 3px 3px 3px 0;
     vertical-align: top;
     text-align: right;
+}
+
+:host /deep/ #registered-persons tr td:last-child,
+#further-info-table tr td:last-child {
+    padding-left: 3px;
 }
 
 #population-info #decile-key {

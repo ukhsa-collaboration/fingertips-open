@@ -61,12 +61,15 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         }
 
         [TestMethod]
-        public void TestMapChartExportMenuIsPresent()
+        public void TestMapExportMenuIsPresent()
         {
             navigateTo.FingertipsDataForProfile(ProfileUrlKeys.SexualHealth);
             SelectTab("page-map");
 
-            CheckExportLinkPresent();
+            // Assert link is present
+            var tab = driver.FindElement(By.Id("tab-specific-options"));
+            var link = tab.FindElement(By.ClassName("export-link"));
+            Assert.IsNotNull(link);
         }
 
         [TestMethod]
@@ -111,7 +114,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             foreach (var domain in domains)
             {
                 SelectDomain(domain, waitFor);
-                var indicatorName = driver.FindElement(By.Id(LongerLivesIds.TartanRugIndicatorNameOnFirstRow)).Text;
+                var indicatorName = driver.FindElement(By.Id(PublicHealthDashboardIds.TartanRugIndicatorNameOnFirstRow)).Text;
 
                 var indicatorCount = driver.FindElements(By.ClassName("rug-indicator")).Count;
 
@@ -165,9 +168,9 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
         private void CheckExportLinkPresent()
         {
-            By byExportMenuId = By.ClassName("export-link");
-            waitFor.ExpectedElementToBeVisible(byExportMenuId);
-            var exportMenu = driver.FindElement(byExportMenuId);
+            By byExportLink = By.ClassName("export-link");
+            waitFor.ExpectedElementToBeVisible(byExportLink);
+            var exportMenu = driver.FindElement(byExportLink);
             waitFor.ElementToContainText(exportMenu, "Export");
         }
     }

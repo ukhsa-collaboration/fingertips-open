@@ -2,8 +2,7 @@
 @using IndicatorsUI.MainUI.Helpers
 <div id="map-help" class="map-overlay">
     @{
-        ContentItem contentItem = ContentProvider.GetContentItem(ContentKeys.MapHelp, Model.ProfileId)
-                          ?? ContentProvider.GetContentItem(ContentKeys.MapHelp, ProfileIds.LongerLives);
+        ContentItem contentItem = ContentProvider.GetContentItem(ContentKeys.MapHelp, Model.ProfileId);
     }
     @(contentItem.HtmlEncodedString)
 </div>

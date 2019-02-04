@@ -9,7 +9,7 @@ export class Parameters {
     }
 
     getRequestOptions(): RequestOptions {
-        let requestOptions: RequestOptions = new RequestOptions({
+        const requestOptions: RequestOptions = new RequestOptions({
             headers: new Headers({ 'Content-Type': 'application/json' })
         });
         requestOptions.search = this.params;
@@ -53,6 +53,10 @@ export class Parameters {
         this.params.set('area_code', areaCode);
     }
 
+    addAreaCodes(areaCodes: string): void {
+        this.params.set('area_codes', areaCodes);
+    }
+
     addComparatorId(comparatorId: number): void {
         this.params.set('comparator_id', comparatorId.toString());
     }
@@ -92,26 +96,60 @@ export class Parameters {
     addIndicatorIds(indicatorIds: Array<number>): void {
         this.params.set('indicator_ids', indicatorIds.join(','));
     }
+
     addSearchText(searchText: string): void {
         this.params.set('search_text', searchText);
     }
-    addNoCache(noCache: Boolean): void {
-        this.params.set('no_cache', noCache.toString());
+
+    addNoCache(): void {
+        this.params.set('no_cache', true.toString());
     }
+
     addIncludeCoordinates(includeCoordinates: Boolean): void {
         this.params.set('include_coordinates', includeCoordinates.toString());
     }
+
     addParentAreasToIncludeInResults(parentAreasToIncludeInResults: Boolean): void {
         this.params.set('parent_areas_to_include_in_results', parentAreasToIncludeInResults.toString());
     }
+
     addPolygonAreaTypeId(polygonAreaTypeId: number): void {
         this.params.set('polygon_area_type_id', polygonAreaTypeId.toString());
     }
+
     addEasting(easting: number): void {
         this.params.set('easting', easting.toString());
     }
-    addNorhing(northing: number): void {
+    addNorthing(northing: number): void {
         this.params.set('northing', northing.toString());
+    }
+
+    addUserId(userId: string): void {
+        this.params.set('user_id', userId);
+    }
+
+    addAreaListId(areaListId: number): void {
+        this.params.set('area_list_id', areaListId.toString());
+    }
+
+    addPublicId(publicId: string): void {
+        this.params.set('public_id', publicId);
+    }
+
+    addProfileKey(profileKey: string): void {
+        this.params.set('profile_key', profileKey);
+    }
+
+    addFileName(fileName: string): void {
+        this.params.set('file_name', fileName);
+    }
+
+    addTimePeriod(timePeriod: string): void {
+        this.params.set('time_period', timePeriod);
+    }
+
+    addKey(key: string): void {
+        this.params.set('key', key);
     }
 }
 

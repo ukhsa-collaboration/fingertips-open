@@ -464,7 +464,7 @@ vertical-align: top;
     opacity: 0.50; /*IE9, etc*/
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)"; /*IE8*/
     filter: alpha(opacity=50); /*IE6-7*/
-    z-index: 1;
+    z-index: 1001;
 }
 #infoBox
 {
@@ -472,7 +472,7 @@ vertical-align: top;
     background: white;
     border: 5px solid #eee;
     padding: 6px;
-    z-index: 1000;
+    z-index: 1002;
     border-radius: 5px;
 }
 

@@ -24,7 +24,6 @@ namespace Fpm.ProfileData.Entities.Profile
         public string ExtraCssFiles { get; set; }
         public int EnumParentDisplay { get; set; }
         public string AreasIgnoredForSpineChart { get; set; }
-        public int KeyColourId { get; set; }
         public int DefaultFingertipsTabId { get; set; }
         public bool ArePdfs { get; set; }
         public bool StartZeroYAxis { get; set; }
@@ -57,7 +56,7 @@ namespace Fpm.ProfileData.Entities.Profile
 
         public IEnumerable<AreaType> PdfAreaTypes { get; set; }
 
-        public int NewDataTimeSpanInDays { get; set; }
+        public int NewDataDeploymentCount { get; set; }
 
         public void SetDefaultValues(string extraJsFiles)
         {
@@ -67,7 +66,6 @@ namespace Fpm.ProfileData.Entities.Profile
             EnumParentDisplay = 0;
             AreasIgnoredForSpineChart =
                 AreaCodes.CountyUa_IslesOfScilly + "," + AreaCodes.CountyUa_CityOfLondon;
-            KeyColourId = 0;
             DefaultFingertipsTabId = 0;
             SkinId = SkinIds.Core;
             ArePdfs = false;

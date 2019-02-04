@@ -81,40 +81,42 @@
         var isArchiveProfile = Model.IsArchiveProfile() ? "none" : "inline";
     }
     <div class="button-box" style="display: @userHasAssignedProfiles">
-    @if (CommonUtilities.IsReadOnlyMode())
-    {
-        <input type="button" id="edit_Domains" value="Manage Domains" disabled="disabled" style="display: @userHasWritePermissions" />
-
-        
-             <input type="button" id="reorder_Indicators" value="Reorder Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-             <input type="button" value="New Indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")    ' " disabled=" disabled"/>
-
-             <div class="divRight">
-                 <input type="button" id="audit_history" value="Show History"/>
-                 <input type="button" id="delete-indicators-button" value="Remove Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-                 <input type="button" id="move-indicators-button" value="Move Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-                 <input type="button" id="copy-indicators-button" value="Copy Indicators" disabled="disabled"/>
-             </div>
-         
-    }
-    else
-    {
-        <input type="button" id="edit_Domains" value="Manage domains" style="display: @userHasWritePermissions" />
-        if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+        <input type="hidden" id="selected-group-id" value="@Model.SelectedGroupId" />
+        <input type="hidden" id="profile-id" value="@Model.Profile.Id" />
+        @if (CommonUtilities.IsReadOnlyMode())
         {
-            <input type="button" id="reorder_Indicators" value="Reorder indicators" style="display: @userHasWritePermissions"/>
-            <input type="button" value="New indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")'"/>
+            <input type="button" id="edit_Domains" value="Manage Domains" disabled="disabled" style="display: @userHasWritePermissions"/>
+
+
+            <input type="button" id="reorder-indicators" value="Reorder Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+            <input type="button" value="New Indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")    ' " disabled=" disabled"/>
+
             <div class="divRight">
-                <input type="button" id="audit_history" value="Show history"/>
-                <input type="button" id="delete-indicators-button" value="Remove indicators" style="display: @userHasWritePermissions"/>
-                <input type="button" id="move-indicators-button" value="Move indicators" style="display: @userHasWritePermissions"/>
-                <input type="button" id="copy-indicators-button" value="Copy indicators" style="display: @isArchiveProfile"/>
+                <input type="button" id="audit_history" value="Show History"/>
+                <input type="button" id="delete-indicators-button" value="Remove Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+                <input type="button" id="move-indicators-button" value="Move Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
+                <input type="button" id="copy-indicators-button" value="Copy Indicators" disabled="disabled"/>
             </div>
+
         }
-    }
+        else
+        {
+            <input type="button" id="edit_Domains" value="Manage domains" style="display: @userHasWritePermissions"/>
+            if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
+            {
+                <input type="button" id="reorder-indicators" value="Reorder indicators" style="display: @userHasWritePermissions"/>
+                <input type="button" value="New indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")'"/>
+                <div class="divRight">
+                    <input type="button" id="audit_history" value="Show history"/>
+                    <input type="button" id="delete-indicators-button" value="Remove indicators" style="display: @userHasWritePermissions"/>
+                    <input type="button" id="move-indicators-button" value="Move indicators" style="display: @userHasWritePermissions"/>
+                    <input type="button" id="copy-indicators-button" value="Copy indicators" style="display: @isArchiveProfile"/>
+                </div>
+            }
+        }
     </div>
 
-<div class="a-modal">
-    <!-- Place at bottom of page -->
+    <div class="a-modal">
+        <!-- Place at bottom of page -->
+    </div>
 </div>
-

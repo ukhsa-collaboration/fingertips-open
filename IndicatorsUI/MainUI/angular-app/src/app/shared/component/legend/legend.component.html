@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col-md-8">
+        &nbsp;
+    </div>
+    <div class="col-md-4 value-note-legend">
+        <span class="asterisk">*</span> a note is attached to the value, hover over to see more details
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <ft-legend-area-profiles [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB" [showQuintilesRAG]="showQuintilesRAG"
+            [showQuintilesBOB]="showQuintilesBOB" *ngIf="showAreaProfiles()"></ft-legend-area-profiles>
+        <ft-legend-map [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB" [showQuartiles]="showQuartiles"
+            [showQuintilesRAG]="showQuintilesRAG" [showQuintilesBOB]="showQuintilesBOB" [showContinuous]="showContinuous"
+            *ngIf="showMap()"></ft-legend-map>
+        <ft-legend-bob [legendType]="legendType" [keyType]="keyType"></ft-legend-bob>
+        <ft-legend-continuous [legendType]="legendType" [keyType]="keyType"></ft-legend-continuous>
+        <ft-legend-quartiles [legendType]="legendType" [keyType]="keyType"></ft-legend-quartiles>
+        <ft-legend-quintiles [legendType]="legendType" [keyType]="keyType"></ft-legend-quintiles>
+        <ft-legend-rag-3 [legendType]="legendType" [keyType]="keyType"></ft-legend-rag-3>
+        <ft-legend-rag-5 [legendType]="legendType" [keyType]="keyType"></ft-legend-rag-5>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <ft-legend-recent-trends [showRecentTrends]="showRecentTrends"></ft-legend-recent-trends>
+    </div>
+</div>

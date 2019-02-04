@@ -76,6 +76,11 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.LinkText(AreaNames.CcgWestLancashire));
         }
 
+        public void RankingsToLoad()
+        {
+            ExpectedElementToBeVisible(By.LinkText(AreaNames.EastSussex));
+        }
+
         public void CountyUaRankingsToLoad()
         {
             ExpectedElementToBeVisible(By.LinkText(AreaNames.CountyUaBathAndNorthEastSomerset));
@@ -88,7 +93,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void AutoCompleteSearchResultsToBeDisplayed()
         {
-            ExpectedElementToBeVisible(By.Id(LongerLivesIds.AreaSearchAutocompleteOptions));
+            ExpectedElementToBeVisible(By.Id(PublicHealthDashboardIds.AreaSearchAutocompleteOptions));
             GoogleMapToLoad();
         }
 
@@ -103,6 +108,11 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.LinkText("Parkgate Surgery"));
         }
 
+        public void AreaRankingsToLoad()
+        {
+            ExpectedElementToBeVisible(By.LinkText("All local authorities"));
+        }
+
         public void PracticeDetailsToLoad()
         {
             // ImplicitlyWait for element only found on practice details page
@@ -110,7 +120,13 @@ namespace IndicatorsUI.MainUISeleniumTest
 
             // ImplicitlyWait until the table rows have been created
             ExpectedElementToBeVisible(
-                By.XPath("//*[@id=\"diabetes-rankings-table\"]/tbody/tr[1]/td[1]"));
+                By.XPath("//*[@id=\"diabetes-rankings-table\"]"));
+        }
+
+        public void PracticeDetailsToBePresentInElementLocated(By className, string expectedValue)
+        {
+            // ImplicitlyWait for displayed element only found on practice details page
+            ExpectedElementToBePresentInElementLocated(className, expectedValue);
         }
 
         public void FingertipsSpineChartToLoad()
@@ -149,7 +165,7 @@ namespace IndicatorsUI.MainUISeleniumTest
 
         public void PhofDomainsToLoad()
         {
-            ExpectedElementToBeVisible(By.ClassName("phof-domains"));
+            ExpectedElementToBeVisible(By.ClassName("phof-domains-top"));
         }
 
         public void PhofTrendOptionButtonToLoad()
@@ -167,29 +183,94 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("inequalities-trend-filters"));
         }
 
-        public void PracticeProfilesSearchTabToLoad()
-        {
-            ExpectedElementToBeVisible(By.Id("searchText"));
-        }
-
-        public void PracticeProfilesSummaryTabToLoad()
-        {
-            ExpectedElementToBeVisible(By.Id("ethnicity"));
-        }
-
-        public void PracticeProfilesSpineChartsTabToLoad()
-        {
-            ExpectedElementToBeVisible(By.Id("spine-table-box"));
-        }
-
         public void MortalityAreaDetailRankingToLoad()
         {
             ExpectedElementToBeVisible(By.Id("main_ranking"));
         }
 
+        public void HomePageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("your-account"));
+        }
+
         public void SignInPageToLoad()
         {
             ExpectedElementToBeVisible(By.Id("frm-login-for-fingertips"));
+        }
+
+        public void SignOutPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.LinkText("Sign in"));
+        }
+
+        public void IndicatorListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("lnk-create-new-indicator-list"));
+        }
+
+        public void IndicatorListPageTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("grid-content"));
+        }
+
+        public void CreateNewIndicatorListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("list-name"));
+        }
+
+        public void EditIndicatorListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("save-indicator-list-button"));
+        }
+
+        public void CopyIndicatorListPopupToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("infoBox"));
+        }
+
+        public void ViewIndicatorListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("left-tartan-table"));
+        }
+
+        public void AreaListPageToLoad()
+        {
+            AreaListPageTableToLoad();
+        }
+
+        public void CreateNewAreaListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("btn-save-area-list"));
+        }
+
+        public void EditAreaListPageToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("btn-save-area-list"));
+        }
+
+        public void CopyAreaListPopupToLoad()
+        {
+            ExpectedElementToBeVisible(By.ClassName("info-box"));
+        }
+
+        public void AreaListPageTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("grid-content"));
+        }
+
+        public void AreaListAreasTableToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("area-list-table"));
+        }
+
+        public void IndicatorsToLoadOnIndicatorListPage()
+        {
+            ExpectedElementToBeVisible(By.Id("indicator-list"));
+        }
+
+        public void ProfilesToLoadOnIndicatorListPage()
+        {
+            ExpectedElementToBeVisible(By.XPath("//*[@id='profile-list']/option[3]"));
         }
 
         public void FingertipsTrendsTableToLoad()
@@ -242,6 +323,11 @@ namespace IndicatorsUI.MainUISeleniumTest
             ExpectedElementToBeVisible(By.Id("infoBox"));
         }
 
+        public void FingertipsAreaTypeToLoad()
+        {
+            ExpectedElementToBeVisible(By.Id("areaTypes"));
+        }
+
         public void GoogleMapToLoad()
         {
             /*  http://stackoverflow.com/questions/5779102/selenium-tests-for-google-maps
@@ -257,7 +343,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void ExpectedElementToBePresent(By element)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(TimeoutLimitInSeconds))
-                .Until(ExpectedConditions.ElementExists(element));
+                .Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementExists(element));
         }
 
         /// <summary>
@@ -266,7 +352,16 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void ExpectedElementToBeVisible(By element)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(TimeoutLimitInSeconds))
-                .Until(ExpectedConditions.ElementIsVisible(element));
+                .Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(element));
+        }
+
+        /// <summary>
+        /// Wait for an element to be present on the page.
+        /// </summary>
+        public void ExpectedElementToBePresentInElementLocated(By element, string text)
+        {
+            new WebDriverWait(driver, TimeSpan.FromSeconds(TimeoutLimitInSeconds))
+                .Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TextToBePresentInElementLocated(element, text));
         }
 
         public void PageToFinishLoading()

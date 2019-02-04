@@ -6,6 +6,8 @@ function documentReady() {
         $('.indicator-check-box').attr('checked', $(this).is(':checked'));
     });
 
+    toggleInactiveUsers();
+
     $('#audit_history').click(function () {
         var selectedUsers = [] ;
 
@@ -34,6 +36,26 @@ function documentReady() {
                 }
             });
         }
+    });
+}
+
+function toggleInactiveUsers() {
+    var inactiveUsersShown = false;
+
+    var $button = $('#toggle-current-users');
+    var $inactiveUsers = $('.not-current');
+
+    $('#toggle-current-users').click(function () {
+
+        if (inactiveUsersShown) {
+            $button.val('Show inactive users');
+            $inactiveUsers.hide();
+        } else {
+            $button.val('Hide inactive users');
+            $inactiveUsers.show();
+        }
+
+        inactiveUsersShown = !inactiveUsersShown;
     });
 }
 

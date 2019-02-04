@@ -41,6 +41,8 @@ namespace PholioVisualisation.RequestParameters
         public const string RetrieveIgnoredAreas = "ria";
         public const string ParentAreaTypesToIncludeInResults = "parent_area_types_to_include_in_results";
 
+        public const string UserId = "uid";
+
         //Exception Logging Parameters
         public const string Application = "app";
         public const string UserName = "unm";

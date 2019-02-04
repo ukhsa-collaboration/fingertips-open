@@ -35,7 +35,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestGetMetadataForSpecifiedGroup()
         {
-            IList<Grouping> groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupId(GroupIds.Diabetes_TreatmentTargets);
+            IList<Grouping> groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupId(GroupIds.SexualAndReproductiveHealth);
             var list = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(groupings, 
                 IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific);
             Assert.IsTrue(list.Count > 0);

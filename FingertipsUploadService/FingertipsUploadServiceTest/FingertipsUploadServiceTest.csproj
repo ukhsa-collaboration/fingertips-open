@@ -88,6 +88,7 @@
     <Compile Include="DuplicateDataFilterTest.cs" />
     <Compile Include="FingertipsUploadServiceTest.cs" />
     <Compile Include="FilePathHelperTest.cs" />
+    <Compile Include="Helpers\FileNameHelperTest.cs" />
     <Compile Include="UploadJobWorkerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -114,13 +115,10 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
-    <None Include="TestFiles\batch-indicator-upload-duplicate-rows.xlsx" />
-    <None Include="TestFiles\batch-indicator-upload-new-data.xlsx" />
-    <None Include="TestFiles\upload-simple-duplicate-row-in-file.xlsx" />
-    <None Include="TestFiles\upload-simple-duplicate-row-in-pholio.xlsx" />
-    <None Include="TestFiles\upload-simple-new-data.xlsx" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="TestFiles\" />
+  </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

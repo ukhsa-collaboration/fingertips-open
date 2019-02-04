@@ -3,6 +3,9 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.Analysis
 {
+    /// <summary>
+    /// Value confidence intervals overlapping with benchmark confidence intervals
+    /// </summary>
     public class DoubleOverlappingCIsComparer : IndicatorComparer
     {
         public override Significance Compare(CoreDataSet data, CoreDataSet comparator, IndicatorMetadata metadata)

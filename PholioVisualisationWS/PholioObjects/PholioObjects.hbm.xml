@@ -101,7 +101,9 @@
     <property name="ShouldBuildExcel" column="should_build_excel"/>
     <property name="HasTrendMarkers" column="has_trend_markers"/>
     <property name="IsProfileLive" column="is_profile_live"/>
-    <property name="NewDataTimeSpanInDays" column="new_data_time_span_in_days"/>      
+    <property name="NewDataDeploymentCount" column="new_data_deployment_count"/>
+    <property name="DefaultAreaTypeId" column="default_area_type_id"/>
+    <property name="HasAnyData" column="has_any_data"/>
   </class>
 
   <!-- LongerLivesProfile class -->
@@ -735,6 +737,17 @@
     <property name="SelectedText" column="SelectedText"/>
     <property name="ExtraLink" column="ExtraLink"/>
   </class>
+
+  <!-- GroupingSubheading -->
+  <class name="GroupingSubheading" table="GroupingSubheadings">
+    <id name="SubheadingId" column="SubheadingID" type="int" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="GroupId" column="GroupID"/>
+    <property name="AreaTypeId" column="AreaTypeID"/>
+    <property name="Subheading" column="Subheading"/>
+    <property name="Sequence" column="Sequence"/>
+  </class>
   
   <!-- Get Nearby Practices by calling stored procedure  -->
   <sql-query name="GetNearbyGpPractice_SP">
@@ -869,6 +882,18 @@
     JOIN GroupingMetadata gm ON gm.GroupID = g.GroupID
     JOIN UI_Profiles uip ON gm.ProfileId = uip.id
     LEFT JOIN UI_SiteSkins skn ON uip.skin_id = skn.id
+    WHERE IndicatorID IN (:indicatorIds)
+    ORDER BY uip.name
+  </sql-query>
+
+  <sql-query name="GetProfilesForIndicatorIdsAndAreaTypeId">
+    SELECT DISTINCT g.indicatorid as IndicatorId, g.groupid as GroupId, AreaTypeID as AreaTypeId,
+    gm.ProfileId as ProfileId , uip.name as ProfileName, uip.url_key as ProfileUrl,
+    skn.test_host as TestHostUrl, skn.live_host as LiveHostUrl
+    FROM grouping g
+    JOIN GroupingMetadata gm ON gm.GroupID = g.GroupID
+    JOIN UI_Profiles uip ON gm.ProfileId = uip.id
+    LEFT JOIN UI_SiteSkins skn ON uip.skin_id = skn.id
     WHERE IndicatorID IN (:indicatorIds) AND AreaTypeID = :areaTypeId
     ORDER BY uip.name
   </sql-query>
@@ -893,6 +918,16 @@
     and IndicatorID = :indicatorId)  and status = 1000 order by DateCreated desc
   </sql-query>
 
+  <sql-query name="GetLastestTimePeriodOfCoreData">
+    SELECT TOP 1 [Year]
+    ,[YearRange]
+    ,[Quarter]
+    ,[Month]
+    FROM [CoreDataSet]
+    where IndicatorId = :indicatorId and YearRange = :yearRange
+    order by year desc, Quarter desc, month desc
+  </sql-query>
+  
   <sql-query name="SelectIndicatorNames">
     select indicatorid as Id,[1_Name] as Name from IndicatorMetadataTextValues
     where profileId is null
@@ -916,6 +951,13 @@
   <sql-query name="Insert_FpmDocument">
     insert into fpm_document (ProfileId, FileName, FileData, UploadedOn, UploadedBy)
     values (:ProfileId, :FileName, :FileData, :UploadedOn, :UploadedBy)
+  </sql-query>
+
+  <sql-query name="GetMostCommonPolarityIdForIndicator">
+    SELECT Top 1 [PolarityID] FROM [grouping]
+    where [IndicatorID] = :indicatorId
+    group by [PolarityID]
+    order by count([PolarityID]) desc
   </sql-query>
 
 </hibernate-mapping>

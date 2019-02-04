@@ -9,6 +9,11 @@ namespace IndicatorsUI.MainUI.Helpers
         private IList<int> _searchAreaTypeIds;
         private int _profileId;
 
+        private List<int> excludedAreaTypes = new List<int>
+        {
+            AreaTypeIds.CcgPostApr2017, AreaTypeIds.CcgSince2018
+        };
+
         public AreaSearchHelper(int profileId, string searchAreaTypeIds)
         {
             _searchAreaTypeIds = new IntListStringParser(searchAreaTypeIds).IntList;
@@ -19,8 +24,7 @@ namespace IndicatorsUI.MainUI.Helpers
         {
             get
             {
-                return _searchAreaTypeIds
-                    .Any(x => x != AreaTypeIds.CcgPostApr2017);
+                return _searchAreaTypeIds.Any(x => excludedAreaTypes.Contains(x) == false);
             }
         }
 

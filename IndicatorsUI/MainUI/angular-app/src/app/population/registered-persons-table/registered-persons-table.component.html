@@ -12,7 +12,7 @@
                 </td>
                 <td>{{row.personCount}}
                     <div *ngIf="!row.hasPersonCount()" class="no-data">-</div>
-                    <span *ngIf="row.isAverage" class="average">(average)</span>
+                    <span *ngIf="row.isAverage && row.hasPersonCount()" class="average">(average)</span>
                 </td>
             </tr>
         </tbody>

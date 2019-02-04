@@ -32,14 +32,5 @@ namespace PholioVisualisation.DataAccess
 
         [JsonProperty]
         public IList<GroupingMetadata> GroupMetadata { get; set; }
-
-        /// <summary>
-        /// i.e. is not search results, or other kind of ad hoc profile.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsDefinedProfile
-        {
-            get { return Id != ProfileIds.Search; }
-        }
     }
 }

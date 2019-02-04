@@ -1,5 +1,15 @@
-<div class="export-chart-box">
-    <a class="export-link" (click)="onExportClick($event)">Export map as image</a>
+<div id="tab-specific-options" class="tab-options clearfix">
+    <div>
+        <span>Areas </span>
+        <button id="tab-option-0" [class]="this.subNationalButtonClass" (click)="setBenchMark(1)" [innerHTML]="this.formattedParentAreaName"></button>
+        <button id="tab-option-1" [class]="this.nationalButtonClass" (click)="setBenchMark(4)">All in England</button>
+    </div>
+    <div class="export-chart-box">
+        <a class="export-link" (click)="onExportClick($event)">Export map as image</a>
+    </div>
+    <div class="export-chart-box-csv">
+        <a id="export-link-csv-map" class="export-link-csv" (click)="onExportCsvFileClick($event)">Export map as CSV file</a>
+    </div>
 </div>
 <div id="wrapper">
     <div [hidden]="isError" id="google-map" #googleMap class="googleMapNg"></div>
@@ -9,13 +19,12 @@
         <div id="mapOptions" *ngIf="showOverlay" (mouseleave)="hideOverlay()">
             <p>Background map</p>
             <label *ngFor="let baseMap of baseMaps;let idx = index" class="basemapLabel">
-                    <div class="basemap {{baseMap.cssClass}}">
-                    <input type="radio" name="baseMap"  [value]="baseMap.val" 
-                    [checked]="(idx === 0)" (click)= "onOverlaySelectionChange(baseMap)">
+                <div class="basemap {{baseMap.cssClass}}">
+                    <input type="radio" name="baseMap" [value]="baseMap.val" [checked]="(idx === 0)" (click)="onOverlaySelectionChange(baseMap)">
                     <span></span>{{baseMap.name}}
-                    </div>
-                    <br/>
-                </label>
+                </div>
+                <br />
+            </label>
             <p>Transparency</p>
             <div class="opacity" *ngFor="let opac of opacityArray;let idx = index;" [attr.selected]="opac/100 == fillOpacity?true : null">
                 <input type="radio" name="opacity" value="{{opac}}" id="opacity_{{opac}}" (click)="onOpacitySelectionChange(opac)">
@@ -23,7 +32,7 @@
                     <span [ngStyle]="{
                     'background-position':(opac * -4.1 + 37) + 'px 0px'}"></span>
                     {{opac}} %
-                    </label>
+                </label>
             </div>
         </div>
     </div>

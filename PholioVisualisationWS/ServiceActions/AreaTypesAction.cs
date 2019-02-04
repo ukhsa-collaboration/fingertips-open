@@ -22,5 +22,12 @@ namespace PholioVisualisation.ServiceActions
             }
             return areaTypeListProvider.GetAllAreaTypes();
         }
+
+        public IList<AreaType> GetResponse()
+        {
+            var areaTypeListProvider = new AreaTypeListProvider(new GroupIdProvider(profileReader), areasReader, groupDataReader);
+            var areaTypes = areaTypeListProvider.GetAllAreaTypesWithData();
+            return areaTypes.OrderBy(x => x.ShortName).ToList();
+        }
     }
 }

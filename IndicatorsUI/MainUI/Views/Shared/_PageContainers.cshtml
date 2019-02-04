@@ -1,7 +1,7 @@
 ﻿@using IndicatorsUI.MainUI.Models
 @model PageModel
 <div class="standard-width clearfix">
-    <div id="graph-container" app-root></div>
-    <div id="no-domain-data" class="tall-central-message" style="display: none;">No indicators for current area type</div>
+    <ft-data-view></ft-data-view>
+    <div id="main-info-message" class="tall-central-message" style="display: none;"></div>
     @Html.Partial("_GoogleMaps")
 </div>

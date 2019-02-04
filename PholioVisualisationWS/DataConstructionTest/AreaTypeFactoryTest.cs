@@ -29,6 +29,14 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
+        public void NewAreaListAreaType()
+        {
+            var id = AreaTypeIds.AreaList;
+            var areaType = AreaTypeFactory.New(ReaderFactory.GetAreasReader(), id);
+            Assert.IsNotNull(areaType);
+        }
+
+        [TestMethod]
         public void NewCategoryAreaType_NameIsDefined()
         {
             var name = "decile";

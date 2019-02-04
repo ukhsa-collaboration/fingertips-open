@@ -2,9 +2,11 @@
 {
     public class IndicatorMetadataTextValue
     {
+        public int Id { get; set; }
+
         public int IndicatorId { get; set; }
         public int? ProfileId { get; set; }
-        public string Name { get; set; } ///     Indicator name
+        public string Name { get; set; }
         public string NameLong { get; set; }
         public string Definition { get; set; }
         public string Rationale { get; set; }
@@ -29,7 +31,7 @@
         public string Frequency { get; set; }
         public string Rounding { get; set; }
         public string DataQuality { get; set; }
-        public int Id { get; set; }
         public string IndicatorContent { get; set; }
+        public string SpecificRationale { get; set; }
     }
 }

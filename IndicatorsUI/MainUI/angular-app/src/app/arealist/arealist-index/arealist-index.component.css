@@ -1,0 +1,77 @@
+#div-content a.btn {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.webgrid-table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    font-size: 1.1em;
+    width: 100%;
+    display: table;
+    border-collapse: collapse;
+    border: solid 1px #98BF21;
+    background-color: white;
+}
+
+.webgrid-table td,
+th {
+    border: 1px solid #98BF21;
+    padding: 3px 7px 2px;
+}
+
+.webgrid-header {
+    padding-bottom: 4px;
+    padding-top: 5px;
+    text-align: center;
+}
+
+.webgrid-header th {
+    text-align: center;
+}
+
+.webgrid-row-style {
+    padding: 3px 7px 2px;
+}
+
+.webgrid-row-style a,
+.webgrid-alternating-row a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.webgrid-alternating-row {
+    padding: 3px 7px 2px;
+}
+
+thead tr th:first-child,
+tbody tr td:first-child {
+    width: 40em;
+}
+
+.list-name {
+    color: #2e3191;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+#lightBox {
+    display: none;
+}
+
+#infoBox {
+    display: none;
+    width: 438px;
+    top: 50%;
+    left: 50%;
+    margin-top: -50px;
+    margin-left: -50px;
+}
+
+.help-link-button {
+    text-decoration: underline;
+    color: #2e3191;
+    float: right;
+    z-index: 1000;
+    margin-top: -59px;
+    padding-right: 0px;
+}

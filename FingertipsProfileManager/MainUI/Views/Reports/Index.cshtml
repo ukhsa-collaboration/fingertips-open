@@ -9,11 +9,11 @@
 
 @section ExtraScripts
 {
-<script src="@(AppConfig.AngularAppDistPath)inline.bundle.js" type="text/javascript" defer></script>
-<script src="@(AppConfig.AngularAppDistPath)polyfills.bundle.js" type="text/javascript" defer></script>
-<script src="@(AppConfig.AngularAppDistPath)styles.bundle.js" type="text/javascript" defer></script>
-<script src="@(AppConfig.AngularAppDistPath)vendor.bundle.js" type="text/javascript" defer></script>
-<script src="@(AppConfig.AngularAppDistPath)main.bundle.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)main.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)polyfills.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)runtime.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)styles.js" type="text/javascript" defer></script>
+    <script src="@(AppConfig.AngularAppDistPath)vendor.js" type="text/javascript" defer></script>
 }
 
 @section AngularApp
@@ -25,5 +25,5 @@
 </div>
 
 <div class="container" >
-    <app-root></app-root>
+    <app-reports></app-reports>
 </div>

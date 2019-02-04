@@ -31,7 +31,7 @@
         <div class="col-md-4">
             @Html.Partial("_AreaMenu")
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             @Html.Partial("_ParentAreaMenu")
             @if (hasNearestNeighbours)
             {
@@ -39,6 +39,20 @@
                     <a id="nearest-neighbour-link" onclick="nearestNeighboursSelected()" class="a-link"></a>
                 </div>
             }
+            <div id="area-list-wrapper" class="area-list-wrapper">
+                <a id="edit-new-area-list-link" onclick="redirectToEditAreaList();" class="a-link edit-area-list-link">Edit</a>
+                <a id="create-new-area-list-link" onclick="redirectToCreateNewAreaList();" class="a-link create-new-area-list-link">New area list</a>
+            </div>
+            <div id="sign-in-link-wrapper" class="sign-in-link-wrapper">
+                <a id="sign-in-link" onclick="redirectToSignIn();" class="a-link sign-in-link">
+                    Sign in to create new area list
+                </a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div id="filter-indicator-wrapper" class="filter-indicator-wrapper">
+                <a id="filter-indicators" onclick="showFilterIndicatorsLightBox()" class="a-link">Filter indicators</a>
+            </div>
         </div>
     </div>
     <!--Here's the GP address placeholder-->
@@ -50,4 +64,3 @@
     </div>
 </div>
 @Html.Partial("_Key")
-

@@ -36,7 +36,6 @@ namespace Fpm.MainUI.Controllers
 
             // Get text properties of selected indicator
             IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
-            int groupId = profile.GetSelectedGroupingMetadata(selectedDomainNumber).GroupId;
 
             // Assemble model
             var model = new IndicatorEdit
@@ -44,7 +43,9 @@ namespace Fpm.MainUI.Controllers
                 SelectedIndicatorId = indicatorId,
                 UrlKey = urlKey,
                 Profile = profile,
-                TextValues = _reader.GetIndicatorTextValues(indicatorId, properties, profile.Id).ToList()
+                TextValues = _reader.GetIndicatorTextValues(indicatorId, properties, profile.Id)
+                    .OrderBy(x => x.IndicatorMetadataTextProperty.DisplayOrder)
+                    .ToList()
             };
 
             // Prev/Next
@@ -67,10 +68,12 @@ namespace Fpm.MainUI.Controllers
                 model.IndicatorIdPrevious = names[prevIndex].IndicatorId;
             }
 
-            //Get the indicatore meta data
+            //Get the indicator metadata
             IndicatorMetadata indicatorMetaData = _reader.GetIndicatorMetadata(indicatorId);
             model.IndicatorMetadata = indicatorMetaData;
 
+            // Get the grouping
+            var groupId = GetGroupId(selectedDomainNumber, profile);
             IList<Grouping> groupList = _reader.GetGroupings(groupId);
             IEnumerable<Grouping> indicatorGroupData =
                 groupList.Where(
@@ -99,6 +102,7 @@ namespace Fpm.MainUI.Controllers
 
             ViewBag.listOfProfiles = listOfProfiles;
 
+            // Domains
             var domains = new ProfileMembers();
 
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
@@ -160,6 +164,18 @@ namespace Fpm.MainUI.Controllers
                 alwaysShowSpineChart, profile.Id, disclosureControlId, latestChangeTimestamp);
 
             return Redirect(returnUrl);
+        }
+
+        private static int GetGroupId(int selectedDomainNumber, Profile profile)
+        {
+            var groupingMetadata = profile.GetSelectedGroupingMetadata(selectedDomainNumber);
+            if (groupingMetadata == null)
+            {
+                throw new FpmException("Grouping metadata not found, check the sequence values are not all zero");
+            }
+
+            var groupId = groupingMetadata.GroupId;
+            return groupId;
         }
 
         private void SaveMetadataChanges(int indicatorId, int? groupId, int valueTypeId, int ciMethodId,

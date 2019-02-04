@@ -304,18 +304,6 @@ namespace Fpm.ProfileDataTest
         }
 
         [TestMethod]
-        public void TestGetIndicatorTextValuesGroupSpecificAvailable()
-        {
-            ProfilesReader reader = Reader();
-            IList<IndicatorMetadataTextProperty> properties = reader.GetIndicatorMetadataTextProperties();
-            IList<IndicatorText> list = reader.GetIndicatorTextValues(
-                IndicatorIds.LifeExpectancyAtBirth, properties, ProfileIds.ChildrenAndYoungPeoplesHealthBenchmarkingTool);
-            Assert.IsFalse(list[0].ValueSpecific.Contains("0.1i"));
-            Assert.IsTrue(list[0].ValueGeneric.Contains("0.1i"));
-            Assert.IsTrue(list.Count > 10);
-        }
-
-        [TestMethod]
         public void TestGetIndicatorTextValuesGroupSpecificIgnoredIfNotAppropriate()
         {
             ProfilesReader reader = Reader();
@@ -381,7 +369,7 @@ namespace Fpm.ProfileDataTest
         public void TestGetAllComparatorConfidences()
         {
             IList<double> list = Reader().GetAllComparatorConfidences();
-            var expected = new List<double> {95, 98, 99.8};
+            var expected = new List<double> {95, 99.8};
             Assert.AreEqual(list.Count, expected.Count);
             foreach (double val in expected)
             {

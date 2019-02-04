@@ -55,7 +55,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -70,15 +73,41 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AreaList.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AreaList.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AreaList.cs">
+      <DependentUpon>AreaList.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AreaList.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AreaList.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="AreaListAreaCode.cs">
+      <DependentUpon>AreaList.tt</DependentUpon>
+    </Compile>
+    <Compile Include="AreaLists\AreaListProvider.cs" />
     <Compile Include="IndicatorLists\IIndicatorListRepository.cs" />
     <Compile Include="IndicatorLists\IndicatorList.cs" />
     <Compile Include="IndicatorLists\IndicatorListItem.cs" />
     <Compile Include="IndicatorLists\IndicatorListRepository.cs" />
     <Compile Include="IndicatorLists\IndicatorListProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AreaListRepository.cs" />
+    <Compile Include="Repositories\IAreaListRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <EntityDeploy Include="AreaList.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>AreaList.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="AreaList.edmx.diagram">
+      <DependentUpon>AreaList.edmx</DependentUpon>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -90,6 +119,21 @@
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
       <Name>PholioObjects</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="AreaList.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AreaList.edmx</DependentUpon>
+      <LastGenOutput>AreaList.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="AreaList.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>AreaList.edmx</DependentUpon>
+      <LastGenOutput>AreaList1.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

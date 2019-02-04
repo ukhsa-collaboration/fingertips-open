@@ -115,12 +115,14 @@
     <Compile Include="SeleniumHelper.cs" />
     <Compile Include="ProfilesAndIndicatorsTest.cs" />
     <Compile Include="TestHelper.cs" />
+    <Compile Include="UploadTest.cs" />
     <Compile Include="UserTest.cs" />
     <Compile Include="WaitFor.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="UploadFiles\upload-tests.xlsx" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MainUI\MainUI.csproj">
@@ -140,6 +142,7 @@
     <Content Include="Client Scripts\MvcFoolproofValidation.js" />
     <Content Include="Client Scripts\MvcFoolproofValidation.min.js" />
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

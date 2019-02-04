@@ -33,7 +33,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             _uploadJobRepository.SaveJob(newJob);
 
             var notStartedJobs = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
-            Assert.IsTrue(notStartedJobs.Count() == 1);
+            Assert.IsTrue(notStartedJobs.Any(x => x.Guid == _guid));
         }
 
 
@@ -45,9 +45,9 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             _uploadJobRepository.SaveJob(newJob);
 
             var notStartedJobs = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
-            Assert.IsTrue(notStartedJobs.Count() == 1);
+            Assert.IsTrue(notStartedJobs.Any(x => x.Guid == _guid));
 
-            var jobFromDB = notStartedJobs.First();
+            var jobFromDB = notStartedJobs.First(x => x.Guid == _guid);
             jobFromDB.Status = UploadJobStatus.ConfirmationGiven;
 
 
@@ -55,7 +55,7 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
 
             var jobsAfterStatusChange = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
 
-            Assert.IsTrue(jobsAfterStatusChange.Count() == 1);
+            Assert.IsTrue(jobsAfterStatusChange.Any(x => x.Guid == _guid));
 
         }
 
@@ -72,7 +72,8 @@ namespace FingertipsUploadService.ProfileDataTest.Respositories
             _uploadJobRepository.SaveJob(jobConfirmationAwaited);
 
             var notStartedJobs = _uploadJobRepository.GetNotStartedOrConfirmationGivenUploadJobs();
-            Assert.IsTrue(notStartedJobs.Count() == 2);
+            Assert.IsTrue(notStartedJobs.Any(x => x.Guid == _guid));
+            Assert.IsTrue(notStartedJobs.Any(x => x.Guid == confirmationAwaitedGuid));
 
             // Cleanup
             _uploadJobRepository.DeleteJob(confirmationAwaitedGuid);

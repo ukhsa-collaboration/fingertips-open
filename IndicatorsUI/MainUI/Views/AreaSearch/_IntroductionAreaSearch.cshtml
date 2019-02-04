@@ -20,12 +20,12 @@
         {
             <tr><td>Search by postcode, town or @areaTypeLabel</td></tr>
             <tr>
-                <td>
+                <td style="padding-bottom: 30px;">
                     <input id="area-search-text" type="text" name="search_text"/>
                 </td>
             </tr>
         }
-        <tr><td style="padding-top: 30px;">List @(areaSearch.GetAreaTypeLabelPlural()) by region</td></tr>
+        <tr><td>List @(areaSearch.GetAreaTypeLabelPlural()) by region</td></tr>
         <tr><td><select id="parent-area-menu"><option/></select></td></tr>
     </table>
     @Html.Partial("_SearchNoMatches")
@@ -50,7 +50,7 @@
 {
 <script type="text/javascript">
     $(document).ready(function() {
-        callAngularEvent('MapEnvReady-Event', { 'searchMode': true });
+        callAngularEvent('MapSelected', { 'searchMode': true });
     });
 </script>
 }

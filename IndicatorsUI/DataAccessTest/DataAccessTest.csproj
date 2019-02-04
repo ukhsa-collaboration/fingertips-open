@@ -83,6 +83,7 @@
     <Compile Include="ReaderFactoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="FileLoggerTest.cs" />
+    <Compile Include="Repository\RelativeUrlRedirectRepositoryTest.cs" />
     <Compile Include="TwitterClientTest.cs" />
     <Compile Include="TwitterSettingReaderTest.cs" />
     <Compile Include="TwitterPullServiceTest.cs" />

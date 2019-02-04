@@ -180,73 +180,23 @@ $(document).ready(function () {
         loading();
     });
 
-    $('#reorder_Indicators').click(function () {
-        loading();
+    $('#reorder-indicators').click(function() {
+        var profileId = $('#profile-id').val(),
+            profileUrlKey = $('#UrlKey').val(),
+            domainSequence = $('#selectedDomain').val(),
+            areaTypeId = $('#SelectedAreaTypeId').val(),
+            groupId = $('#selected-group-id').val();
 
-        $.ajax({
-            cache: false,
-            type: 'Get',
-            url: '/ReorderIndicators',
-            data: {
-                selectedDomain: $('#selectedDomain').val(),
-                urlKey: $('#UrlKey').val(),
-                selectedGroupId: 1,
-                selectedAreaType: $('#SelectedAreaTypeId').val()
-            },
-            dataType: 'html',
-            success: function (data) {
-                var h = data;
-                lightbox.show(h, 20, 300, 700);
-                $('#reorderIndicators').show();
-
-                $('.indicator').hover(function () {
-                    if (!$(this).hasClass('selected-Indicator')) {
-                        $(this).removeClass('unselected-Indicator').addClass('hover-Indicator');
-                    }
-                }, function () { // mouseleave 
-                    if (!$(this).hasClass('selected-Indicator')) {
-                        $(this).removeClass('hover-Indicator').addClass('unselected-Indicator');
-                    }
-                });
-
-                $('.indicator').click(function () {
-                    $('.indicator').removeClass('hover-Indicator selected-Indicator').addClass('unselected-Indicator');
-                    $(this).removeClass('unselected-Indicator').addClass('selected-Indicator');
-                });
-
-                $('#reorderUp').click(function () {
-                    if ($('.selected-Indicator input').length > 0) {
-                        var $parent = $('.selected-Indicator').closest('.indicator');
-                        $('#save').addClass('save-required');
-                        $parent.insertBefore($parent.prev());
-                        reorderIndicators();
-                    }
-                });
-
-                $('#reorderDown').click(function () {
-                    if ($('.selected-Indicator input').length > 0) {
-                        var $parent = $('.selected-Indicator').closest('.indicator');
-                        $('#save').addClass('save-required');
-                        $parent.insertAfter($parent.next());
-                        reorderIndicators();
-                    }
-                });
-
-                loadingFinished();
-            },
-            error: function () {
-                loadingFinished();
-            }
-        });
-
-        function reorderIndicators() {
-            var indicatorOrder = '';
-            $('.indicator').each(function () {
-                indicatorOrder += $(this).find($('.indicatorId')).val() +
-                    '~' + $(this).find($('.sexId')).val() + '¬';
-            });
-            $('#IndicatorOrder').val(indicatorOrder);
-        }
+        window.location.href = "/ReorderIndicators?profileId=" +
+            profileId +
+            "&profileUrlKey=" +
+            profileUrlKey +
+            "&domainSequence=" +
+            domainSequence +
+            "&areaTypeId=" +
+            areaTypeId +
+            "&groupId=" +
+            groupId;
     });
 
     $('#audit_history').click(function () {

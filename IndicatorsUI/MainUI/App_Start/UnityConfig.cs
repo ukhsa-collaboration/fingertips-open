@@ -24,7 +24,6 @@ namespace IndicatorsUI.MainUI
         /// <summary>
         /// Configured Unity Container.
         /// </summary>
-//        public static IUnityContainer Container => container.Value;
         public static IUnityContainer Container
         {
             get { return container.Value; }
@@ -63,6 +62,11 @@ namespace IndicatorsUI.MainUI
             // Register app config singleton
             container.RegisterType<IAppConfig>(new ContainerControlledLifetimeManager(), 
                 new InjectionFactory(c => AppConfig.Instance));
+
+            // Register GoogleAnalyticsEventLogger singleton
+            GoogleAnalyticsEventLogger.Instance = new GoogleAnalyticsEventLogger(new MeasurementProtocolDownloadFiles());
+            container.RegisterType<IGoogleAnalyticsEventLogger>(new ContainerControlledLifetimeManager(),
+                new InjectionFactory(c => GoogleAnalyticsEventLogger.Instance));
         }
     }
 }

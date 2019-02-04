@@ -22,7 +22,18 @@ namespace PholioVisualisation.DataConstruction
             if (indicatorIds == null || indicatorIds.Any() == false) return response;
 
             var profileReader = ReaderFactory.GetProfileReader();
-            var profiles = profileReader.GetProfilesForIndicators(indicatorIds.ToList(), areaTypeId);
+
+            IList<ProfilePerIndicator> profiles;
+
+            if (areaTypeId == AreaTypeIds.Undefined)
+            {
+                profiles = profileReader.GetProfilesForIndicators(indicatorIds.ToList());
+            }
+            else
+            {
+                profiles = profileReader.GetProfilesForIndicators(indicatorIds.ToList(), areaTypeId);
+            }
+            
             profiles = ProfileFilter.RemoveSystemProfiles(profiles);
 
             var uniqueIndicators = profiles.Select(x => x.IndicatorId).Distinct().ToList();

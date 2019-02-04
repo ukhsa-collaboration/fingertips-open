@@ -29,9 +29,9 @@ namespace Fpm.MainUI.Helpers
             Delete
         }
 
-        private static void AddPleaseSelectOption(List<SelectListItem> list)
+        private static void AddPleaseSelectOption(List<SelectListItem> list, int value)
         {
-            list.Insert(0, new SelectListItem { Text = "Please select...", Value = "-1" });
+            list.Insert(0, new SelectListItem { Text = "Please select...", Value = value.ToString() });
         }
 
         public static List<SelectListItem> GetListOfAreaTypes(PleaseSelectOption pleaseSelectOption,
@@ -54,7 +54,7 @@ namespace Fpm.MainUI.Helpers
             var items = new AreaTypeSelectListBuilder(areaTypes, selectedAreaTypeId).SelectListItems;
             if (pleaseSelectOption == PleaseSelectOption.Required)
             {
-                AddPleaseSelectOption(items);
+                AddPleaseSelectOption(items, -1);
             }
             return items;
         }
@@ -89,7 +89,7 @@ namespace Fpm.MainUI.Helpers
             if (comparatorId == null)
             {
                 // Comparator hasn't been set so need default option
-                AddPleaseSelectOption(listOfComparators);
+                AddPleaseSelectOption(listOfComparators, -1);
             }
             return listOfComparators;
 
@@ -104,7 +104,7 @@ namespace Fpm.MainUI.Helpers
                     new SelectListItem { Text = "Not Applicable", Value = "-1" }
                 };
 
-            AddPleaseSelectOption(listOfComparators);
+            AddPleaseSelectOption(listOfComparators, -99);
             return listOfComparators;
 
         }
@@ -120,7 +120,7 @@ namespace Fpm.MainUI.Helpers
 
             if (selectionOption == PleaseSelectOption.Required)
             {
-                AddPleaseSelectOption(listOfFrequencies);
+                AddPleaseSelectOption(listOfFrequencies, -1);
             }
 
             return listOfFrequencies;
@@ -138,7 +138,7 @@ namespace Fpm.MainUI.Helpers
 
             if (selectOption == PleaseSelectOption.Required)
             {
-                AddPleaseSelectOption(items);
+                AddPleaseSelectOption(items, -1);
             }
 
             return items;
@@ -146,14 +146,22 @@ namespace Fpm.MainUI.Helpers
 
         public static IList<SelectListItem> GetListOfComparatorConfidences()
         {
-            var items = Reader.GetAllComparatorConfidences()
-                .Select(x => new SelectListItem
-                {
-                    Value = x.ToString(),
-                    Text = x.ToString()
-                }).ToList();
+            var confidences = Reader.GetAllComparatorConfidences();
 
-            AddPleaseSelectOption(items);
+            var items = new List<SelectListItem>();
+
+            foreach (var confidence in confidences)
+            {
+                var item = new SelectListItem
+                {
+                    Value = confidence.ToString(),
+                    Text = string.Format("{0:0.0}", confidence)
+                };
+
+                items.Add(item);
+            }
+
+            AddPleaseSelectOption(items, -1);
             return items;
         }
 
@@ -211,15 +219,34 @@ namespace Fpm.MainUI.Helpers
             return GetSelectListOfPolarities(polarities);
         }
 
-        public static IEnumerable<SelectListItem> GetListOfPolarityTypes(PleaseSelectOption selectOption)
+        public static IEnumerable<SelectListItem> GetListOfPolarityTypes(PleaseSelectOption selectOption, int comparatorMethodId = ComparatorMethodIds.NoComparison)
         {
             var polarities = Reader.GetAllPolarities();
 
             var listOfPolarities = GetSelectListOfPolarities(polarities);
 
+            if (comparatorMethodId == ComparatorMethodIds.Quintiles)
+            {
+                foreach (var polarity in listOfPolarities)
+                {
+                    switch (Convert.ToInt32(polarity.Value))
+                    {
+                        case PolarityIds.NotApplicable:
+                            polarity.Text = "No judgement";
+                            break;
+                        case PolarityIds.RagHighIsGood:
+                            polarity.Text = "High is good";
+                            break;
+                        case PolarityIds.RagLowIsGood:
+                            polarity.Text = "Low is good";
+                            break;
+                    }
+                }
+            }
+
             if (selectOption == PleaseSelectOption.Required)
             {
-                AddPleaseSelectOption(listOfPolarities);
+                AddPleaseSelectOption(listOfPolarities, -99);
             }
 
             return listOfPolarities;
@@ -305,7 +332,7 @@ namespace Fpm.MainUI.Helpers
 
             if (selectionOption == PleaseSelectOption.Required)
             {
-                AddPleaseSelectOption(listOfYearRanges);
+                AddPleaseSelectOption(listOfYearRanges, -1);
             }
 
             return listOfYearRanges;

@@ -1,17 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F90E6631-DB1A-4CC1-B648-8FD3EBAED8DE}"
-	ProjectSection(SolutionItems) = preProject
-		CIJenkinsUpdateScript.ps1 = CIJenkinsUpdateScript.ps1
-		Jenkins_Test_Generic_App.config = Jenkins_Test_Generic_App.config
-		Local.testsettings = Local.testsettings
-		PholioDataVisualisation.vsmdi = PholioDataVisualisation.vsmdi
-		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services", "Services\Services.csproj", "{7F25ED64-20A5-491A-BA93-04DDDDAD0C4C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PholioObjects", "PholioObjects\PholioObjects.csproj", "{AD4A4236-BE35-4B2A-B49D-28D514949984}"
@@ -310,6 +301,9 @@ Global
 		{3860F267-D928-46DE-B306-EE35E1939B43} = {CB87A53A-E689-4F09-9250-BD3E373E3615}
 		{B01455EA-2060-4176-99A2-C4EF7908193F} = {C0262A9F-990B-4C78-AE36-0463A8E88705}
 		{B5A01845-A963-4DAC-8C7A-E759AC46B2CC} = {C0262A9F-990B-4C78-AE36-0463A8E88705}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {69C2A874-BF18-4D1B-9E32-198608D8D1CD}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = PholioDataVisualisation.vsmdi

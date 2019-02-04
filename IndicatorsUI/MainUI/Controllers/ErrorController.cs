@@ -35,11 +35,22 @@ namespace IndicatorsUI.MainUI.Controllers
             InitPageModel();
         }
 
+        [Route("profile-not-available")]
+        public ActionResult ProfileNotAvailable()
+        {
+            HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+            SetPageTitle("Profile closed");
+            errorPageModel.Error = new Error { Message = 
+                @"Sorry, this profile is no longer available. However, the indicators and data may
+still be available in other profiles and by searching for indicator keywords." };
+            return View(ViewName, errorPageModel);
+        }
+
         [Route("access-not-allowed")]
         public ActionResult AccessNotAllowed()
         {
             HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
-            PageModel.PageTitle = "Access denied";
+            SetPageTitle("Access denied");
             errorPageModel.Error = new Error { Message = "You do not have permission to view this page" };
             return View(ViewName, errorPageModel);
         }
@@ -55,7 +66,7 @@ namespace IndicatorsUI.MainUI.Controllers
                 return new LongerLivesController(ReaderFactory.GetProfileReader(), _appConfig).Get404Error();
             }
 
-            PageModel.PageTitle = "Page not found";
+            SetPageTitle("Page not found");
             errorPageModel.Error = new Error { Message = "Sorry, that page could not be found..." };
             return View(ViewName, errorPageModel);
         }
@@ -71,7 +82,7 @@ namespace IndicatorsUI.MainUI.Controllers
                 return new LongerLivesController(ReaderFactory.GetProfileReader(), _appConfig).Get500Error();
             }
 
-            PageModel.PageTitle = "Unexpected Error";
+            SetPageTitle("Unexpected Error");
 
             errorPageModel.Error = new Error
             {
@@ -87,7 +98,6 @@ namespace IndicatorsUI.MainUI.Controllers
             return View("BrowserNotSupported");
         }
 
-
         public static ActionResult InvokeHttp404(HttpContextBase httpContext)
         {
             IController errorController = new ErrorController(AppConfig.Instance);
@@ -99,6 +109,12 @@ namespace IndicatorsUI.MainUI.Controllers
                  httpContext, errorRoute));
 
             return new EmptyResult();
+        }
+
+        private void SetPageTitle(string title)
+        {
+            PageModel.PageTitle = title;
+            PageModel.DisplayProfileTitle = true;
         }
     }
 }

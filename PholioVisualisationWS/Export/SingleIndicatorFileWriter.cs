@@ -1,4 +1,5 @@
-﻿using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.Analysis;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export.File;
@@ -16,10 +17,16 @@ namespace PholioVisualisation.Export
         private LookUpManager _lookUpManager;
         private TrendMarkerLabelProvider _trendMarkerLabelProvider;
         private SignificanceFormatter _significanceFormatter;
-        private IndicatorExportParameters _parameters;
-        private DateChangeHelper _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository());
+        private readonly IndicatorExportParameters _parameters;
+        private IDateChangeHelper _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository(), new CoreDataSetRepository());
         private ProfileConfig _profileConfig;
-        private readonly Dictionary<int, IndicatorDateChange> _indicatorDataChanges = new Dictionary<int, IndicatorDateChange>();
+
+        // Indicator specific varibles
+        private IndicatorMetadata _indicatorMetadata;
+        private readonly Dictionary<string, IndicatorDateChange> _timePeriodToDataChanges = new Dictionary<string, IndicatorDateChange>();
+        private TargetComparer _targetComparer;
+
+        private const string UnavailableInfo = "Unavailable info";
 
         public SingleIndicatorFileWriter(int indicatorId, IndicatorExportParameters parameters)
         {
@@ -34,11 +41,13 @@ namespace PholioVisualisation.Export
         }
 
         public void Init(LookUpManager lookUpManager, TrendMarkerLabelProvider trendMarkerLabelProvider,
-            SignificanceFormatter significanceFormatter)
+            SignificanceFormatter significanceFormatter, IndicatorMetadata indicatorMetadata)
         {
             _lookUpManager = lookUpManager;
             _trendMarkerLabelProvider = trendMarkerLabelProvider;
             _significanceFormatter = significanceFormatter;
+            _indicatorMetadata = indicatorMetadata;
+            InitTargetComparer();
         }
 
         public byte[] TryLoadFile()
@@ -63,23 +72,22 @@ namespace PholioVisualisation.Export
             return contents;
         }
 
-        public void WriteData(IndicatorMetadata indicatorMetadata, CoreDataSet data, string timePeriod,
+        public void WriteData(CoreDataSet data, string timePeriod,
             IArea parentArea, TrendMarkerResult trendMarkerResult, Significance comparedToEnglandSignificance,
             Significance comparedToSubnationalParentSignificance, int? sortableTimePeriod)
         {
             var formatter = new CoreDataSetExportFormatter(_lookUpManager, data);
             var areaCode = data.AreaCode;
 
-            var trendMarkerLabel = trendMarkerResult != null
-                ? _trendMarkerLabelProvider.GetLabel(trendMarkerResult.Marker).Text
-                : "";
+            var trendMarkerLabel = GetTrendMarkerLabel(trendMarkerResult);
+            var includeParentDetails = parentArea != null & Area.IsAreaListArea(parentArea) == false;
 
             var items = new List<object>
             {
-                indicatorMetadata.IndicatorId,
-                indicatorMetadata.Name,
-                parentArea == null ? "" : parentArea.Code,
-                parentArea == null ? "" : parentArea.Name,
+                _indicatorMetadata.IndicatorId,
+                _indicatorMetadata.Name,
+                includeParentDetails ? parentArea.Code : "",
+                includeParentDetails ? parentArea.Name: "",
                 areaCode,
                 _lookUpManager.GetAreaName(areaCode),
                 _lookUpManager.GetAreaTypeName(areaCode),
@@ -107,15 +115,40 @@ namespace PholioVisualisation.Export
                 items.Add(sortableTimePeriod);
             }
 
+            // Data Changes 
+            var changeText = _profileConfig != null ? GetDateChange(data, timePeriod).HasDataChangedRecently ? "New data" : string.Empty : UnavailableInfo;
+            
+            items.Add(changeText);
 
-            // Data Changes   
-            if (_profileConfig != null)
+            // Add target data 
+            if (_targetComparer != null)
             {
-                var datachange = GetDataChange(indicatorMetadata);
-                var dataChangeText = datachange.HasDataChangedRecently ? "New data" : "";
-                items.Add(dataChangeText);
+                var significance = _targetComparer.CompareAgainstTarget(data);
+                items.Add(_significanceFormatter.GetTargetLabel(significance));
             }
+
+            if (changeText == UnavailableInfo)
+            {
+                items.Add("Notice: If new data field info is required, please add &profile_id=NUMBER at the url end, replacing NUMBER word for the corresponding number of profile id");
+            }
+
             _csvWriter.AddLine(items.ToArray());
+        }
+
+        private string GetTrendMarkerLabel(TrendMarkerResult trendMarkerResult)
+        {
+            var trendMarkerLabel = trendMarkerResult != null
+                ? _trendMarkerLabelProvider.GetLabel(trendMarkerResult.Marker).Text
+                : "";
+            return trendMarkerLabel;
+        }
+
+        private void InitTargetComparer()
+        {
+            if (_indicatorMetadata.TargetId != null)
+            {
+                _targetComparer = TargetComparerFactory.New(_indicatorMetadata.TargetConfig);
+            }
         }
 
         private bool UseFileCache
@@ -126,15 +159,19 @@ namespace PholioVisualisation.Export
             }
         }
 
-        private IndicatorDateChange GetDataChange(IndicatorMetadata metadata)
+        private IndicatorDateChange GetDateChange(CoreDataSet data, string timePeriod)
         {
-            if (!_indicatorDataChanges.ContainsKey(metadata.IndicatorId))
+            if (!_timePeriodToDataChanges.ContainsKey(timePeriod))
             {
-                var dataChange = _dateChangeHelper.AssignDateChange(metadata, _profileConfig.NewDataTimeSpanInDays);
-                _indicatorDataChanges.Add(metadata.IndicatorId, dataChange);
+                var dataChange = _dateChangeHelper.GetIndicatorDateChange(data.GetTimePeriod(),
+                    _indicatorMetadata, _profileConfig.NewDataDeploymentCount);
+
+                _timePeriodToDataChanges.Add(timePeriod, dataChange);
+
                 return dataChange;
             }
-            return _indicatorDataChanges[metadata.IndicatorId];
+
+            return _timePeriodToDataChanges[timePeriod];
         }
     }
 }

@@ -31,7 +31,7 @@ namespace IndicatorsUI.MainUI.Helpers
         /// get around this we use the PHE identity as the user name instead of the
         /// email address that the user has entered.
         /// </summary>
-        public string GetUserName(IPrincipal user,string userName)
+        public string GetUserName(IPrincipal user, string userName)
         {
             var identity = user.Identity;
 
@@ -57,6 +57,45 @@ namespace IndicatorsUI.MainUI.Helpers
         {
             var authenticationManager = request.GetOwinContext().Authentication;
             authenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
+        }
+
+        public static string GetUserId(IPrincipal user)
+        {
+            var identity = user.Identity;
+
+            // Sometimes on the test environment the GetUserId function returns an empty string so need
+            // different approach
+            if (AppConfig.Instance.IsEnvironmentTest)
+            {
+                var applicationUser = new IdentityWrapper().GetApplicationUser(user);
+                if (applicationUser == null)
+                {
+                    // User has not registered to create an account
+                    return "User does not have account";
+                }
+
+                // User has account and has been authenticated by IIS basic authentication
+                return applicationUser.Id;
+            } 
+
+            return identity.GetUserId();
+        }
+
+        public static bool IsUserSignedIn(IPrincipal user)
+        {
+            if (user == null)
+            {
+                return false;
+            }
+
+            var identity = user.Identity;
+
+            if (identity.GetUserId() == null)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

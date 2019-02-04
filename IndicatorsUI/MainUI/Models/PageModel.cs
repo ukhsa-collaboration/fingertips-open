@@ -58,8 +58,6 @@ namespace IndicatorsUI.MainUI.Models
         public bool IsOfficialStatistics { get; set; }
         public bool HasRecentTrends { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
-        public int RagColourId { get; set; }
-        public SpineChartMinMaxLabelBuilder.MinMaxLabel SpineChartMinMaxLabel { get; set; }
 
         /// <summary>
         /// Whether or not PDFs are available for the profile.
@@ -89,21 +87,6 @@ namespace IndicatorsUI.MainUI.Models
         ///     Used to limit search results and parent areas that are displayed in the region menu.
         /// </summary>
         public int TemplateProfileId { get; set; }
-
-        public bool DisplayRagKey
-        {
-            get { return RagColourId != KeyColours.BluesOnly; }
-        }
-
-        public bool DisplayBlueKey
-        {
-            get { return RagColourId != KeyColours.RagOnly; }
-        }
-
-        public bool DisplayBothKeyColorings
-        {
-            get { return RagColourId == KeyColours.RagAndBlues; }
-        }
 
         public string Title
         {

@@ -46,6 +46,8 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(indicatorId, grouping.IndicatorId);
             Assert.AreEqual(sexId, grouping.SexId);
             Assert.AreEqual(ageId, grouping.AgeId);
+
+            VerifyAll();
         }
 
         [TestMethod]
@@ -59,6 +61,8 @@ namespace PholioVisualisation.DataConstructionTest
 
             Assert.AreEqual(groupId, grouping.GroupId);
             AssertIdsAreSameAsRequested(grouping);
+
+            VerifyAll();
         }
 
         /// <summary>
@@ -81,6 +85,8 @@ namespace PholioVisualisation.DataConstructionTest
 
             Assert.AreEqual(expectedGroupId, grouping.GroupId);
             AssertIdsAreSameAsRequested(grouping);
+
+            VerifyAll();
         }
 
         /// <summary>
@@ -95,6 +101,8 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupIds.Search, areaTypeId, indicatorId, sexId, ageId);
 
             AssertIdsAreSameAsRequested(grouping);
+
+            VerifyAll();
         }
 
         [TestMethod]
@@ -105,6 +113,8 @@ namespace PholioVisualisation.DataConstructionTest
             var grouping = provider.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(areaTypeId, indicatorId, sexId, ageId);
 
             AssertIdsAreSameAsRequested(grouping);
+
+            VerifyAll();
         }
 
         [TestMethod]
@@ -114,6 +124,8 @@ namespace PholioVisualisation.DataConstructionTest
                 new GroupIdProvider(ReaderFactory.GetProfileReader()));
             var grouping = provider.GetGroupingByProfileIdAndGroupIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(ProfileIds.Undefined, 1, 2, 3, 4, 5);
             Assert.IsNull(grouping);
+
+            VerifyAll();
         }
 
         [TestMethod]
@@ -123,14 +135,24 @@ namespace PholioVisualisation.DataConstructionTest
             _groupDataReader.Setup(x => x.GetGroupingsByGroupIdsAndIndicatorIds(It.IsAny<IList<int>>(),
                 It.IsAny<IList<int>>())).Returns(GetGroupings());
 
+            SetUpGetCommonestPolarityForIndicator();
+
             // Act: Get the latest grouping
             var grouping = new SingleGroupingProvider(_groupDataReader.Object, null)
-                .GetGroupingWithLatestDataPoint(new List<int> { 1 }, 2, 3);
+                .GetGroupingWithLatestDataPoint(new List<int> { 1 }, 2, 3, 4);
 
             // Assert: most recent year
             Assert.AreEqual(2002, grouping.DataPointYear);
+
+            VerifyAll();
         }
-        
+
+        private void SetUpGetCommonestPolarityForIndicator()
+        {
+            _groupDataReader.Setup(x => x.GetCommonestPolarityForIndicator(It.Is<int>(i => i == indicatorId)))
+                .Returns(PolarityIds.RagHighIsGood);
+        }
+
         [TestMethod]
         public void Test_GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId_WithLatestDataPoint()
         {
@@ -138,12 +160,16 @@ namespace PholioVisualisation.DataConstructionTest
             _groupDataReader.Setup(x => x.GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(It.IsAny<int>(),
                 It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(GetGroupings());
 
+            SetUpGetCommonestPolarityForIndicator();
+
             // Act: Get the latest grouping
             var grouping = new SingleGroupingProvider(_groupDataReader.Object, null)
-                .GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(1, 2, 3,4);
+                .GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(1, 2, 3, 4);
 
             // Assert: most recent year
             Assert.AreEqual(2002, grouping.DataPointYear);
+
+            VerifyAll();
         }
 
         [TestMethod]
@@ -155,18 +181,20 @@ namespace PholioVisualisation.DataConstructionTest
 
             var groupingDifferentiator = new GroupingDifferentiator
             {
-                IndicatorId = 2,
+                IndicatorId = indicatorId,
                 AgeId = 3,
                 SexId = 4
             };
 
             _groupDataReader.Setup(x => x.GetGroupingsByIndicatorId(groupingDifferentiator.IndicatorId)).Returns(new List<Grouping>
                 {
-                    new Grouping {AreaTypeId = childAreaTypeId, SexId = groupingDifferentiator.SexId, AgeId = groupingDifferentiator.AgeId},
-                    new Grouping {AreaTypeId = unmatchedId, SexId = groupingDifferentiator.SexId, AgeId = groupingDifferentiator.AgeId},
-                    new Grouping {AreaTypeId = childAreaTypeId, SexId = unmatchedId, AgeId = groupingDifferentiator.AgeId},
-                    new Grouping {AreaTypeId = childAreaTypeId, SexId = groupingDifferentiator.SexId, AgeId = unmatchedId}
+                    new Grouping {IndicatorId = indicatorId, AreaTypeId = childAreaTypeId, SexId = groupingDifferentiator.SexId, AgeId = groupingDifferentiator.AgeId},
+                    new Grouping {IndicatorId = indicatorId, AreaTypeId = unmatchedId, SexId = groupingDifferentiator.SexId, AgeId = groupingDifferentiator.AgeId},
+                    new Grouping {IndicatorId = indicatorId, AreaTypeId = childAreaTypeId, SexId = unmatchedId, AgeId = groupingDifferentiator.AgeId},
+                    new Grouping {IndicatorId = indicatorId, AreaTypeId = childAreaTypeId, SexId = groupingDifferentiator.SexId, AgeId = unmatchedId}
                 });
+
+            SetUpGetCommonestPolarityForIndicator();
 
             // Act: Get the latest grouping
             var grouping = new SingleGroupingProvider(_groupDataReader.Object, null)
@@ -176,6 +204,8 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(childAreaTypeId, grouping.AreaTypeId);
             Assert.AreEqual(groupingDifferentiator.AgeId, grouping.AgeId);
             Assert.AreEqual(groupingDifferentiator.SexId, grouping.SexId);
+
+            VerifyAll();
         }
 
         private static Mock<GroupIdProvider> MockGroupIdProvider()
@@ -201,13 +231,18 @@ namespace PholioVisualisation.DataConstructionTest
             return o;
         }
 
-        private static IList<Grouping> GetGroupings()
+        private void VerifyAll()
+        {
+            _groupDataReader.VerifyAll();
+        }
+
+        private IList<Grouping> GetGroupings()
         {
             return new List<Grouping>
             {
-                new Grouping {DataPointYear = 2000, AreaTypeId = 3},
-                new Grouping {DataPointYear = 2002, AreaTypeId = 3},
-                new Grouping {DataPointYear = 2001, AreaTypeId = 3}
+                new Grouping {IndicatorId = indicatorId, DataPointYear = 2000, AreaTypeId = 3},
+                new Grouping {IndicatorId = indicatorId,DataPointYear = 2002, AreaTypeId = 3},
+                new Grouping {IndicatorId = indicatorId,DataPointYear = 2001, AreaTypeId = 3}
             };
         }
     }

@@ -66,7 +66,6 @@ namespace IndicatorsUI.DataAccess
             return service;
         }
 
-
         public static ProfileReader GetProfileReader()
         {
             var service = new ProfileReader(GetSessionFactory());

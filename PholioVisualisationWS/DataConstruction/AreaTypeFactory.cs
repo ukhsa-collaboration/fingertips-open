@@ -31,6 +31,11 @@ namespace PholioVisualisation.DataConstruction
                 return CategoryAreaType.New(categoryType);
             }
 
+            if (AreaListAreaType.IsAreaListAreaType(parentAreaTypeId))
+            {
+                return new AreaListAreaType();
+            }
+
             return areasReader.GetAreaType(parentAreaTypeId);
         }
     }

@@ -9,6 +9,8 @@ namespace PholioVisualisation.DataConstructionTest
     [TestClass]
     public class ProfilePerIndicatorBuilderTest
     {
+        public const int Indicator1 = IndicatorIds.DeprivationScoreIMD2015;
+
         [TestMethod]
         public void TestEmptyIndicatorList()
         {
@@ -34,7 +36,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void UrlWithStagingTest()
         {
             var result = BuildProfilesPerIndicator(false);
-            var profiles = result[IndicatorIds.DeprivationScoreIMD2010];
+            var profiles = result[Indicator1];
             Assert.IsTrue(profiles[0].Url.Contains("https://"));
         }
 
@@ -42,7 +44,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void UrlWithProdTest()
         {
             var result = BuildProfilesPerIndicator(true);
-            var profiles = result[IndicatorIds.DeprivationScoreIMD2010];
+            var profiles = result[Indicator1];
             Assert.IsTrue(profiles[0].Url.Contains("http://"));
         }
 
@@ -50,7 +52,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var indicators = new List<int>
             {
-                IndicatorIds.DeprivationScoreIMD2010,
+                Indicator1,
                 IndicatorIds.ChildrenInLowIncomeFamilies
             };
             var builder = new ProfilePerIndicatorBuilder(isEnvironmentLive);

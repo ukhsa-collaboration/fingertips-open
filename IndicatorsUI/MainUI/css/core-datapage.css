@@ -38,7 +38,7 @@
     text-decoration: none;
     border-left: 2px solid transparent;
     padding: 5px 0 3px 0;
-    font-size: 1.2em;
+    font-size: 17px;
     vertical-align: top;
 }
 
@@ -309,6 +309,18 @@ th.rug-period, td.rug-period {
     width: 58px;
 }
 
+td.rug-subheading {
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 2px;
+    line-height: 35px;
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: left;
+}
+
 #tartan-scroll-box .rug-indicator {
     visibility: hidden;
 }
@@ -319,25 +331,111 @@ th.rug-period, td.rug-period {
 }
 
 /* ------------------------------------------------------------
+	Tartan rug legend
+------------------------------------------------------------ */
+.tartan-compared-with-text {
+    float: left;
+    font-size: 11px;
+    margin-right: 5px;
+}
+
+.outer-tartan-legend-box {
+    float: left;
+    font-size: 11px;
+}
+
+.tartan-legend-box {
+    float: left;
+    margin-left: 2px;
+    padding: 2px 0px 2px 0px;
+    width: 70px;
+    text-align: center;
+}
+
+.not-compared {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 80px;
+    height: 18px;
+    line-height: 13px;
+}
+
+.left-margin {
+    margin-left: 18px;
+}
+
+/* ------------------------------------------------------------
+	Bar chart legend
+------------------------------------------------------------ */
+.bar-compared-with-text {
+    float: left;
+    font-size: 11px;
+    margin-right: 15px;
+}
+
+.bar-chart-legend-outer-box {
+    float: left;
+    font-size: 11px;
+    margin-right: 15px;
+}
+
+.bar-chart-legend-box {
+    float: left;
+    margin-left: 2px;
+    padding: 2px 0px 2px 0px;
+    text-align: center;
+}
+
+.bar-chart-not-compared {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 80px;
+    height: 19px;
+}
+
+/* ------------------------------------------------------------
+	Spine chart legend
+------------------------------------------------------------ */
+.spine-compared-with-text {
+    float: left;
+    font-size: 11px;
+    margin-right: 15px;
+}
+
+.spine-chart-legend-outer-box {
+    float: left;
+    font-size: 11px;
+    margin-right: 15px;
+}
+
+.spine-chart-legend-box {
+    float: left;
+    margin-left: 2px;
+    padding: 2px 0px 2px 0px;
+    text-align: center;
+}
+
+.spine-chart-not-compared {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    width: 80px;
+    height: 19px;
+}
+
+/* ------------------------------------------------------------
 	Target / goal
 ------------------------------------------------------------ */
 .target .unit {
     color: #333;
 }
 
-.target.bobLower .unit, .target.worse .unit {
+.target.bobLower .unit, .target.worse .unit, .target.worst .unit {
     color: white;
 }
 
 /* ------------------------------------------------------------
 	Other tabs
 ------------------------------------------------------------ */
-
-#single-area-table {
-    float: left;
-    clear: left;
-    margin-top: 8px;
-}
 
 #indicators-container, #download-container {
     width: 1000px;
@@ -454,7 +552,7 @@ div.key-spine-text {
 div.key-box {
     height: 20px;
     line-height: 20px;
-    width: 45px;
+    width: 68px;
     vertical-align: middle;
 }
 
@@ -488,7 +586,8 @@ td.key-box-right {
 }
 
 .key .tartan-text {
-    width: 45px;
+    width: 67px;
+    margin-left: 2px;
 }
 
 #value-note-legend {
@@ -496,7 +595,14 @@ td.key-box-right {
     font-size: 11px;
     color: #777;
     text-align: right;
-    margin-top: 8px;
+    width: 160px;
+}
+
+#value-note-legend span {
+     font-size: 1.2em;
+     color:#333;
+     position:relative;
+     top:4px;
 }
 
 #spine-table, #barTable {
@@ -506,6 +612,14 @@ td.key-box-right {
     #spine-table td.quintile-key, .keyBar.quintile-key {
         padding-top: 6px;
     }
+
+#quintile-key-table {
+    margin-top: 6px;
+}
+
+#tartan-quintile-key-table {
+    margin-top: 10px;
+}
 
 /* ------------------------------------------------------------
 	Trends
@@ -603,6 +717,11 @@ td.coloured {
     overflow-wrap: break-word;
 }
 
+    .trend-source p {
+        font-style: italic;
+        font-size: 11px !important;
+    }
+
 #trend-helper {
     border-style: dotted;
     border-width: thin;
@@ -653,9 +772,11 @@ td span.unit {
 
     #target-benchmark-box li:first-child {
         padding-left: 2px;
-        margin-top: 3px;
     }
 
+#benchmark-box {
+    margin-bottom: 0;
+}
 /* ------------------------------------------------------------
 	Parent area menus
 ------------------------------------------------------------ */
@@ -698,6 +819,13 @@ td span.unit {
         display: inline-block;
         float: right;
     }
+
+.indicator-subheading {
+    font-weight: bold;
+    font-size: 14px;
+    padding-left: 2px;
+    line-height: 35px;
+}
 
 /* ------------------------------------------------------------
 	Trends
@@ -889,6 +1017,10 @@ td span.unit {
     top: -2px;
 }
 
+.noLeft {
+    border-left: 0 none #fff;
+}
+
 /* ------------------------------------------------------------
 	Scatter plot - fixes selected indicator name not displayed
 ------------------------------------------------------------ */
@@ -979,9 +1111,15 @@ td span.unit {
     left: 28px;
     z-index: 5;
     width: 400px;
+    text-align: center;
+}
+
+#nearest-neighbour-links {
+    margin-top: -18px;
 }
 
 #nearest-neighbour-links a {
+    padding: 1px;
     text-decoration: none;
     margin-right: 50px;
 }
@@ -1017,14 +1155,14 @@ td span.unit {
 /*----------------------------------------
 	Chart & table export
 ------------------------------------------*/
-.export-chart-box {
+.export-chart-box, .export-chart-box-csv {
     height: 16px;
     margin-bottom: 8px;
     margin-top: 5px;
     color: #450AA3;
 }
 
-    .export-chart-box select {
+    .export-chart-box select, .export-chart-box-csv select{
         width: 80px;
     }
 
@@ -1032,19 +1170,26 @@ td span.unit {
     background-color: #ffffff;
 }
 
-.tab-options div.export-chart-box {
+.tab-options div.export-chart-box, .tab-options div.export-chart-box-csv {
     padding-top: 6px;
     float: left;
 }
 
-.export-chart-box .export-link, .tab-options .export-chart-box a {
+.export-chart-box .export-link, .tab-options .export-chart-box a{
     text-decoration: none;
     color: #1F0AA1;
     background: #FFF url(../images/save-image-icon.png) left center no-repeat;
     padding: 5px 27px;
 }
 
-.export-chart-box a.show-ci {
+.export-chart-box-csv .export-link-csv, .tab-options .export-chart-box-csv a {
+    text-decoration: none;
+    color: #1F0AA1;
+    background: #FFF url(../images/download24.png) left center no-repeat;
+    padding: 5px 27px;
+}
+
+.export-chart-box a.show-ci, .export-chart-box-csv a.show-ci {
     text-decoration: none;
     color: #1F0AA1;
 }
@@ -1145,6 +1290,18 @@ td span.unit {
         text-decoration: none;
     }
 
+#indicator-profile-origin-link {
+    padding: 10px 0;
+}
+
+    #indicator-profile-origin-link a {
+        color: #1f0aa1;
+        text-decoration: none;
+    }
+
+        #indicator-profile-origin-link a:hover {
+            text-decoration: underline;
+        }
 
 /*----------------------------------------
 	Population (cannot go in Angular 2 CSS file)
@@ -1263,19 +1420,41 @@ div.decile-spacer {
     height: 16px;
     margin-top: 10px;
     color: #450AA3;
+    float: left;
 }
 
+.export-chart-box-csv {
+    height: 16px;
+    margin-top: 10px;
+    color: #450AA3;
+}
+
+#export-link-csv-trend {
+    margin-left: 30px;
+}
+#export-link-csv-inequalities-pos{
+    float: left;
+    margin-left: 30px;
+}
     .export-chart-box a.export-link, .export-chart-box button {
         color: #1F0AA1;
         background: #FFF url(../images/save-image-icon.png) left center no-repeat;
         padding: 5px 30px;
     }
 
-    .export-chart-box a, .export-chart-box button {
+.export-chart-box-csv a.export-link-csv, .export-chart-box-csv button {
+    color: #1F0AA1;
+    background: #FFF url(../images/download24.png) left center no-repeat;
+    padding: 5px 30px;
+}
+
+    .export-chart-box a, .export-chart-box button,
+    .export-chart-box-csv a, .export-chart-box-csv button {
         text-decoration: none;
     }
 
-        .export-chart-box a:hover, .export-chart-box button:hover {
+        .export-chart-box a:hover, .export-chart-box button:hover,
+        .export-chart-box-csv a:hover, .export-chart-box-csv button:hover {
             text-decoration: underline !important;
             cursor: pointer;
         }
@@ -1437,7 +1616,7 @@ div.no-indicator-data {
     text-align: center;
     float: left;
     width: 100%;
-    font-style: italic;
+    font-size: 16px;
     margin: 150px 0;
 }
 
@@ -1550,156 +1729,147 @@ div.sparkline-indicator, img.sparkline-area {
         background-color: white;
     }
 
+
 /* ------------------------------------------------------------
-	Spine charts
+	Area list functionality
 ------------------------------------------------------------ */
-#single-area-table {
-    margin-bottom: 30px;
+.area-list-wrapper {
+    display: none;
+    margin-left: 156px;
 }
 
-#single-area-table th div {
-    line-height: 1.1em;
+.create-new-area-list-link {
+    margin-left: 20px;
 }
 
-.noSpine {
-    height: 23px;
-    line-height: 23px;
-    width: 100%;
-    text-align: center;
-    font-style: italic;
-    font-size: 11px;
+#create-new-area-list {
+    min-width: 70px;
 }
 
-.q1, .q2, .q4, .spine {
-    height: 23px;
-    float: left;
+.sign-in-link-wrapper {
+    display: none;
 }
 
-.spine {
-    overflow: hidden;
-    padding: 0 0 0 0;
+.sign-in-link {
+    margin-left: 156px;
 }
 
-.spine250 {
-    width: 274px; /*SPINE_WIDTH + (margin-left calculateSpineDimensions x2)*/
+.filter-indicator-wrapper {
+    margin-top: 22px;
+    display: none;
+}
+
+.filter-indicator-wrapper-england {
     position: relative;
-    text-align: center;
+    right: 100px;
+    top: -30px;
+    display: block;
 }
 
-.average250 {
-    width: 2px;
-    left: 136px; /*half spine250 width - 1(i.e. half average bar width)*/
-    position: absolute;
-    height: 23px;
+.better-99 {
+    background: url("../images/best.png");
 }
 
-.marker {
-    position: absolute;
-    top: 2px;
+.better-95 {
+    background: url("../images/better.png");
 }
 
-/* ------------------------------------------------------------
-	Download tab
------------------------------------------------------------- */
-#download-container {
-    color: #666;
-    padding: 60px 0 120px 0;
+.similar {
+    background: url("../images/same.png");
 }
 
-    #download-container h2 {
-        padding: 0;
-        color: #555;
-    }
-
-    #download-container a {
-        font-size: 16px;
-        color: #2e3191;
-        margin: 6px 0;
-        background-repeat: no-repeat;
-        display: block;
-        text-decoration: none;
-    }
-
-#pdf-download-text a {
-    /*font-size: 20px;*/
+.worse-95 {
+    background: url("../images/red.png");
+    color: #fff;
 }
 
-#download-container h3 {
-    margin: 20px 0 0 0;
+.worse-99 {
+    background: url("../images/worst.png");
+    color: #fff;
 }
 
-#download-container a:hover {
-    text-decoration: underline;
+.bob-lower {
+    background: url("../images/bobLower.png");
 }
 
-#download-container p {
-    line-height: 1.4em;
-    margin: 0;
+.bob-similar {
+    background: url("../images/same.png");
 }
 
-#excel-box {
-    border-right: 2px solid #eee;
+.bob-higher {
+    background: url("../images/bobHigher.png");
 }
 
-#download-container img {
-    height: 300px;
-    border: 2px solid #eee;
-    float: right;
+.quartiles-low {
+    background: url("../images/quartiles-low.png");
 }
 
-#pdf-download-text {
-    /*padding-left: 40px;*/
+.quartiles-medium-1 {
+    background: url("../images/quartiles-medium-1.png");
 }
 
-    #pdf-download-text p {
-        /*margin-bottom: 20px;*/
-    }
-
-.noLeft {
-    border-left: 0 none #fff;
+.quartiles-medium-2 {
+    background: url("../images/quartiles-medium-2.png");
 }
 
-/* ------------------------------------------------------------
-	England tab
------------------------------------------------------------- */
-#england-container table {
-    margin-top: 10px;
-    width: 80%;
+.quartiles-high {
+    background: url("../images/quartiles-high.png");
+    color: #fff;
 }
 
-    #england-container table tr th:first-child {
-        width: 50%;
-    }
-
-    #england-container table tr td {
-        padding: 2px;
-    }
-
-        #england-container table tr td:first-child button {
-            text-align: left;
-        }
-
-.table-hover tbody tr:hover td {
-    color: #000;
-    background: #D7EBE8;
+.rag-quintiles-1 {
+    background: url("../images/rag-quintile-1.png");
 }
 
-    .table-hover tbody tr:hover td a {
-        color: #2e3191;
-    }
-
-/* ------------------------------------------------------------
-	Reports tab
------------------------------------------------------------- */
-#reports-container table tr td {
-    font-size: 17px;
+.rag-quintiles-2 {
+    background: url("../images/rag-quintile-2.png");
 }
 
-    #reports-container table tr td.format {
-        width: 90px;
-        text-align: center;
-    }
+.rag-quintiles-3 {
+    background: url("../images/rag-quintile-3.png");
+}
 
-    #reports-container table tr td:first-child {
-        width: 300px;
-    }
+.rag-quintiles-4 {
+    background: url("../images/rag-quintile-4.png");
+}
+
+.rag-quintiles-5 {
+    background: url("../images/rag-quintile-5.png");
+    color: #fff;
+}
+
+.bob-quintiles-1 {
+    background: url("../images/bob-quintile-1.png");
+    color: #fff;
+}
+
+.bob-quintiles-2 {
+    background: url("../images/bob-quintile-2.png");
+}
+
+.bob-quintiles-3 {
+    background: url("../images/bob-quintile-3.png");
+}
+
+.bob-quintiles-4 {
+    background: url("../images/bob-quintile-4.png");
+}
+
+.bob-quintiles-5 {
+    background: url("../images/bob-quintile-5.png");
+}
+
+.continuous-lowest {
+    background: url("../images/continuous_low.png");
+}
+
+.continuous-range
+{
+    width: 200px !important;
+    background: url("../images/continuous_range.png") repeat-y scroll center center;
+}
+
+.continuous-highest {
+    background: url("../images/continuous_high.png");
+    color: #fff;
+}

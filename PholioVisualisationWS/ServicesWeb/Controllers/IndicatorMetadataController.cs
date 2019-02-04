@@ -26,7 +26,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// Gets the indicator metadata for a list of indicator IDs
         /// </summary>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
-        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
+        /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs [optional]</param>
         /// <param name="include_definition">Whether to include the definition in response [yes/no - no is default]</param>
         /// <param name="include_system_content">Whether to include system content in response [yes/no - no is default]</param>
         [HttpGet]
@@ -313,6 +313,47 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 }
 
                 return null;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a list of the indicators in the specified profile groups
+        /// </summary>
+        /// <param name="group_ids">Comma separated list of group ids</param>
+        [HttpGet]
+        [Route("indicator_names/by_group_id")]
+        public IList<DomainIndicatorName> GetIndicatorNamesByGroupId(string group_ids)
+        {
+            try
+            {
+                var groupIds = ParseIntList(group_ids);
+
+                var domainIndicatorNames = new List<DomainIndicatorName>();
+                foreach (var groupId in groupIds)
+                {
+                    var groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupId(groupId);
+
+                    var metadataCollection = IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(groupings);
+
+                    foreach (var indicatorMetadata in metadataCollection.IndicatorMetadata)
+                    {
+                        var domainIndicatorName = new DomainIndicatorName()
+                        {
+                            GroupId = groupId,
+                            IndicatorId = indicatorMetadata.IndicatorId,
+                            IndicatorName = indicatorMetadata.Name
+                        };
+
+                        domainIndicatorNames.Add(domainIndicatorName);
+                    }
+                }
+
+                return domainIndicatorNames;
             }
             catch (Exception ex)
             {

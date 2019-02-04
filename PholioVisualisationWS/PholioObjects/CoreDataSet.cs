@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
-  public class CoreDataSet : ValueWithCIsData
+  public class CoreDataSet : ValueWithCIsData, ICloneable
     {
         private double? countPerYear;
         public const int NoValueNote = 0;
@@ -189,6 +190,22 @@ namespace PholioVisualisation.PholioObjects
         public bool ShouldSerializeValueNoteId()
         {
             return ValueNoteId != NoValueNote;
+        }
+
+        public TimePeriod GetTimePeriod()
+        {
+            return new TimePeriod
+            {
+                Year = Year,
+                YearRange = YearRange,
+                Quarter = Quarter,
+                Month = Month
+            };
+        }
+        
+        public object Clone()
+        {
+            return MemberwiseClone();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetCcgPracticePopulations()
         {
-            var map = Reader().GetCcgPracticePopulations(AreaCodes.Ccg_Chiltern);
+            var map = Reader().GetCcgPracticePopulations(AreaCodes.Ccg_CambridgeshirePeterborough);
             Assert.IsTrue(map.Count > 0);
             foreach (var keyValuePair in map)
             {

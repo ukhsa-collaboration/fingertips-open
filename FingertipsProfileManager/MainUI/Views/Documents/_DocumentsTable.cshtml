@@ -3,13 +3,15 @@
 
 @{
     var documents = ViewBag.DocumentItems;
-    var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
 }
 
 @if (documents != null)
 {
     if (documents.Count > 0)
     {
+        var isAdministrator = UserDetails.CurrentUser().IsAdministrator;
+        var hasUserAccessToProfile = UserDetails.CurrentUser().HasWritePermissionsToProfile(Model.ProfileId);
+        var canPublishToLive = isAdministrator || hasUserAccessToProfile;
         <table class="grid sortable">
             <thead>
                 <tr>
@@ -18,7 +20,7 @@
                     <th class="header">Content URL</th>
                     <th class="header">Download</th>
                     <th class="header">Delete</th>
-                    @if (isAdministrator)
+                    @if (canPublishToLive)
                     {
                         <th class="header">Publish live</th>
                     }
@@ -44,7 +46,7 @@
                     <td>
                         <a href="" class="document-delete" documentId="@doc.Id" title="Delete @doc.FileName from the test site">Delete</a>
                     </td>
-                    @if (isAdministrator)
+                    @if (canPublishToLive)
                     {
                         <td id="document-publish-live-td-@doc.Id">
                             <a href="" class="document-publish" documentId="@doc.Id" title="Publish @doc.FileName to live site">Publish to live site</a>

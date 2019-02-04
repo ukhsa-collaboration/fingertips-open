@@ -18,10 +18,10 @@ namespace PholioVisualisation.DataConstruction
         private IProfileReader _profileReader = ReaderFactory.GetProfileReader();
 
         private TimePeriodTextFormatter _timePeriodFormatter;
-        private int childAreaCount;
-        private CcgPopulation ccgPopulation;
-        private IList<string> areaCodesToIgnore;
-        private bool? shouldShowSpineChart;
+        private int _childAreaCount;
+        private CcgPopulation _ccgPopulation;
+        private IList<string> _areaCodesToIgnore;
+        private bool? _shouldShowSpineChart;
         private IArea _parentArea;
         private IndicatorMetadata _indicatorMetadata;
 
@@ -51,7 +51,7 @@ namespace PholioVisualisation.DataConstruction
                     Age = grouping.Age,
                     Stats = statsPercentiles,
                     StatsF = formatter.FormatStats(statsPercentiles),
-                    HaveRequiredValues = shouldShowSpineChart,
+                    HaveRequiredValues = _shouldShowSpineChart,
                     Period = formattedTimePeriod,
                     Limits = new LimitsBuilder().GetLimits(values.ToList())
                 };
@@ -64,7 +64,7 @@ namespace PholioVisualisation.DataConstruction
                     IID = _indicatorMetadata.IndicatorId,
                     Sex = grouping.Sex,
                     Age = grouping.Age,
-                    HaveRequiredValues = shouldShowSpineChart,
+                    HaveRequiredValues = _shouldShowSpineChart,
                     Period = formattedTimePeriod
                 };
             }
@@ -76,15 +76,15 @@ namespace PholioVisualisation.DataConstruction
             _timePeriodFormatter = new TimePeriodTextFormatter(_indicatorMetadata);
 
             // Set area codes to ignore
-            areaCodesToIgnore = _profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
+            _areaCodesToIgnore = _profileReader.GetAreaCodesToIgnore(profileId).AreaCodesIgnoredForSpineChart;
 
             _parentArea = AreaFactory.NewArea(_areasReader, parentArea.AreaCode);
             if (_parentArea.IsCcg)
             {
-                ccgPopulation = new CcgPopulationProvider(_pholioReader).GetPopulation(_parentArea.Code);
+                _ccgPopulation = new CcgPopulationProvider(_pholioReader).GetPopulation(_parentArea.Code);
             }
 
-            childAreaCount = new ChildAreaCounter(_areasReader)
+            _childAreaCount = new ChildAreaCounter(_areasReader)
                 .GetChildAreasCount(_parentArea, parentArea.ChildAreaTypeId);
         }
 
@@ -98,23 +98,22 @@ namespace PholioVisualisation.DataConstruction
             {
                 // Optimisation for large number of areas
                 values = _groupDataReader.GetOrderedCoreDataValidValuesForAllAreasOfType(grouping, timePeriod,
-                    areaCodesToIgnore);
+                    _areaCodesToIgnore);
             }
             else
             {
                 data = new CoreDataSetListProvider(_groupDataReader).GetChildAreaData(grouping, _parentArea, timePeriod);
-                data = new CoreDataSetFilter(data).RemoveWithAreaCode(areaCodesToIgnore).ToList();
+                data = new CoreDataSetFilter(data).RemoveWithAreaCode(_areaCodesToIgnore).ToList();
                 data = data.OrderBy(x => x.Value).ToList();
                 values = new ValueListBuilder(data).ValidValues;
             }
 
             // Apply rules
+            _shouldShowSpineChart = IsRequiredNumberOfAreaValues(values) || metadata.AlwaysShowSpineChart;
             int areaTypeId = grouping.AreaTypeId;
             if (areaTypeId != AreaTypeIds.GpPractice)
             {
-                shouldShowSpineChart = IsRequiredNumberOfAreaValues(values) || metadata.AlwaysShowSpineChart;
-
-                if (shouldShowSpineChart == false)
+                if (_shouldShowSpineChart == false)
                 {
                     values = null;
                 }
@@ -122,7 +121,7 @@ namespace PholioVisualisation.DataConstruction
             else if (_parentArea.IsCcg)
             {
                 // CCG average of GP practices
-                if (RuleShouldCcgAverageBeCalculated.Validates(grouping, data, ccgPopulation) == false)
+                if (RuleShouldCcgAverageBeCalculated.Validates(grouping, data, _ccgPopulation) == false)
                 {
                     values = null;
                 }
@@ -136,10 +135,10 @@ namespace PholioVisualisation.DataConstruction
         /// </summary>
         private bool IsRequiredNumberOfAreaValues(IEnumerable<double> values)
         {
-            if (childAreaCount > 0)
+            if (_childAreaCount > 0)
             {
                 double fractionOfAreasWithValues = Convert.ToDouble(values.Count()) /
-                    Convert.ToDouble(childAreaCount);
+                    Convert.ToDouble(_childAreaCount);
 
                 return fractionOfAreasWithValues >= 0.75;
             }

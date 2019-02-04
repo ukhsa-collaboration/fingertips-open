@@ -51,6 +51,12 @@ namespace PholioVisualisation.DataConstruction
             return areasReader.GetAllAreaTypes();
         }
 
+        public IList<AreaType> GetAllAreaTypesWithData()
+        {
+            var areaTypeIds = groupDataReader.GetDistinctGroupingAreaTypeIdsForAllProfiles();
+            return areasReader.GetAreaTypes(areaTypeIds);
+        }
+
         public IList<AreaType> GetSupportedAreaTypes()
         {
             return areasReader.GetSupportedAreaTypes();

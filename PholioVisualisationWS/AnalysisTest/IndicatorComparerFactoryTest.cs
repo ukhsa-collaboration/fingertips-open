@@ -76,8 +76,8 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void TestNewSingleOverlappingCIsComparer()
         {
-            var comparer = New(ComparatorMethodIds.SingleOverlappingCIs, 0);
-            Assert.IsTrue(comparer is SingleOverlappingCIsComparer);
+            var comparer = New(ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel, 0);
+            Assert.IsTrue(comparer is SingleOverlappingCIsForOneCILevelComparer);
         }
 
         [TestMethod]

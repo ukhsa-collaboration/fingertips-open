@@ -164,6 +164,47 @@ where [LowerCI95] = -1 and [UpperCI95] = -1
             Assert.IsTrue(true);
         }
 
+        [TestMethod]
+        public void TestGroupingsAreAvailableForDefaultAreaType()
+        {
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+
+            var profiles = ReaderFactory.GetProfileReader().GetAllProfiles();
+            foreach (var profileConfig in profiles)
+            {
+                var areaTypeId = profileConfig.DefaultAreaTypeId;
+
+                // FPM test TestUpdateProfile change area type Id so need to ignore these profiles (they have ID 0 or 1)
+                if (profileConfig.HasAnyData && profileConfig.ProfileId != ProfileIds.Search && 
+                    areaTypeId != 0 && areaTypeId != 1)
+                {
+                    var groupIds = groupDataReader.GetGroupIdsOfProfile(profileConfig.ProfileId);
+                    var areaTypeIds = groupDataReader.GetDistinctGroupingAreaTypeIds(groupIds);
+                    if (areaTypeIds.Any() && areaTypeIds.Contains(areaTypeId) == false)
+                    {
+                        Assert.Fail(
+                            string.Format("There are no groupings for default area type {0} for profile {1}", areaTypeId, profileConfig.ProfileId));
+                    }
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestGpPracticesAllHaveCoordinates()
+        {
+            var areaCodes = areasReader.GetAreaCodesForAreaType(AreaTypeIds.GpPractice);
+
+            var splitter = new LongListSplitter<string>(areaCodes);
+            while (splitter.AnyLeft())
+            {
+                var areas = areasReader.GetAreaWithAddressFromCodes(splitter.NextItems())
+                    .Where(x => x.EastingNorthing == null);
+                Assert.AreEqual(0, areas.Count(), @"Some GP practices do not have coordinates. You need to add them with Google Maps! Run query to find:
+SELECT * FROM [L_Areas]
+WHERE areatypeid = 7 AND areacode not in (select AreaCode from [dbo].[GIS_AreaCoordinates])");
+            }
+        }
+
         private List<int> GetChildAreaTypeIdsThatHaveParentOptionDefined(int profileId)
         {
             var defaultChildAreaTypeIds = areasReader.GetParentAreaGroupsForProfile(profileId)

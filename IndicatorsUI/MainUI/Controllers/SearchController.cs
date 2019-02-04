@@ -89,7 +89,6 @@ namespace IndicatorsUI.MainUI.Controllers
             PageModel.PageTitle = TitleSearchResults;
             ViewBag.SearchText = searchText ?? string.Empty;
 
-            PageModel.RagColourId = templateProfile.RagColourId;
             PageModel.StartZeroYAxis = templateProfile.StartZeroYAxis;
             PageModel.DefaultFingertipsTabId = templateProfile.DefaultFingertipsTabId;
             PageModel.IgnoredSpineChartAreas = templateProfile.AreasToIgnoreForSpineCharts;

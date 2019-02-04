@@ -15,7 +15,6 @@ namespace IndicatorsUI.DomainObjects
         public string AreasToIgnoreEverywhere { get; set; }
         public int DefaultAreaType { get; set; }
         public int EnumParentDisplay { get; set; }
-        public int RagColourId { get; set; }
         public bool ArePdfs { get; set; }
         public bool StartZeroYAxis { get; set; }
         public int DefaultFingertipsTabId { get; set; }
@@ -81,7 +80,5 @@ namespace IndicatorsUI.DomainObjects
                 return Title;
             }
         }
-
-        public SpineChartMinMaxLabel SpineChartMinMaxLabel { get; set; }
     }
 }

@@ -33,8 +33,12 @@ namespace PholioVisualisation.Analysis
                 {
                     case Significance.Worse:
                         return Significance.Better;
+                    case Significance.Worst:
+                        return Significance.Best;
                     case Significance.Better:
                         return Significance.Worse;
+                    case Significance.Best:
+                        return Significance.Worst;
                 }
             }
 

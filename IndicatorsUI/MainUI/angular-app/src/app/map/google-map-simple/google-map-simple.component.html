@@ -1,0 +1,27 @@
+<div id="wrapper">
+    <div [hidden]="isError" id="google-map" #googleMap class="googleMapNg"></div>
+    <div *ngIf="isError" id="polygonError" class="googleMapNg"> {{errorMessage}} </div>
+    <div [hidden]="isError" id="floating-panel" class="layerControl info map-control">
+        <a class="map-control-layers-toggle" href="#" title="Layers" *ngIf="!showOverlay" (mouseover)="displayOverlay()"></a>
+        <div id="mapOptions" *ngIf="showOverlay" (mouseleave)="hideOverlay()">
+            <p>Background map</p>
+            <label *ngFor="let baseMap of baseMaps;let idx = index" class="basemapLabel">
+                <div class="basemap {{baseMap.cssClass}}">
+                    <input type="radio" name="baseMap" [value]="baseMap.val" [checked]="(idx === 0)" (click)="onOverlaySelectionChange(baseMap)">
+                    <span class="label-image"></span>
+                    <span class="label-name">{{baseMap.name}}</span>
+                </div>
+                <br/>
+            </label>
+            <p>Transparency</p>
+            <div class="opacity" *ngFor="let opac of opacityArray;let idx = index;" [attr.selected]="opac/100 == fillOpacity?true : null">
+                <input type="radio" name="opacity" value="{{opac}}" id="opacity_{{opac}}" (click)="onOpacitySelectionChange(opac)">
+                <label for="opacity_{{opac}}">
+                    <span [ngStyle]="{
+                    'background-position':(opac * -4.1 + 37) + 'px 0px'}"></span>
+                    {{opac}} %
+                </label>
+            </div>
+        </div>
+    </div>
+</div>

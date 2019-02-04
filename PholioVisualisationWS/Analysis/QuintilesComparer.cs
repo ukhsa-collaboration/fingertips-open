@@ -41,8 +41,26 @@ namespace PholioVisualisation.Analysis
             {
                 if (data.Value <= _bounds[boundsIndex])
                 {
+                    if (PolarityId == PolarityIds.RagHighIsGood)
+                    {
+                        switch (boundsIndex)
+                        {
+                            case 1:
+                                return 5;
+                            case 2:
+                                return 4;
+                            case 3:
+                                return 3;
+                            case 4:
+                                return 2;
+                            case 5:
+                                return 1;
+                        }
+                    }
+
                     return boundsIndex;
                 }
+
                 boundsIndex++;
             }
 

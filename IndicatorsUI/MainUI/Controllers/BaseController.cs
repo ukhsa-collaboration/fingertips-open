@@ -68,6 +68,8 @@ namespace IndicatorsUI.MainUI.Controllers
             ViewBag.UseGoogleAnalytics = _appConfig.UseGoogleAnalytics;
             ViewBag.JavaScriptVersion = versionFolder;
             ViewBag.FeatureSwitchJavaScript = JsonConvert.SerializeObject(_appConfig.ActiveFeatures);
+            ViewBag.IsEnvironmentLive = _appConfig.IsEnvironmentLive;
+            ViewBag.IsUserSignedIn = UserAccountHelper.IsUserSignedIn(User);
         }
 
         private void SetBridgeServicesUrl()
@@ -142,7 +144,6 @@ namespace IndicatorsUI.MainUI.Controllers
                 PageModel.PageTitle = details.Title;
 
                 ViewBag.DefaultAreaType = details.DefaultAreaType;
-                PageModel.RagColourId = details.RagColourId;
                 PageModel.StartZeroYAxis = details.StartZeroYAxis;
                 PageModel.DefaultFingertipsTabId = details.DefaultFingertipsTabId;
                 PageModel.HasRecentTrends = details.HasRecentTrends;
@@ -166,12 +167,6 @@ namespace IndicatorsUI.MainUI.Controllers
                 ViewBag.StaticReportsFolders = details.StaticReportsFolders ?? string.Empty;
                 ViewBag.StaticReportsLabel = details.StaticReportsLabel ?? "Report year";
                 ViewBag.IsChangeFromPreviousPeriodShown = details.IsChangeFromPreviousPeriodShown;
-
-                PageModel.SpineChartMinMaxLabel = new SpineChartMinMaxLabelBuilder(
-                    details.SpineChartMinMaxLabel,
-                    PageModel.RagColourId
-                    ).MinMaxLabels;
-
                 ViewBag.NNConfig = JsonConvert.SerializeObject(new NearestNeighbourHelper().GetNeighbourConfig(details.Id));
             }
         }

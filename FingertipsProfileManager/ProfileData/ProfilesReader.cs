@@ -22,6 +22,8 @@ namespace Fpm.ProfileData
             IList<int> indicatorIds, int profileId);
 
         ProfileDetails GetProfileDetailsByProfileId(int profileId);
+
+        int GetProfileIdFromUrlKey(string urlKey);
     }
 
     public class ProfilesReader : BaseReader, IProfilesReader
@@ -285,22 +287,31 @@ namespace Fpm.ProfileData
                 ? (IList<object>)results[1] // first overwritten metadata
                 : null;
 
+            // IndicatorID and GroupID
+            var valueIndex = 2;
+
             List<IndicatorText> indicatorTextList = new List<IndicatorText>();
             for (int i = 0; i < properties.Count; i++)
             {
+                // Skip ID
+                while (genericResults[valueIndex] is int)
+                {
+                    valueIndex++;
+                }
+
                 var property = properties[i];
-
                 IndicatorText indicatorText = new IndicatorText { IndicatorMetadataTextProperty = property };
-                indicatorTextList.Add(indicatorText);
 
-                // Add 1 to skip IndicatorID and GroupID
-                int valueIndex = property.PropertyId + 1;
                 indicatorText.ValueGeneric = (string)genericResults[valueIndex];
 
                 if (specificResults != null)
                 {
                     indicatorText.ValueSpecific = (string)specificResults[valueIndex];
                 }
+
+                indicatorTextList.Add(indicatorText);
+
+                valueIndex++;
             }
             return indicatorTextList;
         }
@@ -311,15 +322,6 @@ namespace Fpm.ProfileData
             q.SetParameter("indicatorId", indicatorId);
             IndicatorMetadata metadata = q.UniqueResult<IndicatorMetadata>();
             return metadata;
-        }
-
-        public Dictionary<int, int> GetIndicatorIdsByProfileIds(List<int> profileIds)
-        {
-            var result = CurrentSession.CreateCriteria<IndicatorMetadata>()
-                .Add(Restrictions.In("OwnerProfileId", profileIds))
-                .List<IndicatorMetadata>()
-                .ToDictionary(x => x.IndicatorId, x => x.OwnerProfileId);
-            return result;
         }
 
         public IEnumerable<Grouping> DoesIndicatorExistInMoreThanOneGroup(int indicatorId, int ageId, int sexId)
@@ -334,6 +336,7 @@ namespace Fpm.ProfileData
         public virtual IList<double> GetAllComparatorConfidences()
         {
             return CurrentSession.CreateCriteria<ComparatorConfidence>()
+                .Add(Restrictions.Not(Restrictions.Eq("ConfidenceValue", 98D)))
                 .SetProjection(Projections.Distinct(Projections.Property("ConfidenceValue")))
                 .List<double>();
         }

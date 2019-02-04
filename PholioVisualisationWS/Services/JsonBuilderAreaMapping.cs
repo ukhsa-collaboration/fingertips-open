@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.DataSorting;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
 
 namespace PholioVisualisation.Services
 {
@@ -23,6 +23,8 @@ namespace PholioVisualisation.Services
         public Dictionary<string, IEnumerable<string>> GetParentAreaToChildAreaDictionary()
         {
             var nearestNeighbourCode = _parameters.NearestNeighbourCode;
+            var userId = _parameters.UserId;
+            var parentAreaTypeId = _parameters.ParentAreaTypeId;
 
             Dictionary<string, IEnumerable<string>> parentCodeToChildCodes = new Dictionary<string, IEnumerable<string>>();
 
@@ -30,7 +32,22 @@ namespace PholioVisualisation.Services
 
             var listBuilder = new AreaListProvider(areasReader);
 
-            if (nearestNeighbourCode != "")
+            if (parentAreaTypeId == 30000 && userId != null)
+            {
+                IAreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
+                var areaLists = areaListRepository.GetAll(userId);
+                foreach (var areaList in areaLists)
+                {
+                    List<string> areaListAreaCodes = new List<string>();
+                    foreach (var areaListAreaCode in areaList.AreaListAreaCodes)
+                    {
+                        areaListAreaCodes.Add(areaListAreaCode.AreaCode);
+                    }
+
+                    parentCodeToChildCodes.Add(areaList.PublicId, areaListAreaCodes);
+                }
+            }
+            else if (nearestNeighbourCode != "")
             {
                 // Find nearest neighbours
                 CheckNeighbourCodeIsValid(nearestNeighbourCode);
@@ -42,7 +59,7 @@ namespace PholioVisualisation.Services
             else
             {
                 // Find child areas of parents
-                listBuilder.CreateAreaListFromAreaTypeId(_parameters.ProfileId, _parameters.ParentAreaTypeId);
+                listBuilder.CreateAreaListFromAreaTypeId(_parameters.ProfileId, _parameters.ParentAreaTypeId, _parameters.UserId);
                 var parentAreas = listBuilder.Areas;
                 foreach (var parentArea in parentAreas)
                 {

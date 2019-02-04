@@ -245,5 +245,13 @@ ComparatorMethodIds = {
     Undefined : -1,
     SuicidePlanDefined: 14,
     Quintiles: 15,
-    Quartiles : 16
+    Quartiles: 16,
+    SingleOverlappingCIsForTwoCILevels:17
 };
+
+PolarityIds = {
+    NotApplicable: -1,
+    RagLowIsGood: 0,
+    RagHighIsGood: 1,
+    UseBlues: 99
+}

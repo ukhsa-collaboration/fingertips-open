@@ -77,9 +77,13 @@ namespace Fpm.ProfileData.Repositories
         void DeleteOverriddenMetadataTextValues(int? indicatorId, int profileId);
         void ArchiveIndicatorFromGrouping(int groupId, int? indicatorId, int areaTypeId, int sexId, int ageId);
 
-        IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId,
-            int profileId);
-
+        string GetDomainName(int groupId, int domainSequence);
+        IList<GroupingSubheading> GetGroupingSubheadingsByGroupIds(IList<int> groupIds);
+        IList<GroupingSubheading> GetGroupingSubheadings(int areaTypeId, int groupId);
+        IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId, int profileId);
+        void SaveGroupingSubheading(GroupingSubheading groupingSubheading);
+        void UpdateGroupingSubheading(GroupingSubheading groupingSubheading);
+        void DeleteGroupingSubheading(int subheadingId);
         ProfileDetails GetProfileDetailsById(int Id);
     }
 
@@ -91,12 +95,13 @@ namespace Fpm.ProfileData.Repositories
         }
 
         /// <summary>
-        /// Flush the session. May be required for testing to ensure changes are .
+        /// Flush the session. May be required for testing to ensure changes are picked up.
         /// </summary>
         public void RefreshObject(object o)
         {
             CurrentSession.Flush();
             CurrentSession.Refresh(o);
+            CurrentSession.Clear();
         }
 
         public IList<ProfileDetails> GetProfiles()
@@ -293,7 +298,8 @@ namespace Fpm.ProfileData.Repositories
             return -1;
         }
 
-        public bool UpdateProfileCollection(int profileCollectionId, string assignedProfilesToUpdate, string collectionNameToUpdate, string collectionSkinTitleToUpdate)
+        public bool UpdateProfileCollection(int profileCollectionId, string assignedProfilesToUpdate, string collectionNameToUpdate, 
+            string collectionSkinTitleToUpdate)
         {
 
             try
@@ -314,8 +320,10 @@ namespace Fpm.ProfileData.Repositories
                 {
                     foreach (var assignedProfile in assignedProfilesToUpdate.Split(','))
                     {
-                        var assignedProfileId = assignedProfile.Split('~')[0];
-                        var showDomain = assignedProfile.Split('~')[1] == "true";
+                        var bits = assignedProfile.Split('~');
+
+                        var assignedProfileId = bits[0];
+                        var showDomain = bits[1] == "true";
 
                         CurrentSession.Save(new ProfileCollectionItem()
                         {
@@ -728,6 +736,14 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
+        public string GetDomainName(int groupId, int domainSequence)
+        {
+            IQuery q = CurrentSession.CreateQuery("select g.GroupName from GroupingMetadata g where g.GroupId = :groupId and g.Sequence = :domainSequence");
+            q.SetParameter("groupId", groupId);
+            q.SetParameter("domainSequence", domainSequence);
+            return q.UniqueResult<string>();
+        }
+
         public IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId, int profileId)
         {
             var groupings = CurrentSession.GetNamedQuery("GetGroupingPlusNames")
@@ -773,6 +789,104 @@ namespace Fpm.ProfileData.Repositories
             }
 
             return groupingPlusNamesWithoutOverriddenMetadata;
+        }
+
+        public IList<GroupingSubheading> GetGroupingSubheadingsByGroupIds(IList<int> groupIds)
+        {
+            return CurrentSession.CreateCriteria<GroupingSubheading>()
+                .Add(Restrictions.In("GroupId", groupIds.ToList()))
+                .List<GroupingSubheading>();
+        }
+
+        public IList<GroupingSubheading> GetGroupingSubheadings(int areaTypeId, int groupId)
+        {
+            IQuery q = CurrentSession.CreateQuery("from GroupingSubheading g where g.AreaTypeId = :areaTypeId and g.GroupId = :groupId");
+            q.SetParameter("areaTypeId", areaTypeId);
+            q.SetParameter("groupId", groupId);
+            return q.List<GroupingSubheading>();
+        }
+
+        public GroupingSubheading GetGroupingSubheading(int subheadingId)
+        {
+            IQuery q = CurrentSession.CreateQuery("from GroupingSubheading g where g.SubheadingId = :subheadingId");
+            q.SetParameter("subheadingId", subheadingId);
+            return q.UniqueResult<GroupingSubheading>();
+        }
+
+        public void SaveGroupingSubheading(GroupingSubheading groupingSubheading)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                var groupingSubheadings = GetGroupingSubheadings(groupingSubheading.AreaTypeId, groupingSubheading.GroupId);
+
+                if (groupingSubheadings.FirstOrDefault(x => x.Subheading.ToLower() == groupingSubheading.Subheading.ToLower()) == null)
+                {
+                    // Save new 
+                    CurrentSession.GetNamedQuery("Insert_GroupingSubheading")
+                        .SetParameter("GroupId", groupingSubheading.GroupId)
+                        .SetParameter("AreaTypeId", groupingSubheading.AreaTypeId)
+                        .SetParameter("Subheading", groupingSubheading.Subheading)
+                        .SetParameter("Sequence", groupingSubheading.Sequence)
+                        .ExecuteUpdate();
+
+                    transaction.Commit();
+                }
+                else
+                {
+                    throw new FpmException("The grouping subheading with the same name, area type id and group id already exists.");
+                }
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
+        public void UpdateGroupingSubheading(GroupingSubheading groupingSubheading)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                CurrentSession.GetNamedQuery("Update_GroupingSubheading")
+                    .SetParameter("GroupId", groupingSubheading.GroupId)
+                    .SetParameter("AreaTypeId", groupingSubheading.AreaTypeId)
+                    .SetParameter("Subheading", groupingSubheading.Subheading)
+                    .SetParameter("Sequence", groupingSubheading.Sequence)
+                    .SetParameter("SubheadingId", groupingSubheading.SubheadingId)
+                    .ExecuteUpdate();
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
+        public void DeleteGroupingSubheading(int subheadingId)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                int deleteCount = CurrentSession.GetNamedQuery("Delete_GroupingSubheading")
+                    .SetParameter("SubheadingId", subheadingId)
+                    .ExecuteUpdate();
+
+                if (deleteCount == 0)
+                {
+                    throw new Exception(String.Format("Unable to delete the grouping subheading with id {0}", subheadingId));
+                }
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
         }
 
         private void DeleteIndicatorFromGroupingByAgeSexAndArea(int? groupId,

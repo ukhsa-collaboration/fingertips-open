@@ -1,41 +1,44 @@
 ﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
 @{
     var hrefBase = "/profile/" + ViewBag.ProfileUrlKey + "/data#gid/";
 }
 
 <div class="row">
-    <div class="link-header col-md-12">
-        <a href="@hrefBase@GroupIds.Phof_OverarchingIndicators">Overarching indicators</a>
+    <div class="col-md-12">
+        @ContentProvider.GetIntroduction(Model.ProfileId)
     </div>
 
-    <div class="phof-domains col-md-6">
-        <p class="large">Find out about differences in life expectancy and healthy life expectancy between communities.</p>
-    </div>
-    <div class="phof-domains col-md-6">
-        @Html.Partial("_StartButton")
-    </div>
-    <div class="phof-domains col-md-6">
-        <a href="@hrefBase@GroupIds.Phof_WiderDeterminantsofHealth">Improving the wider determinants of health</a>
-        <p>
-            Browse indicators for tracking progress in wider factors that affect health and wellbeing.
-        </p>
-    </div>
-    <div class="phof-domains col-md-6">
-        <a href="@hrefBase@GroupIds.Phof_HealthImprovment">Health improvement</a>
-        <p>
-            Browse indicators for tracking progress in helping people to live healthy lifestyles and make healthy choices.
-        </p>
-    </div>
-    <div class="phof-domains col-md-6">
-        <a href="@hrefBase@GroupIds.Phof_HealthProtection">Health protection</a>
-        <p>
-            Browse indicators for tracking progress in protecting the population’s health from major incidents and other threats.
-        </p>
-    </div>
-    <div class="phof-domains col-md-6">
-        <a href="@hrefBase@GroupIds.Phof_PrematureMortality">Healthcare public health and preventing premature mortality</a>
-        <p>
-            Browse indicators for tracking progress in reducing numbers of people living with preventable ill health and people dying prematurely.
-        </p>
+    <div class="phof-domains-top col-md-12">
+        <a href="@hrefBase@GroupIds.Phof_OverarchingIndicators" class="phof-domains-indicators-header-link">
+            <div class="phof-domains-indicators-header col-sm-12">
+                Overarching indicators
+            </div>
+        </a>
+        <div class="phof-domains-indicators-middle-top col-sm-12">
+            <div class="row">
+                <a href="@hrefBase@GroupIds.Phof_WiderDeterminantsofHealth" class="phof-domains-indicators-middle-elements col-sm-3">
+                    <div  style="padding-top: 20px;">
+                        Wider <br /> Determinants
+                    </div>
+                </a>
+                <a href="@hrefBase@GroupIds.Phof_HealthImprovment" class="phof-domains-indicators-middle-elements col-sm-3">
+                    <div  style="padding-top: 20px;">
+                        Health<br /> Improvement
+                    </div>
+                </a>
+                <a href="@hrefBase@GroupIds.Phof_HealthProtection" class="phof-domains-indicators-middle-elements col-sm-3">
+                    <div  style="padding-top: 20px;">
+                        Health <br /> Protection
+                    </div>
+                </a>
+                <a href="@hrefBase@GroupIds.Phof_PrematureMortality" class="phof-domains-indicators-middle-elements col-sm-3">
+                    <div >
+                        Healthcare <br /> and <br /> Premature Mortality
+                    </div>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
+

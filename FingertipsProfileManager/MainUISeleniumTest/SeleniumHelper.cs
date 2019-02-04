@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 
 namespace Fpm.MainUISeleniumTest
@@ -14,7 +10,7 @@ namespace Fpm.MainUISeleniumTest
         /// <summary>
         /// Wait for an element to be present on the page.
         /// </summary>
-        public static void WaitForExpectedElement(IWebDriver driver, By element, int timeoutInSeconds = 10)
+        public static void WaitForExpectedElement(IWebDriver driver, By element, int timeoutInSeconds = 30)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
                 .Until(ExpectedConditions.ElementExists(element));
@@ -23,10 +19,19 @@ namespace Fpm.MainUISeleniumTest
         /// <summary>
         /// Wait for an element to be present on the page.
         /// </summary>
-        public static void WaitForExpectedElementToBeVisible(IWebDriver driver, By element, int timeoutInSeconds = 10)
+        public static void WaitForExpectedElementToBeVisible(IWebDriver driver, By element, int timeoutInSeconds = 30)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
                 .Until(ExpectedConditions.ElementIsVisible(element));
+        }
+
+        /// <summary>
+        /// Wait for an element to be clickable on the page.
+        /// </summary>
+        public static void WaitForExpectedElementToBeClickable(IWebDriver driver, By element, int timeoutInSeconds = 30)
+        {
+            new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
+                .Until(ExpectedConditions.ElementToBeClickable(element));
         }
 
         /// <summary>

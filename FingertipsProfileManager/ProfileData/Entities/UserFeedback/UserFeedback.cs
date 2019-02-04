@@ -12,5 +12,6 @@ namespace Fpm.ProfileData.Entities.UserFeedback
         public string Environment { get; set; }
         public DateTime Timestamp { get; set; }
         public bool HasBeenDealtWith { get; set; }
+        public string Comment { get; set; }
     }
 }

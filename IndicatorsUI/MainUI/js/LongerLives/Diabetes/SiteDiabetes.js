@@ -679,8 +679,7 @@ function goToAreaDetails() {
 
 function areaSearchResultSelected(noMatches, searchResult) {
 
-    if (!noMatches.is(':visible')) {
-
+    if (!noMatches.is(':visible')) {        
         // Reset search box
         $('#search_text').val('').blur();
         var model = MT.model;

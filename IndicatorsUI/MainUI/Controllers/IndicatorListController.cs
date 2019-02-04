@@ -8,6 +8,7 @@ using AutoMapper;
 using IndicatorsUI.MainUI.Models.UserList;
 using System.ComponentModel.DataAnnotations;
 using IndicatorsUI.DataAccess;
+using IndicatorsUI.DomainObjects;
 using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.MainUI.Models.UserAccess;
 using IndicatorsUI.UserAccess;
@@ -38,8 +39,9 @@ namespace IndicatorsUI.MainUI.Controllers
         [Route("")]
         public ActionResult Index()
         {
+
             // Check user is logged in
-            if (_identity.IsUserSignedIn(User) == false)
+            if (IsUserSignedIn() == false)
             {
                 return RedirectToAction("Login", "UserAccount");
             }
@@ -57,7 +59,7 @@ namespace IndicatorsUI.MainUI.Controllers
         public ActionResult Create()
         {
             // Check user is logged in
-            if (_identity.IsUserSignedIn(User) == false)
+            if (IsUserSignedIn() == false)
             {
                 return RedirectToAction("Login", "UserAccount");
             }
@@ -71,7 +73,7 @@ namespace IndicatorsUI.MainUI.Controllers
         public ActionResult Save(IndicatorListViewModel indicatorListVM)
         {
             // Check user is logged in
-            if (_identity.IsUserSignedIn(User) == false)
+            if (IsUserSignedIn() == false)
             {
                 return RedirectToAction("Login", "UserAccount");
             }
@@ -100,7 +102,7 @@ namespace IndicatorsUI.MainUI.Controllers
 
             try
             {
-                SaveIndicatorList(indicatorList);
+                SaveIndicatorList(indicatorList, false);
             }
             catch (Exception ex)
             {
@@ -111,11 +113,65 @@ namespace IndicatorsUI.MainUI.Controllers
             return GetJsonTaskResult(true, "Saved successfully");
         }
 
+        [Route("copy")]
+        public ActionResult Copy(string listId, string listName)
+        {
+            // Check user is logged in
+            if (IsUserSignedIn() == false)
+            {
+                return RedirectToAction("Login", "UserAccount");
+            }
+
+            // Check user owns the list
+            var user = _identity.GetApplicationUser(User);
+            if (_indicatorListRepository.DoesUserOwnList(listId, user.Id) == false)
+            {
+                return RedirectToAction("Index", "IndicatorList");
+            }
+
+            var indicatorList = new IndicatorList()
+            {
+                ListName = listName,
+                UserId = user.Id
+            };
+
+            var indicatorListFromDb = _indicatorListRepository.GetListByPublicId(listId);
+            foreach (var indicatorListItemFromDb in indicatorListFromDb.IndicatorListItems)
+            {
+                var indicatorListItem = new IndicatorListItem()
+                {
+                    AgeId = indicatorListItemFromDb.AgeId,
+                    SexId = indicatorListItemFromDb.SexId,
+                    IndicatorId = indicatorListItemFromDb.IndicatorId,
+                    Sequence = indicatorListItemFromDb.Sequence
+                };
+
+                indicatorList.IndicatorListItems.Add(indicatorListItem);
+            }
+
+            try
+            {
+                SaveIndicatorList(indicatorList, true);
+            }
+            catch (Exception ex)
+            {
+                _exceptionLoggerWrapper.LogException(ex, null);
+                ViewBag.Error = "Another indicator list already has that name. Please choose a different one.";
+            }
+
+            var indicatorsLists = _indicatorListRepository.GetAll(user.Id);
+            IndicatorListsViewModel model = new IndicatorListsViewModel()
+            {
+                IndicatorLists = Mapper.Map<IEnumerable<IndicatorListViewModel>>(indicatorsLists)
+            };
+            return View("IndicatorListIndex", model);
+        }
+
         [Route("edit")]
         public ActionResult Edit(string listId)
         {
             // Check user is logged in
-            if (_identity.IsUserSignedIn(User) == false)
+            if (IsUserSignedIn() == false)
             {
                 return RedirectToAction("Login", "UserAccount");
             }
@@ -137,7 +193,7 @@ namespace IndicatorsUI.MainUI.Controllers
         public ActionResult Delete(string listId)
         {
             // Check user is logged in
-            if (_identity.IsUserSignedIn(User) == false)
+            if (IsUserSignedIn() == false)
             {
                 return RedirectToAction("Login", "UserAccount");
             }
@@ -172,9 +228,9 @@ namespace IndicatorsUI.MainUI.Controllers
             return id > 0;
         }
 
-        private void SaveIndicatorList(IndicatorList indicatorList)
+        private void SaveIndicatorList(IndicatorList indicatorList, bool createCopy = false)
         {
-            if (HasIndicatorListIdBeenAssigned(indicatorList.Id))
+            if (!createCopy && HasIndicatorListIdBeenAssigned(indicatorList.Id))
             {
                 _indicatorListRepository.Update(indicatorList);
             }
@@ -206,6 +262,11 @@ namespace IndicatorsUI.MainUI.Controllers
             {
                 item.Sequence = sequence++;
             }
+        }
+
+        private bool IsUserSignedIn()
+        {
+            return _identity.IsUserSignedIn(User);
         }
     }
 }

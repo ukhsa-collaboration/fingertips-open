@@ -15,6 +15,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
 
 namespace PholioVisualisation.ServicesWeb.Controllers
 {
@@ -67,6 +69,25 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             {
                 return new AreaTypesAction().GetResponse(
                     new IntListStringParser(profile_ids).IntList);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a list of area types with data
+        /// </summary>
+        /// <returns>List of area types</returns>
+        [HttpGet]
+        [Route("area_types/with_data")]
+        public IList<AreaType> GetAreaTypesWithData()
+        {
+            try
+            {
+                return new AreaTypesAction().GetResponse();
             }
             catch (Exception ex)
             {
@@ -193,7 +214,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         [HttpGet]
         [Route("areas/by_area_type")]
         public IList<IArea> GetAreasOfAreaType(int area_type_id, int profile_id = ProfileIds.Undefined,
-            int template_profile_id = ProfileIds.Undefined, string retrieve_ignored_areas = null)
+            int template_profile_id = ProfileIds.Undefined, string retrieve_ignored_areas = null, string user_id = null)
         {
             try
             {
@@ -201,7 +222,52 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 var retrieveIgnoredAreas = ServiceHelper.ParseYesOrNo(retrieve_ignored_areas, false);
 
                 return new AreasOfAreaTypeAction().GetResponse(area_type_id, profile_id,
-                    template_profile_id, retrieveIgnoredAreas);
+                    template_profile_id, retrieveIgnoredAreas, user_id);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a list of areas of a specific area type and area name search text
+        /// </summary>
+        /// <param name="area_type_id">Area type ID</param>
+        /// <param name="area_name_search_text">Area name search text</param>
+        [HttpGet]
+        [Route("areas/by_area_type_and_area_name_search_text")]
+        public IList<IArea> GetAreasOfAreaTypeAndAreaNameSearchText(int area_type_id, string area_name_search_text)
+        {
+            try
+            {
+                return new AreasOfAreaTypeAction().GetResponse(area_type_id, area_name_search_text);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get the area based on area type and parent code
+        /// </summary>
+        /// <param name="area_type_id">Area type ID</param>
+        /// <param name="parent_code">Parent code</param>
+        /// <param name="profile_id">Profile ID</param>
+        [HttpGet]
+        [Route("area/by_area_type_and_parent_code")]
+        public IArea GetAreaByAreaTypeAndParentCode(int area_type_id, string parent_code, int profile_id = ProfileIds.Undefined)
+        {
+            try
+            {
+                AreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
+
+                var userId = areaListRepository.GetUserIdByPublicId(parent_code);
+
+                return new AreasOfAreaTypeAction().GetResponse(area_type_id, profile_id, userId, parent_code);
             }
             catch (Exception ex)
             {
@@ -245,6 +311,29 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 var areaListBuilder = new AreaListProvider(ReaderFactory.GetAreasReader());
                 areaListBuilder.CreateAreaListFromAreaCodes(codes);
                 return areaListBuilder.Areas;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get a list of areas with address from their area codes
+        /// </summary>
+        /// <param name="area_codes">List of area codes</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("areas_with_addresses/by_area_code")]
+        public IList<AreaAddress> GetAreasWithAddresses(string area_codes)
+        {
+            try
+            {
+                var codes = new StringListParser(area_codes).StringList;
+                var areaAddressProvider = new AreaAddressProvider(ReaderFactory.GetAreasReader());
+
+                return areaAddressProvider.GetAreaAddressList(codes);
             }
             catch (Exception ex)
             {
@@ -298,7 +387,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         [Route("parent_to_child_areas")]
         public Dictionary<string, IEnumerable<string>> GetParentToChildAreaMapping(
             int child_area_type_id = -1, int parent_area_type_id = -1, int profile_id = -1,
-            string nearest_neighbour_code = null, string retrieve_ignored_areas = null)
+            string nearest_neighbour_code = null, string user_id = null, string retrieve_ignored_areas = null)
         {
             try
             {
@@ -308,6 +397,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 nameValues.Add(ParameterNames.ProfileId, profile_id.ToString());
                 nameValues.Add(ParameterNames.NearestNeighbourCode, nearest_neighbour_code ?? string.Empty);
                 nameValues.Add(ParameterNames.RetrieveIgnoredAreas, retrieve_ignored_areas ?? string.Empty);
+                nameValues.Add(ParameterNames.UserId, user_id ?? string.Empty);
 
                 var parameters = new AreaMappingParameters(nameValues);
                 return new JsonBuilderAreaMapping(parameters).GetParentAreaToChildAreaDictionary();
@@ -319,6 +409,44 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets a dictionary of parent area code to a list of child area codes
+        /// </summary>
+        /// <param name="child_area_type_id">Child area type ID [optional]</param>
+        /// <param name="parent_area_type_id">Parent area type ID [optional]</param>
+        /// <param name="profile_id">Profile ID for filtering of certain areas [optional]</param>
+        /// <param name="nearest_neighbour_code">Nearest neighbour code [optional]</param>
+        /// <param name="parent_code">Parent code [optional]</param>
+        /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] [optional]</param>
+        [HttpGet]
+        [Route("parent_to_child_areas_by_parent_code")]
+        public Dictionary<string, IEnumerable<string>> GetParentToChildAreaMappingByParentCode(
+            int child_area_type_id = -1, int parent_area_type_id = -1, int profile_id = -1,
+            string nearest_neighbour_code = null, string parent_code = null, string retrieve_ignored_areas = null)
+        {
+            try
+            {
+                AreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
+
+                var userId = areaListRepository.GetUserIdByPublicId(parent_code);
+
+                NameValueCollection nameValues = new NameValueCollection();
+                nameValues.Add(ParameterNames.AreaTypeId, child_area_type_id.ToString());
+                nameValues.Add(ParameterNames.ParentAreaTypeId, parent_area_type_id.ToString());
+                nameValues.Add(ParameterNames.ProfileId, profile_id.ToString());
+                nameValues.Add(ParameterNames.NearestNeighbourCode, nearest_neighbour_code ?? string.Empty);
+                nameValues.Add(ParameterNames.RetrieveIgnoredAreas, retrieve_ignored_areas ?? string.Empty);
+                nameValues.Add(ParameterNames.UserId, userId ?? string.Empty);
+
+                var parameters = new AreaMappingParameters(nameValues);
+                return new JsonBuilderAreaMapping(parameters).GetParentAreaToChildAreaDictionary();
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
 
         /// <summary>
         /// Gets a list of areas within 5 miles radius of a point

@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -29,7 +30,7 @@ namespace PholioVisualisation.DataConstructionTest
                 Id = CategoryTypeIds.DeprivationDecileCountyAndUA2010
             });
             var builder = new AreaListProvider(ReaderFactory.GetAreasReader());
-            builder.CreateAreaListFromAreaTypeId(profileId, categoryAreaType.Id);
+            builder.CreateAreaListFromAreaTypeId(profileId, categoryAreaType.Id, String.Empty);
             var areaList = builder.Areas;
             Assert.IsTrue(areaList.Any());
 
@@ -56,7 +57,7 @@ namespace PholioVisualisation.DataConstructionTest
             AreasGotFromCodes(codes, areas, mockAreasReader);
 
             var builder = new AreaListProvider(mockAreasReader.Object);
-            builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
+            builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId, String.Empty);
             var areaList = builder.Areas;
             Assert.AreEqual(3, areaList.Count);
         }
@@ -173,7 +174,7 @@ namespace PholioVisualisation.DataConstructionTest
             NoParentAreaCodes(mockAreasReader);
 
             var builder = new AreaListProvider(mockAreasReader.Object);
-            builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId);
+            builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId, String.Empty);
             return builder;
         }
 

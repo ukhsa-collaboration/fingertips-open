@@ -1,6 +1,6 @@
 import { LatitudeLongitude } from '../../typings/FT.d';
 
-export class autoCompleteResult {
+export class AutoCompleteResult {
     polygonAreaCode: string;
     displayName: string;
     constructor(polygonAreaCode: string, name: string, parentAreaName: string) {

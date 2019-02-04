@@ -11,6 +11,8 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
     [TestClass]
     public class AreasControllerTest
     {
+        private const string ParentCode = "al-ZY6zmuVONE";
+
         [TestMethod]
         public void TestGetChildAreas_Area_Ignored_For_Profile()
         {
@@ -53,7 +55,7 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         }
 
         [TestMethod]
-        public void TestGetChildAreasWithAddressesAsCsv()
+        public void TestGetChildAreas_WithAddressesAsCsv()
         {
             var addresses = new AreasController().GetChildAreasWithAddressesAsCsv(
                 AreaCodes.Ccg_Barnet, AreaTypeIds.GpPractice);
@@ -63,5 +65,22 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
             Assert.IsTrue(text.Contains("Barnet"));
         }
 
+        [TestMethod]
+        public void TestGetArea_ByAreaType_And_ParentCode()
+        {
+            var area = new AreasController().GetAreaByAreaTypeAndParentCode(AreaTypeIds.AreaList,
+                ParentCode, ProfileIds.Phof);
+
+            Assert.AreEqual(area.Code, ParentCode);
+        }
+
+        [TestMethod]
+        public void TestGetParentToChildAreaMapping_ByParentCode()
+        {
+            var mappings = new AreasController().GetParentToChildAreaMappingByParentCode(-1, AreaTypeIds.AreaList,
+                ProfileIds.Phof, null, ParentCode, null);
+
+            Assert.IsTrue(mappings.Any());
+        }
     }
 }

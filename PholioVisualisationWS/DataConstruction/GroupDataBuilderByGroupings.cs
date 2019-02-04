@@ -8,6 +8,7 @@ namespace PholioVisualisation.DataConstruction
 {
     public class GroupDataBuilderByGroupings : GroupDataBuilderBase
     {
+        public string ParentAreaCode;
         public int ChildAreaTypeId;
         public int GroupId;
 
@@ -18,7 +19,18 @@ namespace PholioVisualisation.DataConstruction
 
         protected override IList<IArea> GetChildAreas()
         {
-           return ReadChildAreas(GetParentAreaCode(), ChildAreaTypeId);
+            IList<IArea> childAreas;
+
+            if (Area.IsAreaListAreaCode(ParentAreaCode))
+            {
+                childAreas = ReadChildAreas(ParentAreaCode, ChildAreaTypeId);
+            }
+            else
+            {
+                childAreas = ReadChildAreas(GetParentAreaCode(), ChildAreaTypeId);
+            }
+
+            return childAreas;
         }
     }
 }

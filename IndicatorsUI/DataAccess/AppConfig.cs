@@ -351,5 +351,13 @@ namespace IndicatorsUI.DataAccess
         {
             return _appSettings[key];
         }
+
+        public bool isAllowingRedirection
+        {
+            get
+            {
+                return !AppConfig.Instance.IsEnvironmentTest || ConfigurationManager.AppSettings["allowRedirectionInTestEnvironment"].ToLower() == "true";
+            }
+        }
     }
 }

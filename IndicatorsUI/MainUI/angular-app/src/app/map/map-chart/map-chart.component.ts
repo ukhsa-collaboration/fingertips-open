@@ -75,7 +75,7 @@ export class MapChartComponent implements OnChanges {
         let currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
         let unit = this.ftHelperService.getMetadata(currentGrpRoot.IID).Unit;
         let valuesForBarChart: any[] = [];
-        let extraTooltip: string = '';
+        let extraTooltip = '';
 
         Object.keys(sortedata).forEach(key => {
             let value: CoreDataSet = sortedata[key];
@@ -136,7 +136,7 @@ export class MapChartComponent implements OnChanges {
         const valueWithUnit: ValueWithUnit = this.coreDataHelperService.valueWithUnit(unit);
         for (let grouping of currentGrpRoot.Grouping) {
 
-            if (grouping.ComparatorData.ValF === '-') continue;
+            if (grouping.ComparatorData.ValF === '-') { continue; }
             let valF = grouping.ComparatorData.ValF;
             let val = grouping.ComparatorData.Val;
 
@@ -241,10 +241,10 @@ export class MapChartComponent implements OnChanges {
                     shadow: false,
                     states: {
                         hover:
-                            {
-                                brightness: 0,
-                                color: '#000000',
-                            }
+                        {
+                            brightness: 0,
+                            color: '#000000',
+                        }
                     },
                     point: {
                         events: {
@@ -265,10 +265,10 @@ export class MapChartComponent implements OnChanges {
                         hover: {
                             lineWidth: 0,
                             marker:
-                                {
-                                    enabled: false,
-                                    symbol: 'x'
-                                }
+                            {
+                                enabled: false,
+                                symbol: 'x'
+                            }
                         }
                     }
                 },

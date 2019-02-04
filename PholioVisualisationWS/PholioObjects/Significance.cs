@@ -6,7 +6,8 @@ namespace PholioVisualisation.PholioObjects
         None,
         Worse,
         Same,
-        Better
+        Better,
+        Worst,
+        Best
     }
-
 }

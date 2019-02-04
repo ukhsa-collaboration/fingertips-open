@@ -42,6 +42,7 @@ namespace Fpm.MainUI.Controllers
             viewModel.DisplayName = fpmUser.DisplayName;
             viewModel.FpmUserId = fpmUser.Id;
             viewModel.IsAdministrator = fpmUser.IsAdministrator;
+            viewModel.IsCurrent = fpmUser.IsCurrent;
             viewModel.IsMemberOfFpmSecurityGroup = userDetails.IsMemberOfFpmSecurityGroup;
 
             ViewBag.ProfilesUserHasPermissionTo = userDetails.GetProfilesUserHasPermissionsTo();
@@ -70,6 +71,7 @@ namespace Fpm.MainUI.Controllers
                 return View("CreateUser", user);
             }
 
+            user.IsCurrent = true;
             _userRepository.CreateUserItem(user, UserDetails.CurrentUser().Name);
 
             return RedirectToAction("UserIndex");
@@ -87,6 +89,7 @@ namespace Fpm.MainUI.Controllers
             user.DisplayName = viewModel.DisplayName;
             user.IsAdministrator = viewModel.IsAdministrator;
             user.UserName = viewModel.UserName;
+            user.IsCurrent = viewModel.IsCurrent;
 
             //fpm_userAudit userid should be equal to fpm_user id
             _userRepository.UpdateUserItem(user, UserDetails.CurrentUser().Name);

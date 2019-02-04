@@ -1,11 +1,12 @@
-﻿<div class="row">
+﻿@using IndicatorsUI.MainUI.Models
+<div class="row">
     <div id="playbutton-video" class="col-md-12">
         <h2>User Guide</h2>
-        <figure id="image-figure" class="figure">
-            <a href="https://www.youtube.com/watch?v=j_8WJUDldb8&feature=youtu.be" target="_blank">
-                <img src="~/images/image-video/introduction-fingertips-tool.png" class="figure-img img-fluid rounded img-responsive" alt="An introduction to using the Fingertips Tool">
-            </a>
-            <figcaption class="figure-caption"></figcaption>
-        </figure>
+        @Html.Partial("_VideoLink", new VideoLink
+       {
+           ImgSrc = "/images/image-video/introduction-fingertips-tool.png",
+           VideoUrl = "https://www.youtube.com/watch?v=j_8WJUDldb8&feature=youtu.be",
+           Alt = "An introduction to using the Fingertips Tool"
+       })
     </div>
 </div>

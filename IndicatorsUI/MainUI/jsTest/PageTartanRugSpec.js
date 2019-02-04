@@ -124,3 +124,42 @@ describe('TartanRugCellBuilder', function () {
         expect(html).toContain(VALUE_NOTE);
     });
 });
+
+describe('Tests for csv download files code', function (){
+
+    beforeEach(function() {
+        FT.url.corews = "fakeCoreWs";
+        FT.model.parentTypeId = 0;
+        FT.model.areaTypeId = 0;
+        FT.model.profileId = 0;
+        FT.model.parentCode = 0;
+
+        indicatorIdList = {};
+        indicatorIdList.getAllIds = function(){ return 1;};
+
+        spyOn(window, 'getAreasCodeDisplayed').and.returnValue([{Code: "fakeAreaCode"}]);
+        spyOn(tartanRug, 'getParentAreaCode').and.returnValue("fakeParentAreaCode");
+        spyOn(window, 'downloadLatestNoInequalitiesDataCsvFileByIndicator');
+        spyOn(window, 'downloadLatestNoInequalitiesDataCsvFileByGroup');
+        
+        spyOn( window, 'open' ).and.callFake( function() {
+            return true;
+        });
+    });
+
+    it('Save csv file', function () {
+        spyOn(window, 'isInSearchMode').and.returnValue(false);
+
+        tartanRug.saveAsCsvFile();
+
+        expect( window.downloadLatestNoInequalitiesDataCsvFileByGroup ).toHaveBeenCalled();
+    });
+
+    it('Save csv file in search mode', function () {
+        spyOn(window, 'isInSearchMode').and.returnValue(true);
+
+        tartanRug.saveAsCsvFile();
+        
+        expect( window.downloadLatestNoInequalitiesDataCsvFileByIndicator ).toHaveBeenCalled();
+    });
+});

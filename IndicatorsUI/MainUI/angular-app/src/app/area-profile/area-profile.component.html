@@ -1,0 +1,77 @@
+<div *ngIf="isAnyData" id="area-profile-container" style="display:none;">
+    <div class="row">
+        <div class="col-md-12">
+            <ft-legend [pageType]="pageType" [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB"
+                [showQuintilesRAG]="showQuintilesRAG" [showQuintilesBOB]="showQuintilesBOB" [showRecentTrends]="showRecentTrends"></ft-legend>
+        </div>
+    </div>
+    <div class="row">
+        <div class="export-chart-box col-md-3">
+            <a class="export-link" (click)="onExportClick($event)">Export table as image</a>
+        </div>
+        <div class="export-chart-box-csv col-md-4">
+            <a id="export-link-csv-area-profile" class="export-link-csv" (click)="onExportCsvFileClick($event)">Export table as CSV file</a>
+        </div>
+        <div class="col-md-5 text-right"> <img src="{{spineChartImageUrl}}" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <table id="single-area-table" class="bordered-table" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr>
+                        <th id="spine-indicator-header" rowspan="2">Indicator</th>
+                        <th id="spine-period-header" rowspan="2">Period</th>
+                        <th style="position: relative;" class="numericHeader areaName topRow" [attr.colspan]="trendColSpan">
+                            <div>{{shortAreaName}}</div>&nbsp;
+                        </th>
+                        <th *ngIf="!isParentUk && isNationalAndRegional && isNotNN" class="numericHeader topRow parent-area-type">{{parentType}}</th>
+                        <th *ngIf="!isParentUk && isNationalAndRegional" class="numericHeader topRow" style="position:relative;">England
+                        </th>
+                        <th id="england-header" *ngIf="!isParentUk" [attr.colspan]="colSpan" class="numericHeader topRow" style="width: 390px;">{{benchmarkName}}
+                            <div *ngIf="isAreaIgnored" id="no-spine-box">
+                                <p>Due to its small population <i>{{areaName}}</i> is not used to determine the lowest,
+                                    highest and percentile values required for the spine charts. However the area value
+                                    is included in the <i>{{benchmarkName}}</i> average.</p>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th *ngIf="areRecentTrendsDisplayed" class="numericHeader">Recent Trend</th>
+                        <th class="numericHeader">Count</th>
+                        <th class="numericHeader">Value</th>
+                        <th *ngIf="!isParentUk && isNationalAndRegional && isNotNN" class="numericHeader">Value</th>
+                        <th *ngIf="!isParentUk" class="numericHeader">Value</th>
+                        <th *ngIf="!isParentUk" class="numericHeader">{{lowest}}</th>
+                        <th *ngIf="!isParentUk" class="spine250">Range</th>
+                        <th *ngIf="!isParentUk" class="numericHeader">{{highest}}</th>
+                    </tr>
+                </thead>
+                <tbody id="spine-body">
+                    <tr *ngFor="let row of indicatorRows">
+                        <td [innerHtml]="getIndicatorNameHtml(row)" (click)="goToBarChart(row)" (mouseover)="showIndicatorTooltip($event,row)"
+                            (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)"></td>
+                        <td [innerHtml]="row.period"></td>
+                        <td *ngIf="areRecentTrendsDisplayed" [innerHtml]="row.recentTrendImage" (click)="goToTrends(row)"
+                            (mouseover)="showRecentTrendTooltip($event,row)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)"></td>
+                        <td class="numeric" [innerHtml]="row.areaCount"></td>
+                        <td class="numeric" [innerHtml]="row.areaValue" data-toggle="tooltip" data-placement="top"
+                            title="{{row.areaValueTooltip}}"></td>
+                        <td *ngIf="!isParentUk && isNationalAndRegional && isNotNN" class="numeric" [innerHtml]="row.subnationalValue"
+                            data-toggle="tooltip" data-placement="top" title="{{row.subnationalValueTooltip}}"></td>
+                        <td *ngIf="!isParentUk" class="numeric" [innerHtml]="row.englandValue" data-toggle="tooltip" data-placement="top"
+                            title="{{row.englandValueTooltip}}"></td>
+                        <td *ngIf="!isParentUk" class="numeric" data-toggle="tooltip" data-placement="top" [innerHtml]="row.englandMin"
+                            title="{{row.minTooltip}}"></td>
+                        <td *ngIf="!isParentUk" >
+                            <ft-spine-chart [dimensions]="row.spineChartDimensions" [tooltip]="tooltip" [indicatorRow]="row"></ft-spine-chart>
+                        </td>
+                        <td *ngIf="!isParentUk" class="numeric" data-toggle="tooltip" data-placement="top" [innerHtml]="row.englandMax"
+                            title="{{row.maxTooltip}}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

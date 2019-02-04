@@ -1,7 +1,7 @@
 ﻿
 namespace IndicatorsUI.MainUISeleniumTest
 {
-    public class LongerLivesIds
+    public class PublicHealthDashboardIds
     {
         public const string Map = "map";
         public const string AreaTypeLinkCcgs = "153";
@@ -48,6 +48,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string InformationToolTipWithPosition = "info-tooltip-with-position";
         public const string CloseIcon = "close";
         public const string Width90 = "width-90";
+        public const string EnglandLabel = "england_label";
     }
 
     public class AreaNames
@@ -56,6 +57,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public const string CcgWalthamForest = "NHS Waltham Forest CCG";
         public const string CountyUaBathAndNorthEastSomerset = "Bath and North East Somerset";
         public const string DistrictUaTendring = "Tendring";
+        public const string EastSussex = "East Sussex";
     }
 
     public class XPaths
@@ -63,7 +65,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         // Navigation header links
         public const string NavHome = "//*[@id='home-nav']/a";
         public const string NavNationalComparisons = "//*[@id='rankings-nav']/a";
-        public const string NavAboutTheProject = "//*[@id='about-project-nav']/a";
+        public const string NavMap = "//*[@id='map-with-data']/a";
         public const string NavAboutTheData = "//*[@id='about-data-nav']/a";
         public const string NavKeyMessages = "//*[@id='key-messages-nav']/a";
         public const string NavConnect = "//*[@id='connect-nav']/a";

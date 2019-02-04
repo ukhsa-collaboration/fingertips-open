@@ -23,6 +23,7 @@
     <property name="DisplayName" column="displayname"/>
     <property name="UserName" column="username"/>
     <property name="IsAdministrator" column="isadministrator"/>
+    <property name="IsCurrent" column="iscurrent"/>
   </class>
 
   <!-- User Audit class -->

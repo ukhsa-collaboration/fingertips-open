@@ -1,4 +1,5 @@
-﻿using Fpm.ProfileData.Entities.Job;
+﻿using System;
+using Fpm.ProfileData.Entities.Job;
 
 namespace Fpm.MainUI.ViewModels.Upload
 {
@@ -9,5 +10,6 @@ namespace Fpm.MainUI.ViewModels.Upload
         public string Filename { get; set; }
         public UploadJobStatus Status { get; set; }
         public string StatusText { get; set; }
+        public Guid Guid { get; set; }
     }
 }

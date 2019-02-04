@@ -116,6 +116,7 @@
     <Compile Include="Respositories\WhenUsingDocumentsRepository.cs" />
     <Compile Include="Respositories\WhenUsingExceptionLogRepository.cs" />
     <Compile Include="Respositories\WhenUsingLoggingRepository.cs" />
+    <Compile Include="Respositories\WhenUsingMonthlyReleaseRepository.cs" />
     <Compile Include="Respositories\WhenUsingUploadRepository.cs" />
     <Compile Include="Respositories\WhenUsingLooksUpRepository.cs" />
     <Compile Include="Respositories\WhenUsingCoreDataRepository.cs" />

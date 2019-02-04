@@ -25,5 +25,5 @@ pages.add(PAGE_MODES.BOX_PLOT, {
     gotoName: 'goToBoxPlotPage',
     needsContainer: false,
     jqIds: ['boxplot-container', 'indicator-menu-div', 'spine-range-key', 'spineKey', '.geo-menu', 'export-chart-box',
-        'spineRangeKeyContainer', 'nearest-neighbour-link']
+        'spineRangeKeyContainer', 'nearest-neighbour-link', 'area-list-wrapper', 'filter-indicator-wrapper']
 });

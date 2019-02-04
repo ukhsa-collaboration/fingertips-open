@@ -2,6 +2,9 @@
     <div class="export-chart-box">
         <button class="export-link" (click)="exportChart()">Export chart as image</button>
     </div>
+    <div class="export-chart-box-csv">
+        <button id="export-link-csv-population" class="export-link-csv" (click)="exportChartAsCsv()">Export chart as CSV file</button>
+    </div>
 </div>
 <div id="population-chart" #chart>
 </div>

@@ -12,7 +12,7 @@ function goToMapPage() {
         // Search results empty
         displayNoData();
     } else {
-        callAngularEvent('MapEnvReady-Event');
+        callAngularEvent('MapSelected');
         unlock();
     }
 }
@@ -33,7 +33,7 @@ pages.add(PAGE_MODES.MAP, {
     goto: goToMapPage,
     gotoName: 'goToMapPage',
     needsContainer: false,
-    jqIds: ['map-container','indicator-menu-div', '.geo-menu', 'benchmark-box', 'nearest-neighbour-link','region-menu-box'],
+    jqIds: ['map-container', 'indicator-menu-div', '.geo-menu', 'benchmark-box', 'nearest-neighbour-link', 'region-menu-box', 'area-list-wrapper', 'filter-indicator-wrapper'],
     jqIdsNotInitiallyShown: ['target-benchmark-box'],
     showHide: hideAndShowMapMenus
 });

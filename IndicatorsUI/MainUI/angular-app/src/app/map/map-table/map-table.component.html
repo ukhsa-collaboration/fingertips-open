@@ -9,7 +9,7 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let item of selectedCoreData" (mouseover)="rowMouseHovered = true;onRowMouseOver($event)" (mouseout)="rowMouseHovered = false;onRowMouseLeave($event)" [attr.areaCode]="item.areaCode" [class.rowHover]="rowMouseHovered" (click)="onRowClick($event)">
+        <tr *ngFor="let item of selectedCoreData" (mouseover)="onRowMouseOver($event)" (mouseout)="onRowMouseLeave($event)" [attr.areaCode]="item.areaCode" [class.rowHover]="rowMouseHovered" (click)="onRowClick($event)">
             <td [ngStyle]="{'border-left-color': item.colour}">{{item.areaName}}</td>
             <td>{{item.formattedCount}}</td>
             <td [ngClass]="{'hasNote value-note-symbol': item.isNote}" [attr.data-NoteId]="item.isNote?item.noteId:null" (mouseenter)="onMouseEnter($event)" (mousemove)="onMouseMove($event)" (mouseleave)="onMouseLeave($event)" innerHTML="{{item.formattedValue}}">

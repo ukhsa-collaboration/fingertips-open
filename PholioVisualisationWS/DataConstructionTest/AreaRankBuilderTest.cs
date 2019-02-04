@@ -262,10 +262,10 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestAreaPolaritySwitch()
         {
-            var highIsGoodPolarityRanking = TestAreaWithHighIsGoodPolarity(AreaCodes.Ccg_Cumbria.ToLower());
-            var lowIsGoodPolarityRanking = TestAreaWithLowIsGoodPolarity(AreaCodes.Ccg_Cumbria.ToLower());
+            var highIsGoodPolarityRanking = TestAreaWithHighIsGoodPolarity(AreaCodes.CountyUa_Cambridgeshire.ToLower());
+            var lowIsGoodPolarityRanking = TestAreaWithLowIsGoodPolarity(AreaCodes.CountyUa_Cambridgeshire.ToLower());
 
-            Assert.IsTrue(highIsGoodPolarityRanking.AreaRank.Rank < lowIsGoodPolarityRanking.AreaRank.Rank,
+            Assert.IsTrue(highIsGoodPolarityRanking.AreaRank.Rank > lowIsGoodPolarityRanking.AreaRank.Rank,
                 "Invalid Polarity Comparison Value");
         }
 
@@ -336,7 +336,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             return new Grouping
             {
-                GroupId = GroupIds.LongerLives,
+                GroupId = GroupIds.PublicHealthDashboardLongerLives_SummaryRank,
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
                 AgeId = AgeIds.Under75,
                 YearRange = 3,
@@ -352,12 +352,12 @@ namespace PholioVisualisation.DataConstructionTest
         {
             return new Grouping
             {
-                GroupId = GroupIds.Diabetes_TreatmentTargets,
-                IndicatorId = IndicatorIds.GoodBloodSugarControl,
-                AgeId = AgeIds.Plus17,
+                GroupId = GroupIds.PublicHealthDashboardLongerLives_ChildObesity,
+                IndicatorId = IndicatorIds.ObesityYear6,
+                AgeId = AgeIds.From10To11,
                 YearRange = 1,
                 SexId = SexIds.Persons,
-                AreaTypeId = AreaTypeIds.CcgsPreApr2017,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
                 DataPointYear = 2015,
                 DataPointMonth = -1,
                 DataPointQuarter = -1

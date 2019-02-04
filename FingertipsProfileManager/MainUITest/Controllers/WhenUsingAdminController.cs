@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.MainUI.Controllers;
+﻿using Fpm.MainUI.Controllers;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace Fpm.MainUITest
+namespace Fpm.MainUITest.Controllers
 {
     [TestClass]
     public class WhenUsingAdminController

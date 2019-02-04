@@ -7,11 +7,11 @@ namespace PholioVisualisation.ServiceActions
 {
     public class PartitionDataForAllCategoriesBuilder : PartitionDataBuilderBase
     {
-        private IList<CoreDataSet> _specialCaseBenchmarkDataList = new List<CoreDataSet>();
+         private IList<CoreDataSet> _specialCaseBenchmarkDataList = new List<CoreDataSet>();
 
         public PartitionDataForAllCategories GetPartitionData(int profileId,
             string areaCode, int indicatorId, int sexId, int ageId, int areaTypeId)
-        {
+                {
             var partitionData = new PartitionDataForAllCategories
             {
                 AreaCode = areaCode,
@@ -32,6 +32,12 @@ namespace PholioVisualisation.ServiceActions
 
             var timePeriod = TimePeriod.GetDataPoint(_grouping);
 
+            var maxYear = _groupDataReader.GetCoreDataMaxYear(indicatorId);
+            if (timePeriod.Year != maxYear)
+            {
+                timePeriod.Year = maxYear;
+            }
+
             // Get Data
             IList<CoreDataSet> categoryDataList = _groupDataReader.GetAllCategoryDataWithinParentArea(areaCode,
                 indicatorId, sexId, ageId, timePeriod);
@@ -40,7 +46,9 @@ namespace PholioVisualisation.ServiceActions
             FormatData(categoryDataList);
             FormatData(_specialCaseBenchmarkDataList);
 
-            partitionData.CategoryTypes = GetCategoryTypes(categoryDataList);
+            //partitionData.CategoryTypes = GetCategoryTypes(categoryDataList);
+            partitionData.CategoryTypes = GetCategoryTypes(areaCode, indicatorId, sexId, ageId);
+
             partitionData.Data = categoryDataList;
             return partitionData;
         }
@@ -88,17 +96,6 @@ namespace PholioVisualisation.ServiceActions
             timePeriods = RemoveEarlyEmptyTimePeriods(dictionaryBuilder, timePeriods);
 
             var areaAverageAccordingToTimePeriod = new List<CoreDataSet>();
-            // Remove unwanted period data
-            foreach (var timePeriod in timePeriods)
-            {
-                foreach (var dataSet in areaAverage)
-                {
-                    if (dataSet.Year == timePeriod.Year)
-                    {
-                        areaAverageAccordingToTimePeriod.Add(dataSet);
-                    }
-                }
-            }
 
             // Format category data
             FormatData(allData);
@@ -122,9 +119,10 @@ namespace PholioVisualisation.ServiceActions
             _grouping = groupingProvider.GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(profileId, areaTypeId, indicatorId, sexId, ageId);
         }
 
-        private IList<CategoryType> GetCategoryTypes(IList<CoreDataSet> categoryDataList)
+        private IList<CategoryType> GetCategoryTypes(string areaCode, int indicatorId, int sexId, int ageId)
         {
-            List<int> categoryTypeIds = categoryDataList.Select(x => x.CategoryTypeId).Distinct().ToList();
+            IList<int> categoryTypeIds = _groupDataReader.GetAllCategoryTypeIds(areaCode,
+                indicatorId, sexId, ageId);
             IList<CategoryType> categoryTypes = _areasReader.GetCategoryTypes(categoryTypeIds);
             return categoryTypes;
         }

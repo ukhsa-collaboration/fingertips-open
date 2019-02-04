@@ -87,6 +87,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             SelectElement indicatorMenuDropdown = new SelectElement(driver.FindElement(By.Id("indicatorMenu")));
             indicatorMenuDropdown.SelectByText("2.04 - Under 18 conceptions");
 
+            waitFor.AjaxLockToBeUnlocked();
             waitFor.FingertipsCategoryTypeDescriptionsToLoad();
 
             // Check whether the category type description pop-ups are working as expected
@@ -143,28 +144,15 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
         private void CheckCategoryTypeDescriptionPopUps()
         {
-            //int counter = 0;
-
             // Get the list of information tooltip icons based on the class name
             ReadOnlyCollection<IWebElement> elements = driver.FindElements(By.ClassName(Classes.InformationToolTipWithPosition));
 
-            // Loop through the read-only collection of web elements
             foreach (IWebElement element in elements)
             {
-                //var headerTextContainer = driver.FindElements(By.ClassName(Classes.Width90))[counter];
-                //var headerTextElement = headerTextContainer.FindElement(By.TagName("a"));
-                //string headerText = headerTextElement.Text;
-
-                // Check whether the pop-up is visible
-                //CheckCategoryTypeDescriptionPopUpIsVisible(element, headerText);
-
                 CheckCategoryTypeDescriptionPopUpIsVisible(element);
-
-                //counter++;
             }
         }
 
-        //private void CheckCategoryTypeDescriptionPopUpIsVisible(IWebElement element, string headerText)
         private void CheckCategoryTypeDescriptionPopUpIsVisible(IWebElement element)
         {
             // Open the information pop-up
@@ -181,6 +169,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
             // Find the close icon of the opened pop-up
             var closeIcon = driver.FindElement(By.ClassName(Classes.CloseIcon));
+
             // Close the pop-up
             closeIcon.Click();
         }

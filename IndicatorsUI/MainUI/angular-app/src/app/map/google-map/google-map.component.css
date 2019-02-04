@@ -10,9 +10,17 @@
     clear: both;
 }
 
+#google-map {
+    overflow: auto !important;
+}
+
+#google-map::-webkit-scrollbar { 
+    display: none; 
+}
+
 #floating-panel {
     position: absolute;
-    margin-top: 92px;
+    margin-top: 148px;
     z-index: 5;
     padding-left: 8px;
     margin-left: 10px;
@@ -145,4 +153,13 @@
 
 .export-chart-box {
     margin: 0;
+}
+
+.tab-options button.button-selected, .tab-options button:hover {
+    color: #fff;
+    background-color: #02ae94;
+}
+
+.tab-options div.export-chart-box {
+    margin-top: 15px;
 }

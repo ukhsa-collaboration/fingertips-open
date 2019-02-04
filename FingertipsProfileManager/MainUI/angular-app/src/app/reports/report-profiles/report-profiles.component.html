@@ -1,31 +1,33 @@
 <div class="form-group">
     <label for="profiles" class="control-label col-xs-2">Profiles</label>
     <div class="col-xs-4">
-        <app-profile-list (getSelectedProfile)="onProfileChange($event)"></app-profile-list>
+        <app-profile-list [userProfiles]="userProfiles" (getSelectedProfile)="onProfileChange($event)"></app-profile-list>
     </div>
     <div>
         <button class="btn" (click)="addProfile()">Add</button>
     </div>
 </div>
-<div class="row col-md-offset-2">
-    <div *ngIf="selectedProfiles?.length > 0">       
-        <table class="table">
-            <thead>
-                <tr>
-                    <th> List of profiles</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let profile of selectedProfiles; let i = index">
-                <td>
-                     {{ userProfilesHash[profile].Name}}  
-                 </td>
-                <td>
-                    <button (click)="removeProfile(i)" class="btn btn-danger">Remove</button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div *ngIf="selectedProfiles?.length > 0">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th> List of profiles</th>
+
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let profile of selectedProfiles; let i = index">
+
+                        <td> {{ profile.Name }} </td>
+                        <td>
+                            <button (click)="removeProfile(i)" class="btn btn-danger">Remove</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

@@ -44,34 +44,6 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void TestDiabetesPrevAndRiskHighestQuintileExists()
-        {
-            var areaTypeId = AreaTypeIds.CcgsPreApr2017;
-            var profileId = ProfileIds.DiabetesLongerLives;
-
-            var parentArea = new ParentArea(AreaCodes.CommissioningRegionLondon, areaTypeId);
-            ComparatorMap comparatorMap = new ComparatorMapBuilder(parentArea).ComparatorMap;
-
-            GroupData data = new GroupDataBuilderByGroupings
-            {
-                GroupId = GroupIds.Diabetes_PrevalenceAndRisk,
-                ChildAreaTypeId = areaTypeId,
-                ProfileId = ProfileIds.DiabetesLongerLives,
-                ComparatorMap = comparatorMap,
-                AssignData = true
-            }.Build();
-
-            IList<TrendRoot> trendRoots = new TrendRootBuilder().Build(data.GroupRoots, 
-                comparatorMap, areaTypeId, profileId, data.IndicatorMetadata, false);
-
-            var highestQuintileCount = trendRoots
-                .Select(x => x.DataPoints.Values.FirstOrDefault()[0].Significance)
-                .Count(significances => significances.ContainsValue((Significance)5));
-            
-            Assert.AreNotEqual(highestQuintileCount, 0);
-        }
-
-        [TestMethod]
         [Ignore]
         public void Build_Returns_Results_With_Trends()
         {

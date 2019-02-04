@@ -18,7 +18,6 @@ namespace PholioVisualisation.ServiceActions
         // Instance variables
         protected Grouping _grouping;
         protected IndicatorMetadata _indicatorMetadata;
-        private IArea _nationalArea;
         protected IndicatorMetadataSpecialCase _specialCase;
 
         protected void InitMetadata(Grouping grouping)

@@ -28,7 +28,7 @@ namespace PholioVisualisation.ExportTest
             };
 
             var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
+                GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
 
             var bytes = fileBuilder.GetFileForSpecifiedIndicators(
                 GetPhofIndicatorIds(), parameters);
@@ -36,6 +36,28 @@ namespace PholioVisualisation.ExportTest
             // Assert
             var csv = GetCsv(bytes);
             Assert.IsTrue(csv.Contains("Derby"));
+        }
+
+        [TestMethod]
+        public void TestCategoryType()
+        {
+            var parameters = new IndicatorExportParameters
+            {
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ParentAreaCode = AreaCodes.England,
+                ParentAreaTypeId = CategoryAreaType.GetAreaTypeIdFromCategoryTypeId(CategoryTypeIds.DeprivationDecileCountyAndUA2015),
+                ProfileId = ProfileIds.Phof
+            };
+
+            var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
+                GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
+
+            var bytes = fileBuilder.GetFileForSpecifiedIndicators(
+                GetPhofIndicatorIds(), parameters);
+
+            // Assert
+            var csv = GetCsv(bytes);
+            Assert.IsTrue(csv.Contains("IMD 2015"));
         }
 
         [TestMethod]
@@ -67,7 +89,7 @@ namespace PholioVisualisation.ExportTest
             };
 
             var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
+                GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
 
             var bytes = fileBuilder.GetFileForSpecifiedIndicators(
                 new List<int> { IndicatorIds.NumberPrescribedAntibioticItems }, parameters);
@@ -89,7 +111,7 @@ namespace PholioVisualisation.ExportTest
             };
 
             var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
+                GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
 
             var bytes = fileBuilder.GetFileForSpecifiedIndicators(
                 new List<int> { IndicatorIds.LongTermDisability },
@@ -112,7 +134,7 @@ namespace PholioVisualisation.ExportTest
             };
 
             var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
+                GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
 
             var bytes = fileBuilder.GetFileForSpecifiedIndicators(
                 new List<int> { IndicatorIds.HealthyLifeExpectancyAtBirth },
@@ -137,7 +159,7 @@ namespace PholioVisualisation.ExportTest
                 };
 
                 var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                    GetExportAreaHelper(parameters), _areasReader, new FileBuilder());
+                    GetExportAreaHelper(parameters), _areasReader, new CsvFileBuilder());
 
 
                 _phofBytes = fileBuilder.GetFileForSpecifiedIndicators(

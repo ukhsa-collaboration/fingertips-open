@@ -20,6 +20,9 @@ namespace PholioVisualisation.Export
         private string[] _parentAreaCodes;
         private Dictionary<string, Area> _childAreaCodeToParentAreaMap;
 
+        // Categories Enum
+        public enum GeographicalCategory { National, SubNational, Local };
+
         public ExportAreaHelper(IAreasReader areasReader, IndicatorExportParameters parameters,
             AreaFactory areaFactory)
         {
@@ -37,12 +40,29 @@ namespace PholioVisualisation.Export
             {
                 var parentAreas = GetParentAreas(_parameters);
                 _parentAreaCodes = parentAreas.Select(x => x.Code).ToArray();
+
+                // Init child to parent area map
                 _childAreaCodeToParentAreaMap = _areasReader.GetParentAreasFromChildAreaId(_parameters.ParentAreaTypeId,
                     _parameters.ChildAreaTypeId);
 
                 InitParentToChildAreaCodeMap();
 
                 InitChildAreaCodes();
+
+                // Populate look ups for area lists
+                if (_parentAreaCodes.Length == 1 && Area.IsAreaListAreaCode(parentAreas.First().Code))
+                {
+                    InitChildCodeToParentAreaMapForAreaList(parentAreas);
+                }
+            }
+        }
+
+        private void InitChildCodeToParentAreaMapForAreaList(IList<IArea> parentAreas)
+        {
+            var parentArea = parentAreas.First();
+            foreach (var childAreaCode in _childAreaCodes)
+            {
+                _childAreaCodeToParentAreaMap.Add(childAreaCode, (Area) parentArea);
             }
         }
 
@@ -106,8 +126,8 @@ namespace PholioVisualisation.Export
 
         private void InitChildAreaCodes()
         {
-            var childAreas = new FilteredChildAreaListProvider(_areasReader).ReadChildAreas(
-                _parameters.ParentAreaCode, _parameters.ProfileId, _parameters.ChildAreaTypeId);
+            var childAreas = new FilteredChildAreaListProvider(_areasReader)
+                .ReadChildAreas(_parameters.ParentAreaCode, _parameters.ProfileId, _parameters.ChildAreaTypeId);
             _childAreaCodes = childAreas.Select(x => x.Code).ToArray();
         }
 
@@ -130,5 +150,12 @@ namespace PholioVisualisation.Export
             return parentAreas;
         }
 
+        public static GeographicalCategory GetGeographicalCategory(IArea parentArea = null)
+        {
+            if (parentArea == null)
+                return GeographicalCategory.National;
+
+            return parentArea.Code.Equals(AreaCodes.England) ? GeographicalCategory.SubNational : GeographicalCategory.Local;
+        }
     }
 }
