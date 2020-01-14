@@ -2,38 +2,19 @@
 using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Entities.User;
+using Fpm.ProfileData.Repositories;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Fpm.ProfileData.Repositories;
 
 namespace Fpm.ProfileData
 {
-    public interface IProfilesReader
-    {
-        IList<int> GetGroupingIds(int profileId);
-        IList<int> GetGroupingIndicatorIds(IList<int> groupIds);
-
-        IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValuesByIndicatorIdsAndProfileId(
-            IList<int> indicatorIds, int profileId);
-
-        ProfileDetails GetProfileDetailsByProfileId(int profileId);
-
-        int GetProfileIdFromUrlKey(string urlKey);
-    }
-
     public class ProfilesReader : BaseReader, IProfilesReader
     {
         public const int MaxAreaResults = 1000;
-
-        /// <summary>
-        /// Parameterless constructor to enable mocking.
-        /// </summary>
-        public ProfilesReader() { }
 
         public ProfilesReader(ISessionFactory sessionFactory)
             : base(sessionFactory)
@@ -108,6 +89,14 @@ namespace Fpm.ProfileData
             return q.List<UserGroupPermissions>();
         }
 
+        public IList<ProfileDetails> GetProfilesEditableByUser(int userId)
+        {
+            IQuery q = CurrentSession.CreateQuery("select distinct p from ProfileDetails p, UserGroupPermissions ugp where p.Id = ugp.ProfileId and ugp.UserId = :userId and p.Id != :profileId");
+            q.SetParameter("userId", userId);
+            q.SetParameter("profileId", ProfileIds.Search);
+            return q.List<ProfileDetails>();
+        }
+
         public IList<Grouping> GetGroupings(int groupId)
         {
             IQuery q = CurrentSession.CreateQuery("from Grouping g where g.GroupId = :groupId order by g.Sequence");
@@ -139,14 +128,15 @@ namespace Fpm.ProfileData
                 .List<Grouping>();
         }
 
-        public IList<Grouping> GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId(int groupId, int areaTypeId,
-            int indicatorId, int sexId)
+        public IList<Grouping> GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexIdAndAgeId(int groupId, int areaTypeId,
+            int indicatorId, int sexId, int ageId)
         {
             return CurrentSession.CreateCriteria<Grouping>()
                 .Add(Restrictions.Eq("GroupId", groupId))
                 .Add(Restrictions.Eq("AreaTypeId", areaTypeId))
                 .Add(Restrictions.Eq("IndicatorId", indicatorId))
                 .Add(Restrictions.Eq("SexId", sexId))
+                .Add(Restrictions.Eq("AgeId", ageId))
                 .List<Grouping>();
         }
 
@@ -190,15 +180,30 @@ namespace Fpm.ProfileData
 
         public IList<Grouping> GetGroupingByIndicatorId(List<int> indicatorIds)
         {
+            CurrentSession.Clear();
+
             IQuery q = CurrentSession.CreateQuery("from Grouping g where g.IndicatorId in (:indicatorIds) order by g.GroupId");
             q.SetParameterList("indicatorIds", indicatorIds);
+            q.SetCacheable(false);
+            return q.List<Grouping>();
+        }
+
+        public IList<Grouping> GetGroupingByIndicatorIdAndSexIdAndAgeId(int indicatorId, int sexId, int ageId)
+        {
+            CurrentSession.Clear();
+
+            IQuery q = CurrentSession.CreateQuery("from Grouping g where g.IndicatorId = :indicatorId and g.SexId = :sexId and g.AgeId = :ageId order by g.GroupId");
+            q.SetParameter("indicatorId", indicatorId);
+            q.SetParameter("sexId", sexId);
+            q.SetParameter("ageId", ageId);
+            q.SetCacheable(false);
             return q.List<Grouping>();
         }
 
         public IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties()
         {
             IQuery q = CurrentSession.CreateQuery("from IndicatorMetadataTextProperty i");
-            return q.List<IndicatorMetadataTextProperty>();
+            return q.List<IndicatorMetadataTextProperty>().OrderBy(property => property.PropertyId).ToList();
         }
 
         public IList<IndicatorMetadataTextValue> SearchIndicatorMetadataTextValuesByText(string searchText)
@@ -280,48 +285,19 @@ namespace Fpm.ProfileData
             return HydrateIndicatorTextList(properties, results);
         }
 
-        private static List<IndicatorText> HydrateIndicatorTextList(IList<IndicatorMetadataTextProperty> properties, IList results)
-        {
-            IList<object> genericResults = (IList<object>)results[0];
-            IList<object> specificResults = results.Count > 1
-                ? (IList<object>)results[1] // first overwritten metadata
-                : null;
-
-            // IndicatorID and GroupID
-            var valueIndex = 2;
-
-            List<IndicatorText> indicatorTextList = new List<IndicatorText>();
-            for (int i = 0; i < properties.Count; i++)
-            {
-                // Skip ID
-                while (genericResults[valueIndex] is int)
-                {
-                    valueIndex++;
-                }
-
-                var property = properties[i];
-                IndicatorText indicatorText = new IndicatorText { IndicatorMetadataTextProperty = property };
-
-                indicatorText.ValueGeneric = (string)genericResults[valueIndex];
-
-                if (specificResults != null)
-                {
-                    indicatorText.ValueSpecific = (string)specificResults[valueIndex];
-                }
-
-                indicatorTextList.Add(indicatorText);
-
-                valueIndex++;
-            }
-            return indicatorTextList;
-        }
-
         public IndicatorMetadata GetIndicatorMetadata(int indicatorId)
         {
             IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
             q.SetParameter("indicatorId", indicatorId);
             IndicatorMetadata metadata = q.UniqueResult<IndicatorMetadata>();
             return metadata;
+        }
+
+        public IList<IndicatorMetadata> GetIndicatorMetadata(List<int> indicatorIds)
+        {
+            return CurrentSession.CreateCriteria<IndicatorMetadata>()
+                .Add(Restrictions.In("IndicatorId", indicatorIds))
+                .List<IndicatorMetadata>();
         }
 
         public IEnumerable<Grouping> DoesIndicatorExistInMoreThanOneGroup(int indicatorId, int ageId, int sexId)
@@ -473,13 +449,6 @@ namespace Fpm.ProfileData
                 .List<AreaType>();
         }
 
-        private IList<AreaType> GetNonCurrentAreaTypes()
-        {
-            return CurrentSession.CreateCriteria<AreaType>()
-                .Add(Restrictions.Eq("IsCurrent", false))
-                .List<AreaType>();
-        }
-
         public IList<AreaType> GetSpecificAreaTypes(List<int> areaTypeIds)
         {
             return CurrentSession.CreateCriteria<AreaType>()
@@ -620,6 +589,13 @@ namespace Fpm.ProfileData
             return user;
         }
 
+        public IList<FpmUser> GetUserListByUserIds(List<string> userIds)
+        {
+            IQuery q = CurrentSession.CreateQuery("from FpmUser fu where fu.Id in (:userIds) order by DisplayName");
+            q.SetParameterList("userIds", userIds);
+            return q.List<FpmUser>();
+        }
+
         public IList<UserGroupPermissions> GetUserGroupPermissionsByUserAndProfile(int userId, int profileId)
         {
             IQuery q = CurrentSession.CreateQuery("from UserGroupPermissions ugp where ugp.ProfileId = :profileid and ugp.UserId = :userid");
@@ -633,10 +609,10 @@ namespace Fpm.ProfileData
             CurrentSession.Clear();
         }
 
-        public IList<ProfileCollectionItem> GetProfileCollectionItems(int profilecollectionid)
+        public IList<ProfileCollectionItem> GetProfileCollectionItems(int profileCollectionId)
         {
             IQuery q = CurrentSession.CreateQuery("from ProfileCollectionItem pci where pci.ProfileCollectionId = :profilecollectionid");
-            q.SetParameter("profilecollectionid", profilecollectionid);
+            q.SetParameter("profilecollectionid", profileCollectionId);
             return q.List<ProfileCollectionItem>();
         }
 
@@ -700,31 +676,6 @@ namespace Fpm.ProfileData
             return documents;
         }
 
-        private ProjectionList GetDocumentProjectionListWithoutFileData()
-        {
-            Document documentTypeCast = null;
-
-            return Projections.ProjectionList()
-                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
-                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
-                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
-                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
-                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
-        }
-
-        private ProjectionList GetDocumentProjectionListWithFileData()
-        {
-            Document documentTypeCast = null;
-
-            return Projections.ProjectionList()
-                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
-                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
-                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
-                .Add(Projections.Property<Document>(x => x.FileData).WithAlias(() => documentTypeCast.FileData))
-                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
-                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
-        }
-
         public IEnumerable<SpineChartMinMaxLabel> GetSpineChartMinMaxLabelOptions()
         {
             return CurrentSession.CreateCriteria<SpineChartMinMaxLabel>()
@@ -752,6 +703,81 @@ namespace Fpm.ProfileData
             IQuery q = CurrentSession.CreateQuery("from UserGroupPermissions ugp where ugp.ProfileId = :profileid");
             q.SetParameter("profileid", profileId);
             return q.List<UserGroupPermissions>();
+        }
+
+        public IList<IndicatorMetadataReviewAudit> GetIndicatorMetadataReviewAudits(int indicatorId)
+        {
+            IQuery q = CurrentSession.CreateQuery("from IndicatorMetadataReviewAudit i where i.IndicatorId = :indicatorid");
+            q.SetParameter("indicatorid", indicatorId);
+            return q.List<IndicatorMetadataReviewAudit>().OrderByDescending(property => property.Timestamp).ToList();
+        }
+
+        private static List<IndicatorText> HydrateIndicatorTextList(IList<IndicatorMetadataTextProperty> properties, IList results)
+        {
+            IList<object> genericResults = (IList<object>)results[0];
+            IList<object> specificResults = results.Count > 1
+                ? (IList<object>)results[1] // first overwritten metadata
+                : null;
+
+            // IndicatorID and GroupID
+            var valueIndex = 2;
+
+            List<IndicatorText> indicatorTextList = new List<IndicatorText>();
+            for (int i = 0; i < properties.Count; i++)
+            {
+                // Skip ID
+                while (genericResults[valueIndex] is int)
+                {
+                    valueIndex++;
+                }
+
+                var property = properties[i];
+                IndicatorText indicatorText = new IndicatorText { IndicatorMetadataTextProperty = property };
+
+                indicatorText.ValueGeneric = (string)genericResults[valueIndex];
+
+                if (specificResults != null)
+                {
+                    indicatorText.ValueSpecific = (string)specificResults[valueIndex];
+                }
+
+                indicatorTextList.Add(indicatorText);
+
+                valueIndex++;
+            }
+            return indicatorTextList;
+        }
+
+        private IList<AreaType> GetNonCurrentAreaTypes()
+        {
+            return CurrentSession.CreateCriteria<AreaType>()
+                .Add(Restrictions.Eq("IsCurrent", false))
+                .List<AreaType>();
+        }
+
+        private ProjectionList GetDocumentProjectionListWithoutFileData()
+        {
+            Document documentTypeCast = null;
+
+            return Projections.ProjectionList()
+                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
+                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
+                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
+                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
+                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
+        }
+
+        private ProjectionList GetDocumentProjectionListWithFileData()
+        {
+            Document documentTypeCast = null;
+
+            return Projections.ProjectionList()
+                .Add(Projections.Property<Document>(x => x.Id).WithAlias(() => documentTypeCast.Id))
+                .Add(Projections.Property<Document>(x => x.ProfileId).WithAlias(() => documentTypeCast.ProfileId))
+                .Add(Projections.Property<Document>(x => x.FileName).WithAlias(() => documentTypeCast.FileName))
+                .Add(Projections.Property<Document>(x => x.FileData).WithAlias(() => documentTypeCast.FileData))
+                .Add(Projections.Property<Document>(x => x.UploadedOn).WithAlias(() => documentTypeCast.UploadedOn))
+                .Add(Projections.Property<Document>(x => x.UploadedBy).WithAlias(() => documentTypeCast.UploadedBy));
         }
 
         private IList<int> GetComponentAreaTypeIds(int areaTypeId)

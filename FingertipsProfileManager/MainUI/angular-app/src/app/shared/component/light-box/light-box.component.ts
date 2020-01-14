@@ -1,4 +1,7 @@
-import { Component, OnChanges, Input, Output, SimpleChanges, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import {
+  Component, OnChanges, Input, Output, SimpleChanges, EventEmitter, ChangeDetectorRef
+} from '@angular/core';
+import { LightBoxConfig, LightBoxTypes } from './light-box';
 
 @Component({
   selector: 'ft-light-box',
@@ -13,6 +16,7 @@ export class LightBoxComponent implements OnChanges {
   showLightBox = false;
   isInfoBoxOk = false;
   isInfoBoxOkCancel = false;
+  okButtonText = 'OK';
 
   constructor(private changeDetectorRef: ChangeDetectorRef) { }
 
@@ -37,6 +41,12 @@ export class LightBoxComponent implements OnChanges {
           break;
       }
 
+      // Update OK button text if provided
+      if (this.lightBoxConfig.OkButtonText !== '') {
+        this.okButtonText = this.lightBoxConfig.OkButtonText;
+      }
+
+      // Display the light box
       this.showLightBox = true;
     }
   }
@@ -65,19 +75,4 @@ export class LightBoxComponent implements OnChanges {
 
     this.emitLightBoxActionConfirmed.emit(actionConfirmed);
   }
-}
-
-export class LightBoxConfig {
-  public Type: number;
-  public Html: string;
-  public Title: string;
-  public Height: number;
-  public OkButtonText: string;
-  public CancelButtonText: string;
-  public ActionType: string;
-}
-
-export class LightBoxTypes {
-  public static readonly Ok = 1;
-  public static readonly OkCancel = 2;
 }

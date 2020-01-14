@@ -1,0 +1,264 @@
+﻿@using System.Text.RegularExpressions
+@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData.Entities.Profile
+
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    IndicatorMetadataTextProperty property;
+
+    var status = Model.IndicatorMetadata.Status;
+    if (status != null)
+    {
+        Regex upperCaseRegex = new Regex(@"[A-Z]{1}[a-z]*");
+        MatchCollection matches = upperCaseRegex.Matches(status);
+        List<string> words = new List<string>();
+        foreach (Match match in matches)
+        {
+            words.Add(match.Value);
+        }
+
+        status = String.Join(" ", words.ToArray());
+    }
+
+    var destinationProfileName = string.Empty;
+    if (Model.IndicatorMetadata.DestinationProfileId != -1)
+    {
+        destinationProfileName = Model.DestinationProfileName;
+    }
+}
+
+<div style="width: 100%; float: left; clear: both;">
+    <table class="text-properties">
+        <tr>
+            <td></td>
+            <td style="vertical-align: middle;"></td>
+        </tr>
+        @if (Model.IndicatorMetadata.DestinationProfileId != -1)
+        {
+            <tr>
+                <td class="property-heading">
+                    Destination profile
+                </td>
+                <td class="indicator-internal-metadata-text">
+                    @destinationProfileName
+                </td>
+            </tr>
+        }
+        @if (status != null)
+        {
+            <tr>
+                <td class="property-heading">
+                    Status
+                </td>
+                <td class="indicator-internal-metadata-text">
+                    @status
+                </td>
+            </tr>
+        }
+        <tr>
+            <td class="property-heading">
+                Keywords
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "Keywords");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Keywords, new { @class = "indicator-internal-metadata-text" })
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Evidence of variability
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "EvidOfVariability");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.EvidOfVariability, new { @class = "indicator-internal-metadata-text" })
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Justification of confidence interval method
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "JustifConfIntMeth");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.JustifConfIntMeth, new { @class = "indicator-internal-metadata-text" })
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Quality assurance
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "QualityAssurance");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.QualityAssurance, new { @class = "indicator-internal-metadata-text" })
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Quality improvement plan
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "QualityImprPlan");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.QualityImprPlan,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Justification of exclusions
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "JustiOfExclusions");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.JustiOfExclusions,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Justification of data sources
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "JustifOfDataSources");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.JustifOfDataSources,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Sponsor/stakeholders
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "SponsorStakeholders");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.SponsorStakeholders,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Indicator owner contact details
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "IndOwnerContDet");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.IndOwnerContDet,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Comments
+            </td>
+            <td>
+                @{
+                    property = Model.IndicatorMetadataTextProperties.Find(x => x.ColumnName == "Comments");
+                }
+                @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Comments,
+                    new {@class = "indicator-internal-metadata-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+            </td>
+            <td class="property-attributes">
+                @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            </td>
+        </tr>
+    </table>
+    <table class="data-partition-table">
+        <tr>
+            <td colspan="3" class="data-partitions-heading">
+                Data partitions
+            </td>
+
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Ages
+            </td>
+            <td class="data-partition">
+                @Html.DropDownListFor(model => model.PartitionAgeIds, CommonUtilities.GetListOfAllAges(PleaseSelectOption.NotRequired), new { @class = "partition-age-ids indicator-dropdown", @multiple = "multiple" })
+                <input type="hidden" id="hdn-partition-age-ids" value="@Model.IndicatorMetadata.PartitionAgeIds" />
+                <span class="info-tooltip right">
+                    <i>The age values data will be produced for</i>
+                </span>
+            </td>
+            <td class="property-attributes">
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Sexes
+            </td>
+            <td class="data-partition">
+
+                @Html.DropDownListFor(model => model.PartitionSexIds, CommonUtilities.GetListOfAllSexes(PleaseSelectOption.NotRequired),
+                    new
+                    {
+                        @class = "partition-sex-ids indicator-dropdown", @multiple = "multiple"
+                    })
+                <input type="hidden" id="hdn-partition-sex-ids" value="@Model.IndicatorMetadata.PartitionSexIds"/>
+                <span class="info-tooltip right">
+                    <i>The sex values data will be produced for</i>
+                </span>
+            </td>
+            <td class="property-attributes">
+                &nbsp;
+            </td>
+        </tr>
+        <tr>
+            <td class="property-heading">
+                Area types
+            </td>
+            <td class="data-partition">
+                @Html.DropDownListFor(model => model.PartitionAreaTypeIds, CommonUtilities.GetListOfSupportedAreaTypes(PleaseSelectOption.NotRequired), new { @class = "partition-areatype-ids indicator-dropdown", @multiple = "multiple" })
+                <input type="hidden" id="hdn-partition-areatype-ids" value="@Model.IndicatorMetadata.PartitionAreaTypeIds" />
+                <span class="info-tooltip right">
+                    <i>The area types data will be produced for</i>
+                </span>
+            </td>
+            <td class="property-attributes">
+                &nbsp;
+            </td>
+        </tr>
+    </table>
+</div>

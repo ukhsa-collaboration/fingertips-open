@@ -87,7 +87,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CategoryValuesValidatorTest.cs" />
-    <Compile Include="DataUploadValidationTest.cs" />
+    <Compile Include="DataRowValidatorTest.cs" />
     <Compile Include="DefaultValueSetterTest.cs" />
     <Compile Include="UploadRowParserTest.cs" />
     <Compile Include="SmallNumberCheckerTest.cs" />

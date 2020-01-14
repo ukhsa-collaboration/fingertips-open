@@ -31,7 +31,7 @@ namespace PholioVisualisation.DataConstructionTest
             InitDateChangeHelper();
             var metadata = GetIndicatorMetadata(IndicatorIds.DeprivationScoreIMD2010, null, false);
 
-            var dateChange = _dateChangeHelper.GetIndicatorDateChange(_timePeriod, metadata, 1);
+            var dateChange = _dateChangeHelper.GetIndicatorDateChange(metadata, 1, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             // Assert: data has not changed recently because no upload info
             AssertDataNotChangedRecently(dateChange);
@@ -43,29 +43,31 @@ namespace PholioVisualisation.DataConstructionTest
         public void Test_ShouldNewDataBeHighlighted_True()
         {
             var indicatorId = IndicatorIds.LearningDisabilityQofPrevalence;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             var deploymentCount = 12;
             var dateUploaded = new DateTime(2018, 04, 06);
             var dateOfLastRelease = new DateTime(2018, 04, 01);
             var dateOfNextRelease = new DateTime(2018, 05, 02);
+            var dateUpdated = new DateTime(2019, 01, 01);
 
-            _coreDataAuditRepository.Setup(x => x.GetLatestUploadAuditData(indicatorId))
-                .Returns(new CoreDataUploadAudit
+            _coreDataSetRepository.Setup(x => x.GetCoreDataSetChangeLog(indicatorId, areaTypeId))
+                .Returns(new CoreDataSetChangeLog
                 {
-                    DateCreated = dateUploaded
+                    IndicatorId = indicatorId,
+                    AreaTypeId = areaTypeId,
+                    DateUpdated = dateUpdated
                 });
 
             // Arrange: Monthly release helper
             _monthlyReleaseHelper.Setup(x => x.GetReleaseDate(deploymentCount)).Returns(dateOfLastRelease);
-            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUploaded)).Returns(dateOfNextRelease);
-
-            SetUpGetLastestTimePeriodOfCoreData(indicatorId, _timePeriod.YearRange);
+            _monthlyReleaseHelper.Setup(x => x.GetFollowingReleaseDate(dateUpdated)).Returns(dateOfNextRelease);
 
             InitDateChangeHelper();
 
             var metadata = GetIndicatorMetadata(indicatorId, dateOfLastRelease, true);
 
             // Act 
-            var dateChange = _dateChangeHelper.GetIndicatorDateChange(_timePeriod, metadata, deploymentCount);
+            var dateChange = _dateChangeHelper.GetIndicatorDateChange(metadata, deploymentCount, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             // Assert: data has changed recently
             AssertDataChangedRecently(dateChange);
@@ -77,12 +79,6 @@ namespace PholioVisualisation.DataConstructionTest
         {
             _dateChangeHelper = new DateChangeHelper(_monthlyReleaseHelper.Object,
                 _coreDataAuditRepository.Object, _coreDataSetRepository.Object);
-        }
-
-        private void SetUpGetLastestTimePeriodOfCoreData(int indicatorId, int yearRange)
-        {
-            _coreDataSetRepository.Setup(x => x.GetLastestTimePeriodOfCoreData(indicatorId, yearRange))
-                .Returns(_timePeriod);
         }
 
         private static void AssertDataNotChangedRecently(IndicatorDateChange dateChange)

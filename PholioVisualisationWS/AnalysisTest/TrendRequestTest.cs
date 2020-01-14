@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using PholioVisualisation.Analysis;
+using PholioVisualisation.Analysis.TrendMarkers;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 
@@ -22,9 +22,8 @@ namespace PholioVisualisation.AnalysisTest
                 Data = DataList()
             };
 
-            string validationMessage = null;
-            var isValid = trendRequest.IsValid(ref validationMessage);
-            Assert.IsTrue(isValid, validationMessage);
+            var validationResult = trendRequest.IsValid();
+            Assert.IsTrue(validationResult.IsValid, validationResult.ValidationMessage);
         }
 
         [TestMethod]
@@ -38,9 +37,8 @@ namespace PholioVisualisation.AnalysisTest
                 Data = DataList()
             };
 
-            string validationMessage = null;
-            var isValid = trendRequest.IsValid(ref validationMessage);
-            Assert.IsTrue(isValid, validationMessage);
+            var validationResult = trendRequest.IsValid();
+            Assert.IsTrue(validationResult.IsValid, validationResult.ValidationMessage);
         }
 
         [TestMethod]
@@ -65,9 +63,8 @@ namespace PholioVisualisation.AnalysisTest
                 Data = dataList
             };
 
-            string validationMessage = null;
-            var isValid = trendRequest.IsValid(ref validationMessage);
-            Assert.IsTrue(isValid, validationMessage);
+            var validationResult = trendRequest.IsValid();
+            Assert.IsTrue(validationResult.IsValid, validationResult.ValidationMessage);
         }
 
         [TestMethod]
@@ -84,9 +81,8 @@ namespace PholioVisualisation.AnalysisTest
                 Data = dataList
             };
 
-            string validationMessage = null;
-            trendRequest.IsValid(ref validationMessage);
-            Assert.AreEqual("Not enough data points with valid values to calculate recent trend", validationMessage);
+            var validationResult = trendRequest.IsValid();
+            Assert.AreEqual("Not enough data points with valid values to calculate recent trend", validationResult.ValidationMessage);
         }
 
         [TestMethod]
@@ -99,9 +95,8 @@ namespace PholioVisualisation.AnalysisTest
                 YearRange = 3
             };
 
-            string validationMessage = null;
-            trendRequest.IsValid(ref validationMessage);
-            Assert.IsTrue(validationMessage == "The recent trend cannot be calculated for this year range");
+            var validationResult = trendRequest.IsValid();
+            Assert.IsTrue(validationResult.ValidationMessage == "The recent trend cannot be calculated for this year range");
         }
 
         [TestMethod]
@@ -114,9 +109,8 @@ namespace PholioVisualisation.AnalysisTest
                 YearRange = 1
             };
 
-            string validationMessage = null;
-            trendRequest.IsValid(ref validationMessage);
-            Assert.IsTrue(validationMessage == "The recent trend cannot be calculated for this value type");
+            var validationResult = trendRequest.IsValid();
+            Assert.IsTrue(validationResult.ValidationMessage == "The recent trend cannot be calculated for this value type");
         }
 
         private IList<CoreDataSet> DataList()

@@ -50,7 +50,7 @@ namespace FingertipsUploadService.Upload
 
                 var rowNumber = i + 2;
                 var validationFailures = new List<UploadValidationFailure>();
-                var rowValidator = new DataRowValidator(row, rowNumber);
+                var rowValidator = new DataRowValidator(row, rowNumber, _profilesReader);
 
                 if (!hasCellsBeingValidatedOnce)
                 {
@@ -127,7 +127,7 @@ namespace FingertipsUploadService.Upload
                 var row = dataTable.Rows[i];
 
                 var rowNumber = i + 2;
-                var rowValidator = new DataRowValidator(row, rowNumber);
+                var rowValidator = new DataRowValidator(row, rowNumber, _profilesReader);
                 _logger.Debug("Validating current row # {0} ", rowNumber);
                 var validationFailures = validationManager.ValidateRow(rowValidator, i);
 

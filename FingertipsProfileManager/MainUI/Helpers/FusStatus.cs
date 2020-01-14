@@ -1,16 +1,16 @@
-﻿using System;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Repositories;
+using System;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class FusStatus
+    public static class FusStatus
     {
         public static string Message()
         {
-            var dateLastChecked = new LoggingRepository()
-                .GetDatabaseLog(DatabaseLogIds.FusCheckedJobs)
-                .Timestamp;
+            var loggingRepository = new LoggingRepository(NHibernateSessionFactory.GetSession());
+
+            var dateLastChecked = loggingRepository.GetDatabaseLog(DatabaseLogIds.FusCheckedJobs).Timestamp;
 
             var minutesSinceLastCheck = Math.Round((DateTime.Now - dateLastChecked).TotalMinutes, 0);
             if (minutesSinceLastCheck <= 1)
@@ -19,6 +19,7 @@ namespace Fpm.MainUI.Helpers
             }
 
             var timeMessage = GetTimeText(minutesSinceLastCheck);
+
             return string.Format("Upload jobs last checked {0} ago", timeMessage);
         }
 

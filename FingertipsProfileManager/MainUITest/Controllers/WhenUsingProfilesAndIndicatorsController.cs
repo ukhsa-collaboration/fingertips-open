@@ -11,32 +11,42 @@ namespace Fpm.MainUITest.Controllers
     [TestClass]
     public class WhenUsingProfilesAndIndicatorsController
     {
+        private ProfilesReader _profilesReader;
+        private ProfilesWriter _profilesWriter;
         private CoreDataRepository _coreDataRepository;
         private LookUpsRepository _lookUpsRepository;
         private ProfileRepository _profileRepository;
+        private EmailRepository _emailRepository;
         private ProfilesAndIndicatorsController _controller;
 
         [TestInitialize]
         public void Init()
         {
+            _profilesReader = new ProfilesReader(NHibernateSessionFactory.GetSession());
+            _profilesWriter = new ProfilesWriter(NHibernateSessionFactory.GetSession());
             _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
             _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
             _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
+            _emailRepository = new EmailRepository(NHibernateSessionFactory.GetSession());
         }
 
         [TestCleanup]
         public void CleanUp()
         {
+            _profilesReader.Dispose();
+            _profilesWriter.Dispose();
             _profileRepository.Dispose();
             _coreDataRepository.Dispose();
             _lookUpsRepository.Dispose();
+            _emailRepository.Dispose();
         }
 
         [TestMethod]
         public void BrowseIndicatorData_Returns_Result_With_PopulatedFilters_For_a_SelectedIndicator()
         {
             // Arrange
-            _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
+            _controller = new ProfilesAndIndicatorsController(_profilesReader, _profilesWriter, _profileRepository,
+                _lookUpsRepository, _coreDataRepository, _emailRepository);
             
             const int indicatorId = IndicatorIds.LifeExpectancyAtBirth;
             
@@ -74,7 +84,8 @@ namespace Fpm.MainUITest.Controllers
         public void BrowseIndicatorData_Returns_Result_With_CoreData_For_a_SelectedIndicator()
         {
             // Arrange
-            _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
+            _controller = new ProfilesAndIndicatorsController(_profilesReader, _profilesWriter, _profileRepository,
+                _lookUpsRepository, _coreDataRepository, _emailRepository);
 
             const int indicatorId = IndicatorIds.ChildrenInPoverty;
 
@@ -96,12 +107,16 @@ namespace Fpm.MainUITest.Controllers
         [TestMethod]
         public void ReorderIndicators_For_Profile()
         {
+            const string urlKey = UrlKeys.HealthProfiles;
+            const int groupId = GroupIds.PhofWiderDeterminantsOfHealth;
+
             // Arrange
-            _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
+            _controller = new ProfilesAndIndicatorsController(_profilesReader, _profilesWriter, _profileRepository,
+                _lookUpsRepository, _coreDataRepository, _emailRepository);
 
             // Act
-            var result = (ViewResult)_controller.ReorderIndicators(ProfileIds.Phof, UrlKeys.AdultSocialCare, 1,
-                AreaTypeIds.CountyAndUnitaryAuthority, GroupIds.PeopleWithCareAndSupportNeeds);
+            var result = (ViewResult)_controller.ReorderIndicators(ProfileIds.Phof, urlKey, 1,
+                AreaTypeIds.CountyAndUnitaryAuthorityPre2019, groupId);
 
             // Assert
             Assert.IsTrue(result != null);
@@ -109,21 +124,23 @@ namespace Fpm.MainUITest.Controllers
             var model = result.Model as ReorderIndicatorsViewModel;
 
             Assert.IsTrue(model != null
-              && model.GroupId == GroupIds.PeopleWithCareAndSupportNeeds
-              && model.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority
-              && model.ProfileUrlKey == UrlKeys.AdultSocialCare
+              && model.GroupId == groupId
+              && model.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthorityPre2019
+              && model.ProfileUrlKey == urlKey
             );
         }
 
+        [TestMethod]
         public void BrowseIndicatorData_Returns_Empty_Data_For_Invalid_IndicatorId()
         {
             // Arrange
-            _controller = new ProfilesAndIndicatorsController(_profileRepository, _lookUpsRepository, _coreDataRepository);
+            _controller = new ProfilesAndIndicatorsController(_profilesReader, _profilesWriter, _profileRepository,
+                _lookUpsRepository, _coreDataRepository, _emailRepository);
 
             const int indicatorId = -11111999;
 
             // Act
-            var result = _controller.BrowseIndicatorData(indicatorId) as ViewResult;
+            var result = (PartialViewResult)_controller.BrowseIndicatorData(indicatorId) as PartialViewResult;
 
             
             // Assert

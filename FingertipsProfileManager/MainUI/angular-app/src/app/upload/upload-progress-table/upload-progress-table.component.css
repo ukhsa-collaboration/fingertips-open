@@ -1,0 +1,13 @@
+.show-more-upload-jobs-link {
+  color: #003399;
+  text-decoration: none;
+}
+
+.show-more-upload-jobs-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.width-100 {
+  width: 100%;
+}

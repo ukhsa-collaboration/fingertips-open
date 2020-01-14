@@ -1,0 +1,57 @@
+.ngx-dropdown-container,
+.ngx-dropdown-list-container {
+    overflow-y: scroll !important;
+    min-height: 300px !important;
+}
+
+.search-container {
+    float: left !important;
+    width: 100% !important;
+}
+
+#scatter-plot-chart {
+    width: 900px;
+    height: 600px;
+}
+
+.scatter-gp-label {
+    float: left;
+}
+
+.scatter-gp-practice-label {
+    margin-right: 15px;
+}
+
+.scatter-gp-parent-label {
+    margin-right: 15px;
+}
+
+.top-margin-30 {
+    margin-top: 30px;
+}
+
+.no-data {
+    margin: 150px 0;
+    font-size: 16px;
+}
+
+.do-not-display-for-england {
+    width: 100%;
+    height: 399px;
+    padding-top: 189px;
+}
+
+.do-not-display-for-england div {
+    width: 100%;
+    text-align: center;
+    font-size: 17px;
+    margin-left:30px;
+}
+
+.tab-options {
+    float: none !important;
+}
+
+#imageChart {
+    min-height: 500px;
+}

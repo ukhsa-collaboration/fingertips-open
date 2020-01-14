@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpService } from './http.service'
 import { Parameters } from './parameters';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
-import { AreaType, ProfilePerIndicator } from '../../../typings/FT.d';
+import { FTHelperService } from '../helper/ftHelper.service';
+import { AreaType, ProfilePerIndicator } from '../../../typings/FT';
 
 @Injectable()
 export class ProfileService {
@@ -14,7 +14,7 @@ export class ProfileService {
   }
 
   public areaTypesWithPdfs(profileId: number): Observable<AreaType[]> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addProfileId(profileId);
 
     return this.httpService.httpGet('api/profile/area_types_with_pdfs', params);

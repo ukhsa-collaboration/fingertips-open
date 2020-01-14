@@ -1,5 +1,7 @@
-﻿
-function documentReady() {
+﻿function documentReady() {
+    // Remove validation class from the server dropdown
+    $('#ServerList').removeClass('input-validation-error');
+
     $('.sortable').tablesorter({
         theme: 'blue',
         widthFixed: true,
@@ -58,6 +60,50 @@ function documentReady() {
             }
         });
     });
+
+    $('#live-servers').click(function() {
+        if ($('#LiveServersFilterApplied').val() === 'False') {
+            $('#LiveServersFilterApplied').val('True');
+            $('#NumberOfDays').val('5');
+        } else {
+            $('#LiveServersFilterApplied').val('False');
+            $('#NumberOfDays').val('0');
+        }
+
+        $('#ServerList').val('ALL SERVERS');
+        $('#Server').val('ALL SERVERS');
+
+        submitForm();
+    });
+
+    $('#api-errors').click(function() {
+        if ($('#ApiErrorsFilterApplied').val() === 'False') {
+            $('#ApiErrorsFilterApplied').val('True');
+            $('#NumberOfDays').val('5');
+        } else {
+            $('#ApiErrorsFilterApplied').val('False');
+            if ($('#LiveServersFilterApplied').val() === 'False') {
+                $('#NumberOfDays').val('0');
+                $('#ServerList').val('ALL SERVERS');
+                $('#Server').val('ALL SERVERS');
+            }
+        }
+
+        submitForm();
+    });
+}
+
+function triggerNumberOfDaysChangedEvent(e) {
+    submitForm();
+}
+
+function triggerServerListChangedEvent(e) {
+    $('#Server').val(e.value);
+    submitForm();
+}
+
+function submitForm() {
+    $('#reload-exceptions-form').submit();
 }
 
 $(document).ready(documentReady);

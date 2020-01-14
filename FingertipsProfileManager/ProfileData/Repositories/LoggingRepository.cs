@@ -1,13 +1,10 @@
-﻿using System;
-using Fpm.ProfileData.Entities.Logging;
+﻿using Fpm.ProfileData.Entities.Logging;
 using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class LoggingRepository : RepositoryBase
+    public class LoggingRepository : RepositoryBase, ILoggingRepository
     {
-
-        // poor man injection, should be removed when we use DI containers
         public LoggingRepository()
             : this(NHibernateSessionFactory.GetSession())
         {

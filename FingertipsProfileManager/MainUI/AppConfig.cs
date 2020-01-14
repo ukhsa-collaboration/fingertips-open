@@ -78,6 +78,11 @@ namespace Fpm.MainUI
             return GetAppSetting("LiveUpdateKey");
         }
 
+        public static string ImrgEnquiriesEmailAddress()
+        {
+            return GetAppSetting("IMRGEnquiriesEmailAddress");
+        }
+
         private static string GetPath(string folderName)
         {
             string version = GetAppSetting("JavaScriptVersionFolder");

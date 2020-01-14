@@ -15,8 +15,14 @@ namespace Fpm.MainUI.Controllers
     [RoutePrefix("user")]
     public class UserController : Controller
     {
-        private UserRepository _userRepository;
-        private readonly ProfilesReader _profilesReader = ReaderFactory.GetProfilesReader();
+        private readonly IProfilesReader _reader;
+        private readonly IUserRepository _userRepository;
+
+        public UserController(IProfilesReader reader, IUserRepository userRepository)
+        {
+            _reader = reader;
+            _userRepository = userRepository;
+        }
 
         [Route("user-index")]
         public ActionResult UserIndex()
@@ -42,13 +48,14 @@ namespace Fpm.MainUI.Controllers
             viewModel.DisplayName = fpmUser.DisplayName;
             viewModel.FpmUserId = fpmUser.Id;
             viewModel.IsAdministrator = fpmUser.IsAdministrator;
+            viewModel.IsReviewer = fpmUser.IsReviewer;
             viewModel.IsCurrent = fpmUser.IsCurrent;
             viewModel.IsMemberOfFpmSecurityGroup = userDetails.IsMemberOfFpmSecurityGroup;
 
             ViewBag.ProfilesUserHasPermissionTo = userDetails.GetProfilesUserHasPermissionsTo();
 
             // Profile drop down
-            viewModel.ProfileList = new ProfileMenuHelper().GetAllProfiles(_profilesReader);
+            viewModel.ProfileList = new ProfileMenuHelper().GetAllProfiles(_reader);
 
             return View("EditUser", viewModel);
         }
@@ -72,7 +79,15 @@ namespace Fpm.MainUI.Controllers
             }
 
             user.IsCurrent = true;
-            _userRepository.CreateUserItem(user, UserDetails.CurrentUser().Name);
+            _userRepository.CreateUser(user, UserDetails.CurrentUser().Name);
+
+            // Add default user group permissions
+            UserGroupPermissions userGroupPermissions = new UserGroupPermissions
+            {
+                UserId = user.Id,
+                ProfileId = ProfileIds.IndicatorsForReview
+            };
+            _userRepository.SaveUserGroupPermissions(userGroupPermissions);
 
             return RedirectToAction("UserIndex");
         }
@@ -83,16 +98,19 @@ namespace Fpm.MainUI.Controllers
         [MultipleButton(Name = "action", Argument = "UpdateUser")]
         public ActionResult UpdateUser(EditUserViewModel viewModel)
         {
-            var user = new FpmUser();
+            var user = new FpmUser
+            {
+                Id = viewModel.FpmUserId,
+                DisplayName = viewModel.DisplayName,
+                IsAdministrator = viewModel.IsAdministrator,
+                IsReviewer = viewModel.IsReviewer,
+                UserName = viewModel.UserName,
+                IsCurrent = viewModel.IsCurrent
+            };
 
-            user.Id = viewModel.FpmUserId;
-            user.DisplayName = viewModel.DisplayName;
-            user.IsAdministrator = viewModel.IsAdministrator;
-            user.UserName = viewModel.UserName;
-            user.IsCurrent = viewModel.IsCurrent;
 
             //fpm_userAudit userid should be equal to fpm_user id
-            _userRepository.UpdateUserItem(user, UserDetails.CurrentUser().Name);
+            _userRepository.UpdateUser(user, UserDetails.CurrentUser().Name);
 
             return RedirectToAction("UserIndex");
         }
@@ -107,9 +125,11 @@ namespace Fpm.MainUI.Controllers
             int profileIdInt;
             if (int.TryParse(profileId, out profileIdInt))
             {
-                UserGroupPermissions user = new UserGroupPermissions();
-                user.UserId = viewModel.FpmUserId;
-                user.ProfileId = profileIdInt;
+                UserGroupPermissions user = new UserGroupPermissions
+                {
+                    UserId = viewModel.FpmUserId,
+                    ProfileId = profileIdInt
+                };
                 _userRepository.SaveUserGroupPermissions(user);
             }
 
@@ -175,18 +195,6 @@ namespace Fpm.MainUI.Controllers
             }
 
             return View("UserIndex");
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            _userRepository = new UserRepository();
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _userRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
         }
     }
 }

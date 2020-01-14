@@ -55,6 +55,10 @@ namespace PholioVisualisation.UserData.Repositories
                 .ToList();
         }
 
+        /// <summary>
+        /// Saves a new area list
+        /// </summary>
+        /// <returns>The saved area list ID</returns>
         public int Save(AreaList areaList, IList<string> areaCodes)
         {
             _dbContext.AreaLists.Add(areaList);

@@ -1,0 +1,143 @@
+<div class="row" id="inequalities-container" style="display:none;" #inequalitiesContainer>
+  <div class="col">
+    <div class="row">
+      <div class="col">
+        <ft-legend [legendConfig]="legendConfig"></ft-legend>
+      </div>
+    </div>
+    <div class="row">
+      <div id="inequalities-tabs" class="col tab-options clearfix">
+        <div>
+          <span>Display </span>
+          <button id="inequalities-tab-option-0" [class]="latestValuesButtonClass" (click)="selectedLatestValues(true)">Latest values</button>
+          <button id="inequalities-tab-option-1" [class]="trendsButtonClass" (click)="selectedLatestValues(false)">Trends</button>
+        </div>
+        <div>
+          <span>Inequalities for </span>
+          <button id="inequalities-tab-option-2" [class]="nationalButtonClass" (click)="selectNational(true)">England</button>
+          <button id="inequalities-tab-option-3" [class]="areaButtonClass" (click)="selectNational(false)" [innerHtml]="areaName"></button>
+        </div>
+      </div>
+    </div>
+    <div class="row margin-top-10">
+      <div class="col data-header-container">
+        <div class="data-main-header">
+          <a class="trend-link" title="More about this indicator" (click)="goToMetadataPage()" [innerHtml]="selectedIndicatorName"></a>
+        </div>
+        <span class="new-data-badge-container" [innerHtml]="selectedIndicatorNewDataBadge"></span>
+        <div class="data-main-header sub-content" [innerHtml]="selectedIndicatorAreaWithPeriod">
+        </div>
+        <div class="data-secondary-header" [innerHtml]="selectedIndicatorUnit">
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="!noData">
+      <div class="col">
+        <div class="row">
+          <div class="col">
+            <div class="export-chart-box">
+              <a id="inequalities-export-image" class="export-link" (click)="exportChart()">Export chart as image</a>
+              <a class="show-ci" (click)="showErrorBar()" [innerHtml]="confidenceIntervalsLabel" *ngIf="viewModes === 1"></a>
+            </div>
+            <div id="export-link-csv-inequalities-pos" class="export-chart-box-csv">
+              <a id="export-link-csv-inequalities" class="export-link-csv" (click)="exportSelectedChartCsvFile()">Export chart as CSV file</a>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10" *ngIf="showBarChart">
+          <div class="col-md-9">
+            <ft-inequalities-bar-chart [barChartData]="barChartData" (emitBarChart)="setBarChart($event)">
+            </ft-inequalities-bar-chart>
+          </div>
+          <div class="col-md-3">
+            <div id="inequalities-partition-menu" class="clearfix">
+              <p>Partition data by:</p>
+              <div class="full-width" *ngFor="let option of partitionOptions; let first=first">
+                <div class="fl info-tooltip-with-position width-10" (click)="showCategoryTypeDescription(option)" *ngIf="option.Description !== null">&nbsp;</div>
+                <div class="fl width-10" *ngIf="option.Description === null">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectPartitionOption(option)" [ngClass]="{ 'selected': option.Id === displayCategoryTypeId }" [innerHtml]="option.Name"></a>
+                </div>
+              </div>
+              <div class="full-width" *ngIf="isAgeData">
+                <div class="fl width-10">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectAge()" [ngClass]="{ 'selected' : preferredPartitionType === 2 }">Age</a>
+                </div>
+              </div>
+              <div class="full-width" *ngIf="isSexData">
+                <div class="fl width-10">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectSex()" [ngClass]="{ 'selected' : preferredPartitionType === 1 }">Sex</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10" *ngIf="!showBarChart">
+          <div class="col-md-6">
+            <ft-inequalities-trend-chart [trendChartData]="trendChartData" (emitTrendChart)="setTrendChart($event)">
+            </ft-inequalities-trend-chart>
+          </div>
+          <div class="col-md-3">
+            <div id="inequalities-trend-filters">
+              <p>Display on chart:</p>
+              <div class="trend-options-filter">
+                <a (click)="hideOrShowAllTrends(true)" class="link">Show all</a>
+              </div>
+              <div class="trend-options-filter">
+                <a (click)="hideOrShowAllTrends(false)" class="link">Clear chart</a>
+              </div>
+              <div class="trend-options-filter">
+                <hr>
+              </div>
+              <div class="trend-option" *ngFor="let option of trendOptions">
+                <input id="chkTrendOption-{{option.NamedIdentity.Id}}" class="trend-option-checkbox" type="checkbox" [checked]="option.OptionSelected"
+                  (click)="toggleTrend(option)">
+                <a (click)="toggleTrend(option)" class="link" [innerHtml]="option.NamedIdentity.Name"></a>
+                <div class="trend-options-filter" *ngIf="hideOrShowTrendOption(option)">
+                  <hr>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div id="inequalities-partition-menu" class="clearfix">
+              <p>Partition data by:</p>
+              <div class="full-width" *ngFor="let option of partitionOptions">
+                <div class="fl info-tooltip-with-position width-10" (click)="showCategoryTypeDescription(option)" *ngIf="option.Description !== null">&nbsp;</div>
+                <div class="fl width-10" *ngIf="option.Description === null">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectTrendPartitionOption(option)" [ngClass]="{ 'selected': option.Id === displayCategoryTypeId }" [innerHtml]="option.Name"></a>
+                </div>
+              </div>
+              <div class="full-width" *ngIf="isAgeData">
+                <div class="fl width-10">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectAge()" [ngClass]="{ 'selected' : preferredPartitionType === 2 }">Age</a>
+                </div>
+              </div>
+              <div class="full-width" *ngIf="isSexData">
+                <div class="fl width-10">&nbsp;</div>
+                <div class="fl width-90">
+                  <a (click)="selectSex()" [ngClass]="{ 'selected' : preferredPartitionType === 1 }">Sex</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row margin-top-10" *ngIf="!showBarChart">
+          <ft-inequalities-trend-table [trendTableData]="trendTableData"></ft-inequalities-trend-table>
+        </div>
+      </div>
+    </div>
+    <div class="row" *ngIf="noData">
+      <div class="col no-indicator-data">
+        Inequality data is not available for this indicator and area
+      </div>
+    </div>
+  </div>
+  <ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>
+</div>
+<ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)">
+</ft-light-box>

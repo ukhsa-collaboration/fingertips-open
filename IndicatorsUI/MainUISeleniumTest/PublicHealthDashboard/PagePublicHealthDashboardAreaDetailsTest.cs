@@ -7,7 +7,7 @@ using OpenQA.Selenium;
 namespace IndicatorsUI.MainUISeleniumTest.PublicHealthDashboard
 {
     [TestClass]
-    public class PagePublicHealthDashboardAreaDetailsTest : BaseUnitTest
+    public class PagePublicHealthDashboardAreaDetailsTest : PublicHealthDashboardBaseTest
     {
 
         [TestMethod]

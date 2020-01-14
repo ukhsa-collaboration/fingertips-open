@@ -22,6 +22,15 @@ namespace PholioVisualisation.DataSorting
                 .ToList();
         }
 
+        public IList<Grouping> SortByBaseLineTimePeriodEarliestFirst()
+        {
+            return _groupings
+                .OrderBy(x => x.BaselineYear)
+                .ThenBy(x => x.BaselineQuarter)
+                .ThenBy(x => x.BaselineMonth)
+                .ToList();
+        }
+
         public int GetMostCommonPolarityId()
         {
             var polarityIds = _groupings.Select(x => x.PolarityId);

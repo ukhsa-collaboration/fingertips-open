@@ -1,0 +1,70 @@
+﻿@using Fpm.MainUI.Models
+@model RemoveIndicatorsModel
+<div id="removeIndicators" style="display: none;">
+    @using (Html.BeginForm("ConfirmRemoveIndicators", "ProfilesAndIndicators", FormMethod.Get, new { id = "RemoveIndicatorForm" }))
+    {
+        <div>
+            <h3>Remove indicators</h3>
+
+            @if (Model.IndicatorsThatCantBeRemoved.Any())
+            {
+                <h3 id="shared-indicators">
+                    The following indicators are owned by this profile but<br>cannot be removed because they are used in other profiles
+                </h3>
+                <table class="grid">
+                    @foreach (var indicator in Model.IndicatorsThatCantBeRemoved)
+                    {
+                        <tr>
+                            <td class="left">
+                                @indicator.IndicatorId
+                            </td>
+                            <td class="left">
+                                @indicator.IndicatorName (@indicator.Sex) (@indicator.Age)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+
+            @if (Model.IndicatorsToRemove != null && Model.IndicatorsToRemove.Any())
+            {
+                <h3 id="unassigned-indicators">
+                    The following indicators will be removed
+                </h3>
+                <table class="grid">
+                    @foreach (var indicator in Model.IndicatorsToRemove)
+                    {
+                        @Html.Hidden("indicator-to-remove" + indicator.IndicatorId, indicator.IndicatorId + "~" + indicator.SexId + "~" + indicator.AgeId, new { @class = "indicator-id" })
+                        <tr>
+                            <td class="left">@indicator.IndicatorId</td>
+                            <td class="left">
+                                @indicator.IndicatorName (@indicator.Sex) (@indicator.Age)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+
+        @Html.HiddenFor(x => x.Profile.Id)
+        @Html.HiddenFor(x => x.DomainId)
+        @Html.HiddenFor(x => x.UrlKey)
+        @Html.HiddenFor(x => x.DomainName)
+        @Html.HiddenFor(x => x.ProfileName)
+        @Html.HiddenFor(x => x.SelectedAreaTypeId)
+        @Html.Hidden("indicatorRemoveDetails")
+
+        // Only show confirm button if any indicators can be removed
+        if (Model.IndicatorsToRemove.Any())
+        {
+            <p>
+                <input class="medium-button" id="ConfirmRemove" type="button" value="Confirm" />
+            </p>
+        }
+
+        <p>
+            <input class="medium-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
+        </p>
+    }
+</div>
+

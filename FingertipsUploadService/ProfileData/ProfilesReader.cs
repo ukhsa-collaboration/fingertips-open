@@ -10,6 +10,8 @@ namespace FingertipsUploadService.ProfileData
 {
     public class ProfilesReader : BaseReader
     {
+        private readonly Dictionary<int, IndicatorMetadata> _indicatorMetadataLookUp = new Dictionary<int, IndicatorMetadata>();
+
         /// <summary>
         /// Parameterless constructor to enable mocking.
         /// </summary>
@@ -42,10 +44,17 @@ namespace FingertipsUploadService.ProfileData
 
         public virtual IndicatorMetadata GetIndicatorMetadata(int indicatorId)
         {
-            IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
-            q.SetParameter("indicatorId", indicatorId);
-            IndicatorMetadata metadata = q.UniqueResult<IndicatorMetadata>();
-            return metadata;
+            if (_indicatorMetadataLookUp.ContainsKey(indicatorId) == false)
+            {
+                var indicatorMetadata = CurrentSession.CreateCriteria<IndicatorMetadata>()
+                    .Add(Restrictions.Eq("IndicatorId", indicatorId))
+                    .SetCacheMode(CacheMode.Refresh)
+                    .UniqueResult<IndicatorMetadata>();
+
+                _indicatorMetadataLookUp.Add(indicatorId, indicatorMetadata);
+            }
+
+            return _indicatorMetadataLookUp[indicatorId];
         }
 
         public Dictionary<int, int> GetIndicatorIdsByProfileIds(List<int> profileIds)

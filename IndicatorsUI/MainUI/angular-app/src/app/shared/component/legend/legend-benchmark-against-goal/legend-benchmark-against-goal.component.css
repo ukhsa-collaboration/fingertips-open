@@ -1,0 +1,14 @@
+.tartan-legend-box {
+    float: left;
+    margin-left: 2px;
+    padding: 2px 0px 2px 0px;
+    width: 70px;
+    text-align: center;
+}
+
+.not-compared {
+    background-color: #c9c9c9;
+    border: 1px solid #ccc;
+    width: 80px;
+    height: 19px;
+}

@@ -29,7 +29,6 @@ namespace PholioVisualisation.DataAccess
         IList<Sex> GetAllSexes();
         ConfidenceIntervalMethod GetConfidenceIntervalMethod(int id);
         IList<ConfidenceIntervalMethod> GetAllConfidenceIntervalMethods();
-        IList<KeyMessageOverride> GetKeyMessageOverrides(int profileId, string areaCode);
         ComparatorConfidence GetComparatorConfidence(int comparatorMethodId, double comparatorConfidence);
         IList<object> GetExceededOverriddenIndicatorMetadataTextValues();
         IList<NearestNeighbourType> GetAllNearestNeighbourTypes();
@@ -182,6 +181,7 @@ namespace PholioVisualisation.DataAccess
             return CurrentSession.CreateCriteria<Age>()
                 .SetCacheable(true)
                 .Add(Restrictions.In("Id", ageIds.ToList()))
+                .AddOrder(Order.Asc("Sequence"))
                 .List<Age>();
         }
 
@@ -189,6 +189,7 @@ namespace PholioVisualisation.DataAccess
         {
             return CurrentSession.CreateCriteria<Age>()
                 .SetCacheable(true)
+                .AddOrder(Order.Asc("Sequence"))
                 .List<Age>();
         }
 
@@ -230,14 +231,6 @@ namespace PholioVisualisation.DataAccess
             return CurrentSession.CreateCriteria<ConfidenceIntervalMethod>()
                 .SetCacheable(true)
                 .List<ConfidenceIntervalMethod>();
-        }
-
-        public virtual IList<KeyMessageOverride> GetKeyMessageOverrides(int profileId, string areaCode)
-        {
-            return CurrentSession.CreateCriteria<KeyMessageOverride>()
-                .Add(Restrictions.Eq("ProfileId", profileId))
-                .Add(Restrictions.Eq("AreaCode", areaCode))
-                .List<KeyMessageOverride>();
         }
 
         public virtual ComparatorConfidence GetComparatorConfidence(int comparatorMethodId, double comparatorConfidence)

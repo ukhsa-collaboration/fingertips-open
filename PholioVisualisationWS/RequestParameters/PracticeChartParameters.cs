@@ -16,11 +16,13 @@ namespace PholioVisualisation.RequestParameters
         public const string ParameterAgeId1 = "age1";
         public const string ParameterAgeId2 = "age2";
         public const string ParameterDataPointOffset = IndicatorStatsParameters.ParameterDataPointOffset;
-        public const string ParameterParentArea = ParameterNames.ParentAreaCode;
+        public const string ParameterParentAreaCode = ParameterNames.ParentAreaCode;
+        public const string ParameterAreaTypeId = ParameterNames.AreaTypeId;
 
         public int GroupId1 { get; set; }
         public int GroupId2 { get; set; }
         public string AreaCode { get; set; }
+        public int AreaTypeId { get; set; }
         public string ParentAreaCode { get; set; }
         public int DataPointOffset { get; set; }
         public int IndicatorId1 { get; set; }
@@ -34,7 +36,8 @@ namespace PholioVisualisation.RequestParameters
             : base(parameters)
         {
             AreaCode = ParseString(ParameterNames.AreaCode);
-            ParentAreaCode = ParseString(ParameterParentArea);
+            AreaTypeId = ParseInt(ParameterNames.AreaTypeId);
+            ParentAreaCode = ParseString(ParameterParentAreaCode);
             GroupId1 = ParseInt(ParameterGroupId1);
             GroupId2 = ParseInt(ParameterGroupId2);
             IndicatorId1 = ParseInt(ParameterIndicatorId1);

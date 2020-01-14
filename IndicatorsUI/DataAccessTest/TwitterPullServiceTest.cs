@@ -1,14 +1,14 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IndicatorsUI.DataAccess;
-using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.DataAccessTest
 {
     [TestClass]
     public class TwitterPullServiceTest
     {
-        [TestMethod]
+        // Tweet not pulled anymore
+        [TestMethod, TestCategory("ExcludeFromJenkins")]
         public void ListTweetsOnUserTimelineTest()
         {
             // We are using PHE_Uk twitter details

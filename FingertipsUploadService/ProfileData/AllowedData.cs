@@ -64,6 +64,10 @@ namespace FingertipsUploadService.ProfileData
                         // Users cannot upload data with note for system aggregated values
                         .Where(x => x != ProfileData.ValueNoteIds.AggregatedFromAllKnownLowerGeographyValuesByFingertips)
                         .ToList();
+
+                    /* Allow users to include -1 as common error. It will
+                     be changed to 0 when the row is parsed.*/
+                    valueNoteIds.Add(-1);
                 }
                 return valueNoteIds;
             }

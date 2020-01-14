@@ -17,6 +17,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="profile_key">Profile URL key</param>
         /// <param name="file_name">Name of the file</param>
         /// <param name="time_period">The time period the file is associated with [optional]</param>
+        /// <param name="subfolder">Subfolder [optional]</param>
         /// <returns>Static document, e.g. PDF report</returns>
         [HttpGet]
         [Route("static-reports")]
@@ -55,6 +56,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="profile_key">Profile URL key</param>
         /// <param name="file_name">Name of the file</param>
         /// <param name="time_period">The time period the file is associated with [optional]</param>
+        /// <param name="subfolder">Subfolder [optional]</param>
         /// <returns>Whether or not a static document is available</returns>
         [HttpGet]
         [Route("api/static-reports/exists")]

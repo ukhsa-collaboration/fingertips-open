@@ -1,23 +1,29 @@
-﻿using System;
+﻿using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
+using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.Profile;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Mvc;
-using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
-using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Profile;
-using Newtonsoft.Json;
 
 namespace Fpm.MainUI.Controllers
 {
     [RoutePrefix("live-updates")]
     public class LiveUpdateController : Controller
     {
+        private readonly IProfilesReader _reader;
+
         private readonly string _targetApiUrl = AppConfig.GetLiveSiteWsUrl();
         private readonly string _sourceApiUrl = AppConfig.GetPholioWs();
         private readonly string _liveUpdateKey = AppConfig.GetLiveUpdateKey();
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
+
+        public LiveUpdateController(IProfilesReader reader)
+        {
+            _reader = reader;
+        }
 
         [Route("profile")]
         public ActionResult ProfileLiveUpdate(int profileId = ProfileIds.Undefined)

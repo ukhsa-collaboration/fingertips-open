@@ -1,12 +1,14 @@
 import { Component, Input, SimpleChanges, OnChanges, ViewChild, ElementRef } from '@angular/core';
+import { isDefined } from '@angular/compiler/src/util';
 import {
   AllPopulationData, RegisteredPersons
 } from '../population';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import {
   FTModel, Population, ValueData
-} from '../../typings/FT.d';
-import { CommaNumber, AreaTypeIds, NumberHelper, IndicatorIds, ProfileIds } from '../../shared/shared';
+} from '../../typings/FT';
+import { CommaNumber, NumberHelper } from '../../shared/shared';
+import { AreaTypeIds, IndicatorIds, ProfileIds } from '../../shared/constants';
 import * as _ from 'underscore';
 import { MetadataTableComponent } from '../../metadata/metadata-table/metadata-table.component';
 
@@ -20,7 +22,7 @@ export class PopulationSummaryComponent implements OnChanges {
   private noData = '<div class="no-data">-</div>';
 
   @Input() allPopulationData: AllPopulationData;
-  @ViewChild('metadata') metadata: MetadataTableComponent;
+  @ViewChild('metadata', { static: false }) metadata: MetadataTableComponent;
 
   registeredPersons: RegisteredPersons[];
   ethnicityLabel: string;
@@ -36,7 +38,7 @@ export class PopulationSummaryComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (this.allPopulationData) {
-      let areaName = this.ftHelperService.getAreaName(this.ftModel.areaCode);
+      const areaName = this.ftHelperService.getAreaName(this.ftModel.areaCode);
 
       this.defineRegisteredPersons(areaName);
       this.practiceLabel = this.ftModel.areaCode + ' - ' + areaName;
@@ -60,7 +62,7 @@ export class PopulationSummaryComponent implements OnChanges {
 
   public metadataIsReady(isReady: boolean) {
     if (isReady) {
-      let metadata = this.metadata;
+      const metadata = this.metadata;
       // Set timeout so metadata table view will have finished rendering
       setTimeout(function () { metadata.showInLightbox(); });
     }
@@ -73,16 +75,16 @@ export class PopulationSummaryComponent implements OnChanges {
   private defineDeprivationDecile() {
 
     // Decile label
-    let decileNumber = this.allPopulationData.populationSummary.GpDeprivationDecile;
-    if (_.isUndefined(decileNumber)) {
-      this.decileLabel = '<i>Data not available for current practice</i>';
-    } else {
-      let deciles = this.allPopulationData.deprivationDeciles;
+    const decileNumber = this.allPopulationData.populationSummary.GpDeprivationDecile;
+    if (isDefined(decileNumber)) {
+      const deciles = this.allPopulationData.deprivationDeciles;
       this.decileLabel = _.find(deciles, function (decile) { return decile.Id === decileNumber; }).Name;
+    } else {
+      this.decileLabel = '<i>Data not available for current practice</i>';
     }
 
     // Decile blocks
-    let decileLabels: DecileLabel[] = [];
+    const decileLabels: DecileLabel[] = [];
     for (let i = 1; i <= 10; i++) {
       decileLabels.push(new DecileLabel(i));
     }
@@ -95,14 +97,14 @@ export class PopulationSummaryComponent implements OnChanges {
 
   private defineAdHocIndicatorRows() {
 
-    let rows = [];
-    let values = this.allPopulationData.populationSummary.AdHocValues;
+    const rows = [];
+    const values = this.allPopulationData.populationSummary.AdHocValues;
 
     // QOF achievement
-    let qof = values.Qof;
-    let text = _.isUndefined(qof)
-      ? this.noData
-      : NumberHelper.roundNumber(qof.Count, 1) + ' (out of ' + qof.Denom + ')';
+    const qof = values.Qof;
+    let text = isDefined(qof)
+      ? NumberHelper.roundNumber(qof.Count, 1) + ' (out of ' + qof.Denom + ')'
+      : this.noData;
     rows.push(new AdHocIndicatorRow(IndicatorIds.QofPoints, 'QOF achievement', text));
 
     // Life expectancy
@@ -110,10 +112,11 @@ export class PopulationSummaryComponent implements OnChanges {
     rows.push(this.getLifeExpectancy('Female', values.LifeExpectancyFemale));
 
     // Patients that recommend practice
-    let recommend = values.Recommend;
-    text = _.isUndefined(recommend) ?
-      this.noData
-      : recommend.ValF + '%';
+    const recommend = values.Recommend;
+    text = isDefined(recommend)
+      ? recommend.ValF + '%'
+      : this.noData;
+
     rows.push(new AdHocIndicatorRow(IndicatorIds.WouldRecommendPractice,
       '% having a positive experience of their practice', text));
 
@@ -121,22 +124,24 @@ export class PopulationSummaryComponent implements OnChanges {
   }
 
   private getLifeExpectancy(sex: string, data: ValueData): AdHocIndicatorRow {
-    let text = _.isUndefined(data)
-      ? this.noData
-      : data.ValF + ' years';
+
+    const text = isDefined(data)
+      ? data.ValF + ' years'
+      : this.noData;
+
     return new AdHocIndicatorRow(IndicatorIds.LifeExpectancy, 'Life expectancy (' + sex + ')', text);
   }
 
   private defineEthnicityLabel() {
-    let ethnicity = this.allPopulationData.populationSummary.Ethnicity;
-    this.ethnicityLabel = _.isUndefined(ethnicity)
-      ? '<i>Insufficient data to provide accurate summary</i>'
-      : ethnicity;
+    const ethnicity = this.allPopulationData.populationSummary.Ethnicity;
+    this.ethnicityLabel = isDefined(ethnicity)
+      ? ethnicity
+      : '<i>Insufficient data to provide accurate summary</i>';
   }
 
   private defineRegisteredPersons(areaName: string) {
-    let populations = this.allPopulationData.populations;
-    let parentAreaName = this.ftHelperService.getParentArea().Name;
+    const populations = this.allPopulationData.populations;
+    const parentAreaName = this.ftHelperService.getParentArea().Name;
 
     this.registeredPersons = [
       this.getRegisteredPersons(areaName, false, populations.areaPopulation),
@@ -146,7 +151,7 @@ export class PopulationSummaryComponent implements OnChanges {
   }
 
   private getRegisteredPersons(areaName: string, isAverage: boolean, population: Population): RegisteredPersons {
-    let persons = new RegisteredPersons();
+    const persons = new RegisteredPersons();
     persons.isAverage = isAverage;
     persons.areaName = areaName;
     persons.personCount = this.formatListSize(population.ListSize);
@@ -167,8 +172,8 @@ class AdHocIndicatorRow {
 }
 
 class DecileLabel {
-  constructor(public num: number) { }
   public text = '';
+  constructor(public num: number) { }
   public getClass(): string {
     return 'decile' + this.num;
   }

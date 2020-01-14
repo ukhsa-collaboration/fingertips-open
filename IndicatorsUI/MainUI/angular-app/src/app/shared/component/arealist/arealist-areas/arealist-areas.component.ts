@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { Area } from '../../../../typings/FT.d';
+import { Area } from '../../../../typings/FT';
 import { AreaService } from '../../../service/api/area.service';
-import { AreaListService } from '../../../../shared/service/api/arealist.service';
+import { AreaListService } from '../../../service/api/arealist.service';
 
 @Component({
   selector: 'ft-arealist-areas',

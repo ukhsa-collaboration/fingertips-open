@@ -1,9 +1,10 @@
-﻿using IndicatorsUI.DataAccess;
-using IndicatorsUI.MainUI.Helpers;
-using System;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Web.Mvc;
+using IndicatorsUI.DataAccess;
+using IndicatorsUI.MainUI.Helpers;
 
 namespace IndicatorsUI.MainUI.Controllers
 {
@@ -29,26 +30,96 @@ namespace IndicatorsUI.MainUI.Controllers
             AddGroupId(groupId);
 
             AddFormatParameters(format);
-
+ 
             var ssrsFormat = new SsrsFormat(format);
+            var fileName = String.Format("{0}-{1}.{2}", reportName.Replace("/", "-"), areaCode, ssrsFormat.Extension);
 
+            var ssrsUrl = _sb.ToString();
             try
             {
-                // Download file from SSRS
-                var webClient = new WebClient();
-                webClient.UseDefaultCredentials = true;
-                var fileData = webClient.DownloadData(_sb.ToString());
-
                 // Return file
-                var filename = areaCode + "." + ssrsFormat.Extension;
-                return File(fileData, ssrsFormat.ContentType, filename);
+                var fileData = GetFileData(fileName, ssrsUrl);
+                return File(fileData, ssrsFormat.ContentType, fileName);
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogger.LogException(ex, ssrsUrl);
+                var errorMessage = GetErrorMessage(ex);
+                return Content(errorMessage);
+            }
+        }
+
+        private byte[] GetFileData(string fileName, string ssrsUrl)
+        {
+            byte[] fileData;
+
+            if (AppConfig.Instance.UseFileCaching)
+            {
+                // Return the saved report if exists or generate the report
+                var filePath = GetReportFilePath(fileName);         
+                fileData = ReadFileFromDisk(filePath);
+
+                if (fileData == null)
+                {
+                    // Download file
+                    fileData = DownloadFile(ssrsUrl);
+
+                    // Save file to disk
+                    SaveFileToDisk(filePath, fileData);
+                }
+            }
+            else
+            {
+                // Download file
+                fileData = DownloadFile(ssrsUrl);
+            }
+
+            return fileData;
+        }
+
+        private byte[] ReadFileFromDisk(string filePath)
+        {
+            if (System.IO.File.Exists(filePath))
+            {
+                return System.IO.File.ReadAllBytes(filePath);
+            }
+
+            return null;
+        }
+
+        private void SaveFileToDisk(string filePath, byte[] fileData)
+        {
+            try
+            {
+                System.IO.File.WriteAllBytes(filePath, fileData);
             }
             catch (Exception ex)
             {
                 ExceptionLogger.LogException(ex, null);
-                var errorMessage = GetErrorMessage(ex);
-                return Content(errorMessage);
             }
+        }
+
+        private static string GetReportFilePath(string fileName)
+        {
+            var directory = Path.Combine(AppConfig.Instance.StaticReportsDirectory, "ssrs");
+
+            // Ensure directory exists
+            if (Directory.Exists(directory) == false)
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var fileNameWithPath = Path.Combine(directory, fileName);
+            return fileNameWithPath;
+        }
+
+        private byte[] DownloadFile(string address)
+        {
+            // Download file from SSRS
+            var webClient = new WebClient();
+            webClient.UseDefaultCredentials = true;
+
+            return webClient.DownloadData(address);
         }
 
         private static string GetErrorMessage(Exception ex)

@@ -8,25 +8,26 @@ namespace IndicatorsUI.MainUISeleniumTest
     {
         public static string BaseUrl = AppConfig.Instance.BridgeWsUrl;
 
-        private IWebDriver driver;
-        private WaitFor waitFor;
+        private readonly IWebDriver _driver;
+        private readonly WaitFor _waitFor;
 
         public NavigateTo(IWebDriver driver)
         {
-            this.driver = driver;
-            waitFor = new WaitFor(driver);
+            _driver = driver;
+            _waitFor = new WaitFor(driver);
         }
 
         public void FingertipsDataForProfile(string profileUrlKey)
         {
             GoToUrl("profile/" + profileUrlKey + "/data");
-            waitFor.FingertipsTartanRugToLoad();
+            _waitFor.FingertipsOverviewTabToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
         public void FingertipsFrontPageForProfile(string profileUrlKey)
         {
             GoToUrl("profile/" + profileUrlKey);
-            waitFor.FingertipsProfileFrontPageToLoad();
+            _waitFor.FingertipsProfileFrontPageToLoad();
         }
 
         public void JavaScriptTestPage(string testPage)
@@ -37,7 +38,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void PublicHealthDashboardMap()
         {
             GoToUrl("topic/public-health-dashboard/map-with-data");
-            waitFor.GoogleMapToLoad();
+            _waitFor.GoogleMapToLoad();
         }
 
         public void PublicHealthDashboardRankings()
@@ -48,7 +49,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         public void PublicHealthDashboardHome()
         {
             GoToUrl("topic/public-health-dashboard");
-            waitFor.GoogleMapToLoad();
+            _waitFor.GoogleMapToLoad();
         }
 
         public void FingertipsIndicatorSearchResults(string searchText)
@@ -61,97 +62,115 @@ namespace IndicatorsUI.MainUISeleniumTest
             GoToUrl("/");
         }
 
-        public void PhofInequalities()
+        public void PhofHealthImprovementDomain()
         {
-            PhofDataTab(TabIds.Inequalities);
-            waitFor.InequalitiesTabToLoad();
+            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/0/gid/" + GroupIds.Phof_HealthImprovement);
         }
 
-        public void PhofCompareAreas()
+        public void PhofInequalitiesTab()
         {
-            PhofDataTab(TabIds.CompareAreas);
-            waitFor.FingertipsBarChartTableToLoad();
+            NavigateToDataTab(ProfileUrlKeys.Phof, TabIds.Inequalities);
+            _waitFor.InequalitiesTabToLoad();
         }
 
-        public void PhofTartanRug()
+        public void PhofCompareAreasTab()
         {
-            PhofDataTab(TabIds.TartanRug);
-            waitFor.FingertipsTartanRugToLoad();
+            NavigateToDataTab(ProfileUrlKeys.Phof, TabIds.CompareAreas);
+            _waitFor.FingertipsBarChartTableToLoad();
         }
 
-        public void PhofAreaProfile()
+        public void PhofOverviewTab()
         {
-            PhofDataTab(TabIds.AreaProfile);
-            waitFor.FingertipsSpineChartToLoad();
+            NavigateToDataTab(ProfileUrlKeys.Phof, TabIds.Overview);
+            _waitFor.FingertipsOverviewTabToLoad();
         }
 
-        public void FingertipsTartanRug()
+        public void OverviewTab()
         {
-            DeveloperTestProfile(TabIds.TartanRug);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.Overview);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsScatterplot()
+        public void CompareIndicatorsTab()
         {
-            DeveloperTestProfile(TabIds.ScatterPlot);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.CompareIndicators);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsMap()
+        public void MapTab()
         {
-            DeveloperTestProfile(TabIds.Map);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.Map);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsTrends()
+        public void TrendsTab()
         {
-            DeveloperTestProfile(TabIds.Trends);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.Trends);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsCompareAreas()
+        public void CompareAreasTab()
         {
-            DeveloperTestProfile(TabIds.CompareAreas);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.CompareAreas);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsAreaProfiles()
+        public void AreaProfilesTab()
         {
-            DeveloperTestProfile(TabIds.AreaProfile);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.AreaProfile);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsPopulation()
+        public void PopulationTab()
         {
-            DeveloperTestProfile(TabIds.Population);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.Population);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsInequalities()
+        public void InequalitiesTab()
         {
-            DeveloperTestProfile(TabIds.Inequalities);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.Inequalities);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
         }
 
-        public void FingertipsEngland()
+        public void EnglandTab()
         {
-            DeveloperTestProfile(TabIds.England);
-            waitFor.FingertipsAreaTypeToLoad();
+            NavigateToDataTab(ProfileUrlKeys.DevelopmentProfileForTesting, TabIds.England);
+            _waitFor.FingertipsAreaTypeToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
+        }
+
+        public void PracticeProfilesDefinitionsTab()
+        {
+            NavigateToDataTab(ProfileUrlKeys.PracticeProfiles, TabIds.Definitions);
+            _waitFor.FingertipsDefinitionsTableToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
+        }
+
+        public void PracticeProfilesCompareAreasTab()
+        {
+            NavigateToDataTab(ProfileUrlKeys.PracticeProfiles, TabIds.CompareAreas);
+            _waitFor.FingertipsCompareAreasTableToLoad();
+            _waitFor.AjaxLockToBeUnlocked();
+        }
+
+        private void NavigateToDataTab(string profileUrlKey, int tabId)
+        {
+            var url = string.Format("profile/{0}/data#page/{1}", profileUrlKey, tabId);
+            GoToUrl(url);
         }
 
         public void GoToUrl(string relativeUrl)
         {
-            driver.Navigate().GoToUrl(BaseUrl + relativeUrl);
-        }
-
-        private void PhofDataTab(int tabId)
-        {
-            GoToUrl("profile/" + ProfileUrlKeys.Phof + "/data#page/" + tabId);
-        }
-
-        private void DeveloperTestProfile(int tabId)
-        {
-            GoToUrl("profile/" + ProfileUrlKeys.DeveloperTestProfile + "/data#page/" + tabId);
+            _driver.Navigate().GoToUrl(BaseUrl + relativeUrl);
         }
     }
 }

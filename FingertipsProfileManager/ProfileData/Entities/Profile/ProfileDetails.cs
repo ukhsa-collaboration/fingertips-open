@@ -19,7 +19,7 @@ namespace Fpm.ProfileData.Entities.Profile
         public IEnumerable<UserGroupPermissions> UserPermissions { get; set; }
 
         public int DefaultAreaTypeId { get; set; }
-        public int ContactUserId { get; set; }
+        public string ContactUserIds { get; set; }
         public string ExtraJsFiles { get; set; }
         public string ExtraCssFiles { get; set; }
         public int EnumParentDisplay { get; set; }
@@ -33,6 +33,7 @@ namespace Fpm.ProfileData.Entities.Profile
         public int? SkinId { get; set; }
         public bool IsProfileViewable { get; set; }
         public bool ShowDataQuality { get; set; }
+        public bool ShowOfficialStatistic { get; set; }
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
@@ -58,9 +59,11 @@ namespace Fpm.ProfileData.Entities.Profile
 
         public int NewDataDeploymentCount { get; set; }
 
+        public bool AreIndicatorNamesDisplayedWithNumbers { get; set; }
+
         public void SetDefaultValues(string extraJsFiles)
         {
-            DefaultAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            DefaultAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPre2019;
             ExtraJsFiles = extraJsFiles;
             ExtraCssFiles = "PageMap.css";
             EnumParentDisplay = 0;

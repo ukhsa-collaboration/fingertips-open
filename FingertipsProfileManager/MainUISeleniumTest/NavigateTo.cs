@@ -21,12 +21,12 @@ namespace Fpm.MainUISeleniumTest
 
         public void ProfilesPage()
         {
-            GoToUrl("profilemanager");
+            GoToUrl("profiles");
         }
 
         public void ProfilesForNonAdminPage()
         {
-            GoToUrl("profile/EditProfileNonAdmin");
+            GoToUrl("profiles/profile/edit-profile-non-admin");
         }
 
         public void ContentIndexPage()

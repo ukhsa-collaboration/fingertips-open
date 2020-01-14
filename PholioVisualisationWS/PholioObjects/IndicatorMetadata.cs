@@ -58,6 +58,21 @@ namespace PholioVisualisation.PholioObjects
         [JsonProperty]
         public string SpecialCases { get; set; }
 
+        [JsonProperty]
+        public bool AlwaysShowSexWithIndicatorName { get; set; }
+
+        [JsonProperty]
+        public bool AlwaysShowAgeWithIndicatorName { get; set; }
+
+        [JsonProperty]
+        public bool ShouldAveragesBeCalculated { get; set; }
+
+        [JsonProperty]
+        public string Status { get; set; }
+
+        [JsonProperty]
+        public int DestinationProfileId { get; set; }
+
         [JsonIgnore]
         public bool HasSpecialCases
         {

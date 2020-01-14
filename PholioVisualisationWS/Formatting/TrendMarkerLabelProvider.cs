@@ -51,12 +51,24 @@ namespace PholioVisualisation.Formatting
 
         private TrendMarkerLabel CannotBeCalculated
         {
-            get { return new TrendMarkerLabel { Id = TrendMarker.CannotBeCalculated, Text = "Cannot be calculated" }; }
+            get
+            {
+                return new TrendMarkerLabel
+                {
+                    Id = TrendMarker.CannotBeCalculated, Text = "Cannot be calculated"
+                };
+            }
         }
 
         private TrendMarkerLabel NoChange
         {
-            get { return new TrendMarkerLabel { Id = TrendMarker.NoChange, Text = "No significant change" }; }
+            get
+            {
+                return new TrendMarkerLabel
+                {
+                    Id = TrendMarker.NoChange, Text = "No significant change"
+                };
+            }
         }
     }
 }

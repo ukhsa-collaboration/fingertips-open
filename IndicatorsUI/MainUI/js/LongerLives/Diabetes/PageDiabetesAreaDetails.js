@@ -2,7 +2,7 @@
 
 var headlineIndicator;
 
-function initPage() {    
+function initPage() {
     showLoadingSpinner();
     lock();
 
@@ -120,13 +120,12 @@ function displayPage() {
             ? getSignificanceText(significances[i], root)
             : '';
 
-        if (isFeatureEnabled('enablePhdLinkToFingertips')) {
-            if (MT.model.profileId === ProfileIds.PublicHealthDashboard && !isSummaryRank) {
-                if (i > 0) {
-                    significanceText = getViewTrendLink(MT.model, root);
-                }
+        if (MT.model.profileId === ProfileIds.PublicHealthDashboard && !isSummaryRank) {
+            if (i > 0) {
+                significanceText = getViewTrendLink(MT.model, root);
             }
         }
+
         var causeBar = getCauseBars(area, causeInfo, rank, causeClass,
             metadata, root.ComparatorMethodId, sexForCurrectIndicator, significanceText);
 
@@ -454,20 +453,8 @@ function getBars(rankInfo, area, isOverall, displayMaxFirst, metadata) {
     }
 
     // Bar labels
-    var lowestLabel, highestLabel;
-    if (MT.model.profileId === ProfileIds.PublicHealthDashboard &&
-        isFeatureEnabled('useLongerLivesBestWorstLabels')) {
-        lowestLabel = 'BEST';
-        highestLabel = 'WORST';
-    } else {
-        if (min.Val < max.Val) {
-            lowestLabel = 'LOWEST';
-            highestLabel = 'HIGHEST';
-        } else {
-            lowestLabel = 'HIGHEST';
-            highestLabel = 'LOWEST';
-        }
-    }
+    var lowestLabel = 'BEST';
+    var highestLabel = 'WORST';
 
     var valueNotes = getValueNotes(rankInfo);
     var viewModel = {
@@ -793,16 +780,16 @@ function pageHeader(model) {
     var pageHeaderTemplate, viewModel;
     if (MT.model.profileId === ProfileIds.HealthChecks) {
         pageHeaderTemplate = '<h1 class="area_name">{{areaName}}</h1>' +
-                '<div id="c1" class="info_box_3">' +
-                '<h2><strong>{{eligibleEnglang}}</strong> people eligible for an NHS Health Check in England</h2>' +
-                '</div>' +
-                '<div id="c2" class="info_box_3">' +
-                '<h2><strong>{{eligibleThisArea}}</strong> people eligible for an NHS Health Check in this area</h2>' +
-                '</div>' +
-                '<div id="c3" class="info_box_3">' +
-                '<h2>{{{preventableCvdMortality}}} preventable cardio-vascular disease deaths in this area</h2>' +
-                '</div>' +
-                '</div>';
+            '<div id="c1" class="info_box_3">' +
+            '<h2><strong>{{eligibleEnglang}}</strong> people eligible for an NHS Health Check in England</h2>' +
+            '</div>' +
+            '<div id="c2" class="info_box_3">' +
+            '<h2><strong>{{eligibleThisArea}}</strong> people eligible for an NHS Health Check in this area</h2>' +
+            '</div>' +
+            '<div id="c3" class="info_box_3">' +
+            '<h2>{{{preventableCvdMortality}}} preventable cardio-vascular disease deaths in this area</h2>' +
+            '</div>' +
+            '</div>';
 
         viewModel = {
             areaName: model.areaName,
@@ -951,15 +938,15 @@ function getCauseOptions() {
     } else {
         // Do not need to associate styling with individual rows
         options = [
-        { key: 'a' },
-        { key: 'b' },
-        { key: 'c' },
-        { key: 'd' },
-        { key: 'e' },
-        { key: 'f' },
-        { key: 'g' },
-        { key: 'h' },
-        { key: 'i' }
+            { key: 'a' },
+            { key: 'b' },
+            { key: 'c' },
+            { key: 'd' },
+            { key: 'e' },
+            { key: 'f' },
+            { key: 'g' },
+            { key: 'h' },
+            { key: 'i' }
         ];
     }
     return options;
@@ -994,7 +981,7 @@ function getValueNotes(data) {
 
 function getViewTrendLink(model, root) {
     var baseUrl = 'https://fingertips.phe.org.uk/',
-    link = baseUrl + profileUrlKey + "-ft" + "#page/4";
+        link = baseUrl + profileUrlKey + "-ft" + "#page/4";
     link += "/gid/" + model.groupId;
     link += "/pat/" + model.parentTypeId;
     link += "/par/" + model.parentCode;
@@ -1003,7 +990,7 @@ function getViewTrendLink(model, root) {
     link += "/iid/" + root.IID;
     link += "/age/" + root.Age.Id;
     link += "/sex/" + root.Sex.Id;
-    
+
     return '<a style="text-transform:none;color:#2e3191;"  href="' + link + '" target="_blank">View trend</a>';
 }
 

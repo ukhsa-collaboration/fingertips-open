@@ -7,26 +7,15 @@ namespace PholioVisualisation.DataConstructionTest
     [TestClass]
     public class LongerLivesAreaDetailsBuilderTest
     {
-        /// <summary>
-        /// Suicide Related Risk Factors
-        /// </summary>
-        [TestMethod]
-        public void TestGetAreaDetails_Suicide()
-        {
-            var areaCode = AreaCodes.England;
-            var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.Suicide, GroupIds.Suicide_RelatedRiskFactors, AreaTypeIds.CountyAndUnitaryAuthority, areaCode);
-
-            Assert.IsNotNull(areaDetails);
-        }
+        private int _profileId = ProfileIds.PublicHealthDashboardLongerLives;
 
         [TestMethod]
         public void TestGetAreaDetails_Public_Health_Dashboard_Nearest_Neighbours()
         {
             var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.PublicHealthDashboardLongerLives, 
+                .GetAreaDetails(_profileId, 
                 GroupIds.PublicHealthDashboardLongerLives_SummaryRank,
-                AreaTypeIds.CountyAndUnitaryAuthority, 
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, 
                 NearestNeighbourArea.CreateAreaCode(NearestNeighbourTypeIds.Cipfa, AreaCodes.CountyUa_Cambridgeshire)
                 );
 
@@ -42,7 +31,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_CountyUA_England()
         {
             var areaCode = AreaCodes.England;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             CheckBenchmarkDetails(areaDetails);
         }
@@ -51,7 +40,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_CountyUA_Manchester()
         {
             var areaCode = AreaCodes.CountyUa_Manchester;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNotNull(areaDetails.Decile, "Decile is not defined");
             Assert.IsNotNull(areaDetails.Significances);
@@ -65,7 +54,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_CountyUA_IslesOfScilly()
         {
             var areaCode = AreaCodes.CountyUa_IslesOfScilly;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNotNull(areaDetails.Decile, "Decile is not defined");
             Assert.IsNotNull(areaDetails.Significances);
@@ -73,21 +62,10 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void TestGetAreaDetails_Ccg()
-        {
-            var areaCode = AreaCodes.Ccg_Barnet;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CcgsPreApr2017);
-            Assert.AreEqual(areaCode, areaDetails.Area.Code);
-            Assert.IsNotNull(areaDetails.Decile, "Decile should be defined");
-            Assert.IsNotNull(areaDetails.Significances);
-            Assert.AreEqual(2, areaDetails.Benchmarks.Count);
-        }
-
-        [TestMethod]
         public void TestGetAreaDetails_DistrictUA_SouthCambridgeshire()
         {
             var areaCode = AreaCodes.DistrictUa_SouthCambridgeshire;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNotNull(areaDetails.Decile, "Decile is not defined");
             Assert.IsNotNull(areaDetails.Significances);
@@ -98,7 +76,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_DistrictUA_Mansfield()
         {
             var areaCode = AreaCodes.DistrictUa_Mansfield;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNotNull(areaDetails.Decile, "Decile is not defined");
             Assert.IsNotNull(areaDetails.Significances);
@@ -110,7 +88,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var areaCode = CategoryArea.CreateAreaCode(
                 CategoryTypeIds.DeprivationDecileCountyAndUA2010, 5);
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             CheckBenchmarkDetails(areaDetails);
         }
@@ -119,7 +97,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_DistrictUA_ONSCluster()
         {
             var areaCode = AreaCodes.OnsGroup_ProsperingSouthernEngland;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNull(areaDetails.Benchmarks);
         }
@@ -128,7 +106,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestGetAreaDetails_DistrictUA_England()
         {
             var areaCode = AreaCodes.England;
-            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthority);
+            var areaDetails = LongerLivesAreaDetails(areaCode, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(areaCode, areaDetails.Area.Code);
             Assert.IsNull(areaDetails.Benchmarks);
         }
@@ -141,10 +119,11 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.IsNull(areaDetails.Benchmarks);
         }
 
-        private static LongerLivesAreaDetails LongerLivesAreaDetails(string areaCode, int areaTypeId)
+        private LongerLivesAreaDetails LongerLivesAreaDetails(string areaCode, int areaTypeId)
         {
             var areaDetails = new LongerLivesAreaDetailsBuilder()
-                .GetAreaDetails(ProfileIds.LongerLives, GroupIds.PublicHealthDashboardLongerLives_SummaryRank, areaTypeId, areaCode);
+                .GetAreaDetails(_profileId, 
+                    GroupIds.PublicHealthDashboardLongerLives_SummaryRank, areaTypeId, areaCode);
             return areaDetails;
         }
     }

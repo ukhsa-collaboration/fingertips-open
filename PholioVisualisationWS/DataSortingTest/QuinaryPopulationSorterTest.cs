@@ -32,7 +32,7 @@ namespace PholioVisualisation.DataSortingTest
                 AgeIds.From75To79,
                 AgeIds.From80To84,
                 AgeIds.From85To89,
-                AgeIds.From90To95,
+                AgeIds.From90To94,
                 AgeIds.Over95
                 );
             Shuffle(data);
@@ -58,7 +58,7 @@ namespace PholioVisualisation.DataSortingTest
             Assert.AreEqual(AgeIds.From75To79, sortedValues[index++]);
             Assert.AreEqual(AgeIds.From80To84, sortedValues[index++]);
             Assert.AreEqual(AgeIds.From85To89, sortedValues[index++]);
-            Assert.AreEqual(AgeIds.From90To95, sortedValues[index++]);
+            Assert.AreEqual(AgeIds.From90To94, sortedValues[index++]);
             Assert.AreEqual(AgeIds.Over95, sortedValues[index]);
         }
 

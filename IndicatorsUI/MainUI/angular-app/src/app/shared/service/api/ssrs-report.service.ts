@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
+import { FTHelperService } from '../helper/ftHelper.service';
 import { Parameters } from './parameters';
 import { HttpService } from './http.service'
-import { SSRSReport } from '../../../typings/FT.d'
+import { SSRSReport } from '../../../typings/FT'
 
 @Injectable()
 export class SsrsReportService {
@@ -14,7 +14,7 @@ export class SsrsReportService {
   }
 
   getSsrsReports(profileId: number): Observable<SSRSReport[]> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
 
     return this.httpService.httpGet('api/ssrs_reports/' + profileId, params);
   }

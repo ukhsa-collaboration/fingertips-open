@@ -76,7 +76,11 @@ namespace PholioVisualisation.SearchIndexing
         {
             var groupIds = ReaderFactory.GetProfileReader().GetGroupIdsFromAllProfiles();
             var groupings = _groupDataReader.GetGroupingsByGroupIds(groupIds);
-            return _groupDataReader.GetIndicatorMetadata(groupings.ToList(), properties.ToList());
+
+            IList<GroupingMetadata> groupingMetadata = _groupDataReader.GetGroupingMetadataList(groupIds);
+            int profileId = groupingMetadata[0].ProfileId;
+
+            return _groupDataReader.GetIndicatorMetadata(groupings.ToList(), properties.ToList(), profileId);
         }
 
         private IndexWriter GetWriter(string type)

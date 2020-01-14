@@ -1,13 +1,24 @@
 ﻿@using System.Web.Optimization
 @using IndicatorsUI.MainUI.Models
 @model PageModel
-@{ var pageType = Model.PageType; }
+@{
+    var pageType = Model.PageType; 
+    var jsPath = ViewBag.JavaScriptVersion != string.Empty 
+        ? "/" + ViewBag.JavaScriptVersion
+        : "";
+}
 @if (pageType == PageType.DataPageOfProfileWithFrontPage ||
-                pageType == PageType.DataPageOfProfileWithoutFrontPage ||
-                pageType == PageType.IndicatorSearchResultsDataPage ||
-                pageType == PageType.IndicatorListDataPage ||
-                pageType == PageType.AreaListPage)
+     pageType == PageType.DataPageOfProfileWithoutFrontPage ||
+     pageType == PageType.IndicatorSearchResultsDataPage ||
+     pageType == PageType.IndicatorListDataPage ||
+     pageType == PageType.AreaListPage)
 {
     @* Transpiled TypeScript files *@
-    @Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/js-angular")
+@*     @Scripts.RenderFormat("<script src='{0}' defer></script>", "~/bundles/js-angular") *@
+
+    <script src="@jsPath/angular-app-dist/main.js"></script>
+    <script src="@jsPath/angular-app-dist/polyfills.js"></script>
+    <script src="@jsPath/angular-app-dist/runtime.js"></script>
+    <script src="@jsPath/angular-app-dist/styles.js"></script>
+    <script src="@jsPath/angular-app-dist/vendor.js"></script>
 }

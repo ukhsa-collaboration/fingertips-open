@@ -20,11 +20,11 @@
         <div class="col-md-4">
             @Html.TextBoxFor(model => model.Id, new { @class = "disabled unselected-domain", @disabled = "disabled" })
         </div>
-        
+
         @* Update live *@
         <div class="col-md-3 pull-right text-right">
             @Html.ActionLink("Update profile on live site",
-                "ProfileLiveUpdate","LiveUpdate", new { profileId = Model.Id }, new {})
+                     "ProfileLiveUpdate", "LiveUpdate", new { profileId = Model.Id }, new { })
         </div>
     </div>
 
@@ -47,6 +47,8 @@
 
     @Html.Partial("_FingertipsTabOptions")
 
+    <h3>Further settings</h3>
+
     <div class="row form-group">
         <label class="col-md-3 col-form-label">Areas ignored for spine chart:</label>
         <div class="col-md-8">
@@ -61,150 +63,135 @@
         </div>
     </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Extra CSS files:</label>
-                <div class="col-md-9">
-                    @Html.TextBoxFor(model => model.ExtraCssFiles, new { @class = "unselected-domain" })
-                </div>
-            </div>
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Extra CSS files:</label>
+        <div class="col-md-9">
+            @Html.TextBoxFor(model => model.ExtraCssFiles, new { @class = "unselected-domain" })
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Access control group:</label>
-                <div class="col-md-9">
-                    @Html.TextBoxFor(model => model.AccessControlGroup, new { @class = "unselected-domain" })
-                </div>
-            </div>
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Access control group:</label>
+        <div class="col-md-9">
+            @Html.TextBoxFor(model => model.AccessControlGroup, new { @class = "unselected-domain" })
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Skin:</label>
-                <div class="col-md-4">
-                    @Html.DropDownListFor(model => model.SkinId, null)
-                </div>
-            </div>
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Skin:</label>
+        <div class="col-md-4">
+            @Html.DropDownListFor(model => model.SkinId, null)
+        </div>
+    </div>
 
-            @Html.Partial("_NonAdminProfileCheckboxes")
+    @Html.Partial("_NonAdminProfileCheckboxes")
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Is profile live?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.IsLive)
-                </div>
-            </div>
+    <div class="row form-group profile-options">
+        <div class="col-md-3">
+            @Html.CheckBoxFor(model => model.IsLive)
+            <label class="col-form-label">Is profile live</label>
+        </div>
+        <div class="col-md-3">
+            @Html.CheckBoxFor(model => model.HasOwnFrontPage)
+            <label class="col-form-label">Has own front page</label>
+        </div>
+        <div class="col-md-4">
+            @Html.CheckBoxFor(model => model.ShouldBuildExcel)
+            <label class="col-form-label">Should CSV files be built overnight</label>
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Has own front page?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.HasOwnFrontPage)
-                </div>
-            </div>
+    <div class="row form-group profile-options">
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Is national?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.IsNational)
-                </div>
-            </div>
+        <div class="col-md-3">
+            @Html.CheckBoxFor(model => model.IsNational)
+            <label class="col-form-label">Is national</label>
+        </div>
+        <div class="col-md-3">
+            @Html.CheckBoxFor(model => model.HasAnyData)
+            <label class="col-form-label">Has any data</label>
+        </div>
+        <div class="col-md-5">
+            @Html.CheckBoxFor(model => model.AreIndicatorsExcludedFromSearch)
+            <label class="col-form-label">Exclude indicators from global search</label>
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Exclude indicators from global search?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.AreIndicatorsExcludedFromSearch)
-                </div>
-            </div>
+    <div class="row form-group profile-options">
+        <div class="col-md-6">
+            @Html.CheckBoxFor(model => model.IsProfileViewable)
+            <label class="col-form-label">Is viewable in <a href="@AppConfig.DefaultTestUrl">test site</a></label>
+        </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Is viewable in test site? (@AppConfig.DefaultTestUrl):</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.IsProfileViewable)
-                </div>
-            </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Should Excel files for England be built overnight?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.ShouldBuildExcel)
-                </div>
-            </div>
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Lead profile for profile collections:<br><small>(comma separated list of profile collection IDs)</small></label>
+        <div class="col-md-4">
+            @Html.TextBoxFor(model => model.LeadProfileForCollectionIds, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Has any data?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.HasAnyData)
-                </div>
-            </div>
+    <h3>Static reports</h3>
+    <p>Reports stored in <em>\\londevapppor01\c$\web-sites\static-reports</em> and managed by users</p>
 
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Lead profile for profile collections:<br><small>(comma separated list of profile collection IDs)</small></label>
-                <div class="col-md-4">
-                    @Html.TextBoxFor(model => model.LeadProfileForCollectionIds, new { @class = "unselected-domain wide-profile-textbox" })
-                </div>
-            </div>
+    <div class="row form-group profile-options">
+        <div class="col-md-6">@Html.CheckBoxFor(model => model.HasStaticReports)
+            <label class="col-form-label">Has static reports?</label>
+        </div>
+    </div>
 
-            <h3>Generated PDFs</h3>
-            <p>Reports produced by Richard Dean's PDF generator</p>
+    @Html.Partial("_AreaTypes", Model.SelectedPdfAreaTypes)
 
-            @Html.Partial("_AreaTypes", Model.SelectedPdfAreaTypes)
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Report label:<br><small>(optional: "Report year" will be used if not set)</small></label>
+        <div class="col-md-4">
+            @Html.TextBoxFor(model => model.StaticReportsLabel, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+    </div>
 
-
-            <h3>Static reports</h3>
-            <p>Reports stored in <em>\\londevapppor01\c$\web-sites\static-reports</em> and managed by users</p>
-
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Has static reports?</label>
-                <div class="col-md-4">
-                    @Html.CheckBoxFor(model => model.HasStaticReports)
-                </div>
-            </div>
-
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Report label:<br><small>(optional: "Report year" will be used if not set)</small></label>
-                <div class="col-md-4">
-                    @Html.TextBoxFor(model => model.StaticReportsLabel, new { @class = "unselected-domain wide-profile-textbox" })
-                </div>
-            </div>
-
-            <div class="row form-group">
-                <label class="col-md-3 col-form-label">Static report folder names:<br><small>(optional: comma separated list, usually time periods with most recent period first)</small></label>
-                <div class="col-md-4">
-                    @Html.TextBoxFor(model => model.StaticReportsFolders, new { @class = "unselected-domain wide-profile-textbox" })
-                </div>
-            </div>
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">Static report folder names:<br><small>(optional: comma separated list, usually time periods with most recent period first)</small></label>
+        <div class="col-md-4">
+            @Html.TextBoxFor(model => model.StaticReportsFolders, new { @class = "unselected-domain wide-profile-textbox" })
+        </div>
+    </div>
 
 
-            <div class="row col-md-12">
-                <input class="btn btn-primary" id="update-profile" name="action:UpdateProfile" type="submit" value="Update" />
-                <input class="btn btn-secondary" id="cancel_profile" type="button" onclick="location.href='@Model.ReturnUrl'" value="Cancel" />
-            </div>
+    <div class="row col-md-12">
+        <input class="btn btn-primary" id="update-profile" name="action:UpdateProfile" type="submit" value="Save" />
+        <input class="btn btn-secondary" id="cancel_profile" type="button" onclick="location.href='@Model.ReturnUrl'" value="Cancel" />
+    </div>
 
-            <div class="row col-md-12">
-                <h2 class="subheading ">Users with permission to edit this profile</h2>
-            </div>
+    <div class="row col-md-12">
+        <h2 class="subheading ">Users with permission to edit this profile</h2>
+    </div>
 
-            <div id="user-listing" class="row">
-                @Html.Partial("_UserPermissions", Model.ProfileUsers)
-            </div>
+    <div id="user-listing" class="row">
+        @Html.Partial("_UserPermissions", Model.ProfileUsers)
+    </div>
 
-            <h3>Add / Remove users</h3>
-            <div class="row form-group">
-                <div class="col-md-1">
-                    <label>User:</label>
-                </div>
-                <div class="col-md-6">
-                    @Html.DropDownList("userId", Model.AllUsers, "-- Select User --", new { @class = "form-control" })
-                </div>
-            </div>
+    <h3>Add / Remove users</h3>
+    <div class="row form-group">
+        <div class="col-md-1">
+            <label>User:</label>
+        </div>
+        <div class="col-md-6">
+            @Html.DropDownList("userId", Model.AllUsers, "-- Select User --", new { @class = "form-control" })
+        </div>
+    </div>
 
-            <div class="row form-group">
-                <div class="col-md-7">
-                    <input class="btn btn-primary" id="AddBtn" onclick="addProfileUser()" type="button" name="action:AddProfile" value="Add user" />
-                    <input class="btn btn-primary" id="RemoveBtn" onclick="removeProfileUser()" type="button" name="action:RemoveProfile" value="Remove user" />
-                    <input class="btn btn-secondary" id="CancelBtn" type="button" onclick="location.href = '@Url.Action("UserIndex")'" value="Cancel" />
-                </div>
-            </div>
+    <div class="row form-group">
+        <div class="col-md-7">
+            <input class="btn btn-primary" id="AddBtn" onclick="addProfileUser()" type="button" name="action:AddProfile" value="Add user" />
+            <input class="btn btn-primary" id="RemoveBtn" onclick="removeProfileUser()" type="button" name="action:RemoveProfile" value="Remove user" />
+            <input class="btn btn-secondary" id="CancelBtn" type="button" onclick="location.href = '@Url.Action("UserIndex")'" value="Cancel" />
+        </div>
+    </div>
 
-            @Html.HiddenFor(x => x.Id)
-            @Html.HiddenFor(x => x.ReturnUrl)
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.ReturnUrl)
 
-            @Html.HiddenFor(m => m.SelectedPdfAreaTypes, "")
-            @Html.Hidden("ProfileUsers", Model.ProfileUsers)
+    @Html.HiddenFor(m => m.SelectedPdfAreaTypes, "")
+    @Html.Hidden("ProfileUsers", Model.ProfileUsers)
 }

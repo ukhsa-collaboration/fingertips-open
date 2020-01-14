@@ -1,7 +1,17 @@
 .value-note-legend {
-    color: #777;
+    color: #333;
     font-size: 11px;
     float: right;
-    margin-bottom: 10px;
     text-align: right;
+    width: 100%;
+}
+
+.legend-link-container {
+    margin: -28px -8px 0 0;
+}
+
+.legend-link {
+    font-size: 12px;
+    text-decoration: none;
+    color: #1f0aa1 !important;
 }

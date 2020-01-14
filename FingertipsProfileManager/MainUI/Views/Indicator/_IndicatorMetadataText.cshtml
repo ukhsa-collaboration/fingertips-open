@@ -1,0 +1,554 @@
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
+@using Fpm.ProfileData.Entities.Profile
+
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    var ownerProfileName = "";
+    var usersString = "";
+    var doesProfileOwnIndicator = false;
+    var doesUserHaveWritePermission = false;
+    var tooltip = "";
+    IndicatorMetadataTextProperty property;
+    const string classHtmlAllowed = "indicator-text html-allowed";
+    const string classHtmlNotAllowed = "indicator-text";
+    const string classHtmlAllowedAndMandatory = "indicator-text mandatory-input html-allowed";
+    const string classHtmlNotAllowedAndMandatory = "indicator-text mandatory-input";
+    var className = "";
+
+    var isEditAction = Model.IsEditAction;
+
+    if (isEditAction)
+    {
+        ownerProfileName = CommonUtilities.GetProfile(Model.IndicatorMetadata.OwnerProfileId).Name;
+        var users = CommonUtilities.GetContactUsersByProfile(Model.IndicatorMetadata.OwnerProfileId);
+        usersString = string.Join(", ", users.Select(user => user.FpmUser.DisplayName));
+        doesProfileOwnIndicator = Model.DoesProfileOwnIndicator() || (Model.Profile.Id == ProfileIds.IndicatorsForReview && Model.Grouping.GroupId == GroupIds.InDevelopment);
+        doesUserHaveWritePermission = Model.DoesUserHaveWritePermission() || (Model.Profile.Id == ProfileIds.IndicatorsForReview && Model.Grouping.GroupId == GroupIds.InDevelopment);
+        tooltip = doesUserHaveWritePermission
+            ? "Click 'Override' to replace existing metadata that cannot be edited directly, to revert back to the original text just delete the new text"
+            : "Fields are marked 'Overridden' where the original metadata has been replaced with alternative text";
+    }
+}
+
+<table id="text-properties" class="text-properties">
+    @if (Model.IsEditAction)
+    {
+        if (doesUserHaveWritePermission && !doesProfileOwnIndicator)
+        {
+            <p class="warning">
+                This indicator is owned by '@ownerProfileName'
+                <br />
+                For metadata changes to Specific rationale and Indicator number use Override
+                <br />
+                For changes to other fields contact the owner profile team: @usersString
+            </p>
+        }
+        <tr>
+            <td></td>
+            <td style="vertical-align: middle;">
+                <a id="show-empty" href="javascript:toggleShowEmpty();"></a>
+            </td>
+            <td style="vertical-align: text-bottom; text-align: center">
+                <span class="info-tooltip right"><i>@tooltip</i></span>
+            </td>
+        </tr>
+    }
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.RefNum);
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            Indicator number
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.RefNum,
+                new { @class = "indicator-text", @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            <span class="info-tooltip right">
+                <i>@property.Definition</i>
+            </span>
+            @if (isEditAction && doesUserHaveWritePermission && !doesProfileOwnIndicator)
+            {
+                <br />
+                <a id="override-ref-num" title="Override this metadata" href="javascript:override('ref-num')">Override</a>
+            }
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Name);
+    }
+    <tr id="row-@property.DisplayOrder">
+        @if (isEditAction)
+        {
+            <td class="property-heading">
+                Indicator
+            </td>
+        }
+        else
+        {
+            <td class="property-heading mandatory-label">
+                * Indicator
+            </td>
+        }
+        <td>
+            @{
+                if (isEditAction)
+                {
+                    className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+                }
+                else
+                {
+                    className = property.IsHtml ? classHtmlAllowedAndMandatory : classHtmlNotAllowedAndMandatory;
+                }
+            }
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Name,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Definition);
+    }
+    <tr id="row-@property.DisplayOrder">
+        @if (isEditAction)
+        {
+            <td class="property-heading">
+                @property.DisplayName
+            </td>
+        }
+        else
+        {
+            <td class="property-heading mandatory-label">
+                * @property.DisplayName
+            </td>
+        }
+        <td>
+            @{
+                if (isEditAction)
+                {
+                    className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+                }
+                else
+                {
+                    className = property.IsHtml ? classHtmlAllowedAndMandatory : classHtmlNotAllowedAndMandatory;
+                }
+            }
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Definition,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Rationale);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Rationale,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.SpecificRationale);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.SpecificRationale,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+            @if (isEditAction && doesUserHaveWritePermission && !doesProfileOwnIndicator)
+            {
+                <br />
+                <a id="override-specific-rationale" title="Override this metadata" href="javascript:override('specific-rationale')">Override</a>
+            }
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.DataSource);
+    }
+<tr id="row-@property.DisplayOrder">
+    @if (isEditAction)
+    {
+    <td class="property-heading">
+        @property.DisplayName
+    </td>
+    }
+    else
+    {
+    <td class="property-heading mandatory-label">
+        * @property.DisplayName
+    </td>
+    }
+    <td>
+        @{
+            if (isEditAction)
+            {
+                className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+            }
+            else
+            {
+                className = property.IsHtml ? classHtmlAllowedAndMandatory : classHtmlNotAllowedAndMandatory;
+            }
+        }
+        @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.DataSource,
+            new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+    </td>
+    <td class="property-attributes">
+        @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+    </td>
+</tr>
+
+@{
+    property = Model.GetProperty(IndicatorTextMetadataColumnNames.IndSourceLink);
+    className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+}
+<tr id="row-@property.DisplayOrder">
+    <td class="property-heading">
+        @property.DisplayName
+    </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.IndSourceLink,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Producer);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Producer,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.CountDefinition);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.CountDefinition,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.CountSource);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.CountSource,
+                new { @class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.DenomDefinition);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.DenomDefinition,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.DenomSource);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.DenomSource,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.IndMethod);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.IndMethod,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.StandardPop);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.StandardPop,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Frequency);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Frequency,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.CIMethod);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.CIMethod,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.DiscControl);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.DiscControl,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Rounding);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Rounding,
+                new { @class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Caveats);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Caveats,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Notes);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Notes,
+                new { @class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Copyright);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Copyright,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Reuse);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Reuse,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.Links);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.Links,
+                new {@class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)"})
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.DataQuality);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.DataQuality,
+                new { @class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+
+    @{
+        property = Model.GetProperty(IndicatorTextMetadataColumnNames.IndicatorContent);
+        className = property.IsHtml ? classHtmlAllowed : classHtmlNotAllowed;
+    }
+    <tr id="row-@property.DisplayOrder">
+        <td class="property-heading">
+            @property.DisplayName
+        </td>
+        <td>
+            @Html.TextAreaFor(model => model.IndicatorMetadataTextValue.IndicatorContent,
+                new { @class = @className, @onfocus = "textEnter(this)", @onblur = "textOut(this)" })
+        </td>
+        <td class="property-attributes">
+            @Html.Partial("_IndicatorMetadataTextPropertyInfo", property)
+        </td>
+    </tr>
+</table>
+@if (!isEditAction)
+{
+    <div class="property-heading mandatory-label-info">
+        * these fields must be completed
+    </div>
+}

@@ -1,6 +1,11 @@
 ﻿@using Fpm.MainUI.Helpers
 @using Fpm.MainUI.Models
 @model CopyIndicatorsModel
+
+@{
+    var profiles = ((IEnumerable<SelectListItem>)ViewBag.Profiles).Where(x => x.Value != "indicators-for-review").ToList();
+}
+
 <div id="copyIndicators" style="display: none;">
     @using (Html.BeginForm("ConfirmCopyIndicators", "ProfilesAndIndicators", FormMethod.Get, new { id = "CopyIndicatorForm" }))
     {
@@ -13,15 +18,12 @@
             @{ const string cssClasses = "create-indicator-dropdown dropdown-selected"; }
             <p>
                 <label class="short-associated-detail-label">Profile:</label>
-                @Html.DropDownListFor(m => m.TargetProfileUrlKey, 
-                (IEnumerable<SelectListItem>)ViewBag.listOfProfiles,
-                     new { @class = cssClasses })
+                @Html.DropDownListFor(m => m.TargetProfileUrlKey, profiles, new { @class = cssClasses })
             </p>
 
             <p>
                 <label class="short-associated-detail-label">Domain:</label>
-                @Html.DropDownListFor(model => model.TargetGroupId, Model.ListOfDomains,
-                     new {  @class = cssClasses })
+                @Html.DropDownListFor(model => model.TargetGroupId, Model.ListOfDomains, new {  @class = cssClasses })
             </p>
 
             <p>

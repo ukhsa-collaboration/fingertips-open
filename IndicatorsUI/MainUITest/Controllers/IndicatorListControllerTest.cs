@@ -91,7 +91,7 @@ namespace IndicatorsUI.MainUITest.Controllers
         public void Edit_Cannot_Be_Reached_If_Signed_Out()
         {
             SetUpUserIsNotSignedIn();
-            var result = (RedirectToRouteResult)GetIndicatorListController().Edit(null);
+            var result = (RedirectToRouteResult)GetIndicatorListController().Edit(null, false);
             AssertNotAuthenticatedRedirect(result);
             VerifyAll();
         }

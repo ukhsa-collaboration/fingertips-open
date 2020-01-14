@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IIndicatorMetadataTextChanger
-    {
-        void UpdateIndicatorTextValues(int indicatorId, IList<IndicatorMetadataTextItem> textChangesByUser,
-            IList<IndicatorMetadataTextProperty> properties, string userName, int profileId,
-            bool isOwnerProfileBeingEdited);
-    }
-
     public class IndicatorMetadataTextChanger : IIndicatorMetadataTextChanger
     {
         private readonly ProfileRepository _profileRepository;

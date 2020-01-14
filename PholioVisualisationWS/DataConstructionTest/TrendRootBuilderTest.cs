@@ -16,7 +16,7 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestBuild()
         {
-            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             var profileId = ProfileIds.Phof;
             var profile = ReaderFactory.GetProfileReader().GetProfile(profileId);
 
@@ -54,11 +54,11 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_WiderDeterminantsOfHealth,
                 ProfileId = ProfileIds.Phof,
                 ComparatorMap = comparatorMap,
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
 
             var trendRoots = new TrendRootBuilder().Build(data.GroupRoots, comparatorMap,
-                AreaTypeIds.CountyAndUnitaryAuthority, ProfileIds.Phof,
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, ProfileIds.Phof,
                data.IndicatorMetadata, false);
 
             var trendRoot = trendRoots.FirstOrDefault();

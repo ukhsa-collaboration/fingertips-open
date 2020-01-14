@@ -38,7 +38,7 @@ namespace PholioVisualisation.RequestParametersTest
             NameValueCollection nameValues = new NameValueCollection();
             nameValues.Add(GroupDataAtDataPointBySearchParameters.ParameterIndicatorIds, "2,3");
             nameValues.Add(ParameterNames.ParentAreaCode, AreaCodes.Sha_EastOfEngland);
-            nameValues.Add(ParameterNames.AreaTypeId, AreaTypeIds.CountyAndUnitaryAuthority.ToString());
+            nameValues.Add(ParameterNames.AreaTypeId, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019.ToString());
             return nameValues;
         }
 

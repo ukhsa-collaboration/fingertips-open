@@ -27,14 +27,15 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestWeightedAverageCalculatorForProportion()
         {
             Assert.IsInstanceOfType(Calculator(ValueTypeId.Proportion),
-                typeof(WeightedAverageCalculator));
+                typeof(StandardAverageCalculator));
         }
 
         public static AverageCalculator Calculator(int id)
         {
             var indicatorMetadata = new IndicatorMetadata
             {
-                ValueTypeId = id
+                ValueTypeId = id,
+                ShouldAveragesBeCalculated = true
             };
 
             return AverageCalculatorFactory.New(new List<CoreDataSet>(), indicatorMetadata);

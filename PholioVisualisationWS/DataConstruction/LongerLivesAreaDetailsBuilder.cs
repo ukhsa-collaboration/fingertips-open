@@ -138,8 +138,8 @@ namespace PholioVisualisation.DataConstruction
 
         private static bool ShouldHaveNearestNeighbours(int childAreaTypeId)
         {
-            return childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority ||
-                   childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority;
+            return childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 ||
+                   childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019;
         }
 
         private int GetSignificance(string areaCode, GroupRoot groupRoot, Grouping grouping,
@@ -215,7 +215,7 @@ namespace PholioVisualisation.DataConstruction
         private void AddOnsClusterToParentAreas(int childAreaTypeId, IArea area,
             List<IArea> parentAreas)
         {
-            var isParentAreaTypeOnsCluster = childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority;
+            var isParentAreaTypeOnsCluster = childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019;
 
             if (isParentAreaTypeOnsCluster &&
                 _isParentArea == false)
@@ -239,17 +239,13 @@ namespace PholioVisualisation.DataConstruction
             CategorisedArea decileArea = null;
             int? categoryTypeId = null;
 
-            if (childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthority)
+            if (childAreaTypeId == AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019)
             {
                 categoryTypeId = CategoryTypeIds.DeprivationDecileDistrictAndUA2015;
             }
-            else if (childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority)
+            else if (childAreaTypeId == AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019)
             {
                 categoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2015;
-            }
-            else if (childAreaTypeId == AreaTypeIds.CcgsPreApr2017)
-            {
-                categoryTypeId = CategoryTypeIds.DeprivationDecileCcg2010;
             }
 
             if (categoryTypeId.HasValue)

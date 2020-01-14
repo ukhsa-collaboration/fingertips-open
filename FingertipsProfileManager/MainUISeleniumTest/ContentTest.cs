@@ -10,8 +10,9 @@ namespace Fpm.MainUISeleniumTest
     public class ContentTest : BaseUnitTest
     {
         [TestMethod]
-        public void ContentIndex()
+        public void TestContentIndex()
         {
+            // Load content page
             var driver = Driver;
             new NavigateTo(driver).ContentIndexPage();
             new WaitFor(driver).ContentIndexPageToLoad();
@@ -19,13 +20,13 @@ namespace Fpm.MainUISeleniumTest
             // Select option in menu
             var profileSelect = driver.FindElement(By.Id("profileId"));
             var selectElement = new SelectElement(profileSelect);
-            selectElement.SelectByValue(ProfileIds.Diabetes.ToString());
+            selectElement.SelectByValue(ProfileIds.DevelopmentProfileForTesting.ToString());
             new WaitFor(driver).ContentIndexPageToLoad();
 
             // Check the content item table contains expected
             var contentItemTable = driver.FindElement(By.ClassName("grid"));
             var text = contentItemTable.Text;
-            TestHelper.AssertTextContains(text, "about the data");
+            TestHelper.AssertTextContains(text, "introduction");
         }
     }
 }

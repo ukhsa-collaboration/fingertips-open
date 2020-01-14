@@ -72,10 +72,27 @@
     @* Other page *@
     @if (pageType == PageType.SupportingInformation)
     {
+        var parentContentItem = (ContentItem) ViewBag.ParentContentItem;
         var contentItem = (ContentItem)ViewBag.SupportingInformationContentItem;
+        var isParentContent = parentContentItem != null;
+        var baseUrl = "/profile/" + profileKey + "/supporting-information/";
+        var supportingInformationUrl = isParentContent
+            ? baseUrl + parentContentItem.ContentKey + "/" + contentItem.ContentKey
+            : baseUrl + contentItem.ContentKey;
+
+        if (isParentContent)
+        {
+            <li class="breadcrumb-separator">></li>
+            <li class="site-link">
+                <a href="@baseUrl@parentContentItem.ContentKey">
+                    @parentContentItem.Description
+                </a>
+            </li>
+        }
+
         <li class="breadcrumb-separator">></li>
         <li class="site-link">
-            <a href="/profile/@profileKey/supporting-information/@contentItem.ContentKey">
+            <a href="@supportingInformationUrl">
                 @contentItem.Description
             </a>
         </li>

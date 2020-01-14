@@ -155,7 +155,7 @@
     <Compile Include="PracticePopulationFileGenerator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnityDependencyResolver.cs" />
+    <Compile Include="UnityContainerProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

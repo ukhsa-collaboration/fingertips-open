@@ -63,6 +63,19 @@ namespace IndicatorsUI.MainUI.Controllers
             return GetView(leadProfileUrlKey, "Data");
         }
 
+        [Route("profile-group/{urlKey}/supporting-information/{contentKey}")]
+        public ActionResult SupportingPage(string urlKey, string contentKey)
+        {
+            InitPageModel();
+            PageModel.PageType = PageType.SupportingInformation;
+            details = new ProfileDetailsBuilder(urlKey).Build();
+
+            ViewBag.SupportingInformationContentItem =
+                ContentProvider.GetContentItem(contentKey, details.Id);
+
+            return GetView(urlKey, "SupportingInformation");
+        }
+
         private ActionResult GetView(string leadProfileUrlKey, string viewName)
         {
             if (details == null)

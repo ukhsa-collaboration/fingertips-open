@@ -56,3 +56,7 @@
 .btn-link {
     color: #2e3191;
 }
+
+#btn-cancel {
+    margin-left:10px;
+}

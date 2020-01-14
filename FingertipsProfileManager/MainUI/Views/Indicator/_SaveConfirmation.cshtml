@@ -1,0 +1,21 @@
+﻿@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+<div id="save-indicator-popup" style="display: none;">
+    <div style="width: 100%; height: 250px;">
+        <div id="confirm-new-indicator">
+                <h3>
+                    New Indicator
+                </h3>
+                <p class="confirm-sub-title">
+                    Your indicator will be created under the <label>Indicators for review</label> profile. When ready you can submit the indicator to be reviewed by IMRG.
+                    <br />
+                </p>
+                <p class="confirm-sub-title">
+                    Once the indicator has been approved it will be automatically moved into the first domain 
+                    of the <label id="profile-name" class="confirm-sub-title"></label> profile.
+                </p>
+                <input id="confirm-create-indicator" class="btn btn-primary" type="button" value="OK" />
+                <input id="Cancel" class="btn btn-secondary" type="button" value="Cancel" onclick="lightbox.hide()" />
+            </div>
+    </div>
+</div>

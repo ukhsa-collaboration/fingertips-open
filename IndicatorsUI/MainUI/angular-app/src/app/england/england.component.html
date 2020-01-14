@@ -1,11 +1,11 @@
 <div id="england-container" style="display:none;">
     <div class="row">
         <div class="col-md-12">
-            <ft-legend [keyType]="keyType" [legendType]="legendType" [showRecentTrends]="showRecentTrends"></ft-legend>
+            <ft-legend [legendConfig]="legendConfig" [showRecentTrends]="showRecentTrends"></ft-legend>
         </div>
     </div>
     <div class="export-chart-box" style="display:block;">
-        <a class="export-link" (click)="onExportClick($event)">Export table as image</a>
+        <a id="england-export-image" class=" export-link" (click)="onExportClick($event)">Export table as image</a>
     </div>
     <div class="export-chart-box-csv" style="display:block;">
         <a id="export-link-csv-england" class="export-link-csv" (click)="onExportCsvFileClick($event)">Export table as CSV file</a>
@@ -16,31 +16,35 @@
                 <tr>
                     <th>Indicator</th>
                     <th>Period</th>
-                    <th class="center">England<br />count</th>
-                    <th class="center">England<br />value</th>
-                    <th *ngIf="hasRecentTrends" class="center">Recent<br />trend</th>
-                    <th *ngIf="isChangeFromPreviousPeriodShown" class="center">Change from<br />previous <br/>time period</th>
+                    <th class="center">England
+                        <br />count</th>
+                    <th class="center">England
+                        <br />value</th>
+                    <th *ngIf="hasRecentTrends" class="center">Recent
+                        <br />trend</th>
+                    <th *ngIf="isChangeFromPreviousPeriodShown" class="center">Change from
+                        <br />previous
+                        <br />time period</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let row of rows">
-                    <td *ngIf="(row.isSubheading == true)" colspan="6" title="{{row.indicatorName}}" data-toggle="tooltip"
-                        data-placement="top" class="rug-subheading numeric boot-tooltip">{{row.indicatorName}}</td>
+                    <td *ngIf="row.isSubheading" colspan="6" title="{{row.indicatorName}}" data-toggle="tooltip" data-placement="top" class="rug-subheading numeric boot-tooltip">{{row.indicatorName}}</td>
                     <td *ngIf="(row.isSubheading == false)">
                         <button class="pLink" href="#" (click)=indicatorNameClicked(row)>{{row.indicatorName}}</button>
-                        <span *ngIf="row.hasNewData" style="margin-right: 8px;" class="badge badge-success">New data</span>
+                        <span *ngIf="row.hasNewData" style="margin-right: 8px;" class="badge badge-success">New data
+                        </span>
                     </td>
-                    <td *ngIf="(row.isSubheading == false)">{{row.period}}</td>
+                    <td *ngIf="(row.isSubheading == false)" class="center">{{row.period}}</td>
                     <td *ngIf="(row.isSubheading == false)" class="numeric" [innerHTML]="row.count"></td>
-                    <td *ngIf="(row.isSubheading == false)" class="numeric" (mouseover)=showValueNoteTooltip($event,row)
-                        (mouseout)=hideTooltip() (mousemove)=positionTooltip($event) [innerHTML]="row.value"></td>
-                    <td *ngIf="hasRecentTrends && (row.isSubheading == false)" class="center pointer" (click)=recentTrendClicked(row)
-                        (mouseout)=hideTooltip() (mouseover)=showRecentTrendTooltip($event,row) (mousemove)=positionTooltip($event)
-                        [innerHTML]="row.recentTrendHtml"></td>
-                    <td *ngIf="isChangeFromPreviousPeriodShown && (row.isSubheading == false)" class="center"
-                        [innerHTML]="row.changeFromPreviousHtml"></td>
+                    <td *ngIf="(row.isSubheading == false)" class="numeric" (mouseover)=showValueNoteTooltip($event,row) (mouseout)=hideTooltip()
+                        (mousemove)=positionTooltip($event) [innerHTML]="row.value"></td>
+                    <td *ngIf="hasRecentTrends && (row.isSubheading == false)" class="center pointer" (click)=recentTrendClicked(row) (mouseout)=hideTooltip()
+                        (mouseover)=showRecentTrendTooltip($event,row) (mousemove)=positionTooltip($event) [innerHTML]="row.recentTrendHtml"></td>
+                    <td *ngIf="isChangeFromPreviousPeriodShown && (row.isSubheading == false)" class="center" [innerHTML]="row.changeFromPreviousHtml"></td>
                 </tr>
             </tbody>
         </table>
     </div>
+    <ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>
 </div>

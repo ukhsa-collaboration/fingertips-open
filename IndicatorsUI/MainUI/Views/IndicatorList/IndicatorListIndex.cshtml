@@ -56,7 +56,7 @@
                         grid.Column(header: "Edit", style: "center", format: (item) =>
                         {
                             var link = Html.ActionLink("Edit", "edit", "indicatorlist",
-                                new { listId = item.PublicId }, new { id = "lnk-edit-indicator-list", @class = "btn btn-outline-primary indicator-list-button" });
+                                new { listId = item.PublicId, redirect = false }, new { id = "lnk-edit-indicator-list", @class = "btn btn-outline-primary indicator-list-button" });
                             return link;
                         }),
                         grid.Column(header: "Copy", style: "center", format: (item) =>
@@ -68,7 +68,7 @@
                         }),
                         grid.Column(header: "Share by email", style: "center", format: (item) =>
                         {
-                            var link = Html.Raw("<a href=\"#\" class=\"btn btn-outline-primary indicator-list-button\" onclick=\"return openEmailDialog(this,'" + item.PublicId + 
+                            var link = Html.Raw("<a href=\"#\" class=\"btn btn-outline-primary indicator-list-button\" onclick=\"return openShareIndicatorListDialog(this,'" + item.PublicId +
                                 "','" + item.ListName + "')\">Share</a> ");
                             return link;
                         }),
@@ -76,7 +76,7 @@
                         {
                             var link = Html.ActionLink("Delete", "Delete", "indicatorlist",
                                 new { listid = item.PublicId },
-                                new { @class = "btn btn-outline-primary  indicator-list-button", onclick = "return deleteConfirm(this);" });
+                                new { id = "lnk-delete-indicator-list", @class = "btn btn-outline-primary  indicator-list-button", onclick = "return deleteConfirm(this);" });
                             return link;
                         })
                         ))

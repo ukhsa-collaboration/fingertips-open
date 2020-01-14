@@ -1,18 +1,20 @@
 <div id="boxplot-container" style="display:none;">
-    <!-- <div class="export-chart-box" style="display:block;">
-            <a class="export-link" (click)="onExportClick($event)"
-                >Export chart as image</a>
-        </div> -->
-    <div id="indicator-details-boxplot-data" class="standard-width" [hidden]="!isAvailable">
-        <ft-indicator-header [header]="header"></ft-indicator-header>
-        <div id="boxplot-legend-img" *ngIf="isAnyData()"></div>
+  <div id="indicator-details-boxplot-data" class="standard-width" *ngIf="!isEnglandAreaSelected && isAnyData">
+    <ft-indicator-header [header]="header"></ft-indicator-header>
 
-        <ft-boxplot-chart *ngIf="isAnyData()" [boxplotData]="boxplotData"></ft-boxplot-chart>
+    <div class="export-chart-box">
+      <a class="export-link" (click)="onExportClick($event)">Export chart as image</a>
+    </div>
 
-        <ft-boxplot-table *ngIf="isAnyData()" [boxplotData]="boxplotData"></ft-boxplot-table>
-        <div id="boxplot-no-data" class="no-indicator-data" *ngIf="!isAnyData()">No Data</div>
+    <div class="row col-md-12">
+      <ft-boxplot-chart [boxplotData]="boxplotData" (emitBoxPlot)="setBoxPlotChart($event)"></ft-boxplot-chart>
+
+      <div id="boxplot-legend-img"></div>
+
+      <ft-boxplot-table [boxplotDataForTable]="boxplotDataForTable"></ft-boxplot-table>
     </div>
-    <div [hidden]="isAvailable" id="boxplot-not-available" class="standard-width">
-       Not applicable for England data
-    </div>
+  </div>
+  <div *ngIf="isEnglandAreaSelected && isAnyData" id="boxplot-not-available" class="standard-width">
+    Not applicable for England data
+  </div>
 </div>

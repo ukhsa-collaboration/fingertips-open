@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.DataAccess;
+﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.Export
 {
     public interface IIndicatorIdListProvider
     {
-        IList<int> GetIdsForGroup(int groupId);
+        IList<int> GetIdsForGroupAreaType(int groupId, int areaTypeId);
         IList<int> GetIdsForProfile(int profileId);
     }
 
@@ -22,10 +22,11 @@ namespace PholioVisualisation.Export
             _groupIdProvider = groupIdProvider;
         }
 
-        public IList<int> GetIdsForGroup(int groupId)
+        public IList<int> GetIdsForGroupAreaType(int groupId, int areaTypeId)
         {
             return _groupDataReader
                 .GetGroupingsByGroupId(groupId)
+                .Where(x => x.AreaTypeId == areaTypeId)
                 .Select(x => x.IndicatorId)
                 .Distinct()
                 .ToList();

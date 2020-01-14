@@ -1,12 +1,11 @@
 import { Component, HostListener } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import {
-  FTModel, FTRoot, GroupRoot, Population, Category, PopulationSummary
-} from '../typings/FT.d';
+import { forkJoin } from 'rxjs';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import { IndicatorService } from '../shared/service/api/indicator.service';
-import { AreaCodes, AreaTypeIds, CategoryTypeIds } from '../shared/shared';
+import { AreaTypeIds, CategoryTypeIds } from '../shared/constants';
+import { AreaCodes } from '../shared/constants';
 import { Populations, PopulationModifier, AllPopulationData } from './population';
+import { Population, Category, PopulationSummary, FTModel } from '../typings/FT';
 
 @Component({
   selector: 'ft-population',
@@ -15,25 +14,20 @@ import { Populations, PopulationModifier, AllPopulationData } from './population
 })
 export class PopulationComponent {
 
-  populations: Populations = null;
-  allPopulationData: AllPopulationData;
-  showSummary: boolean;
+  public populations: Populations = null;
+  public allPopulationData: AllPopulationData = null;
+  public showSummary = false;
 
   constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) { }
 
   @HostListener('window:PopulationSelected', ['$event'])
   public onOutsideEvent(event): void {
 
-    let model = this.ftHelperService.getFTModel();
+    const model = this.ftHelperService.getFTModel();
     this.showSummary = model.areaTypeId === AreaTypeIds.Practice;
 
     // Get populations
-    const observables = [];
-    observables.push(
-      this.indicatorService.getPopulation(model.areaCode, model.areaTypeId),
-      this.indicatorService.getPopulation(model.parentCode, model.areaTypeId),
-      this.indicatorService.getPopulation(AreaCodes.England, model.areaTypeId)
-    );
+    const observables = this.getPopulationObservables(model);
 
     // Get summary data
     if (this.showSummary) {
@@ -43,13 +37,10 @@ export class PopulationComponent {
       );
     }
 
-    Observable.forkJoin(observables).subscribe(results => {
+    forkJoin(observables).subscribe(results => {
 
       // Init populations
-      let populations = new Populations();
-      populations.areaPopulation = <Population>results[0];
-      populations.areaParentPopulation = <Population>results[1];
-      populations.nationalPopulation = <Population>results[2];
+      const populations = this.setPopulations(results);
       new PopulationModifier(populations).makeMalePopulationsNegative();
       this.populations = populations;
 
@@ -69,6 +60,29 @@ export class PopulationComponent {
   public isAnyData(): boolean {
     return this.populations &&
       this.populations.nationalPopulation.IndicatorName !== null;
+  }
+
+  private getPopulationObservables(model: FTModel): any[] {
+
+    const areaTypeId = model.areaTypeId;
+
+    const nationalPopulation = this.indicatorService.getPopulation(AreaCodes.England, areaTypeId);
+    const areaPopulation = this.indicatorService.getPopulation(model.areaCode, areaTypeId);
+
+    const parentCode = model.isNearestNeighbours() ? model.nearestNeighbour : model.parentCode;
+    const subnationalPopulation = this.indicatorService.getPopulation(parentCode, areaTypeId);
+
+    return [nationalPopulation, subnationalPopulation, areaPopulation];
+  }
+
+  private setPopulations(results: any[]): Populations {
+    const populations = new Populations();
+
+    populations.nationalPopulation = <Population>results[0];
+    populations.areaParentPopulation = <Population>results[1];
+    populations.areaPopulation = <Population>results[2];
+
+    return populations;
   }
 }
 

@@ -5,10 +5,10 @@ using PholioVisualisation.Export.FileBuilder.Wrappers;
 
 namespace PholioVisualisation.Export.FileBuilder.Writers
 {
-    public class CsvBuilderIndicatorDataWriter : IFileBuilderWriter<byte[]>
+    public class CsvBuilderIndicatorDataWriter : IFileBuilderWriter
     {
-        private readonly IBuilderHeaderWriter<byte[]> _header;
-        private readonly IBuilderBodyWriter<byte[]> _body;
+        private readonly IBuilderHeaderWriter _header;
+        private readonly IBuilderBodyWriter _body;
 
         public CsvBuilderIndicatorDataWriter(IAreasReader areasReader, IndicatorMetadataProvider indicatorMetadataProvider,
             ExportAreaHelper areaHelper, IndicatorExportParameters generalParameters, OnDemandQueryParametersWrapper onDemandParameters)

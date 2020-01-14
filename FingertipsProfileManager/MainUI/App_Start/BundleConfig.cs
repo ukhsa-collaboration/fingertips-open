@@ -14,12 +14,14 @@ namespace Fpm.MainUI
                 .Include(angularDist + "main.js")
                 .Include(angularDist + "polyfills.js")
                 .Include(angularDist + "runtime.js")
+                .Include(angularDist + "scripts.js")
                 .Include(angularDist + "styles.js")
                 .Include(angularDist + "vendor.js")
                 );
 
             bundles.Add(new StyleBundle("~/css/site")
                .Include(cssPath + "bootstrap.css")
+               .Include(cssPath + "select2.min.css")
                .Include(cssPath + "fingertips.css")
                .Include(cssPath + "dashboard.css")
                .Include(cssPath + "profile-manager.css")
@@ -47,6 +49,9 @@ namespace Fpm.MainUI
             bundles.Add(new ScriptBundle("~/js/bootstrap")
                .Include(jsPath + "bootstrap.js"));
 
+            bundles.Add(new ScriptBundle("~/js/select")
+                .Include(jsPath + "select2.min.js"));
+
             bundles.Add(new ScriptBundle("~/js/common")
                .Include(jsPath + "included-on-all-pages.js"));
 
@@ -70,6 +75,12 @@ namespace Fpm.MainUI
 
             bundles.Add(new ScriptBundle("~/userfeedback.js")
                 .Include(jsPath + "UserFeedback/userfeedback.js"));
+
+            bundles.Add(new ScriptBundle("~/PageCoreData.js")
+                .Include(jsPath + "PageCoreData.js"));
+
+            bundles.Add(new ScriptBundle("~/PageProfilesAndIndicators.js")
+                .Include(jsPath + "PageProfilesAndIndicators.js"));
         }
     }
 }

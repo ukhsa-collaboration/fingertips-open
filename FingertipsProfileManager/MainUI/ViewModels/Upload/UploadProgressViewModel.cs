@@ -9,7 +9,7 @@ namespace Fpm.MainUI.ViewModels.Upload
     {
         public int InProgress { get; set; }
         public int InQueue { get; set; }
-        public int AwaitingConfomation { get; set; }
+        public int AwaitingConfirmation { get; set; }
         public IEnumerable<UploadJob> Jobs { get; set; }
     }
 }

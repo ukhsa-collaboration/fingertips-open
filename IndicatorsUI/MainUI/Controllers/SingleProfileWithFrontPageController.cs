@@ -1,10 +1,9 @@
-﻿using System.Web.UI;
+﻿using System.Web.Mvc;
 using IndicatorsUI.DataConstruction;
 using IndicatorsUI.DomainObjects;
 using IndicatorsUI.MainUI.Caching;
 using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.MainUI.Models;
-using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
 
 namespace IndicatorsUI.MainUI.Controllers
@@ -54,6 +53,18 @@ namespace IndicatorsUI.MainUI.Controllers
 
             ViewBag.SupportingInformationContentItem = 
                 ContentProvider.GetContentItem(contentKey, profileDetails.Id);
+
+            return result;
+        }
+
+        [Route("profile/{urlKey}/supporting-information/{parentContentKey}/{contentKey}")]
+        public ActionResult SupportingPageUnderParent(string urlKey, string parentContentKey, string contentKey)
+        {
+            var result = GetPage(ViewNameSupportingInformation, DefaultViewFolder, urlKey,
+                PageType.SupportingInformation);
+
+            ViewBag.SupportingInformationContentItem = ContentProvider.GetContentItem(contentKey, profileDetails.Id);
+            ViewBag.ParentContentItem = ContentProvider.GetContentItem(parentContentKey, profileDetails.Id); ;
 
             return result;
         }

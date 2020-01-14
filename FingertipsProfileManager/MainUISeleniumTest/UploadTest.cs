@@ -27,9 +27,7 @@ namespace Fpm.MainUISeleniumTest
             var filePath = Path.GetFullPath(filePathPartial + "\\"+ testUploadFile);
             elem.SendKeys(filePath);
 
-            var uploadBotton = Driver.FindElements(By.XPath("//input[@type='submit']")).First();
-            uploadBotton.Click();
-
+            Driver.FindElement(By.Id("uploadButton")).Click();
         }
 
         [TestMethod]
@@ -47,10 +45,8 @@ namespace Fpm.MainUISeleniumTest
 
             var filePath = Path.GetFullPath(filePathPartial + "\\"+ testUploadFile);
             elem.SendKeys(filePath);
-            
-            var uploadBotton = Driver.FindElements(By.XPath("//input[@type='reset']")).First();
-            uploadBotton.Click();
 
+            Driver.FindElement(By.Id("cancelButton")).Click();
         }
 
         private void LoadUploadPage()

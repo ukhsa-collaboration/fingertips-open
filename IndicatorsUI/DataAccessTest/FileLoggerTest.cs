@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using IndicatorsUI.DataAccess;
@@ -8,7 +9,7 @@ namespace IndicatorsUI.DataAccessTest
     [TestClass]
     public class FileLoggerTest
     {
-        private const string Path = @"c:\fingertips\FileLoggerTest.txt";
+        private static readonly string Path = ConfigurationManager.AppSettings["LoggerTest"];
 
         [TestMethod]
         public void Test()

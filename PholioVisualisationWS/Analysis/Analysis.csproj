@@ -79,7 +79,11 @@
     <Compile Include="TargetComparerFactory.cs" />
     <Compile Include="SingleValueTargetComparer.cs" />
     <Compile Include="TrendBetweenTwoValuesCalculator.cs" />
-    <Compile Include="TrendMarkerCalculator.cs" />
+    <Compile Include="TrendMarkers\TrendMarkerCalculatedValue.cs" />
+    <Compile Include="TrendMarkers\TrendMarkerCalculatedValueForProportion.cs" />
+    <Compile Include="TrendMarkers\TrendMarkerCalculator.cs" />
+    <Compile Include="TrendMarkers\TrendRequest.cs" />
+    <Compile Include="ValidationResult.cs" />
     <Compile Include="ValueCategoriesCalculator.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,42 +1,51 @@
 ﻿@using Fpm.MainUI.Helpers
 @model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
 
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Trend chart y axis<br>always starts at zero?</label>
-    <div class="col-md-4">
-        @Html.CheckBoxFor(model => model.StartZeroYAxis,
-               TooltipHelper.GetTooltipRight("Whether or not the Y axis of the Fingertips trend chart will always start from zero (ignored if any values are negative)"))
-    </div>
-</div>
 
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Display data quality flags?</label>
-    <div class="col-md-4">
-        @Html.CheckBoxFor(model => model.ShowDataQuality,
-               TooltipHelper.GetTooltipRight("Whether or not data quality flags are displayed for the profile"))
-    </div>
-</div>
-
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Display recent trends?</label>
-    <div class="col-md-4">
+<div class="row form-group profile-options">
+    <div class="col-md-3">
         @Html.CheckBoxFor(model => model.HasTrendMarkers,
-            TooltipHelper.GetTooltipRight("Whether or not recent trends are displayed for the profile"))
+                      TooltipHelper.GetTooltipRight("Whether or not recent trends are displayed for the profile"))
+        <label class="col-form-label">Display recent trends</label>
+    </div>
+    <div class="col-md-6">
+        @Html.CheckBoxFor(model => model.StartZeroYAxis,
+                      TooltipHelper.GetTooltipRight("Whether or not the Y axis of the Fingertips trend chart will always start from zero (ignored if any values are negative)"))
+        <label class="col-form-label">Trend chart y axis always starts at zero</label>
     </div>
 </div>
 
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Display change since previous time period?</label>
-    <div class="col-md-4">
-        @Html.CheckBoxFor(model => model.IsChangeFromPreviousPeriodShown,
-               TooltipHelper.GetTooltipRight("Whether or not changes since the previous time period are displayed on the England tab"))
-    </div>
-</div>
-
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">Use goal benchmark by default?</label>
-    <div class="col-md-4">
+<div class="row form-group profile-options">
+    <div class="col-md-3">
         @Html.CheckBoxFor(model => model.UseTargetBenchmarkByDefault,
-        TooltipHelper.GetTooltipRight("Whether or not the 'Benchmark against goal' checkbox should be selected by default in Fingertips (only applies to domains that contain indicators that can be benchmarked by goal)"))
+                 TooltipHelper.GetTooltipRight("Whether or not the 'Benchmark against goal' checkbox should be selected by default in Fingertips (only applies to domains that contain indicators that can be benchmarked by goal)"))
+        <label class="col-form-label">Use goal benchmark by default</label>
+    </div>
+
+    <div class="col-md-6">
+        @Html.CheckBoxFor(model => model.AreIndicatorNamesDisplayedWithNumbers,
+                TooltipHelper.GetTooltipRight("The indicator names are displayed with numbers in Fingertips"))
+        <label class="col-form-label">Display indicator names with numbers</label>
+    </div>
+</div>
+
+<div class="row form-group profile-options">
+    <div class="col-md-3">
+        @Html.CheckBoxFor(model => model.ShowDataQuality,
+            TooltipHelper.GetTooltipRight("Whether or not data quality flags are displayed for the profile"))
+        <label class="col-form-label">Display data quality flags</label>
+    </div>
+    <div class="col-md-6">
+        @Html.CheckBoxFor(model => model.IsChangeFromPreviousPeriodShown,
+            TooltipHelper.GetTooltipRight("Whether or not changes since the previous time period are displayed on the England tab"))
+        <label class="col-form-label">Display change since previous time period</label>
+    </div>
+</div>
+
+<div class="row form-group profile-options">
+    <div class="col-md-3">
+        @Html.CheckBoxFor(model => model.ShowOfficialStatistic,
+            TooltipHelper.GetTooltipRight("Whether or not the profile is an Official Statistic"))
+        <label class="col-form-label">Official Statistic</label>
     </div>
 </div>

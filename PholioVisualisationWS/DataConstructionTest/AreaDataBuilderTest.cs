@@ -81,28 +81,6 @@ namespace PholioVisualisation.DataConstructionTest
             Assert.AreEqual(1, map.Count);
         }
 
-        [TestMethod]
-        public void TestDiabetesPracticeDetails()
-        {
-            var areaCode = AreaCodes.Gp_PracticeInBarnetCcg;
-            var parentAreaCode = AreaCodes.Ccg_Barnet;
-
-            AreaDataBuilder builder = new AreaDataBuilder
-            {
-                Areas = new List<IArea>{new Area{Code = areaCode}},
-                ComparatorAreaCodes = new List<string> { parentAreaCode },
-                GroupId = GroupIds.Diabetes_PrevalenceAndRisk,
-                AreaTypeId = AreaTypeIds.GpPractice
-            };
-
-            var dataList = builder.Build()[areaCode];
-            foreach (var simpleAreaData in dataList)
-            {
-                Assert.IsNotNull(simpleAreaData);
-                Assert.IsTrue(simpleAreaData.Significances[parentAreaCode].First()/*only one time period*/ > 0);
-            }
-        }
-
         private static List<IArea> Area()
         {
             return new List<IArea> { new Area { Code = AreaCodes.Pct_Ashton } };

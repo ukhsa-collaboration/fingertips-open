@@ -1,0 +1,32 @@
+﻿@using System.Web.Mvc.Html
+@using System.Web.Optimization
+@using Fpm.MainUI
+@using Fpm.ProfileData.Entities.Profile
+@model Fpm.MainUI.Models.ProfileGridModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@{
+    ViewBag.Title = "FPM - Profile Manager";
+}
+
+@Scripts.Render("~/profile.js")
+
+<div class="standardWidth">
+
+    <h2 class="subheading">Your profiles</h2>
+
+    @if (ViewBag.UserProfiles.Count > 0)
+    {
+        @Html.Partial("_UserProfilesTable", (List<ProfileDetails>)ViewBag.UserProfiles)
+    }
+    else
+    {
+        <label>You don't have rights to edit any profiles</label>
+    }
+
+    @if (ViewBag.SystemProfiles.Count > 0)
+    {
+        <h2 class="subheading">System profiles</h2>
+        @Html.Partial("_SystemProfilesTable", (List<ProfileDetails>)ViewBag.SystemProfiles)
+    }
+
+</div>

@@ -4,57 +4,61 @@
     @Html.Partial("_JavaScriptAndCssForUserAccount")
 }
 <div class="title-divider"></div>
-<div class="container">
-    <div class="row col-md-12">
-        <div id="div-content">
-            <div>
-                <h2>Your details</h2>
-                <p>We will never share your email or any other personal data with anyone else.</p>
-           </div>
-            <div class="my-account">
-                    <div class="form-group">
-                        <label for="first-name">
-                            <span class="form-label-bold">First Name</span>
-                        </label>
-                        @Html.TextBoxFor(s => s.FirstName, new { @class = "form-control", id = "first-name", @readonly="readonly" })
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label-bold" for="last-name">
-                            <span class="form-label-bold">Last Name</span>
-                        </label>
-                        @Html.TextBoxFor(s => s.LastName, new { @class = "form-control", id = "last-name", @readonly = "readonly" })
-                        </div>
-                    <div class="form-group">
-                        <label class="form-label-bold" for="job-title">
-                            <span class="form-label-bold">Job Title</span>
-                        </label>
-                        @Html.TextBoxFor(s => s.JobTitle, new { @class = "form-control", id = "job-name", @readonly = "readonly" })
-                        </div>
-                    <div class="form-group">
-                        <label class="form-label-bold" for="organisation">
-                            <span class="form-label-bold">Organisation</span>
-                        </label>
-                        @Html.DropDownListFor(s=>s.OrganisationId, new List<SelectListItem>()
-                        {
-                            new SelectListItem() { Text  = "Please select your organisation", Value = ""},
-                            new SelectListItem() { Text  = "Public Health England", Value = "1"},
-                            new SelectListItem() { Text  = "Department of Health", Value = "2"},
-                            new SelectListItem() { Text  = "Other Government Departments and Agencies", Value = "3"},
-                            new SelectListItem() { Text  = "Local Authority", Value = "4"},
-                            new SelectListItem() { Text  = "NHS", Value = "5"},
-                            new SelectListItem() { Text  = "Private company", Value = "6"},
-                            new SelectListItem() { Text  = "Member of the public", Value = "7"},
-                            new SelectListItem() { Text  = "Other", Value = "8"}
-                        }, new { @class = "form-control", @readonly="readonly"})
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label-bold" for="email">
-                            <span class="form-label-bold">Email Address</span>
-                         </label>
-                        @Html.TextBoxFor(s => s.UserName, new { @class = "form-control", id = "email", @readonly="readonly" })
-                    </div>
-            </div>
+<div class="container content">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Your details</h2>
+        </div>
 
-        </div> <!-- /div-content -->
+        <div class="col-md-8">
+            <p>We will never share your email or any other personal data with anyone else.</p>
+        </div>
+        <div class="col-md-4 text-right">
+            @Html.ActionLink("Reset your password", "ForgotPassword")
+        </div>
+
+        <div class="my-account col-md-12">
+            <div class="form-group">
+                <label for="first-name">
+                    <span class="form-label-bold">First Name</span>
+                </label>
+                @Html.TextBoxFor(s => s.FirstName, new { @class = "form-control", id = "first-name", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                <label class="form-label-bold" for="last-name">
+                    <span class="form-label-bold">Last Name</span>
+                </label>
+                @Html.TextBoxFor(s => s.LastName, new { @class = "form-control", id = "last-name", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                <label class="form-label-bold" for="job-title">
+                    <span class="form-label-bold">Job Title</span>
+                </label>
+                @Html.TextBoxFor(s => s.JobTitle, new { @class = "form-control", id = "job-name", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                <label class="form-label-bold" for="organisation">
+                    <span class="form-label-bold">Organisation</span>
+                </label>
+                @Html.DropDownListFor(s => s.OrganisationId, new List<SelectListItem>()
+                {
+                    new SelectListItem() {Text = "Please select your organisation", Value = ""},
+                    new SelectListItem() {Text = "Public Health England", Value = "1"},
+                    new SelectListItem() {Text = "Department of Health", Value = "2"},
+                    new SelectListItem() {Text = "Other Government Departments and Agencies", Value = "3"},
+                    new SelectListItem() {Text = "Local Authority", Value = "4"},
+                    new SelectListItem() {Text = "NHS", Value = "5"},
+                    new SelectListItem() {Text = "Private company", Value = "6"},
+                    new SelectListItem() {Text = "Member of the public", Value = "7"},
+                    new SelectListItem() {Text = "Other", Value = "8"}
+                }, new { @class = "form-control", @readonly = "readonly" })
+            </div>
+            <div class="form-group">
+                <label class="form-label-bold" for="email">
+                    <span class="form-label-bold">Email Address</span>
+                </label>
+                @Html.TextBoxFor(s => s.UserName, new { @class = "form-control", id = "email", @readonly = "readonly" })
+            </div>
+        </div>
     </div> <!-- /row -->
 </div>

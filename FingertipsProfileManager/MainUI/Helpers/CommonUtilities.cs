@@ -26,7 +26,8 @@ namespace Fpm.MainUI.Helpers
             Copy,
             Move,
             Change,
-            Delete
+            Delete,
+            Remove
         }
 
         private static void AddPleaseSelectOption(List<SelectListItem> list, int value)
@@ -63,36 +64,6 @@ namespace Fpm.MainUI.Helpers
         public static Dictionary<int, string> GetAreaTypesLookUp()
         {
             return Reader.GetAllAreaTypes().ToDictionary(x => x.Id, x => x.ShortName);
-        }
-
-        public static IEnumerable<SelectListItem> GetListOfComparators(int? comparatorId = null)
-        {
-            var listOfComparators = new List<SelectListItem>
-                {
-                    new SelectListItem {
-                        Text = "National & Subnational",
-                        Value = ComparatorIds.NationalAndSubnational.ToString(),
-                        Selected = comparatorId == ComparatorIds.NationalAndSubnational
-                    },
-                    new SelectListItem {
-                        Text = "National Only",
-                        Value = ComparatorIds.National.ToString(),
-                        Selected = comparatorId == ComparatorIds.National
-                    },
-                    new SelectListItem {
-                        Text = "Subnational Only",
-                        Value = ComparatorIds.Subnational.ToString(),
-                        Selected = comparatorId == ComparatorIds.Subnational
-                    }
-                };
-
-            if (comparatorId == null)
-            {
-                // Comparator hasn't been set so need default option
-                AddPleaseSelectOption(listOfComparators, -1);
-            }
-            return listOfComparators;
-
         }
 
         public static IEnumerable<SelectListItem> GetListOfCiConfidenceLevels()
@@ -166,10 +137,11 @@ namespace Fpm.MainUI.Helpers
         }
 
         public static IEnumerable<SelectListItem> GetOrderedListOfDomainsWithGroupId(ProfileMembers domains,
-            SelectListItem defaultProfile, ProfileRepository profileRepository, int? selectedGroupId = null)
+            SelectListItem defaultProfile, IProfileRepository profileRepository, int? selectedGroupId = null)
         {
             if (defaultProfile != null)
             {
+
                 domains.Profile = GetProfile(defaultProfile.Value, 0, -1, profileRepository);
 
                 var groupingMetadataList = domains.Profile.GroupingMetadatas.OrderBy(g => g.Sequence);
@@ -309,9 +281,9 @@ namespace Fpm.MainUI.Helpers
             return Reader.GetProfileDetailsByProfileId(profileId);
         }
 
-        public static Profile GetProfile(string urlKey, int selectedDomainNumber, int areaType, ProfileRepository profileRepository)
+        public static Profile GetProfile(string urlKey, int selectedDomainNumber, int areaType, IProfileRepository profileRepository)
         {
-            return new ProfileBuilder(profileRepository).Build(urlKey, selectedDomainNumber, areaType);
+            return new ProfileBuilder(Reader, profileRepository).Build(urlKey, selectedDomainNumber, areaType);
         }
 
         public static IEnumerable<SelectListItem> GetListOfYearRanges(PleaseSelectOption selectionOption)
@@ -381,20 +353,17 @@ namespace Fpm.MainUI.Helpers
 
         public static string GetTestSiteUrl(IndicatorGridModel model)
         {
-            string url = GetTestSiteUrl(model.ProfileKey) + "#gid/" + model.SelectedGroupId;
-
-            var areaTypeId = model.SelectedAreaTypeId;
-            if (areaTypeId != AreaTypeIds.GpPractice)
-            {
-                url += "/ati/" + model.SelectedAreaTypeId;
-            }
-
-            return url;
+            return GetTestSiteUrl(model.ProfileKey) + "#gid/" + model.SelectedGroupId + "/ati/" + model.SelectedAreaTypeId;
         }
 
         public static string GetTestSiteUrl(string profileUrlKey)
         {
             return AppConfig.DefaultTestUrl + profileUrlKey;
+        }
+
+        public static string GetTestSiteUrl()
+        {
+            return AppConfig.DefaultTestUrl;
         }
 
         public static string GetStatusUpdateMessage()
@@ -405,6 +374,13 @@ namespace Fpm.MainUI.Helpers
         public static IEnumerable<UserGroupPermissions> GetUserGroupPermissionsByUserId(int userId)
         {
             return Reader.GetUserGroupPermissionsByUserId(userId);
+        }
+
+        public static IEnumerable<UserGroupPermissions> GetContactUsersByProfile(int profileId)
+        {
+            var contactUserIdsOfString = Reader.GetProfileDetailsByProfileId(profileId).ContactUserIds.Split(',').ToArray();
+            var contactUserIds = Array.ConvertAll(contactUserIdsOfString, Int32.Parse);
+            return Reader.GetProfileUsers(profileId).Where(user => contactUserIds.Contains(user.UserId)); 
         }
 
         public static IEnumerable<SelectListItem> GetOrderedListOfProfilesForCurrentUser(BaseDataModel model)
@@ -432,6 +408,12 @@ namespace Fpm.MainUI.Helpers
             return Reader.GetAllAreaTypes();
         }
 
+        public static IEnumerable<FpmUser> GetAllFpmUsers()
+        {
+            IUserRepository userRepository = new UserRepository(NHibernateSessionFactory.GetSession());
+            return userRepository.GetAllFpmUsers();
+        }
+
         public static IEnumerable<IndicatorAudit> GetIndicatorAudit(List<int> indicatorList)
         {
             return Reader.GetIndicatorAudit(indicatorList);
@@ -456,6 +438,12 @@ namespace Fpm.MainUI.Helpers
         {
             return "/profile/" + urlKey + "/area-type/" + selectedAreaType + "/domain/" + selectedDomain +
                 "/indicator/" + indicatorId + "/ageId/" + ageId + "/sexId/" + sexId;
+        }
+
+        public static string GetIndicatorUrl(string urlReferrerScheme, string urlReferrerAuthority, string urlReferrerAbsolutePath, string profileUrlKey, int domainSequence, int areaTypeId)
+        {
+            return string.Format("{0}://{1}{2}?ProfileKey={3}&DomainSequence={4}&selectedAreaTypeId={5}", urlReferrerScheme, urlReferrerAuthority,
+                urlReferrerAbsolutePath, profileUrlKey, domainSequence, areaTypeId);
         }
 
         public static IEnumerable<SelectListItem> GetListOfDecimalPlaces()
@@ -492,10 +480,32 @@ namespace Fpm.MainUI.Helpers
 
         public static IEnumerable<SelectListItem> GetDistinctExceptionServers()
         {
-            var exceptionServers = new ExceptionsRepository().GetDistinctExceptionServers().ToList();
-            exceptionServers.Add(ExceptionOptions.AllServers);
+            var exceptionServers = new List<string>
+            {
+                ExceptionOptions.AllServers
+            };
+
+            IExceptionsRepository exceptionsRepository = new ExceptionsRepository(NHibernateSessionFactory.GetSession());
+            var exceptionServersFromDb = exceptionsRepository.GetDistinctExceptionServers().ToList();
+
+            foreach (var exceptionServer in exceptionServersFromDb)
+            {
+                exceptionServers.Add(exceptionServer);
+            }
 
             return exceptionServers.Select(x => new SelectListItem { Text = x, Value = x }).ToList();
+        }
+
+        public static IEnumerable<SelectListItem> GetLiveExceptionServers()
+        {
+            var liveExceptionServers = new List<string>
+            {
+                ExceptionOptions.AllServers,
+                ServerNames.Live1.ToUpper(),
+                ServerNames.Live2.ToUpper()
+            };
+
+            return liveExceptionServers.Select(x => new SelectListItem { Text = x, Value = x }).ToList();
         }
 
         public static HtmlString GetContentItem(string contentKey, int profileId)
@@ -513,8 +523,234 @@ namespace Fpm.MainUI.Helpers
         public static bool IsDomainListAvailable(IEnumerable<SelectListItem> domainList)
         {
             return (domainList != null && domainList.Count() > 0);
+        }
 
+        public static List<SelectListItem> GetListOfAllAges(PleaseSelectOption pleaseSelectOption, int selectedAgeId = -1)
+        {
+            return GetAllAgeItems(pleaseSelectOption, selectedAgeId, Reader.GetAllAges());
+        }
 
+        private static List<SelectListItem> GetAllAgeItems(PleaseSelectOption pleaseSelectOption, int selectedAgeId, IList<Age> ages)
+        {
+            var items = new AgeSelectListBuilder(ages, selectedAgeId).SelectListItems;
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(items, -1);
+            }
+
+            return items;
+        }
+
+        public static List<SelectListItem> GetListOfAllSexes(PleaseSelectOption pleaseSelectOption, int selectedSexId = -1)
+        {
+            return GetAllSexItems(pleaseSelectOption, selectedSexId, Reader.GetAllSexes());
+        }
+
+        private static List<SelectListItem> GetAllSexItems(PleaseSelectOption pleaseSelectOption, int selectedSexId, IList<Sex> sexes)
+        {
+            var items = new SexSelectListBuilder(sexes, selectedSexId).SelectListItems;
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(items, -99);
+            }
+
+            return items;
+        }
+
+        public static IEnumerable<SelectListItem> GetIndicatorValueTypes(PleaseSelectOption pleaseSelectOption)
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            var indicatorValueTypes = lookUpsRepository.GetIndicatorValueTypes();
+
+            foreach (var indicatorValueType in indicatorValueTypes)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = indicatorValueType.Id.ToString(),
+                    Text = indicatorValueType.Label
+                };
+
+                selectedListItems.Add(listItem);
+            }
+
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(selectedListItems, -1);
+            }
+
+            return selectedListItems;
+        }
+
+        public static IEnumerable<SelectListItem> GetConfidenceIntervalMethods(PleaseSelectOption pleaseSelectOption)
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            var confidenceIntervalMethods = lookUpsRepository.GetConfidenceIntervalMethods();
+
+            foreach (var confidenceIntervalMethod in confidenceIntervalMethods)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = confidenceIntervalMethod.Id.ToString(),
+                    Text = confidenceIntervalMethod.Name
+                };
+
+                selectedListItems.Add(listItem);
+            }
+
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(selectedListItems, -1);
+            }
+
+            return selectedListItems;
+        }
+
+        public static IEnumerable<SelectListItem> GetUnits(PleaseSelectOption pleaseSelectOption)
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            var units = lookUpsRepository.GetUnits();
+
+            foreach (var unit in units)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = unit.Id.ToString(),
+                    Text = unit.Label
+                };
+
+                selectedListItems.Add(listItem);
+            }
+
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(selectedListItems, -1);
+            }
+
+            return selectedListItems;
+        }
+
+        public static IEnumerable<SelectListItem> GetDenominatorTypes(PleaseSelectOption pleaseSelectOption)
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            var denominatorTypes = lookUpsRepository.GetDenominatorTypes();
+
+            foreach (var denominatorType in denominatorTypes)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = denominatorType.Id.ToString(),
+                    Text = denominatorType.Name
+                };
+
+                selectedListItems.Add(listItem);
+            }
+
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(selectedListItems, -1);
+            }
+
+            return selectedListItems;
+        }
+
+        public static IEnumerable<SelectListItem> GetYearTypes(PleaseSelectOption pleaseSelectOption)
+        {
+            var selectedListItems = new List<SelectListItem>();
+            var lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
+            var yearTypes = lookUpsRepository.GetYearTypes();
+
+            foreach (var yearType in yearTypes)
+            {
+                var listItem = new SelectListItem
+                {
+                    Value = yearType.Id.ToString(),
+                    Text = yearType.Label
+                };
+
+                selectedListItems.Add(listItem);
+            }
+
+            if (pleaseSelectOption == PleaseSelectOption.Required)
+            {
+                AddPleaseSelectOption(selectedListItems, -1);
+            }
+
+            return selectedListItems;
+        }
+
+        public static List<GroupingPlusName> GetSpecifiedIndicatorNames(List<IndicatorSpecifier> indicatorSpecifiers, IList<GroupingPlusName> allIndicators)
+        {
+            List<GroupingPlusName> indicatorList = new List<GroupingPlusName>();
+            foreach (var indicatorSpecifier in indicatorSpecifiers)
+            {
+                var indicatorId = indicatorSpecifier.IndicatorId;
+                var sexId = indicatorSpecifier.SexId;
+                var ageId = indicatorSpecifier.AgeId;
+
+                var selectedIndicator =
+                    allIndicators
+                        .Where(x => x.IndicatorId == indicatorId)
+                        .Where(x => x.SexId == sexId)
+                        .Where(x => x.AgeId == ageId)
+                        .ToList()
+                        .FirstOrDefault();
+
+                indicatorList.Add(selectedIndicator);
+            }
+            return indicatorList;
+        }
+
+        public static string GetIndicatorNameWithSexAndAgeLabel(GroupingPlusName indicator)
+        {
+            return string.Format("{0} ({1}) ({2})", indicator.IndicatorName, indicator.Sex, indicator.Age);
+        }
+
+        public static IEnumerable<Grouping> GetGroupingsForIndicatorInProfile(int profileId, int indicatorId)
+        {
+            var groupingsForAllProfiles = Reader.GetGroupingByIndicatorId(new List<int> { indicatorId });
+
+            var profileGroupIds = Reader.GetGroupingIds(profileId);
+
+            var groupingsForCurrentProfile = groupingsForAllProfiles
+                .Where(x => profileGroupIds.Contains(x.GroupId));
+
+            return groupingsForCurrentProfile;
+        }
+
+        public static List<Grouping> GetDistinctGroupingsByGroupIdAndAreaTypeId(IEnumerable<Grouping> groupings)
+        {
+            var distinctGroupingsForProfile = new List<Grouping>();
+            foreach (Grouping grouping in groupings)
+            {
+                var isAlreadyFound = false;
+                foreach (var distinctGrouping in distinctGroupingsForProfile)
+                {
+                    if (grouping.GroupId == distinctGrouping.GroupId &&
+                        grouping.AreaTypeId == distinctGrouping.AreaTypeId)
+                    {
+                        isAlreadyFound = true;
+                        break;
+                    }
+                }
+
+                if (isAlreadyFound == false)
+                {
+                    distinctGroupingsForProfile.Add(grouping);
+                }
+            }
+            return distinctGroupingsForProfile;
+        }
+
+        public static UserGroupPermissions GetProfileUserPermissions(IEnumerable<UserGroupPermissions> userPermissions, string urlKey)
+        {
+            var profileId = Reader.GetProfileIdFromUrlKey(urlKey);
+
+            return userPermissions.FirstOrDefault(
+                x => x.ProfileId == profileId);
         }
     }
 }

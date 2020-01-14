@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstruction
         public TargetComparer TargetComparer { get; set; }
         private IGroupDataReader groupDataReader = ReaderFactory.GetGroupDataReader();
 
-        public void CompareToCalculateSignficance(GroupRoot groupRoot, IndicatorMetadata metadata)
+        public void CompareToCalculateSignificance(GroupRoot groupRoot, IndicatorMetadata metadata)
         {
             CompareLocalAreaData(groupRoot, metadata);
             CompareAllDataAgainstTarget(groupRoot);
@@ -34,9 +34,11 @@ namespace PholioVisualisation.DataConstruction
 
                     foreach (CoreDataSet coreData in groupRoot.Data)
                     {
-                        coreData.Significance.Add(grouping.ComparatorId, categoryComparer == null
-                            ? (int)comparer.Compare(coreData, grouping.ComparatorData, metadata)
-                            : categoryComparer.GetCategory(coreData));
+                        int significance = categoryComparer != null
+                            ? categoryComparer.GetCategory(coreData)
+                            : (int) comparer.Compare(coreData, grouping.ComparatorData, metadata);
+
+                        coreData.Significance.Add(grouping.ComparatorId, significance);
                     }
                 }
             }

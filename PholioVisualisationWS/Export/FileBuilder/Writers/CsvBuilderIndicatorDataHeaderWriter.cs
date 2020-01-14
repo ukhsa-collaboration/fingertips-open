@@ -5,7 +5,7 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.Export.FileBuilder.Writers
 {
-    public class CsvBuilderIndicatorDataHeaderWriter : IBuilderHeaderWriter<byte[]>
+    public class CsvBuilderIndicatorDataHeaderWriter : IBuilderHeaderWriter
     {
         private readonly IAreasReader _areasReader;
         private readonly IndicatorExportParameters _generalParameters;

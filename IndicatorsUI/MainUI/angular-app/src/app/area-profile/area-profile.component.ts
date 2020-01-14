@@ -1,20 +1,32 @@
 import { Component, HostListener } from '@angular/core';
+import * as _ from 'underscore';
+import { forkJoin } from 'rxjs';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import { IndicatorService } from '../shared/service/api/indicator.service';
-import {
-  IndicatorStats, FTModel, FTConfig, IndicatorMetadata, IndicatorFormatter,
-  GroupRoot, CoreDataSet, IndicatorStatsPercentilesFormatted, IndicatorStatsPercentiles, ComparisonConfig, TrendMarkerResult, Area
-} from '../typings/FT';
-import { Observable } from 'rxjs/Observable';
 import { UIService } from '../shared/service/helper/ui.service';
 import {
-  ParentDisplay, AreaTypeIds, ComparatorIds, GroupRootHelper, CoreDataListHelper,
-  ValueTypeIds, AreaHelper, PolarityIds, TrendMarkerValue, TooltipHelper, ComparatorMethodIds,
-  SpineChartMinMaxLabelDescription, SpineChartMinMaxLabel, ParameterBuilder
+  GroupRootHelper, CoreDataSetListHelper, AreaHelper, TooltipHelper, LegendHelper,
+  DeviceServiceHelper, NewDataBadgeHelper, ParentAreaHelper, ParentAreaTypeHelper
 } from '../shared/shared';
-import * as _ from 'underscore';
+import {
+  AreaTypeIds, ComparatorIds, ValueTypeIds, ParentDisplay, PolarityIds,
+  TrendMarkerValue, SpineChartMinMaxLabelDescription, SpineChartMinMaxLabel,
+  PageType, AreaCodes, Tabs, CsvCoreDataType
+} from '../shared/constants';
 import { SpineChartCalculator, SpineChartDimensions } from './spine-chart.classes';
-import { PageType } from 'app/shared/component/legend/legend.component';
+import { LegendConfig } from '../shared/component/legend/legend';
+import {
+  IndicatorStats, FTModel, FTConfig, IndicatorMetadata, IndicatorFormatter,
+  GroupRoot, CoreDataSet, IndicatorStatsPercentilesFormatted, IndicatorStatsPercentiles,
+  ComparisonConfig, TrendMarkerResult, Area
+} from '../typings/FT';
+import { LightBoxConfig, LightBoxTypes } from '../shared/component/light-box/light-box';
+import { DeviceDetectorService } from '../../../node_modules/ngx-device-detector';
+import { isDefined } from '@angular/compiler/src/util';
+import { TrendMarkerLabelProvider } from '../shared/classes/trendmarker-label-provider';
+import { TimePeriod } from '../shared/classes/time-period';
+import { CsvConfig, CsvData, CsvDataHelper } from '../shared/component/export-csv/export-csv';
+import { AreaService } from '../shared/service/api/area.service';
 
 @Component({
   selector: 'ft-area-profile',
@@ -31,23 +43,23 @@ export class AreaProfileComponent {
   public shortAreaName: string;
   public areaName: string;
   public benchmarkName: string;
-  public isParentUk = false;
   public isNationalAndRegional = false;
   public isNotNN = false;
   public trendColSpan = 0;
   public colSpan = 0;
   public indicatorRows: IndicatorRow[];
-  public isAnyData: boolean = false;
+  public isAnyData = true;
 
   private model: FTModel;
   private config: FTConfig;
   private imgUrl: string;
-  private tooltip: TooltipHelper;
+  private tooltipHelper: TooltipHelper;
 
   private scrollTop: number;
   private isAreaIgnored: boolean;
-  private currentTooltipHtml: string;
+  private currentTrendsTooltipHtml: string;
   private area: Area;
+  private isEnglandAreaSelected: boolean;
 
   // Data from AJAX
   private indicatorStats: IndicatorStats[];
@@ -56,91 +68,111 @@ export class AreaProfileComponent {
   // HTML
   private NoData = '<div class="no-data">-</div>';
 
-  // Legend display properties
-  pageType = PageType.None;
-  showRAG3 = false;
-  showRAG5 = false;
-  showBOB = false;
-  showQuintilesRAG = false;
-  showQuintilesBOB = false;
+  // Legend
   showRecentTrends = false;
+  showDataQuality = false;
+  legendConfig: LegendConfig;
+  csvConfig: CsvConfig;
 
-  constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService,
-    private uiService: UIService) { }
+  // Lightbox
+  lightBoxConfig: LightBoxConfig;
 
-  @HostListener('window:AreaProfileSelected', ['$event'])
-  public onOutsideEvent(event) {
-    let ftHelper = this.ftHelperService;
+  constructor(private ftHelperService: FTHelperService,
+    private indicatorService: IndicatorService,
+    private areaService: AreaService,
+    private uiService: UIService,
+    private deviceService: DeviceDetectorService) { }
+
+  @HostListener('window:AreaProfileSelected', ['$event', '$event.detail.isEnglandAreaType'])
+  public onOutsideEvent(event, isEnglandAreaType) {
+    const ftHelper = this.ftHelperService;
 
     const groupRoots = ftHelper.getAllGroupRoots();
     this.model = ftHelper.getFTModel();
     this.config = ftHelper.getFTConfig();
-    this.isAnyData = groupRoots.length > 0;
+    this.isAnyData = true;
+
+    this.isEnglandAreaSelected = isEnglandAreaType;
 
     this.scrollTop = this.uiService.getScrollTop();
-
-    let comparatorId = ftHelper.getComparatorId();
-    let parentAreaCode = ftHelper.getComparatorById(comparatorId).Code;
 
     this.setDisplayConfig();
     this.setIsAreaIgnored();
 
-    // AJAX calls
-    let indicatorStatisticsObservable = this.indicatorService.getIndicatorStatistics(this.model.areaTypeId,
-      parentAreaCode, this.model.profileId, this.model.groupId);
+    const profileId = this.model.profileId;
+    const groupId = this.model.groupId;
+    const areaTypeId = this.model.areaTypeId;
+    const parentAreaTypeId = this.model.parentTypeId;
+    const nearestNeighbourCode = this.isNotNN ? '' : this.model.nearestNeighbour;
+    const parentAreaCode = new ParentAreaHelper(ftHelper).getParentAreaCode();
 
-    Observable.forkJoin([indicatorStatisticsObservable]).subscribe(results => {
+    // AJAX calls
+    const indicatorStatisticsObservable = this.indicatorService.getIndicatorStatistics(areaTypeId,
+      parentAreaCode, profileId, groupId);
+
+    const allIndicatorsInProfileGroupForChildAreasObservable = this.indicatorService.getLatestDataForAllIndicatorsInProfileGroupForChildAreas(groupId,
+      areaTypeId, parentAreaCode, profileId);
+
+    const parentToChildAreasObservable = this.areaService.getParentToChildAreas(profileId, areaTypeId, parentAreaTypeId, nearestNeighbourCode);
+
+    forkJoin([indicatorStatisticsObservable, allIndicatorsInProfileGroupForChildAreasObservable, parentToChildAreasObservable]).subscribe(results => {
 
       this.indicatorStats = _.values(results[0]);
+      this.model.groupRoots = results[1];
+      const areaMappings = results[2];
+
+      // Set area mappings
+      this.ftHelperService.setAreaMappings(areaMappings);
+
       this.metadataHash = ftHelper.getMetadataHash();
 
       this.setAreaProfileHtml();
 
       // Unlock UI
       ftHelper.showAndHidePageElements();
-      ftHelper.showDataQualityLegend();
       ftHelper.showTargetBenchmarkOption(groupRoots);
       this.uiService.setScrollTop(this.scrollTop);
 
-      // Legend display configurations
-      this.pageType = PageType.AreaProfiles;
       this.showRecentTrends = this.areRecentTrendsDisplayed;
+      this.showDataQuality = new LegendHelper(this.config).showDataQualityLegend();
 
       ftHelper.unlock();
     });
 
-    this.tooltip = new TooltipHelper(this.ftHelperService.newTooltipManager());
+    this.tooltipHelper = new TooltipHelper(this.ftHelperService.newTooltipManager());
+  }
+
+  @HostListener('window:NoDataDisplayed', ['$event', '$event.detail.isEnglandAreaType'])
+  public refreshVariable(isEnglandAreaType) {
+    this.isAnyData = false;
+    this.isEnglandAreaSelected = isEnglandAreaType;
   }
 
   setAreaProfileHtml() {
 
-    let ftHelper = this.ftHelperService;
+    const ftHelper = this.ftHelperService;
 
     // Benchmark
-    let comparatorId = ftHelper.getComparatorId();
-    let isNationalBenchmark = (comparatorId === ComparatorIds.National);
-    let benchmark = isNationalBenchmark ?
+    const comparatorId = ftHelper.getComparatorId();
+    const isNationalBenchmark = (comparatorId === ComparatorIds.National);
+    const benchmark = isNationalBenchmark ?
       ftHelper.getNationalComparator() :
       ftHelper.getParentArea();
 
-    let areaCode = this.model.areaCode;
+    const areaCode = this.model.areaCode;
     this.area = ftHelper.getArea(areaCode);
 
-    this.uiService.toggleQuintileLegend($('#quintile-key'), false);
-
-    let isSubnationalColumn = !this.model.isNearestNeighbours() && ftHelper.isSubnationalColumn();
-
-    let indicatorRows = [];
+    const indicatorRows = [];
     let rootIndex = 0;
-    let groupRoots = ftHelper.getAllGroupRoots();
+    const groupRoots = ftHelper.getAllGroupRoots();
 
-    for (let root of groupRoots) {
+    for (const root of groupRoots) {
 
-      let metadata = this.metadataHash[root.IID];
-      let areaData = new CoreDataListHelper(root.Data).findByAreaCode(areaCode);
+      const metadata = this.metadataHash[root.IID];
+      const areaData = new CoreDataSetListHelper(root.Data).findByAreaCode(areaCode);
 
       // Create indicator row
-      let row = new IndicatorRow();
+      const row = new IndicatorRow();
       row.rootIndex = rootIndex;
       indicatorRows.push(row);
       rootIndex += 1;
@@ -149,20 +181,21 @@ export class AreaProfileComponent {
       this.assignStatsToRow(root, row);
 
       // Parent data
-      let subnationalData = ftHelper.getRegionalComparatorGrouping(root).ComparatorData;
-      let nationalData = ftHelper.getNationalComparatorGrouping(root).ComparatorData;
-      let benchmarkData = isNationalBenchmark ?
-        nationalData :
-        subnationalData;
+      const subnationalData = ftHelper.getRegionalComparatorGrouping(root).ComparatorData;
+      const nationalData = ftHelper.getNationalComparatorGrouping(root).ComparatorData;
+      const benchmarkData = isNationalBenchmark ? nationalData : subnationalData;
       row.benchmarkData = benchmarkData;
 
+      row.nationalData = nationalData;
+      row.subnationalData = subnationalData;
+
       // Init formatter
-      let formatter = ftHelper.newIndicatorFormatter(root, metadata, areaData, row.statsF);
+      const formatter = ftHelper.newIndicatorFormatter(root, metadata, areaData, row.statsF);
       formatter.averageData = benchmarkData;
 
       // Value displayer
-      var unit = !!metadata ? metadata.Unit : null;
-      var valueDisplayer = ftHelper.newValueDisplayer(unit);
+      const unit = !!metadata ? metadata.Unit : null;
+      const valueDisplayer = ftHelper.newValueDisplayer(unit);
 
       // Set piggy back object
       row.formatter = formatter;
@@ -177,21 +210,21 @@ export class AreaProfileComponent {
       row.areaValue = formatter.getAreaValue();
 
       // Area data note tooltip
-      var dataInfo = ftHelper.newCoreDataSetInfo(row.areaData);
+      const dataInfo = ftHelper.newCoreDataSetInfo(row.areaData);
       if (dataInfo.isNote()) {
         row.areaValueTooltip = ftHelper.getValueNoteById(areaData.NoteId).Text;
       }
 
       // England value
-      let nationalDataInfo = ftHelper.newCoreDataSetInfo(nationalData);
+      const nationalDataInfo = ftHelper.newCoreDataSetInfo(nationalData);
       row.englandValue = valueDisplayer.byDataInfo(nationalDataInfo, { noCommas: 'y' })
       if (nationalDataInfo.isNote()) {
         row.englandValueTooltip = ftHelper.getValueNoteById(nationalData.NoteId).Text;
       }
 
       // Subnational value
-      if (isSubnationalColumn) {
-        let subnationalDataInfo = ftHelper.newCoreDataSetInfo(subnationalData);
+      if (ftHelper.isSubnationalColumn()) {
+        const subnationalDataInfo = ftHelper.newCoreDataSetInfo(subnationalData);
         row.subnationalValue = valueDisplayer.byDataInfo(subnationalDataInfo, { noCommas: 'y' });
         if (subnationalDataInfo.isNote()) {
           row.subnationalValueTooltip = ftHelper.getValueNoteById(subnationalData.NoteId).Text;
@@ -201,7 +234,7 @@ export class AreaProfileComponent {
       this.setSpineChartDimensions(row);
 
       // Min / Max
-      let dimensions = row.spineChartDimensions
+      const dimensions = row.spineChartDimensions
       if (dimensions.isAnyData && dimensions.isSufficientData) {
         // Data available
         row.englandMin = formatter.getMin();
@@ -219,7 +252,7 @@ export class AreaProfileComponent {
 
         let trendMarkerValue, polarityId;
         if (areaData) {
-          var recentTrends = root.RecentTrends[areaData.AreaCode];
+          const recentTrends = root.RecentTrends[areaData.AreaCode];
           trendMarkerValue = recentTrends.Marker;
           polarityId = root.PolarityId;
           row.trendMarkerResult = recentTrends;
@@ -245,43 +278,9 @@ export class AreaProfileComponent {
   }
 
   setLegendDisplay(groupRoots: GroupRoot[]) {
-    this.showRAG3 = false;
-    this.showRAG5 = false;
-    this.showBOB = false;
-    this.showQuintilesRAG = false;
-    this.showQuintilesBOB = false;
-
-    // Show Quintile BOB legend
-    if (groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.Quintiles && x.PolarityId === PolarityIds.NotApplicable) > -1) {
-      this.showQuintilesBOB = true;
-    }
-
-    // Show Quintile RAG legend
-    if (groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.Quintiles && (x.PolarityId === PolarityIds.RAGLowIsGood || x.PolarityId === PolarityIds.RAGHighIsGood)) > -1) {
-      this.showQuintilesRAG = true;
-    }
-
-    // Show RAG5 legend
-    if (groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels) > -1) {
-      this.showRAG5 = true;
-    } else {
-      // Show RAG3 legend
-      if (groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel) > -1) {
-        this.showRAG3 = true;
-      }
-
-      if (this.showRAG3 === false &&
-        (groupRoots.findIndex(x => x.PolarityId === PolarityIds.RAGHighIsGood) > -1 ||
-          groupRoots.findIndex(x => x.PolarityId === PolarityIds.RAGLowIsGood) > -1)) {
-
-        this.showRAG3 = true;
-      }
-    }
-
-    // Show BOB legend
-    if (groupRoots.findIndex(x => x.PolarityId === PolarityIds.BlueOrangeBlue) > -1) {
-      this.showBOB = true;
-    }
+    const config = new LegendConfig(PageType.AreaProfiles, this.ftHelperService);
+    config.configureForMultipleIndicators(groupRoots);
+    this.legendConfig = config;
   }
 
   polarityToText(polarity, isForLowest) {
@@ -294,7 +293,7 @@ export class AreaProfileComponent {
 
   assignStatsToRow(root: GroupRoot, row: IndicatorRow) {
 
-    let statsBase: IndicatorStats =
+    const statsBase: IndicatorStats =
       new GroupRootHelper(root).findMatchingItemBySexAgeAndIndicatorId(this.indicatorStats);
 
     if (statsBase) {
@@ -306,31 +305,31 @@ export class AreaProfileComponent {
 
   setSpineChartDimensions(row: IndicatorRow): void {
 
-    let ftHelper = this.ftHelperService;
-    var benchmarkDataInfo = ftHelper.newCoreDataSetInfo(row.benchmarkData);
+    const ftHelper = this.ftHelperService;
+    const benchmarkDataInfo = ftHelper.newCoreDataSetInfo(row.benchmarkData);
 
-    let isValidBenchmarkValue = benchmarkDataInfo.isValue();
+    const isValidBenchmarkValue = benchmarkDataInfo.isValue();
 
     if (isValidBenchmarkValue && !row.haveRequiredValuesForSpineChart) {
       // Should show not enough values message
-      let dimensions = new SpineChartDimensions();
+      const dimensions = new SpineChartDimensions();
       dimensions.isSufficientData = false;
       row.spineChartDimensions = dimensions;
     } else if (!row.stats ||
       !isValidBenchmarkValue ||
       row.indicatorMetadata.ValueType.Id === ValueTypeIds.Count) {
       // Should show no data message
-      let dimensions = new SpineChartDimensions();
+      const dimensions = new SpineChartDimensions();
       dimensions.isAnyData = false;
       row.spineChartDimensions = dimensions;
     } else {
       // Have data can show spine chart
-      var polarityId = row.groupRoot.PolarityId;
-      let spineChart = new SpineChartCalculator();
-      var proportions = spineChart.getSpineProportions(row.benchmarkData.Val, row.stats, polarityId);
+      const polarityId = row.groupRoot.PolarityId;
+      const spineChart = new SpineChartCalculator();
+      const proportions = spineChart.getSpineProportions(row.benchmarkData.Val, row.stats, polarityId);
 
-      var dataInfo = ftHelper.newCoreDataSetInfo(row.areaData);
-      var spineDimensions = spineChart.getDimensions(proportions, dataInfo, this.imgUrl, row.comparisonConfig,
+      const dataInfo = ftHelper.newCoreDataSetInfo(row.areaData);
+      const spineDimensions = spineChart.getDimensions(proportions, dataInfo, this.imgUrl, row.comparisonConfig,
         row.indicatorMetadata.IID, ftHelper.getMarkerImageFromSignificance);
 
       row.spineChartDimensions = spineDimensions;
@@ -339,14 +338,14 @@ export class AreaProfileComponent {
 
   public getIndicatorNameHtml(row: IndicatorRow): string {
 
-    let formatter = row.formatter;
-    let ftHelper = this.ftHelperService;
-    let root = row.groupRoot;
-    let metadata = row.indicatorMetadata;
+    const formatter = row.formatter;
+    const ftHelper = this.ftHelperService;
+    const root = row.groupRoot;
+    const metadata = row.indicatorMetadata;
 
     // Indicator name & data quality
-    let html = [
-      formatter.getIndicatorName(),
+    const html = [
+      formatter.getIndicatorNamePlusSexAndAge(),
       this.ftHelperService.getIndicatorDataQualityHtml(formatter.getDataQuality())
     ];
 
@@ -356,7 +355,7 @@ export class AreaProfileComponent {
     }
 
     // Target legend
-    var targetLegend = ftHelper.getTargetLegendHtml(row.comparisonConfig, metadata);
+    const targetLegend = ftHelper.getTargetLegendHtml(row.comparisonConfig, metadata);
     if (targetLegend) {
       html.push('<br>', targetLegend);
     }
@@ -371,18 +370,17 @@ export class AreaProfileComponent {
   }
 
   setDisplayConfig() {
-    let ftHelper = this.ftHelperService;
+    const ftHelper = this.ftHelperService;
 
-    let urls = ftHelper.getURL();
+    const urls = ftHelper.getURL();
     this.imgUrl = urls.img;
 
-    let groupRoots = ftHelper.getAllGroupRoots();
+    const groupRoots = ftHelper.getAllGroupRoots();
 
-    this.isParentUk = ftHelper.isParentUk();
     this.isNationalAndRegional = ftHelper.getEnumParentDisplay() === ParentDisplay.NationalAndRegional &&
       this.model.parentTypeId !== AreaTypeIds.Country;
 
-    let trendMarkerFound = groupRoots && groupRoots[0] && groupRoots[0].RecentTrends;
+    const trendMarkerFound = groupRoots && groupRoots[0] && groupRoots[0].RecentTrends;
 
     this.trendColSpan = trendMarkerFound ? 3 : 2;
     this.areRecentTrendsDisplayed = trendMarkerFound && this.config.hasRecentTrends;
@@ -390,7 +388,11 @@ export class AreaProfileComponent {
     this.isNotNN = !this.model.isNearestNeighbours()
     this.colSpan = this.isNationalAndRegional && !this.model.isNearestNeighbours() ? 3 : 4;
 
-    this.parentType = ftHelper.getParentTypeName();
+    if (this.isNotNN) {
+      this.parentType = ftHelper.getParentTypeName();
+    } else {
+      this.parentType = 'Neighbrs average';
+    }
 
     this.setSpineHeadersAndChartLabelImage(urls.img, groupRoots);
 
@@ -399,51 +401,27 @@ export class AreaProfileComponent {
   }
 
   setSpineHeadersAndChartLabelImage(imageUrl: string, groupRoots: GroupRoot[]) {
-    if (groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel) > -1 ||
-      groupRoots.findIndex(x => x.ComparatorMethodId === ComparatorMethodIds.SingleOverlappingCIsForTwoCiLevels) > -1) {
 
-      this.config.spineHeaders.min = SpineChartMinMaxLabelDescription.Worst;
-      this.config.spineHeaders.max = SpineChartMinMaxLabelDescription.Best;
-      this.config.spineChartMinMaxLabelId = SpineChartMinMaxLabel.WorstAndBest;
-    } else {
+    const headers = new SpineChartHeaderLabeller(groupRoots);
 
-      if (groupRoots.findIndex(x => x.PolarityId === PolarityIds.RAGHighIsGood) > -1 ||
-        groupRoots.findIndex(x => x.PolarityId === PolarityIds.RAGLowIsGood) > -1) {
+    this.config.spineHeaders.min = headers.minHeader;
+    this.config.spineHeaders.max = headers.maxHeader;
+    this.config.spineChartMinMaxLabelId = headers.spineChartMinMaxLabelId;
 
-        this.config.spineHeaders.min = SpineChartMinMaxLabelDescription.Worst;
-        this.config.spineHeaders.max = SpineChartMinMaxLabelDescription.Best;
-        this.config.spineChartMinMaxLabelId = SpineChartMinMaxLabel.WorstAndBest;
-      }
-    }
-
-    if (groupRoots.findIndex(x => x.PolarityId === PolarityIds.BlueOrangeBlue) > -1) {
-      if (this.config.spineChartMinMaxLabelId === SpineChartMinMaxLabel.WorstAndBest) {
-
-        this.config.spineHeaders.min = SpineChartMinMaxLabelDescription.WorstLowest;
-        this.config.spineHeaders.max = SpineChartMinMaxLabelDescription.BestHighest;
-        this.config.spineChartMinMaxLabelId = SpineChartMinMaxLabel.WorstLowestAndBestHighest;
-      } else {
-
-        this.config.spineHeaders.min = SpineChartMinMaxLabelDescription.Lowest;
-        this.config.spineHeaders.max = SpineChartMinMaxLabelDescription.Highest;
-        this.config.spineChartMinMaxLabelId = SpineChartMinMaxLabel.LowestAndHighest;
-      }
-    }
-
-    this.spineChartImageUrl = imageUrl + 'spine-key-label-id-' + this.config.spineChartMinMaxLabelId + '.png';
+    this.spineChartImageUrl = imageUrl + 'spine-key-label-id-' + headers.spineChartMinMaxLabelId + '.png';
   }
 
   /** Whether the current area should is ignored for the spine charts */
   setIsAreaIgnored(): void {
 
-    let ignoredSpineChartAreas = this.config.ignoredSpineChartAreas;
+    const ignoredSpineChartAreas = this.config.ignoredSpineChartAreas;
 
     // Is area too small for spine charts
-    var isIgnored = false;
+    let isIgnored = false;
     if (ignoredSpineChartAreas) {
-      let areaCode = this.model.areaCode;
+      const areaCode = this.model.areaCode;
 
-      let areas = ignoredSpineChartAreas.split(',');
+      const areas = ignoredSpineChartAreas.split(',');
       isIgnored = _.any(areas, function (area) {
         return area === areaCode;
       });
@@ -453,52 +431,218 @@ export class AreaProfileComponent {
   }
 
   goToBarChart(row: IndicatorRow) {
-    this.ftHelperService.goToBarChartPage(row.rootIndex);
+    this.ftHelperService.goToBarChartPage(row.rootIndex, true);
   }
 
   goToTrends(row: IndicatorRow) {
-    this.ftHelperService.goToAreaTrendsPage(row.rootIndex);
+    const ftHelper = this.ftHelperService;
+    ftHelper.recentTrendSelected().byGroupRoot(row.rootIndex);
   }
 
   onExportClick(event: MouseEvent) {
-    this.ftHelperService.exportTableAsImage('area-profile-container',
-      'AreaProfilesTable', '#key-spine-chart,#spine-range-key');
+    // Download table does not work on IE
+    // Check whether the browser is IE
+    if (new DeviceServiceHelper(this.deviceService).isIE()) {
+      // Display lightbox informing user to use a different browser
+      const config = new LightBoxConfig();
+      config.Type = LightBoxTypes.Ok;
+      config.Title = 'Browser not compatible';
+      config.Html = 'Exporting the table as an image is not supported by Internet Explorer. Please use a different browser.'
+      config.Height = 200;
+      config.Top = 500;
+      this.lightBoxConfig = config;
+    } else {
+      this.ftHelperService.exportTableAsImage('area-profile-container',
+        'AreaProfilesTable', '#key-spine-chart,#spine-range-key');
+    }
   }
 
   onExportCsvFileClick(event: MouseEvent) {
+    const csvData: CsvData[] = [];
 
-    var urls = this.ftHelperService.getURL();
-    var model = this.ftHelperService.getFTModel();
+    this.indicatorRows.forEach(indicatorRow => {
+      const nationalData = this.addCsvRow(indicatorRow, CsvCoreDataType.National);
+      csvData.push(nationalData);
 
-    var parameters = new ParameterBuilder()
-    .add('parent_area_type_id', model.parentTypeId)
-    .add('child_area_type_id', model.areaTypeId)
-    .add('group_id', model.groupId)
-    .add('areas_code', model.areaCode)
-    .add('parent_area_code', model.parentCode);
-  
-    var url = urls.corews + 'api/latest/no_inequalities_data/csv/by_group_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
+      const subnationalData = this.addCsvRow(indicatorRow, CsvCoreDataType.Subnational);
+      csvData.push(subnationalData);
+
+      const areaData = this.addCsvRow(indicatorRow, CsvCoreDataType.Area);
+      csvData.push(areaData);
+    });
+
+    this.csvConfig = new CsvConfig();
+    this.csvConfig.tab = Tabs.AreaProfiles;
+    this.csvConfig.csvData = csvData;
   }
 
-  public showIndicatorTooltip(event: MouseEvent, row: IndicatorRow) {
-    this.currentTooltipHtml = this.ftHelperService.getIndicatorNameTooltip(row.rootIndex, this.area);
-    this.tooltip.displayHtml(event, this.currentTooltipHtml);
+  addCsvRow(indicatorRow: IndicatorRow, rowType: number): CsvData {
+    const data = new CsvData();
+    let lowerCI = '';
+    let upperCI = '';
+    let lowerCI99_8 = '';
+    let upperCI99_8 = '';
+    let category = '';
+    let categoryType = '';
+    let value = '';
+    let count = '';
+    let denominator = '';
+    let parentCode = '';
+    let parentName = '';
+    let areaCode = '';
+    let areaName = '';
+    let areaType = '';
+
+    const parentAreaHelper = new ParentAreaHelper(this.ftHelperService);
+    const parentAreaTypeHelper = new ParentAreaTypeHelper(this.ftHelperService);
+
+    const indicatorId = indicatorRow.indicatorMetadata.IID;
+    data.indicatorId = indicatorId.toString();
+    data.indicatorName = this.ftHelperService.getIndicatorName(indicatorId);
+
+    switch (rowType) {
+      case CsvCoreDataType.National:
+        categoryType = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.CategoryTypeId);
+        category = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.CategoryId);
+        lowerCI = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.LoCI);
+        upperCI = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.UpCI);
+        lowerCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.LoCI99_8);
+        upperCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.UpCI99_8);
+        count = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.Count);
+        denominator = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.Denom);
+        value = CsvDataHelper.getDisplayValue(indicatorRow.nationalData.Val);
+
+        parentCode = '';
+        parentName = '';
+        areaCode = AreaCodes.England;
+        areaName = 'England';
+        areaType = 'England';
+        break;
+
+      case CsvCoreDataType.Subnational:
+        categoryType = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.CategoryTypeId);
+        category = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.CategoryId);
+        lowerCI = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.LoCI);
+        upperCI = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.UpCI);
+        lowerCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.LoCI99_8);
+        upperCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.UpCI99_8);
+        count = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.Count);
+        denominator = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.Denom);
+        value = CsvDataHelper.getDisplayValue(indicatorRow.subnationalData.Val);
+
+        parentCode = AreaCodes.England;
+        parentName = 'England';
+        areaCode = parentAreaHelper.getParentAreaCode();
+        areaName = parentAreaHelper.getParentAreaNameForCSV();
+        areaType = parentAreaTypeHelper.getParentAreaTypeNameForCSV();
+        break;
+
+      case CsvCoreDataType.Area:
+        if (isDefined(indicatorRow.areaData)) {
+          categoryType = CsvDataHelper.getDisplayValue(indicatorRow.areaData.CategoryTypeId);
+          category = CsvDataHelper.getDisplayValue(indicatorRow.areaData.CategoryId);
+          lowerCI = CsvDataHelper.getDisplayValue(indicatorRow.areaData.LoCI);
+          upperCI = CsvDataHelper.getDisplayValue(indicatorRow.areaData.UpCI);
+          lowerCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.areaData.LoCI99_8);
+          upperCI99_8 = CsvDataHelper.getDisplayValue(indicatorRow.areaData.UpCI99_8);
+          count = CsvDataHelper.getDisplayValue(indicatorRow.areaData.Count);
+          denominator = CsvDataHelper.getDisplayValue(indicatorRow.areaData.Denom);
+          value = CsvDataHelper.getDisplayValue(indicatorRow.areaData.Val);
+        }
+
+        parentCode = parentAreaHelper.getParentAreaCode();
+        parentName = parentAreaHelper.getParentAreaNameForCSV();
+        areaCode = this.model.areaCode;
+        areaName = this.ftHelperService.getArea(areaCode).Name;
+        areaType = this.ftHelperService.getAreaTypeName();
+        break;
+    }
+
+    data.parentCode = parentCode;
+    data.parentName = parentName;
+    data.areaCode = areaCode;
+    data.areaName = areaName;
+    data.areaType = areaType;
+
+    const root = indicatorRow.groupRoot;
+    data.sex = root.Sex.Name;
+    data.age = root.Age.Name;
+
+    data.categoryType = categoryType;
+    data.category = category;
+    data.timePeriod = indicatorRow.period;
+    data.value = value;
+    data.lowerCiLimit95 = lowerCI;
+    data.upperCiLimit95 = upperCI;
+    data.lowerCiLimit99_8 = lowerCI99_8;
+    data.upperCiLimit99_8 = upperCI99_8;
+    data.count = count;
+    data.denominator = denominator;
+
+    data.valueNote = this.getValueNoteForCsv(rowType, indicatorRow);
+
+    data.recentTrend = '';
+    if (isDefined(indicatorRow.trendMarkerResult)) {
+      data.recentTrend = new TrendMarkerLabelProvider(root.PolarityId).getLabel(indicatorRow.trendMarkerResult.Marker);
+    }
+
+    data.comparedToEnglandValueOrPercentiles = CsvDataHelper.getSignificanceValue(indicatorRow.areaData,
+      root.PolarityId, ComparatorIds.National, root.ComparatorMethodId);
+
+    data.comparedToRegionValueOrPercentiles = CsvDataHelper.getSignificanceValue(indicatorRow.areaData,
+      root.PolarityId, ComparatorIds.SubNational, root.ComparatorMethodId);
+
+    data.timePeriodSortable = new TimePeriod(root.Grouping[0]).getSortableNumber();
+
+    const hasDataChanged = this.ftHelperService.hasDataChanged(root);
+    const isNewData = NewDataBadgeHelper.isNewData(hasDataChanged);
+    data.newData = isNewData ? 'New data' : '';
+
+    data.comparedToGoal = CsvDataHelper.getSignificanceValue(indicatorRow.areaData,
+      root.PolarityId, ComparatorIds.Target, root.ComparatorMethodId);
+
+    return data;
+  }
+
+  getValueNoteForCsv(rowType: number, row: IndicatorRow): string {
+    let valueNote = '';
+
+    switch (rowType) {
+      case 0:
+        if (isDefined(row.englandValueTooltip)) {
+          valueNote = row.englandValueTooltip;
+        }
+        break;
+
+      case 1:
+        if (isDefined(row.subnationalValueTooltip)) {
+          valueNote = row.subnationalValueTooltip;
+        }
+        break;
+
+      case 2:
+        if (isDefined(row.areaValueTooltip)) {
+          valueNote = row.areaValueTooltip;
+        }
+        break;
+    }
+
+    return valueNote;
   }
 
   public showRecentTrendTooltip(event: MouseEvent, row: IndicatorRow) {
-    let tooltipProvider = this.ftHelperService.newRecentTrendsTooltip();
-    this.currentTooltipHtml = tooltipProvider.getTooltipByData(row.trendMarkerResult);
-    this.tooltip.displayHtml(event, this.currentTooltipHtml);
+    const tooltipProvider = this.ftHelperService.newRecentTrendsTooltip();
+    this.currentTrendsTooltipHtml = tooltipProvider.getTooltipByData(row.trendMarkerResult);
+    this.tooltipHelper.displayHtml(event, this.currentTrendsTooltipHtml);
   }
 
   public hideTooltip() {
-    this.tooltip.hide();
-    this.currentTooltipHtml = null;
+    this.tooltipHelper.hide();
+    this.currentTrendsTooltipHtml = null;
   }
 
   public repositionTooltip(event: MouseEvent) {
-    this.tooltip.reposition(event);
+    this.tooltipHelper.reposition(event);
   }
 }
 
@@ -527,9 +671,50 @@ export class IndicatorRow {
   benchmarkData: CoreDataSet;
   stats: IndicatorStatsPercentiles = null;
   statsF: IndicatorStatsPercentilesFormatted = null;
-  haveRequiredValuesForSpineChart: boolean = false;
+  haveRequiredValuesForSpineChart = false;
   comparisonConfig: ComparisonConfig;
   rootIndex: number;
   trendMarkerResult: TrendMarkerResult;
   area: Area;
+  nationalData: CoreDataSet;
+  subnationalData: CoreDataSet;
+}
+
+export class SpineChartHeaderLabeller {
+
+  public spineChartMinMaxLabelId: number;
+  public maxHeader: string;
+  public minHeader: string;
+
+  constructor(private groupRoots: GroupRoot[]) {
+    this.getLabels();
+  }
+
+  getLabels() {
+
+    const anyLowestHighest = this.isPolarity(PolarityIds.NotApplicable) || this.isPolarity(PolarityIds.BlueOrangeBlue);
+
+    const anyWorstBest = this.isPolarity(PolarityIds.RAGHighIsGood) || this.isPolarity(PolarityIds.RAGLowIsGood);
+
+    if (anyWorstBest && anyLowestHighest) {
+      // Worst / Lowest -> Best / Highest
+      this.minHeader = SpineChartMinMaxLabelDescription.WorstLowest;
+      this.maxHeader = SpineChartMinMaxLabelDescription.BestHighest;
+      this.spineChartMinMaxLabelId = SpineChartMinMaxLabel.WorstLowestAndBestHighest;
+    } else if (anyWorstBest) {
+      // Worst  -> Best
+      this.minHeader = SpineChartMinMaxLabelDescription.Worst;
+      this.maxHeader = SpineChartMinMaxLabelDescription.Best;
+      this.spineChartMinMaxLabelId = SpineChartMinMaxLabel.WorstAndBest;
+    } else {
+      // Lowest ->  Highest
+      this.minHeader = SpineChartMinMaxLabelDescription.Lowest;
+      this.maxHeader = SpineChartMinMaxLabelDescription.Highest;
+      this.spineChartMinMaxLabelId = SpineChartMinMaxLabel.LowestAndHighest;
+    }
+  }
+
+  isPolarity(id: number): boolean {
+    return this.groupRoots.findIndex(x => x.PolarityId === id) > -1;
+  }
 }

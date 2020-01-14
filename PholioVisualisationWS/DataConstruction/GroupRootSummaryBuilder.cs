@@ -18,7 +18,7 @@ namespace PholioVisualisation.DataConstruction
             _groupRootSummaries = new List<GroupRootSummary>();
         }
 
-        public IList<GroupRootSummary> BuildForIndicatorIds(List<int> indicatorIds, int? profileId)
+        public IList<GroupRootSummary> BuildForIndicatorIds(List<int> indicatorIds, int profileId)
         {
             foreach (var indicatorId in indicatorIds)
             {
@@ -26,16 +26,16 @@ namespace PholioVisualisation.DataConstruction
                     _groupDataReader.GetGroupingsByIndicatorId(indicatorId);
 
                 // Filter groupings by profile
-                if (profileId.HasValue)
+                if (profileId != ProfileIds.Undefined)
                 {
-                    var groupIds = _groupDataReader.GetGroupIdsOfProfile(profileId.Value);
+                    var groupIds = _groupDataReader.GetGroupIdsOfProfile(profileId);
                     groupings = groupings.Where(x => groupIds.Contains(x.GroupId)).ToList();
                 }
 
                 // Distinct grouping by sex, age, indicator ID
                 var distinctGroupings = GetDistinctGroupings(groupings);
 
-                AddSummariesOfGroupings(distinctGroupings);
+                AddSummariesOfGroupings(distinctGroupings, profileId);
             }
 
             return _groupRootSummaries;
@@ -49,7 +49,7 @@ namespace PholioVisualisation.DataConstruction
                 IList<Grouping> groupings =_groupDataReader
                     .GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(groupId, areaTypeId);
 
-                AddSummariesOfGroupings(groupings);
+                AddSummariesOfGroupings(groupings, profileId);
             }
             return _groupRootSummaries;
         }
@@ -65,13 +65,13 @@ namespace PholioVisualisation.DataConstruction
             return uniqueGroupings;
         }
 
-        private void AddSummariesOfGroupings(IList<Grouping> groupings)
+        private void AddSummariesOfGroupings(IList<Grouping> groupings, int profileId)
         {
-            GroupRootBuilder rootBuilder = new GroupRootBuilder();
+            GroupRootBuilder rootBuilder = new GroupRootBuilder(_groupDataReader);
             IList<GroupRoot> roots = rootBuilder.BuildGroupRoots(groupings);
 
             IndicatorMetadataCollection metadataCollection =
-                _metadataRepo.GetIndicatorMetadataCollection(groupings);
+                _metadataRepo.GetIndicatorMetadataCollection(groupings, profileId);
 
             foreach (var groupRoot in roots)
             {

@@ -12,7 +12,7 @@ namespace Fpm.MainUITest.Helpers
         private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
         Document docA = new Document
         {
-            ProfileId = ProfileIds.Diabetes,
+            ProfileId = ProfileIds.DevelopmentProfileForTesting,
             FileName = "A.doc",
             FileData = new byte[] { 0x5, 0x6, 0x7, 0x8, 0x9 },
             UploadedBy = UserNames.Doris,

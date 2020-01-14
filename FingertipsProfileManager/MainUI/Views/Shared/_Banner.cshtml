@@ -1,13 +1,19 @@
 ﻿@using Fpm.MainUI.Helpers
+
+@{
+    var currentUser = UserDetails.CurrentUser();
+}
+
 <div id="phe-header" class="standardWidth clearfix">
     <a href="https://www.gov.uk/government/organisations/public-health-england" title="Public Health England">
         <img src="/images/PHE30.png" height="30px" />
     </a>
 </div>
 <div id="header" class="clearfix">
-    @if (UserDetails.CurrentUser().IsAdministrator)
-    {
-        <nav class="standardWidth clearfix">
+
+    <nav class="standardWidth clearfix">
+        @if (currentUser.IsAdministrator)
+        {
             <small>@FusStatus.Message() <a href="http://londevapppor01.phe.gov.uk:1234/fingertips-logs/fus.txt" target="_blank">FUS log</a></small>
             <ul style="float: right;">
                 <li class="site-link">@Html.ActionLink("Profiles", "ProfileIndex", "Profile")</li>
@@ -16,14 +22,19 @@
                 <li class="site-link">@Html.ActionLink("Exceptions", "ExceptionIndex", "ExceptionLog")</li>
                 <li class="site-link">@Html.ActionLink("Admin", "Admin", "Admin")</li>
             </ul>
-        </nav>
-    }
+        }
+
+        <ul style="float: right;">
+            <li id="your-profiles" class="site-link">@Html.ActionLink("Your profiles", "ProfilesEditableByUser", "Profile")</li>
+        </ul>
+    </nav>
+
     <nav id="site-links-box" class="standardWidth clearfix">
         <span id="app-title">Fingertips Profile Manager</span>
         <ul style="float: right;">
             <li class="site-link">@Html.ActionLink("Profiles", "EditProfileNonAdmin", "Profile", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link">@Html.ActionLink("Indicators", "ListIndicatorsInProfile", "ProfilesAndIndicators", new { profileId = ViewBag.ProfileId }, new { })</li>
-            <li class="site-link"><a href="/upload">Upload data</a></li>
+            <li class="site-link">@Html.ActionLink("Upload data", "UploadIndex", "Upload")</li>
             <li class="site-link">@Html.ActionLink("Documents", "DocumentsIndex", "Documents", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link">@Html.ActionLink("Content", "ContentIndex", "Content", new { profileId = ViewBag.ProfileId }, new { })</li>
             <li class="site-link">@Html.ActionLink("Look up tables", "Index", "LookUpTables")</li>
@@ -46,11 +57,11 @@
                         <a href="/reports">Reports</a>
                     </li>
                     <li class="site-link">
-                        <a href="/userfeedback">User Feedback</a>
+                        @Html.ActionLink("User Feedback", "UserFeedbackIndex", "UserFeedback")
                     </li>
                 </ul>
             </li>
-            
+
         </ul>
     </nav>
     @if (CommonUtilities.IsReadOnlyMode())

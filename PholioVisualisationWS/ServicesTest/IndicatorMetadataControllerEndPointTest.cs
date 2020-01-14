@@ -32,7 +32,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetIndicatorMetadata_For_Indicator_Ids()
         {
             var url = "indicator_metadata/by_indicator_id?" +
-                      "indicator_ids=" + IndicatorIds.AdultSmokingPrevalence +
+                      "indicator_ids=" + IndicatorIds.AdultSmokingRelatedDeaths +
                       "&restrict_to_profile_ids=" + ProfileIds.Tobacco;
             byte[] data = GetData(url);
 

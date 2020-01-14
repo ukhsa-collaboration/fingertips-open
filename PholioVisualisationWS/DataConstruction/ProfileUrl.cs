@@ -26,6 +26,11 @@ namespace PholioVisualisation.DataConstruction
                     return GetPracticeProfilesUrl();
                 }
 
+                if (_profile.ProfileId == ProfileIds.PublicHealthDashboardLongerLives)
+                {
+                    return GetPublicHealthDashboardLongerLivesUrl();
+                }
+
                 var sb = new StringBuilder();
                 sb.Append(Protocol)
                     .Append(Host)
@@ -47,6 +52,18 @@ namespace PholioVisualisation.DataConstruction
             sb.Append(Protocol)
                 .Append(Host)
                 .Append("/profile/general-practice/data");
+            return sb.ToString();
+        }
+
+        private string GetPublicHealthDashboardLongerLivesUrl()
+        {
+            // e.g. https://testhealthierlives.phe.org.uk/topic/public-health-dashboard/map-with-data#/gid/1938133145
+
+            var sb = new StringBuilder();
+            sb.Append(Protocol)
+                .Append(Host)
+                .Append("/topic/public-health-dashboard/map-with-data#/gid/")
+                .Append(_profile.GroupId);
             return sb.ToString();
         }
 

@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PholioVisualisation.Parsers;
 using PholioVisualisation.PholioObjects;
 
@@ -10,7 +9,7 @@ namespace PholioVisualisation.DataConstruction
     /// </summary>
     public class IndicatorMetadataSpecialCase
     {
-        private IDictionary<string, string> _parameters;
+        private readonly IDictionary<string, string> _parameters;
 
         public IndicatorMetadataSpecialCase(string specialCaseString)
         {
@@ -32,6 +31,11 @@ namespace PholioVisualisation.DataConstruction
             return _parameters.ContainsKey(IndicatorMetadataSpecialCases.InequalityData_OmitAgeId);
         }
 
+        public bool ShouldUseForAverageLineOnChart()
+        {
+            return _parameters.ContainsKey(IndicatorMetadataSpecialCases.InequalityChartAverageLine_UseAgeId);
+        }
+
         public int CategoryTypeId
         {
             get { return int.Parse(_parameters[IndicatorMetadataSpecialCases.InequalityBenchmark_ForCategoryTypeId]); }
@@ -45,6 +49,11 @@ namespace PholioVisualisation.DataConstruction
         public int AgeIdToOmit
         {
             get { return int.Parse(_parameters[IndicatorMetadataSpecialCases.InequalityData_OmitAgeId]); }
+        }
+
+        public int ChartAverageLineAgeId
+        {
+            get { return int.Parse(_parameters[IndicatorMetadataSpecialCases.InequalityChartAverageLine_UseAgeId]); }
         }
     }
 }

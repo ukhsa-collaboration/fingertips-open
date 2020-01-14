@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
-using IndicatorsUI.DomainObjects;
+﻿using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUISeleniumTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
+using System.Linq;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {

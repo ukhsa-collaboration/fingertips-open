@@ -144,10 +144,10 @@ namespace PholioVisualisation.DataAccess
             return (double)o;
         }
 
-        public Dictionary<string, float> GetPracticeCodeToValidValueMap(int indicatorId, TimePeriod period, int sexId)
+        public Dictionary<string, float> GetPracticeCodeToValidValueMap(int indicatorId, TimePeriod period, int sexId, int areaTypeId)
         {
             string sql = string.Format(SqlGetPracticeCodeToValidValueMap,
-                indicatorId, sexId, period.Year, period.YearRange, period.Quarter, period.Month, AreaTypeIds.GpPractice);
+                indicatorId, sexId, period.Year, period.YearRange, period.Quarter, period.Month, areaTypeId);
 
             DataTable table = ExecuteSelectSqlString(sql);
 

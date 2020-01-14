@@ -26,6 +26,7 @@
     <IISExpressUseClassicPipelineMode />
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
     <UseGlobalApplicationHostFile />
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -157,10 +158,6 @@
     <ProjectReference Include="..\Formatting\Formatting.csproj">
       <Project>{EE646860-6872-48B7-B67F-B2D717953139}</Project>
       <Name>Formatting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PdfData\PdfData.csproj">
-      <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
-      <Name>PdfData</Name>
     </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>

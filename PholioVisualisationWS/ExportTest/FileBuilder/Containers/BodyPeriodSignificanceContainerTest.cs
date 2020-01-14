@@ -47,7 +47,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             var significance = bodyPeriodSignificanceContainer.GetSignificance(new IndicatorMetadata(), _comparisionCoreDataSet,_comparision,new Area());
@@ -61,7 +61,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, null);
             var significance = bodyPeriodSignificanceContainer.GetSignificance(new IndicatorMetadata(), _comparisionCoreDataSet, _comparision, new Area());
@@ -75,7 +75,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             var significance = bodyPeriodSignificanceContainer.GetSignificance(new CategoryComparisonManager(new QuintilesComparer(), _comparision), _comparision, new IndicatorMetadata(), _comparisionCoreDataSet);
@@ -89,7 +89,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var comparisionCoreDataSetLocal = new CoreDataSet { AgeId = Male, CategoryTypeId = CategoryTypeUndefined, AreaCode = "areaTest" };
             var comparisionLocal = new List<CoreDataSet> { comparisionCoreDataSetLocal };
-            var coreDataSet = BodyPeriodSignificanceContainer.GetCoreDataForComparison(comparisionLocal);
+            var coreDataSet = BodyPeriodSignificanceContainer.GetCoreDataForComparison(comparisionLocal, CategoryTypeUndefined);
 
             Assert.IsTrue(coreDataSet.Count == 1);
         }
@@ -99,7 +99,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var comparisionCoreDataSetLocal = new CoreDataSet { AgeId = Male, CategoryTypeId = CategoryDeprivationDecileGp2010, AreaCode = "areaTest" };
             var comparisionLocal = new List<CoreDataSet> { comparisionCoreDataSetLocal };
-            var coreDataSet = BodyPeriodSignificanceContainer.GetCoreDataForComparison(comparisionLocal);
+            var coreDataSet = BodyPeriodSignificanceContainer.GetCoreDataForComparison(comparisionLocal, CategoryTypeUndefined);
 
             Assert.IsTrue(coreDataSet.Count == 0);
         }
@@ -109,14 +109,13 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area());
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             IArea parentArea;
-            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance( new Dictionary<string, Area>(), _categoryComparisonManager , _comparision,
-                                                                                                 new IndicatorMetadata(), _comparisionCoreDataSet, true, out parentArea);
+            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(_categoryComparisonManager , _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, true, out parentArea);
             Assert.IsNotNull(significance);
             Assert.AreEqual(significance, Significance.None);
             Assert.IsNotNull(parentArea);
@@ -127,12 +126,17 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
+            var area = new Area { AreaTypeId = 1, Code = "areaTest" };
+
+            _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area());
+            _areasReaderMock.Setup(x => x.GetChildAreas(It.IsAny<string>(), It.IsAny<int>())).Returns(new List<IArea> { area });
+            _areasReaderMock.Setup(x => x.GetParentAreasFromChildAreaId(It.IsAny<int>(), It.IsAny<int>())).Returns(new Dictionary<string, Area>());
+            exportAreaHelper.Init();
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             IArea parentArea;
-            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(new Dictionary<string, Area>(), null, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet,
-                                                                                                false, out parentArea);
+            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance( null, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, false, out parentArea);
 
             Assert.IsNotNull(significance);
             Assert.AreEqual(significance, Significance.None);
@@ -144,12 +148,18 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
-            var dictionaryAreas = new Dictionary<string, Area> { { "areaTest", new Area() } };
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
+            var area = new Area { AreaTypeId = 1, Code = "areaTest" };
+            var dictionaryAreas = new Dictionary<string, Area> { { "areaTest", area } };
+
+            _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area());
+            _areasReaderMock.Setup(x => x.GetChildAreas(It.IsAny<string>(), It.IsAny<int>())).Returns(new List<IArea> { area });
+            _areasReaderMock.Setup(x => x.GetParentAreasFromChildAreaId(It.IsAny<int>(), It.IsAny<int>())).Returns(dictionaryAreas);
+            exportAreaHelper.Init();
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             IArea parentArea;
-            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(dictionaryAreas, _categoryComparisonManager, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, false, out parentArea);
+            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(_categoryComparisonManager, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, false, out parentArea);
 
             Assert.IsNotNull(significance);
             Assert.AreEqual(significance, Significance.None);
@@ -161,14 +171,19 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
-            var dictionaryAreas = new Dictionary<string, Area> {{"areaTest", new Area()}};
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
+            var area = new Area {AreaTypeId = 1, Code = "areaTest"};
+            var dictionaryAreas = new Dictionary<string, Area> {{"areaTest", area } };
 
+            _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area());
+            _areasReaderMock.Setup(x => x.GetChildAreas(It.IsAny<string>(), It.IsAny<int>())).Returns(new List<IArea>{ area });
+            _areasReaderMock.Setup(x => x.GetParentAreasFromChildAreaId(It.IsAny<int>(), It.IsAny<int>())).Returns(dictionaryAreas);
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Best);
+            exportAreaHelper.Init();
 
             var bodyPeriodSignificanceContainer = new BodyPeriodSignificanceContainer(exportAreaHelper, _indicatorComparerMock.Object);
             IArea parentArea;
-            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(dictionaryAreas, null, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, false, out parentArea);
+            var significance = bodyPeriodSignificanceContainer.GetSubNationalParentSignificance(null, _comparision, new IndicatorMetadata(), _comparisionCoreDataSet, false, out parentArea);
 
             Assert.IsNotNull(significance);
             Assert.AreEqual(significance, Significance.Best);
@@ -180,7 +195,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters {ParentAreaCode = AreaCodes.England};
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Best);
 
@@ -196,7 +211,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.None);
 
@@ -212,7 +227,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Better);
 
@@ -228,7 +243,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Same);
 
@@ -244,7 +259,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Worse);
 
@@ -260,7 +275,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             var areaFactory = new AreaFactory(_areasReaderMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areasReaderMock.Object, indicatorExportParameters);
 
             _indicatorComparerMock.Setup(x => x.Compare(It.IsAny<CoreDataSet>(), It.IsAny<CoreDataSet>(), It.IsAny<IndicatorMetadata>())).Returns(Significance.Worst);
 

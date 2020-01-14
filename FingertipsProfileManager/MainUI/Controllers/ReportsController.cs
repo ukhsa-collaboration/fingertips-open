@@ -6,7 +6,7 @@ namespace Fpm.MainUI.Controllers
     {
         // GET: Reports
         [Route("reports")]
-        public ActionResult Index()
+        public ActionResult ReportsIndex()
         {
             return View();
         }

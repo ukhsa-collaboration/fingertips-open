@@ -48,6 +48,9 @@
   <ItemGroup>
     <Compile Include="ContentItem.cs" />
     <Compile Include="Document.cs" />
+    <Compile Include="Email.cs" />
+    <Compile Include="EmailTemplates\ResetPasswordParameters.cs" />
+    <Compile Include="EmailTemplates\VerificationEmailParameters.cs" />
     <Compile Include="LongerLivesProfileDetails.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="NeighbourType.cs" />

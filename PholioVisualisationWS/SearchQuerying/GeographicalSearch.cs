@@ -60,14 +60,12 @@ namespace PholioVisualisation.SearchQuerying
             var isPostcode = userSearch.ContainsAnyNumbers;
 
             // Setup the fields to search through
-            BooleanQuery finalQuery = isPostcode
+            var finalQuery = isPostcode
                 ? GetPostcodeQuery(userSearch.SearchText, FieldNames.Postcode)
                 : GetPlaceNameQuery(userSearch, polygonAreaTypeId);
 
             // Perform the search
-            var directory = FSDirectory.Open(new DirectoryInfo(
-                Path.Combine(ApplicationConfiguration.Instance.SearchIndexDirectory, "placePostcodes")));
-            var searcher = new IndexSearcher(directory, true);
+            var searcher = new IndexSearcher(GetIndexDirectory("placePostcodes"), true);
 
             //Add the sorting parameters
             var sortBy = new Sort(
@@ -75,17 +73,17 @@ namespace PholioVisualisation.SearchQuerying
                 );
             var docs = searcher.Search(finalQuery, null, ShortResultCount, sortBy);
 
-            List<GeographicalSearchResult> searchResults = new List<GeographicalSearchResult>();
-            int resultCount = docs.ScoreDocs.Length;
-            for (int i = 0; i < resultCount; i++)
+            var searchResults = new List<GeographicalSearchResult>();
+            var resultCount = docs.ScoreDocs.Length;
+            for (var i = 0; i < resultCount; i++)
             {
-                ScoreDoc scoreDoc = docs.ScoreDocs[i];
+                var scoreDoc = docs.ScoreDocs[i];
 
-                Document doc = searcher.Doc(scoreDoc.Doc);
+                var doc = searcher.Doc(scoreDoc.Doc);
 
                 var geographicalSearchResult = NewGeographicalSearchResult(doc, polygonAreaTypeId, isPostcode);
 
-                CheckPolygonAreaCodeIsDefined(polygonAreaTypeId, geographicalSearchResult);
+                if (!IsDefinedCheckPolygonAreaCode(geographicalSearchResult)) continue;
 
                 AssignEastingAndNorthing(doc, geographicalSearchResult);
 
@@ -135,13 +133,9 @@ namespace PholioVisualisation.SearchQuerying
             }
         }
 
-        private static void CheckPolygonAreaCodeIsDefined(int childAreaTypeId, GeographicalSearchResult geographicalSearchResult)
+        private static bool IsDefinedCheckPolygonAreaCode(GeographicalSearchResult geographicalSearchResult)
         {
-            if (geographicalSearchResult.PolygonAreaCode == null)
-            {
-                throw new FingertipsException(string.Format(
-                    "Area type id not supported for search: {0}", childAreaTypeId));
-            }
+            return geographicalSearchResult.PolygonAreaCode != null;
         }
 
         private void AssignEastingAndNorthing(Document doc, GeographicalSearchResult pp)
@@ -212,16 +206,37 @@ namespace PholioVisualisation.SearchQuerying
         {
             string text = rawSearchText.ToLower().Trim();
             List<string> terms = new List<string>();
+
+            // Ignore anything after a comma, e.g. "DE74 2AD, West Leicestershire CCG"
+            if (text.Contains(","))
+            {
+                var comaIndex = text.IndexOf(",");
+                var relevantStringPart = text.Substring(0, comaIndex);
+                var postcodeTerms = SplitPostcode(relevantStringPart);
+                terms.AddRange(postcodeTerms);
+                return terms;
+            }
+
             if (text.Contains(" "))
             {
-                var bits = text.Split(' ');
-                terms.Add(bits.First());
-                terms.Add(bits.Last() + "*");
+                var postcodeTerms = SplitPostcode(text);
+                terms.AddRange(postcodeTerms);
+                return terms;
             }
-            else
-            {
-                terms.Add(text);
-            }
+
+            terms.Add(text);
+            
+            return terms;
+        }
+
+        private static List<string> SplitPostcode(string postCode)
+        {
+            List<string> terms = new List<string>();
+
+            var bits = postCode.Split(' ');
+            terms.Add(bits.First());
+            terms.Add(bits.Last() + "*");
+
             return terms;
         }
     }

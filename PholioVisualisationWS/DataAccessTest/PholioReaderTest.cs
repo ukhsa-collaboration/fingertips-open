@@ -180,13 +180,6 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
-        public void TestKeyMessageOverride()
-        {
-            var messages = Reader().GetKeyMessageOverrides(ProfileIds.Phof, AreaCodes.CountyUa_Cambridgeshire);
-            Assert.AreEqual(0, messages.Count);
-        }
-
-        [TestMethod]
         public void TestGetComparatorConfidence()
         {
             PholioReader reader = Reader();

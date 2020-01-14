@@ -1,0 +1,125 @@
+<div class="row" id="trends-container" style="display:none;">
+  <div class="col">
+    <div class="row">
+      <div class="col">
+        <ft-legend [legendConfig]="legendConfig" [showRecentTrends]="showRecentTrends"></ft-legend>
+      </div>
+    </div>
+    <div id="trend-tabs" class="row tab-options clearfix">
+      <div class="col">
+        <!-- Trends for options -->
+        <div *ngIf="selectedAreaTypeId !== 15">
+          <span>Trends for </span>
+          <button id="trends-tab-option-0" [class]="areaButtonClass" (click)="isSingleArea=true;selectedArea()"
+            [innerHTML]="selectedAreaName"></button>
+          <button id="trends-tab-option-1" [class]="regionButtonClass" (click)="isSingleArea=false;selectedArea()"
+            [innerHTML]="formattedselectedParentName"></button>
+        </div>
+        <!-- Single or all indicators options -->
+        <div *ngIf="isSingleArea">
+          <span>Display </span>
+          <button id="trends-tab-option-2" [class]="selectedIndicatorClass" (click)="selectedIndicator(true)">Selected
+            indicator
+          </button>
+          <button id="trends-tab-option-3" [class]="allIndicatorsClass" (click)="selectedIndicator(false)">All
+            indicators
+          </button>
+        </div>
+        <!-- Sort multiple charts options -->
+        <div *ngIf="isSingleArea==false">
+          <span>Sort charts by:</span>
+          <button id="trends-tab-option-4" [class]="sortByAlphabeticalClass"
+            (click)="sortSmallMultipleTrendCharts(0)">A-Z</button>
+          <button id="trends-tab-option-5" [class]="sortByValueClass"
+            (click)="sortSmallMultipleTrendCharts(1)">Value</button>
+          <button id="trends-tab-option-6" [class]="sortByRankClass" (click)="sortSmallMultipleTrendCharts(2)"
+            *ngIf="isNearestNeighbours">Rank</button>
+        </div>
+      </div>
+    </div>
+    <div class="row area-container" *ngIf="!showAllAreasInRegion">
+      <div class="col">
+        <div class="row" *ngFor="let data of finalData; let i = index">
+          <div class="col">
+            <!-- Trend header -->
+            <div class="row">
+              <div class="col data-header-container" [ngClass]="{'trend-top-margin': i > 0}">
+                <div class="data-main-header">
+                  <a class="trend-link" title="More about this indicator" (click)="goToMetadataPage(i)"
+                    [innerHtml]="data.indicatorName"></a>
+                </div>
+                <span class="new-data-badge-container" *ngIf="data.isNewData">
+                  &nbsp;
+                  <span class="badge badge-success">New data</span>
+                </span>
+                <div class="data-main-header sub-content" [innerHtml]="data.areaName">
+                </div>
+                <div class="data-secondary-header" [innerHtml]="data.unit">
+                </div>
+              </div>
+            </div>
+            <!-- Export links -->
+            <div class="row">
+              <div class="col">
+                <div class="export-chart-box">
+                  <a id="export-link-trend-chart" class="export-link" (click)="exportChart(i)">Export chart as image</a>
+                  <a id="showCI0" class="show-ci" (click)="showErrorBar()" [innerHtml]="confidenceIntervalsLabel"></a>
+                </div>
+                <div class="export-chart-box-csv">
+                  <a id="export-link-csv-trend" class="export-link-csv"
+                    (click)="exportTableAsCsv(data.indicatorId)">Export table as CSV file
+                  </a>
+                </div>
+              </div>
+            </div>
+            <!-- Single trend chart -->
+            <div class="row">
+              <div id="chart-{{i}}" class="col-md-6">
+                <ft-trend-chart [trendData]="data.trendData" (emitAreaCodeSelected)="updateData($event)"
+                  (emitPeriodSelected)="enableHover($event)" (emitChart)="updateChartList($event)"></ft-trend-chart>
+              </div>
+              <!-- Trend table -->
+              <div class="col-md-6">
+                <ft-trend-table [trendRows]="data.trendRows" [trendSource]="data.trendSource"
+                  [selectedAreaTypeId]="selectedAreaTypeId" [selectedParentName]="selectedParentName"
+                  [showRecentTrends]="showRecentTrends" (emitRowHovered)="enableRowHover($event)"></ft-trend-table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row region-container" *ngIf="showAllAreasInRegion">
+      <div class="col">
+        <div class="row" *ngFor="let data of finalData; let first=first">
+          <div class="col data-header-container" *ngIf="first">
+            <div class="data-main-header">
+              <a class="trend-link" title="More about this indicator" (click)="goToMetadataPage(i)"
+                [innerHtml]="data.indicatorName"></a>
+            </div>
+            <span class="new-data-badge-container" [innerHtml]="data.newDataBadge"></span>
+            <div class="data-secondary-header" [innerHtml]="data.unit">
+            </div>
+          </div>
+        </div>
+        <!-- Multiple trend charts -->
+        <div class="row">
+          <div class="col">
+            <div style="float: left;" *ngFor="let data of finalData; let i=index">
+              <div class="sparkline-box sparkline-indicator" (click)="showBigArea(data.areaCode);">
+                <div class="multi-trend-header">
+                  <span [innerHtml]="data.areaName"></span>
+                </div>
+                <div>
+                  <ft-trend-chart [trendData]="data.trendData" (emitPeriodSelected)="enableHover($event)">
+                  </ft-trend-chart>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>
+</div>

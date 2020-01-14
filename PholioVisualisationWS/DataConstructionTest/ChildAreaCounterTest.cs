@@ -40,8 +40,10 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestCountryAreaCount()
         {
             // Arrange
+            var areaCode = AreaCodes.Gor_EastMidlands;
             var parentArea = new Mock<IArea>(MockBehavior.Strict);
             parentArea.Setup(x => x.IsCountry).Returns(true);
+            parentArea.Setup(x => x.Code).Returns(areaCode);
 
             // Act
             _areasReader.Setup(x => x.GetAreaCountForAreaType(ChildAreaTypeId))

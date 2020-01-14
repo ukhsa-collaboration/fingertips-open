@@ -1,8 +1,4 @@
-﻿@using IndicatorsUI.DataAccess
-<h2 class="tab">
+﻿<h2 class="tab">
     <a id="indicator-list-button" class="tab-selected">Your indicator lists</a>
-    @if (AppConfig.Instance.IsFeatureActive("yourAreaListsEnabled"))
-    {
-        <a href="area-list" id="area-list-button" class="tab-not-selected">Your area lists</a>
-    }
+    <a href="area-list" id="area-list-button" class="tab-not-selected">Your area lists</a>
 </h2>

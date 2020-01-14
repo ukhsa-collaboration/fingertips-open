@@ -1,0 +1,65 @@
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
+
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+
+    ViewBag.Title = "FPM - Create Indicator";
+}
+
+@Scripts.Render("~/js/chosen.jquery.min.js")
+@Scripts.Render("~/js/PageIndicatorEdit.js")
+@Scripts.Render("~/js/tiny_mce/tinymce.min.js")
+@Scripts.Render("~/js/tiny_mce/jquery.tinymce.min.js")
+@Scripts.Render("~/js/select2.min.js")
+
+<link href="@(AppConfig.CssPath)chosen/chosen.min.css" rel="stylesheet" type="text/css" />
+
+<script type="text/javascript">
+    $(function () {
+        $("#tabs").tabs();
+    });
+</script>
+
+<div id="tabs" class="row col standardWidth">
+    @using (Html.BeginForm("SaveIndicator", "Indicator", FormMethod.Post, new { @id = "create-indicator-form" }))
+    {
+        @Html.HiddenFor(x => x.IsEditAction)
+        @Html.HiddenFor(x => x.DomainSequence)
+        @Html.HiddenFor(x => x.DestinationProfileUrlKey)
+        @Html.HiddenFor(x => x.IndicatorMetadata.IndicatorId)
+        @Html.HiddenFor(x => x.IndicatorMetadataTextValue.Id)
+        @Html.HiddenFor(x => x.IndicatorMetadata.Status)
+        @Html.HiddenFor(x => x.IndicatorMetadata.DestinationProfileId)
+
+        @Html.Partial("_IndicatorHeader")
+        <ul>
+            <li id="tab1" class="section-tab"><a class="sub-title-error" href="#tabs-1">1 - Indicator Metadata Text</a></li>
+            <li id="tab2" class="section-tab sub-title-error"><a href="#tabs-2">2 - Indicator Metadata Other</a></li>
+            <li id="tab3" class="section-tab sub-title-error"><a href="#tabs-3">3 - Profile Data Selection</a></li>
+            <li id="tab4" class="section-tab"><a class="sub-title-error" href="#tabs-4">4 - Internal Metadata</a></li>
+            <li id="tab4" class="section-tab"><a class="sub-title-error" href="#tabs-5">5 - Metadata Review</a></li>
+        </ul>
+        <div id="tabs-1">
+            @Html.Partial("_IndicatorMetadataText")
+        </div>
+        <div id="tabs-2">
+            @Html.Partial("_IndicatorMetadataOther")
+        </div>
+        <div id="tabs-3">
+            @Html.Partial("_ProfileDataSelection")
+        </div>
+        <div id="tabs-4">
+            @Html.Partial("_InternalMetadata")
+        </div>
+        <div id="tabs-5">
+            @Html.Partial("_IndicatorMetadataReview")
+        </div>
+
+        @Html.Partial("_SaveConfirmation")
+    }
+</div>
+@Html.Partial("_EditMetaDataText")
+<div class="a-modal"></div>

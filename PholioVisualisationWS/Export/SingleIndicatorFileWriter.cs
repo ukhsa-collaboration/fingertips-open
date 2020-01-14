@@ -3,6 +3,7 @@ using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export.File;
+using PholioVisualisation.Export.FileBuilder.Containers;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
@@ -17,27 +18,22 @@ namespace PholioVisualisation.Export
         private LookUpManager _lookUpManager;
         private TrendMarkerLabelProvider _trendMarkerLabelProvider;
         private SignificanceFormatter _significanceFormatter;
-        private readonly IndicatorExportParameters _parameters;
-        private IDateChangeHelper _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(), new CoreDataAuditRepository(), new CoreDataSetRepository());
+        private readonly CsvBuilderAttributesForBodyContainer _parameters;
+        private IDateChangeHelper _dateChangeHelper = new DateChangeHelper(new MonthlyReleaseHelper(),
+            new CoreDataAuditRepository(), new CoreDataSetRepository());
         private ProfileConfig _profileConfig;
 
-        // Indicator specific varibles
+        // Indicator specific variables
         private IndicatorMetadata _indicatorMetadata;
         private readonly Dictionary<string, IndicatorDateChange> _timePeriodToDataChanges = new Dictionary<string, IndicatorDateChange>();
         private TargetComparer _targetComparer;
 
-        private const string UnavailableInfo = "Unavailable info";
-
-        public SingleIndicatorFileWriter(int indicatorId, IndicatorExportParameters parameters)
+        public SingleIndicatorFileWriter(int indicatorId, CsvBuilderAttributesForBodyContainer parameters)
         {
-            _fileName = CacheFileNamer.GetIndicatorFileName(
-                indicatorId, parameters.ParentAreaCode,
-                parameters.ParentAreaTypeId,
-                parameters.ChildAreaTypeId,
-                parameters.ProfileId);
+            _fileName = CacheFileNamer.GetIndicatorFileName(indicatorId, parameters);
 
             _parameters = parameters;
-            _profileConfig = ReaderFactory.GetProfileReader().GetProfileConfig(_parameters.ProfileId);
+            _profileConfig = ReaderFactory.GetProfileReader().GetProfileConfig(_parameters.GeneralParameters.ProfileId);
         }
 
         public void Init(LookUpManager lookUpManager, TrendMarkerLabelProvider trendMarkerLabelProvider,
@@ -61,26 +57,49 @@ namespace PholioVisualisation.Export
             return null;
         }
 
-        public byte[] GetFileContent()
+        public void SaveFile(byte[] contents)
         {
-            var contents = _csvWriter.WriteAsBytes();
             if (UseFileCache)
             {
                 _exportFileManager.SaveFile(contents);
             }
+        }
 
+        public byte[] GetFileContent()
+        {
+            var contents = _csvWriter.WriteAsBytes();
             return contents;
         }
 
         public void WriteData(CoreDataSet data, string timePeriod,
             IArea parentArea, TrendMarkerResult trendMarkerResult, Significance comparedToEnglandSignificance,
-            Significance comparedToSubnationalParentSignificance, int? sortableTimePeriod)
+            Significance comparedToSubnationalParentSignificance, int? sortableTimePeriod, Grouping grouping)
         {
             var formatter = new CoreDataSetExportFormatter(_lookUpManager, data);
             var areaCode = data.AreaCode;
 
             var trendMarkerLabel = GetTrendMarkerLabel(trendMarkerResult);
             var includeParentDetails = parentArea != null & Area.IsAreaListArea(parentArea) == false;
+
+            var areaName = string.Empty;
+            var areaTypeName = string.Empty;
+
+            if (NearestNeighbourArea.IsNearestNeighbourAreaCode(areaCode))
+            {
+                areaCode = NearestNeighbourArea.GetAreaCodeFromNeighbourAreaCode(areaCode);
+                areaName = "Nearest neighbours of ";
+            }
+
+            if (ExportAreaHelper.IsCategoryAreaCode(new[] { areaCode }))
+            {
+                var categoryAreaCode = ExportAreaHelper.GetCategoryInequalityFromAreaCode(areaCode, ReaderFactory.GetAreasReader());
+                areaName = _lookUpManager.GetCategoryName(categoryAreaCode.CategoryTypeId, categoryAreaCode.CategoryId);
+            }
+            else
+            {
+                areaName = areaName + _lookUpManager.GetAreaName(areaCode);
+                areaTypeName = _lookUpManager.GetAreaTypeName(areaCode);
+            }
 
             var items = new List<object>
             {
@@ -89,8 +108,8 @@ namespace PholioVisualisation.Export
                 includeParentDetails ? parentArea.Code : "",
                 includeParentDetails ? parentArea.Name: "",
                 areaCode,
-                _lookUpManager.GetAreaName(areaCode),
-                _lookUpManager.GetAreaTypeName(areaCode),
+                areaName,
+                areaTypeName,
                 _lookUpManager.GetSexName(data.SexId),
                 _lookUpManager.GetAgeName(data.AgeId),
                 formatter.CategoryType,
@@ -109,30 +128,58 @@ namespace PholioVisualisation.Export
                 _significanceFormatter.GetLabel(comparedToSubnationalParentSignificance)
             };
 
-            // Add sortable time period only if defined
-            if (sortableTimePeriod.HasValue)
-            {
-                items.Add(sortableTimePeriod);
-            }
+            // Add sortable time period 
+            var sortableTimePeriodText = sortableTimePeriod.HasValue ? sortableTimePeriod.Value.ToString() : string.Empty;
+            items.Add(sortableTimePeriodText);
 
-            // Data Changes 
-            var changeText = _profileConfig != null ? GetDateChange(data, timePeriod).HasDataChangedRecently ? "New data" : string.Empty : UnavailableInfo;
-            
+            // New data
+            var changeText = GetNewDataText(data, timePeriod, grouping.AreaTypeId);
             items.Add(changeText);
 
             // Add target data 
+            var targetText = GetTargetText(data);
+            items.Add(targetText);
+
+            _csvWriter.AddLine(items.ToArray());
+        }
+
+        public bool UseFileCache
+        {
+            get
+            {
+                return ApplicationConfiguration.Instance.UseFileCache;
+            }
+        }
+
+        private string GetTargetText(CoreDataSet data)
+        {
+            string targetText;
             if (_targetComparer != null)
             {
                 var significance = _targetComparer.CompareAgainstTarget(data);
-                items.Add(_significanceFormatter.GetTargetLabel(significance));
+                targetText = _significanceFormatter.GetTargetLabel(significance);
             }
-
-            if (changeText == UnavailableInfo)
+            else
             {
-                items.Add("Notice: If new data field info is required, please add &profile_id=NUMBER at the url end, replacing NUMBER word for the corresponding number of profile id");
+                targetText = string.Empty;
             }
 
-            _csvWriter.AddLine(items.ToArray());
+            return targetText;
+        }
+
+        private string GetNewDataText(CoreDataSet data, string timePeriod, int areaTypeId)
+        {
+            string changeText;
+            if (_profileConfig == null) //TODO use search config instead
+            {
+                changeText = string.Empty;
+            }
+            else
+            {
+                changeText = GetDateChange(data, timePeriod, areaTypeId).HasDataChangedRecently ? "New data" : string.Empty;
+            }
+
+            return changeText;
         }
 
         private string GetTrendMarkerLabel(TrendMarkerResult trendMarkerResult)
@@ -151,20 +198,12 @@ namespace PholioVisualisation.Export
             }
         }
 
-        private bool UseFileCache
-        {
-            get
-            {
-                return ApplicationConfiguration.Instance.UseFileCache;
-            }
-        }
-
-        private IndicatorDateChange GetDateChange(CoreDataSet data, string timePeriod)
+        private IndicatorDateChange GetDateChange(CoreDataSet data, string timePeriod, int areaTypeId)
         {
             if (!_timePeriodToDataChanges.ContainsKey(timePeriod))
             {
-                var dataChange = _dateChangeHelper.GetIndicatorDateChange(data.GetTimePeriod(),
-                    _indicatorMetadata, _profileConfig.NewDataDeploymentCount);
+                var dataChange = _dateChangeHelper.GetIndicatorDateChange(_indicatorMetadata,
+                    _profileConfig.NewDataDeploymentCount, areaTypeId);
 
                 _timePeriodToDataChanges.Add(timePeriod, dataChange);
 

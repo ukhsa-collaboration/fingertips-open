@@ -5,14 +5,17 @@ using PholioVisualisation.Export.FileBuilder.Containers;
 
 namespace PholioVisualisation.Export.FileBuilder.Writers
 { 
-    public class CsvBuilderIndicatorDataBodyWriter : IBuilderBodyWriter<byte[]>
+    public class CsvBuilderIndicatorDataBodyWriter : IBuilderBodyWriter
     {
         private readonly IndicatorDataBodyContainer _indicatorDataBodyContainer;
         public readonly CsvBuilderAttributesForBodyContainer AttributesForBodyContainer;
 
-        public CsvBuilderIndicatorDataBodyWriter(IndicatorMetadataProvider indicatorMetadataProvider, ExportAreaHelper areaHelper, IAreasReader areasReader, CsvBuilderAttributesForBodyContainer attributesForBodyContainer)
+        public CsvBuilderIndicatorDataBodyWriter(IndicatorMetadataProvider indicatorMetadataProvider, 
+            ExportAreaHelper areaHelper, IAreasReader areasReader,
+            CsvBuilderAttributesForBodyContainer attributesForBodyContainer)
         {
-            _indicatorDataBodyContainer = new IndicatorDataBodyContainer(indicatorMetadataProvider, areaHelper, areasReader, attributesForBodyContainer);
+            _indicatorDataBodyContainer = new IndicatorDataBodyContainer(indicatorMetadataProvider, 
+                areaHelper, areasReader, attributesForBodyContainer);
             AttributesForBodyContainer = attributesForBodyContainer;
         }
 

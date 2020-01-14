@@ -71,13 +71,7 @@ namespace PholioVisualisation.DataConstruction
             }
             else
             {
-                IList<string> parentCodes = _areasReader.GetProfileParentAreaCodes(profileId, areaTypeId);
-
-                IList<IArea> areas = parentCodes.Any()
-                    ? _areasReader.GetAreasFromCodes(parentCodes)
-                    : _areasReader.GetAreasByAreaTypeId(areaTypeId);
-
-                Areas = areas.Cast<IArea>().ToList();
+                Areas = _areasReader.GetAreasByAreaTypeId(areaTypeId).ToList();
             }
         }
 

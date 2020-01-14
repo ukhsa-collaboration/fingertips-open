@@ -8,5 +8,6 @@
         public string Parameters { get; set; }
         public string Notes { get; set; }
         public bool IsLive { get; set; }
+        public string AreaTypeIds { get; set; }
     }
 }

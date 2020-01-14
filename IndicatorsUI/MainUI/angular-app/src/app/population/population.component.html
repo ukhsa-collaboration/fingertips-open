@@ -6,4 +6,7 @@
             No population data available for current area type
         </div>
     </div>
+    <div class="standard-width">
+        <ft-population-table [populations]="populations" *ngIf="isAnyData()"></ft-population-table>
+    </div>
 </div>

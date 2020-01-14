@@ -1,8 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReportsService } from 'app/services/reports.service';
+import { ReportsService } from '../../services/reports.service';
 import { ReportListViewComponent } from './report-list-view.component';
-import { HttpService } from 'app/services/http.service';
+import { HttpService } from '../../services/http.service';
 import { Observable, of } from 'rxjs';
 
 describe('ReportListViewComponent', () => {

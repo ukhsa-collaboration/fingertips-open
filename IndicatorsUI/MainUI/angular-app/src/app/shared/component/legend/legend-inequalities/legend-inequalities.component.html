@@ -1,0 +1,58 @@
+<div class="legend-row d-flex flex-row compare-with-benchmark"
+  *ngIf="legendConfig && legendConfig.showComparedToBenchmarkLegend()">
+  <div class="p-2">
+    <i>Compared with benchmark:</i>
+  </div>
+  <!-- RAG5 -->
+  <div class="p-2" *ngIf="legendConfig.showRAG5">
+    <img class="bar keyBar" src="/images/best.png" /> Better 99.8%
+    <img class="bar keyBar" src="/images/better.png" /> Better 95%
+    <img class="bar keyBar" src="/images/same.png" /> Similar
+    <img class="bar keyBar" src="/images/red.png" /> Worse 95%
+    <img class="bar keyBar" src="/images/worst.png" /> Worse 99.8%
+  </div>
+  <!-- RAG3 -->
+  <div class="p-2" *ngIf="legendConfig.showRAG3">
+    <img class="bar keyBar" src="/images/better.png" /> Better
+    <img class="bar keyBar" src="/images/same.png" /> Similar
+    <img class="bar keyBar" src="/images/red.png" /> Worse
+  </div>
+  <!-- BOB5 -->
+  <div class="p-2" *ngIf="legendConfig.showBOB5">
+    <img class="bar keyBar" src="/images/bobLowest.png" /> Lowest
+    <img class="bar keyBar" src="/images/bobLower.png" /> Lower
+    <img class="bar keyBar" src="/images/same.png" /> Similar
+    <img class="bar keyBar" src="/images/bobHigher.png" /> Higher
+    <img class="bar keyBar" src="/images/bobHighest.png" /> Highest
+  </div>
+  <!-- BOB3 -->
+  <div class="p-2" *ngIf="legendConfig.showBOB3">
+    <img class="bar keyBar" src="/images/bobLower.png" /> Lower
+    <img class="bar keyBar" src="/images/same.png" /> Similar
+    <img class="bar keyBar" src="/images/bobHigher.png" /> Higher
+  </div>
+  <!-- Not compared -->
+  <div class="p-2">
+    <img class="bar keyBar" src="/images/lightGrey.png" /> Not compared
+  </div>
+</div>
+
+<!-- No significance colouring -->
+<div class="legend-row d-flex flex-row" *ngIf="legendConfig && legendConfig.showNotComparedOnly()">
+  <div class="p-2">
+    <i>Compared with benchmark:</i>
+  </div>
+  <div class="p-2">
+    <img class="bar keyBar" src="/images/lightGrey.png" /> Not compared
+  </div>
+</div>
+
+<!-- Quintiles: not applicable to inequality data -->
+<div class="legend-row d-flex flex-row" *ngIf="legendConfig && legendConfig.showQuintiles()">
+  <div class="p-2">
+    <i>Quintiles:</i>
+  </div>
+  <div class="p-2">
+    <img class="bar keyBar" src="/images/lightGrey.png" /> Not applicable
+  </div>
+</div>

@@ -18,6 +18,7 @@ namespace PholioVisualisation.ExportTest
 
         public const int GroupId = 5;
         public const int ProfileId = 4;
+        public const int AreaTypeId = 0;
 
         [TestInitialize]
         public void TestInitialize()
@@ -36,7 +37,7 @@ namespace PholioVisualisation.ExportTest
             var indicatorIdListProvider = new IndicatorIdListProvider(_groupDataReader.Object, _groupIdProvider.Object);
 
             // Act: get indicator ids for group
-            var ids = indicatorIdListProvider.GetIdsForGroup(GroupId);
+            var ids = indicatorIdListProvider.GetIdsForGroupAreaType(GroupId, AreaTypeId);
 
             AssertAll(ids);
         }

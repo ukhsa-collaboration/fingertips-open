@@ -1,0 +1,56 @@
+<div class="d-flex flex-row" *ngIf="legendConfig && legendConfig.showComparedToBenchmarkLegend()">
+  <div class="p-2 spine-compared-with-text">
+    <i>Compared with benchmark:</i>
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showRAG5">
+    <img class="key-circle" src="/images/circle_dark_green_mini.png" alt="" /> Better 99.8%&nbsp;
+    <img class="key-circle" src="/images/circle_green_mini.png" alt="" /> Better 95%&nbsp;
+    <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar&nbsp;
+    <img class="key-circle" src="/images/circle_red_mini.png" alt="" /> Worse 95%&nbsp;
+    <img class="key-circle" src="/images/circle_dark_red_mini.png" alt="" /> Worse 99.8%
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showRAG3">
+    <img class="key-circle" src="/images/circle_green_mini.png" alt="" /> Better&nbsp;
+    <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar&nbsp;
+    <img class="key-circle" src="/images/circle_red_mini.png" alt="" /> Worse
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showBOB5">
+    <img class="key-circle" src="/images/circle_cloud_burst_mini.png" alt="" /> Lowest&nbsp;
+    <img class="key-circle" src="/images/circle_darkblue_mini.png" alt="" /> Lower&nbsp;
+    <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar&nbsp;
+    <img class="key-circle" src="/images/circle_lightblue_mini.png" alt="" /> Higher&nbsp;
+    <img class="key-circle" src="/images/circle_mint_tulip_mini.png" alt="" /> Highest
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showBOB3">
+    <img class="key-circle" src="/images/circle_darkblue_mini.png" alt="" /> Lower&nbsp;
+    <img class="key-circle" src="/images/circle_orange_mini.png" alt="" /> Similar&nbsp;
+    <img class="key-circle" src="/images/circle_lightblue_mini.png" alt="" /> Higher
+  </div>
+  <div class="p-2">
+    <img class="key-circle" src="/images/circle_white_mini.png" alt="" /> Not compared
+  </div>
+</div>
+<div class="d-flex flex-row margin-top-10" *ngIf="legendConfig && legendConfig.showQuintiles()">
+  <div class="p-2 spine-compared-with-text">
+    <i>Quintiles:</i>
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showQuintilesRAG">
+    Best&nbsp;
+    <img class="key-circle" src="/images/circle_rag_quintile1_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_rag_quintile2_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_rag_quintile3_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_rag_quintile4_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_rag_quintile5_mini.png" alt="" />&nbsp; Worst
+  </div>
+  <div class="p-2" *ngIf="legendConfig.showQuintilesBOB">
+    Low&nbsp;
+    <img class="key-circle" src="/images/circle_bob_quintile1_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_bob_quintile2_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_bob_quintile3_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_bob_quintile4_mini.png" alt="" />&nbsp;
+    <img class="key-circle" src="/images/circle_bob_quintile5_mini.png" alt="" />&nbsp; High
+  </div>
+  <div class="p-2">
+    <img class="key-circle" src="/images/circle_white_mini.png" alt="" /> Not applicable
+  </div>
+</div>

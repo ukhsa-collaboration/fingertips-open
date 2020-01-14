@@ -22,7 +22,20 @@ namespace Fpm.MainUITest.Helpers
         [TestInitialize]
         public void TestInitialize()
         {
-            _indicatorMetadataTextChanger = new IndicatorMetadataTextChanger(new ProfileRepository(NHibernateSessionFactory.GetSession()), GetProfilesReader());
+            _indicatorMetadataTextChanger = new IndicatorMetadataTextChanger(
+                new ProfileRepository(NHibernateSessionFactory.GetSession()), GetProfilesReader());
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            // Delete overridden text
+            var textValue = new IndicatorMetadataTextValue
+            {
+                IndicatorId = IndicatorId,
+                ProfileId = ProfileId
+            };
+            ReaderFactory.GetProfilesWriter().DeleteOverriddenIndicatorMetadataTextValue(textValue);
         }
 
         [TestMethod]

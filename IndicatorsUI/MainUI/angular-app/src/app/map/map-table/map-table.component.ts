@@ -1,15 +1,12 @@
 import {
-  Component, OnInit, Input, Output, SimpleChanges, OnChanges,
-  EventEmitter, DoCheck, KeyValueDiffers, ChangeDetectorRef, ChangeDetectionStrategy, AfterViewChecked
-  , ViewChild, ElementRef, AfterViewInit
+  Component, Input, Output, SimpleChanges, OnChanges,
+  EventEmitter, ChangeDetectorRef, ViewChild, ElementRef
 } from '@angular/core';
-import {
-  FTModel, FTRoot, Area, GroupRoot, CoreDataSet, CoreDataHelper, Unit, ValueWithUnit, ValueNote, ValueDisplayer,
-  IndicatorMetadataHash, IndicatorMetadata, CoreDataSetInfo,
-  ValueNoteTooltipProvider, TooltipManager
-} from '../../typings/FT.d';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import * as _ from 'underscore';
+import { CoreDataSet, TooltipManager, Area, ValueNoteTooltipProvider, ValueDisplayer, CoreDataSetInfo } from '../../typings/FT';
+import { isDefined } from '@angular/compiler/src/util';
+import { CommaNumber } from '../../shared/shared';
 declare let $: JQueryStatic;
 
 @Component({
@@ -17,8 +14,8 @@ declare let $: JQueryStatic;
   templateUrl: './map-table.component.html',
   styleUrls: ['./map-table.component.css']
 })
-export class MapTableComponent {
-  @ViewChild('maptable') el: ElementRef;
+export class MapTableComponent implements OnChanges {
+  @ViewChild('maptable', { static: true }) el: ElementRef;
   @Input() sortedCoreData: Map<string, CoreDataSet> = null;
   @Input() areaTypeId: number = null;
   @Input() selectedAreaList;
@@ -39,8 +36,8 @@ export class MapTableComponent {
   ngOnChanges(changes: SimpleChanges) {
 
     if (changes['isBoundaryNotSupported']) {
-      let localBoundryNotSupported = changes['isBoundaryNotSupported'].currentValue;
-      if (localBoundryNotSupported !== undefined) {
+      const localBoundryNotSupported = changes['isBoundaryNotSupported'].currentValue;
+      if (isDefined(localBoundryNotSupported)) {
         if (localBoundryNotSupported) {
           this.selectedCoreData = [];
         }
@@ -52,10 +49,13 @@ export class MapTableComponent {
   }
 
   onMouseEnter(event: MouseEvent): void {
-    let noteId = event.srcElement.attributes.getNamedItem('data-NoteId');
+    const noteId = event.fromElement.attributes.getNamedItem('data-NoteId');
+
+    event.fromElement.attributes
+
     if (noteId) {
-      let tooltipPrvdr: ValueNoteTooltipProvider = this.ftHelperService.newValueNoteTooltipProvider();
-      let html = tooltipPrvdr.getHtmlFromNoteId(noteId.value);
+      const tooltipPrvdr: ValueNoteTooltipProvider = this.ftHelperService.newValueNoteTooltipProvider();
+      const html = tooltipPrvdr.getHtmlFromNoteId(noteId.value);
       this.tooltip = this.ftHelperService.newTooltipManager();
       this.tooltip.setHtml(html);
       this.tooltip.positionXY(event.pageX + 10, event.pageY + 15);
@@ -64,21 +64,22 @@ export class MapTableComponent {
   }
 
   onMouseMove(event: MouseEvent): void {
-    if (!_.isUndefined(this.tooltip)) {
+    if (isDefined(this.tooltip)) {
       this.tooltip.positionXY(event.pageX + 10, event.pageY + 15);
     }
   }
 
   onMouseLeave(event: MouseEvent): void {
-    if (!_.isUndefined(this.tooltip)) {
+    if (isDefined(this.tooltip)) {
       this.tooltip.hide();
     }
   }
 
   onRowMouseOver(event: MouseEvent): void {
-    let areaCode = this.getAreaCode(event);
+    const areaCode = this.getAreaCode(event);
     this.hoverAreaCodeChanged.emit({ areaCode: areaCode });
-    let row = this.getRow(event.srcElement);
+    const row = this.getRow(event.toElement);
+
     this.clearRowHovers();
     $(row).addClass('rowHover');
   }
@@ -88,7 +89,7 @@ export class MapTableComponent {
   }
 
   onRowClick(event: MouseEvent): void {
-    let areaCode = this.getAreaCode(event);
+    const areaCode = this.getAreaCode(event);
     if (areaCode !== null) {
       // Remove core data
       for (let i = 0; i < this.selectedCoreData.length; i++) {
@@ -115,12 +116,12 @@ export class MapTableComponent {
   }
 
   getAreaCode(event: MouseEvent): string {
-    let areaCodeProp = 'areaCode';
-    let areaCode = event.srcElement.attributes.getNamedItem(areaCodeProp);
+    const areaCodeProp = 'areaCode';
+    let areaCode = event.toElement.attributes.getNamedItem(areaCodeProp);
     if (areaCode === null) {
-      areaCode = event.srcElement.parentElement.attributes.getNamedItem(areaCodeProp);
+      areaCode = event.toElement.parentElement.attributes.getNamedItem(areaCodeProp);
       if (areaCode === null) {
-        areaCode = event.srcElement.parentElement.parentElement.attributes.getNamedItem(areaCodeProp);
+        areaCode = event.toElement.parentElement.parentElement.attributes.getNamedItem(areaCodeProp);
       }
     }
     return areaCode != null ? areaCode.value : null;
@@ -128,23 +129,23 @@ export class MapTableComponent {
 
   loadData() {
 
-    let newData = [];
+    const newData = [];
 
     this.selectedAreaList.forEach(areaCode => {
 
-      let valueDisplayer: ValueDisplayer = this.ftHelperService.newValueDisplayer(null);
-      let coreDataSet: CoreDataSet = this.sortedCoreData[areaCode];
-      let coreDatasetInfo: CoreDataSetInfo = this.ftHelperService.newCoreDataSetInfo(coreDataSet);
+      const valueDisplayer: ValueDisplayer = this.ftHelperService.newValueDisplayer(null);
+      const coreDataSet: CoreDataSet = this.sortedCoreData[areaCode];
+      const coreDatasetInfo: CoreDataSetInfo = this.ftHelperService.newCoreDataSetInfo(coreDataSet);
 
       // Set up data view model
-      let areaName = this.ftHelperService.getAreaName(areaCode);
-      let isNote: boolean = coreDatasetInfo.isNote();
-      let noteId: number = coreDatasetInfo.getNoteId();
-      let formattedCount = coreDatasetInfo.isCount() ? this.ftHelperService.newCommaNumber(coreDataSet.Count).rounded() : '-';
-      let formattedValue: string = valueDisplayer.byNumberString(coreDataSet.ValF);
-      let loCI = valueDisplayer.byNumberString(coreDataSet.LoCIF);
-      let upCI = valueDisplayer.byNumberString(coreDataSet.UpCIF);
-      let colour = this.areaCodeColour ? this.areaCodeColour.get(areaCode) : '#B0B0B2';
+      const areaName = this.ftHelperService.getAreaName(areaCode);
+      const isNote: boolean = coreDatasetInfo.isNote();
+      const noteId: number = coreDatasetInfo.getNoteId();
+      const formattedCount = coreDatasetInfo.isCount() ? new CommaNumber(coreDataSet.Count).rounded() : '-';
+      const formattedValue: string = valueDisplayer.byNumberString(coreDataSet.ValF);
+      const loCI = valueDisplayer.byNumberString(coreDataSet.LoCIF);
+      const upCI = valueDisplayer.byNumberString(coreDataSet.UpCIF);
+      const colour = this.areaCodeColour ? this.areaCodeColour.get(areaCode) : '#B0B0B2';
 
       newData.push({
         areaName: areaName, areaCode: areaCode,

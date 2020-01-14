@@ -9,6 +9,12 @@ namespace IndicatorsUI.MainUI
         // For more information on Bundling, visit http://go.microsoft.com/fwlink/?LinkId=254725
         public static void RegisterBundles(BundleCollection bundles)
         {
+#if DEBUG
+            BundleTable.EnableOptimizations = false;
+#else
+            BundleTable.EnableOptimizations = true;
+#endif
+
             var appConfig = AppConfig.Instance;
             var staticPath = "~/" + appConfig.JavaScriptVersionFolder;
             var jsPath = staticPath + "js/";
@@ -51,8 +57,9 @@ namespace IndicatorsUI.MainUI
             AddStyles(bundles, cssPath, "css-area-list-edit", "AreaList/area-list-edit.css");
             AddStyles(bundles, cssPath, "css-area-list-index", "AreaList/area-list-index.css");
 
-            // Add TranspiledFiles
+            // Add Angular files
             AddScripts(bundles, angularPath, "js-angular", GetAngularFiles());
+            AddStyles(bundles, angularPath, "css-angular", "styles.css");
         }
 
         private static void AddSingleScriptFiles(BundleCollection bundles, string path)
@@ -64,7 +71,6 @@ namespace IndicatorsUI.MainUI
                 "PageMap.js",
                 "PageAreaTrends.js",
                 "PageBarChart.js",
-                "PageBarChartAndFunnelPlot.js",
                 "PageAreaProfile.js",
                 "PageInequalities.js",
                 "PageEngland.js",
@@ -97,12 +103,15 @@ namespace IndicatorsUI.MainUI
 
         private static string[] GetAngularFiles()
         {
-            var tsFiles = new[]
+            var jsFiles = new[]
             {
-                "inline.bundle.js", "polyfills.bundle.js", "styles.bundle.js", "vendor.bundle.js",
-                "main.bundle.js", "scripts.bundle.js"
+                "main.js",
+                "polyfills.js",
+                "runtime.js",
+                "styles.js",
+                "vendor.js"
             };
-            return tsFiles;
+            return jsFiles;
         }
 
         private static string[] GetJsHtml2Canvas()
@@ -225,7 +234,7 @@ namespace IndicatorsUI.MainUI
         public static void AddScripts(BundleCollection bundles, string path, string bundleName,
             params string[] files)
         {
-            bundles.Add(new ScriptBundle("~/bundles/" + bundleName).Include(
+            bundles.Add(new Bundle("~/bundles/" + bundleName).Include(
                 PrependUrlPath(files, path)));
         }
     }

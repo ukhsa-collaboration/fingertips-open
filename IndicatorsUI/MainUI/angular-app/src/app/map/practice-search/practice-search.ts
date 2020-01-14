@@ -1,11 +1,11 @@
-import { LatitudeLongitude } from '../../typings/FT.d';
+import { LatitudeLongitude } from '../../typings/FT';
 
 export class AutoCompleteResult {
     polygonAreaCode: string;
     displayName: string;
     constructor(polygonAreaCode: string, name: string, parentAreaName: string) {
         this.polygonAreaCode = polygonAreaCode;
-        this.displayName = name + ", " + parentAreaName.replace('NHS ', '')
+        this.displayName = name + ', ' + parentAreaName.replace('NHS ', '')
     }
 };
 

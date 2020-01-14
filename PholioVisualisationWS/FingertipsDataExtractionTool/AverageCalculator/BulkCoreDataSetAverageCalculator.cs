@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NLog;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
@@ -18,6 +19,9 @@ namespace FingertipsDataExtractionTool.AverageCalculator
 
     public class BulkCoreDataSetAverageCalculator : IBulkCoreDataSetAverageCalculator
     {
+        private const int UndefinedIndicatorId = -1;
+
+        // Dependencies
         private IAreasReader _areasReader;
         private IGroupDataReader _groupDataReader;
         private ICoreDataSetRepository _coreDataSetRepository;
@@ -25,11 +29,13 @@ namespace FingertipsDataExtractionTool.AverageCalculator
         private ILogger _logger;
         private IIndicatorMetadataRepository _indicatorMetadataRepository;
 
+        // Instance variables
         private int _valueCount;
-        int currentIndicatorId = -1;
+        private int _currentIndicatorId = UndefinedIndicatorId;
+        private FileTimer _fileTimer;
 
         public BulkCoreDataSetAverageCalculator(IAreasReader areasReader, IParentAreaProvider parentAreaProvider,
-            IGroupDataReader groupDataReader, ICoreDataSetRepository coreDataSetRepository, ILogger logger, 
+            IGroupDataReader groupDataReader, ICoreDataSetRepository coreDataSetRepository, ILogger logger,
             IIndicatorMetadataRepository indicatorMetadataRepository)
         {
             _areasReader = areasReader;
@@ -61,8 +67,17 @@ namespace FingertipsDataExtractionTool.AverageCalculator
 
                 foreach (var area in areas)
                 {
-                    SaveDataIfRequired(timePeriods, coreDataSetProviderFactory, area, 
-                        grouping, indicatorMetadata);
+                    try
+                    {
+                        SaveDataIfRequired(timePeriods, coreDataSetProviderFactory, area,
+                            grouping, indicatorMetadata);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Frequently thrown when run on command line, usually because DB is not accessible temporarily
+                        WriteException(ex, indicatorMetadata, area);
+                        WaitIfRequired();
+                    }
                 }
             }
         }
@@ -137,6 +152,7 @@ namespace FingertipsDataExtractionTool.AverageCalculator
                     var childAreaListBuilder = new ChildAreaListBuilder(_areasReader);
                     coreData = new SubnationalAreaAverageCalculator(_groupDataReader, childAreaListBuilder)
                         .CalculateAverage(grouping, timePeriod, indicatorMetadata, parentArea);
+
                     if (coreData == null)
                     {
                         coreData = CoreDataSet.GetNullObject();
@@ -157,16 +173,54 @@ namespace FingertipsDataExtractionTool.AverageCalculator
         /// </summary>
         private void LogIndicatorInformation(IndicatorMetadata indicatorMetadata)
         {
-            if (indicatorMetadata.IndicatorId != currentIndicatorId)
+            if (indicatorMetadata.IndicatorId != _currentIndicatorId)
             {
-                if (currentIndicatorId != -1)
+                // Current indicator finished
+                if (_currentIndicatorId != UndefinedIndicatorId)
                 {
-                    _logger.Info(_valueCount + " values added");
+                    _logger.Info(_valueCount + " values added for " + _currentIndicatorId);
+                    if (_fileTimer != null)
+                    {
+                        _fileTimer.Stop();
+                    }
                 }
+
+                // New indicator
                 _valueCount = 0;
-                currentIndicatorId = indicatorMetadata.IndicatorId;
-                _logger.Info(string.Format("# Starting indicator {0} {1}", currentIndicatorId,
+                _currentIndicatorId = indicatorMetadata.IndicatorId;
+                _logger.Info(string.Format("# Starting indicator {0} {1}", _currentIndicatorId,
                     indicatorMetadata.Name));
+                _fileTimer = new FileTimer(_logger);
+            }
+        }
+
+        /// <summary>
+        /// Writes to command line for logging when app is being run this way
+        /// </summary>
+        private static void WriteException(Exception ex, IndicatorMetadata metadata, IArea area)
+        {
+            Console.WriteLine(DateTime.Now.ToLongDateString() + " " + metadata.IndicatorId + " - " + area.Code + ":" + area.Name);
+            Console.WriteLine("Exception message: " + ex.Message);
+            Console.WriteLine("Exception type: " + ex.GetType().FullName);
+            Console.WriteLine(ex.StackTrace);
+            Console.WriteLine("");
+        }
+
+        /// <summary>
+        /// Wait before continuing
+        /// </summary>
+        private static void WaitIfRequired()
+        {
+            var now = DateTime.Now;
+            if (now.Hour == 4 && now.Minute >= 30)
+            {
+                // Wait 5 mins while DB is backed up
+                Thread.Sleep(5 * 60 * 1000);
+            }
+            else
+            {
+                // Wait few seconds
+                Thread.Sleep(3 * 1000);
             }
         }
     }

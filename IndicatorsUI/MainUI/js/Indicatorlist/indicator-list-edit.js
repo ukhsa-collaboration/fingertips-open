@@ -82,13 +82,16 @@ function searchForIndicators() {
 
 function searchLoading() {
     showSpinner();
-    $('#alert').hide();
+    $('#alertBox').hide();
     $(".indicator-list-component").hide();
+    $('#search-result-header').hide();
+    $('.indicator-list-items-header').hide();
 }
 
 function searchLoaded() {
-    hideSpinner();
+    displayYourIndicatorListHeader();
     $(".indicator-list-component").show();
+    hideSpinner();
 }
 
 function clearList() {
@@ -227,6 +230,7 @@ function saveIndicatorList() {
         var publicId = $('#public-id').val();
         var listName = $('#list-name').val();
         var listItems = getSelectedListItems();
+        var redirectAction = $('#redirect-action').val();
 
         var data = {
             Id: listId,
@@ -238,7 +242,11 @@ function saveIndicatorList() {
         $.post('save', data)
             .success(function (result) {
                 if (result.Success) {
-                    window.location = '/user-account/indicator-list';
+                    if (redirectAction.toLowerCase() === "true") {
+                        window.location = '/indicator-list/view/' + publicId;
+                    } else {
+                        window.location = '/user-account/indicator-list';
+                    }
                 } else {
                     // List was not saved
                     alertMessage(result.Message);
@@ -276,7 +284,14 @@ function getIndicatorList(listId) {
 }
 
 function back() {
-    window.location.href = '/user-account/indicator-list';
+    var publicId = $('#public-id').val();
+    var redirectAction = $('#redirect-action').val();
+
+    if (redirectAction.toLowerCase() === "true") {
+        window.location = '/indicator-list/view/' + publicId;
+    } else {
+        window.location.href = '/user-account/indicator-list';
+    }
 }
 
 function initEventHandlers() {

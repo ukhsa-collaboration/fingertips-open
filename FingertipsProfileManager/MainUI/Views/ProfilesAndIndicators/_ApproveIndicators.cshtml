@@ -1,0 +1,36 @@
+﻿@model Fpm.MainUI.Models.ApproveIndicatorsModel
+<div id="approveIndicators" style="display: none;">
+    @using (Html.BeginForm("ConfirmApproveIndicators", "ProfilesAndIndicators", FormMethod.Post, new { id = "ApproveIndicatorsForm" }))
+    {
+        <div>
+            <h3>Approve indicators</h3>
+        </div>
+        if (Model.IndicatorsToApprove != null && Model.IndicatorsToApprove.Any())
+        {
+            <div>
+                The following indicators will be approved:
+                <br />
+                <table class="grid">
+                    @foreach (var indicator in Model.IndicatorsToApprove)
+                    {
+                        @Html.Hidden("indicator-to-approve" + indicator.IndicatorId, indicator.IndicatorId + "~" + indicator.SexId + "~" + indicator.AgeId, new { @class = "indicator-id" })
+                        <tr>
+                            <td class="left">@indicator.IndicatorId</td>
+                            <td class="left">
+                                @indicator.IndicatorName (@indicator.Sex) (@indicator.Age)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+        <div>
+            @Html.HiddenFor(x => x.AreaTypeId)
+            @Html.Hidden("indicatorsToApproveDetails")
+            <p>
+                <input class="btn btn-primary" id="indicators-to-approve-confirm-button" type="button" value="Confirm" />
+                <input class="btn btn-default" id="Cancel" onclick="lightbox.hide()" value="Cancel" style="width: 80px;" />
+            </p>
+        </div>
+    }
+</div>

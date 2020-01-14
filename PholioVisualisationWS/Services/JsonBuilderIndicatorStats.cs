@@ -65,12 +65,12 @@ namespace PholioVisualisation.Services
                     _parameters.IndicatorIds,
                     _parameters.ChildAreaTypeId);
 
-                var roots = new GroupRootBuilder().BuildGroupRoots(groupings);
+                var roots = new GroupRootBuilder(reader).BuildGroupRoots(groupings);
                 return new GroupRootFilter(reader).RemoveRootsWithoutChildAreaData(roots);
             }
 
             groupings = reader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(_parameters.GroupId, _parameters.ChildAreaTypeId);
-            return new GroupRootBuilder().BuildGroupRoots(groupings);
+            return new GroupRootBuilder(reader).BuildGroupRoots(groupings);
         }
 
     }

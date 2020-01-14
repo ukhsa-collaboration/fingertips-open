@@ -1,7 +1,7 @@
 import {
   IndicatorMetadata, IndicatorStatsPercentilesFormatted,
   IndicatorStats, IndicatorStatsPercentiles
-} from '../typings/FT.d';
+} from '../typings/FT';
 
 export class BoxplotData {
 
@@ -10,8 +10,9 @@ export class BoxplotData {
   periods: string[] = [];
   min: number = null;
 
-  constructor(public metadata: IndicatorMetadata, public areaTypeName: string,
-    public comparatorName: string) { }
+  constructor(public metadata: IndicatorMetadata, public indicatorName: string,
+    public areaTypeName: string, public areaName: string, public comparatorName: string,
+    public comparatorCode: string, public isNearestNeighbour) { }
 
   addStats(indicatorStats: IndicatorStats): void {
 
@@ -23,14 +24,20 @@ export class BoxplotData {
 
     // Time periods
     this.periods.push(indicatorStats.Period);
+  }
 
-    // Set min limit if zero to prevent Y axis starting at negative number
-    if (indicatorStats.Limits.Min === 0) {
-      this.min = indicatorStats.Limits.Min;
-    }
+  setMin(min: boolean): void {
+    this.min = min ? 0 : null;
   }
 
   isAnyData(): boolean {
     return this.periods.length > 0;
   }
+}
+
+export class BoxplotDataForTable {
+  public period: string;
+  public statsFormatted: IndicatorStatsPercentilesFormatted;
+  public unitLabel: string;
+  public trendSource: string;
 }

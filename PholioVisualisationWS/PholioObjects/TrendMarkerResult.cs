@@ -4,12 +4,6 @@ namespace PholioVisualisation.PholioObjects
 {
     public class TrendMarkerResult
     {
-        [JsonIgnore]
-        public double? Slope { get; set; }
-
-        [JsonIgnore]
-        public double? Intercept { get; set; }
-
         [JsonProperty]
         public TrendMarker Marker { get; set; }
 

@@ -36,7 +36,7 @@ namespace PholioVisualisation.ServiceActionsTest
             const int profileId = ProfileIds.Phof;
             const string parentAreaCode = AreaCodes.England;
             const int groupId = GroupIds.Phof_WiderDeterminantsOfHealth;
-            const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             const int indicatorId = IndicatorIds.ChildrenInLowIncomeFamilies;
             const int sexId = SexIds.Persons;
             const int ageId = AgeIds.Under16;

@@ -1,0 +1,58 @@
+<div id="population-table">
+  <ft-metadata-table #metadata style="display:none;" (isReady)="metadataIsReady($event)"></ft-metadata-table>
+  <div class="trend-header">
+    <div class="trend-title">Population age profile ({{indicatorName}})</div>
+    <div class="trend-period">{{period}}</div>
+  </div>
+  <div id="table-box">
+    <table class="bordered-table table-hover table">
+      <thead>
+        <tr>
+          <th class="content-align-right" rowspan="2" style="width:20%;">
+            <div id="quinary-tooltip-box">
+              <div class="left-tooltip-icon info-tooltip" (click)="showQuinaryPopulationMetadata()"></div>
+            </div>
+            Age range
+          </th>
+          <th colspan="2">{{areaName}}</th>
+          <th colspan="2">{{parentAreaName}}</th>
+          <th colspan="2">England</th>
+        </tr>
+        <tr>
+          <th class="content-align-right decorate-male">Male</th>
+          <th class="content-align-right decorate-female">Female</th>
+          <th class="content-align-right decorate-male">Male</th>
+          <th class="content-align-right decorate-female">Female</th>
+          <th class="content-align-right decorate-male">Male</th>
+          <th class="content-align-right decorate-female">Female</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let data of populationTableData">
+          <td [innerHtml]="data.ageBand" class="content-align-right"></td>
+          <td [innerHtml]="data.maleArea" class="content-align-right" (mousemove)="showTooltip($event,data,1,1)" (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="data.femaleArea" class="content-align-right" (mousemove)="showTooltip($event,data,2,1)" (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="data.maleAreaParent" class="content-align-right" (mousemove)="showTooltip($event,data,1,2)" (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="data.femaleAreaParent" class="content-align-right" (mousemove)="showTooltip($event,data,2,2)" (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="data.maleNational" class="content-align-right" (mousemove)="showTooltip($event,data,1,3)" (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="data.femaleNational" class="content-align-right" (mousemove)="showTooltip($event,data,2,3)" (mouseout)="hideTooltip()"></td>
+        </tr>
+        <tr class="all-ages">
+          <td class="content-align-right font-weight-bold">All ages</td>
+          <td [innerHtml]="sumOfMaleAreaPopulation" class="content-align-right decorate-male" (mousemove)="showTooltip($event,null,1,1)"
+            (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="sumOfFemaleAreaPopulation" class="content-align-right decorate-female" (mousemove)="showTooltip($event,null,2,1)"
+            (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="sumOfMaleAreaParentPopulation" class="content-align-right decorate-male" (mousemove)="showTooltip($event,null,1,2)"
+            (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="sumOfFemaleAreaParentPopulation" class="content-align-right decorate-female" (mousemove)="showTooltip($event,null,2,2)"
+            (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="sumOfMaleNationalPopulation" class="content-align-right decorate-male" (mousemove)="showTooltip($event,null,1,3)"
+            (mouseout)="hideTooltip()"></td>
+          <td [innerHtml]="sumOfFemaleNationalPopulation" class="content-align-right decorate-female" (mousemove)="showTooltip($event,null,2,3)"
+            (mouseout)="hideTooltip()"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

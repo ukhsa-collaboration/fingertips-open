@@ -11,8 +11,8 @@ namespace PholioVisualisation.DataAccessTest
     [TestClass]
     public class PholioTest
     {
-        private IAreasReader reader;
-        private int areaTypeId;
+        private IAreasReader _areasReader;
+        private int _areaTypeId;
 
         /// <summary>
         /// If this test fails compare the areas on the test site with those on the live site
@@ -21,9 +21,9 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestAreaMappingsGorToUpperTierLAs()
         {
-            areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            _areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
-            reader = ReaderFactory.GetAreasReader();
+            _areasReader = ReaderFactory.GetAreasReader();
             ExpectChildren(AreaCodes.Gor_EastMidlands, 9);
             ExpectChildren(AreaCodes.Gor_EastOfEngland, 11);
             ExpectChildren(AreaCodes.Gor_London, 33);
@@ -38,7 +38,7 @@ namespace PholioVisualisation.DataAccessTest
 
         private void ExpectChildren(string parentCode, int count)
         {
-            Assert.AreEqual(count, reader.GetChildAreaCount(parentCode, areaTypeId));
+            Assert.AreEqual(count, _areasReader.GetChildAreaCount(parentCode, _areaTypeId));
         }
     }
 }

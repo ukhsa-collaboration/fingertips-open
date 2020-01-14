@@ -23,8 +23,11 @@ namespace Fpm.MainUISeleniumTest
 
         protected void InitDriverObjects()
         {
-            const string driverDirectory = @"C:\fingertips\3rdPartyLibraries\selenium";
-            _driver = new ChromeDriver(driverDirectory);
+            //const string driverDirectory = @"C:\fingertips\3rdPartyLibraries\selenium";
+            //_driver = new ChromeDriver(driverDirectory);
+
+            FirefoxDriverService service = FirefoxDriverService.CreateDefaultService(@"c:\Fingertips\3rdPartyLibraries\selenium");
+            _driver = new FirefoxDriver(service);
 
             waitFor = new WaitFor(_driver);
             navigateTo = new NavigateTo(_driver);

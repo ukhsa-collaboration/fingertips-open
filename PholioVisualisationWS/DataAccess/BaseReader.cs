@@ -13,6 +13,7 @@ namespace PholioVisualisation.DataAccess
         internal const string ParameterGroupId = "groupId";
         internal const string ParameterIndicatorId = "indicatorId";
         internal const string ParameterSexId = "sexId";
+        internal const string ParameterAreaType = "areaTypeId";
 
         /// <summary>
         /// The session factory, used to create new sessions as required

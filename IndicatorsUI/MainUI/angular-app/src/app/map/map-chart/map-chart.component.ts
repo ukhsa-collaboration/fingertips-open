@@ -1,15 +1,14 @@
 import { Component, ElementRef, ViewChild, Input, Output, SimpleChanges, OnChanges, EventEmitter } from '@angular/core';
-import {
-    FTModel, FTRoot, Area, GroupRoot, CoreDataSet, CoreDataHelper, Unit, ValueWithUnit, ValueNote,
-    IndicatorMetadataHash, IndicatorMetadata
-} from '../../typings/FT.d';
+import * as _ from 'underscore';
+import { isDefined } from '@angular/compiler/src/util';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { CoreDataHelperService } from '../../shared/service/helper/coreDataHelper.service';
-import { AreaCodes } from '../../shared/shared'
+import { AreaCodes } from '../../shared/constants';
 import * as Highcharts from 'highcharts';
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/highcharts-more')(Highcharts);
-import * as _ from 'underscore';
+import { AreaHelper } from '../../shared/shared';
+import { CoreDataSet, GroupRoot, ValueWithUnit } from '../../typings/FT';
 
 @Component({
     selector: 'ft-map-chart',
@@ -17,43 +16,47 @@ import * as _ from 'underscore';
     styleUrls: ['./map-chart.component.css']
 })
 export class MapChartComponent implements OnChanges {
-    @ViewChild('mapChart') public chartEl: ElementRef;
+    @ViewChild('mapChart', { static: true }) public chartEl: ElementRef;
     @Input() sortedCoreData: Map<string, CoreDataSet> = null;
     @Input() areaTypeId: number = null;
     @Input() currentAreaCode = null;
     @Input() areaCodeColour = null;
+    @Input() subNationalTabButtonClicked = null;
     @Input() isBoundaryNotSupported;
     @Output() selectedAreaCodeChanged = new EventEmitter();
+    @Output() hoverAreaCodeChanged = new EventEmitter();
+
     chart: Highcharts.ChartObject;
     chartData: { color: String, x: number, key: string, y: number }[] = [];
-    @Output() hoverAreaCodeChanged = new EventEmitter();
+    isNearestNeighbours = false;
+
     constructor(private ftHelperService: FTHelperService,
         private coreDataHelperService: CoreDataHelperService) { }
 
     ngOnChanges(changes: SimpleChanges) {
 
+        this.isNearestNeighbours = this.ftHelperService.isNearestNeighbours();
+
         if (changes['isBoundaryNotSupported']) {
-            let localBoundryNotSupported = changes['isBoundaryNotSupported'].currentValue;
-            if (localBoundryNotSupported !== undefined) {
-                if (localBoundryNotSupported) {
-                    this.chartData = [];
-                }
+            const isBoundaryNotSupported = changes['isBoundaryNotSupported'].currentValue;
+            if (isDefined(isBoundaryNotSupported) && isBoundaryNotSupported) {
+                this.chartData = [];
             }
         }
         if (changes['sortedCoreData']) {
-            let sortedataChange = changes['sortedCoreData'].currentValue;
-            if (sortedataChange) {
-                this.loadHighChart(sortedataChange);
+            const sortedCoreData = changes['sortedCoreData'].currentValue;
+            if (sortedCoreData) {
+                this.loadHighChart(sortedCoreData);
             }
         }
         if (changes['currentAreaCode']) {
-            let currentAreaCode = changes['currentAreaCode'].currentValue;
+            const currentAreaCode = changes['currentAreaCode'].currentValue;
             if (currentAreaCode) {
                 this.highlightArea(currentAreaCode);
             }
         }
         if (changes['areaCodeColour']) {
-            let areaCodeColour = changes['areaCodeColour'].currentValue;
+            const areaCodeColour = changes['areaCodeColour'].currentValue;
             if (areaCodeColour) {
                 if (this.sortedCoreData) {
                     this.loadHighChart(this.sortedCoreData);
@@ -61,40 +64,59 @@ export class MapChartComponent implements OnChanges {
             }
         }
     }
+
     loadHighChart(sortedata: Map<string, CoreDataSet>) {
 
         let xVal = 0;
-        let xAxisCategories: {
+        const xAxisCategories: {
             AreaName: String, ValF: string, LoCIF: string,
             UpCIF: string, AreaCode: string, NoteId: number
         }[] = [];
-        let errorData = [];
+        const errorData = [];
         this.chartData = [];
-        let regionValues = [];
-        const x: number = 0;
-        let currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-        let unit = this.ftHelperService.getMetadata(currentGrpRoot.IID).Unit;
-        let valuesForBarChart: any[] = [];
+        const regionValues = [];
+        const currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
+        const unit = this.ftHelperService.getMetadata(currentGrpRoot.IID).Unit;
+        const valuesForBarChart: any[] = [];
         let extraTooltip = '';
 
-        Object.keys(sortedata).forEach(key => {
-            let value: CoreDataSet = sortedata[key];
-            let colour = null;
-            if (this.areaCodeColour) {
-                colour = this.areaCodeColour.get(key);
+        // Mapping between parent and child areas if subnational comparator
+        let areaMappings = null;
+        if (this.subNationalTabButtonClicked) {
+            const parentTypeId = this.ftHelperService.getParentTypeId();
+            const areaTypeId = this.ftHelperService.getAreaTypeId();
+            const areaCode = this.ftHelperService.getFTModel().areaCode;
+
+            const key = parentTypeId.toString() + '-' + areaTypeId.toString() + '-';
+            areaMappings = this.ftHelperService.getAreaMappingsForParentCode(key);
+
+            if (_.findIndex(areaMappings, areaCode) === -1) {
+                areaMappings.push(areaCode);
             }
-            if (value.ValF !== '-') {
-                valuesForBarChart.push({
-                    Colour: colour
-                    , AreaCode: value.AreaCode
-                    , Val: value.Val
-                    , LCI: value.LoCI
-                    , UCI: value.UpCI
-                    , ValF: value.ValF
-                    , LoCIF: value.LoCIF
-                    , UpCIF: value.UpCIF
-                    , NoteId: value.NoteId
-                });
+        }
+
+        Object.keys(sortedata).forEach(key => {
+            const value: CoreDataSet = sortedata[key];
+            let colour = null;
+
+            if (areaMappings === null ||
+                areaMappings.findIndex(x => x.toString() === value.AreaCode) > -1) {
+                if (this.areaCodeColour) {
+                    colour = this.areaCodeColour.get(key);
+                }
+                if (value.ValF !== '-') {
+                    valuesForBarChart.push({
+                        Colour: colour
+                        , AreaCode: value.AreaCode
+                        , Val: value.Val
+                        , LCI: value.LoCI
+                        , UCI: value.UpCI
+                        , ValF: value.ValF
+                        , LoCIF: value.LoCIF
+                        , UpCIF: value.UpCIF
+                        , NoteId: value.NoteId
+                    });
+                }
             }
         });
 
@@ -104,11 +126,11 @@ export class MapChartComponent implements OnChanges {
             return 0;
         });
 
-        for (let value of valuesForBarChart) {
+        for (const value of valuesForBarChart) {
             this.chartData.push({ color: value.Colour, x: xVal, key: value.AreaCode, y: value.Val });
             xVal++;
 
-            let areaName = this.ftHelperService.getAreaName(value.AreaCode);
+            const areaName = this.ftHelperService.getAreaName(value.AreaCode);
             xAxisCategories.push({
                 AreaName: areaName, ValF: value.ValF, LoCIF: value.LoCIF,
                 UpCIF: value.UpCIF, AreaCode: value.AreaCode, NoteId: value.NoteId
@@ -116,7 +138,7 @@ export class MapChartComponent implements OnChanges {
 
             errorData.push([value.LoCI, value.UpCI]);
         }
-        let series: any[] /*Highcharts.IndividualSeriesOptions[]*/ = [
+        const series: any[] /*Highcharts.IndividualSeriesOptions[]*/ = [
             {
                 type: 'column',
                 name: 'Value',
@@ -132,13 +154,24 @@ export class MapChartComponent implements OnChanges {
             }
         ];
 
-        const comparatorName: string = this.ftHelperService.getCurrentComparator().Name;
+
+        // Label for subnational option
+        let comparatorName: string;
+        if (this.isNearestNeighbours) {
+            const model = this.ftHelperService.getFTModel();
+            const area = this.ftHelperService.getArea(model.areaCode);
+            const nnAreaName = new AreaHelper(area).getShortAreaNameToDisplay();
+            comparatorName = nnAreaName + ' and neighbours';
+        } else {
+            comparatorName = this.ftHelperService.getCurrentComparator().Name;
+        }
+
         const valueWithUnit: ValueWithUnit = this.coreDataHelperService.valueWithUnit(unit);
-        for (let grouping of currentGrpRoot.Grouping) {
+        for (const grouping of currentGrpRoot.Grouping) {
 
             if (grouping.ComparatorData.ValF === '-') { continue; }
-            let valF = grouping.ComparatorData.ValF;
-            let val = grouping.ComparatorData.Val;
+            const valF = grouping.ComparatorData.ValF;
+            const val = grouping.ComparatorData.Val;
 
             if (grouping.ComparatorId === 4 && grouping.ComparatorData.AreaCode === AreaCodes.England) {
                 // England data
@@ -162,7 +195,7 @@ export class MapChartComponent implements OnChanges {
                 extraTooltip += '<br>' + comparatorName + ': ' + valueWithUnit.getFullLabel(valF);
             }
         }
-        let yAxis = {
+        const yAxis = {
             labels: {
                 formatter: function () {
                     return this.value;
@@ -176,13 +209,10 @@ export class MapChartComponent implements OnChanges {
             }
         };
         const chartTitle: string = this.buildChartTitle();
-        let valueNotes: Array<ValueNote> = [] = this.ftHelperService.getValueNotes();
-        let areaCodeChanged = this.hoverAreaCodeChanged;
-        let _thisLocal = this;
+        const valueNotes = this.ftHelperService.getValueNotes();
 
         // Locals for events
-        let unhighlightArea = this.unhighlightArea;
-        let chartData = this.chartData;
+        const _thisLocal = this;
 
         const chartOptions: any /*Highcharts.Options*/ = {
             title: {
@@ -202,24 +232,28 @@ export class MapChartComponent implements OnChanges {
             tooltip: {
                 shared: false,
                 formatter: function () {
+
+                    // Benchmark tooltip
                     if (this.series.type === 'line') {
                         return '<b>' + this.series.name + '</b><br />'
                             + valueWithUnit.getFullLabel(regionValues[this.series.index]);
                     }
-                    let data = xAxisCategories[this.x];
+
+                    // Child area tooltip
+                    const data = xAxisCategories[this.x];
 
                     _thisLocal.hoverAreaCodeChanged.emit({ areaCode: data.AreaCode });
                     let s = '<b>' + data.AreaName + '</b>';
                     s += '<br>' + valueWithUnit.getFullLabel(data.ValF);
 
-                    if (data.NoteId !== undefined) {
+                    if (data.NoteId) {
                         s += '<br><em>' + valueNotes[data.NoteId].Text + '</em>';
                     }
 
-                    if (data.LoCIF !== undefined) {
+                    if (data.LoCIF) {
                         s += '<br>LCI: ' + valueWithUnit.getFullLabel(data.LoCIF);
                     }
-                    if (data.UpCIF !== undefined) {
+                    if (data.UpCIF) {
                         s += '<br>UCI: ' + valueWithUnit.getFullLabel(data.UpCIF);
                     }
 
@@ -249,9 +283,14 @@ export class MapChartComponent implements OnChanges {
                     point: {
                         events: {
                             mouseOut: function (e) {
-                                let areaCode = this.options.key;
+                                const areaCode = this.options.key;
                                 _thisLocal.hoverAreaCodeChanged.emit({ areaCode: null });
-                                unhighlightArea(chart, chartData, areaCode);
+
+                                // Highlighting throws exception in nearest neighbours mode for unknown reason
+                                if (!_thisLocal.isNearestNeighbours) {
+                                    // Unhighlight area
+                                    _thisLocal.changeAreaHighlight(_thisLocal.chart, _thisLocal.chartData, areaCode, false);
+                                }
                             }
                         }
                     }
@@ -292,30 +331,32 @@ export class MapChartComponent implements OnChanges {
             chartContainer = this.chartEl.nativeElement;
         }
         this.chart = new Highcharts.Chart(chartContainer, chartOptions);
-        let chart = this.chart;
+        const chart = this.chart;
     }
 
     highlightArea(areaCode: string): void {
-        if (this.chart && this.chartData != null) {
-            let data = _.where(this.chartData, { key: areaCode })[0];
-            if (data !== undefined) {
-                this.chart.series[0].data[data.x].select(true);
-            }
+        // Highlighting throws exception in nearest neighbours mode for unknown reason
+        if (!this.isNearestNeighbours) {
+            this.changeAreaHighlight(this.chart, this.chartData, areaCode, true);
         }
     }
 
-    unhighlightArea(chart: Highcharts.ChartObject,
-        chartData: any, areaCode: string): void {
+    changeAreaHighlight(chart: Highcharts.ChartObject,
+        chartData: any, areaCode: string, shouldBeSelected): void {
+
         if (chart && chartData != null) {
-            let data = _.where(chartData, { key: areaCode })[0];
-            if (data !== undefined) {
-                chart.series[0].data[data['x']].select(false);
+            const data = _.where(chartData, { key: areaCode })[0];
+            if (isDefined(data)) {
+                const pointList = chart.series[0].data;
+                const pointIndex = [data['x']];
+                const point = pointList[pointIndex];
+                point.select(shouldBeSelected);
             }
         }
     }
 
     onExportClick(event: MouseEvent) {
-        let title = this.buildChartTitle();
+        const title = this.buildChartTitle();
         if (this.chart) {
             this.chart.exportChart({ type: 'image/png' }, {
                 chart: {
@@ -341,12 +382,13 @@ export class MapChartComponent implements OnChanges {
             this.ftHelperService.logEvent('ExportImage', 'MapBarChart');
         }
     }
+
     buildChartTitle(): string {
-        const currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-        const data: IndicatorMetadata = this.ftHelperService.getMetadata(currentGrpRoot.IID);
-        const unit = data.Unit;
+        const groupRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
+        const metadata = this.ftHelperService.getMetadata(groupRoot.IID);
+        const unit = metadata.Unit;
         const unitLabel = (typeof unit.Label !== 'undefined') ? unit.Label : '';
-        const period: string = currentGrpRoot.Grouping[0].Period;
-        return data.ValueType.Name + ' - ' + unitLabel + ' ' + period;
+        const period: string = groupRoot.Grouping[0].Period;
+        return metadata.ValueType.Name + ' - ' + unitLabel + ' ' + period;
     }
 }

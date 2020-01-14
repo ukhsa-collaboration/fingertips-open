@@ -19,3 +19,9 @@ h2.secondary-heading {
  h3 {
     margin: 20px 0 0 0;
     }
+
+.btn.truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}

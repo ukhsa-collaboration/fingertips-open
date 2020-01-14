@@ -15,15 +15,15 @@ namespace PholioVisualisation.DataConstruction
 
         public Dictionary<string, ValueData> IndicatorToValue { get; set; }
 
-        private IGroupDataReader groupDataReader;
-        private int dataPointOffset;
+        private IGroupDataReader _groupDataReader;
+        private int _dataPointOffset;
 
         public PracticePerformanceIndicatorValues(IGroupDataReader groupDataReader, string practiceCode, int dataPointOffset)
         {
             IndicatorToValue = new Dictionary<string, ValueData>();
             IndicatorToValue = new Dictionary<string, ValueData>();
-            this.groupDataReader = groupDataReader;
-            this.dataPointOffset = dataPointOffset;
+            this._groupDataReader = groupDataReader;
+            this._dataPointOffset = dataPointOffset;
 
             // Require count and denominator for QOF
             SetCoreData(GetData(IndicatorIds.QofPoints, practiceCode), Qof);
@@ -51,7 +51,7 @@ namespace PholioVisualisation.DataConstruction
 
         private IList<CoreDataSet> GetYearOrderedData(int indicatorId, string practiceCode)
         {
-            return groupDataReader.GetCoreData(indicatorId, practiceCode).OrderBy(x => x.Year).ToList();
+            return _groupDataReader.GetCoreData(indicatorId, practiceCode).OrderBy(x => x.Year).ToList();
         }
 
         private CoreDataSet GetData(int indicatorId, string practiceCode)
@@ -64,13 +64,13 @@ namespace PholioVisualisation.DataConstruction
         {
             int maximumIndex = dataList.Count() - 1;
 
-            if (maximumIndex < dataPointOffset)
+            if (maximumIndex < _dataPointOffset)
             {
                 // Run out of data
                 return null;
             }
 
-            return dataList.ElementAt(maximumIndex - dataPointOffset);
+            return dataList.ElementAt(maximumIndex - _dataPointOffset);
         }
 
         private void SetValueData(CoreDataSet data, string key)

@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections;
+﻿using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.Profile;
+using Fpm.ProfileData.Entities.User;
+using Fpm.ProfileData.Repositories;
+using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
 using System.Globalization;
 using System.Linq;
 using System.Web;
-using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Profile;
-using Fpm.ProfileData.Entities.User;
-using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Helpers
 {
-    public class UserDetails
+    public class UserDetails : IUserDetails
     {
-        private readonly ProfilesReader reader = ReaderFactory.GetProfilesReader();
+        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
         public string Name { get; private set; }
         private FpmUser _fpmUser;
 
@@ -31,7 +30,7 @@ namespace Fpm.MainUI.Helpers
         /// </summary>
         private UserDetails(int userId)
         {
-            _fpmUser = reader.GetUserByUserId(userId);
+            _fpmUser = _reader.GetUserByUserId(userId);
             InitName(_fpmUser.UserName);
         }
 
@@ -67,12 +66,12 @@ namespace Fpm.MainUI.Helpers
             {
                 if (_fpmUser == null)
                 {
-                    _fpmUser = reader.GetUserByUserName(Name);
+                    _fpmUser = _reader.GetUserByUserName(Name);
 
                     if (_fpmUser == null)
                     {
                         CreateNewUser();
-                        _fpmUser = reader.GetUserByUserName(Name);
+                        _fpmUser = _reader.GetUserByUserName(Name);
                     }
                 }
 
@@ -101,6 +100,15 @@ namespace Fpm.MainUI.Helpers
             {
                 FpmUser user = FpmUser;
                 return user.IsAdministrator;
+            }
+        }
+
+        public bool IsReviewer
+        {
+            get
+            {
+                FpmUser user = FpmUser;
+                return user.IsReviewer;
             }
         }
 
@@ -134,7 +142,7 @@ namespace Fpm.MainUI.Helpers
 
                     return userPrincipal.IsMemberOf(groupPrincipal);
                 }
-                catch (Exception AppDomainUnloadedException)
+                catch (Exception)
                 {
                     // Sometimes security check cannot be made so give benefit of the doubt
                     return true;
@@ -151,17 +159,18 @@ namespace Fpm.MainUI.Helpers
 
         public IEnumerable<ProfileDetails> GetProfilesUserHasPermissionsTo()
         {
-            var permissionIds = reader.GetUserGroupPermissionsByUserId(FpmUser.Id)
+            var permissionIds = _reader.GetUserGroupPermissionsByUserId(FpmUser.Id)
                 .Select(x => x.ProfileId);
 
-            return reader.GetProfiles()
+            return _reader.GetProfiles()
                 .Where(x => permissionIds.Contains(x.Id))
                 .OrderBy(x => x.Name);
         }
 
         private void CreateNewUser()
         {
-            new UserRepository().CreateUserItem(new FpmUser
+            IUserRepository userRepository = new UserRepository(NHibernateSessionFactory.GetSession());
+            userRepository.CreateUser(new FpmUser
             {
                 UserName = Name,
                 DisplayName = ConvertUserNameToDisplayName(Name)

@@ -4,7 +4,7 @@
 @Scripts.Render("~/areas.js")
 <link href="@(AppConfig.CssPath)area-detail.css" rel="stylesheet" type="text/css" />
 
-<div class="profile-title">Area Details</div>
+<h2>Area details</h2>
 
 @using (Html.BeginForm("UpdateArea", "Areas", FormMethod.Post, new { id = "EditArea" }))
 {
@@ -52,12 +52,10 @@
         @Html.CheckBoxFor(x => x.AreaDetails.IsCurrent)
     </div>
 
-    <p>
-        <input class="medium-button" id="Confirm" type="button" value="Confirm" />
-    </p>
-    <p>
-        <input class="small-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
-    </p>
+    <div style="margin-top: 30px; padding-left: 128px;">
+        <input class="btn btn btn-primary" id="Confirm" type="button" value="Save" />
+        <input class="btn btn-secondary" id="Cancel" onclick="lightbox.hide()" value="Cancel" style="width: 80px;"/>
+    </div>
 }
 
 <div id="dialog-confirm" title="Update the area code?" style="display: none;">

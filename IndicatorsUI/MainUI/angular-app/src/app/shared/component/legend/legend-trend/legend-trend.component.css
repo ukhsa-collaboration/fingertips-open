@@ -1,0 +1,14 @@
+
+
+.margin-top-10 {
+    margin-top: 10px !important;
+    padding-top: 0 !important;
+}
+
+div {
+    font-size: 11px;
+}
+
+.spine-chart-legend-outer-box {
+    margin-right: 15px;
+}

@@ -22,7 +22,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
             _coreDataCollector = new MultipleCoreDataCollector();
             _attributesForPeriodsMock = new CsvBuilderAttributesForPeriodsWrapper();
 
-            _indicatorMetadata = new IndicatorMetadata{ Unit = new Unit { Value = 1 }};
+            _indicatorMetadata = new IndicatorMetadata { Unit = new Unit { Value = 1 } };
             _coreData = new CoreDataSet();
             _trendContainer = new BodyPeriodTrendContainer(_coreDataCollector, _attributesForPeriodsMock);
         }
@@ -30,7 +30,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         [TestMethod]
         public void ShouldGetTrendMarkerForNationalSmokeTest()
         {
-            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.National);
+            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.National, new Grouping());
 
             Assert.IsNotNull(trendMaker);
             Assert.IsInstanceOfType(trendMaker, typeof(TrendMarkerResult));
@@ -39,7 +39,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         [TestMethod]
         public void ShouldGetTrendMarkerForSubNationalSmokeTest()
         {
-            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.SubNational);
+            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.SubNational, new Grouping());
 
             Assert.IsNotNull(trendMaker);
             Assert.IsInstanceOfType(trendMaker, typeof(TrendMarkerResult));
@@ -48,7 +48,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         [TestMethod]
         public void ShouldGetTrendMarkerLocalSmokeTest()
         {
-            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.Local);
+            var trendMaker = _trendContainer.GetTrendMarker(_indicatorMetadata, _coreData, ExportAreaHelper.GeographicalCategory.Local, new Grouping());
 
             Assert.IsNotNull(trendMaker);
             Assert.IsInstanceOfType(trendMaker, typeof(TrendMarkerResult));

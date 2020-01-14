@@ -22,7 +22,7 @@ describe('ProfileService', () => {
   });
 
   it('should ...',
-    async(inject([ProfileService], (profileService: ProfileService) => {
-      expect(profileService).toBeTruthy();
+    async(inject([ProfileService], (service: ProfileService) => {
+      expect(service).toBeTruthy();
     })));
 });

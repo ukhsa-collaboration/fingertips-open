@@ -607,15 +607,15 @@ describe('isSubnationalColumn', function () {
         expect(isSubnationalColumn()).toBe(true);
     });
 
+    it('yes if nearest neighbours', function () {
+        init();
+        FT.model.isNearestNeighbours = function () { return true; };
+        expect(isSubnationalColumn()).toBe(true);
+    });
+
     it('no where only national parent is displayed', function () {
         init();
         enumParentDisplay = PARENT_DISPLAY.NATIONAL_ONLY;
-        expect(isSubnationalColumn()).toBe(false);
-    });
-
-    it('no if nearest neighbours', function () {
-        init();
-        FT.model.isNearestNeighbours = function () { return true; };
         expect(isSubnationalColumn()).toBe(false);
     });
 

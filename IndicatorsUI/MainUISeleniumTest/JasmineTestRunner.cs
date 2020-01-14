@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using IndicatorsUI.MainUISeleniumTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 
@@ -7,6 +7,12 @@ namespace IndicatorsUI.MainUISeleniumTest
     [TestClass]
     public class JasmineTestRunner : BaseUnitTest
     {
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            InitDriverObjects();
+        }
+
         [TestMethod]
         public void TestFingertips()
         {
@@ -29,7 +35,7 @@ namespace IndicatorsUI.MainUISeleniumTest
         {
             navigateTo.JavaScriptTestPage(testPage);
             var by = By.ClassName("bar");
-            new WaitFor(driver).ExpectedElementToBeVisible(by);
+            waitFor.ExpectedElementToBeVisible(by);
 
             var element = driver.FindElement(by);
             var html = element.Text;

@@ -1,10 +1,12 @@
-import { Component, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { AreaService } from '../../shared/service/api/area.service';
 import { AreaListService } from '../../shared/service/api/arealist.service';
-import { Observable } from 'rxjs/Observable';
-import { AreaList, AreaType } from '../../typings/FT.d';
-import { LightBoxTypes, LightBoxConfig } from '../../shared/component/light-box/light-box.component';
-import { LightBoxWithInputTypes, LightBoxWithInputConfig } from 'app/shared/component/light-box-with-input/light-box-with-input.component';
+import { forkJoin } from 'rxjs';
+import { AreaList, AreaType } from '../../typings/FT';
+import { LightBoxConfig, LightBoxTypes } from '../../shared/component/light-box/light-box';
+import {
+  LightBoxWithInputConfig, LightBoxWithInputTypes
+} from '../../shared/component/light-box-with-input/light-box-with-input';
 
 @Component({
   selector: 'ft-arealist-index',
@@ -12,7 +14,7 @@ import { LightBoxWithInputTypes, LightBoxWithInputConfig } from 'app/shared/comp
   styleUrls: ['./arealist-index.component.css'],
   providers: [AreaListService]
 })
-export class ArealistIndexComponent {
+export class ArealistIndexComponent implements OnInit {
 
   userId: string;
   areaListId: number;
@@ -40,7 +42,7 @@ export class ArealistIndexComponent {
     const areaListsObservable = this.areaListService.getAreaLists(this.userId);
     const areaTypesObservable = this.areaService.getAreaTypes();
 
-    Observable.forkJoin([areaListsObservable, areaTypesObservable]).subscribe(results => {
+    forkJoin([areaListsObservable, areaTypesObservable]).subscribe(results => {
       this.areaLists = <AreaList[]>results[0];
       this.areaTypes = <AreaType[]>results[1];
 
@@ -196,7 +198,7 @@ export class ArealistIndexComponent {
     this.areaListService.deleteAreaList(formData)
       .subscribe(
         (response) => {
-          if (response.status === 200) {
+          if (response.toString().toLowerCase() === 'success') {
             window.location.reload(true);
           }
         },
@@ -250,7 +252,7 @@ export class ArealistIndexComponent {
       this.areaListService.copyAreaList(formData)
         .subscribe(
           (response) => {
-            if (response.status === 200) {
+            if (response.toString().toLowerCase() === 'success') {
               window.location.reload(true);
             }
           },
@@ -290,7 +292,7 @@ export class SortColumns {
 };
 
 export class ActionTypes {
-  public static readonly Info = "INFO";
-  public static readonly Delete = "DELETE";
-  public static readonly Copy = "COPY";
+  public static readonly Info = 'INFO';
+  public static readonly Delete = 'DELETE';
+  public static readonly Copy = 'COPY';
 }

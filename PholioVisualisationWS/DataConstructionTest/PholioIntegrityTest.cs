@@ -61,7 +61,7 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void Test_CIs_Are_Not_Both_Minus_One_Instead_Of_Null()
+        public void Test_95_CIs_Are_Not_Both_Minus_One_Instead_Of_Null()
         {
             var count = ReaderFactory.GetGroupDataReader()
                 .GetCoreDataCountWhereBothCI95AreMinusOne();
@@ -70,6 +70,19 @@ FUS should have changed these to nulls instead. Run this script to fix:
 update [CoreDataSet]
 set  [LowerCI95] = null, [UpperCI95] = null
 where [LowerCI95] = -1 and [UpperCI95] = -1
+             ");
+        }
+
+        [TestMethod]
+        public void Test_99_8_CIs_Are_Not_Both_Minus_One_Instead_Of_Null()
+        {
+            var count = ReaderFactory.GetGroupDataReader()
+                .GetCoreDataCountWhereBothCI998AreMinusOne();
+            Assert.AreEqual(0, count, @"There should be no CoreDataSet rows where both CI99_8 values are -1. 
+FUS should have changed these to nulls instead. Run this script to fix:
+update [CoreDataSet]
+set  [LowerCI99_8] = null, [UpperCI99_8] = null
+where [LowerCI99_8] = -1 and [UpperCI99_8] = -1
              ");
         }
 
@@ -231,7 +244,6 @@ WHERE areatypeid = 7 AND areacode not in (select AreaCode from [dbo].[GIS_AreaCo
         public void CheckMandatoryProperties(IndicatorMetadata indicatorMetadata)
         {
             CheckIsDefined(indicatorMetadata, IndicatorMetadataTextColumnNames.Name);
-            CheckIsDefined(indicatorMetadata, IndicatorMetadataTextColumnNames.NameLong);
             CheckIsDefined(indicatorMetadata, IndicatorMetadataTextColumnNames.DataSource);
             CheckIsDefined(indicatorMetadata, IndicatorMetadataTextColumnNames.Definition);
         }

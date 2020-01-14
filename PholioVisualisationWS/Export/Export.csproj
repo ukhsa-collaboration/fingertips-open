@@ -35,6 +35,12 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.2\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
@@ -50,6 +56,7 @@
       <HintPath>..\lib\SpreadsheetGear.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -64,20 +71,25 @@
     <Compile Include="CategoryComparisonDifferentiator.cs" />
     <Compile Include="CategoryComparisonManager.cs" />
     <Compile Include="CoreDataSetExportFormatter.cs" />
-    <Compile Include="DataFileBuilder.cs" />
+    <Compile Include="ExportPeriodHelper.cs" />
+    <Compile Include="ExportPopulationHelper.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodComparisonContainer.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodSearchContainer.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodSignificanceContainer.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodTrendContainer.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodWriterContainer.cs" />
     <Compile Include="FileBuilder\Containers\IndicatorDataBodyContainer.cs" />
-    <Compile Include="FileBuilder\DataFileBuilderBase.cs" />
+    <Compile Include="FileBuilder\Dtos\InequalitySearchDto.cs" />
     <Compile Include="FileBuilder\IDataFileBuilder.cs" />
     <Compile Include="ExportAreaHelper.cs" />
     <Compile Include="FileBuilder\IndicatorDataCsvFileBuilder.cs" />
     <Compile Include="FileBuilder\Containers\CsvBuilderAttributesForBodyContainer.cs" />
+    <Compile Include="FileBuilder\SupportModels\CategoryInequalitySearch.cs" />
+    <Compile Include="FileBuilder\SupportModels\InequalitySearch.cs" />
+    <Compile Include="FileBuilder\SupportModels\SexAgeInequalitySearch.cs" />
     <Compile Include="FileBuilder\Wrappers\CsvBuilderAttributesForIndicatorsWrapper.cs" />
     <Compile Include="FileBuilder\Wrappers\CsvBuilderAttributesForPeriodsWrapper.cs" />
+    <Compile Include="FileBuilder\SupportModels\GroupingInequality.cs" />
     <Compile Include="FileBuilder\Wrappers\OnDemandQueryParametersWrapper.cs" />
     <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyPeriodWriter.cs" />
     <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyWriter.cs" />
@@ -89,7 +101,6 @@
     <Compile Include="CoverSheet.cs" />
     <Compile Include="ExcelFileBuilder.cs" />
     <Compile Include="ExcelFileWriter.cs" />
-    <Compile Include="ExcelHelper.cs" />
     <Compile Include="File\ExportFileManager.cs" />
     <Compile Include="File\FileBuilder.cs" />
     <Compile Include="File\CacheFileNamer.cs" />
@@ -144,12 +155,21 @@
       <Project>{EE646860-6872-48B7-B67F-B2D717953139}</Project>
       <Name>Formatting</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ServiceActions\ServiceActions.csproj">
+      <Project>{40254974-C7E8-4303-B3FF-BF8A0F8C6491}</Project>
+      <Name>ServiceActions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserData\UserData.csproj">
+      <Project>{F8A2D703-7140-4AC7-80CD-2B81DEC1770F}</Project>
+      <Name>UserData</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="Export.cd" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

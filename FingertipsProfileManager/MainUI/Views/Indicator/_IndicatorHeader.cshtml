@@ -1,0 +1,70 @@
+﻿@using Fpm.MainUI.Helpers
+
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    var doesUserHaveWritePermission = Model.DoesUserHaveWritePermission();
+    var isEditAction = Model.IsEditAction;
+    var profile = Model.Profile;
+    var indicatorId = Model.IndicatorMetadata.IndicatorId;
+    var indicatorMetadataTextValueName = Model.IndicatorMetadataTextValue.Name;
+    var profileUrlKey = Model.UrlKey;
+    var domainSequence = Model.DomainSequence;
+    var areaTypeId = Model.Grouping.AreaTypeId;
+}
+
+<div class="clearfix" style="width: 100%; float: left; clear: both;">
+    @if (isEditAction)
+    {
+        if (profile != null)
+        {
+            var displayMode = CommonUtilities.IsReadOnlyMode() ? "none" : "inline";
+            <div id="button-box" class="filtering clearfix">
+                <div class="row col-md-12">
+                <input id="back" class="btn btn-secondary" type="button" value="Cancel" style="margin-left: 10px;"
+                       onclick="location.href = '@Url.Action("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators",
+                                                     new {ProfileKey = @profileUrlKey, DomainSequence = @domainSequence, SelectedAreaTypeId = @areaTypeId})'"/>
+                <input id="update-indicator" class="btn btn-primary" type="button" value="Save" style="display: @displayMode"/>
+
+                <input id="copy-indicator" class="btn btn-primary pull-right" type="button" value="Create new indicator by copying this metadata"
+                       data-toggle="tooltip" data-placement="bottom"
+                       title="This will create a new indicator by copying the metadata and other details below. This is a quick way to create a new indicator where much of these details are the same. If instead you simply want include this indicator in your profile then you can copy it on the previous page."/>
+            </div>
+                </div>
+
+            <table class="info-table">
+                <tr>
+                    <td class="left">Profile:</td>
+                    <td class="right">@profile.Name</td>
+                </tr>
+                <tr>
+                    <td class="left">Domain:</td>
+                    <td class="right">@profile.GetSelectedGroupingMetadata(profile.SelectedDomain).GroupName</td>
+                </tr>
+                <tr>
+                    <td class="left">Indicator:</td>
+                    <td class="right">@indicatorId - @indicatorMetadataTextValueName</td>
+                </tr>
+            </table>
+        }
+        else
+        {
+            <div class="profile-title">
+                Generic Metadata
+            </div>
+        }
+
+        if (!doesUserHaveWritePermission)
+        {
+            <p class="warning">You do not have permission to edit indicators for "@profile.Name"</p>
+        }
+    }
+    
+    @if (!isEditAction)
+    {
+        <div class="button-panel">
+            <input id="back" class="small-button" type="button" value="Cancel" style="margin-left: 10px;" />
+            <input id="add-indicator" class="small-button" type="button" value="Save" />
+        </div>
+    }
+</div>

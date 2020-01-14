@@ -1,5 +1,5 @@
 import { Component, Input, SimpleChanges, OnChanges } from '@angular/core';
-import { FTHelperService } from 'app/shared/service/helper/ftHelper.service';
+import { FTHelperService } from '../../../service/helper/ftHelper.service';
 
 @Component({
   selector: 'ft-legend-recent-trends',
@@ -8,7 +8,7 @@ import { FTHelperService } from 'app/shared/service/helper/ftHelper.service';
 })
 export class LegendRecentTrendsComponent implements OnChanges {
 
-  @Input() showRecentTrends: Boolean = null;
+  @Input() showRecentTrends: boolean = null;
 
   constructor(private ftHelperService: FTHelperService) { }
 

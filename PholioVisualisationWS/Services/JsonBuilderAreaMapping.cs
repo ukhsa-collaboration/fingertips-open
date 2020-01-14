@@ -28,11 +28,17 @@ namespace PholioVisualisation.Services
 
             Dictionary<string, IEnumerable<string>> parentCodeToChildCodes = new Dictionary<string, IEnumerable<string>>();
 
+            // Check that sufficient parameters are defined
+            if (parentAreaTypeId == AreaTypeIds.Undefined || _parameters.AreaTypeId == AreaTypeIds.Undefined)
+            {
+                return parentCodeToChildCodes;
+            }
+
             var ignoredAreasFilter = IgnoredAreasFilterFactory.New(_parameters.GetNonSearchProfileId());
 
             var listBuilder = new AreaListProvider(areasReader);
 
-            if (parentAreaTypeId == 30000 && userId != null)
+            if (AreaListAreaType.IsAreaListAreaType(parentAreaTypeId) && userId != null)
             {
                 IAreaListRepository areaListRepository = new AreaListRepository(new fingertips_usersEntities());
                 var areaLists = areaListRepository.GetAll(userId);
@@ -58,13 +64,20 @@ namespace PholioVisualisation.Services
             }
             else
             {
+                var areaChild = areasReader.GetAreaType(_parameters.AreaTypeId);
+
+                if (areaChild.IsEngland())
+                {
+                    _parameters.ParentAreaTypeId = AreaTypeIds.Country;
+                }
+
                 // Find child areas of parents
                 listBuilder.CreateAreaListFromAreaTypeId(_parameters.ProfileId, _parameters.ParentAreaTypeId, _parameters.UserId);
                 var parentAreas = listBuilder.Areas;
                 foreach (var parentArea in parentAreas)
                 {
                     var parentChildAreaRelationship = new ParentChildAreaRelationshipBuilder(
-                        ignoredAreasFilter, new AreaListProvider(areasReader))
+                            ignoredAreasFilter, new AreaListProvider(areasReader))
                         .GetParentAreaWithChildAreas(parentArea, _parameters.AreaTypeId, _parameters.RetrieveIgnoredAreas);
                     parentCodeToChildCodes.Add(parentArea.Code, parentChildAreaRelationship.GetChildAreaCodes());
                 }

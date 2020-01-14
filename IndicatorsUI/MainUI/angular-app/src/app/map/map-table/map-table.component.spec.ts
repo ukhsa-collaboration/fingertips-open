@@ -26,7 +26,7 @@ describe('MapTableComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    let createComponent = function () {
+    const createComponent = function () {
         fixture = TestBed.createComponent(MapTableComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using IndicatorsUI.MainUISeleniumTest.Fingertips;
+﻿using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUISeleniumTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using IndicatorsUI.DomainObjects;
+using System.Linq;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 {
@@ -13,12 +11,24 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     public class FingertipsAreaSearchTest : FingertipsBaseUnitTest
     {
         [TestInitialize]
-        public override void TestInitialize()
+        public void TestInitialize()
         {
-            base.TestInitialize();
+            // Because area search is displayed on introduction page
+            OpenProfilePage(ProfileUrlKeys.Phof);
+        }
 
-            // Health profiles because area search is displayed on introduction page
-            OpenProfilePage(ProfileUrlKeys.HealthProfiles);
+        [TestMethod]
+        public void Test_Search_For_Area()
+        {
+            navigateTo.PhofOverviewTab();
+            var areaName = "Croydon";
+
+            fingertipsHelper.SwitchToAreaSearchMode();
+            fingertipsHelper.SearchForAnAreaAndSelectFirstResult(areaName);
+            fingertipsHelper.LeaveAreaSearchMode();
+
+            // Check area menu contains searched for area
+            Assert.AreEqual(areaName, fingertipsHelper.GetSelectedAreaNameFromMenu());
         }
 
         [TestMethod]
@@ -51,8 +61,10 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
             // Assert expected results are displayed
             var resultsHtml = GetResultsHtml();
-            TestHelper.AssertTextContains(resultsHtml, "Allerdale", "Allerdale should be displayed as a district result");
-            TestHelper.AssertTextContains(resultsHtml, "Cumbria", "Derbyshire should be displayed as a county result");
+            TestHelper.AssertTextContains(resultsHtml, "Allerdale", 
+                "Allerdale should be displayed as a district result");
+            TestHelper.AssertTextContains(resultsHtml, "Cumbria", 
+                "Derbyshire should be displayed as a county result");
         }
 
         /// <summary>
@@ -83,9 +95,11 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             Assert.AreEqual(text, "Erewash", "Erewash should be selected on tartan rug page");
         }
 
-        [TestMethod] public void Test_No_Results_Found_For_Ignored_Area()
+        [TestMethod]
+        public void Test_No_Results_Found_For_Ignored_Area()
         {
-            FingertipsHelper.SearchForAnAreaAndSelectFirstResult(driver, "Scilly");
+            OpenProfilePage(ProfileUrlKeys.HealthProfiles);
+            fingertipsHelper.SearchForAnAreaAndSelectFirstResult("Scilly");
             waitFor.FingertipsAreaSearchResultsPageToLoad();
 
             // Assert no data message is displayed
@@ -115,10 +129,16 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             waitFor.FingertipsAreaSearchResultsPageToLoad();
         }
 
+        private IWebElement GetRegionMenu()
+        {
+            var regionMenu = driver.FindElement(By.Id("parent-area-menu"));
+            return regionMenu;
+        }
+
         private void SearchForAnAreaAndSelectFirstResult(string place)
         {
             // Search for a county
-            FingertipsHelper.SearchForAnAreaAndSelectFirstResult(driver, place);
+            fingertipsHelper.SearchForAnAreaAndSelectFirstResult(place);
             waitFor.FingertipsAreaSearchResultsPageToLoad();
         }
 
@@ -126,12 +146,6 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         {
             var resultsHtml = driver.FindElement(By.Id("area-results-box")).Text;
             return resultsHtml;
-        }
-
-        private IWebElement GetRegionMenu()
-        {
-            var regionMenu = driver.FindElement(By.Id("parent-area-menu"));
-            return regionMenu;
         }
     }
 }

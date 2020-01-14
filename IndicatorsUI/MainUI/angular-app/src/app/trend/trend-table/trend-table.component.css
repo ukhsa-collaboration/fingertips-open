@@ -1,0 +1,13 @@
+.trend-source p {
+    font-size: 11px !important;
+}
+
+.bordered-table th {
+   text-align: center;
+}
+
+.trend-marker {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 5px;
+}

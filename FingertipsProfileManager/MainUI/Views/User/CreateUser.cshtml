@@ -26,11 +26,15 @@
             <label class="content-item-detail-label">Is Administrator:</label>@Html.CheckBoxFor(model => model.IsAdministrator)
             <br />
         </div>
+        <div class="delete-indicators">
+            <label class="content-item-detail-label">Is Reviewer:</label>@Html.CheckBoxFor(model => model.IsReviewer)
+            <br />
+        </div>
         <p>
-            <input class="medium-button" id="Confirm" type="submit" value="Confirm" />
+            <input class="medium-button" id="Confirm" type="submit" value="Save" />
         </p>
         <p>
-            <input class="medium-button" id="CancelBtn" type="button" onclick="location.href = '@Url.Action("UserIndex")'" value="Cancel"/>
+            <input class="medium-button" id="CancelBtn" type="button" onclick="location.href = '@Url.Action("UserIndex")'" value="Cancel" />
         </p>
     }
 </div>

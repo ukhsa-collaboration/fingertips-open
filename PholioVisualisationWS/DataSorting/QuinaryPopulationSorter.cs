@@ -1,17 +1,18 @@
-﻿
-using System;
+﻿using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
 using System.Linq;
-using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataSorting
 {
     public class QuinaryPopulationSorter
     {
         /// <summary>
-        /// Values sorted by age ID: youngest first, oldest last
+        /// Population percentages sorted by age ID: youngest first, oldest last
         /// </summary>
         public IList<double> SortedValues { get; private set; }
+
+        public IList<CoreDataSet> SortedData { get; private set; }
+
         public IList<int> SortedAgeIds { get; private set; }
 
         public QuinaryPopulationSorter(IList<CoreDataSet> data)
@@ -20,11 +21,13 @@ namespace PholioVisualisation.DataSorting
                 ? GetAgeIdsToOver95()
                 : GetAgeIdsToOver90();
 
-            IEnumerable<CoreDataSet> sortedData = SortedAgeIds
-                .Select(ageId => data.FirstOrDefault(x => x.AgeId == ageId));
+            SortedData = SortedAgeIds
+                .Select(ageId => data.FirstOrDefault(x => x.AgeId == ageId))
+                .Where(x => x != null)
+                .ToList();
 
-            SortedValues = sortedData
-                .Where(x => x != null &&  x.Value != ValueData.NullValue)
+            SortedValues = SortedData
+                .Where(x => x != null && x.Value != ValueData.NullValue)
                 .Select(x => x.Value)
                 .ToList();
         }
@@ -47,7 +50,7 @@ namespace PholioVisualisation.DataSorting
         public static IList<int> GetAgeIdsToOver95()
         {
             var ageIds = GetAgeIdsUpTo89();
-            ageIds.Add(AgeIds.From90To95);
+            ageIds.Add(AgeIds.From90To94);
             ageIds.Add(AgeIds.Over95);
             return ageIds;
         }

@@ -1,6 +1,7 @@
 ﻿@model IndicatorsUI.MainUI.Models.PageModel
 @using IndicatorsUI.DataAccess
 @using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
 @{ Layout = "~/Views/LongerLives/Diabetes/_DiabetesLayoutPage.cshtml"; }
 @section headContent {
     <script src="@(Model.JsPath)tooltip.js" type="text/javascript"></script>
@@ -24,10 +25,7 @@
         <div class="compare">
             <h3>Compare:</h3>
             <ul id="area_display_options">
-                @if (AppConfig.Instance.IsFeatureActive("enableNeighbourComparisonInLongerLives"))
-                {
-                    <li id="show_nearest_neighbours"><a href="javascript:showNearestNeighbours()">Similar local authorities</a></li>
-                }
+                <li id="show_nearest_neighbours"><a href="javascript:showNearestNeighbours()">Similar local authorities</a></li>
                 <li id="show_similar_areas"><a href="javascript:showSimilarAreas()">Deprivation group</a></li>
                 <li id="show_all_areas"><a href="javascript:showAllAreas()">All local authorities</a></li>
             </ul>
@@ -47,7 +45,7 @@
                         }
                     }
                 </ul>
-                        }
+            }
             <br />
         </div>
 
@@ -78,40 +76,15 @@
 
         </div>
 
-        <ul class="related_links no-print">
-            @if (Model.ProfileId == ProfileIds.SuicidePrevention)
-            {
-                <li>@Html.Partial("_MentalHealthLink")</li>
-            }
-            else
-            {
-                <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
-                if (Model.ProfileId == ProfileIds.PublicHealthDashboard)
-                {
-                    <li>@Html.Partial("_HealthProfileLink")</li>
-                    <li>@Html.Partial("_FingertipsLink")</li>
-                }
-            }
-            <li><a href="/topic/@(ViewBag.ProfileUrlKey)/about-data">About the data</a></li>
-            @if (Model.ProfileId == ProfileIds.HealthChecks)
-            {
-                <li><a href="http://www.healthcheck.nhs.uk/" class="external_link" target="_blank">Information for professionals interested in the NHS Health Check programme</a></li>
-                <li><a id="la_link" class="external_link" target="_blank" href="#">Find out more about the NHS Health Check in this local authority</a></li>
-            }
-        </ul>
+        <div class="related_links no-print">
+            @Html.Partial("_SideBarLinks")
+        </div>
 
     </div>
     <div id="main_content" class="area-details">
 
         <span id="legend"></span>
-        @if (Model.ProfileId == ProfileIds.HealthChecks)
-        {
-            @Html.Partial("_LegendInlineQuintiles")
-        }
-        else if (Model.ProfileId == ProfileIds.PublicHealthDashboard)
-        {
-            @Html.Partial("_LegendDetailedQuartiles")
-        }
+        @Html.Partial("_LegendDetailedQuartiles")
 
         <span id="headline_bar_chart"></span>
         <span id="ranking_bar_charts"></span>

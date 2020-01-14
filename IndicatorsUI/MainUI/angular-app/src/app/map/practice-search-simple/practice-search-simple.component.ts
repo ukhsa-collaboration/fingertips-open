@@ -3,25 +3,24 @@ import {
 } from '@angular/core';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { AreaService } from '../../shared/service/api/area.service';
-import { AreaListService } from '../../shared/service/api/arealist.service';
-import { AreaTypeIds } from '../../shared/shared';
-import { AreaTextSearchResult, NearByAreas, AreaAddress, Area } from '../../typings/FT.d';
+import { AreaTypeIds } from '../../shared/constants';
+import { AreaTextSearchResult, NearByAreas, AreaAddress, Area } from '../../typings/FT';
 import { Observable } from 'rxjs/Observable';
-import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/ngx-bootstrap-typeahead';
 import { AutoCompleteResult, Practice } from './practice-search-simple';
 import * as _ from 'underscore';
 import { FormGroup, FormControl } from '@angular/forms';
+import { isDefined } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'ft-practice-search-simple',
   templateUrl: './practice-search-simple.component.html',
-  styleUrls: ['./practice-search-simple.component.css'],
-  providers: [AreaListService]
+  styleUrls: ['./practice-search-simple.component.css']
 })
 export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
 
-  @ViewChild('scrollPracticeTable') practiceTable: ElementRef;
-  @ViewChild('googleMapNew') mapEl: ElementRef;
+  @ViewChild('scrollPracticeTable', { static: true }) practiceTable: ElementRef;
+  @ViewChild('googleMapNew', { static: true }) mapEl: ElementRef;
   @Input() IsMapUpdateRequired = false;
   @Input() searchMode = false;
   @Input() areaTypeId: number;
@@ -53,14 +52,16 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
   selectedPractices: Practice[] = [];
   firstTimeLoad = true;
 
+  private readonly CcgAreaTypeToSearch = AreaTypeIds.CcgSinceApr2019;
+
   ngOnChanges(changes: SimpleChanges): void {
     if (this.IsMapUpdateRequired && this.showCcgPractices) {
       this.onShowAllPracticeinCCGClick();
     }
     if (changes['searchMode']) {
-      const displyCCGLink = changes['searchMode'].currentValue;
-      if (displyCCGLink !== undefined) {
-        if (displyCCGLink) {
+      const searchMode = changes['searchMode'].currentValue;
+      if (isDefined(searchMode)) {
+        if (searchMode) {
           this.localSearchMode = true;
           this.displayCCGPracticeLink = false;
         }
@@ -76,14 +77,14 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
 
   constructor(private ftHelperService: FTHelperService,
     private areaService: AreaService,
-    private arealistService: AreaListService,
     private ref: ChangeDetectorRef) {
 
     this.localSearchMode = false;
     this.displayCCGPracticeLink = true;
     this.dataSource = Observable.create((observer: any) => {
-      this.areaService.getAreaSearchByText(this.placeNameText, AreaTypeIds.CcgPreApr2017, true, true)
+      this.areaService.getAreaSearchByText(this.placeNameText, AreaTypeIds.DistrictUA, true, true)
         .subscribe((areaTextSearchResult: any) => {
+
           this.searchResults = <AreaTextSearchResult[]>areaTextSearchResult;
           const newResult = _.map(this.searchResults, function (result) {
             return new AutoCompleteResult(result.PolygonAreaCode, result.PlaceName,
@@ -156,7 +157,9 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
 
   public typeaheadOnSelect(e: TypeaheadMatch): void {
     const polygonAreaCode = (<AutoCompleteResult>e.item).polygonAreaCode;
+
     this.selectedArea = _.find(this.searchResults, function (obj) { return obj.PolygonAreaCode === polygonAreaCode; });
+
     this.areaService.getAreaSearchByProximity(this.selectedArea.Easting, this.selectedArea.Northing, AreaTypeIds.Practice)
       .subscribe((result: any) => {
         const nearByAreas = <NearByAreas[]>result;
@@ -180,17 +183,21 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
           return new Practice(area.Name, area.Code,
             area.A1, area.A2, area.Postcode, '', area.Pos);
         });
+
         this.displayMarkersOnMap();
+        this.decorateSelectedNearbyAreas();
         this.showCcgPractices = true;
         this.placeNameText = '';
       });
   }
 
   displayMarkersOnMap(): void {
+
+    const iconPath = 'http://maps.google.com/mapfiles/ms/icons/';
+
     const bounds = new google.maps.LatLngBounds();
     const infoWindow = new google.maps.InfoWindow({});
     const linkList = [];
-    let iconUrl;
 
     for (let i = 0; i < this.nearByPractices.length; i++) {
       const position = new google.maps.LatLng(this.nearByPractices[i].lat, this.nearByPractices[i].lng);
@@ -198,17 +205,16 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
 
       let practiceInSelectedPractices: Practice;
       practiceInSelectedPractices = this.selectedPractices.find(x => x.areaCode === this.nearByPractices[i].areaCode);
-      if (practiceInSelectedPractices !== null && practiceInSelectedPractices !== undefined) {
-        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/green-dot.png';
-      } else {
-        iconUrl = 'http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png';
-      }
+
+      const iconFile = (isDefined(practiceInSelectedPractices) && practiceInSelectedPractices)
+        ? 'green-dot.png'
+        : 'ltblue-dot.png';
 
       // Create marker
       const marker = new google.maps.Marker({
         position: position,
         map: this.practiceMap,
-        icon: iconUrl
+        icon: iconPath + iconFile
       });
       marker.set('marker_id', this.nearByPractices[i].areaCode);
 
@@ -227,18 +233,19 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
         infoWindow.setContent(linkList[i]);
         infoWindow.open(this.practiceMap, marker);
 
+        const $area = $('.available-practices-' + areaCode);
         const selectedPracticeIndex = _.findIndex(this.selectedPractices, x => x.areaCode === areaCode);
         if (selectedPracticeIndex === -1) {
-          marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+          marker.setIcon(iconPath + 'green-dot.png')
           const currentPracticeIndex = _.findIndex(this.nearByPractices, x => x.areaCode === areaCode);
           const currentPractice = this.nearByPractices[currentPracticeIndex];
           this.selectedPractices.push(currentPractice);
 
-          $('.available-practices-' + areaCode).addClass('bg-info text-white');
+          $area.addClass('bg-info text-white');
         } else {
-          marker.setIcon('http://maps.google.com/mapfiles/ms/icons/ltblue-dot.png');
+          marker.setIcon(iconPath + 'ltblue-dot.png');
           this.selectedPractices.splice(selectedPracticeIndex, 1);
-          $('.available-practices-' + areaCode).removeClass('bg-info text-white');
+          $area.removeClass('bg-info text-white');
         }
 
         this.emitSelectedPractices.emit(this.selectedPractices);
@@ -285,7 +292,7 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
   }
 
   searchForPracticesInCCG() {
-    this.areaService.getAreas(152)
+    this.areaService.getAreas(this.CcgAreaTypeToSearch)
       .subscribe((result: any) => {
         this.practicesInCCG = <Area[]>result;
       });
@@ -309,53 +316,92 @@ export class PracticeSearchSimpleComponent implements OnInit, OnChanges {
 
       this.selectedPractices.length = 0;
       this.displayMarkersOnMap();
+
+      this.nearByPractices.forEach(practice => {
+        const $element = this.getItem('available-practices', practice.areaCode);
+        $element.removeClass('bg-info text-white');
+      });
     }
   }
 
   removeFromList(areaCode) {
-    let areaCodeIndex = this.selectedPractices.findIndex(x => x.areaCode === areaCode);
+    const areaCodeIndex = this.selectedPractices.findIndex(x => x.areaCode === areaCode);
     this.selectedPractices.splice(areaCodeIndex, 1);
 
-    this.displayMarkersOnMap();
+    if (this.practicesInCCGFormGroup.get('practicesInCCG').value !== '-1') {
+      this.displayMarkersOnMap();
+    }
+
+    const nearByPractice = this.nearByPractices.find(x => x.areaCode === areaCode);
+    if (nearByPractice !== null && nearByPractice !== undefined) {
+      const $element = this.getItem('available-practices', nearByPractice.areaCode);
+      $element.removeClass('bg-primary text-white cursor-pointer bg-info');
+    }
   }
 
   toggleMap() {
-    $('#nearby-practices-list').toggle();
+    const $practicesList = $('#nearby-practices-list');
+    $practicesList.toggle();
     $('#nearby-practices-map').toggle();
 
-    if ($('#nearby-practices-list').is(':visible')) {
-      $('#toggleMapHeading').html('Show practices on map');
-    } else {
-      $('#toggleMapHeading').html('Show practices as list');
+    const heading = $practicesList.is(':visible')
+      ? 'Show practices on map'
+      : 'Show practices as list'
+
+    this.decorateSelectedNearbyAreas();
+
+    $('#toggleMapHeading').html(heading);
+  }
+
+  decorateSelectedNearbyAreas(): void {
+    const $practicesList = $('#nearby-practices-list');
+    if ($practicesList.is(':visible')) {
+      this.selectedPractices.forEach(practice => {
+        const nearByPractice = this.nearByPractices.find(x => x.areaCode === practice.areaCode);
+        if (nearByPractice !== undefined && nearByPractice !== null) {
+          const $element = this.getItem('available-practices', nearByPractice.areaCode);
+          $element.addClass('bg-info text-white');
+        }
+      });
     }
   }
 
   // Method to handle the mouse over event on the practice list
   selectPractice(itemType, item) {
-    if (!$('.' + itemType + '-' + item).hasClass('bg-info')) {
-      $('.' + itemType + '-' + item).addClass('bg-primary text-white cursor-pointer');
+
+    const $element = this.getItem(itemType, item);
+    if (!$element.hasClass('bg-info')) {
+      $element.addClass('bg-primary text-white cursor-pointer');
     }
   }
 
   // Method to handle the mouse out event on the practice list
   deselectPractice(itemType, item) {
-    if (!$('.' + itemType + '-' + item).hasClass('bg-info')) {
-      $('.' + itemType + '-' + item).removeClass('bg-primary text-white cursor-pointer');
+
+    const $element = this.getItem(itemType, item);
+    if (!$element.hasClass('bg-info')) {
+      $element.removeClass('bg-primary text-white cursor-pointer');
     }
   }
 
+  getItem(itemType, item) {
+    return $('.' + itemType + '-' + item);
+  }
+
   movePractice(itemType, item) {
+    const $element = this.getItem(itemType, item);
+
     const selectedPracticeIndex = _.findIndex(this.selectedPractices, x => x.areaCode === item);
     if (selectedPracticeIndex === -1) {
       const currentPracticeIndex = _.findIndex(this.nearByPractices, x => x.areaCode === item);
       const currentPractice = this.nearByPractices[currentPracticeIndex];
       this.selectedPractices.push(currentPractice);
 
-      $('.' + itemType + '-' + item).addClass('bg-info text-white');
+      $element.addClass('bg-info text-white');
 
     } else {
       this.selectedPractices.splice(selectedPracticeIndex, 1);
-      $('.' + itemType + '-' + item).removeClass('bg-info');
+      $element.removeClass('bg-info text-white');
     }
 
     this.displayMarkersOnMap();

@@ -8,13 +8,16 @@ namespace PholioVisualisation.ServiceActions
 {
     public class PartitionDataForAllAgesBuilder : PartitionDataBuilderBase
     {
+        private int _chartAverageLineAgeId = -1;
+        private IList<CoreDataSet> _dataList = new List<CoreDataSet>();
+
         public PartitionDataForAllAges GetPartitionData(int profileId,
             string areaCode, int indicatorId, int sexId, int areaTypeId)
         {
             InitGrouping(profileId, areaTypeId, indicatorId, sexId);
             if (_grouping == null)
             {
-                // No inequalitity data available
+                // No inequality data available
                 return new PartitionDataForAllAges
                 {
                     AreaCode = areaCode,
@@ -26,21 +29,25 @@ namespace PholioVisualisation.ServiceActions
             }
 
             InitMetadata(_grouping);
+            if (_specialCase != null && _specialCase.ShouldUseForAverageLineOnChart())
+            {
+                _chartAverageLineAgeId = _specialCase.ChartAverageLineAgeId;
+            }
 
-            var timePeriod = TimePeriod.GetDataPoint(_grouping);
+            InitTimePeriod(profileId, _grouping);
 
             // Get Data
-            var dataList = _groupDataReader.GetCoreDataForAllAges(indicatorId,
-                timePeriod, areaCode, sexId);
-            dataList = FilterOutAgeIdsIfRequired(dataList);
+            _dataList = _groupDataReader.GetCoreDataForAllAges(indicatorId,
+                _timePeriod, areaCode, sexId);
+            _dataList = FilterOutAgeIdsIfRequired(_dataList);
 
             // Define and order ages
-            var ages = GetAgesFromDataList(dataList);
+            var ages = GetAgesFromDataList(_dataList);
 
             // Process data list
-            dataList = new CoreDataSetSorter(dataList).SortByAgeId(ages);
-            CalculateSignificances(areaCode, timePeriod, dataList);
-            FormatData(dataList);
+            _dataList = new CoreDataSetSorter(_dataList).SortByAgeId(ages);
+            CalculateSignificances(areaCode, _timePeriod, _dataList);
+            FormatData(_dataList);
 
             return new PartitionDataForAllAges
             {
@@ -48,7 +55,8 @@ namespace PholioVisualisation.ServiceActions
                 IndicatorId = indicatorId,
                 SexId = sexId,
                 Ages = ages,
-                Data = dataList
+                Data = _dataList,
+                ChartAverageLineAgeId = _chartAverageLineAgeId
             };
         }
 
@@ -120,5 +128,39 @@ namespace PholioVisualisation.ServiceActions
             _grouping = groupingProvider.GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexId(profileId, areaTypeId, indicatorId, sexId);
         }
 
+        protected override void CalculateSignificances(string areaCode, TimePeriod timePeriod, IList<CoreDataSet> dataList)
+        {
+            // Get benchmark data
+            var area = AreaFactory.NewArea(_areasReader, areaCode);
+            var benchmarkData = GetBenchmarkData(timePeriod, area);
+
+            if (_indicatorMetadata.HasSpecialCases)
+            {
+                benchmarkData = GetSpecialCaseBenchmarkData(timePeriod, area);
+            }
+
+            var indicatorComparisonHelper = GetIndicatorComparisonHelper();
+            foreach (CoreDataSet coreDataSet in dataList)
+            {
+                coreDataSet.SignificanceAgainstOneBenchmark = indicatorComparisonHelper.GetSignificance(coreDataSet, benchmarkData);
+            }
+        }
+
+        /// <summary>
+        /// Override base method to allow handling of special cases
+        /// </summary>
+        protected override CoreDataSet GetSpecialCaseBenchmarkData(TimePeriod timePeriod,
+            IArea area)
+        {
+            foreach (var data in _dataList)
+            {
+                if (data.AgeId == _chartAverageLineAgeId)
+                {
+                    return data;
+                }
+            }
+
+            return null;
+        }
     }
 }

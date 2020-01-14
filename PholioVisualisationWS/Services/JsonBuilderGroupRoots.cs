@@ -20,9 +20,10 @@ namespace PholioVisualisation.Services
 
         public IList<GroupRoot> GetGroupRoots()
         {
-            var groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            var groupings = groupDataReader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(
                 _parameters.GroupId, _parameters.AreaTypeId);
-            return new GroupRootBuilder().BuildGroupRoots(groupings);
+            return new GroupRootBuilder(groupDataReader).BuildGroupRoots(groupings);
         }
     }
 }

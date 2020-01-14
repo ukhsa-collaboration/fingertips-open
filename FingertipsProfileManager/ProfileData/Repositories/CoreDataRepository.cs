@@ -9,29 +9,17 @@ using System.Text;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public interface ICoreDataRepository
-    {
-        IEnumerable<CoreDataSetArchive> GetCoreDataArchives(string areaCode);
-        void DeleteCoreDataArchive(Guid uploadBatchId);
-        void DeleteCoreDataSet(Guid uploadBatchId);
-        Area GetAreaDetail(string areaCode);
-        void UpdateAreaDetail(Area newAreaDetail, string originalAreaCode, string loggedInUser);
-        IEnumerable<CategoryType> GetCategoryTypes(int indicatorId);
-        IEnumerable<AreaType> GetAreaTypes(int indicatorId);
-        IEnumerable<Sex> GetSexes(int indicatorId);
-        IEnumerable<Age> GetAges(int indicatorId);
-        IEnumerable<int> GetYearRanges(int indicatorId);
-        IEnumerable<int> GetYears(int indicatorId);
-        IEnumerable<int> GetMonths(int indicatorId);
-        IEnumerable<int> GetQuarters(int indicatorId);
-        IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, out int totalRows);
-        IEnumerable<CoreDataSet> GetCoreDataSet(int indicatorId, Dictionary<string, object> filters, out int totalRows);
-        int DeleteCoreDataSet(int indicatorId, Dictionary<string, object> filters, string userName);
-        bool CanDeleteDataSet(int indicatorId, string userName);
-    }
-
     public class CoreDataRepository : RepositoryBase, ICoreDataRepository
     {
+        const string SqlColumns = " [IndicatorID] ,[Year] ,[YearRange] ,[Quarter] ,[Month] ,[AgeID] ,[SexID] ,[AreaCode] " +
+                                  ",[Count] ,[Value] ,[LowerCI95] ,[UpperCI95], [LowerCI99_8] ,[UpperCI99_8] ,[Denominator] ,[Denominator_2] ,[ValueNoteId] " +
+                                  ",[uploadbatchid] ,[CategoryTypeID] ,[CategoryID]";
+
+        public CoreDataRepository()
+            : this(NHibernateSessionFactory.GetSession())
+        {
+        }
+
         public CoreDataRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
@@ -264,16 +252,12 @@ namespace Fpm.ProfileData.Repositories
         public int DeleteCoreDataSet(int indicatorId, Dictionary<string, object> filters, string userName)
         {
 
-            const string sqlColumns = " [IndicatorID] ,[Year] ,[YearRange] ,[Quarter] ,[Month] ,[AgeID] ,[SexID] ,[AreaCode] " +
-                                      ",[Count] ,[Value] ,[LowerCI95] ,[UpperCI95], [LowerCI99_8] ,[UpperCI99_8] ,[Denominator] ,[Denominator_2] ,[ValueNoteId] " +
-                                      ",[uploadbatchid] ,[CategoryTypeID] ,[CategoryID]";
-
             var deleteBatchId = Guid.NewGuid();
 
             var sqlWhere = " WHERE indicatorId = " + indicatorId + GetSqlFromFilters(filters);
 
-            var sqlInsertArchive = "INSERT INTO Coredataset_Archive(" + sqlColumns + ", DeleteBatchId) " +
-                                   "SELECT " + sqlColumns + ", '" + deleteBatchId + "' FROM Coredataset " +
+            var sqlInsertArchive = "INSERT INTO Coredataset_Archive(" + SqlColumns + ", DeleteBatchId) " +
+                                   "SELECT " + SqlColumns + ", '" + deleteBatchId + "' FROM Coredataset " +
                                    sqlWhere;
 
             var sqlDeleteCoreData = "DELETE FROM Coredataset " + sqlWhere;
@@ -310,6 +294,34 @@ namespace Fpm.ProfileData.Repositories
 
             }
             return -1;
+        }
+
+        public void DeleteCoreDataSet(int indicatorId, int valueNoteId)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                var deleteBatchId = Guid.NewGuid();
+
+                var sqlInsertArchive = string.Format(
+                    "INSERT INTO Coredataset_Archive(" + SqlColumns + ", DeleteBatchId) SELECT " + SqlColumns + ", '" +
+                    deleteBatchId + "' FROM Coredataset WHERE IndicatorId = {0} AND ValueNoteId = {1}", indicatorId,
+                    valueNoteId);
+
+                CurrentSession.CreateSQLQuery(sqlInsertArchive).ExecuteUpdate();
+
+                var sql = string.Format("DELETE FROM CoreDataSet WHERE IndicatorId = {0} AND ValueNoteId = {1}",
+                    indicatorId, valueNoteId);
+
+                CurrentSession.CreateSQLQuery(sql).ExecuteUpdate();
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
         }
 
         private string GetSqlFromFilters(Dictionary<string, object> filters)

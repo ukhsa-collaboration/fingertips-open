@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace PholioVisualisation.RequestParameters
 {
@@ -17,7 +18,9 @@ namespace PholioVisualisation.RequestParameters
             SearchText = ParseString(ParameterNames.Text);
             PolygonAreaTypeId = ParseInt(ParameterNames.PolygonAreaTypeId);
             AreEastingAndNorthingRequired = ParseBool(ParameterNames.AreEastingAndNorthingRequired);
-            ParentAreaTypesToIncludeInResults = ParseIntList(ParameterNames.ParentAreaTypesToIncludeInResults, ',');
+
+            var parentAreaTypesToInclude = ParseIntList(ParameterNames.ParentAreaTypesToIncludeInResults, ',');
+            ParentAreaTypesToIncludeInResults = parentAreaTypesToInclude.Where(x => x != UndefinedInteger).ToList();
         }
 
         public override bool AreValid

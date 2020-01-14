@@ -1,14 +1,11 @@
 import { Component, HostListener } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import {
-  FTModel, FTRoot, GroupRoot, IndicatorMetadata, IndicatorStatsPercentilesFormatted,
-  IndicatorStats, TooltipManager, IndicatorStatsPercentiles
-} from '../typings/FT.d';
-import { BoxplotData } from './boxplot';
+import { forkJoin } from 'rxjs';
+import { BoxplotData, BoxplotDataForTable } from './boxplot';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import { IndicatorService } from '../shared/service/api/indicator.service';
-import { IndicatorHeader } from '../shared/component/indicator-header/indicator-header.component';
-import { AreaTypeIds } from 'app/shared/shared';
+import { IndicatorHeader } from '../shared/component/indicator-header/indicator-header';
+import { GroupRoot, IndicatorMetadata, IndicatorStats } from '../typings/FT';
+import { TrendSourceHelper, ComparatorHelper, AreaHelper } from '../shared/shared';
 
 @Component({
   selector: 'ft-boxplot',
@@ -19,79 +16,137 @@ export class BoxplotComponent {
 
   public header: IndicatorHeader;
   public boxplotData: BoxplotData;
-  public isAvailable = true;
+  public boxplotDataForTable: BoxplotDataForTable[] = [];
+  public isEnglandAreaSelected = true;
+
+  isAnyData = true;
+  indicatorMetadata: IndicatorMetadata;
+  groupRoot: GroupRoot;
+  isNearestNeighbour = false;
+  boxPlotChart: any;
 
   constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) { }
 
-  @HostListener('window:BoxplotSelected', ['$event'])
-  public onOutsideEvent(event): void {
+  @HostListener('window:BoxplotSelected', ['$event', '$event.detail.isEnglandAreaType'])
+  public onOutsideEvent(event, isEnglandAreaSelected): void {
 
-    let ftHelper = this.ftHelperService;
+    const ftHelper = this.ftHelperService;
+    const model = ftHelper.getFTModel();
+    this.isNearestNeighbour = model.isNearestNeighbours();
 
-    let groupRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-    let model = ftHelper.getFTModel();
-
-    this.isAvailable = model.areaTypeId !== AreaTypeIds.Country;
+    this.groupRoot = ftHelper.getCurrentGroupRoot();
+    this.isEnglandAreaSelected = isEnglandAreaSelected;
+    this.isAnyData = true;
 
     // Get data
-    let metadataObservable = this.indicatorService.getIndicatorMetadata(model.groupId);
-    let statsObservable = this.indicatorService.getIndicatorStatisticsTrendsForSingleIndicator(
-      groupRoot.IID, groupRoot.Sex.Id, groupRoot.Age.Id, model.areaTypeId,
-      this.ftHelperService.getCurrentComparator().Code);
+    const groupRoot = this.groupRoot;
+    const comparatorCode = new ComparatorHelper(ftHelper).getCurrentComparatorCode();
+    const metadataObservable = this.indicatorService.getIndicatorMetadata(model.groupId);
+    const statsObservable = this.indicatorService.getIndicatorStatisticsTrendsForSingleIndicator(
+      groupRoot.IID, groupRoot.Sex.Id, groupRoot.Age.Id, model.areaTypeId, comparatorCode, model.profileId);
 
-    Observable.forkJoin([metadataObservable, statsObservable]).subscribe(results => {
-      let metadataHash: Map<number, IndicatorMetadata> = results[0];
-      let statsArray: IndicatorStats[] = results[1];
+    forkJoin([metadataObservable, statsObservable]).subscribe(results => {
+      const metadataHash: Map<number, IndicatorMetadata> = results[0];
+      const statsArray: IndicatorStats[] = results[1];
 
-      this.displayBoxplot(metadataHash[groupRoot.IID], groupRoot, statsArray);
+      this.indicatorMetadata = metadataHash[groupRoot.IID];
 
-      this.ftHelperService.showAndHidePageElements();
-      this.ftHelperService.unlock();
+      this.displayBoxplot(statsArray, groupRoot);
+
+      ftHelper.showAndHidePageElements();
+      ftHelper.unlock();
     });
   }
 
-  displayBoxplot(metadata: IndicatorMetadata, groupRoot: GroupRoot, statsArray: IndicatorStats[]) {
+  @HostListener('window:NoDataDisplayed', ['$event', '$event.detail.isEnglandAreaType'])
+  public refershVariables(event, isEnglandAreaSelected): void {
+    this.isAnyData = false;
+    this.isEnglandAreaSelected = isEnglandAreaSelected;
+  }
+
+  displayBoxplot(statsArray: IndicatorStats[], groupRoot: GroupRoot) {
+    let hasNegativeStats = false;
 
     // Define header
-    this.displayHeader(metadata, groupRoot);
+    this.displayHeader();
 
     // Define data
-    let data = new BoxplotData(metadata, this.ftHelperService.getAreaTypeName(),
-      this.ftHelperService.getCurrentComparator().Name);
+    const comparatorHelper = new ComparatorHelper(this.ftHelperService);
+    const comparatorName = comparatorHelper.getCurrentComparatorName();
+    const comparatorCode = comparatorHelper.getCurrentComparatorCode();
+
+    const indicatorName = this.ftHelperService.getIndicatorName(this.indicatorMetadata.IID) +
+      this.ftHelperService.getSexAndAgeLabel(groupRoot);
+
+    const areaTypeName = this.ftHelperService.getAreaTypeName();
+    const areaCode = this.ftHelperService.getFTModel().areaCode;
+    const areaName = this.ftHelperService.getArea(areaCode).Name;
+    const data = new BoxplotData(this.indicatorMetadata, indicatorName, areaTypeName, areaName,
+      comparatorName, comparatorCode, this.isNearestNeighbour);
     for (let i = 0; i < statsArray.length; i++) {
-      let indicatorStats = statsArray[i];
+      const indicatorStats = statsArray[i];
       if (indicatorStats.Stats) {
         data.addStats(indicatorStats);
+
+        // Check whether any of the stats values are negative
+        // Helps to decide whether y axis can start with zero
+        const stats = indicatorStats.Stats;
+        hasNegativeStats = stats.Min < 0;
       }
     }
+
+    // Define whether y axis can start with zero
+    const canStartZeroYAxis = this.ftHelperService.getFTConfig().startZeroYAxis;
+    data.setMin(canStartZeroYAxis && !hasNegativeStats);
+
+    this.formatBoxplotDataForTable(data);
+
     this.boxplotData = data;
   }
 
-  displayHeader(metadata: IndicatorMetadata, groupRoot: GroupRoot): void {
+  formatBoxplotDataForTable(data: BoxplotData) {
+
+    const unitLabel = this.ftHelperService.newValueSuffix(this.indicatorMetadata.Unit).getShortLabel();
+    const trendSource = new TrendSourceHelper(this.indicatorMetadata).getTrendSource();
+
+    const periodsCount = data.periods.length;
+    const rows = [];
+    for (let i = 0; i < periodsCount; i++) {
+      const row = new BoxplotDataForTable();
+      row.period = data.periods[i];
+      row.statsFormatted = data.statsFormatted[i];
+      row.unitLabel = unitLabel;
+      row.trendSource = trendSource;
+      rows.push(row);
+    }
+
+    this.boxplotDataForTable = rows;
+  }
+
+  displayHeader(): void {
+
+    // Define unit label
+    const metadata = this.indicatorMetadata;
     let unitLabel = metadata.Unit.Label;
     if (unitLabel !== '') {
       unitLabel = ' - ' + unitLabel;
     }
 
-    let hasDataChangedRecently = groupRoot.DateChanges && groupRoot.DateChanges.HasDataChangedRecently;
+    // Has data changed
+    const groupRoot = this.groupRoot;
+    const hasDataChangedRecently = groupRoot.DateChanges && groupRoot.DateChanges.HasDataChangedRecently;
+
+    const comparatorName = new ComparatorHelper(this.ftHelperService).getCurrentComparatorName();
 
     this.header = new IndicatorHeader(metadata.Descriptive['Name'], hasDataChangedRecently,
-      this.ftHelperService.getCurrentComparator().Name,
-      metadata.ValueType.Name, unitLabel, this.ftHelperService.getSexAndAgeLabel(groupRoot));
-  }
-
-  public isAnyData(): boolean {
-    return this.boxplotData && this.boxplotData.isAnyData();
+      comparatorName, metadata.ValueType.Name, unitLabel, this.ftHelperService.getSexAndAgeLabel(groupRoot));
   }
 
   onExportClick(event: MouseEvent) {
-    event.preventDefault();
-    let boxplotTable = $('.boxplot-table').hide();
-    let chart = $('#indicator-details-boxplot-data');
-    $('.highcharts-credits,.highcharts-contextbutton').hide();
-    this.ftHelperService.saveElementAsImage(chart, 'boxplot');
-    $(boxplotTable).show();
-    this.ftHelperService.logEvent('ExportImage', 'Boxplot');
+    this.boxPlotChart.exportChart({ type: 'image/png' }, {});
   }
 
+  setBoxPlotChart(event) {
+    this.boxPlotChart = event.chart;
+  }
 }

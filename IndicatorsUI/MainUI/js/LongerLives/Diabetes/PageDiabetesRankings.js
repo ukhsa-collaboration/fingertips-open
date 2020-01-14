@@ -51,7 +51,6 @@ function getSecondaryData() {
 
     populateAreaTypes(model);
     populateCauseList();
-    createExportLinks();
     populateSupportingIndicatorList();
     removeLoadingSpinner();
 }
@@ -81,13 +80,13 @@ function getSupportingDataValues(prevAndRiskRootIndex) {
 
     var parameters = new ParameterBuilder(
     ).add('group_id', groupId
-    ).add('area_type_id', model.areaTypeId
-    ).add('parent_area_code', model.parentCode
-    ).add('profile_id', model.profileId
-    ).add('comparator_id', -1
-    ).add('indicator_id', root.IID
-    ).add('sex_id', root.Sex.Id
-    ).add('age_id', root.Age.Id);
+        ).add('area_type_id', model.areaTypeId
+        ).add('parent_area_code', model.parentCode
+        ).add('profile_id', model.profileId
+        ).add('comparator_id', -1
+        ).add('indicator_id', root.IID
+        ).add('sex_id', root.Sex.Id
+        ).add('age_id', root.Age.Id);
 
     ajaxGet('api/latest_data/single_indicator_for_all_areas', parameters.build(),
         function (obj) {
@@ -327,14 +326,14 @@ function displayTable(rows) {
     // Render data
     $('#diabetes-rankings-table tbody').html(
         templates.render('rows',
-        {
-            rows: rows,
-            englandValCol1: column1Val,
-            englandValCol2: column2Val,
-            col1Unit: column1Unit,
-            col2Unit: column2Unit,
-            showEnglandVal: showEnglandVal
-        })
+            {
+                rows: rows,
+                englandValCol1: column1Val,
+                englandValCol2: column2Val,
+                col1Unit: column1Unit,
+                col2Unit: column2Unit,
+                showEnglandVal: showEnglandVal
+            })
     );
 }
 
@@ -406,38 +405,6 @@ function selectAreaType(parentAreaTypeId) {
     }
 }
 
-function createExportLinks() {
-    var model = MT.model;
-
-    var parameters = new ParameterBuilder(
-        ).add('profile_id', model.profileId
-        ).add('child_area_type_id', model.areaTypeId);
-
-    // Via core so saves as HTML
-    var exportLink = '<a href="' + FT.url.corews + 'api/all_data/csv/by_profile_id?';
-
-    // National data download link (not for practices)
-    var $link = $('#download_data_for_england');
-    if (model.areaTypeId === AreaTypeIds.Practice) {
-        // Hide national link
-        $link.hide();
-
-        // Download practice data within parent area
-        parameters.add('parent_area_type_id', model.parentAreaType);
-        parameters.add('parent_area_code', model.parentCode);
-        $('#download_data_for_ccg').html(exportLink + parameters.build() +
-            '" class="external_link" target="_blank">Download ' + profileTitle + ' data for '
-            + loaded.addresses[MT.model.parentCode].Name + '</a>');
-
-    } else {
-        // Download national data
-        parameters.add('parent_area_type_id', AreaTypeIds.Country);
-        parameters.add('parent_area_code', NATIONAL_CODE);
-        $link.html(exportLink + parameters.build() +
-            '" class="external_link" target="_blank">Download ' + profileTitle + ' data for England</a>');
-    }
-}
-
 function getIndexOfGroupRootThatContainsIndicator(model, groupRoots) {
 
     var index = 0;
@@ -459,7 +426,7 @@ function getPracticeList() {
     var model = MT.model;
 
     var parameters = new ParameterBuilder(
-        ).add('profile_id', model.profileId
+    ).add('profile_id', model.profileId
         ).add('parent_area_code', model.parentCode
         ).add('area_type_id', model.areaTypeId);
 
@@ -603,7 +570,7 @@ function repopulateSupportingIndicatorList() {
 function getSupportingGroupRoots(model) {
 
     var parameters = new ParameterBuilder(
-        ).add('group_id', selectedSupportingGroupId
+    ).add('group_id', selectedSupportingGroupId
         ).add('area_type_id', model.areaTypeId);
 
     ajaxGet('api/profile_group_roots', parameters.build(),
@@ -640,7 +607,7 @@ function selectPrimaryIndicator(rootIndex) {
         var model = MT.model;
 
         rootIndex = isDefined(rootIndex)
-    		? rootIndex
+            ? rootIndex
             : 0;
         selectedRootIndex = rootIndex;
 
@@ -767,8 +734,8 @@ function getNewRowsWithCoreData() {
 
         if (row) {
             row.PrimaryData = isPrimaryData
-             ? primaryDataList[i]
-             : null;
+                ? primaryDataList[i]
+                : null;
 
             // Assign supporting data
             var supportingData = null;
@@ -793,11 +760,11 @@ function initView() {
 function displayInfoBoxes() {
 
     var supportingAreaData = loaded.supportingAreaData.getData(
-    {
-        profileId: SupportingProfileId,
-        groupId: SupportingGroupId,
-        areaCode: MT.model.parentCode
-    });
+        {
+            profileId: SupportingProfileId,
+            groupId: SupportingGroupId,
+            areaCode: MT.model.parentCode
+        });
     var ranks = supportingAreaData.Ranks[NATIONAL_CODE];
 
     switch (MT.model.profileId) {
@@ -820,10 +787,10 @@ function displayInfoBoxes() {
 function displayInfoBox1(rank) {
 
     var html = templates.renderOnce(
-            '<h2>Population of <span class="area_name"></span></h2><p><span>{{count}}</span></p>',
-            {
-                count: new CommaNumber(rank.AreaRank.Count).rounded()
-            });
+        '<h2>Population of <span class="area_name"></span></h2><p><span>{{count}}</span></p>',
+        {
+            count: new CommaNumber(rank.AreaRank.Count).rounded()
+        });
 
     $('#info_box_1').html(html);
 }
@@ -832,18 +799,12 @@ function displayInfoBox2(rank) {
 
     var count, template;
     var templateModel = {};
-    var profileId = MT.model.profileId;
 
-    if (profileId === ProfileIds.Suicide) {
-        count = new CommaNumber(rank.AreaRank.Count).rounded();
-        template = '<h2>Deaths from suicide in England</h2>';
-    } else {
-        count = isDefined(rank.AreaRank)
-            ? new CommaNumber(rank.AreaRank.Count).rounded()
-            : 'Data unavailable';
-        template = '<h2>Adults in <span class="area_name"></span> with {{condition}}';
-        templateModel.condition = getConditionWord();
-    }
+    count = isDefined(rank.AreaRank)
+        ? new CommaNumber(rank.AreaRank.Count).rounded()
+        : 'Data unavailable';
+    template = '<h2>Adults in <span class="area_name"></span> with {{condition}}';
+    templateModel.condition = '???';
 
     templateModel.period = rank.Period;
     templateModel.count = count;
@@ -862,7 +823,7 @@ function setPrimaryDataHeader(metadata) {
     }
 
     $('#value_type_heading').html(columnHeader +
-            '<i style="right: -1.3em;"></i>'/*sorted by triangle*/);
+        '<i style="right: -1.3em;"></i>'/*sorted by triangle*/);
 }
 
 function assignDataLabelsToRows(primaryMetadata, supportingMetadata) {
@@ -1255,7 +1216,7 @@ function selectSimilarAreas(areaCode, element) {
     if (!FT.ajaxLock) {
         lock();
 
-        if (isFeatureEnabled('enableNeighbourComparisonInLongerLives') && element && doesAreaTypeHaveNearestNeighbours()) {
+        if (element && doesAreaTypeHaveNearestNeighbours()) {
             // More than one compare similar option so need to show lightbox for user to choose
             showCompareSimilarOptions(areaCode, element);
             return;
@@ -1407,7 +1368,7 @@ function getDeprivationColumnHeader() {
 
     var model = MT.model;
     var parentAreaType = model.areaTypeId === AreaTypeIds.Practice
-    ? model.parentAreaType
+        ? model.parentAreaType
         : AreaTypeIds.Country;
 
     return getDeprivationLabel('Deprivation', parentAreaType);
@@ -1489,7 +1450,7 @@ function AreaValuesDataManager() {
         if (!getDataFromModel(modelCopy, root)) {
 
             var parameters = new ParameterBuilder(
-                ).add('group_id', modelCopy.groupId
+            ).add('group_id', modelCopy.groupId
                 ).add('area_type_id', modelCopy.areaTypeId
                 ).add('parent_area_code', modelCopy.parentCode
                 ).add('profile_id', modelCopy.profileId
@@ -1525,7 +1486,7 @@ templates.add('rows',
     <td class="last-child"><span class="grade {{grade}}" onmouseover="showSigTooltip(event, {{primaryIndicatorSig}})" onmouseout="hideSigTooltip()"><img src="' + FT.url.img + 'Mortality/{{grade}}.png" /></span><span style="max-width:170px;">{{primaryDataText}}</span><span>{{{unitLabel}}}</span>{{{primaryValueNote}}}{{{compareSimilar}}}</td></tr>{{/rows}}');
 
 templates.add('bobLegend',
-'<p class="legend">Comparison with {{comparator}} average\
+    '<p class="legend">Comparison with {{comparator}} average\
     <span class="grade">\
         <img src="' + FT.url.img + 'Mortality/bobLower.png" alt="worse" />lower\
     </span>\
@@ -1538,7 +1499,7 @@ templates.add('bobLegend',
 </p>');
 
 templates.add('ragAndBobLegend',
-'<p class="legend">Comparison with national average\
+    '<p class="legend">Comparison with national average\
     <span class="grade">\
         <img src="' + FT.url.img + 'Mortality/grade-3.png" alt="worse" />worse\
     </span>\
@@ -1549,7 +1510,7 @@ templates.add('ragAndBobLegend',
         <img src="' + FT.url.img + 'Mortality/grade-0.png" alt="better" />better\
     </span>\
 </p>' +
-'<p class="legend">Comparison with national average\
+    '<p class="legend">Comparison with national average\
     <span class="grade">\
         <img src="' + FT.url.img + 'Mortality/bobLower.png" alt="worse" />lower&nbsp;\
     </span>\

@@ -3,11 +3,12 @@
 @using (Html.BeginForm("EditProfile", "Profile", FormMethod.Post, new { id = "frmProfile" }))
 {
     @Html.Partial("_NonAdminProfileOtherComponents")
+    <br>
     @Html.Partial("_NonAdminProfileCheckboxes")
     @Html.Partial("_FingertipsTabOptions")
 
     <div class="row col-md-12">
-        <input class="btn btn-primary" id="update-profile" type="button" value="Update" onclick="SaveProfileDetail()" />
+        <input class="btn btn-primary" id="update-profile" type="button" value="Save" onclick="SaveProfileDetail()" />
         <input class="btn btn-secondary" id="cancel_profile" type="button" value="Cancel" onclick="CancelProfileUpdate()" />
     </div>
 

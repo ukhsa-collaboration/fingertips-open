@@ -41,6 +41,8 @@ namespace IndicatorsUI.MainUI
 
         private static void AddGeneralProfileRoute(RouteCollection routes)
         {
+
+
             routes.MapRoute(
                 "ProfileData", // Route name
                 "{profileKey}", // URL with parameters
@@ -110,7 +112,6 @@ namespace IndicatorsUI.MainUI
                 "wp",
                 "wordpress",
                 "{.*}/wp-admin",
-                "site.webmanifest",
                 "angular-app-dist/webpack.config.js", // Requested by angular code but does not exist
                 "webpack.config.js", // Requested by angular code but does not exist
                 "safari-pinned-tab.svg", // Apple fav icon - don't have SVG version yet

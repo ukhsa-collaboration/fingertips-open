@@ -55,7 +55,6 @@ namespace FingertipsUploadService.Upload
                 ValueNoteId,
                 CategoryTypeId,
                 CategoryId
-
             };
         }
 

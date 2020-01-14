@@ -14,7 +14,7 @@ namespace PholioVisualisation.DataConstruction
             this.groupDataReader = groupDataReader;
         }
 
-        public void AssignExtraDataIfRequired(IArea england, TargetComparer targetComparer, Grouping grouping, 
+        public void AssignExtraDataIfRequired(IArea england, TargetComparer targetComparer, Grouping grouping,
             IndicatorMetadata indicatorMetadata, TimePeriod timePeriod)
         {
             var bespokeComparer = targetComparer as BespokeTargetPreviousYearEnglandValueComparer;
@@ -46,7 +46,7 @@ namespace PholioVisualisation.DataConstruction
                 // Upper tier LA values should always be used
                 var utlaGrouping = new Grouping(grouping)
                 {
-                    AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                    AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
                 };
                 var utlaValues = groupDataReader.GetCoreDataForAllAreasOfType(utlaGrouping, timePeriod);
 

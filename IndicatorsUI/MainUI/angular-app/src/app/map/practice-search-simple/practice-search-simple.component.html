@@ -3,7 +3,8 @@
     <div class="col-md-8">
       <h3>Show all practices in CCG</h3>
       <div class="top-margin-10">
-        <select id="practicesInCCG" formControlName="practicesInCCG" class="form-control" (change)="onShowAllPracticeinCCGClick()">
+        <select id="practicesInCCG" formControlName="practicesInCCG" class="form-control"
+          (change)="onShowAllPracticeinCCGClick()">
           <option [value]="-1">SELECT CCG</option>
           <option *ngFor="let practice of practicesInCCG; let last=last" [value]="practice.Code">
             {{practice.Name}} {{last? setDefaultOption() : ''}}
@@ -13,26 +14,30 @@
       </div>
       <div class="top-margin-20">
         <h3>Or search for practices near a postcode or place</h3>
-        <input [(ngModel)]="placeNameText" [typeahead]="dataSource" (typeaheadLoading)="changeTypeaheadLoading($event)" (typeaheadNoResults)="changeTypeaheadNoResults($event)"
-          (typeaheadOnSelect)="typeaheadOnSelect($event)" typeaheadOptionsLimit="7" typeaheadOptionField="displayName" placeholder=""
-          [typeaheadWaitMs]="200" [typeaheadMinLength]="3" class="form-control" id="gp-practice-search-text" [ngModelOptions]="{standalone: true}"
-          autocomplete="off">
+        <input [(ngModel)]="placeNameText" [typeahead]="dataSource" (typeaheadLoading)="changeTypeaheadLoading($event)"
+          (typeaheadNoResults)="changeTypeaheadNoResults($event)" (typeaheadOnSelect)="typeaheadOnSelect($event)"
+          typeaheadOptionsLimit="7" typeaheadOptionField="displayName" placeholder="" [typeaheadWaitMs]="200"
+          [typeaheadMinLength]="3" class="form-control" id="gp-practice-search-text"
+          [ngModelOptions]="{standalone: true}" autocomplete="off">
       </div>
       <div *ngIf="typeaheadNoResults===true" class="">
-        No Results Found
+        No results found
       </div>
       <div class="top-margin-20" *ngIf="nearByPractices.length > 0">
-        <button id="toggleMapHeading" class="btn btn-link clear-list-button" (click)="toggleMap()">Show practices as list</button>
+        <button id="toggleMapHeading" class="btn btn-link clear-list-button" (click)="toggleMap()">Show practices as
+          list</button>
       </div>
       <div id="nearby-practices-map" class="nearby-practices-map" [style.height]="height + 'px'">
         <div id="google-map" #googleMapNew class="googleMapNg">
         </div>
       </div>
       <div id="nearby-practices-list" class="available-practices-list">
-        <div *ngFor="let practice of nearByPractices;" #elem [attr.id]="practice.areaCode" class="available-practices available-practices-{{practice.areaCode}}"
-          (mouseover)="selectPractice('available-practices', practice.areaCode)" (mouseout)="deselectPractice('available-practices', practice.areaCode)"
+        <div *ngFor="let practice of nearByPractices;" #elem [attr.id]="practice.areaCode"
+          class="available-practices available-practices-{{practice.areaCode}}"
+          (mouseover)="selectPractice('available-practices', practice.areaCode)"
+          (mouseout)="deselectPractice('available-practices', practice.areaCode)"
           (click)="movePractice('available-practices', practice.areaCode)">
-          {{practice.areaName}}
+          {{practice.areaCode}} - {{practice.areaName}}
         </div>
       </div>
     </div>
@@ -46,11 +51,14 @@
         Select a practice below to remove
         <br />it from your list
         <div class="top-margin-20">
-          <div *ngFor="let practice of selectedPractices;" #elem [attr.id]="practice.areaName" class="top-margin-10 selected-practices selected-practices-{{practice.Code}}"
-            (mouseover)="selectPractice('selected-practices', practice.Code)" (mouseout)="deselectPractice('selected-practices', practice.Code)"
-            (click)="movePracticeOut('selected-practices', practice.Code)">
-            <h6>
-              <b><span class="cursor-pointer" (click)="removeFromList(practice.areaCode)">{{practice.areaCode}} - {{practice.areaName}}</span></b>
+          <div *ngFor="let practice of selectedPractices;" #elem [attr.id]="practice.areaName"
+            class="top-margin-10 selected-practices selected-practices-{{practice.Code}}"
+            (mouseover)="selectPractice('selected-practices', practice.Code)"
+            (mouseout)="deselectPractice('selected-practices', practice.Code)">
+            <div class="cursor-pointer" (click)="removeFromList(practice.areaCode)">
+              <b>
+                {{practice.areaCode}} - {{practice.areaName}}
+              </b>
               <ng-template [ngIf]="practice?.addressLine1">
                 <br />{{practice.addressLine1}}
               </ng-template>
@@ -58,7 +66,7 @@
                 <br />{{practice.addressLine2}}
               </ng-template>
               <br />{{practice.postcode}}
-            </h6>
+            </div>
           </div>
         </div>
       </div>

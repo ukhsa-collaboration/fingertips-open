@@ -1,11 +1,9 @@
 <div #table class="definition-table">
-    <h2>Indicator Definitions and Supporting Information</h2>
-    <tbody>
-        <table class="bordered-table" cellspacing="0">
-            <tr *ngFor="let row of rows">
-                <td class="header" [innerHTML]="row.header"></td>
-                <td [innerHTML]="row.text"></td>
-            </tr>
-        </table>
-    </tbody>
+  <h2>Indicator Definitions and Supporting Information</h2>
+  <table id="metadata-table" class="bordered-table" cellspacing="0">
+    <tr *ngFor="let row of rows">
+      <td class="header" [innerHTML]="row.header"></td>
+      <td [innerHTML]="row.text"></td>
+    </tr>
+  </table>
 </div>

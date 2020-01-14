@@ -29,6 +29,21 @@ namespace PholioVisualisation.Parsers
                     .ToList();
             }
         }
+        public string[] StringArray
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(concaternatedStrings))
+                {
+                    return new string[]{};
+                }
 
+                return concaternatedStrings
+                    .Split(',')
+                    .Select(bit => bit.Trim())
+                    .Where(trimmed => trimmed.Length > 0)
+                    .ToArray();
+            }
+        }
     }
 }

@@ -4,7 +4,7 @@
 @model  IEnumerable<ProfileAreaType>
 
 <div id="profile-area-types-container" class="row form-group">
-    <label class="col-md-3 col-form-label">Area types that have PDFs:</label>
+    <label class="col-md-3 col-form-label">Area types with reports:</label>
     <div id="profile-area-types" class="col-md-6">
         @if (!((IEnumerable<ProfileAreaType>) ViewBag.AvailableAreaTypes).Any())
         {

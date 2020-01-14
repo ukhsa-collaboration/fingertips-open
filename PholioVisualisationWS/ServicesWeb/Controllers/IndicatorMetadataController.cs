@@ -1,21 +1,22 @@
-﻿using PholioVisualisation.DataConstruction;
+﻿using PholioVisualisation.DataAccess;
+using PholioVisualisation.DataAccess.Repositories;
+using PholioVisualisation.DataConstruction;
+using PholioVisualisation.Export;
+using PholioVisualisation.Export.File;
+using PholioVisualisation.Parsers;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
+using PholioVisualisation.SearchQuerying;
+using PholioVisualisation.ServiceActions;
 using PholioVisualisation.Services;
+using PholioVisualisation.ServicesWeb.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using PholioVisualisation.DataAccess;
-using PholioVisualisation.DataAccess.Repositories;
-using PholioVisualisation.Export;
-using PholioVisualisation.Export.File;
-using PholioVisualisation.Parsers;
-using PholioVisualisation.SearchQuerying;
-using PholioVisualisation.ServiceActions;
-using PholioVisualisation.ServicesWeb.Helpers;
 
 namespace PholioVisualisation.ServicesWeb.Controllers
 {
@@ -23,7 +24,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
     public class IndicatorMetadataController : BaseController
     {
         /// <summary>
-        /// Gets the indicator metadata for a list of indicator IDs
+        /// Get the indicator metadata for a list of indicator IDs
         /// </summary>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs [optional]</param>
@@ -57,7 +58,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets indicator metadata for one or more profile groups
+        /// Get indicator metadata for one or more profile groups
         /// </summary>
         /// <param name="group_ids">Comma separated list of profile group IDs</param>
         /// <param name="include_definition">Whether to include the indicator definition in response [yes/no - no is default]</param>
@@ -89,7 +90,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets indicator metadata for all the indicators available
+        /// Get indicator metadata for all the indicators available
         /// </summary>
         /// <param name="include_definition">Whether to include the indicator definition in response [yes/no - no is default]</param>
         /// <param name="include_system_content">Whether to include system content in response [yes/no - no is default]</param>
@@ -123,9 +124,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         {
             try
             {
-                return IndicatorMetadataProvider.Instance.IndicatorMetadataTextProperties
-                    .OrderBy(x => x.DisplayOrder)
-                    .ToList();
+                return IndicatorMetadataProvider.Instance.IndicatorMetadataTextProperties.OrderBy(x => x.DisplayOrder).ToList();
             }
             catch (Exception ex)
             {
@@ -174,14 +173,14 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a CSV file of metadata for the specified indicators.
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// Get a CSV file of metadata for the specified indicators
         /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
         /// <param name="indicator_ids">Comma-separated list of indicator IDs</param>
         /// <param name="profile_id">Profile ID [optional]</param>
         [HttpGet]
         [Route("indicator_metadata/csv/by_indicator_id")]
-        public HttpResponseMessage GetIndicatorMetadataFileForIndicatorList(string indicator_ids, int? profile_id = null)
+        public HttpResponseMessage GetIndicatorMetadataFileForIndicatorList(string indicator_ids, int profile_id = ProfileIds.Undefined)
         {
             try
             {
@@ -201,14 +200,17 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
-                throw;
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
             }
         }
 
         /// <summary>
         /// Gets a CSV file of metadata for all the indicators in the specified profile group    
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
         /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
         /// <param name="group_id">Profile group ID</param>
         [HttpGet]
         [Route("indicator_metadata/csv/by_group_id")]
@@ -235,14 +237,17 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
-                throw;
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
             }
         }
 
         /// <summary>
-        /// Gets a CSV file of metadata for all the indicators in the specified profile    
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// Get a CSV file of metadata for all the indicators in the specified profile    
         /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
         /// <param name="profile_id">Profile ID</param>
         [HttpGet]
         [Route("indicator_metadata/csv/by_profile_id")]
@@ -261,9 +266,11 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 }
 
                 // Create new file
-                var groupIds = new GroupIdProvider(ReaderFactory.GetProfileReader()).GetGroupIds(profile_id);
-                var fileContent = GetIndicatorMetadataFileBuilder()
-                    .GetFileForGroups(groupIds);
+                var profileReader = ReaderFactory.GetProfileReader();
+                var groupIdProvider = new GroupIdProvider(profileReader);
+                var groupIds = groupIdProvider.GetGroupIds(profile_id);
+
+                var fileContent = GetIndicatorMetadataFileBuilder().GetFileForGroups(groupIds, profile_id);
                 if (fileContent != null)
                 {
                     // Save file to cache
@@ -275,15 +282,18 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
-                throw;
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
             }
         }
 
 
         /// <summary>
-        /// Gets a CSV file of metadata for all the indicators available
-        /// [Note: this services returns data in CSV not JSON format so the response will not be viewable on this page]
+        /// Get a CSV file of metadata for all the indicators available
         /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
         [HttpGet]
         [Route("indicator_metadata/csv/all")]
         public HttpResponseMessage GetIndicatorMetadataFileForAllIndicators()
@@ -303,7 +313,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 var indicatorIds = ReaderFactory.GetGroupDataReader().GetAllIndicatorIds();
 
                 var fileBuilder = GetIndicatorMetadataFileBuilder();
-                var fileContent = fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, null);
+                var fileContent = fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, ProfileIds.Undefined);
 
                 if (fileContent != null)
                 {
@@ -317,7 +327,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
-                throw;
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
             }
         }
 
@@ -331,14 +344,19 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         {
             try
             {
+                var groupReader = ReaderFactory.GetGroupDataReader();
+
                 var groupIds = ParseIntList(group_ids);
+
+                IList<GroupingMetadata> groupingMetadata = groupReader.GetGroupingMetadataList(groupIds);
+                var profileId = groupingMetadata[0].ProfileId;
 
                 var domainIndicatorNames = new List<DomainIndicatorName>();
                 foreach (var groupId in groupIds)
                 {
                     var groupings = ReaderFactory.GetGroupDataReader().GetGroupingsByGroupId(groupId);
 
-                    var metadataCollection = IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(groupings);
+                    var metadataCollection = IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(groupings, profileId);
 
                     foreach (var indicatorMetadata in metadataCollection.IndicatorMetadata)
                     {

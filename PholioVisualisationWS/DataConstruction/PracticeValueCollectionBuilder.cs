@@ -12,6 +12,7 @@ namespace PholioVisualisation.DataConstruction
         public string TopAreaCode { get; set; }
         public string ParentAreaCode { get; set; }
         public string AreaCode { get; set; }
+        public int AreaTypeId { get; set; }
         public int DataPointOffset { get; set; }
 
         public int GroupId1 { get; set; }
@@ -33,12 +34,18 @@ namespace PholioVisualisation.DataConstruction
 
             // Indicator 1
             IndicatorMetadata indicatorMetadata1 = indicatorMetadataProvider.GetIndicatorMetadata(IndicatorId1);
-            Grouping grouping1 = reader.GetGroupings(GroupId1, IndicatorId1, AreaTypeIds.GpPractice, SexId1, AgeId1).FirstOrDefault();
+            Grouping grouping1 = reader.GetGroupings(GroupId1, IndicatorId1, AreaTypeId, SexId1, AgeId1).FirstOrDefault();
+
+            if (grouping1 == null)
+            {
+                return collection;
+            }
+
             TimePeriod period1 = new DataPointOffsetCalculator(grouping1, DataPointOffset, indicatorMetadata1.YearType).TimePeriod;
 
             if (axis1 == null)
             {
-                axis1 = GetPracticeAxis(IndicatorId1, period1, SexId1, indicatorMetadata1);
+                axis1 = GetPracticeAxis(IndicatorId1, period1, SexId1, AreaTypeId, indicatorMetadata1);
                 if (axis1 == null)
                 {
                     return collection;
@@ -57,12 +64,18 @@ namespace PholioVisualisation.DataConstruction
 
             // Indicator 2
             IndicatorMetadata indicatorMetadata2 = indicatorMetadataProvider.GetIndicatorMetadata(IndicatorId2);
-            Grouping grouping2 = reader.GetGroupings(GroupId2, IndicatorId2, AreaTypeIds.GpPractice, SexId2, AgeId2).FirstOrDefault();
+            Grouping grouping2 = reader.GetGroupings(GroupId2, IndicatorId2, AreaTypeId, SexId2, AgeId2).FirstOrDefault();
+
+            if (grouping2 == null)
+            {
+                return collection;
+            }
+
             TimePeriod period2 = new DataPointOffsetCalculator(grouping2, DataPointOffset, indicatorMetadata2.YearType).TimePeriod;
 
             if (axis2 == null)
             {
-                axis2 = GetPracticeAxis(IndicatorId2, period2, SexId2, indicatorMetadata2);
+                axis2 = GetPracticeAxis(IndicatorId2, period2, SexId2, AreaTypeId, indicatorMetadata2);
                 if (axis2 == null)
                 {
                     return collection;
@@ -93,10 +106,10 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        private PracticeAxis GetPracticeAxis(int indicatorId, TimePeriod period, int sexId, IndicatorMetadata metadata)
+        private PracticeAxis GetPracticeAxis(int indicatorId, TimePeriod period, int sexId, int areaTypeId, IndicatorMetadata metadata)
         {
             PracticeAxis axis = new PracticeAxis();
-            axis.IndicatorData = new PracticeDataAccess().GetPracticeCodeToValidValueMap(indicatorId, period, sexId);
+            axis.IndicatorData = new PracticeDataAccess().GetPracticeCodeToValidValueMap(indicatorId, period, sexId, areaTypeId);
             if (axis.IndicatorData.Count > 0)
             {
                 axis.Limits = GetLimits(axis.IndicatorData);

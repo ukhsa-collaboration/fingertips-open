@@ -30,9 +30,6 @@ namespace IndicatorsUI.DomainObjects
         /// The instructions on the map page of Longer Lives
         /// </summary>
         public const string MapHelp = "help-guide";
-        public const string ConnectHeader = "connect-header";
-        public const string ConnectHeaderText = "connect-header-text";
-        public const string ConnectBodyText = "connect-body-text";
 
         /// <summary>
         /// Extra download link on rankings page
@@ -51,7 +48,6 @@ namespace IndicatorsUI.DomainObjects
         public const string Phof = "public-health-outcomes-framework";
         public const string LongerLives = "mortality";
         public const string TbStrategy = "tb-monitoring";
-        public const string Diabetes = "diabetes";
         public const string HealthProfiles = "health-profiles";
         public const string Populations = "populations";
         public const string SexualHealth = "sexualhealth";
@@ -59,7 +55,7 @@ namespace IndicatorsUI.DomainObjects
         public const string PracticeProfiles = "general-practice";
         public const string MarmotIndicatorsForLocalAuthorities = "marmot-indicators";
         public const string PublicHealthDashboard = "public-health-dashboard";
-        public const string DeveloperTestProfile = "devtestprofile";
+        public const string DevelopmentProfileForTesting = "development-profile-for-testing";
     }
 
     public class ProfileIds
@@ -86,19 +82,20 @@ namespace IndicatorsUI.DomainObjects
     {
         public const int SevereMentalIllness_PsychosisPathway = 1938132719;
         public const int SevereMentalIllness_RiskFactors = 8000027;
-        public const int SevereMentalIllness_Finance = 8000040;
-        public const int Phof_HealthImprovment = 1000042;
+        public const int Phof_HealthImprovement = 1000042;
         public const int Phof_WiderDeterminantsofHealth = 1000041;
         public const int Phof_HealthProtection = 1000043;
         public const int Phof_PrematureMortality = 1000044;
         public const int Phof_OverarchingIndicators = 1000049;
+        public const int Dementia_PathwayOnAPage = 1938133052;
         public const int DomainThatDoesNotExist = 123456;
     }
 
     public class IndicatorIds
     {
-        public const int GapInLifeExpectancyAtBirth = 90365;
         public const int LifeExpectancyAtBirth = 90366;
+        public const int IndicatorForTestNotes = 93530;
+        public const int BackPainPrevalence = 93086;
     }
 
     public class SexIds
@@ -116,12 +113,16 @@ namespace IndicatorsUI.DomainObjects
     public class AreaTypeIds
     {
         public const int Region = 6;
+        public const int GpPractice = 7;
         public const int Ward = 8;
-        public const int CountyAndUnitaryAuthority = 102;
+        public const int England = 15;
+        public const int DistrictAndUAPreApr2019 = 101;
+        public const int CountyAndUnitaryAuthorityPre2019 = 102;
         public const int AcuteTrusts = 118;
         public const int CcgPostApr2017 = 152;
         public const int CcgPreApr2017 = 153;
         public const int CcgSince2018 = 154;
+        public const int CcgSinceApr2019 = 165;
     }
 
     public class AreaCodes
@@ -132,6 +133,7 @@ namespace IndicatorsUI.DomainObjects
         public const string IslesOfScilly = "E06000053";
         public const string Croydon = "E09000008";
         public const string Hartlepool = "E06000001";
+        public const string Broxbourne = "E07000095";
 
         // CCGs
         public const string CcgWalthamForest = "E38000192";
@@ -161,16 +163,19 @@ namespace IndicatorsUI.DomainObjects
 
     public class TabIds
     {
-        public const int TartanRug = 0;
+        public const int Overview = 0;
         public const int AreaProfile = 1;
         public const int CompareAreas = 3;
         public const int Inequalities = 7;
         public const int Map = 8;
-        public const int ScatterPlot = 10;
+        public const int CompareIndicators = 10;
         public const int Reports = 13;
         public const int Trends = 4;
         public const int Population = 12;
         public const int England = 11;
+        public const int BoxPlot = 14;
+        public const int Definitions = 6;
+        public const int Download = 9;
     }
 
     public class NeighbourTypes
@@ -184,6 +189,12 @@ namespace IndicatorsUI.DomainObjects
     {
         public const string ResetPassword = "3e7a8124-68cc-4fb8-b21e-b030df40ec60";
         public const string VerifyEmailAddress = "b2d4e6f5-1f62-47ff-a9fd-0b06793a4a1a";
+    }
+
+    public class EmailNotificationType
+    {
+        public const string ResetPassword = "reset-password";
+        public const string VerifyEmailAddress = "verification-email";
     }
 
     public class MaximumFieldLengths

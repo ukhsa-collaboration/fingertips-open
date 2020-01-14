@@ -430,13 +430,28 @@ body {
         padding: 28px 0 12px;
     }
 
+#related_content .related_links h5 {
+    font-size: 15.5px;
+    margin: 5px 0;
+}
+
         #related_content .related_links li {
             padding: 0 0 10px;
         }
 
-            #related_content .related_links li a {
-                text-decoration: underline;
-            }
+        #related_content .related_links ul {
+            list-style-type:none;
+            padding-left: 0;
+        }
+
+        #related_content .related_links li a {
+            text-decoration: none;
+        }
+
+
+#related_content .related_links li a:hover {
+    text-decoration: underline;
+}
 
     #related_content .note {
         font-size: 0.85em;
@@ -445,7 +460,7 @@ body {
         padding: 11px 0 15px;
     }
     
-    #related_content .twitter_link {
+#related_content .twitter_link {
         font-family: Arial,sans-serif;
     }
 
@@ -584,6 +599,7 @@ body {
 
 #site_policies {
     float: right;
+    max-width: 237px;
 }
 
 #footer_copyright {

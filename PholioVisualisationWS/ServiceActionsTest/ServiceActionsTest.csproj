@@ -101,7 +101,6 @@
     <Compile Include="SpcForDsrLimitsActionTest.cs" />
     <Compile Include="ParameterCheckTest.cs" />
     <Compile Include="ChildAreasForPdfsActionTest.cs" />
-    <Compile Include="NationalValuesForPdfsActionTest.cs" />
     <Compile Include="TrendMarkersActionTest.cs" />
     <Compile Include="ValueLimitsActionTest.cs" />
   </ItemGroup>
@@ -126,10 +125,6 @@
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>
       <Name>Formatting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\PdfData\PdfData.csproj">
-      <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
-      <Name>PdfData</Name>
-    </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>
       <Name>PholioObjects</Name>
@@ -141,6 +136,10 @@
     <ProjectReference Include="..\ServiceActions\ServiceActions.csproj">
       <Project>{40254974-c7e8-4303-b3ff-bf8a0f8c6491}</Project>
       <Name>ServiceActions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserDataTest\UserDataTest.csproj">
+      <Project>{3860F267-D928-46DE-B306-EE35E1939B43}</Project>
+      <Name>UserDataTest</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

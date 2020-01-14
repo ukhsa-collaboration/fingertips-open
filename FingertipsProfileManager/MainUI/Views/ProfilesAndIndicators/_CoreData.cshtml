@@ -8,33 +8,36 @@
 }
 
 <div class="content-row">
-    
+
     @if (Model.DeleteStatus.HasValue)
     {
         <label class='field-validation-@(Model.DeleteStatus.Value ? "success" : "error")'> @Model.Message </label>
     }
     else
     {
-        <h3>@rowsFound rows found 
+        <h3>
+            @rowsFound rows found
         @if (Model.DataSet != null && rowsFound > 0)
         {
-             <span style="font-size:small" >(@rowsDisplayed displayed)</span> <br/>
+            <span class="small-font">(@rowsDisplayed displayed)</span>
+            <br />
         }
-        </h3>  
-    }
-    
+    </h3>
+}
+
     @if (rowsFound > 0)
     {
         if (Model.CanDeleteDataSet)
-         {
-             <input type="button" style="float: right;" class="btn btn-danger" id="btn-delete-filteredData" value="Delete @rowsFound rows" />
-         }
-         else
-         {
-             <label class="field-validation-warning" style="float: right">
-                 You cannot delete data for this indicator (you do not have permission to the owning profile)
-             </label>
-         }
+        {
+            <input type="button" class="btn btn-danger" id="btn-delete-filteredData" value="Delete @rowsFound rows" />
+            <br />
+        }
+        else
+        {
+            <label class="field-validation-warning" style="float: right">
+                You cannot delete data for this indicator (you do not have permission to the owning profile)
+            </label>
+        }
     }
 </div>
 

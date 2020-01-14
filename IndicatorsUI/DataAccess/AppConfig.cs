@@ -36,7 +36,6 @@ namespace IndicatorsUI.DataAccess
         string CoreWsUrlForAjaxBridge { get; }
         string CoreWsUrlForLogging { get; }
         string CoreWsUrl { get; }
-        string PdfUrl { get; }
         IList<string> ActiveFeatures { get; }
         bool ShowUpdateDelayedMessage { get; }
 
@@ -149,6 +148,11 @@ namespace IndicatorsUI.DataAccess
         public bool UseInMemoryCaching
         {
             get { return ParseBool("UseInMemoryCaching"); }
+        }
+
+        public bool UseFileCaching
+        {
+            get { return ParseBool("UseFileCaching"); }
         }
 
         public string LongerLivesFrontPageProfileKey
@@ -281,12 +285,9 @@ namespace IndicatorsUI.DataAccess
             }
         }
 
-        public string PdfUrl
+        public string StaticReportsDirectory
         {
-            get
-            {
-                return EnsureUrlEndsWithForwardSlash(GetAppSetting("PdfUrl"));
-            }
+            get { return GetAppSetting("StaticReportsDirectory"); }
         }
 
         /// <summary>

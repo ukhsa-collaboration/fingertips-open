@@ -62,7 +62,6 @@
     <Compile Include="AreaAddress.cs" />
     <Compile Include="AreaCodeAreaListMapping.cs" />
     <Compile Include="AreaCodeNeighbourMapping.cs" />
-    <Compile Include="AreaCodeNhsMapping.cs" />
     <Compile Include="AreaHierarchy.cs" />
     <Compile Include="AreaLink.cs" />
     <Compile Include="AreaListAreaType.cs" />
@@ -80,6 +79,7 @@
     <Compile Include="ComparatorMethod.cs" />
     <Compile Include="ComparatorSignificance.cs" />
     <Compile Include="ContentItem.cs" />
+    <Compile Include="CoreDataSetChangeLog.cs" />
     <Compile Include="CoreDataUploadAudit.cs" />
     <Compile Include="DatabaseLog.cs" />
     <Compile Include="DataChange.cs" />
@@ -99,7 +99,6 @@
     <Compile Include="InequalitiesTrendPoint.cs" />
     <Compile Include="InequalitiesTrendRoot.cs" />
     <Compile Include="INamedEntity.cs" />
-    <Compile Include="KeyMessageOverride.cs" />
     <Compile Include="LongerLivesProfile.cs" />
     <Compile Include="MonthlyRelease.cs" />
     <Compile Include="NamedEntity.cs" />
@@ -144,7 +143,6 @@
     <Compile Include="EastingNorthing.cs" />
     <Compile Include="AreaRankGrouping.cs" />
     <Compile Include="ParentAreaWithChildAreas.cs" />
-    <Compile Include="ProfileParentAreas.cs" />
     <Compile Include="ParentArea.cs" />
     <Compile Include="ParentDisplay.cs" />
     <Compile Include="QuinaryPopulation.cs" />

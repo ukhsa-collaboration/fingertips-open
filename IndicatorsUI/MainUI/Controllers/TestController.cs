@@ -1,5 +1,4 @@
-﻿
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
 using IndicatorsUI.DomainObjects;
 

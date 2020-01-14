@@ -423,7 +423,7 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank)
         // Indicator desecription
         indicatorDescription = trimName(isDefined(textMetadata.IndicatorContent)
             ? replacePercentageWithArialFont(textMetadata.IndicatorContent)
-            : replacePercentageWithArialFont(textMetadata.NameLong), 140);
+            : replacePercentageWithArialFont(textMetadata.Name), 140);
 
         // Top indicator text
         if (groupId === GroupIds.DrugsAndAlcohol.PrevalenceAndRisks ||
@@ -468,7 +468,7 @@ CallOutBox.getCausePopUpHtml = function (ranks, areaDetails, supportingDataRank)
         }
     } else {
         // Nearest neighbours
-        if (model.areaTypeId === AreaTypeIds.CountyUA && isFeatureEnabled('enableNeighbourComparisonInLongerLives')) {
+        if (model.areaTypeId === AreaTypeIds.CountyUA) {
             similarAreaOptions.push({ func: 'viewNearestNeighbours', text: 'Similar areas' });
         }
 

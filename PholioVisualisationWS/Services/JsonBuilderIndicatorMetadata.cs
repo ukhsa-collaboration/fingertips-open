@@ -71,9 +71,20 @@ namespace PholioVisualisation.Services
         private IList<IndicatorMetadata> GetIndicatorMetadataInGroups()
         {
             IList<Grouping> groupings = _groupDataReader.GetGroupingsByGroupIds(_parameters.GroupIds);
-            var indicatorMetadataList = _indicatorMetadataProvider.GetIndicatorMetadata(groupings,
-                IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific);
-            return indicatorMetadataList;
+
+            var groupingMetadataList = _groupDataReader.GetGroupingMetadataList(_parameters.GroupIds);
+
+            if (groupingMetadataList.Any())
+            {
+                var profileId = groupingMetadataList[0].ProfileId;
+
+                var indicatorMetadataList = _indicatorMetadataProvider.GetIndicatorMetadata(groupings,
+                    IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific, profileId);
+
+                return indicatorMetadataList;
+            }
+
+            return new List<IndicatorMetadata>();
         }
 
         private IList<IndicatorMetadata> GetIndicatorMetadataFromIdList()

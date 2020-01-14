@@ -13,11 +13,20 @@ namespace Fpm.MainUI.Controllers
     [RoutePrefix("lookup-tables")]
     public class LookUpTablesController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
-        private LookUpsRepository _lookUpsRepository;
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
 
-        [Route("")]
+        private readonly ILookUpsRepository _lookUpsRepository;
+
+        public LookUpTablesController(IProfilesReader reader, IProfilesWriter writer, ILookUpsRepository lookUpsRepository)
+        {
+            _reader = reader;
+            _writer = writer;
+
+            _lookUpsRepository = lookUpsRepository;
+        }
+
+        [Route]
         public ActionResult Index()
         {
             return View("LookUpTablesIndex");
@@ -219,20 +228,5 @@ namespace Fpm.MainUI.Controllers
             _writer.NewTargetConfigAudit(new TargetConfigAudit(model.Target, UserDetails.CurrentUser().Id, "New"));
             return Redirect(SiteUrls.TargetIndex);
         }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            if (_lookUpsRepository == null) _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _lookUpsRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
-        }
-
     }
 }

@@ -1,0 +1,24 @@
+﻿@model List<Fpm.ProfileData.Entities.Profile.ProfileDetails>
+<table class="grid user-profiles">
+    <thead>
+    <tr>
+        <th class="header">Name</th>
+        <th class="header">Indicators</th>
+    </tr>
+    </thead>
+    @foreach (var item in Model)
+    {
+        var routeValues = new {profileId = item.Id};
+        var linkClass = new {@class = "profile-link"};
+
+        <tr>
+            <td class="left">
+                @item.Name
+            </td>
+            <td class="left">
+                @Html.ActionLink("Indicators", "ListIndicatorsInProfile", "ProfilesAndIndicators",
+                    routeValues, linkClass)
+            </td>
+        </tr>
+    }
+</table>

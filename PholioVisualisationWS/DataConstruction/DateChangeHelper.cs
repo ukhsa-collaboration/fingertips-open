@@ -6,8 +6,8 @@ namespace PholioVisualisation.DataConstruction
 {
     public interface IDateChangeHelper
     {
-        IndicatorDateChange GetIndicatorDateChange(TimePeriod timePeriod,
-            IndicatorMetadata metadata, int newDataDeploymentCount);
+        IndicatorDateChange GetIndicatorDateChange(IndicatorMetadata metadata, int newDataDeploymentCount,
+            int areaTypeId);
     }
 
     public class DateChangeHelper : IDateChangeHelper
@@ -24,8 +24,8 @@ namespace PholioVisualisation.DataConstruction
             _coreDataSetRepository = coreDataSetRepository;
         }
 
-        public IndicatorDateChange GetIndicatorDateChange(TimePeriod timePeriod,
-            IndicatorMetadata metadata, int newDataDeploymentCount)
+        public IndicatorDateChange GetIndicatorDateChange(IndicatorMetadata metadata, int newDataDeploymentCount,
+            int areaTypeId)
         {
             // Is this an indicator that should be highlighted as new
             if (metadata.ShouldNewDataBeHighlighted == false)
@@ -33,19 +33,11 @@ namespace PholioVisualisation.DataConstruction
                 return IndicatorDateChange.GetNoChange();
             }
 
-            // Is any there any audit information
-            var coreDataUpload = GetLatestUploadAuditData(metadata.IndicatorId);
-            if (coreDataUpload == null)
+            // Is there any change log recorded for this indicator and area type combination
+            var coreDataSetChangeLog = _coreDataSetRepository.GetCoreDataSetChangeLog(metadata.IndicatorId, areaTypeId);
+            if (coreDataSetChangeLog == null)
             {
                 return IndicatorDateChange.GetNoChange();
-            }
-
-            // Is data from most recent time period
-            var mostRecentTimePeriod = _coreDataSetRepository.GetLastestTimePeriodOfCoreData(metadata.IndicatorId, timePeriod.YearRange);
-            if (mostRecentTimePeriod == null || mostRecentTimePeriod.ToString() != timePeriod.ToString())
-            {
-                // Data is not of the most recent available time period
-                 return IndicatorDateChange.GetNoChange();
             }
 
             // Initialise the data changed to be false
@@ -69,11 +61,11 @@ namespace PholioVisualisation.DataConstruction
                 }
 
                 // Determine whether data changed recently
-                hasDataChanged = releaseDate < coreDataUpload.DateCreated;
+                hasDataChanged = releaseDate < coreDataSetChangeLog.DateUpdated;
             }
 
             // Get the following release date after core data upload date created
-            DateTime dateOfLastChange = _monthlyReleaseHelper.GetFollowingReleaseDate(coreDataUpload.DateCreated);
+            DateTime dateOfLastChange = _monthlyReleaseHelper.GetFollowingReleaseDate(coreDataSetChangeLog.DateUpdated);
 
             // Return
             return new IndicatorDateChange

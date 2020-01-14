@@ -101,15 +101,18 @@ namespace PholioVisualisation.DataAccess.Repositories
                 transaction = CurrentSession.BeginTransaction();
 
                 // Get the list of group id based on the profile id
-                IList<int> groupIds = CurrentSession.CreateCriteria<GroupingMetadata>()
+                var groupIds = CurrentSession.CreateCriteria<GroupingMetadata>()
                     .Add(Restrictions.Eq("ProfileId", profileId))
                     .SetProjection(Projections.Property("Id"))
                     .List<int>();
 
                 // Delete all groupings corresponding to the profile id
-                IQuery q = CurrentSession.CreateQuery("delete from Grouping g where g.GroupId in (:groupId)");
-                q.SetParameterList(BaseReader.ParameterGroupId, groupIds.ToList());
-                q.ExecuteUpdate();
+                if (groupIds.Any())
+                {
+                    var q = CurrentSession.CreateQuery("delete from Grouping g where g.GroupId in (:groupId)");
+                    q.SetParameterList(BaseReader.ParameterGroupId, groupIds.ToList());
+                    q.ExecuteUpdate();
+                }
 
                 // All went well, commit the transaction
                 transaction.Commit();

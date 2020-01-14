@@ -24,7 +24,7 @@ namespace IndicatorsUI.MainUITest.Helpers
         }
 
         [TestMethod]
-        public async Task Test_Should_Not_Throw_Exception()
+        public void Test_Should_Not_Throw_Exception()
         {
             AppConfig.AppSettings["Environment"] = "Development";
 

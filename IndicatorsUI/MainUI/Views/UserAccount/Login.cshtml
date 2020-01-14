@@ -9,6 +9,7 @@
         @using (Html.BeginForm("ValidateLogin", "UserAccount", FormMethod.Post, new { id = "frm-login-for-fingertips" }))
         {
             Html.EnableClientValidation(true);
+            @Html.HiddenFor(model => model.ReturnUrl);
 
             <div class="col-md-8">
                 <h2>Sign in</h2>
@@ -16,9 +17,13 @@
                 @if (ViewBag.DisplayResendEmail != null && (bool)ViewBag.DisplayResendEmail)
                 {
                     @* User has not validated email address yet*@
-                    <div><p>Before you can log in you will need to verify your email address. 
-                    You should have received an email from us that will tell you how to do this. 
-                    If not please select the button below to resend.</p></div>
+                    <div>
+                        <p>
+                            Before you can log in you will need to verify your email address.
+                            You should have received an email from us that will tell you how to do this.
+                            If not please select the button below to resend.
+                        </p>
+                    </div>
                     @Html.HiddenFor(s => s.UserName)
                     <button id="resend-verification-email" class="btn btn-lg btn-primary" type="submit" name="action:ResendEmail">
                         Resend verification email
@@ -39,16 +44,16 @@
                             <span class="form-hint"></span>
                         </label>
 
-                        @Html.TextBoxFor(s => s.UserName, new {@class = "form-control form-control-full-width", id = "email"})
-                        @Html.ValidationMessageFor(m => m.UserName, "", new {@class = "error-message"})
+                        @Html.TextBoxFor(s => s.UserName, new { @class = "form-control form-control-full-width", id = "email" })
+                        @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "error-message" })
                     </div>
                     <div class="form-group">
                         <label class="form-label-bold">
                             <span class="form-label-bold">Password</span>
                             <span class="form-hint"></span>
                         </label>
-                        @Html.PasswordFor(s => s.Password, new {@class = "form-control form-control-full-width", id = "pwd"})
-                        @Html.ValidationMessageFor(m => m.Password, "", new {@class = "error-message"})
+                        @Html.PasswordFor(s => s.Password, new { @class = "form-control form-control-full-width", id = "pwd" })
+                        @Html.ValidationMessageFor(m => m.Password, "", new { @class = "error-message" })
                     </div>
                     <div class="form-group">
                         <label class="form-label-bold">

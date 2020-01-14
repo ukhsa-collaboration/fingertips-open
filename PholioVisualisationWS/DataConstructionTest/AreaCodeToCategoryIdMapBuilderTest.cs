@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var builder = new AreaCodeToCategoryIdMapBuilder
             {
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 CategoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2010
             };
 
@@ -26,7 +26,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var builder = new AreaCodeToCategoryIdMapBuilder
             {
-                ChildAreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019,
                 CategoryTypeId = CategoryTypeIds.DeprivationDecileDistrictAndUA2010
             };
 

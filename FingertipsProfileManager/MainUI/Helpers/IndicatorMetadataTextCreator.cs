@@ -1,20 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IIndicatorMetadataTextCreator
-    {
-        void CreateNewIndicatorTextValues(int profileId,
-            IList<IndicatorMetadataTextItem> indicatorMetadataTextItems,
-            IList<IndicatorMetadataTextProperty> properties,
-            int nextIndicatorId, string userName);
-    }
-
     public class IndicatorMetadataTextCreator : IIndicatorMetadataTextCreator
     {
         private ProfileRepository _profileRepository;

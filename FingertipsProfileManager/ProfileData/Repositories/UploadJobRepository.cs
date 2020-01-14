@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class UploadJobRepository : RepositoryBase, IFpmUploadRepository
+    public class UploadJobRepository : RepositoryBase, IUploadJobRepository
     {
         public UploadJobRepository()
             : this(NHibernateSessionFactory.GetSession())

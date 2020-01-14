@@ -4,32 +4,14 @@
     @using (Html.BeginForm("ConfirmDeleteIndicators", "ProfilesAndIndicators", FormMethod.Get, new { id = "DeleteIndicatorForm" }))
     {
         <div>
-            <h3>Remove indicators</h3>
-
-            @if (Model.IndicatorsThatCantBeRemoved.Any())
-            {
-                <h3 id="shared-indicators">
-                    The following indicators are used elsewhere and cannot be removed:
-                </h3>
-    <table class="grid">
-        @foreach (var indicator in Model.IndicatorsThatCantBeRemoved)
-        {
-            <tr>
-                <td class="left">
-                    @indicator.IndicatorId
-                </td>
-                <td class="left">
-                    @indicator.IndicatorName (@indicator.Sex) (@indicator.Age)
-                </td>
-            </tr>
-        }
-    </table>
-            }
+            <h3>Delete indicators</h3>
 
             @if (Model.IndicatorsToDelete != null && Model.IndicatorsToDelete.Any())
             {
-                <h3 id="archived-indicators">
-                    The following indicators will be removed:
+                <h3 id="unassigned-indicators">
+                    The following indicators will be permanently deleted from the system.
+                    <br /><br />
+                    You can use the <i>Download metadata</i> button to download the metadata before proceeding.
                 </h3>
                 <table class="grid">
                     @foreach (var indicator in Model.IndicatorsToDelete)
@@ -46,19 +28,16 @@
             }
         </div>
 
-        @Html.HiddenFor(x => x.Profile.Id)
-        @Html.HiddenFor(x => x.DomainId)
-        @Html.HiddenFor(x => x.UrlKey)
-        @Html.HiddenFor(x => x.DomainName)
-        @Html.HiddenFor(x => x.ProfileName)
-        @Html.HiddenFor(x => x.SelectedAreaTypeId)
         @Html.Hidden("indicatorDeleteDetails")
 
+
         <p>
-            <input class="medium-button" id="ConfirmDelete" type="button" value="Confirm" />
-        </p>
-        <p>
-            <input class="medium-button" id="Cancel" onclick="lightbox.hide()" value="Cancel" />
+            @if (Model.IndicatorsToDelete.Any())
+            {
+                // Only show confirm button if any indicators can be deleted
+                <input class="btn btn-primary" id="ConfirmDelete" type="button" value="Confirm"/>
+            }
+            <input class="btn btn-default" id="Cancel" onclick="lightbox.hide()" value="Cancel" style="width: 80px;"/>
         </p>
     }
 </div>

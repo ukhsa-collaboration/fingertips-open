@@ -40,7 +40,7 @@ namespace PholioVisualisation.DataConstruction
                             PholioReader = pholioReader,
                             TargetComparer = _targetComparerProvider.GetTargetComparer(metadata, groupRoot.FirstGrouping)
                         }
-                        .CompareToCalculateSignficance(groupRoot, metadata);
+                        .CompareToCalculateSignificance(groupRoot, metadata);
                         new CoreDataProcessor(null).TruncateList(groupRoot.Data);
                     }
                 }

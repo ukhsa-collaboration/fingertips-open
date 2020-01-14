@@ -18,17 +18,17 @@ namespace PholioVisualisation.Analysis
 
             if (IsBetweenLowerConfidenceInterval95And98(comparator.Value, data))
             {
+                return AdjustForPolarity(Significance.Better);
+            }
+
+            if (IsBetweenHigherConfidenceInterval95And98(comparator.Value, data))
+            {
                 return AdjustForPolarity(Significance.Worse);
             }
 
             if (data.Value < comparator.Value)
             {
                 return AdjustForPolarity(Significance.Worst);
-            }
-
-            if (IsBetweenHigherConfidenceInterval95And98(comparator.Value, data))
-            {
-                return AdjustForPolarity(Significance.Better);
             }
 
             return AdjustForPolarity(Significance.Best);

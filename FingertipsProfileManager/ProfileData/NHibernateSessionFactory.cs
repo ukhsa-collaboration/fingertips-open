@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Cfg;
+using System;
+using System.Collections.Generic;
 
 namespace Fpm.ProfileData
 {

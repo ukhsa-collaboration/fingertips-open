@@ -14,6 +14,9 @@ namespace PholioVisualisation.DataConstruction
 
     public class PartitionTrendDataDictionaryBuilder
     {
+        /// <summary>
+        /// Key is named entity Id, value is CoreDataSet list
+        /// </summary>
         private Dictionary<int, IList<CoreDataSet>> _trendDataDictionary;
         private readonly IList<INamedEntity> _namedEntities;
         private readonly List<CoreDataSet> _allData = new List<CoreDataSet>();
@@ -55,44 +58,53 @@ namespace PholioVisualisation.DataConstruction
             _trendDataDictionary.Remove(id);
         }
 
+        /// <summary>
+        /// Removes empty years at start of data list
+        /// </summary>
+        /// <returns>Latest index without any data</returns>
         public int RemoveEarlyEmptyYears()
         {
-            var index = GetEarliestIndexWithoutData();
+            var index = GetLatestIndexWithoutData();
 
             if (index > -1)
             {
                 var copy = new Dictionary<int, IList<CoreDataSet>>(_trendDataDictionary);
 
-                foreach (var key in copy.Keys)
+                foreach (var namedEntityId in copy.Keys)
                 {
-                    var dataList = copy[key];
-                    _trendDataDictionary[key] = dataList.Skip(index + 1)
-                        .ToList();
+                    var dataList = copy[namedEntityId];
+                    _trendDataDictionary[namedEntityId] = dataList.Skip(index + 1).ToList();
                 }
             }
 
             return index;
         }
 
-        private int GetEarliestIndexWithoutData()
+        private int GetLatestIndexWithoutData()
         {
-            var earliestIndexWithoutData = -1;
+            var latestIndexWithoutData = -1;
 
-            for (int i = 0; i < _timePeriodCount; i++)
+            for (int periodIndex = 0; periodIndex < _timePeriodCount; periodIndex++)
             {
-                foreach (var key in _trendDataDictionary.Keys)
+                // Check time point for each entity 
+                foreach (var namedEntityId in _trendDataDictionary.Keys)
                 {
-                    var dataList = _trendDataDictionary[key];
-                    if (dataList[i] != null && dataList[i].IsValueValid)
+                    var dataList = _trendDataDictionary[namedEntityId];
+
+                    if (periodIndex < dataList.Count)
                     {
-                        return earliestIndexWithoutData;
+                        var data = dataList[periodIndex];
+                        if (data != null && data.IsValueValid)
+                        {
+                            return latestIndexWithoutData;
+                        }
                     }
                 }
 
-                earliestIndexWithoutData++;
+                latestIndexWithoutData++;
             }
 
-            return earliestIndexWithoutData;
+            return latestIndexWithoutData;
         }
 
         private void InitGetDataMethod(PartitionDataType partitionDataType)

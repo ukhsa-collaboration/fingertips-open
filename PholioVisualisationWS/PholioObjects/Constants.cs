@@ -1,6 +1,20 @@
 ﻿
 namespace PholioVisualisation.PholioObjects
 {
+    public class FingertipsUserIds
+    {
+
+        public const string TestUser = "58189c36-969d-4e13-95c9-67a01832ab24";
+    }
+
+    /// <summary>
+    /// Area lists used for testing
+    /// </summary>
+    public class AreaListCodes
+    {
+        public const string TestListId = "0123456789abc";
+    }
+
     public class AreaTypeIds
     {
         public const int areaTypeMinusOne = -1;
@@ -12,38 +26,32 @@ namespace PholioVisualisation.PholioObjects
         public const int GoRegion = 6;
         public const int GpPractice = 7;
         public const int County = 9;
-        public const int CountyQuintile = 10;
         public const int AcuteTrust = 14;
         public const int Country = 15;
         public const int UnitaryAuthority = 16;
         public const int Shape = 18;
-        public const int MentalHealthTrust = 20;
-        public const int CountyAndUnitaryAuthorityDeprivationDecile = 23;
         public const int AmbulanceTrust = 41;
-        public const int PheCentreObsolete = 43;
         public const int Subregion = 46;
-        public const int PheCentreFrom2013 = 48;
-        public const int PheCentreFrom2015 = 49;
-        public const int PheCentreFrom2013To2015 = 50;
-        public const int CcgUnchangedApr2017 = 51;
-        public const int CcgNewApr2017 = 52;
-        public const int CcgSupercededApr2017 = 53;
-        public const int DistrictAndUnitaryAuthority = 101;
-        public const int CountyAndUnitaryAuthority = 102;
-        public const int PheCentresFrom2013To2015 = 103;
-        public const int PheCentresFrom2015 = 104;
+        public const int DistrictAndUnitaryAuthorityPreApr2019 = 101;
+        public const int CountyAndUnitaryAuthorityPreApr2019 = 102;
         public const int OnsClusterGroup2001 = 110;
-        public const int StrategicClinicalNetwork = 112;
         public const int OnsClusterGroup2011 = 115;
-        public const int CombinedMentalHealthAndAcuteTrust = 117;
-        public const int AcuteTrustsIncludingCombinedMentalHealthTrusts = 118;
-        public const int MentalHealthTrustsIncludingCombinedAcuteTrusts = 119;
         public const int Stp = 120;
         public const int CombinedAuthorities = 126;
-        public const int CcgsPostApr2017 = 152;
-        public const int CcgsPreApr2017 = 153;
-        public const int CcgsPostApr2018 = 154;
+        public const int CountyUnchanged = 180;
+        public const int DistrictAndUnitaryAuthority = 201;
+        public const int CountyAndUnitaryAuthority = 202;
         public const int AreaList = 30000;
+        public const int CategoryAreaTypeIdForTesting = 10001;
+
+        // PHE Centres
+        public const int PheCentresFrom2013To2015 = 103;
+        public const int PheCentresFrom2015 = 104;
+
+        // CCGs
+        public const int CcgsPostApr2017 = 152;
+        public const int CcgsPostApr2018 = 154;
+        public const int CcgsPostApr2019 = 165;
     }
 
     public class CategoryIds
@@ -82,6 +90,7 @@ namespace PholioVisualisation.PholioObjects
         public const int LsoaDeprivationQuintilesInEngland2015 = 41;
         public const int LsoaDeprivationDecilesWithinArea2015 = 48;
         public const int LsoaDeprivationQuintilesWithinArea2015 = 50;
+        public const int DeprivationDecileGp2019 = 124;
     }
 
     public class SexIds
@@ -113,6 +122,7 @@ namespace PholioVisualisation.PholioObjects
 
     public class AgeIds
     {
+        public const int NotApplicable = -1;
         public const int NotAnActualAge = 0;
         public const int AllAges = 1;
         public const int From5To9 = 4;
@@ -146,17 +156,20 @@ namespace PholioVisualisation.PholioObjects
         public const int Plus17 = 187;
         public const int Plus15 = 188;
         public const int From5To15 = 193;
+        public const int From4To5 = 200;
         public const int From10To11 = 201;
         public const int From16To64 = 204;
+        public const int Over2 = 205;
         public const int Over60 = 214;
+        public const int From40To74 = 219;
         public const int From18To75 = 234;
-        public const int From90To95 = 281;
+        public const int From90To94 = 281;
         public const int Over95 = 282;
     }
 
     public class IndicatorIds
     {
-        public const int IndicatorHasNoData = 2;
+        public const int IndicatorThatDoesNotExist = 2;
         public const int OverallPrematureDeaths = 108;
         public const int AdultSmokingRelatedDeaths = 113;
         public const int QofListSize = 114;
@@ -171,8 +184,6 @@ namespace PholioVisualisation.PholioObjects
         public const int AgedOver85Years = 642;
         public const int LifeExpectancyMsoaBasedEstimate = 650;
         public const int EstimatedPrevalenceOfCHD = 720;
-        public const int PercentageLivingInEachDeprivationQuintile = 734;
-        public const int AdultSmokingPrevalence = 750;
         public const int DeathsFromLungCancer = 1203;
         public const int OralCancerRegistrations = 1206;
         public const int EthnicityEstimates = 1679;
@@ -181,51 +192,40 @@ namespace PholioVisualisation.PholioObjects
         public const int KilledAndSeriouslyInjuredOnRoads = 11001;
         public const int ViolentCrime = 11202;
         public const int StatutoryHomelessness = 11501;
-        public const int BreastfeedingInitiation = 20201;
-        public const int TeenagePregnancy = 20401;
-        public const int HospitalStaysForSelfHarm = 21001;
-        public const int VaccinationCoverageDatp = 30303;
-        public const int AdultUnder75MortalityRateCvd = 40401;
         public const int AdultUnder75MortalityRateCancer = 40501;
-        public const int HipFractures = 41401;
         public const int ObesityYear6 = 90323;
+        public const int ExcessWinterDeathsIndex = 90360;
         public const int HealthyLifeExpectancyAtBirth = 90362;
         public const int LifeExpectancyAtBirth = 90366;
-        public const int LongTermDisability = 90408;
         public const int SchoolReadiness = 90634;
         public const int Under16Conceptions = 90639;
         public const int ExcessWinterDeaths = 90641;
-        public const int GoodBloodSugarControl = 90690;
         public const int SyphilisDiagnosis = 90742;
         public const int HIVLateDiagnosis = 90791;
         public const int PercentageOfPeoplePerDeprivationQuintile = 90851;
-        public const int XAxisOfHealthProfilesChartAtBottomOfPage2 = 90852;
         public const int LifeExpectancyAt65 = 91102;
+        public const int PeopleInvitedForNhsHealthCheck = 91111;
         public const int NumberInTreatmentAtSpecialistDrugMisuseServices = 91181;
-        public const int SexuallyTransmittedInfection = 91306;
         public const int IncidenceOfTB = 91361;
         public const int TreatmentCompletionForTB = 91367;
-        public const int AlcoholAdmissionsToHospital = 91414;
         public const int AdultDrugMisuse = 91467;
         public const int DeprivationScoreIMD2015 = 91872;
         public const int GcseAchievement = 92199;
         public const int TotalPrescribedLarc = 92254;
-        public const int PeopleInEmployment = 92313;
-        public const int StatutoryHomelessness2 = 92314;
-        public const int NumberPrescribedAntibioticItems = 92377;
+        public const int LandlordHomeRepossessions = 92408;
         public const int AdultSmokingPrevalence2 = 92443;
-        public const int SmokingInRoutineAndManualOccupations = 92445;
         public const int SuicidePreventionPlan = 92607;
         public const int OnsMidYearPopulationEstimates = 92708;
-        public const int PercentageEthnicMinorities = 92860;
         public const int PopulationProjection = 92869;
-        public const int SlopeIndexOfInequalityForLifeExpectancy = 92901;
-        public const int Under18AlcoholSpecificStays = 92904;
         public const int AdultPhysicalActivity = 93014;
         public const int SmokingAtTimeOfDelivery = 93085;
         public const int AdultExcessWeight = 93088;
         public const int MrsaBacteraemiaRates = 91959;
+        public const int ResidentPopulation = 92708;
         public const int TyphoidAndParatyphoidIncidenceRate = 92841;
+        public const int CDifficileInfectionCounts = 93427;
+        public const int PercentageOfDeathsInUsualPlaceOfResidenceDiUPR = 93500;
+        public const int IDAOPI3 = 93559;
     }
 
     public class ConfidenceIntervalMethodIds
@@ -280,8 +280,6 @@ namespace PholioVisualisation.PholioObjects
         public const string Gor_WestMidlands = "E12000005";
         public const string Gor_YorkshireHumber = "E12000003";
 
-        public const string CommissioningRegionLondon = "E40000003";
-
         public const string Pct_Sheffield = "E16000077";
         public const string Pct_StocktonOnTees = "E16000020";
         public const string Pct_Bedfordshire = "E16000104";
@@ -313,7 +311,6 @@ namespace PholioVisualisation.PholioObjects
         public const string Ccg_Chiltern = "E38000033";
         public const string Ccg_CambridgeshirePeterborough = "E38000026";
         public const string Ccg_Kernow = "E38000089";
-        public const string Ccg_Cumbria = "E38000041";
 
         public const string La_Wychavon = "E07000238";
 
@@ -337,6 +334,8 @@ namespace PholioVisualisation.PholioObjects
         public const string DeprivationDecile_Utla3 = "cat-2-3";
 
         public const string Stp_Devon = "E54000037";
+
+        public const string GenericAreaListCodeForTest = "al-GenericForTests";
     }
 
     /// <summary>
@@ -344,29 +343,23 @@ namespace PholioVisualisation.PholioObjects
     /// </summary>
     public class GroupIds
     {
-        public const int groupIdMinusOne = -1;
+        public const int Undefined = -1;
         public const int Search = 1;
         public const int Phof_WiderDeterminantsOfHealth = 1000041;
-        public const int Phof_HealthcarePrematureMortality = 1000044;
+        public const int Phof_HealthImprovement = 1000042;
         public const int Phof_HealthProtection = 1000043;
+        public const int Phof_HealthcarePrematureMortality = 1000044;
         public const int SexualAndReproductiveHealth = 8000057;
         public const int Population = 1938133081;
         public const int PopulationSummary = 1200006;
 
         // Practice profiles
-        public const int ArchivedIndicators_ArchivedIndicators = 3006000;
         public const int PracticeProfiles_PracticeSummary = 2000005;
         public const int PracticeProfiles_SecondaryCareUse = 2000007;
         public const int PracticeProfiles_IndicatorsForNeedsAssessment = 2000009;
         public const int PracticeProfiles_SupportingIndicators = 1200006;
-        public const int PracticeProfiles_Diabetes = 2000002;
 
-        public const int Diabetes_PrevalenceAndRisk = 1938132727;
-
-        public const int Hypertension_Detection = 1938132758;
         public const int HealthProfiles_OurCommunities = 3007000;
-        public const int HealthProfiles_AllSpineChartIndicators = 1938132701;
-        public const int Suicide_RelatedRiskFactors = 1938132831;
 
         public const int PublicHealthDashboardLongerLives_SummaryRank = 1938133162;
         public const int PublicHealthDashboardLongerLives_ChildObesity = 1938133145;
@@ -377,33 +370,36 @@ namespace PholioVisualisation.PholioObjects
         public const int CommonMentalHealthDisorders_QualityAndOutcomes = 8000043;
         public const int CommonMentalHealthDisorders_Finance = 8000044;
 
-        public const int AllIndicators = 1000002;
+        public const int DrugsAndMentalHealthDisorders_RiskAndRelatedFactors = 1938132935;
+
+        public const int HealthProtection_AllIndicators = 1000002;
+
+        public const int DevelopmentProfileForTesting_Domain1 = 1938133268;
     }
 
     public class ProfileIds
     {
         public const int Undefined = -1;
         public const int Search = 13;
-        public const int SubstanceMisuse = 17;
+        public const int HealthAssetsProfile = 17;
         public const int Tobacco = 18;
         public const int Phof = 19;
         public const int PracticeProfiles = 20;
-        public const int LongerLives = 22;
         public const int Unassigned = 23;
-        public const int Archived = 24;
         public const int HealthProfiles = 26;
-        public const int ChildrenAndYoungPeoplesBenchmarkingTool = 39;
+        public const int HealthProtection = 30;
         public const int SexualHealth = 45;
         public const int HealthProfilesSupportingIndicators = 52;
-        public const int HyperTension = 67;
         public const int LocalAlcoholProfilesForEngland = 87;
-        public const int Suicide = 91;
         public const int CancerServices = 92;
         public const int MentalHealthJsna = 98;
         public const int PhysicalActivity = 99;
         public const int Amr = 101;
         public const int ChildAndMaternalHealth = 105;
+        public const int Populations = 132;
         public const int PublicHealthDashboardLongerLives = 140;
+        public const int DevelopmentProfileForTesting = 151;
+        public const int IndicatorsForReview = 153;
     }
 
     public class ComparatorIds
@@ -434,13 +430,11 @@ namespace PholioVisualisation.PholioObjects
     public class IndicatorMetadataTextColumnNames
     {
         public const string Name = "Name";
-        public const string NameLong = "NameLong";
         public const string DataSource = "DataSource";
         public const string Definition = "Definition";
         public const string Source = "DataSource";
         public const string Notes = "Notes";
         public const string IndicatorNumber = "RefNum";
-        public const string IndicatorContent = "IndicatorContent";
     }
 
     public class IndicatorMetadataTextPropertyIds
@@ -475,6 +469,7 @@ namespace PholioVisualisation.PholioObjects
         public const string InequalityBenchmark_UseAgeId = "inequalityBenchmark_UseAgeId";
         public const string InequalityBenchmark_ForCategoryTypeId = "inequalityBenchmark_ForCategoryTypeId";
         public const string InequalityData_OmitAgeId = "inequalityData_OmitAgeId";
+        public const string InequalityChartAverageLine_UseAgeId = "inequalityChartAverageLine_UseAgeId";
     }
 
     public class SuicidePlanStatus

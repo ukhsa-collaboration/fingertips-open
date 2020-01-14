@@ -84,7 +84,7 @@ function upload() {
         fullPath = $('#fileToBeUploaded').val(),
         filename = fullPath.replace(/^.*[\\\/]/, '');
 
-    $.get("/documents/is_filename_unique", { profileId: profileId, fileName: filename }
+    $.get("/documents/is-filename-unique", { profileId: profileId, fileName: filename }
     ).done(function(data) {
         uploadCallback(data);
     }).fail(function() {

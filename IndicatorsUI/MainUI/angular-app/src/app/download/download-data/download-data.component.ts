@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
-import {
-  AreaTypeIds, ProfileIds, AreaCodes, ParameterBuilder, GroupIds
-} from '../../shared/shared';
-import { FTModel, GroupRoot, FTIndicatorSearch, FTUrls } from '../../typings/FT';
+import { ParameterBuilder, ParentAreaHelper, SexAndAgeLabelHelper, CategoryAreaCodeHelper, AreaHelper } from '../../shared/shared';
+import { AreaTypeIds, ProfileIds, GroupIds } from '../../shared/constants';
+import { AreaCodes } from '../../shared/constants';
+import { FTModel, GroupRoot, FTIndicatorSearch, FTUrls, FTConfig } from '../../typings/FT';
 
 @Component({
   selector: 'ft-download-data',
@@ -16,7 +16,9 @@ export class DownloadDataComponent {
   public showProfile = false;
   public showGroup = false;
   public showAllIndicators = false;
+  public showNational = true;
   public showSubnational = false;
+  public isNearestNeighbours = false;
   public showAddresses = false;
   public showPopulation = false;
   public isEnvironmentTest = false;
@@ -27,17 +29,20 @@ export class DownloadDataComponent {
   public indicatorName = '';
   public allLabel = '';
   public parentLabel = '';
+  public nearestNeighboursLabel = '';
   public apiUrl = '';
 
   // Area codes
   public parentCode = '';
   public nationalCode = '';
+  public nearestNeighbourCode = '';
 
   // Fingertips info
   private model: FTModel;
   private groupRoot: GroupRoot;
   private search: FTIndicatorSearch;
   private urls: FTUrls;
+  private config: FTConfig;
 
   constructor(private ftHelperService: FTHelperService) { }
 
@@ -48,16 +53,17 @@ export class DownloadDataComponent {
     this.groupRoot = this.ftHelperService.getCurrentGroupRoot();
     this.search = this.ftHelperService.getSearch();
     this.urls = this.ftHelperService.getURL();
+    this.config = this.ftHelperService.getFTConfig();
 
     const config = this.ftHelperService.getFTConfig();
 
-    const isNearestNeighbours = this.ftHelperService.isNearestNeighbours(this.model);
+    this.isNearestNeighbours = this.ftHelperService.isNearestNeighbours();
     this.profileName = config.profileName;
     this.groupName = this.ftHelperService.getCurrentDomainName();
 
-    this.showSubnational = !this.ftHelperService.isParentCountry(this.model) &&
+    this.showSubnational = !this.ftHelperService.isParentCountry() &&
       this.model.areaTypeId !== AreaTypeIds.Country &&
-      !isNearestNeighbours;
+      !this.isNearestNeighbours;
 
     this.showAllIndicators = this.search.isInSearchMode();
     this.showProfile = !this.showAllIndicators;
@@ -66,10 +72,10 @@ export class DownloadDataComponent {
 
     const areaTypeName = this.ftHelperService.getAreaTypeName();
 
-    let isEnglandAreaType = areaTypeName === 'England';
+    const isEnglandAreaType = areaTypeName === 'England';
 
-    let dataLabel = 'Data for ' + areaTypeName;
-    if (!isEnglandAreaType){
+    const dataLabel = 'Data for ' + areaTypeName;
+    if (!isEnglandAreaType) {
       dataLabel.concat(' in England');
     }
 
@@ -77,16 +83,23 @@ export class DownloadDataComponent {
 
     this.nationalCode = AreaCodes.England;
     this.parentCode = this.model.parentCode;
+    this.nearestNeighbourCode = this.model.nearestNeighbour;
 
     this.parentLabel = '';
 
-    if(!isEnglandAreaType){
-      this.parentLabel = isNearestNeighbours ? ''
-      : 'Data for ' + areaTypeName + ' in ' + this.ftHelperService.getParentArea().Name;
-    } 
+    if (!isEnglandAreaType) {
+      this.parentLabel = this.isNearestNeighbours ? ''
+        : 'Data for ' + areaTypeName + ' in ' + new ParentAreaHelper(this.ftHelperService).getParentAreaName();
+    }
+
+    if (this.isNearestNeighbours) {
+      const areaName = this.ftHelperService.getArea(this.model.areaCode).Name;
+      this.nearestNeighboursLabel = areaName + ' ' + this.config.nearestNeighbour[this.model.areaTypeId].SelectedText;
+    }
 
     // Indicator name
-    this.indicatorName = this.ftHelperService.getMetadataHash()[this.groupRoot.IID].Descriptive.Name;
+    const sexAndAgeLabel = new SexAndAgeLabelHelper(this.groupRoot).getSexAndAgeLabel();
+    this.indicatorName = this.ftHelperService.getMetadataHash()[this.groupRoot.IID].Descriptive.Name + sexAndAgeLabel;
 
     if (this.model.profileId === ProfileIds.PracticeProfile) {
       // Too much data to download for all of practice profiles
@@ -112,8 +125,8 @@ export class DownloadDataComponent {
   /**
   * Export all indicator metadata for specific profile.
   */
-  exportProfileMetadata = function () {
-    let parameters = new ParameterBuilder();
+  exportProfileMetadata(): void {
+    const parameters = new ParameterBuilder();
     this.addProfileIdParameter(parameters);
     this.downloadCsvMetadata('by_profile_id', parameters);
     this.logEvent('MetadataForProfile', parameters.build());
@@ -122,8 +135,8 @@ export class DownloadDataComponent {
   /**
   * Export indicator metadata for profile group
   */
-  exportGroupMetadata = function () {
-    let parameters = new ParameterBuilder(
+  exportGroupMetadata(): void {
+    const parameters = new ParameterBuilder(
     ).add('group_id', this.model.groupId);
     this.downloadCsvMetadata('by_group_id', parameters);
     this.logEvent('MetadataForDomain', parameters.build());
@@ -132,9 +145,9 @@ export class DownloadDataComponent {
   /**
   * Export all indicator metadata for search results.
   */
-  exportAllIndicatorMetadata = function () {
-    let parameters = new ParameterBuilder();
-    parameters.add('indicator_ids', this.getIndicatorIdsParameter());
+  exportAllIndicatorMetadata(): void {
+    const parameters = new ParameterBuilder();
+    parameters.add('indicator_ids', this.search.getIndicatorIdsParameter());
     this.addProfileIdParameter(parameters);
     this.downloadCsvMetadata('by_indicator_id', parameters);
     this.logEvent('MetadataForAllSearchIndicators', parameters.build());
@@ -143,8 +156,8 @@ export class DownloadDataComponent {
   /**
   * Export indicator metadata for single indicator.
   */
-  exportIndicatorMetadata = function () {
-    let parameters = new ParameterBuilder();
+  exportIndicatorMetadata(): void {
+    const parameters = new ParameterBuilder();
     parameters.add('indicator_ids', this.groupRoot.IID);
     this.addProfileIdParameter(parameters);
     this.downloadCsvMetadata('by_indicator_id', parameters);
@@ -154,9 +167,10 @@ export class DownloadDataComponent {
   /**
   * Export all indicator data for specific profile.
   */
-  exportProfileData = function (parentCode) {
-    let parameters = this.getExportParameters(parentCode);
+  exportProfileData(parentCode: string): void {
+    const parameters = this.getExportParameters(parentCode);
     this.addProfileIdParameter(parameters);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
     this.downloadCsvData('by_profile_id', parameters);
     this.logEvent('DataForProfile', parameters.build());
   }
@@ -164,9 +178,10 @@ export class DownloadDataComponent {
   /**
   * Export indicator data for profile group
   */
-  exportGroupData = function (parentAreaCode) {
-    let parameters = this.getExportParameters(parentAreaCode);
+  exportGroupData(parentAreaCode: string): void {
+    const parameters = this.getExportParameters(parentAreaCode);
     parameters.add('group_id', this.model.groupId);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
     this.downloadCsvData('by_group_id', parameters);
     this.logEvent('DataForGroup', parameters.build());
   }
@@ -174,26 +189,67 @@ export class DownloadDataComponent {
   /**
   * Export all indicator data for search results.
   */
-  exportAllIndicatorData(parentAreaCode) {
+  exportAllIndicatorData(parentAreaCode): void {
     const parameters = this.getExportParameters(parentAreaCode);
     parameters.add('indicator_ids', this.search.getIndicatorIdsParameter());
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
     this.addProfileIdParameter(parameters);
     this.downloadCsvData('by_indicator_id', parameters);
     this.logEvent('DataForAllSearchIndicators', parameters.build());
   }
+
   /**
   * Export indicator data for single indicator.
   */
-  exportIndicatorData(parentAreaCode) {
+  exportIndicatorData(parentAreaCode): void {
     const parameters = this.getExportParameters(parentAreaCode);
     this.addProfileIdParameter(parameters);
     parameters.add('indicator_ids', this.groupRoot.IID);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
+    parameters.add('sex_id', this.model.sexId);
+    parameters.add('age_id', this.model.ageId);
     this.downloadCsvData('by_indicator_id', parameters);
     this.logEvent('DataForIndicator', parameters.build());
   }
 
-  exportPopulation = function (parentAreaCode) {
-    let parameters = new ParameterBuilder()
+  /**
+  * Export all nearest neighbours indicator data for specific profile.
+  */
+  exportProfileNearestNeighboursData() {
+    const parameters = this.getExportParameters(this.nearestNeighbourCode);
+    this.addProfileIdParameter(parameters);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
+    this.downloadCsvData('by_profile_id', parameters);
+    this.logEvent('DataForProfile', parameters.build());
+  }
+
+  /**
+  * Export nearest neighbours indicator data for profile group
+  */
+  exportGroupNearestNeighboursData() {
+    const parameters = this.getExportParameters(this.nearestNeighbourCode);
+    parameters.add('group_id', this.model.groupId);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
+    this.downloadCsvData('by_group_id', parameters);
+    this.logEvent('DataForGroup', parameters.build());
+  }
+
+  /**
+  * Export nearest neighbour indicator data for single indicator
+  */
+  exportIndicatorNearestNeighboursData() {
+    const parameters = this.getExportParameters(this.nearestNeighbourCode);
+    this.addProfileIdParameter(parameters);
+    parameters.add('indicator_ids', this.groupRoot.IID);
+    parameters.add('category_area_code', CategoryAreaCodeHelper.getCategoryAreaCode(this.model.parentCode));
+    parameters.add('sex_id', this.model.sexId);
+    parameters.add('age_id', this.model.ageId);
+    this.downloadCsvData('by_indicator_id', parameters);
+    this.logEvent('DataForIndicator', parameters.build());
+  }
+
+  exportPopulation(parentAreaCode: string): void {
+    const parameters = new ParameterBuilder()
       .add('are', parentAreaCode)
       .add('gid', GroupIds.PracticeProfiles_Population)
       .add('ati', this.model.parentTypeId).build();
@@ -203,11 +259,11 @@ export class DownloadDataComponent {
     this.logEvent('Population', parameters);
   }
 
-  exportAddresses = function (parentAreaCode) {
-    let parameters = new ParameterBuilder()
+  exportAddresses(parentAreaCode: string): void {
+    const parameters = new ParameterBuilder()
       .add('parent_area_code', parentAreaCode)
       .add('area_type_id', this.model.areaTypeId).build();
-    let url = this.urls.corews + 'api/area_addresses/csv/by_parent_area_code?' + parameters;
+    const url = this.urls.corews + 'api/area_addresses/csv/by_parent_area_code?' + parameters;
     this.openFile(url);
     this.logEvent('Addresses', parameters);
   }
@@ -233,9 +289,9 @@ export class DownloadDataComponent {
     this.openFile(url);
   }
 
-  getExportParameters(parentAreaCode) {
-    let model = this.model;
-    let parameters = new ParameterBuilder()
+  getExportParameters(parentAreaCode: string): ParameterBuilder {
+    const model = this.model;
+    const parameters = new ParameterBuilder()
       .add('parent_area_code', parentAreaCode)
       .add('parent_area_type_id', model.parentTypeId)
       .add('child_area_type_id', model.areaTypeId);
@@ -243,6 +299,6 @@ export class DownloadDataComponent {
   }
 
   openFile(url: string) {
-    window.open(url.toLowerCase(), '_blank');
+    window.open(url, '_blank');
   }
 }

@@ -1,10 +1,9 @@
-<form [formGroup]="arealistForm" *ngIf="isAnyData()">
+<form [formGroup]="arealistForm" (keydown.enter)="$event.preventDefault()" *ngIf="isAnyData()">
     <div formGroupName="arealist">
         <div class="row top-margin">
             <div class="col-md-6">
                 <h6 class="font-weight-bold">Area type</h6>
-                <select id="areaTypeList" formControlName="areaTypeList" class="form-control" (change)="changeAreaTypeList()"
-                    *ngIf="isCreate()">
+                <select id="areaTypeList" formControlName="areaTypeList" class="form-control" (change)="changeAreaTypeList()" *ngIf="isCreate()">
                     <option [value]="-1">SELECT AREA TYPE</option>
                     <option *ngFor="let areaType of areaTypes; let last=last" [value]="areaType.Id">
                         {{areaType.Short}} {{last? setDefaultOption() : ''}}
@@ -15,7 +14,7 @@
             </div>
             <div class="col-md-6">
                 <h6 class="font-weight-bold">List name</h6>
-                <input type="text" id="areaListName" formControlName="areaListName" class="form-control" [value]="this.areaListName">
+                <input type="text" id="areaListName" formControlName="areaListName" class="form-control" [value]="areaListName">
             </div>
         </div>
         <div class="row top-margin">
@@ -33,9 +32,8 @@
         <hr>
         <div class="row" *ngIf="isPracticeSearch()">
             <div class="col-md-12" id="practice-search-map">
-                <ft-practice-search-simple [IsMapUpdateRequired]="updateMap" [areaTypeId]="areaTypeId"
-                    [selectedAreaAddresses]="selectedAreaAddresses" [searchMode]="searchMode" #practiceSearch
-                    (emitSelectedPractices)="updateSelectedPractices($event)" (emitShowPracticesAsList)="showPracticesAsList($event)"></ft-practice-search-simple>
+                <ft-practice-search-simple [IsMapUpdateRequired]="updateMap" [areaTypeId]="areaTypeId" [selectedAreaAddresses]="selectedAreaAddresses"
+                    [searchMode]="searchMode" #practiceSearch (emitSelectedPractices)="updateSelectedPractices($event)" (emitShowPracticesAsList)="showPracticesAsList($event)"></ft-practice-search-simple>
             </div>
         </div>
         <div id="area-list-details" class="row" *ngIf="isCreateAndAreaTypeSelected()">
@@ -48,9 +46,9 @@
                         Map is not available for
                         <span [innerHtml]="areaTypeName"></span>
                     </div>
-                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)"
-                        (emitSelectedArea)="updateSelectedArea($event)" (emitDeSelectedArea)="updateDeSelectedArea($event)"
-                        (emitMouseOverArea)="updateMouseOverArea($event)" (emitMouseOutArea)="updateMouseOutArea($event)">
+                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)" (emitSelectedArea)="updateSelectedArea($event)"
+                        (emitDeSelectedArea)="updateDeSelectedArea($event)" (emitMouseOverArea)="updateMouseOverArea($event)"
+                        (emitMouseOutArea)="updateMouseOutArea($event)">
                     </ft-arealist-areas>
                 </div>
                 <div id="area-list-map" *ngIf="isMap()">
@@ -62,27 +60,25 @@
                                 Show all areas as list
                             </button>
                         </div>
-                        <ft-google-map-simple (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [areaCode]="areaCode"
-                            [selectedAreas]="selectedAreas" [availableAreas]="availableAreas" [mapAreaCodes]="mapAreaCodes"
-                            [mapPolygonSelected]="mapPolygonSelected" [areaSearchText]="areaSearchText"
-                            (selectedAreaChanged)="onSelectedAreaChanged($event)">
+                        <ft-google-map-simple (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [areaCode]="areaCode" [selectedAreas]="selectedAreas"
+                            [availableAreas]="availableAreas" [mapAreaCodes]="mapAreaCodes" [mapPolygonSelected]="mapPolygonSelected"
+                            [areaSearchText]="areaSearchText" (selectedAreaChanged)="onSelectedAreaChanged($event)">
                         </ft-google-map-simple>
                     </div>
                 </div>
                 <div id="area-list-list" *ngIf="isMapList()">
                     <h3>Select an area to add it to your list</h3>
                     <button class="btn btn-link clear-list-button" (click)="showMap()">Show all areas as a map</button>
-                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)"
-                        (emitSelectedArea)="updateSelectedArea($event)" (emitDeSelectedArea)="updateDeSelectedArea($event)"
-                        (emitMouseOverArea)="updateMouseOverArea($event)" (emitMouseOutArea)="updateMouseOutArea($event)">
+                    <ft-arealist-areas [areaTypeId]="areaTypeId" [selectedAreas]="selectedAreas" (emitAreas)="updateAvailableAreas($event)" (emitSelectedArea)="updateSelectedArea($event)"
+                        (emitDeSelectedArea)="updateDeSelectedArea($event)" (emitMouseOverArea)="updateMouseOverArea($event)"
+                        (emitMouseOutArea)="updateMouseOutArea($event)">
                     </ft-arealist-areas>
                 </div>
             </div>
             <div class="col-md-3" *ngIf="displaySelectedAreasSection">
                 <h3>Search for an area</h3>
                 <div>
-                    <input type="text" id="areaSearchText" formControlName="areaSearchText" class="form-control"
-                        (keyup)="searchArea()" [value]="areaSearchText">
+                    <input type="text" id="areaSearchText" formControlName="areaSearchText" class="form-control" (keyup)="searchArea()" [value]="areaSearchText">
                 </div>
                 <div class="top-margin">
                     <span *ngIf="searchedAreas.length > 0">

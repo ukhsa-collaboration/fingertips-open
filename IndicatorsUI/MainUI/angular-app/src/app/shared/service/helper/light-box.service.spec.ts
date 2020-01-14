@@ -11,7 +11,7 @@ describe('LightBoxService', () => {
 
     TestBed.configureTestingModule({
       providers: [LightBoxService,
-        { provide: FTHelperService, useValue: ftHelperService },]
+        { provide: FTHelperService, useValue: ftHelperService }]
     });
   });
 

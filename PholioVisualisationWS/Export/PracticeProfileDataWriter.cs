@@ -126,7 +126,7 @@ namespace PholioVisualisation.Export
 
             AddDataHeader(ws, new[] { 
                 new ColumnHeader { Title = HeaderPracticeCode, Width = ColumnWidthAreaCode },
-                new ColumnHeader { Title = areaTypeId==AreaTypeIds.CountyAndUnitaryAuthority ? HeaderCountyUaName : HeaderCcgName, Width = 40 }
+                new ColumnHeader { Title = areaTypeId==AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 ? HeaderCountyUaName : HeaderCcgName, Width = 40 }
             });
 
             // Data
@@ -145,7 +145,7 @@ namespace PholioVisualisation.Export
             IWorksheet ws = ParentAreaDataWorksheet;
 
             AddDataHeader(ws, new[] { 
-                new ColumnHeader { Title = areaTypeId==AreaTypeIds.CountyAndUnitaryAuthority ? HeaderCountyUaName : HeaderCcgName, Width = 60 }
+                new ColumnHeader { Title = areaTypeId==AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 ? HeaderCountyUaName : HeaderCcgName, Width = 60 }
             });
 
             parentAreaCodes = (from a in parentAreas select a.Code).ToList();

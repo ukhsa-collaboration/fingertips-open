@@ -1,48 +1,85 @@
-import { RequestOptions, URLSearchParams, Headers } from '@angular/http';
+import { HttpParams, HttpHeaders } from '@angular/common/http';
+
 export class Parameters {
 
-    private params: URLSearchParams = new URLSearchParams();
+    private params: HttpParams = new HttpParams();
 
     constructor() { }
 
-    getRequestOptions(): RequestOptions {
-        const requestOptions: RequestOptions = new RequestOptions({
-            headers: new Headers({ 'Content-Type': 'application/json' })
+    getRequestOptions(resetCache: boolean): any {
+        let headers = this.getHeaders();
+        const params = this.params;
+
+        if (resetCache) {
+            headers = headers.set('reset-cache', 'true');
+        }
+
+        const options = ({
+            headers: headers,
+            params: params
         });
-        requestOptions.search = this.params;
-        return requestOptions;
+
+        return options;
     }
 
-    /** Returns a concaternated string of the URL parameters */
-    getParameterString() {
+    getHeaders(): HttpHeaders {
+        return new HttpHeaders({ 'Content-Type': 'application/json;charset=UTF-8' });
+    }
+
+    /** Returns a concatenated string of the URL parameters */
+    getParameterString(): string {
         return this.params.toString();
     }
 
     addProfileUrlKey(profileUrlKey: string): void {
-        this.params.set('profileUrlKey', profileUrlKey);
+        this.params = this.params.set('profileUrlKey', profileUrlKey);
     }
 
     addSequenceNumber(sequenceNumber: number): void {
-        this.params.set('sequenceNumber', sequenceNumber.toString());
+        this.params = this.params.set('sequenceNumber', sequenceNumber.toString());
     }
 
     addAreaTypeId(areaTypeId: number): void {
-        this.params.set('areaTypeId', areaTypeId.toString());
+        this.params = this.params.set('areaTypeId', areaTypeId.toString());
     }
 
     addGroupId(groupId: number): void {
-        this.params.set('groupId', groupId.toString());
+        this.params = this.params.set('groupId', groupId.toString());
     }
 
     addProfileId(profileId: number): void {
-        this.params.set('profileId', profileId.toString());
+        this.params = this.params.set('profileId', profileId.toString());
     }
 
     addDomainSequence(sequenceNumber: number): void {
-        this.params.set('domainSequence', sequenceNumber.toString());
+        this.params = this.params.set('domainSequence', sequenceNumber.toString());
     }
 
     addReportId(reportId: number): void {
-        this.params.set('id', reportId.toString());
+        this.params = this.params.set('id', reportId.toString());
+    }
+
+    addNoCache(): void {
+        this.params = this.params.set('no_cache', true.toString());
+    }
+
+    addDateTime(): void {
+        this.params = this.params.set('datetime', (new Date()).getTime().toString());
+    }
+
+    addUserId(userId: number): void {
+        this.params = this.params.set('userId', userId.toString());
+    }
+
+    addNumberOfRecords(numberOfRecords: number): void {
+        this.params = this.params.set('numberOfRecords', numberOfRecords.toString());
+    }
+
+    addGuid(guid: string): void {
+        this.params = this.params.set('guid', guid);
+    }
+
+    addActionCode(actionCode: number): void {
+        this.params = this.params.set('actionCode', actionCode.toString());
     }
 }

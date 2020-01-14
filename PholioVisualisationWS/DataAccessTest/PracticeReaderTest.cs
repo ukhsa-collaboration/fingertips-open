@@ -66,10 +66,10 @@ namespace PholioVisualisation.DataAccessTest
         {
             IDictionary<string, float> map = new PracticeDataAccess().GetPracticeCodeToValidValueMap(
                 IndicatorIds.EstimatedPrevalenceOfCHD,
-                new TimePeriod { Year = 2011, YearRange = 1 }, SexIds.Persons);
+                new TimePeriod { Year = 2011, YearRange = 1 }, SexIds.Persons, AreaTypeIds.GpPractice);
 
             Assert.AreEqual(6.021, Math.Round(map[AreaCodes.Gp_CrossfellHealthCentre], 3));
-            Assert.IsTrue(map.Count > 7000 && map.Count < 9000);
+            Assert.IsTrue(map.Count > 6000 && map.Count < 8000);
         }
 
         [TestMethod]
@@ -131,9 +131,9 @@ namespace PholioVisualisation.DataAccessTest
 
             Dictionary<string, CoreDataSet> map = new PracticeDataAccess()
                 .GetPracticeCodeToBaseDataMap(grouping,
-                new TimePeriod { Year = 2011, YearRange = 1 });
+                new TimePeriod { Year = 2015, YearRange = 1 });
 
-            Assert.AreEqual(map[AreaCodes.Gp_Burnham].LowerCI95, ValueData.NullValue);
+            Assert.AreEqual(map[AreaCodes.Gp_MeersbrookSheffield].LowerCI95, ValueData.NullValue);
         }
     }
 }

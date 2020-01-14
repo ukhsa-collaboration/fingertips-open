@@ -1,0 +1,135 @@
+﻿@using System.Web.Optimization
+@using Fpm.MainUI.Helpers
+@model Fpm.ProfileData.Entities.UserFeedback.UserFeedback
+
+@{
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+
+    var properties = new { @class = "control-label" };
+
+    var profileFeedbackMessageBody = EmailHelper.GetMessageBody("Hi,", "", "This was submitted to site feedback:", "",Model.Email, "", Model.WhatUserWasDoing,
+        Model.WhatWentWrong, Model.Url, "", "Thanks,", "");
+
+    var userMessageBody = EmailHelper.GetMessageBody("Hi,", "",
+        "Thank you for your feedback submitted recently on the PHE Public Health Profiles website.", "",
+        Model.WhatUserWasDoing,
+        Model.WhatWentWrong,  Model.Url, "",
+        "Thanks for alerting us to this issue, ",
+        "we are looking at it now and will have it fixed and working correctly after our monthly update on Tuesday 8th May.",
+        "we are looking at it now so that it is working correctly soon.",
+        "it should now be fixed.",
+        "", "Best wishes,");
+}
+@Scripts.Render("~/userfeedback.js")
+
+<div class="col-md-12">
+
+    <h2 class="subheading">User Feedback</h2>
+
+    @Html.HiddenFor(x => x.Id)
+    
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Submitted by
+        </label>
+        <div class="col-md-10">
+            @if (Model.Email.Length > 0)
+            {
+                <a href="mailto:@Model.Email&subject=PHE Public Health Profiles Feedback&body=@userMessageBody">@Model.Email</a>
+            }
+            else
+            {
+                <span>Not submitted</span>
+            }
+            (<a href="mailto:profilefeedback@phe.gov.uk&subject=Site%20Feedback%20-%20&body=@profileFeedbackMessageBody" class="">Email profile feedback</a>)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            What user was doing
+        </label>
+        <div class="col-md-6">
+            @Html.DisplayFor(model => model.WhatUserWasDoing, properties)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            What went wrong
+        </label>
+        <div class="col-md-6">
+            @Html.DisplayFor(model => model.WhatWentWrong, properties)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Url
+        </label>
+        <div class="col-md-10">
+            <a href="@Model.Url" target="_blank">@Model.Url</a>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Environment
+        </label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Environment, properties)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Timestamp
+        </label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Timestamp, properties)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Has been dealt with
+        </label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.HasBeenDealtWith, properties)
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <label class="col-md-2 col-form-label">
+            Comment
+        </label>
+        <div class="col-md-6">
+            <textarea id="feedback-comment" rows="4" cols="50">@Model.Comment</textarea>
+        </div>
+        <div class="col-md-4 btn-list">
+            <button class="btn btn-default" onclick="addComment('Emailed user')">Emailed user</button>
+            <button class="btn btn-default" onclick="addComment('Emailed profile feedback')">Emailed profile feedback</button>
+            <button class="btn btn-default" onclick="addComment('Could not reproduce')">Could not reproduce</button>
+            <button class="btn btn-default" onclick="addComment('Added to JIRA')">Added to JIRA</button>
+            <button class="btn btn-default" onclick="addComment('Fixed')">Fixed</button>
+            <button class="btn btn-default" onclick="addComment('Unresolved')">Unresolved</button>
+            <button class="btn btn-default" onclick="addComment('Disagree')">Disagree</button>
+            <button class="btn btn-default" onclick="addComment('Emailed to profile owner')">Emailed to profile owner</button>
+            <button class="btn btn-warning" onclick="clearComment()">Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-2">
+        &nbsp;
+    </div>
+    <div class="col-md-10 btn-list">
+        <button class="btn btn-primary" onclick="closeUserFeedbackItem()">Close</button>
+        <button class="btn btn-secondary" onclick="saveUserFeedbackItem('/user-feedback/update')">Save</button>
+        <button type="button" class="btn btn-secondary" onclick="location.href='@Url.Action("UserFeedbackIndex")'">Back</button>
+    </div>
+</div>
+
+
+<p>Add useful feedback that cannot easily be resolved to <a target="_blank" href="https://digitaltools.phe.org.uk/confluence/display/FIN/Unresolved+user+feeback">Unresolved user feedback</a></p>

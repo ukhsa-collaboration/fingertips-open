@@ -1,1 +1,8 @@
-﻿<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos" type="text/javascript"></script>
+﻿@{
+    var browser = Request.Browser;
+
+    if (browser.Type.ToLower() != "internetexplorer11")
+    {
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos" type="text/javascript"></script>
+    }
+}

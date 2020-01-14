@@ -1,30 +1,41 @@
-<div class="col-lg-12">
+<div class="col">
     <div class="pull-right">
-        <button class="pull-right btn btn-primary" (click)="newReport()" name="newReportButton">New Report</button>
+        <button id="newReportButton" class="pull-right btn btn-primary" (click)="newReport()">New Report</button>
     </div>
 </div>
 <br>
 <div>
     <br />
-    <table class="table  table-striped table-bordered table-hover" name="reportListTable">
+    <table id="reportListTable" class="table  table-striped table-bordered table-hover">
         <thead>
             <tr>
                 <th>Name</th>
                 <th>Profiles</th>
                 <th>Parameters</th>
+                <th>Area types</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let report of reportsToDisplay; let i = index" [attr.data-index]="i">
-                <td><span class="cursor-pointer btn-link" (click)="editReport(report)">{{report.name}}</span></td>
-                <td>
-                    <span *ngFor="let profile of report.profiles; let i = index">
-                        {{ profile.Name }}<br>
+                <td class="col-md-3">
+                    <span class="cursor-pointer btn-link" style="font-weight: bold;" (click)="editReport(report)">
+                        {{report.name}}
                     </span>
                 </td>
-                <td>
+                <td class="col-md-3">
+                    <span *ngFor="let profile of report.profiles; let i = index">
+                        {{ profile.Name }}
+                        <br>
+                    </span>
+                </td>
+                <td class="col-md-3">
                     <span *ngFor="let param of report.parameters; let isLast=last">
                         {{param}}{{isLast ? '' : ', '}}
+                    </span>
+                </td>
+                <td class="col-md-3">
+                    <span *ngFor="let areaType of report.areaTypes; let isLast=last">
+                        {{areaType.ShortName}}{{isLast ? '' : ', '}}
                     </span>
                 </td>
             </tr>

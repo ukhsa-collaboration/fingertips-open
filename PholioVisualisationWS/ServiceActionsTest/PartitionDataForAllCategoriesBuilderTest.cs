@@ -16,7 +16,7 @@ namespace PholioVisualisation.ServiceActionsTest
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
             var data = new PartitionDataForAllCategoriesBuilder().GetPartitionData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, SexIds.Male,AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, SexIds.Male,AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.AreEqual(AreaCodes.England, data.AreaCode);
             Assert.AreEqual(SexIds.Male, data.SexId);
@@ -31,7 +31,7 @@ namespace PholioVisualisation.ServiceActionsTest
         {
             var data = new PartitionDataForAllCategoriesBuilder().GetPartitionData(ProfileIds.SexualHealth,
                 AreaCodes.England, IndicatorIds.SyphilisDiagnosis, SexIds.Persons, AgeIds.From0To4,
-                AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.IsNull(data.CategoryTypes);
             Assert.IsNull(data.Data);
@@ -44,7 +44,7 @@ namespace PholioVisualisation.ServiceActionsTest
 
             var trendData = new PartitionDataForAllCategoriesBuilder().GetPartitionTrendData(ProfileIds.Phof,
                 AreaCodes.England, indicatorId, SexIds.Male, AgeIds.AllAges, 
-                CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010, AreaTypeIds.CountyAndUnitaryAuthority);
+                CategoryTypeIds.LsoaDeprivationDecilesWithinArea2010, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.IsNotNull(trendData.Limits);
             Assert.AreEqual(10, trendData.Labels.Count, "Expected 10 deciles");
@@ -59,7 +59,7 @@ namespace PholioVisualisation.ServiceActionsTest
 
             var trendData = new PartitionDataForAllCategoriesBuilder().GetPartitionTrendData(ProfileIds.Phof,
                 AreaCodes.England, indicatorId, SexIds.Male, AgeIds.AllAges,
-                CategoryTypeIds.EthnicGroups5, AreaTypeIds.CountyAndUnitaryAuthority);
+                CategoryTypeIds.EthnicGroups5, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.IsNull(trendData.Limits);
             Assert.AreEqual(5, trendData.Labels.Count, "Expected 5 ethnic groups");

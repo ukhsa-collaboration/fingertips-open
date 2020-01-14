@@ -57,14 +57,12 @@ namespace IndicatorsUI.MainUI.Controllers
 
                 SetBridgeServicesUrl();
                 ViewBag.ImagesUrl = _appConfig.StaticContentUrl + versionFolder + "images/";
-                ViewBag.PdfUrl = _appConfig.PdfUrl;
                 ViewBag.UseGoogleAnalytics = _appConfig.UseGoogleAnalytics;
                 ViewBag.JavaScriptVersion = versionFolder;
                 ViewBag.PageModel = PageModel;
             }
             SetBridgeServicesUrl();
             ViewBag.ImagesUrl = _appConfig.StaticContentUrl + versionFolder + "images/";
-            ViewBag.PdfUrl = _appConfig.PdfUrl;
             ViewBag.UseGoogleAnalytics = _appConfig.UseGoogleAnalytics;
             ViewBag.JavaScriptVersion = versionFolder;
             ViewBag.FeatureSwitchJavaScript = JsonConvert.SerializeObject(_appConfig.ActiveFeatures);

@@ -348,7 +348,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the comparator significances for similarity calculations
+        /// Get the comparator significances for similarity calculations
         /// </summary>
         /// <param name="polarity_id">Polarity ID</param>
         [HttpGet]

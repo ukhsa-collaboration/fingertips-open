@@ -33,8 +33,6 @@ namespace IndicatorsUI.MainUI.Models
         public string CoreServicesUrl { get; set; }
         public string PageTitle { get; set; }
         public string IgnoredSpineChartAreas { get; set; }
-        public string SpineLowest { get; set; }
-        public string SpineHighest { get; set; }
         public string CssPath { get; private set; }
         public string JsPath { get; private set; }
 

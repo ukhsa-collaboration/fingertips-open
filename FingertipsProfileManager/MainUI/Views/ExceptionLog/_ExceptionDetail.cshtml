@@ -1,43 +1,39 @@
 ﻿@model Fpm.ProfileData.Entities.Exceptions.ExceptionLog
 
-<div id="exception-detail" style="display: none;">
+<div id="exception-detail" style="display none;">
     <h2>Exception Detail</h2>
-
     <div>
-        <label class="exception-detail-label">Id:</label><span class="exception-detail">@Model.Id</span>
+        <label class="exception-detail-label">Message</label><div class="exception-detail">@Model.Message</div>
     </div>
     <div>
-        <label class="exception-detail-label">Date:</label><span class="exception-detail">@Model.Date.ToShortDateString()</span>
+        <label class="exception-detail-label">URL</label><a href="@Model.Url" target="_blank">@Model.Url</a>
     </div>
     <div>
-        <label class="exception-detail-label">Time:</label><span class="exception-detail">@Model.Date.ToShortTimeString()</span>
+        <label class="exception-detail-label">Application</label><span class="exception-detail">@Model.Application</span>
     </div>
     <div>
-        <label class="exception-detail-label">Application:</label><span class="exception-detail">@Model.Application</span>
+        <label class="exception-detail-label">Type</label><div class="exception-detail">@Model.Type</div>
     </div>
     <div>
-        <label class="exception-detail-label">Message:</label><div class="exception-detail">@Model.Message</div>
+        <label class="exception-detail-label">Stack Trace</label><div class="exception-detail">@Model.StackTrace</div>
     </div>
     <div>
-        <label class="exception-detail-label">Type:</label><div class="exception-detail">@Model.Type</div>
+        <label class="exception-detail-label">Server</label><span class="exception-detail">@Model.Server</span>
     </div>
     <div>
-        <label class="exception-detail-label">Username:</label><div class="exception-detail">@Model.UserName</div>
+        <label class="exception-detail-label">Id</label><span class="exception-detail">@Model.Id</span>
     </div>
     <div>
-        <label class="exception-detail-label">Stack Trace:</label><div class="exception-detail">@Model.StackTrace</div>
+        <label class="exception-detail-label">Date</label><span class="exception-detail">@Model.Date.ToShortDateString() @Model.Date.ToShortTimeString()</span>
     </div>
     <div>
-        <label class="exception-detail-label">Server:</label><span class="exception-detail">@Model.Server</span>
-    </div>
-    <div>
-        <label class="exception-detail-label">URL</label><span class="exception-detail">@Model.Url</span>
+        <label class="exception-detail-label">Username</label><div class="exception-detail">@Model.UserName</div>
     </div>
 </div>
 
 <p id="exception-detail-buttons">
     <input class="small-button" id="Close" onclick="lightbox.hide()" value="Close" />
-    <a href="/exceptions/exception/@Model.Id">View full screen</a>
+    <a href="/exceptions/exception/@Model.Id" target="_blank">View full screen in new window</a>
 </p>
 
 

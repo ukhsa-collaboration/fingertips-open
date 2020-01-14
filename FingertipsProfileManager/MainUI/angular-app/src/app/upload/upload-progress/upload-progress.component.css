@@ -1,0 +1,19 @@
+.right-align {
+  text-align: right;
+}
+
+.change-user-link {
+  color: #003399;
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.change-user-link:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.scrollable-table-container {
+  height: 300px;
+  overflow: auto;
+}

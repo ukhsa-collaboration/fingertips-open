@@ -4,71 +4,72 @@
 @model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
 
 @{
-    Layout = "~/Views/Shared/_LayoutPage.cshtml"; 
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
     ViewBag.Title = "FPM - Create Profile";
 }
 
 @Scripts.Render("~/profile.js")
+@Scripts.Render("~/js/select2.min.js")
 
 <div class="standardWidth">
     <h2 class="subheading">Profile details</h2>
     @using (Html.BeginForm("CreateProfile", "Profile", FormMethod.Post))
-{
-    <table class="edit-table">
-        <tr>
-            <td>
-                Profile Key:<br><i>(hyphen separated lower case words, e.g. drugs-and-alcohol</i>)
-            </td>
-            <td>
-                @Html.TextBoxFor(model => model.UrlKey, new { @class = "unselected-domain" })
-                <span class="field-validation-valid" data-valmsg-for="UrlKey" data-valmsg-replace="true"></span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Profile Name:
-            </td>
-            <td>
-                @Html.TextBoxFor(model => model.Name, new { @class = "unselected-domain" })
-                <span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Profile Contact:
-            </td>
-            <td>
-                @Html.DropDownListFor(model => model.ContactUserId, null)
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Default Domain Name:
-            </td>
-            <td>
-                @Html.TextBoxFor(model => model.DefaultDomainName, new { @class = "unselected-domain" })
-                <span class="field-validation-valid" data-valmsg-for="DefaultDomainName" data-valmsg-replace="true"></span>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                Is Profile Viewable in default test site? (@AppConfig.DefaultTestUrl):
-            </td>
-            <td>
-                @Html.CheckBoxFor(model => model.IsProfileViewable)
-            </td>
-        </tr>
-    </table>
+    {
+        <table class="edit-table">
+            <tr>
+                <td>
+                    Profile Key:<br><i>(hyphen separated lower case words, e.g. drugs-and-alcohol</i>)
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.UrlKey, new { @class = "unselected-domain" })
+                    <span class="field-validation-valid" data-valmsg-for="UrlKey" data-valmsg-replace="true"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Profile Name:
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.Name, new { @class = "unselected-domain" })
+                    <span class="field-validation-valid" data-valmsg-for="Name" data-valmsg-replace="true"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Profile Contact(s):
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.ContactUserIds, null, new { @class = "profile-contacts", @multiple = "multiple" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Default Domain Name:
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.DefaultDomainName, new { @class = "unselected-domain" })
+                    <span class="field-validation-valid" data-valmsg-for="DefaultDomainName" data-valmsg-replace="true"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    Is Profile Viewable in default test site? (@AppConfig.DefaultTestUrl):
+                </td>
+                <td>
+                    @Html.CheckBoxFor(model => model.IsProfileViewable)
+                </td>
+            </tr>
+        </table>
 
 
-    <div class="button-box clearfix">
-        <input class="medium-button" id="create_profile" type="submit" value="Confirm" />
-        <input class="medium-button" id="CancelBtn" type="button" onclick="location.href='@Model.ReturnUrl    '" value="Cancel" />
-    </div>
+        <div class="button-box clearfix">
+            <input class="medium-button" id="create_profile" type="submit" value="Save" />
+            <input class="medium-button" id="CancelBtn" type="button" onclick="location.href='@Model.ReturnUrl'" value="Cancel" />
+        </div>
 
-    @Html.HiddenFor(x => x.Id)
-    @Html.HiddenFor(x => x.ReturnUrl)
-    @Html.HiddenFor(m => m.ProfileUsers,"")
-        
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.ReturnUrl)
+        @Html.HiddenFor(m => m.ProfileUsers, "")
+
     }
 </div>

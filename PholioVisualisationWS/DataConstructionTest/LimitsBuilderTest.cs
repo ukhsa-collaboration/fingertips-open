@@ -95,13 +95,13 @@ namespace PholioVisualisation.DataConstructionTest
             comparatorMap.Add(new ComparatorDetails
             {
                 Area = AreaFactory.NewArea(areasReader, AreaCodes.Gor_EastOfEngland),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 ComparatorId = ComparatorIds.Subnational
             });
             comparatorMap.Add(new ComparatorDetails
             {
                 Area = AreaFactory.NewArea(areasReader, AreaCodes.England),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 ComparatorId = ComparatorIds.England
             });
 
@@ -119,7 +119,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.Over18,
                 SexId = SexIds.Persons,
                 IndicatorId = IndicatorIds.NumberInTreatmentAtSpecialistDrugMisuseServices,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 DataPointYear = 2014,
                 YearRange = 1,
                 BaselineYear = 2014
@@ -133,7 +133,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.Under75,
                 SexId = SexIds.Persons,
                 IndicatorId = IndicatorIds.OverallPrematureDeaths,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 DataPointYear = 2011,
                 YearRange = 3,
                 BaselineYear = 2011

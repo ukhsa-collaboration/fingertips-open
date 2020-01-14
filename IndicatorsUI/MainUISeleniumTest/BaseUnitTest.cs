@@ -1,55 +1,45 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
-using IndicatorsUI.MainUI.Skins;
-using System.Collections.Generic;
-using System.Linq;
+using IndicatorsUI.MainUISeleniumTest.Helpers;
 
 namespace IndicatorsUI.MainUISeleniumTest
 {
     [TestClass]
     public class BaseUnitTest
     {
-        protected List<IWebDriver> drivers;
         public IWebDriver driver;
         public WaitFor waitFor;
         public NavigateTo navigateTo;
+        public FingertipsHelper fingertipsHelper;
 
+        /// <summary>
+        /// Constructor that uses the default web driver
+        /// </summary>
         public BaseUnitTest()
         {
-            drivers = SeleniumHelper.Drivers();
+            driver = SeleniumHelper.GetDriver();
         }
 
-        [TestInitialize]
-        public virtual void TestInitialize()
+        [TestCleanup]
+        public void TestCleanup_Base()
         {
-            SetSkin(SkinNames.Mortality);
-        }
-
-        protected void InitDriverObjects()
-        {
-            driver = FirstDriver;
-            waitFor = new WaitFor(driver);
-            navigateTo = new NavigateTo(driver);
+            SeleniumHelper.DisposeDriver(driver);
+            driver = null;
         }
 
         protected void SetSkin(string skinName)
         {
             SeleniumHelper.SetSkin(skinName);
-            drivers.ForEach(x => x.Manage().Window.Maximize());
-
             InitDriverObjects();
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        protected void InitDriverObjects()
         {
-            SeleniumHelper.DisposeDrivers(drivers);
-            drivers = null;
-        }
-
-        private IWebDriver FirstDriver
-        {
-            get { return drivers.First(); }
+            driver.Manage().Window.Maximize();
+            waitFor = new WaitFor(driver);
+            navigateTo = new NavigateTo(driver);
+            fingertipsHelper = new FingertipsHelper(driver);
         }
     }
 }

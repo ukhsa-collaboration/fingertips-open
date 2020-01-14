@@ -10,12 +10,7 @@
         else
         {
             @Html.ActionLink("Your indicator lists", "Index", "indicatorlist", new { }, new { @class = "dropdown-item" })
-
-            if (AppConfig.Instance.IsFeatureActive("yourAreaListsEnabled"))
-            {
-                @Html.ActionLink("Your area lists", "Index", "arealist", new {}, new {@class = "dropdown-item"})
-            }
-
+            @Html.ActionLink("Your area lists", "Index", "arealist", new { }, new { @class = "dropdown-item" })
             @Html.ActionLink("Your details", "EditMyAccount", "UserAccount", new { }, new { @class = "dropdown-item" })
             @Html.ActionLink("Sign out", "Logout", "UserAccount", new { }, new { @class = "dropdown-item" })
         }

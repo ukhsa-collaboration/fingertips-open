@@ -1,41 +1,52 @@
 <div id="map-container" class="standard-width clearfix" [style.display]="searchMode ? 'block' : 'none'">
-    <div [hidden]="isBoundaryNotSupported">
-        <div *ngIf="isInitialised">
-            <div *ngIf="!IsPracticeAreaType">
-                <div id="key-ad-hoc" class="key-container" *ngIf="showAdhocKey" [innerHtml]="htmlAdhocKey" style="display: block;overflow: hidden;"></div>
-                <ft-legend [pageType]="pageType" [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB"
-                    [showQuartiles]="showQuartiles" [showQuintilesRAG]="showQuintilesRAG" [showQuintilesBOB]="showQuintilesBOB"
-                    [showContinuous]="showContinuous"></ft-legend>
-                <br>
-                <ft-google-map (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData"
-                    [currentAreaCode]="currentAreaCode" [areaCodeColour]="areaCodeColour" [refreshColour]="refreshColour"
-                    (hoverAreaCodeChanged)="onhoverAreaCodeChangedMap($event)" (selectedAreaChanged)="onSelectedAreaChanged($event)"
-                    (benchmarkChanged)="OnBenchMarkIndexChanged($event)" [isBoundaryNotSupported]="isBoundaryNotSupported"
-                    [selectedAreaList]="selectedAreaList" [benchmarkIndex]="benchmarkIndex">
-                </ft-google-map>
-                <div id="maps_info">
-                    <div id='map_colour_box'>Map colour&nbsp;
-                        <select id='map_colour' (change)="onMapColourBoxChange($event.target.value)" [(ngModel)]="mapColourSelectedValue">
-                            <option value='benchmark'>Comparison to benchmark</option>
-                            <option value='quartile'>Quartiles</option>
-                            <option value='quintile'>Quintiles</option>
-                            <option value='continuous'>Continuous</option>
-                        </select>
-                    </div>
-                    <ft-map-table [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [selectedAreaList]="selectedAreaList"
-                        [areaCodeColour]="areaCodeColour" [isBoundaryNotSupported]="isBoundaryNotSupported"
-                        (hoverAreaCodeChanged)="onhoverAreaCodeChangedData($event)" (selectedAreaChanged)="onSelectedAreaChanged($event)"></ft-map-table>
-                </div>
-                <ft-map-chart [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData" [currentAreaCode]="currentAreaCode"
-                    [isBoundaryNotSupported]="isBoundaryNotSupported" [areaCodeColour]="areaCodeColour"
-                    (selectedAreaCodeChanged)="onSelectedAreaCodeChanged($event)" (hoverAreaCodeChanged)="onhoverAreaCodeChangedChart($event)"></ft-map-chart>
-            </div>
-            <div *ngIf="IsPracticeAreaType">
-                <ft-practice-search [IsMapUpdateRequired]="updateMap" [searchMode]="searchMode" #practiceSearch></ft-practice-search>
-            </div>
+  <div *ngIf="isAnyData && !isBoundaryNotSupported && !isEnglandAreaSelected">
+    <div *ngIf="isInitialised">
+      <div *ngIf="!IsPracticeAreaType">
+        <ft-legend [legendConfig]="legendConfig"></ft-legend>
+        <ft-google-map (mapInit)="onMapInit($event)" [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData"
+          [currentAreaCode]="currentAreaCode" [areaCodeColour]="areaCodeColour" [refreshColour]="refreshColour"
+          (hoverAreaCodeChanged)="onhoverAreaCodeChangedMap($event)"
+          (selectedAreaChanged)="onSelectedAreaChanged($event)" (benchmarkChanged)="OnBenchMarkIndexChanged($event)"
+          [isBoundaryNotSupported]="isBoundaryNotSupported" [selectedAreaList]="selectedAreaList"
+          [benchmarkIndex]="benchmarkIndex">
+        </ft-google-map>
+        <div id="maps_info">
+          <div id='map_colour_box'>Map colour&nbsp;
+            <select id='map_colour' (change)="onMapColourBoxChange($event.target.value)"
+              [(ngModel)]="mapColourSelectedValue">
+              <option value='benchmark'>Comparison to benchmark</option>
+              <option value='quartile'>Quartiles</option>
+              <option value='quintile'>Quintiles</option>
+              <option value='continuous'>Continuous</option>
+            </select>
+          </div>
+          <ft-map-table [areaTypeId]="areaTypeId" [sortedCoreData]="sortedCoreData"
+            [selectedAreaList]="selectedAreaList" [areaCodeColour]="areaCodeColour"
+            [isBoundaryNotSupported]="isBoundaryNotSupported"
+            (hoverAreaCodeChanged)="onhoverAreaCodeChangedData($event)"
+            (selectedAreaChanged)="onSelectedAreaChanged($event)"></ft-map-table>
         </div>
+        <ft-map-chart [areaTypeId]="areaTypeId" [subNationalTabButtonClicked]="subNationalTabButtonClicked"
+          [sortedCoreData]="sortedCoreData" [currentAreaCode]="currentAreaCode"
+          [isBoundaryNotSupported]="isBoundaryNotSupported" [areaCodeColour]="areaCodeColour"
+          (selectedAreaCodeChanged)="onSelectedAreaCodeChanged($event)"
+          (hoverAreaCodeChanged)="onhoverAreaCodeChangedChart($event)"></ft-map-chart>
+      </div>
+      <div *ngIf="IsPracticeAreaType">
+        <ft-practice-search [IsMapUpdateRequired]="updateMap" [searchMode]="searchMode" #practiceSearch>
+        </ft-practice-search>
+      </div>
     </div>
-    <div [hidden]="!isBoundaryNotSupported" id="boundryNotSupported">
-        Maps are not available for this area type
-    </div>
+  </div>
+  <div *ngIf="isAnyData && isBoundaryNotSupported && !isEnglandAreaSelected" id="boundryNotSupported">
+    Maps are not available for this area type
+  </div>
+  <div *ngIf="isAnyData && isEnglandAreaSelected" id="boundryNotSupportedEngland">
+    Not applicable for England data
+  </div>
+  <div *ngIf="!isAnyData && isBrowserIE" class="no-data">
+    Maps are not available on your browser version due to some technical reasons.
+    <br>
+    Please use one of the latest browsers, i.e., Google Chrome, Mozilla Firefox or Microsoft Edge.
+  </div>
 </div>

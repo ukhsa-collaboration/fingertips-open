@@ -34,8 +34,7 @@ namespace PholioVisualisation.DataAccessTest.Repositories
 
             indicatorMetadataTextValue.IndicatorId = 20601;
             indicatorMetadataTextValue.ProfileId = null;
-            indicatorMetadataTextValue.Name = "Reception: Prevalence of overweight(including obese)";
-            indicatorMetadataTextValue.NameLong = "Prevalence of overweight (including obese) among children in Reception";
+            indicatorMetadataTextValue.Name = "Prevalence of overweight (including obese) among children in Reception";
             indicatorMetadataTextValue.Definition = "Proportion of children aged 4-5 years classified as overweight or obese. Children are classified as overweight (including obese) if their BMI is on or above the 85th centile of the British 1990 growth reference (UK90) according to age and sex.";
             indicatorMetadataTextValue.Rationale = "Test Rationale";
 

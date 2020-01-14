@@ -46,7 +46,7 @@ namespace PholioVisualisation.PholioObjectsTest
         [TestMethod]
         public void TestIsCategoryAreaTypeIdFalseForStandardAreaType()
         {
-            Assert.IsFalse(CategoryAreaType.IsCategoryAreaTypeId(AreaTypeIds.CcgsPreApr2017));
+            Assert.IsFalse(CategoryAreaType.IsCategoryAreaTypeId(AreaTypeIds.CcgsPostApr2019));
         }
 
         [TestMethod]

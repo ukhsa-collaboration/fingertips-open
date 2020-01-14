@@ -23,7 +23,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestChildAreas_WhenParentIsArea()
         {
             var areas = _childAreaListBuilder.GetChildAreas(AreaCodes.Gor_EastMidlands, 
-                AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             var count = areas.Count;
             Assert.IsTrue(count > 5 && count < 10);
@@ -35,7 +35,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areaCode = CategoryArea.CreateAreaCode(CategoryTypeIds.DeprivationDecileCountyAndUA2010,
                 1);
 
-            var areas = _childAreaListBuilder.GetChildAreas(areaCode, AreaTypeIds.CountyAndUnitaryAuthority);
+            var areas = _childAreaListBuilder.GetChildAreas(areaCode, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             var count = areas.Count;
             Assert.IsTrue(count > 10 && count < 20);

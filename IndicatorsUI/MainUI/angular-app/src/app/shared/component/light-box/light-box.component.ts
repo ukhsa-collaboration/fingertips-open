@@ -1,4 +1,5 @@
 import { Component, OnChanges, Input, Output, SimpleChanges, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { LightBoxConfig, LightBoxTypes } from './light-box';
 
 @Component({
   selector: 'ft-light-box',
@@ -64,15 +65,3 @@ export class LightBoxComponent implements OnChanges {
   }
 }
 
-export class LightBoxConfig {
-  public Type: number;
-  public Html: string;
-  public Title: string;
-  public Height: number;
-  public Top: number = 500;
-}
-
-export class LightBoxTypes {
-  public static readonly Ok = 1
-  public static readonly OkCancel = 2;
-};

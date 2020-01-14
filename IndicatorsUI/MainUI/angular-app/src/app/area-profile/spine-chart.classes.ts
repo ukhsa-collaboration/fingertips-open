@@ -1,16 +1,16 @@
-import { IndicatorStatsPercentiles, CoreDataSet, CoreDataSetInfo, ComparisonConfig } from "../typings/FT";
+import { IndicatorStatsPercentiles, CoreDataSet, CoreDataSetInfo, ComparisonConfig } from '../typings/FT';
+import { PolarityIds } from 'app/shared/constants';
 
 export class SpineChartCalculator {
 
     // Not 1 for float precision reasons
     private one = 0.9999;
-    private halfMarkerWidth = 18 / 2;
 
-    public getSpineProportions(average: number, stats: IndicatorStatsPercentiles, polarityId: number) {
+    public getSpineProportions(average: number, stats: IndicatorStatsPercentiles, polarityId: number): SpineChartProportions {
 
-        let min, max, p25, p75;
+        let min: number, max: number, p25: number, p75: number;
 
-        let prop = new SpineChartProportions();
+        const prop = new SpineChartProportions();
         prop.isHighestLeft = this.isHighestLeft(polarityId)
 
         if (prop.isHighestLeft) {
@@ -26,8 +26,8 @@ export class SpineChartCalculator {
         }
 
         // Q1 Offset
-        let minAverageDifference = Math.abs(average - min);
-        let maxAverageDifference = Math.abs(average - max);
+        const minAverageDifference = Math.abs(average - min);
+        const maxAverageDifference = Math.abs(average - max);
         if (minAverageDifference > maxAverageDifference) {
             prop.unitsOfLargestSide = minAverageDifference;
             prop.q1Offset = 0;
@@ -44,17 +44,13 @@ export class SpineChartCalculator {
         return prop;
     }
 
-    isHighestLeft(polarityId: number): boolean {
-        return polarityId === 0;
-    }
-
     public getDimensions(proportions: SpineChartProportions, dataInfo: CoreDataSetInfo, imgUrl: string,
-        comparisonConfig: ComparisonConfig, indicatorId: number, getMarkerImageFromSignificance): SpineChartDimensions {
+        comparisonConfig: ComparisonConfig, indicatorId: number, getMarkerImageFromSignificance: Function): SpineChartDimensions {
 
-        var dimensions = new SpineChartDimensions();
+        const dimensions = new SpineChartDimensions();
         dimensions.imgUrl = imgUrl;
 
-        let calc = new SpineChartDimensionCalculator(proportions.unitsOfLargestSide);
+        const calc = new SpineChartDimensionCalculator(proportions.unitsOfLargestSide);
 
         dimensions.q1 = calc.getDimension(proportions.q1);
         dimensions.q2 = calc.getDimension(proportions.q2);
@@ -68,15 +64,16 @@ export class SpineChartCalculator {
         // Marker
         if (dataInfo.isValue()) {
 
-            let markerOffset = calc.getMarkerOffset(dataInfo.data.Val, proportions);
+            const markerOffset = calc.getMarkerOffset(dataInfo.data.Val, proportions);
 
             dimensions.markerOffset = markerOffset + dimensions.q1Offset;
 
-            var suffix = comparisonConfig.useQuintileColouring
+            const suffix = comparisonConfig.useQuintileColouring
                 ? '_medium'
                 : '';
             dimensions.markerImage = getMarkerImageFromSignificance(dataInfo.data.Sig[comparisonConfig.comparatorId],
-                comparisonConfig.useRagColours, suffix, comparisonConfig.useQuintileColouring, indicatorId, dataInfo.data.SexId, dataInfo.data.AgeId);
+                comparisonConfig.useRagColours, suffix, comparisonConfig.useQuintileColouring,
+                indicatorId, dataInfo.data.SexId, dataInfo.data.AgeId);
         }
 
         this.adjustDimensionsForRounding(dimensions, calc.roundDifference);
@@ -84,15 +81,18 @@ export class SpineChartCalculator {
         return dimensions;
     }
 
+    isHighestLeft(polarityId: number): boolean {
+        return polarityId === PolarityIds.RAGLowIsGood;
+    }
+
     adjustDimensionsForRounding(dimensions: SpineChartDimensions, roundDiff: number) {
-        //Note: q4 may not be most appropriate section to adjust
+        // Note: q4 may not be most appropriate section to adjust
         if (roundDiff <= -this.one) {
             dimensions.q4 -= 1;
         } else if (roundDiff >= this.one) {
             dimensions.q4 += 1;
         }
     };
-
 }
 
 class SpineChartDimensionCalculator {
@@ -103,14 +103,14 @@ class SpineChartDimensionCalculator {
     private halfMarkerWidth = 18 / 2;
 
     constructor(unitsOfLargestSide: number) {
-        let halfSpineChartWidth = 250 / 2;
+        const halfSpineChartWidth = 250 / 2;
         this.pixelPerUnit = halfSpineChartWidth / unitsOfLargestSide;
     }
 
     public getDimension(proportion: number) {
 
-        let val = proportion * this.pixelPerUnit;
-        let rounded = Math.round(val);
+        const val = proportion * this.pixelPerUnit;
+        const rounded = Math.round(val);
         this.roundDifference += val - rounded;
         return rounded;
     }
@@ -118,9 +118,9 @@ class SpineChartDimensionCalculator {
     /** Left offset to position the centre of marker image appropriate for the value */
     public getMarkerOffset(value: number, proportions: SpineChartProportions): number {
 
-        if (value) {
-            var min = proportions.min;
-            var marker = proportions.isHighestLeft ?
+        if (value || value === 0 || value === -0) {
+            const min = proportions.min;
+            const marker = proportions.isHighestLeft ?
                 min - value :
                 value - min;
 

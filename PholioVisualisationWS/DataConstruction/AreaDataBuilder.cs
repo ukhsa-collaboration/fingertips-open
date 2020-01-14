@@ -30,7 +30,7 @@ namespace PholioVisualisation.DataConstruction
         {
             IndicatorMetadataProvider indicatorMetadataProvider = IndicatorMetadataProvider.Instance;
             IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(GroupId, AreaTypeId);
-            GroupRootBuilder rootBuilder = new GroupRootBuilder();
+            GroupRootBuilder rootBuilder = new GroupRootBuilder(groupDataReader);
             IList<GroupRoot> roots = rootBuilder.BuildGroupRoots(groupings);
 
             CoreDataSetProviderFactory coreDataSetProviderFactory = new CoreDataSetProviderFactory();

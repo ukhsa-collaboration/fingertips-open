@@ -1,22 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
 using Fpm.MainUI.ViewModels.Areas;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Core;
-using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Repositories;
+using System.Collections.Generic;
+using System.Web.Mvc;
 
 namespace Fpm.MainUI.Controllers
 {
     [RoutePrefix("areas")]
     public class AreasController : Controller
     {
-        private CoreDataRepository _coreDataRepository;
-        private AreaTypeRepository _areaTypeRepository;
+        private readonly ICoreDataRepository _coreDataRepository;
+        private IAreaTypeRepository _areaTypeRepository;
 
-        [Route("")]
+        public AreasController(ICoreDataRepository coreDataRepository, IAreaTypeRepository areaTypeRepository)
+        {
+            _coreDataRepository = coreDataRepository;
+            _areaTypeRepository = areaTypeRepository;
+        }
+
+        [Route]
         public ActionResult AreasIndex(AreasIndexViewModel viewModel)
         {
             if (viewModel.AreaGrid == null)
@@ -54,6 +58,9 @@ namespace Fpm.MainUI.Controllers
         [HttpGet]
         public ActionResult SearchAreas(int areaTypeId, string searchText)
         {
+            // Clean search text
+            searchText = searchText == null ? string.Empty : searchText.Trim();
+
             var viewModel = new AreasIndexViewModel {AreaGrid = new List<Area>()};
 
             HydrateGridFromDBLookup(viewModel, searchText, areaTypeId);
@@ -104,21 +111,6 @@ namespace Fpm.MainUI.Controllers
                     IsCurrent = area.IsCurrent
                 });
             }
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-           
-            _coreDataRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
         }
     }
 }

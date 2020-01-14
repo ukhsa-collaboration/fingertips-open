@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.PholioObjects;
+using System.Linq;
 
 namespace PholioVisualisation.DataAccessTest.Repositories
 {
@@ -89,6 +87,16 @@ namespace PholioVisualisation.DataAccessTest.Repositories
                 IndicatorIds.LifeExpectancyAt65, yearRange);
 
             Assert.IsNull(timePeriod);
+        }
+
+        [TestMethod]
+        public void TestGetCoreDataSetChangeLog()
+        {
+            var coreDataSetChangeLog =
+                _coreDataSetRepository.GetCoreDataSetChangeLog(IndicatorIds.HealthyLifeExpectancyAtBirth,
+                    AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
+
+            Assert.IsNotNull(coreDataSetChangeLog);
         }
 
         private static CoreDataSet GetCoreDataFromDb(Grouping grouping, TimePeriod timePeriod)

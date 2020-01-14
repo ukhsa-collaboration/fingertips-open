@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { IndicatorHeader } from './indicator-header';
 
 @Component({
   selector: 'ft-indicator-header',
@@ -8,13 +9,4 @@ import { Component, Input } from '@angular/core';
 export class IndicatorHeaderComponent {
 
   @Input() header: IndicatorHeader;
-}
-
-export class IndicatorHeader {
-  constructor(public indicatorName: string,
-    public hasNewData: boolean,
-    public comparatorName: string,
-    public valueType: string,
-    public unit: string,
-    public ageSexLabel: string) { }
 }

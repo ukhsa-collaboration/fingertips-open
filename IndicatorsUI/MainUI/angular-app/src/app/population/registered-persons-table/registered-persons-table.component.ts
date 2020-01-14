@@ -1,10 +1,6 @@
 import { Component, Input, EventEmitter, Output } from '@angular/core';
-import {
-  RegisteredPersons
-} from '../population';
-import {
-  IndicatorIds
-} from '../../shared/shared';
+import { RegisteredPersons } from '../population';
+import { IndicatorIds } from '../../shared/constants';
 
 @Component({
   selector: 'ft-registered-persons-table',

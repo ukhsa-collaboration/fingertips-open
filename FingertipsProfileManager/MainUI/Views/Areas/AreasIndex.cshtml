@@ -21,7 +21,7 @@
  
         <div class="left">
             <b>Area Type:</b>  @Html.DropDownListFor(x => x.SearchAreaTypeId, areaTypesList,
-                                   new { @Name = "areaTypeId", @Id = "areaTypeId", @class = "create-indicator-dropdown dropdown-selected validate-required" })
+                                   new { @Name = "areaTypeId", @Id = "areaTypeId", @class = "indicator-dropdown dropdown-selected validate-required" })
 
             <b>Area:</b> @Html.TextBoxFor(model => model.SearchText, 
                                     new { size = 10, Id = "searchText", Name = "searchText", @class = "search-watermark", placeholder = "Enter Area Code or Name" })
@@ -30,7 +30,7 @@
             <span class="info-tooltip"><i>Leave text box blank and click Search to show all the areas of the selected type</i></span>
         </div>
     }
-    
+
     <div id="searches">
         @if (Model.AreaGrid != null && Model.AreaGrid.Any())
         {

@@ -444,7 +444,6 @@ namespace FingertipsUploadService.ProfileDataTest.UnitTests
         public void ShouldDuplicateCoreDataSetForAnIndicatorSecureTest()
         {
             // Arrange
-            var guid = new Guid();
             _sessionMock.Setup(x => x.IsOpen).Returns(true);
             _sessionMock.Setup(x => x.Close()).Returns((IDbConnection)null);
             _sessionMock.Setup(x => x.Dispose());

@@ -489,38 +489,13 @@ function clearFeedbackForm() {
 }
 
 function downloadLatestNoInequalitiesDataCsvFileByGroup(corews, parameters){
-    var url = corews + 'api/latest/no_inequalities_data/csv/by_group_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
+    var url = corews + 'api/latest_data_without_inequalities/csv/by_group_id?' + parameters.build();
+    window.open(url, '_blank');
 }
 
 function downloadLatestNoInequalitiesDataCsvFileByIndicator(corews, parameters){
-    var url = corews + 'api/latest/no_inequalities_data/csv/by_indicator_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
-}
-
-function downloadAllPeriodsNoInequalitiesDataCsvFileByIndicator(corews, parameters){
-    var url = corews + 'api/allPeriods/no_inequalities_data/csv/by_indicator_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
-}
-
-function downloadCsvFileByGroup(corews, parameters){
-    var url = corews + 'api/all_data/csv/by_group_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
-}
-
-function downloadCsvFileByIndicator(corews, parameters){
-    var url = corews + 'api/all_data/csv/by_indicator_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
-}
-
-function downloadLatestWithInequalitiesDataCsvFileByIndicator(corews, parameters){
-    var url = corews + 'api/latest/with_inequalities_data/csv/by_indicator_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
-}
-
-function downloadAllPeriodsWithInequalitiesDataCsvFileByIndicator(corews, parameters){
-    var url = corews + 'api/allPeriods/with_inequalities_data/csv/by_indicator_id?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
+    var url = corews + 'api/latest_data_without_inequalities/csv/by_indicator_id?' + parameters.build();
+    window.open(url, '_blank');
 }
 
 function getIid(){
@@ -530,7 +505,7 @@ function getIid(){
 
 function getAreasCodeDisplayed() {
 
-    var allDisplayedAreas = getChildAreas().map(area => area["Code"]);
+    var allDisplayedAreas = getChildAreas().map(function(area) { return area["Code"] });
 
     if (FT.model.isNearestNeighbours()){
         allDisplayedAreas.push(FT.model.areaCode);
@@ -539,12 +514,36 @@ function getAreasCodeDisplayed() {
     return allDisplayedAreas;
 }
 
+function getAreasCodeForCsvDownload() {
+
+    var allDisplayedAreas = null;
+
+    if (FT.model.isNearestNeighbours()){
+        allDisplayedAreas = getChildAreas().map(function(area) { return area["Code"] });
+        allDisplayedAreas.push(FT.model.areaCode);
+        return allDisplayedAreas;
+    }
+    return allDisplayedAreas;
+}
+
+function getCategoryAreaCode(){
+    if (isCategoryAreacode())
+    {
+        return FT.model.parentCode;
+    }
+    return null;
+}
+
 function getParentAreaCode() {
 
     if (FT.model.isNearestNeighbours()){
         return NATIONAL_CODE;
     }
     return FT.model.parentCode;
+}
+
+function isCategoryAreacode(){
+    return FT.model.parentCode.includes("cat-");
 }
 
 
@@ -565,4 +564,28 @@ function PostRequestDownloadCsvFile(url, data){
             // alert("Status: " + textStatus); alert("Error: " + errorThrown); 
         } 
       });
+}
+
+function SendPostForm(path, params, method) {
+    method = method || "post"; // Set method to post by default if not specified.
+
+    // The rest of this code assumes you are not using a library.
+    // It can be made less wordy if you use one.
+    var form = document.createElement("form");
+    form.setAttribute("method", method);
+    form.setAttribute("action", path);
+
+    for(var key in params) {
+        if(params.hasOwnProperty(key)) {
+            var hiddenField = document.createElement("input");
+            hiddenField.setAttribute("type", "hidden");
+            hiddenField.setAttribute("name", key);
+            hiddenField.setAttribute("value", params[key]);
+
+            form.appendChild(hiddenField);
+        }
+    }
+
+    document.body.appendChild(form);
+    form.submit();
 }

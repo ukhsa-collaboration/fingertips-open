@@ -36,6 +36,12 @@ namespace PholioVisualisation.DataAccessTest
         }
 
         [TestMethod]
+        public void TestAreIndicatorNamesDisplayedWithNumbersAssigned()
+        {
+            Assert.IsTrue(InitialisedProfile().AreIndicatorNamesDisplayedWithNumbers);
+        }
+
+        [TestMethod]
         public void TestNullGroupIdsHandled()
         {
             var profileConfig = GetProfileConfig();
@@ -65,7 +71,9 @@ namespace PholioVisualisation.DataAccessTest
                     ProfileId = profileId,
                     Name = name,
                     UrlKey = urlKey,
-                    IsNational = true
+                    IsNational = true,
+                    HasTrendMarkers = true,
+                    AreIndicatorNamesDisplayedWithNumbers = true
                 };
             return profileConfig;
         }

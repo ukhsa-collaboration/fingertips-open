@@ -13,6 +13,7 @@
     <property name="Parameters" column="parameters" />
     <property name="Notes" column="notes" />
     <property name="IsLive" column="isLive" />
+    <property name="AreaTypeIds" column="areaTypeIds" />
   </class>
 
   <class name="ReportsProfileMapping" table="SSRS_ReportsProfileMapping">

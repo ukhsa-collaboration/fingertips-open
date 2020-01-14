@@ -43,37 +43,20 @@ namespace PholioVisualisation.DataAccess.Repositories
 
                 foreach (ContentItem contentItem in contentItems)
                 {
-                    var contentItemInDb = CurrentSession.CreateCriteria<ContentItem>()
-                        .Add(Restrictions.Eq("ProfileId", contentItem.ProfileId))
-                        .Add(Restrictions.Eq("ContentKey", contentItem.ContentKey))
-                        .UniqueResult<ContentItem>();
+                    var contentItemInDb = GetContentForProfile(contentItem.ProfileId, contentItem.ContentKey);
 
                     if (contentItemInDb == null)
                     {
-                        CurrentSession.GetNamedQuery("Insert_ContentItem")
-                            .SetParameter("ContentKey", contentItem.ContentKey)
-                            .SetParameter("ProfileId", contentItem.ProfileId)
-                            .SetParameter("Description", contentItem.Description)
-                            .SetParameter("Content", contentItem.Content)
-                            .SetParameter("IsPlainText", contentItem.IsPlainText)
-                            .ExecuteUpdate();
+                        // Insert new content item
+                        CurrentSession.Save(contentItem);
                     }
                     else
                     {
-                        if (contentItemInDb.ProfileId == contentItem.ProfileId &&
-                            contentItemInDb.ContentKey == contentItem.ContentKey)
-                        {
-                            IQuery q = CurrentSession.CreateQuery("update ContentItem f set f.Content = :Content where f.ProfileId = :ProfileId and f.ContentKey = :ContentKey");
-                            q.SetParameter("Content", contentItem.Content);
-                            q.SetParameter("ProfileId", contentItem.ProfileId);
-                            q.SetParameter("ContentKey", contentItem.ContentKey);
-                            q.ExecuteUpdate();
-                        }
-                        else
-                        {
-                            throw new Exception(string.Format("No match found for the profile id {0} and the content key {1}",
-                                contentItem.ProfileId, contentItem.ContentKey));
-                        }
+                        // Update content item
+                        contentItemInDb.Content = contentItem.Content;
+                        contentItemInDb.Description = contentItem.Description;
+                        contentItemInDb.IsPlainText = contentItem.IsPlainText;
+                        CurrentSession.Update(contentItemInDb);
                     }
                 }
 
@@ -92,5 +75,6 @@ namespace PholioVisualisation.DataAccess.Repositories
                 throw new Exception(ex.Message, ex.InnerException);
             }
         }
+
     }
 }

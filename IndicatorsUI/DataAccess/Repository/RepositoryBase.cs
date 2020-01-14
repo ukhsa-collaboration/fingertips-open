@@ -29,6 +29,8 @@ namespace IndicatorsUI.DataAccess.Repository
         /// </summary>
         internal ISession CurrentSession;
 
+        internal ITransaction transaction = null;
+
         public RepositoryBase(ISessionFactory sessionFactory)
         {
             this.sessionFactory = sessionFactory;
@@ -62,7 +64,16 @@ namespace IndicatorsUI.DataAccess.Repository
         {
             CloseSession();
         }
-        
+
+        internal void HandleException(Exception exception)
+        {
+            if (transaction != null && transaction.WasRolledBack == false)
+            {
+                transaction.Rollback();
+            }
+            throw exception;
+        }
+
         /// <summary>
         /// Closes a data access session
         /// </summary>

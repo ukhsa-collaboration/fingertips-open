@@ -42,8 +42,8 @@ namespace Fpm.MainUI.Models
 
         // Filtering-related properties
         public string ProfileKey { get; set; }
-        public string ContactUserName { get; set; }
-        public string EmailAddress { get; set; }
+        public string ContactUserNames { get; set; }
+        public string EmailAddresses { get; set; }
         public int? DomainSequence { get; set; }
         public int? IndicatorId { get; set; }
         public int SelectedAreaTypeId { get; set; }

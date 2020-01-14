@@ -5,10 +5,8 @@
         public int IndicatorId { get; set; }
         public int? ProfileId { get; set; }
         public string Name { get; set; }
-        public string NameLong { get; set; }
         public string Definition { get; set; }
         public string Rationale { get; set; }
-        public string Policy { get; set; }
         public string DataSource { get; set; }
         public string Producer { get; set; }
         public string IndSourceLink { get; set; }
@@ -31,5 +29,15 @@
         public string DataQuality { get; set; }
         public int Id { get; set; }
         public string IndicatorContent { get; set; }
+        public string SpecificRationale { get; set; }
+        public string Keywords { get; set; }
+        public string EvidOfVariability { get; set; }
+        public string JustifConfIntMeth { get; set; }
+        public string QualityAssurance { get; set; }
+        public string QualityImprPlan { get; set; }
+        public string JustiOfExclusions { get; set; }
+        public string JustifOfDataSources { get; set; }
+        public string SponsorStakeholders { get; set; }
+        public string IndOwnerContDet { get; set; }
     }
 }

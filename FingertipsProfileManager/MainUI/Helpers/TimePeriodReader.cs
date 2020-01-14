@@ -1,15 +1,10 @@
-﻿using System;
+﻿using Fpm.ProfileData;
+using System;
 using System.IO;
 using System.Net;
-using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface ITimePeriodReader
-    {
-        string GetPeriodString(TimePeriod timePeriod, int yearTypeId);
-    }
-
     public class TimePeriodReader : ITimePeriodReader
     {
         private bool _isWebServiceAvailable = true;

@@ -90,7 +90,6 @@ namespace FingertipsUploadService
                 _logger.Debug("Checking duplicates in file");
                 validator.CheckDuplicatesInFile(jobAnalysis);
 
-
                 // Check duplicate in database
                 _logger.Debug("Checking duplicates in db");
                 validator.CheckGetDuplicatesInDb(dataTable, jobAnalysis);
@@ -102,10 +101,13 @@ namespace FingertipsUploadService
                     var indicatorIds = GetIndicatorIds(jobAnalysis.DataToUpload);
                     _logger.Debug("Checking the permissions for all the indicators in the files");
                     if (DoesUserHavePermissionForAllIndicators(job, indicatorIds) == false) return;
-                    _logger.Debug("Checking for the small numbers");
-                    if (AreAnySmallNumbers(job, jobAnalysis)) return;
+
                     _logger.Debug("Checking for the validation errors");
                     if (AreAnyValidationFailures(job, jobAnalysis)) return;
+
+                    // This check must be done last as the user can override it if they choose
+                    _logger.Debug("Checking for the small numbers");
+                    if (AreAnySmallNumbers(job, jobAnalysis)) return;
                 }
 
                 _jobStatus.InProgress(job);

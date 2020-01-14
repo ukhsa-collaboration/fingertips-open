@@ -429,7 +429,7 @@ a.rowSort, a.rowSort:visited, a.columnSort, a.columnSort:visited {
     margin-right: 3px;
 }
 
-td.worse, td.worst, td.same, td.better, td.best, td.none,.bobLower, .bobHigher, 
+td.worse, td.worst, td.same, td.better, td.best, td.none, td.bobLower, td.bobHigher, td.bobLowest, td.bobHighest,
     .grade-rag-quintile-1, .grade-rag-quintile-2, .grade-rag-quintile-3, .grade-rag-quintile-4, .grade-rag-quintile-5, 
     .grade-bob-quintile-1, .grade-bob-quintile-2, .grade-bob-quintile-3, .grade-bob-quintile-4, .grade-bob-quintile-5 {
     margin: 0 0 0 0;
@@ -527,7 +527,6 @@ span.target {
 .key-table span.target {
     padding: 2px 4px;
     margin: 0;
-    font-size: 14px;
 }
 
 #trends-container .target-box {
@@ -539,6 +538,11 @@ span.target {
     color: white;
 }
 
+td.bobLowest, span.bobLowest {
+    background-color: rgb(37,37,99);
+    color: White;
+}
+
 td.bobLower, span.bobLower {
     background-color: rgb(85,85,230);
     color: White;
@@ -546,6 +550,10 @@ td.bobLower, span.bobLower {
 
 td.bobHigher, span.bobHigher, td.overlapping-cis {
     background-color: rgb(190,210,255);
+}
+
+td.bobHighest, span.bobHighest, td.overlapping-cis {
+    background-color: rgb(193,244,240);
 }
 
 td.none {
@@ -629,7 +637,7 @@ div.page-selected, div.page-selected:hover
     background-image: url('../images/tabs/trends.gif');
 }
 
-#page-areas div {
+#page-area-profile div {
     background-image: url('../images/tabs/areas.gif');
 }
 
@@ -659,7 +667,7 @@ background-image: url('../images/tabs/inequalities.gif');
     background-image: url('../images/tabs/map.gif');
 }
 
-#page-scatter div {
+#page-compare-indicators div {
     background-image: url('../images/tabs/scatter.gif');
 }
 

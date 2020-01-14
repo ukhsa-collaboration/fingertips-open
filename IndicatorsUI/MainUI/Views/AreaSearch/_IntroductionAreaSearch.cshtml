@@ -16,15 +16,22 @@
     @Html.Partial("_Spinner")
 
     <table id="area-search" class="table margin-left" style="display: none;">
-        @if (areaSearch.IsPlaceNameSearchAvailable)
-        {
-            <tr><td>Search by postcode, town or @areaTypeLabel</td></tr>
-            <tr>
+
+        <tr>
+            @if (areaSearch.IsPlaceNameSearchAvailable)
+            {
+                <td>Search by postcode, town or @areaTypeLabel</td>
+            }
+            else
+            {
+                <td>Search by @areaTypeLabel</td>
+            }
+        </tr>
+        <tr>
                 <td style="padding-bottom: 30px;">
                     <input id="area-search-text" type="text" name="search_text"/>
                 </td>
             </tr>
-        }
         <tr><td>List @(areaSearch.GetAreaTypeLabelPlural()) by region</td></tr>
         <tr><td><select id="parent-area-menu"><option/></select></td></tr>
     </table>
@@ -33,7 +40,7 @@
     @Scripts.Render("~/bundles/js-area-search")
     <script type="text/javascript">
         // Globals
-        FT.model.areaTypeId = @AreaTypeIds.CountyAndUnitaryAuthority;
+        FT.model.areaTypeId = @AreaTypeIds.CountyAndUnitaryAuthorityPre2019;
         FT.model.profileId = @Model.ProfileId;
         templateProfileId = -1;
         FT.version = '@ViewBag.JavaScriptVersion';

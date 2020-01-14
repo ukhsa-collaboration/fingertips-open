@@ -3,11 +3,6 @@ using System.Web.Mvc;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface INewDataDeploymentCount
-    {
-        IList<SelectListItem> GetOptions(string selectedValue);
-    }
-
     public class NewDataDeploymentCount : INewDataDeploymentCount
     {
         public const string None = "NONE";

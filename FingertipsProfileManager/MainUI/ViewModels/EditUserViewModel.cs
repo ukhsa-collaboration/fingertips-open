@@ -22,6 +22,8 @@ namespace Fpm.MainUI.ViewModels
 
         public bool IsAdministrator { get; set; }
 
+        public bool IsReviewer { get; set; }
+
         public bool IsCurrent { get; set; }
 
         public bool IsMemberOfFpmSecurityGroup { get; set; }

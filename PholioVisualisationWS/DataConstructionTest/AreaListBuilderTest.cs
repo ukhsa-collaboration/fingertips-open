@@ -47,22 +47,6 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void CreateAreaListFromAreaTypeIdReturnsParentAreas()
-        {
-            IList<string> codes = new List<string> { "a", "b" };
-            var areas = AreaList();
-
-            var mockAreasReader = new Mock<AreasReader>();
-            ParentAreaCodesAreFound(codes, mockAreasReader);
-            AreasGotFromCodes(codes, areas, mockAreasReader);
-
-            var builder = new AreaListProvider(mockAreasReader.Object);
-            builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId, String.Empty);
-            var areaList = builder.Areas;
-            Assert.AreEqual(3, areaList.Count);
-        }
-
-        [TestMethod]
         public void TestRemoveAreasIgnoredEverywhere()
         {
             var areas = AreaList();
@@ -171,7 +155,6 @@ namespace PholioVisualisation.DataConstructionTest
         {
             var mockAreasReader = new Mock<AreasReader>();
             GetAreasByAreaTypeIdReturnsAreas(areas, mockAreasReader);
-            NoParentAreaCodes(mockAreasReader);
 
             var builder = new AreaListProvider(mockAreasReader.Object);
             builder.CreateAreaListFromAreaTypeId(profileId, areaTypeId, String.Empty);
@@ -204,20 +187,6 @@ namespace PholioVisualisation.DataConstructionTest
             mockAreasReader.Setup(x => x
                 .GetAreasByAreaTypeId(areaTypeId))
                 .Returns(areas);
-        }
-
-        private void NoParentAreaCodes(Mock<AreasReader> mock)
-        {
-            mock.Setup(x => x
-                .GetProfileParentAreaCodes(profileId, areaTypeId))
-                .Returns(new List<string>());
-        }
-
-        private void ParentAreaCodesAreFound(IList<string> areaCodes, Mock<AreasReader> mock)
-        {
-            mock.Setup(x => x
-                .GetProfileParentAreaCodes(profileId, areaTypeId))
-                .Returns(areaCodes);
         }
 
         private static void AreasGotFromCodes(IList<string> codes, List<IArea> areas, Mock<AreasReader> mockAreasReader)

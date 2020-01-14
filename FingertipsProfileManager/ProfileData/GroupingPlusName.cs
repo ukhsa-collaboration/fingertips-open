@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Fpm.ProfileData
+﻿namespace Fpm.ProfileData
 {
     public class GroupingPlusName
     {
@@ -28,12 +26,6 @@ namespace Fpm.ProfileData
         public bool UsedElsewhere { get; set; }
         public int? ProfileId { get; set; }
         public int? GroupId { get; set; }
-    }
-
-    public class IndicatorDetail
-    {
-        public string OwnedByProfile { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public string CreatedBy { get; set; }
+        public string IndicatorNumber { get; set; }
     }
 }

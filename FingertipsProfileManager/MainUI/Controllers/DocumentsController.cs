@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using System.Web.Mvc;
-using Fpm.MainUI.Helpers;
+﻿using Fpm.MainUI.Helpers;
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Mvc;
 
 namespace Fpm.MainUI.Controllers
 {
@@ -22,10 +19,16 @@ namespace Fpm.MainUI.Controllers
     {
         public const int MaxFileSizeInBytes = 50000000/*50MB*/;
 
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
 
-        [Route("")]
+        public DocumentsController(IProfilesReader reader, IProfilesWriter writer)
+        {
+            _reader = reader;
+            _writer = writer;
+        }
+
+        [Route]
         public ActionResult DocumentsIndex(int profileId = ProfileIds.Undefined)
         {
             var user = UserDetails.CurrentUser();
@@ -72,7 +75,7 @@ namespace Fpm.MainUI.Controllers
                             docFromDatabase.ProfileId = uploadProfileId;
                             docFromDatabase.FileName = fileName;
                             docFromDatabase.FileData = uploadedFile;
-                            docFromDatabase.UploadedBy = new CurrentUser().Name;
+                            docFromDatabase.UploadedBy = UserDetails.CurrentUser().Name;
                             docFromDatabase.UploadedOn = DateTime.Now;
 
                             _writer.UpdateDocument(docFromDatabase);
@@ -86,7 +89,7 @@ namespace Fpm.MainUI.Controllers
                             ProfileId = uploadProfileId,
                             FileName = fileName,
                             FileData = uploadedFile,
-                            UploadedBy = new CurrentUser().Name,
+                            UploadedBy = UserDetails.CurrentUser().Name,
                             UploadedOn = DateTime.Now
                         };
                         _writer.NewDocument(doc);
@@ -97,7 +100,7 @@ namespace Fpm.MainUI.Controllers
             return RedirectToAction("DocumentsIndex", new { profileId = uploadProfileId });
         }
 
-        [Route("is_filename_unique")]
+        [Route("is-filename-unique")]
         public ActionResult IsFileNameUnique(string filename, int profileId)
         {
             var isUnique = new FileNameHelper(_reader).IsUnique(filename, profileId);

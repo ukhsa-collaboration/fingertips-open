@@ -27,10 +27,16 @@ namespace PholioVisualisation.DataConstruction
                 if (area.IsCcg)
                 {
                     //Note: zeroes may occur and should be included
-                    Value = groupDataReader
-                        .GetCoreDataListForChildrenOfArea(grouping, period, area.Code)
-                        .Where(x => x.IsValueValid)
-                        .Average(x => x.Value);
+                    var coreDataSetList = groupDataReader
+                        .GetCoreDataListForChildrenOfArea(grouping, period, area.Code);
+                    Value = 0;
+
+                    if (coreDataSetList.Count > 0)
+                    {
+                        Value = coreDataSetList
+                            .Where(x => x.IsValueValid)
+                            .Average(x => x.Value);
+                    }
                 }
                 else
                 {
@@ -47,19 +53,24 @@ namespace PholioVisualisation.DataConstruction
                 var data = dataList.First();
                 if (data.IsValueValid)
                 {
-                    Value = data.Value;
 
-                    if (area.IsGpPractice == false)
+                    if (area.IsGpPractice)
+                    {
+                        Value = data.Value;
+                    }
+                    else
                     {
                         // Calculate average
-
                         var areasReader = ReaderFactory.GetAreasReader();
 
                         int count = area.IsCountry ?
                             areasReader.GetAreaCountForAreaType(grouping.AreaTypeId) :
                             areasReader.GetChildAreaCount(area.Code, grouping.AreaTypeId);
 
-                        Value /= count;
+                        if (count > 0)
+                        {
+                            Value = data.Value / count;
+                        }
                     }
                 }
             }

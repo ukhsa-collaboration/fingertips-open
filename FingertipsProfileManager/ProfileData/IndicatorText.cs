@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Fpm.ProfileData.Entities.Profile;
+﻿using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.ProfileData
 {
@@ -23,6 +19,11 @@ namespace Fpm.ProfileData
         public bool HasGenericValue()
         {
             return ValueGeneric != null;
+        }
+
+        public bool HasInternalMetadataProperty()
+        {
+            return IndicatorMetadataTextProperty.IsInternalMetadata;
         }
     }
 }

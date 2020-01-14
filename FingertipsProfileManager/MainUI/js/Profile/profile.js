@@ -1,12 +1,12 @@
 ﻿'use strict';
 
-$(document).ready(function () {
+$(document).ready(function() {
 
     // Index page
     initTableSorter();
 
     $('#profile-menu')
-        .change(function () {
+        .change(function() {
 
             var selectedProfile = $(this).val();
             if (selectedProfile !== '') {
@@ -16,12 +16,12 @@ $(document).ready(function () {
             }
         });
 
-    $("form").submit(function (e) {
+    $("form").submit(function(e) {
         if ($(this).valid()) {
 
             // Get all selected area-types for PDF
             var selectedAreaTypes = [];
-            $('#profile-area-types input:checked').each(function () {
+            $('#profile-area-types input:checked').each(function() {
                 selectedAreaTypes.push({
                     Id: $(this).attr('id').replace('chk', ''),
                     Value: $(this).attr('value')
@@ -31,7 +31,7 @@ $(document).ready(function () {
 
             // Get all selected profile users
             var selectedUsers = [];
-            $('.selectable-check-box:checked').each(function () {
+            $('.selectable-check-box:checked').each(function() {
                 selectedUsers.push({
                     Id: $(this).attr('id').replace('chk', ''),
                     Value: $(this).attr('value')
@@ -40,15 +40,47 @@ $(document).ready(function () {
             $('#ProfileUsers').val(JSON.stringify(selectedUsers));
         }
     });
+
+    // Set contact user id
+    SetContactUserIds();
+
+    // Multi select dropdown
+    ApplySelect2Style('profile-contacts');
 });
+
+function SetContactUserIds() {
+    var contactUserIds = $('#hdn-contact-user-ids').val();
+    if (contactUserIds) {
+        $.each(contactUserIds.split(","), function (i, e) {
+            $("#ContactUserIds option[value='" + e + "']").prop("selected", true);
+            $('#ContactUserIds').trigger('change.select2');
+        });
+    }
+}
+
+function ApplySelect2Style(element) {
+    if ($('.' + element).length) {
+        $('.' + element).select2();
+    }
+
+    if ($('#' + element).length) {
+        $('#' + element).select2();
+    }
+}
 
 function LoadProfileDetail(profileId) {
     $.ajax({
         type: 'GET',
-        url: '/profile/NonAdminProfileDetails?profileId=' + profileId,
-        success: function(response) {
+        url: '/profiles/profile/non-admin-profile-details?profileId=' + profileId,
+        success: function (response) {
             $('#divDetail').html(response);
             $('[data-toggle="tooltip"]').tooltip();
+
+            // Set contact user id
+            SetContactUserIds();
+
+            // Multi select dropdown
+            ApplySelect2Style('profile-contacts');
         },
         error: function(err) {
             console.log(err);
@@ -60,7 +92,7 @@ function SaveProfileDetail() {
     var name = $('#Name').val();
     var data = $('#frmProfile').serialize();
 
-    $.post('/profile/NonAdminProfileDetails', data)
+    $.post('/profiles/profile/non-admin-profile-details', data)
         .done(function (response) {
             if (response) {
                 $('#alert-success').show();
@@ -82,7 +114,7 @@ function addProfileUser() {
         profileId: $("[name=Id]").val(),
         FpmUserId: $("[name=userId]").val()
     };
-    $.post('/Profile/AddProfileUser', data)
+    $.post('/profiles/profile/add-profile-user', data)
         .done(function (result) {
             $('#user-listing').html(result);
         })
@@ -96,7 +128,7 @@ function removeProfileUser() {
         profileId: $("[name=Id]").val(),
         FpmUserId: $("[name=userId]").val()
     };
-    $.post('/Profile/RemoveProfileUser', data)
+    $.post('/profiles/profile/remove-profile-user', data)
         .done(function (result) {
             $('#user-listing').html(result);
         })

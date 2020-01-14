@@ -36,23 +36,7 @@
 
         public int DataPointMonth { get; set; }
 
-        public int TimeSeries
-        {
-            get
-            {
-                if (BaselineQuarter > 0)
-                {
-                    return 2;
-                }
-
-                if (BaselineMonth > 0)
-                {
-                    return 3;
-                }
-
-                return 1;
-            }
-        }
+        public int TimeSeries { get; set; }
 
         public int ComparatorTargetId { get; set; }
         public int PolarityId { get; set; }

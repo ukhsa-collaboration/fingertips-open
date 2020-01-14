@@ -10,6 +10,8 @@ using PholioVisualisation.PholioObjects;
 using NLog;
 using PholioVisualisation.DataSorting;
 using PholioVisualisation.Export.File;
+using PholioVisualisation.Export.FileBuilder;
+using PholioVisualisation.Export.FileBuilder.Wrappers;
 
 namespace FingertipsDataExtractionTool
 {
@@ -62,7 +64,7 @@ namespace FingertipsDataExtractionTool
 
                         foreach (var parentAreaTypeId in parentAreaTypeIds)
                         {
-                            _logger.Info("Creating Excel file with " +
+                            _logger.Info("Creating CSV file with " +
                                 GetProfileDetailsText(profileId,
                                 parentAreaTypeId, childAreaTypeId));
 
@@ -113,7 +115,7 @@ namespace FingertipsDataExtractionTool
             }
             catch (Exception ex)
             {
-                var message = "Failed to create excel file " +
+                var message = "Failed to create CSV file " +
                     GetProfileDetailsText(profileId, subnationalAreaTypeId, areaTypeId);
                 _logger.Error(message);
                 NLogHelper.LogException(_logger, ex);
@@ -123,10 +125,15 @@ namespace FingertipsDataExtractionTool
 
         private void CreateIndicatorFileContent(IList<int> indicatorIds, IndicatorExportParameters exportParameters)
         {
-            var areaHelper = new ExportAreaHelper(_areasReader, exportParameters, new AreaFactory(_areasReader));
-            var fileBuilder = new DataFileBuilder(IndicatorMetadataProvider.Instance,
-                areaHelper, _areasReader, new DummyFileBuilder());
-            fileBuilder.GetFileForSpecifiedIndicators(indicatorIds, exportParameters);
+            var areaHelper = new ExportAreaHelper(_areasReader, exportParameters);
+
+            var inequalities = OnDemandQueryParametersWrapper.GetInitializedInequalitiesDictionary(indicatorIds);
+            var onDemandParameters = new OnDemandQueryParametersWrapper(exportParameters.ProfileId, indicatorIds, inequalities, null, null, true);
+
+            var fileBuilder = new IndicatorDataCsvFileBuilder(IndicatorMetadataProvider.Instance, areaHelper,
+                _areasReader, exportParameters, onDemandParameters);
+
+            fileBuilder.GetDataFile();
         }
 
         /// <summary>

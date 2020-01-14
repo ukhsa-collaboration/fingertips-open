@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ReportsComponent } from './reports.component';
-import { ProfileService } from 'app/services/profile.service';
-import { HttpService } from 'app/services/http.service';
-import { Http } from '@angular/http';
+import { ProfileService } from '../services/profile.service';
+import { HttpService } from '../services/http.service';
+import { HttpClient } from '@angular/common/http';
 
 describe('ReportsComponent', () => {
   let component: ReportsComponent;
@@ -23,7 +23,7 @@ describe('ReportsComponent', () => {
       providers: [
         { provide: ProfileService, useValue: mockProfileService },
         { provide: HttpService, useValue: mockHttpService },
-        { provide: Http }
+        { provide: HttpClient }
       ]
     })
       .compileComponents();
@@ -35,7 +35,7 @@ describe('ReportsComponent', () => {
     fixture.detectChanges();
   });
 
-  // it('should create', () => {
-  //   expect(component).toBeTruthy();
-  // });
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
 });

@@ -8,7 +8,12 @@ namespace PholioVisualisation.PholioObjects
 {
     public class QuinaryPopulationValue
     {
-        public int AgeId { get; set; }
-        public double Value { get; set; }
+        public int AgeId;
+        public double Value;
+
+        public static QuinaryPopulationValue New(CoreDataSet data)
+        {
+            return new QuinaryPopulationValue { Value = data.Value, AgeId = data.AgeId };
+        }
     }
 }

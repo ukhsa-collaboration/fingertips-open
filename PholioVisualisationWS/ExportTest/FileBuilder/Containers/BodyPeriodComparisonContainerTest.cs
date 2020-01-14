@@ -63,7 +63,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             var indicatorExportParameters = new IndicatorExportParameters {ParentAreaCode = AreaCodes.England};
             var areaFactory = new AreaFactory(_areaTypeMock.Object);
-            var exportAreaHelper = new ExportAreaHelper(_areaTypeMock.Object, indicatorExportParameters, areaFactory);
+            var exportAreaHelper = new ExportAreaHelper(_areaTypeMock.Object, indicatorExportParameters);
 
             var bodyPeriodComparisonContainer = new BodyPeriodComparisonContainer(exportAreaHelper, _indicatorComparerMock.Object);
             var comparision = new List<CoreDataSet>{ new CoreDataSet { AgeId = AllAges }};
@@ -84,7 +84,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         {
             _comparision = new List<CoreDataSet> { new CoreDataSet { AgeId = AllAges, CategoryTypeId = CategoryDeprivationDecileGp2010 } };
             IList<CoreDataSet> comparisionForRef = null;
-            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref comparisionForRef, _comparision);
+            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref comparisionForRef, _comparision, CategoryUndefined);
 
             Assert.IsNotNull(bodyPeriodComparisonContainer);
             Assert.IsTrue(comparisionForRef.Count == 0);
@@ -95,7 +95,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         public void ShouldnotGetCoreDataForComparisonToWriteAndNewComparisionRefTest()
         {
             IList<CoreDataSet> comparisionForRef = null;
-            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref comparisionForRef, _comparision);
+            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref comparisionForRef, _comparision, CategoryUndefined);
 
             Assert.IsNotNull(bodyPeriodComparisonContainer);
             Assert.AreEqual(_comparision.FirstOrDefault(), bodyPeriodComparisonContainer.FirstOrDefault());
@@ -105,7 +105,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         [TestMethod]
         public void ShouldGetCoreDataForComparisonToWriteTest()
         {
-            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref _comparisionForRef, _comparision);
+            var bodyPeriodComparisonContainer = BodyPeriodComparisonContainer.GetCoreDataForComparisonToWrite(ref _comparisionForRef, _comparision, CategoryUndefined);
 
             Assert.IsNotNull(bodyPeriodComparisonContainer);
             Assert.AreEqual(_expectedCoreDataSetRef, bodyPeriodComparisonContainer.FirstOrDefault());

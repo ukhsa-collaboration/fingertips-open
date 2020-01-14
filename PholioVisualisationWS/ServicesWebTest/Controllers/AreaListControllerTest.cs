@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using PholioVisualisation.PholioObjects;
 using PholioVisualisation.ServicesWeb.Controllers;
 using PholioVisualisation.ServicesWeb.Helpers;
 using PholioVisualisation.UserData;
@@ -13,9 +14,9 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
     [TestClass]
     public class AreaListControllerTest
     {
-        public const string UserId = "58189c36-969d-4e13-95c9-67a01832ab24";
-        public const int AreaListId = 10;
-        public const string PublicId = "al-ZY6zmuVONE";
+        public const string UserId = FingertipsUserIds.TestUser;
+        public const int AreaListId = 2;
+        public const string PublicId = AreaListCodes.TestListId;
 
         private Mock<IAreaListRepository> _areaListRepository;
         private Mock<IPublicIdGenerator> _publicIdGenerator;
@@ -71,8 +72,8 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         {
             // Arrange
             var list = new AreaList {
-                PublicId = "al-ZY6zmuVONE",
-                UserId = "58189c36-969d-4e13-95c9-67a01832ab24"
+                PublicId = PublicId,
+                UserId = FingertipsUserIds.TestUser
             };
             _areaListRepository.Setup(x => x.GetAreaListByPublicId(PublicId))
                 .Returns(list);

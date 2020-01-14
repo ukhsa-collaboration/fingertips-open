@@ -1,6 +1,6 @@
 ﻿
 function viewIndicatorData(indicatorId, indicatorName) {
-    var ajaxAction = '/BrowseData/' + indicatorId.trim();
+    var ajaxAction = '/profiles-and-indicators/browse-data/' + indicatorId.trim();
     var popupId = "#viewIndicatorData";
 
     loading();
@@ -34,7 +34,7 @@ function initDataBrowse() {
     // Area code filter
     $('input.filter-item').keydown(function (event) {
         // Do not want enter press submit form
-        if (event.keyCode == 13) {
+        if (event.keyCode === 13) {
             event.preventDefault();
             return false;
         }
@@ -77,8 +77,8 @@ function initDataBrowse() {
         $.ajax({
             cache: false,
             async: true,
-            type: "POST",
-            url: '/DeleteData',
+            type: 'POST',
+            url: '/profiles-and-indicators/delete-data',
             data: form.serialize(),
             success: function (data) {
                 $('#coreDataView').html(data);
@@ -112,3 +112,12 @@ function initDataBrowse() {
         }
     }
 }
+
+$(document).ready(function() {
+
+    $('.view-indicator-data-btn').click(function() {
+        var indicatorId = this.id.replace('view-data-', '');
+        var indicatorName = $(this).attr('indicatorname');
+        viewIndicatorData(indicatorId, indicatorName);
+    });
+});

@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
-import { FTRoot, CoreDataSet, Unit, ValueWithUnit } from '../../../typings/FT.d';
+import { FTRoot, CoreDataSet, Unit, ValueWithUnit } from '../../../typings/FT';
 declare let FTWrapper: FTRoot;
 
 @Injectable()
 export class CoreDataHelperService {
-    addOrderandPercentilesToData(coreDataSet: CoreDataSet) {
-        return FTWrapper.coreDataHelper.addOrderandPercentilesToData(coreDataSet);
+    addOrderandPercentilesToData(coreDataSets: CoreDataSet[]) {
+        return FTWrapper.coreDataHelper.addOrderandPercentilesToData(coreDataSets);
     }
     valueWithUnit(unit: Unit): ValueWithUnit {
         return FTWrapper.coreDataHelper.valueWithUnit(unit);

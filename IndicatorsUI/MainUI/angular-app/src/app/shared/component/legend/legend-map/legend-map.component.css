@@ -1,29 +1,42 @@
-.compared-with-text {
-    float: left;
-    font-size: 11px;
-    margin-right: 5px;
-}
-
-.map-legend-box {
-    float: left;
+.p-2 {
     font-size: 11px;
 }
 
-.tartan-legend-box {
-    float: left;
+.p-2 div {
+    float:left;
     margin-left: 2px;
     padding: 2px 0px 2px 0px;
     width: 70px;
     text-align: center;
 }
 
-.not-compared {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    width: 80px;
-    height: 19px;
+.compared-with-text {
+    width:auto;
+    margin-right: 5px;
+    font-style: italic;
 }
 
-.left-margin {
-    margin-left: 18px;
+.not-compared {
+    margin-top:8px;
+    background-color: #c9c9c9;
+    border: 1px solid #ccc;
+    width: auto;
+    height: 18px;
+    padding-top:1px !important;
+}
+
+.p-2 .continuous-range
+{
+    width: 150px !important;
+    margin-left: 0;
+}
+
+.p-2 .continuous-lowest, .p-2 .continuous-highest {
+    width:auto;
+    padding: 2px 5px;
+    margin-left: 0;
+}
+
+.bob-lower {
+    color:#fff;
 }

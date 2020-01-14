@@ -341,7 +341,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.Under75,
                 YearRange = 3,
                 SexId = SexIds.Persons,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 DataPointYear = 2010,
                 DataPointMonth = -1,
                 DataPointQuarter = -1
@@ -357,7 +357,7 @@ namespace PholioVisualisation.DataConstructionTest
                 AgeId = AgeIds.From10To11,
                 YearRange = 1,
                 SexId = SexIds.Persons,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 DataPointYear = 2015,
                 DataPointMonth = -1,
                 DataPointQuarter = -1
@@ -373,7 +373,7 @@ namespace PholioVisualisation.DataConstructionTest
 
         private static IEnumerable<string> IgnoredAreaCodes()
         {
-            return ReaderFactory.GetProfileReader().GetAreaCodesToIgnore(ProfileIds.LongerLives).AreaCodesIgnoredEverywhere;
+            return ReaderFactory.GetProfileReader().GetAreaCodesToIgnore(ProfileIds.PublicHealthDashboardLongerLives).AreaCodesIgnoredEverywhere;
         }
 
         private AreaRankBuilder GetAreaRankBuilder()

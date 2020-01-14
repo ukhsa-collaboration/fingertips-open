@@ -74,6 +74,7 @@
         public const int ChildrenAndYoungPeoplesHealthBenchmarkingTool = 39;
         public const int SexualHealth = 45;
         public const int Diabetes = 51;
+        public const int IndicatorsForReview = 153;
     }
 
     public class UrlKeys
@@ -142,4 +143,12 @@
         public const int GreaterThan0LessThanOrEqualto5 = 1;
     }
 
+    public class IndicatorStatus
+    {
+        public const string InDevelopment = "InDevelopment";
+        public const string UnderReview = "UnderReview";
+        public const string ChangesRequested = "ChangesRequested";
+        public const string Approved = "Approved";
+        public const string NoReviewRecord = "NoReviewRecord";
+    }
 }

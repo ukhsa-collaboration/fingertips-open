@@ -5,14 +5,6 @@ using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public interface IAreaTypeRepository
-    {
-        IList<AreaType> GetAllAreaTypes();
-        AreaType GetAreaType(int areaTypeId);
-        IList<AreaTypeComponent> GetAreaTypeComponents(int parentAreaTypeId);
-        void SaveAreaType(AreaType areaType);
-    }
-
     public class AreaTypeRepository : RepositoryBase, IAreaTypeRepository
     {
         public AreaTypeRepository()

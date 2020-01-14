@@ -8,8 +8,8 @@ import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 })
 export class DownloadComponent {
 
-  @ViewChild('downloadData') downloadDataComponent;
-  @ViewChild('downloadReport') downloadReportComponent;
+  @ViewChild('downloadData', { static: true }) downloadDataComponent;
+  @ViewChild('downloadReport', { static: true }) downloadReportComponent;
 
   constructor(private ftHelperService: FTHelperService) { }
 

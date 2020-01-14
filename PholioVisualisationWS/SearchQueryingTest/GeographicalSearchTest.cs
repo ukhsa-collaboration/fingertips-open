@@ -35,7 +35,7 @@ namespace PholioVisualisation.SearchQueryingTest
             Assert.AreEqual("Barrow-In-Furness", results[1].PlaceName);
 
             // Stoke
-            results = SearchAndIncludePolygonArea("stoke", AreaTypeIds.CountyAndUnitaryAuthority);
+            results = SearchAndIncludePolygonArea("stoke", AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual("Stoke-on-Trent", results[0].PlaceName);
         }
 
@@ -155,37 +155,41 @@ namespace PholioVisualisation.SearchQueryingTest
         public void Test_District_Name_Is_Returned()
         {
             string name = "Erewash";
-            var results = SearchAndIncludePolygonArea(name, AreaTypeIds.DistrictAndUnitaryAuthority);
+            var results = SearchAndIncludePolygonArea(name, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual(name, results[0].PlaceName);
         }
 
         [TestMethod]
         public void TestOnlyParentAreasThatMatchRequestedParentAreaTypeIdAreFound()
         {
+            // Test 1
             var results = SearchAndIncludePolygonArea("Peterborough", 
-                AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.AreEqual("Peterborough", results[0].PlaceName); // the city
             Assert.AreEqual("Peterborough", results[1].PlaceName); // the UA
 
-            results = SearchAndIncludePolygonArea("Peterborough", AreaTypeIds.CcgsPreApr2017);
-            Assert.AreEqual("Peterborough", results[0].PlaceName);
-            Assert.AreEqual("NHS Cambridgeshire and Peterborough CCG".ToLower(), results[1].PlaceName.ToLower());
+            // Test 2
+            results = SearchAndIncludePolygonArea("London", AreaTypeIds.PheCentresFrom2015);
+            Assert.AreEqual("London", results[0].PlaceName);
+            Assert.AreEqual("London PHE centre".ToLower(), results[1].PlaceName.ToLower());
         }
 
         [TestMethod]
         public void TestNamesAreFormattedAsInDatabase()
         {
-            var results = SearchAndIncludePolygonArea("Peterborough CCG", AreaTypeIds.CcgsPreApr2017);
-            Assert.AreEqual("NHS Cambridgeshire and Peterborough CCG", results[0].PlaceName);
+            var results = SearchAndIncludePolygonArea("	London PHE", AreaTypeIds.PheCentresFrom2015);
+            Assert.AreEqual("London PHE centre", results[0].PlaceName);
         }
 
         [TestMethod]
         public void TestParentAreaCodeAssignedMatchesParentAreaTypeId()
         {
             var parent1 = SearchAndIncludePolygonArea(NameOfCity, 
-                AreaTypeIds.CountyAndUnitaryAuthority).First().PolygonAreaCode;
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019).First().PolygonAreaCode;
+
             var parent2 = SearchAndIncludePolygonArea(NameOfCity,
-                AreaTypeIds.CcgsPreApr2017).First().PolygonAreaCode;
+                AreaTypeIds.PheCentresFrom2015).First().PolygonAreaCode;
+
             Assert.AreNotEqual(parent1,parent2);
         }
 
@@ -205,7 +209,7 @@ namespace PholioVisualisation.SearchQueryingTest
         [TestMethod]
         public void TestEastingNorthingAreOnlyRetrievedOnRequest()
         {
-            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             var parentAreasToInclude = new List<int> {areaTypeId};
 
             var results = new GeographicalSearch
@@ -224,7 +228,7 @@ namespace PholioVisualisation.SearchQueryingTest
         [TestMethod]
         public void Test_Parent_Areas_Are_Only_Retrieved_On_Request()
         {
-            var areaTypeId = AreaTypeIds.CcgsPreApr2017;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
             // Include parent area
             var results = new GeographicalSearch().SearchPlacePostcodes(NameOfCity, areaTypeId, 
@@ -232,7 +236,7 @@ namespace PholioVisualisation.SearchQueryingTest
             Assert.AreEqual(2, results.Count);
 
             // Do not include parent areas
-            results = new GeographicalSearch().SearchPlacePostcodes(NameOfCity, AreaTypeIds.CcgsPreApr2017,
+            results = new GeographicalSearch().SearchPlacePostcodes(NameOfCity, areaTypeId,
                 new List<int>());
             Assert.AreEqual(1, results.Count);
         }
@@ -275,13 +279,11 @@ namespace PholioVisualisation.SearchQueryingTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(FingertipsException), "Area type id not supported for search: 5")]
         public void TestNonSupportedAreasCannotBeSearched()
         {
             var results = SearchAndIncludePolygonArea("Peterborough", AreaTypeIds.Sha);
             Assert.AreEqual(0, results.Count);
         }
-
 
         private static List<GeographicalSearchResult> SearchAndIncludePolygonArea(string searchText, int areaTypeId)
         {
@@ -319,7 +321,7 @@ namespace PholioVisualisation.SearchQueryingTest
 
         private static List<GeographicalSearchResult> GetResults(string text)
         {
-            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             var results = new GeographicalSearch().SearchPlacePostcodes(text, areaTypeId, new List<int> {areaTypeId});
             return results;
         }

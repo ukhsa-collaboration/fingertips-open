@@ -7,8 +7,8 @@ import {
   NearByAreas,
   AreaAddress,
   ParentAreaType
-} from '../../../typings/FT.d';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
+} from '../../../typings/FT';
+import { FTHelperService } from '../helper/ftHelper.service';
 import { Parameters } from './parameters';
 import { HttpService } from './http.service'
 
@@ -26,7 +26,7 @@ export class AreaService {
     shouldSearchRetreiveCoordinates: boolean,
     parentAreasToIncludeInResults: boolean
   ): Observable<AreaTextSearchResult> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addPolygonAreaTypeId(areaTypeId);
     params.addNoCache();
     params.addIncludeCoordinates(shouldSearchRetreiveCoordinates);
@@ -41,7 +41,7 @@ export class AreaService {
     northing: number,
     areaTypeId: number
   ): Observable<NearByAreas> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addAreaTypeId(areaTypeId);
     params.addEasting(easting);
     params.addNorthing(northing);
@@ -53,7 +53,7 @@ export class AreaService {
     parentAreaCode: string,
     areaTypeId: number
   ): Observable<AreaAddress> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addAreaTypeId(areaTypeId);
     params.addParentAreaCode(parentAreaCode);
 
@@ -61,14 +61,14 @@ export class AreaService {
   }
 
   getParentAreas(profileId: number): Observable<ParentAreaType[]> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addProfileId(profileId);
 
     return this.httpService.httpGet('api/area_types/parent_area_types', params);
   }
 
   getAreaTypes(): Observable<AreaType[]> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
 
     return this.httpService.httpGet('api/area_types/with_data', params);
   }
@@ -79,5 +79,18 @@ export class AreaService {
     params.addNoCache();
 
     return this.httpService.httpGet('api/areas/by_area_type', params);
+  }
+
+  getParentToChildAreas(profileId: number, childAreaTypeId: number, parentAreaTypeId: number, nearestNeighbourCode: string = ''): Observable<Map<string, string[]>> {
+    const params = new Parameters(this.version);
+    params.addProfileId(profileId);
+    params.addChildAreaTypeId(childAreaTypeId);
+    params.addParentAreaTypeId(parentAreaTypeId);
+
+    if (this.ftHelperService.isNearestNeighbours() && nearestNeighbourCode != '') {
+      params.addNearestNeighbourCode(nearestNeighbourCode);
+    }
+
+    return this.httpService.httpGet('api/parent_to_child_areas', params);
   }
 }

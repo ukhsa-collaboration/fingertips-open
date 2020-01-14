@@ -1,14 +1,16 @@
-<div id="tab-specific-options" class="tab-options clearfix">
+<div id="map-tabs" class="tab-options clearfix">
     <div>
         <span>Areas </span>
-        <button id="tab-option-0" [class]="this.subNationalButtonClass" (click)="setBenchMark(1)" [innerHTML]="this.formattedParentAreaName"></button>
-        <button id="tab-option-1" [class]="this.nationalButtonClass" (click)="setBenchMark(4)">All in England</button>
+        <button id="map-tab-option-0" [class]="this.subNationalButtonClass" (click)="setBenchMark(1)" [innerHTML]="this.formattedParentAreaName"></button>
+        <button id="map-tab-option-1" [class]="this.nationalButtonClass" (click)="setBenchMark(4)">All in England
+        </button>
     </div>
     <div class="export-chart-box">
-        <a class="export-link" (click)="onExportClick($event)">Export map as image</a>
+        <a id="map-export-map-image" class="export-link" (click)="onExportClick($event)">Export map as image</a>
     </div>
     <div class="export-chart-box-csv">
-        <a id="export-link-csv-map" class="export-link-csv" (click)="onExportCsvFileClick($event)">Export map as CSV file</a>
+        <a id="export-link-csv-map" class="export-link-csv" (click)="onExportCsvFileClick($event)">Export map as CSV file
+        </a>
     </div>
 </div>
 <div id="wrapper">
@@ -37,3 +39,5 @@
         </div>
     </div>
 </div>
+<ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
+<ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>

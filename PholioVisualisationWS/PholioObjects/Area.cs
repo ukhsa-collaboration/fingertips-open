@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace PholioVisualisation.PholioObjects
 {
@@ -47,7 +48,10 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsCcg
         {
-            get { return AreaTypeId == AreaTypeIds.CcgsPreApr2017; }
+            get
+            {
+                return AreaType.IsCcgAreaTypeId(AreaTypeId);
+            }
         }
 
         /// <summary>
@@ -103,8 +107,13 @@ namespace PholioVisualisation.PholioObjects
         {
             get
             {
-                return AreaTypeId == AreaTypeIds.OnsClusterGroup2001 ||
-                  AreaTypeId == AreaTypeIds.OnsClusterGroup2011;
+                var ids = new List<int>
+                {
+                    AreaTypeIds.OnsClusterGroup2001,
+                    AreaTypeIds.OnsClusterGroup2011
+                };
+
+                return ids.Contains(AreaTypeId);
             }
         }
 
@@ -123,7 +132,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool IsPheCentre
         {
-            get { return AreaTypeId == AreaTypeIds.PheCentreObsolete; }
+            get { return AreaType.IsPheCentreAreaTypeId(AreaTypeId); }
         }
 
         /// <summary>

@@ -1,13 +1,12 @@
 <div>
-  <br />
   <!--List-->
   <div *ngIf="status === 2">
-    <app-report-list-view (getListViewStatus)="getListViewStatus($event)" [profiles]="profiles" [userProfiles]="userProfiles"
-      [reports]="reports"></app-report-list-view>
+    <app-report-list-view (getListViewStatus)="getListViewStatus($event)" [profiles]="profiles"
+      [userProfiles]="userProfiles" [areaTypes]="areaTypes" [reports]="reports"></app-report-list-view>
   </div>
   <!--Edit-->
   <div *ngIf="status === 1 || status === 0">
     <app-report-edit-view (getReportViewStatus)="getReportViewStatus($event)" [status]="status" [profiles]="profiles"
-      [userProfiles]="userProfiles" [selectedReport]="selectedReport"></app-report-edit-view>
+      [userProfiles]="userProfiles" [areaTypes]="areaTypes" [selectedReport]="selectedReport"></app-report-edit-view>
   </div>
 </div>

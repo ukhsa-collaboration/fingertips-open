@@ -11,84 +11,13 @@ using System.Linq;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public interface IProfileRepository
-    {
-        void RefreshObject(object o);
-        IList<ProfileDetails> GetProfiles();
-        int CreateProfile(ProfileDetails profileDetails);
-        void UpdateProfile(ProfileDetails profileDetails);
-        void UpdateProfileDetail(ProfileDetails profileDetails);
-        void CreateIndicator(IEnumerable<IndicatorMetadataTextProperty> allPropertiesToAdd, int indicatorId);
-        void CreateNewOverriddenIndicator(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId);
-        bool DoesOverriddenIndicatorMetadataRecordAlreadyExist(int indicatorId, int? profileId);
-        IndicatorMetadata GetIndicatorMetadata(int indicatorId);
-        int GetNextIndicatorId();
-        int CreateGrouping(Grouping grouping);
-        int CreateProfileCollection(ProfileCollection profileCollection, string assignedProfiles);
-        bool UpdateProfileCollection(int profileCollectionId, string assignedProfilesToUpdate, string collectionNameToUpdate, string collectionSkinTitleToUpdate);
-
-        bool ChangeOwner(int indicatorId, int newOwnerProfileId,
-            IList<IndicatorText> newOwnerMetadataTextValues,
-            IList<IndicatorText> currentOwnerMetadataTextValues);
-
-        void UpdateProperty(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId);
-
-        bool CreateGroupingAndMetadata(int selectedProfileId, int selectedDomain, int nextIndicatorId,
-            int selectedAreaType, int selectedSex, int selectedAgeRange, int selectedComparator,
-            int selectedComparatorMethods,
-            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
-            int selectedDenominatorType, int startYear, int endYear, int startQuarterRange, int endQuarterRange,
-            int startMonthRange, int endMonthRange, string user, int? selectedDecimalPlaces, int? selectedTargetId,
-            DateTime? latestChangeTimestamp);
-
-        bool UpdateGroupingAndMetadata(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
-            int selectedAgeRange, int selectedComparator, int selectedComparatorMethods,
-            string selectedCiComparatorConfidence,
-            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
-            int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange,
-            int endMonthRange,
-            int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId,
-            IEnumerable<string> userAudit,
-            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart,
-            int disclosureControlId,
-            DateTime? somedate);
-
-        int GetNextAvailableIndicatorSequenceNumber(int domainId);
-
-        bool LogIndicatorMetadataTextPropertyChange(int propertyId, string oldText,
-            int indicatorId, int? profileId, string userName, DateTime timestamp);
-
-        bool LogAuditChange(string auditMessage, int indicatorId, int? groupId, string userName,
-            DateTime timestamp, string auditType);
-
-        bool DeleteChangeAudit(int indicatorId);
-
-        void MoveIndicatorToDomain(int indicatorId, int fromGroupId, int fromAreaTypeId, int fromSexId,
-            int fromAgeId, int toGroupId, int toAreaType, int toSexId, int toAgeId);
-
-        bool IndicatorGroupingsExist(int indicatorId, int domainId, int areaTypeId, int ageId, int sexId);
-
-        void CopyIndicatorToDomain(int indicatorId, int fromGroupId, int fromAreaTypeId, int fromSexId,
-            int fromAgeId, int toGroupId, int toAreaType, int toSexId, int toAgeId);
-
-        void DeleteIndicatorFromGrouping(int? groupId, int? indicatorId, int areaTypeId, int sexId, int ageId);
-        void DeleteOverriddenMetadataTextValues(int? indicatorId, int profileId);
-        void ArchiveIndicatorFromGrouping(int groupId, int? indicatorId, int areaTypeId, int sexId, int ageId);
-
-        string GetDomainName(int groupId, int domainSequence);
-        IList<GroupingSubheading> GetGroupingSubheadingsByGroupIds(IList<int> groupIds);
-        IList<GroupingSubheading> GetGroupingSubheadings(int areaTypeId, int groupId);
-        IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId, int profileId);
-        void SaveGroupingSubheading(GroupingSubheading groupingSubheading);
-        void UpdateGroupingSubheading(GroupingSubheading groupingSubheading);
-        void DeleteGroupingSubheading(int subheadingId);
-        ProfileDetails GetProfileDetailsById(int Id);
-    }
-
     public class ProfileRepository : RepositoryBase, IProfileRepository
     {
+        public ProfileRepository()
+            : this(NHibernateSessionFactory.GetSession())
+        {
+        }
+
         public ProfileRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
@@ -198,8 +127,7 @@ namespace Fpm.ProfileData.Repositories
             {
                 transaction = CurrentSession.BeginTransaction();
 
-                allPropertiesToAdd.ForEach(
-                   p => indicatorMetaDataTextValue.SetPropertyValue(p.ColumnName, p.Text));
+                allPropertiesToAdd.ForEach(p => indicatorMetaDataTextValue.SetPropertyValue(p.ColumnName, p.Text));
 
                 indicatorMetaDataTextValue.IndicatorId = indicatorId;
 
@@ -216,6 +144,13 @@ namespace Fpm.ProfileData.Repositories
         public void CreateNewOverriddenIndicator(IndicatorMetadataTextProperty property, string text, int indicatorId,
             int? profileId)
         {
+            var indicatorMetaDataTextValue = SetIndicatorMetaDataTextValue(property, text, indicatorId, profileId);
+
+            CurrentSession.Save(indicatorMetaDataTextValue);
+        }
+
+        private static IndicatorMetadataTextValue SetIndicatorMetaDataTextValue(IndicatorMetadataTextProperty property, string text, int indicatorId, int? profileId)
+        {
             var indicatorMetaDataTextValue = new IndicatorMetadataTextValue()
             {
                 IndicatorId = indicatorId,
@@ -223,8 +158,20 @@ namespace Fpm.ProfileData.Repositories
             };
 
             indicatorMetaDataTextValue.SetPropertyValue(property.ColumnName, text);
+            indicatorMetaDataTextValue = SetIndicatorMetaDataTextValueInternalVariables(indicatorMetaDataTextValue);
 
-            CurrentSession.Save(indicatorMetaDataTextValue);
+            return indicatorMetaDataTextValue;
+        }
+
+        private static IndicatorMetadataTextValue SetIndicatorMetaDataTextValueInternalVariables(IndicatorMetadataTextValue indicatorMetaDataTextValue)
+        {
+            var indicatorMetadataTextPropertyInternalMetadataList = IndicatorMetadataTextProperty.GetIndicatorMetadataTextPropertyInternalMetadata();
+            foreach (var property in indicatorMetadataTextPropertyInternalMetadataList)
+            {
+                indicatorMetaDataTextValue.SetPropertyValue(property.ColumnName, property.Text);
+            }
+            
+            return indicatorMetaDataTextValue;
         }
 
         public bool DoesOverriddenIndicatorMetadataRecordAlreadyExist(int indicatorId, int? profileId)
@@ -416,114 +363,128 @@ namespace Fpm.ProfileData.Repositories
             updateSession.ExecuteUpdate();
         }
 
-        public bool CreateGroupingAndMetadata(int selectedProfileId, int selectedDomain, int nextIndicatorId,
-            int selectedAreaType, int selectedSex, int selectedAgeRange, int selectedComparator, int selectedComparatorMethods,
-            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
-            int selectedDenominatorType, int startYear, int endYear, int startQuarterRange, int endQuarterRange,
-            int startMonthRange, int endMonthRange, string user, int? selectedDecimalPlaces, int? selectedTargetId, DateTime? latestChangeTimestamp)
+        public bool CreateGroupingAndMetadata(IndicatorMetadata indicatorMetadata,
+            IndicatorMetadataTextValue indicatorMetadataTextValue, Grouping grouping, string user)
         {
-            // Create new indicator metadata
-            var indicatorMetaData = new IndicatorMetadata()
-            {
-                IndicatorId = nextIndicatorId,
-                DenominatorTypeId = selectedDenominatorType,
-                CIMethodId = selectedCiMethodType,
-                ValueTypeId = selectedValueType,
-                UnitId = selectedUnitType,
-                YearTypeId = selectedYearType,
-                OwnerProfileId = selectedProfileId,
-                DecimalPlacesDisplayed = selectedDecimalPlaces,
-                TargetId = selectedTargetId,
-                DateEntered = DateTime.Now,
-                LatestChangeTimestampOverride = latestChangeTimestamp,
-                DisclosureControlId = DisclosureControlIds.FlagCountsBetween1And5
-            };
-
             try
             {
                 transaction = CurrentSession.BeginTransaction();
 
-                CurrentSession.Save(indicatorMetaData);
+                CurrentSession.Save(indicatorMetadataTextValue);
 
-                var nextAvailableIndicatorSequenceNumber = GetNextAvailableIndicatorSequenceNumber(selectedDomain);
+                CurrentSession.Save(indicatorMetadata);
 
-                foreach (var comparatorId in GetComparatorIds(selectedComparator))
-                {
-                    InsertGrouping(selectedDomain, nextIndicatorId, selectedAreaType, selectedSex, selectedAgeRange,
-                        selectedComparatorMethods, selectedComparatorConfidences, selectedYearRange,
-                        selectedPolarityType, startYear, endYear, startQuarterRange, endQuarterRange,
-                        comparatorId, startMonthRange, endMonthRange, nextAvailableIndicatorSequenceNumber);
-                }
+                InsertGrouping(grouping);
 
-                LogAuditChange(string.Format("New Indicator {0} Successfully Created", nextIndicatorId), 
-                    nextIndicatorId, selectedDomain, user, DateTime.Now, "Create");
+                LogAuditChange(string.Format("New Indicator {0} Successfully Created", indicatorMetadata.IndicatorId),
+                    indicatorMetadata.IndicatorId, grouping.GroupId, user, DateTime.Now, "Create");
 
                 transaction.Commit();
                 return true;
+
             }
             catch (Exception exception)
             {
                 HandleException(exception);
             }
+
             return false;
         }
 
-        public bool UpdateGroupingAndMetadata(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
-            int selectedAgeRange, int selectedComparator, int selectedComparatorMethods, string selectedCiComparatorConfidence,
-            double selectedComparatorConfidences, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType, int selectedDenominatorType,
-            int startYear, int endYear, int startQuarterRange, int endQuarterRange, int startMonthRange, int endMonthRange,
-            int indicatorSequence, int currentAgeId, int currentSexId, int currentAreaTypeId, IEnumerable<string> userAudit,
-            string user, string auditType, int? selectedDecimalPlaces, int? targetId, bool alwaysShowSpineChart, int disclosureControlId, 
-            DateTime? somedate)
+        public bool UpdateGroupingAndMetadata(IndicatorMetadata indicatorMetadata,
+            IndicatorMetadataTextValue indicatorMetadataTextValue, Grouping grouping, int oldAreaTypeId, int oldSexId,
+            int oldAgeId, string user)
         {
             try
             {
-                var indicatorMetaData = GetIndicatorMetadata(indicatorId);
-
-                indicatorMetaData.IndicatorId = indicatorId;
-                indicatorMetaData.DenominatorTypeId = selectedDenominatorType;
-                indicatorMetaData.CIMethodId = selectedCiMethodType;
-                indicatorMetaData.ValueTypeId = selectedValueType;
-                indicatorMetaData.UnitId = selectedUnitType;
-                indicatorMetaData.YearTypeId = selectedYearType;
-                indicatorMetaData.DecimalPlacesDisplayed = selectedDecimalPlaces;
-                indicatorMetaData.TargetId = targetId;
-                indicatorMetaData.AlwaysShowSpineChart = alwaysShowSpineChart;
-                indicatorMetaData.DisclosureControlId = disclosureControlId;
-                indicatorMetaData.LatestChangeTimestampOverride = somedate;
-
                 transaction = CurrentSession.BeginTransaction();
 
-                CurrentSession.SaveOrUpdate(indicatorMetaData);
+                CurrentSession.Update(indicatorMetadataTextValue);
 
-                // Delete the existing grouping records for this indicator/domain 
-                DeleteIndicatorFromGroupingByAgeSexAndArea(selectedDomain, indicatorId, currentAgeId, currentSexId,
-                    currentAreaTypeId);
+                CurrentSession.Update(indicatorMetadata);
 
-                foreach (var comparatorId in GetComparatorIds(selectedComparator))
-                {
-                    InsertGrouping(selectedDomain, indicatorId, selectedAreaType, selectedSex, selectedAgeRange,
-                      selectedComparatorMethods, selectedComparatorConfidences, selectedYearRange,
-                      selectedPolarityType, startYear, endYear, startQuarterRange, endQuarterRange,
-                      comparatorId, startMonthRange, endMonthRange, indicatorSequence);
-                }
+                UpdateGrouping(grouping, oldAreaTypeId, oldSexId, oldAgeId);
 
-                // Update the FPM Audit Log
-                foreach (var userChange in userAudit.Where(userChange => !string.IsNullOrEmpty(userChange)))
-                {
-                    LogAuditChange(userChange.Trim(), indicatorId, selectedDomain, user, DateTime.Now, auditType);
-                }
+                LogAuditChange(string.Format("Indicator {0} Successfully Updated", indicatorMetadata.IndicatorId),
+                    indicatorMetadata.IndicatorId, grouping.GroupId, user, DateTime.Now, "Create");
 
                 transaction.Commit();
                 return true;
+
             }
             catch (Exception exception)
             {
                 HandleException(exception);
             }
+
             return false;
+        }
+
+        private void InsertGrouping(Grouping grouping)
+        {
+            if (grouping.ComparatorId == ComparatorIds.Subnational && grouping.AreaTypeId == AreaTypeIds.GoRegion)
+            {
+                return;
+            }
+
+            foreach (var comparatorId in GetComparatorIds())
+            {
+                CurrentSession.Save(new Grouping()
+                {
+                    GroupId = grouping.GroupId,
+                    SexId = grouping.SexId,
+                    AgeId = grouping.AgeId,
+                    AreaTypeId = grouping.AreaTypeId,
+                    IndicatorId =  grouping.IndicatorId,
+                    ComparatorId =  comparatorId,
+                    ComparatorMethodId = grouping.ComparatorMethodId,
+                    ComparatorConfidence = grouping.ComparatorConfidence,
+                    YearRange = grouping.YearRange,
+                    Sequence = grouping.Sequence,
+                    BaselineYear = grouping.BaselineYear,
+                    BaselineQuarter = grouping.BaselineQuarter,
+                    BaselineMonth = grouping.BaselineMonth,
+                    DataPointYear = grouping.DataPointYear,
+                    DataPointQuarter = grouping.DataPointQuarter,
+                    DataPointMonth = grouping.DataPointMonth,
+                    PolarityId = grouping.PolarityId
+                });
+            }
+        }
+
+        private void UpdateGrouping(Grouping grouping, int oldAreaTypeId, int oldSexId, int oldAgeId)
+        {
+            if (grouping.ComparatorId == ComparatorIds.Subnational && grouping.AreaTypeId == AreaTypeIds.GoRegion)
+            {
+                return;
+            }
+
+            DeleteIndicatorFromGroupingByAgeSexAndArea(grouping.GroupId, grouping.IndicatorId, oldAgeId, oldSexId,
+                oldAreaTypeId);
+
+            foreach (var comparatorId in GetComparatorIds())
+            {
+                CurrentSession.Save(new Grouping()
+                {
+                    GroupId = grouping.GroupId,
+                    SexId = grouping.SexId,
+                    AgeId = grouping.AgeId,
+                    AreaTypeId = grouping.AreaTypeId,
+                    IndicatorId = grouping.IndicatorId,
+                    ComparatorId = comparatorId,
+                    ComparatorMethodId = grouping.ComparatorMethodId,
+                    ComparatorConfidence = grouping.ComparatorConfidence,
+                    YearRange = grouping.YearRange,
+                    Sequence = grouping.Sequence,
+                    BaselineYear = grouping.BaselineYear,
+                    BaselineQuarter = grouping.BaselineQuarter,
+                    BaselineMonth = grouping.BaselineMonth,
+                    DataPointYear = grouping.DataPointYear,
+                    DataPointQuarter = grouping.DataPointQuarter,
+                    DataPointMonth = grouping.DataPointMonth,
+                    PolarityId = grouping.PolarityId
+                });
+            }
         }
 
         private void InsertGrouping(int selectedDomain, int indicatorId, int selectedAreaType, int selectedSex,
@@ -638,6 +599,74 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
+        public void MoveIndicators(int indicatorId, int fromGroupId, int toGroupId,
+            int areaTypeId, int sexId, int ageId, string status)
+        {
+            var nextSequenceId = GetNextAvailableIndicatorSequenceNumber(toGroupId);
+
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                // Update groupings
+                var groupings = GetGroupings(fromGroupId, indicatorId, areaTypeId, sexId, ageId);
+                foreach (var grouping in groupings)
+                {
+                    grouping.Sequence = nextSequenceId;
+                    grouping.GroupId = toGroupId;
+                    grouping.AreaTypeId = areaTypeId;
+                    grouping.SexId = sexId;
+                    grouping.AgeId = ageId;
+
+                    CurrentSession.Update(grouping);
+                }
+
+                // Update indicator metadata status
+                var indicatorMetadata = GetIndicatorMetadata(indicatorId);
+                indicatorMetadata.Status = status;
+                CurrentSession.Update(indicatorMetadata);
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
+        public void ChangeIndicatorProfile(int indicatorId, int profileId, string status)
+        {
+            try
+            {
+                var groupingMetadata = GetGroupingMetadata(profileId);
+                if (groupingMetadata != null)
+                {
+                    // Get the first group id
+                    var groupId = groupingMetadata.OrderBy(x => x.Sequence).FirstOrDefault().GroupId;
+
+                    // Queries
+                    var updateGroupingQuery = string.Format(@"update Grouping set GroupId = {0} where IndicatorId = {1}",
+                        groupId, indicatorId);
+                    var updateIndicatorMetadataQuery = string.Format(@"update IndicatorMetadata set OwnerProfileId = {0}, Status = '{1}', DestinationProfileId = -1 where IndicatorId = {2}", profileId, status, indicatorId);
+
+                    // Begin transaction
+                    transaction = CurrentSession.BeginTransaction();
+
+                    // Execute queries
+                    CurrentSession.CreateQuery(updateGroupingQuery).ExecuteUpdate();
+                    CurrentSession.CreateQuery(updateIndicatorMetadataQuery).ExecuteUpdate();
+
+                    // Commit transaction
+                    transaction.Commit();
+                }
+
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
         public bool IndicatorGroupingsExist(int indicatorId, int domainId, int areaTypeId, int ageId, int sexId)
         {
             var groups = GetGroupings(domainId, indicatorId, areaTypeId, sexId, ageId);
@@ -699,6 +728,30 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
+        public void DeleteIndicator(int indicatorId)
+        {
+            try
+            {
+                transaction = CurrentSession.BeginTransaction();
+
+                var queryString = string.Format(@"delete from Grouping where IndicatorId = {0}", indicatorId);
+                CurrentSession.CreateQuery(queryString).ExecuteUpdate();
+
+                queryString = string.Format(@"delete from IndicatorMetadataTextValue where IndicatorId = {0}",
+                    indicatorId);
+                CurrentSession.CreateQuery(queryString).ExecuteUpdate();
+
+                queryString = string.Format(@"delete from IndicatorMetadata where IndicatorId = {0}", indicatorId);
+                CurrentSession.CreateQuery(queryString).ExecuteUpdate();
+
+                transaction.Commit();
+            }
+            catch (Exception exception)
+            {
+                HandleException(exception);
+            }
+        }
+
         public void DeleteIndicatorFromGrouping(int? groupId, int? indicatorId, int areaTypeId, int sexId, int ageId)
         {
             var queryString = string.Format(
@@ -716,7 +769,7 @@ namespace Fpm.ProfileData.Repositories
             CurrentSession.CreateQuery(queryString).ExecuteUpdate();
         }
 
-        public void ArchiveIndicatorFromGrouping(int groupId, int? indicatorId, int areaTypeId, int sexId, int ageId)
+        public void UnassignIndicatorFromGrouping(int groupId, int? indicatorId, int areaTypeId, int sexId, int ageId)
         {
             try
             {
@@ -724,7 +777,7 @@ namespace Fpm.ProfileData.Repositories
 
                 foreach (var grouping in GetGroupings(groupId, indicatorId.Value, areaTypeId, sexId, ageId))
                 {
-                    grouping.GroupId = GroupIds.ArchivedIndicators;
+                    grouping.GroupId = GroupIds.UnassignedIndicators;
 
                     CurrentSession.Update(grouping);
                 }
@@ -744,7 +797,8 @@ namespace Fpm.ProfileData.Repositories
             return q.UniqueResult<string>();
         }
 
-        public IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId, int areaTypeId, int profileId)
+        public IList<GroupingPlusName> GetGroupingPlusNames(int indicatorId, int? selectedDomainId,
+            int areaTypeId, int profileId, bool areIndicatorNamesDisplayedWithNumbers)
         {
             var groupings = CurrentSession.GetNamedQuery("GetGroupingPlusNames")
                 .SetParameter("IndicatorId", indicatorId)
@@ -757,9 +811,28 @@ namespace Fpm.ProfileData.Repositories
             var groupingPlusNamesWithoutOverriddenMetadata = new List<GroupingPlusName>();
             var groupingPlusNamesWithOverriddenMetadata = new List<GroupingPlusName>();
             var indicatorName = string.Empty;
+            var indicatorNumber = string.Empty;
+
+            if (groupings != null)
+            {
+                indicatorName = GetIndicatorName(groupings);
+                indicatorNumber = GetIndicatorNumber(groupings);
+            }
+
+            if (areIndicatorNamesDisplayedWithNumbers)
+            {
+                if (!string.IsNullOrWhiteSpace(indicatorNumber)
+                    && indicatorNumber.Trim().Length > 0
+                    && !string.IsNullOrWhiteSpace(indicatorName))
+                {
+                    indicatorName = String.Format("{0} - {1}", indicatorNumber, indicatorName);
+                }
+            }
 
             foreach (var grouping in groupings)
             {
+                grouping.IndicatorName = indicatorName;
+
                 var isOveriddingMetadata = grouping.ProfileId.HasValue;
 
                 if (isOveriddingMetadata)
@@ -768,7 +841,6 @@ namespace Fpm.ProfileData.Repositories
                 }
                 else
                 {
-                    indicatorName = grouping.IndicatorName;
                     groupingPlusNamesWithoutOverriddenMetadata.Add(grouping);
                 }
             }
@@ -819,24 +891,15 @@ namespace Fpm.ProfileData.Repositories
             {
                 transaction = CurrentSession.BeginTransaction();
 
-                var groupingSubheadings = GetGroupingSubheadings(groupingSubheading.AreaTypeId, groupingSubheading.GroupId);
+                // Save new 
+                CurrentSession.GetNamedQuery("Insert_GroupingSubheading")
+                    .SetParameter("GroupId", groupingSubheading.GroupId)
+                    .SetParameter("AreaTypeId", groupingSubheading.AreaTypeId)
+                    .SetParameter("Subheading", groupingSubheading.Subheading)
+                    .SetParameter("Sequence", groupingSubheading.Sequence)
+                    .ExecuteUpdate();
 
-                if (groupingSubheadings.FirstOrDefault(x => x.Subheading.ToLower() == groupingSubheading.Subheading.ToLower()) == null)
-                {
-                    // Save new 
-                    CurrentSession.GetNamedQuery("Insert_GroupingSubheading")
-                        .SetParameter("GroupId", groupingSubheading.GroupId)
-                        .SetParameter("AreaTypeId", groupingSubheading.AreaTypeId)
-                        .SetParameter("Subheading", groupingSubheading.Subheading)
-                        .SetParameter("Sequence", groupingSubheading.Sequence)
-                        .ExecuteUpdate();
-
-                    transaction.Commit();
-                }
-                else
-                {
-                    throw new FpmException("The grouping subheading with the same name, area type id and group id already exists.");
-                }
+                transaction.Commit();
             }
             catch (Exception exception)
             {
@@ -889,8 +952,31 @@ namespace Fpm.ProfileData.Repositories
             }
         }
 
-        private void DeleteIndicatorFromGroupingByAgeSexAndArea(int? groupId,
-            int? indicatorId, int? ageId, int? sexId, int? areaTypeId)
+        public ProfileDetails GetProfileDetailsById(int id)
+        {
+            var profileDetail = CurrentSession.QueryOver<ProfileDetails>()
+                .Where(ugp => ugp.Id == id)
+                .SingleOrDefault();
+
+            return profileDetail;
+        }
+
+        public ProfileDetails GetProfileDetailsByUrlKey(string urlKey)
+        {
+            var profileDetail = CurrentSession.QueryOver<ProfileDetails>()
+                .Where(ugp => ugp.UrlKey == urlKey)
+                .SingleOrDefault();
+
+            return profileDetail;
+        }
+
+        public void LogIndicatorMetadataReviewAudit(IndicatorMetadataReviewAudit indicatorMetadataReviewAudit)
+        {
+            CurrentSession.Save(indicatorMetadataReviewAudit);
+        }
+
+        private void DeleteIndicatorFromGroupingByAgeSexAndArea(int groupId, int indicatorId, int ageId, int sexId,
+            int areaTypeId)
         {
             var query = string.Format(
                 @"Delete from Grouping Where GroupId = '{0}' And IndicatorId = {1} And AgeId = {2} And SexId = {3} And AreaTypeId = {4}", groupId, indicatorId, ageId, sexId, areaTypeId);
@@ -898,18 +984,14 @@ namespace Fpm.ProfileData.Repositories
             CurrentSession.CreateQuery(query).ExecuteUpdate();
         }
 
-        private static IEnumerable<int> GetComparatorIds(int selectedComparator)
+        private static IEnumerable<int> GetComparatorIds()
         {
-            var comparatorIds = new List<int>();
-            if (selectedComparator == ComparatorIds.NationalAndSubnational)
+            var comparatorIds = new List<int>
             {
-                comparatorIds.Add(ComparatorIds.Subnational);
-                comparatorIds.Add(ComparatorIds.National);
-            }
-            else
-            {
-                comparatorIds.Add(selectedComparator);
-            }
+                ComparatorIds.Subnational,
+                ComparatorIds.National
+            };
+
             return comparatorIds;
         }
 
@@ -923,13 +1005,33 @@ namespace Fpm.ProfileData.Repositories
             return CurrentSession.CreateQuery(query).List<Grouping>();
         }
 
-        public ProfileDetails GetProfileDetailsById(int Id)
+        private IEnumerable<GroupingMetadata> GetGroupingMetadata(int profileId)
         {
-            var profileDetail = CurrentSession.QueryOver<ProfileDetails>()
-                     .Where(ugp => ugp.Id == Id)
-                     .SingleOrDefault();
+            return CurrentSession.CreateCriteria<GroupingMetadata>()
+                .Add(Restrictions.Eq("ProfileId", profileId))
+                .List<GroupingMetadata>();
+        }
 
-            return profileDetail;
+        private string GetIndicatorName(IList<GroupingPlusName> groupings)
+        {
+            var grouping = groupings.FirstOrDefault(x => x.IndicatorName != null);
+            if (grouping != null)
+            {
+                return grouping.IndicatorName;
+            }
+
+            return string.Empty;
+        }
+
+        private string GetIndicatorNumber(IList<GroupingPlusName> groupings)
+        {
+            var grouping = groupings.FirstOrDefault(x => x.IndicatorNumber != null);
+            if (grouping != null)
+            {
+                return grouping.IndicatorNumber;
+            }
+
+            return string.Empty;
         }
     }
 }

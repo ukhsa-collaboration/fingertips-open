@@ -191,6 +191,21 @@
     <property name="ExtraLink" column="extralink" />
   </class>
 
+  <!-- Email class -->
+  <class name="Email" table="email">
+
+    <id name="Id" column="id" type="int" unsaved-value="-1">
+      <generator class="identity" />
+    </id>
+
+    <property name="To" column="[to]" />
+    <property name="TemplateId" column="templateid" />
+    <property name="TemplateParameters" column="templateparameters" />
+    <property name="CreatedTimestamp" column="createdtimestamp" />
+    <property name="SentTimestamp" column="senttimestamp" />
+    <property name="RetryCount" column="retrycount" />
+    <property name="Content" column="[content]" />
+    <property name="ErrorMessage" column="errormessage" />
+  </class>
+
 </hibernate-mapping>
-
-

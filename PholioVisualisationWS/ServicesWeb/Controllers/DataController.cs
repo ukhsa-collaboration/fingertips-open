@@ -1,19 +1,19 @@
-using PholioVisualisation.Analysis;
+using PholioVisualisation.Analysis.TrendMarkers;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
-using PholioVisualisation.Export;
-using PholioVisualisation.Export.File;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.Parsers;
 using PholioVisualisation.PholioObjects;
 using PholioVisualisation.RequestParameters;
 using PholioVisualisation.ServiceActions;
 using PholioVisualisation.Services;
-using PholioVisualisation.ServicesWeb.Helpers;
+using PholioVisualisation.ServicesWeb.Managers;
+using PholioVisualisation.ServicesWeb.Validations;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 
@@ -23,10 +23,140 @@ namespace PholioVisualisation.ServicesWeb.Controllers
     /// Data generator controller
     /// </summary>
     [RoutePrefix("api")]
-    public class DataController : BaseController
+    public class DataController : DataBaseController
     {
         /// <summary>
-        /// Gets the most recent data for a profile group
+        /// Get data for specific indicators in CSV format.
+        /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
+        /// <param name="indicator_ids">Comma separated list of indicator IDs [Maximum 100]</param>
+        /// <param name="child_area_type_id">Child area type ID</param>
+        /// <param name="parent_area_type_id">Parent area type ID</param>
+        /// <param name="profile_id">Profile ID [optional]</param>
+        /// <param name="parent_area_code">The parent area code [default is England]</param>
+        /// <param name="category_area_code">Ignore this parameter</param>
+        [HttpGet]
+        [Route("all_data/csv/by_indicator_id")]
+        public HttpResponseMessage GetDataFileForIndicatorList(string indicator_ids, int child_area_type_id, int parent_area_type_id,
+            int profile_id = ProfileIds.Undefined, string parent_area_code = AreaCodes.England, string category_area_code = null)
+        {
+            var receivedParameters = new DataServicesParameters(DataServiceUse.AllDataFileForIndicatorList, child_area_type_id, parent_area_type_id,
+                parent_area_code, string.Empty, string.Empty, indicator_ids, null, category_area_code, profile_id);
+
+            if (!receivedParameters.IsValid())
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = receivedParameters.GetExceptionStringContentMessages()
+                };
+            }
+
+            try
+            {
+                var dataInternalServiceManager = new DataServicesManager(receivedParameters, GroupDataReader, ProfileReader, AreasReader);
+                var exportParameters = dataInternalServiceManager.ExportParameters;
+                var onDemandParameters = dataInternalServiceManager.OnDemandParameters;
+
+                return GetOnDemandIndicatorDataResponse(AreasReader, exportParameters, onDemandParameters);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+            }
+        }
+
+        /// <summary>
+        /// Get data for all the indicators in a profile group in CSV format
+        /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
+        /// <param name="child_area_type_id">Child area type ID</param>
+        /// <param name="parent_area_type_id">Parent area type ID</param>
+        /// <param name="group_id">Profile group ID</param>
+        /// <param name="parent_area_code">The parent area code [default is England]</param>
+        /// <param name="category_area_code">Ignore this parameter</param>
+        [HttpGet]
+        [Route("all_data/csv/by_group_id")]
+        public HttpResponseMessage GetDataFileForGroup(int child_area_type_id, int parent_area_type_id, int group_id,
+            string parent_area_code = AreaCodes.England, string category_area_code = null)
+        {
+            var receivedParameters = new DataServicesParameters(DataServiceUse.AllDataFileForGroup, child_area_type_id, parent_area_type_id,
+                parent_area_code, "", "", null, null, category_area_code, null, group_id);
+
+            if (!receivedParameters.IsValid())
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = receivedParameters.GetExceptionStringContentMessages()
+                };
+            }
+
+            try
+            {
+                var dataInternalServiceManager = new DataServicesManager(receivedParameters, GroupDataReader, ProfileReader, AreasReader);
+                var exportParameters = dataInternalServiceManager.ExportParameters;
+                var onDemandParameters = dataInternalServiceManager.OnDemandParameters;
+
+                return GetOnDemandIndicatorDataResponse(AreasReader, exportParameters, onDemandParameters);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+            }
+        }
+
+        /// <summary>
+        /// Get data for all the indicators in a profile in CSV format
+        /// </summary>
+        /// <remarks>This service returns data in CSV not JSON format so the response will not be viewable on this page</remarks>
+        /// <param name="child_area_type_id">Child area type ID</param>
+        /// <param name="parent_area_type_id">Parent area type ID</param>
+        /// <param name="profile_id">Profile ID</param>
+        /// <param name="parent_area_code">The parent area code [default is England]</param>
+        /// <param name="category_area_code">Ignore this parameter</param>
+        [HttpGet]
+        [Route("all_data/csv/by_profile_id")]
+        public HttpResponseMessage GetDataFileForProfile(int child_area_type_id, int parent_area_type_id, int profile_id,
+            string parent_area_code = AreaCodes.England, string category_area_code = null)
+        {
+            var receivedParameters = new DataServicesParameters(DataServiceUse.AllDataFileForProfile, child_area_type_id,
+                parent_area_type_id, parent_area_code, "", "", null, null, category_area_code, profile_id);
+
+            if (!receivedParameters.IsValid())
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest)
+                {
+                    Content = receivedParameters.GetExceptionStringContentMessages()
+                };
+            }
+
+            try
+            {
+                var dataInternalServiceManager = new DataServicesManager(receivedParameters, GroupDataReader, ProfileReader, AreasReader);
+                var exportParameters = dataInternalServiceManager.ExportParameters;
+                var onDemandParameters = dataInternalServiceManager.OnDemandParameters;
+
+                return GetOnDemandIndicatorDataResponse(AreasReader, exportParameters, onDemandParameters);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
+            }
+        }
+
+        /// <summary>
+        /// Get the most recent data for a profile group
         /// </summary>
         /// <param name="profile_id">Profile ID</param>
         /// <param name="group_id">Profile group ID</param>
@@ -56,7 +186,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the most recent data for a list of indicator IDs
+        /// Get the most recent data for a list of indicator IDs
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
@@ -64,7 +194,8 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="restrict_to_profile_ids">Comma separated list of profile IDs</param>
         [HttpGet]
         [Route("latest_data/specific_indicators_for_child_areas")]
-        public IList<GroupRoot> GetGroupDataAtDataPoint(int area_type_id, string parent_area_code, string indicator_ids, int profile_id, string restrict_to_profile_ids = "")
+        public IList<GroupRoot> GetGroupDataAtDataPoint(int area_type_id, string parent_area_code,
+            string indicator_ids, int profile_id, string restrict_to_profile_ids = "")
         {
             try
             {
@@ -89,7 +220,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the most recent data for a list of indicator IDs
+        /// Get the most recent data for a list of indicator IDs
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
@@ -123,10 +254,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets data values for a group for one specific area 
+        /// Get data values for a group for one specific area 
         /// </summary>
         /// <remarks>
-        /// Gets CoreDataSet objects for every group root in a domain
+        /// Get CoreDataSet objects for every group root in a domain
         /// </remarks>
         /// <param name="area_code">Area code</param>
         /// <param name="area_type_id">Area type ID</param>
@@ -181,7 +312,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a list of the core data for all the areas within a parent area
+        /// Get a list of the core data for all the areas within a parent area
         /// </summary>
         /// <param name="group_id">Profile group ID</param>
         /// <param name="area_type_id">Area type ID</param>
@@ -259,7 +390,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the recent trends for every area under a parent area.
+        /// Get the recent trends for every area under a parent area.
         /// </summary>
         /// <param name="parent_area_code">Parent area code</param>
         /// <param name="group_id">Profile group ID</param>
@@ -275,11 +406,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             try
             {
                 // Create dependencies
-                var groupDataReader = ReaderFactory.GetGroupDataReader();
                 var trendMarkersProvider = new TrendMarkersProvider(ReaderFactory.GetTrendDataReader(), new TrendMarkerCalculator());
                 var areaListProvider = new FilteredChildAreaListProvider(ReaderFactory.GetAreasReader());
-                var singleGroupingProvider = GetSingleGroupingProvider(groupDataReader);
-                var groupMetadataList = groupDataReader.GetGroupingMetadataList(new List<int> { group_id });
+                var singleGroupingProvider = GetSingleGroupingProvider(GroupDataReader);
+                var groupMetadataList = GroupDataReader.GetGroupingMetadataList(new List<int> { group_id });
                 var profileId = groupMetadataList.First().ProfileId;
 
                 return new TrendMarkersAction(areaListProvider, trendMarkersProvider, singleGroupingProvider)
@@ -293,7 +423,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the trend data for a profile group
+        /// Get the trend data for a profile group
         /// </summary>
         /// <param name="profile_id">Profile ID</param>
         /// <param name="group_id">Profile group ID</param>
@@ -323,7 +453,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets the trend data for a list of indicator IDs
+        /// Get the trend data for a list of indicator IDs
         /// </summary>
         /// <param name="area_type_id">Area type ID</param>
         /// <param name="indicator_ids">Comma separated list of indicator IDs</param>
@@ -355,7 +485,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        ///     Gets all the most recently available category data
+        /// Get all the most recently available category data
         /// </summary>
         /// <remarks>
         /// Used in the inequality tab of Fingertips
@@ -384,7 +514,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        ///     Gets all the most recently available data for all ages
+        /// Get all the most recently available data for all ages
         /// </summary>
         /// <remarks>
         /// Used in the inequality tab of Fingertips
@@ -412,7 +542,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        ///     Gets all the most recently available data for all sexes
+        /// Get all the most recently available data for all sexes
         /// </summary>
         /// <remarks>
         /// Used in the inequality tab of Fingertips
@@ -517,7 +647,33 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets certain details of the specified indicators.
+        /// Get trend data partitioned by categories
+        /// </summary>
+        /// <param name="profile_id">Profile ID</param>
+        /// <param name="area_code">Area code</param>
+        /// <param name="indicator_id">Indicator ID</param>
+        /// <param name="age_id">Age ID</param>
+        /// <param name="sex_id">Sex ID</param>
+        /// <param name="area_type_id">Area type ID</param>
+        [HttpGet]
+        [Route("partition_trend_data/by_categories")]
+        public IList<PartitionTrendData> TrendDataForInequalitiesByCategories(int profile_id,
+            string area_code, int indicator_id, int age_id, int sex_id, int area_type_id)
+        {
+            try
+            {
+                return new PartitionDataForAllCategoriesBuilder().GetPartitionTrendDataForAllCategories(profile_id,
+                    area_code, indicator_id, age_id, sex_id, area_type_id);
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get certain details of the specified indicators.
         /// </summary>
         /// <remarks>
         /// The indicators are differentiated by age and sex where appropriate. Returns a list of group root summaries.
@@ -527,11 +683,11 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="profile_id">Profile ID [optional]</param>
         [HttpGet]
         [Route("grouproot_summaries/by_indicator_id")]
-        public IList<GroupRootSummary> GetGroupDataForProfile(string indicator_ids, int? profile_id = null)
+        public IList<GroupRootSummary> GetGroupDataForProfile(string indicator_ids, int profile_id = ProfileIds.Undefined)
         {
             try
             {
-                var summaries = new GroupRootSummaryBuilder(ReaderFactory.GetGroupDataReader())
+                var summaries = new GroupRootSummaryBuilder(GroupDataReader)
                     .BuildForIndicatorIds(new IntListStringParser(indicator_ids).IntList, profile_id)
                     .ToList();
                 summaries.Sort();
@@ -545,7 +701,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets summaries of a specific list of indicators.
+        /// Get summaries of a specific list of indicators.
         /// </summary>
         /// <remarks>
         /// The indicators are differentiated by age and sex where appropriate. Returns a list of group root summaries. 
@@ -558,7 +714,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         {
             try
             {
-                var summaries = new GroupRootSummaryBuilder(ReaderFactory.GetGroupDataReader())
+                var summaries = new GroupRootSummaryBuilder(GroupDataReader)
                     .BuildForProfileAndAreaType(profile_id, area_type_id)
                     .ToList();
                 summaries.Sort();
@@ -598,7 +754,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets population data used in Profiles
+        /// Get population data used in Profiles for population, ccg's and population without data in db
         /// </summary>
         /// <param name="area_code">Area code</param>
         /// <param name="area_type_id">Area type ID</param>
@@ -610,31 +766,6 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             try
             {
                 return new QuinaryPopulationDataAction().GetPopulationOnly(area_code, area_type_id, data_point_offset);
-            }
-            catch (Exception ex)
-            {
-                Log(ex);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets population data for a specific indicator in a specific profile
-        /// </summary>
-        /// <param name="area_code">Area code</param>
-        /// <param name="area_type_id">Area type ID</param>
-        /// <param name="indicator_id">Indicator ID</param>
-        /// <param name="profile_id">Profile ID</param>
-        /// <param name="data_point_offset">Time period offset from the data point (i.e. latest available time period) [Default is 0]</param>
-        [HttpGet]
-        [Route("quinary_population/by_indicator")]
-        public Dictionary<string, object> GetQuinaryPopulationByIndicatorId(string area_code, int area_type_id, int indicator_id,
-            int profile_id, int data_point_offset = 0)
-        {
-            try
-            {
-                return new QuinaryPopulationDataAction().GetPopulationOnly(area_code, area_type_id,
-                    profile_id, indicator_id, data_point_offset);
             }
             catch (Exception ex)
             {
@@ -665,7 +796,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a list of minimum and maximum value limits for a group
+        /// Get a list of minimum and maximum value limits for a group
         /// </summary>
         /// <remarks>
         ///  Useful for setting limits on charts.
@@ -690,7 +821,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets a formatted time period
+        /// Get a formatted time period
         /// </summary>
         /// <param name="year">Year</param>
         /// <param name="quarter">Quarter</param>
@@ -719,7 +850,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets an ordered list of profile group roots for a profile
+        /// Get an ordered list of profile group roots for a profile
         /// </summary>
         /// <remarks>
         /// Group roots are returned without data. This service is used for find out the order of indicators within a group.
@@ -781,7 +912,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets descriptive statistics (min, max, median, interquartile range) for the latest values for
+        /// Get descriptive statistics (min, max, median, interquartile range) for the latest values for
         /// a list of indicators
         /// </summary>
         /// <param name="child_area_type_id">Child area type ID</param>
@@ -818,7 +949,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets descriptive statistics (min, max, median, interquartile range) for the latest values for
+        /// Get descriptive statistics (min, max, median, interquartile range) for the latest values for
         ///  all the indicators in a profile group
         /// </summary>
         /// <param name="group_id">Profile group ID</param>
@@ -852,7 +983,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets descriptive statistics (min, max, median, interquartile range) for the values of
+        /// Get descriptive statistics (min, max, median, interquartile range) for the values of
         ///  a specific indicator for each available time period
         /// </summary>
         /// <param name="indicator_id">Indicator ID</param>
@@ -879,7 +1010,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
 
                 var indicatorMetadata = IndicatorMetadataProvider.Instance.GetIndicatorMetadata(indicator_id);
 
-                var singleGroupingProvider = GetSingleGroupingProvider(ReaderFactory.GetGroupDataReader());
+                var singleGroupingProvider = GetSingleGroupingProvider(GroupDataReader);
 
                 return new BoxPlotPointListBuilder(singleGroupingProvider)
                     .GetBoxPlotPoints(groupingDifferentiator, parentArea, profile_id, indicatorMetadata);
@@ -905,8 +1036,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         {
             try
             {
-                var groupDataReader = ReaderFactory.GetGroupDataReader();
-                return groupDataReader.GetAvailableDataByIndicatorIdAndAreaTypeId(indicator_id, area_type_id);
+                return GroupDataReader.GetAvailableDataByIndicatorIdAndAreaTypeId(indicator_id, area_type_id);
             }
             catch (Exception ex)
             {
@@ -934,6 +1064,25 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 }
 
                 return dataChange;
+            }
+            catch (Exception ex)
+            {
+                Log(ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Returns the list of all ages
+        /// </summary>
+        [HttpGet]
+        [Route("all_ages")]
+        public IList<Age> GetAllAges()
+        {
+            try
+            {
+                var reader = ReaderFactory.GetPholioReader();
+                return reader.GetAllAges();
             }
             catch (Exception ex)
             {

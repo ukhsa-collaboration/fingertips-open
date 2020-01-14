@@ -1,16 +1,16 @@
 #boxplot-legend-img {
-    width: 143px;
-    height: 296px;
-    text-decoration: none;
-    border: 1px solid lightgrey;
-    float: right;
-    margin-top: 10px;
+  width: 143px;
+  height: 296px;
+  text-decoration: none;
+  border: 1px solid lightgrey;
+  margin-top: 10px;
+  margin-left: 5px;
 }
 
 #boxplot-not-available {
-    width:100%; 
-    height:400px;
-    padding-top:190px; 
-    text-align:center;
-    font-size:17px;
+  width: 100%;
+  height: 400px;
+  padding-top: 190px;
+  text-align: center;
+  font-size: 17px;
 }

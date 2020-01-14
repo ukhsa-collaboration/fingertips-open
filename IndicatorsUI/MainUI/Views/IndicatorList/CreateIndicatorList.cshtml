@@ -7,6 +7,13 @@
     @Scripts.Render("~/bundles/js-indicator-list-edit")
 }
 <div class="title-divider"></div>
+@{
+    var redirectAction = ViewBag.Redirect;
+    if (redirectAction == null)
+    {
+        redirectAction = false;
+    }
+}
 <div id="create-indicator-list" class="container">
     <div class="row">
         <div class="col-md-12">
@@ -33,6 +40,7 @@
             @Html.TextBoxFor(x => x.ListName, new { required = "", id = "list-name", @class = "form-control form-control-full-width" })
             @Html.Hidden("list-id", Model.Id)
             @Html.Hidden("public-id", Model.PublicId)
+            <input type="hidden" id="redirect-action" value="@redirectAction.ToString()" />
             <input type="button" id="save-indicator-list-button" class="btn btn-primary" value="Save list" onclick="saveIndicatorList()" />
             <input type="button" id="cancel-button" class="btn btn-default" value="Cancel" onclick="back()" />
         </div>

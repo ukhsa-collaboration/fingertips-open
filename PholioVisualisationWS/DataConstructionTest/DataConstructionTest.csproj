@@ -108,6 +108,7 @@
     <Compile Include="PostcodeProviderTest.cs" />
     <Compile Include="ProfileIdListProviderTest.cs" />
     <Compile Include="ProfileUrlTest.cs" />
+    <Compile Include="QuinaryPopulationCalculatorTest.cs" />
     <Compile Include="SingleGroupingProviderTest.cs" />
     <Compile Include="GroupingListUniquifierTest.cs" />
     <Compile Include="GroupIdProviderTest.cs" />

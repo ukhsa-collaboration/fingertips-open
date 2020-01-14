@@ -73,7 +73,7 @@ namespace Fpm.ProfileData
             return service;
         }
 
-        private static ISessionFactory GetSessionFactory()
+        public static ISessionFactory GetSessionFactory()
         {
             if (staticSessionFactory == null)
             {

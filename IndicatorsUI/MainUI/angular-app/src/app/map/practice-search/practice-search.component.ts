@@ -1,14 +1,15 @@
 import {
     Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, Input, OnChanges, SimpleChanges
 } from '@angular/core';
+import { isDefined } from '@angular/compiler/src/util';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/ngx-bootstrap-typeahead';
+import { Observable } from 'rxjs/Observable';
+import * as _ from 'underscore';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { AreaService } from '../../shared/service/api/area.service';
-import { AreaTypeIds } from '../../shared/shared';
-import { AreaTextSearchResult, NearByAreas, AreaAddress } from '../../typings/FT.d';
-import { Observable } from 'rxjs/Observable';
-import { TypeaheadMatch } from 'ngx-bootstrap/typeahead';
+import { AreaTypeIds } from '../../shared/constants';
+import { AreaTextSearchResult, NearByAreas, AreaAddress } from '../../typings/FT';
 import { AutoCompleteResult, Practice } from './practice-search';
-import * as _ from 'underscore';
 @Component({
     selector: 'ft-practice-search',
     templateUrl: './practice-search.component.html',
@@ -16,8 +17,8 @@ import * as _ from 'underscore';
 })
 export class PracticeSearchComponent implements OnInit, OnChanges {
 
-    @ViewChild('scrollPracticeTable') practiceTable: ElementRef;
-    @ViewChild('googleMapNew') mapEl: ElementRef;
+    @ViewChild('scrollPracticeTable', { static: true }) practiceTable: ElementRef;
+    @ViewChild('googleMapNew', { static: true }) mapEl: ElementRef;
     @Input() IsMapUpdateRequired = false;
     @Input() searchMode = false;
 
@@ -44,9 +45,9 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
             this.onShowAllPracticeinCCGClick();
         }
         if (changes['searchMode']) {
-            let displyCCGLink = changes['searchMode'].currentValue;
-            if (displyCCGLink !== undefined) {
-                if (displyCCGLink) {
+            const displayCcgLink = changes['searchMode'].currentValue;
+            if (isDefined(displayCcgLink)) {
+                if (displayCcgLink) {
                     this.localSearchMode = true;
                     this.displayCCGPracticeLink = false;
                 }
@@ -65,12 +66,12 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
         this.localSearchMode = false;
         this.displayCCGPracticeLink = true;
         this.dataSource = Observable.create((observer: any) => {
-            this.areaService.getAreaSearchByText(this.placeNameText, AreaTypeIds.CcgPreApr2017, true, true)
-                .subscribe((result: any) => {
-                    this.searchResults = <AreaTextSearchResult[]>result;
-                    let newResult = _.map(this.searchResults, function (result) {
-                        return new AutoCompleteResult(result.PolygonAreaCode, result.PlaceName,
-                            result.PolygonAreaName);
+            this.areaService.getAreaSearchByText(this.placeNameText, AreaTypeIds.DistrictUA, true, true)
+                .subscribe((result1: any) => {
+                    this.searchResults = <AreaTextSearchResult[]>result1;
+                    const newResult = _.map(this.searchResults, function (result2) {
+                        return new AutoCompleteResult(result2.PolygonAreaCode, result2.PlaceName,
+                            result2.PolygonAreaName);
                     });
                     observer.next(newResult);
                 });
@@ -109,10 +110,10 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
             const position = new google.maps.LatLng(53.415649, -2.209015);
             bounds.extend(position);
             this.practiceMap.setCenter(bounds.getCenter());
-            let thisCom = this;
+            const thisCom = this;
             // This is needed as on initial load map was not visible
             google.maps.event.addListener(this.practiceMap, 'idle', function () {
-                let bound = thisCom.practiceMap.getCenter();
+                const bound = thisCom.practiceMap.getCenter();
                 google.maps.event.trigger(thisCom.practiceMap, 'resize');
                 thisCom.practiceMap.setCenter(bound);
             });
@@ -127,11 +128,11 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
     }
 
     public typeaheadOnSelect(e: TypeaheadMatch): void {
-        let polygonAreaCode = (<AutoCompleteResult>e.item).polygonAreaCode;
+        const polygonAreaCode = (<AutoCompleteResult>e.item).polygonAreaCode;
         this.selectedArea = _.find(this.searchResults, function (obj) { return obj.PolygonAreaCode === polygonAreaCode; });
         this.areaService.getAreaSearchByProximity(this.selectedArea.Easting, this.selectedArea.Northing, AreaTypeIds.Practice)
             .subscribe((result: any) => {
-                let nearByAreas = <NearByAreas[]>result;
+                const nearByAreas = <NearByAreas[]>result;
                 this.nearByPractices = _.map(nearByAreas, function (area) {
                     return new Practice(area.AreaName, area.AreaCode,
                         area.AddressLine1, area.AddressLine2, area.Postcode,
@@ -164,7 +165,7 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
         this.areaService.getAreaAddressesByParentAreaCode(this.ftHelperService.getFTModel().parentCode,
             this.ftHelperService.getFTModel().areaTypeId)
             .subscribe((result: any) => {
-                let areaAddresses = <AreaAddress[]>result;
+                const areaAddresses = <AreaAddress[]>result;
                 this.nearByPractices = _.map(areaAddresses, function (area) {
                     return new Practice(area.Name, area.Code,
                         area.A1, area.A2, area.Postcode, '', area.Pos);
@@ -177,22 +178,22 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
     }
 
     displayMarkersOnMap(): void {
-        let bounds = new google.maps.LatLngBounds();
+        const bounds = new google.maps.LatLngBounds();
         const infoWindow = new google.maps.InfoWindow({});
-        let linkList = [];
+        const linkList = [];
         for (let i = 0; i < this.nearByPractices.length; i++) {
-            let position = new google.maps.LatLng(this.nearByPractices[i].lat, this.nearByPractices[i].lng);
+            const position = new google.maps.LatLng(this.nearByPractices[i].lat, this.nearByPractices[i].lng);
             bounds.extend(position);
 
             // Create marker
-            let marker = new google.maps.Marker({
+            const marker = new google.maps.Marker({
                 position: position,
                 map: this.practiceMap
             });
             marker.set('marker_id', this.nearByPractices[i].areaCode);
 
             // Create pop up text
-            let boxText = document.createElement('a');
+            const boxText = document.createElement('a');
             boxText.id = i.toString();
             boxText.className = 'select-area-link';
             boxText.style.cssText = 'color: #2e3191; text-decoration: underline; font-size:16px;';
@@ -201,14 +202,14 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
 
             // Map marker click
             google.maps.event.addListener(marker, 'click', (event) => {
-                let areaCode = marker.get('marker_id');
+                const areaCode = marker.get('marker_id');
                 infoWindow.setContent(linkList[i]);
                 infoWindow.open(this.practiceMap, marker);
 
-                let $practiceHeader = $('#' + areaCode);
+                const $practiceHeader = $('#' + areaCode);
 
                 // Deselect last selected one if any
-                let lastSelectedPracticeIndex = _.findIndex(this.nearByPractices, x => x.selected === true);
+                const lastSelectedPracticeIndex = _.findIndex(this.nearByPractices, x => x.selected === true);
                 if (lastSelectedPracticeIndex !== -1) {
                     const lastSelectedPractice = this.nearByPractices[lastSelectedPracticeIndex];
                     lastSelectedPractice.selected = false;
@@ -238,7 +239,7 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
 
             // Practice pop up link click
             google.maps.event.addDomListener(linkList[i], 'click', (event) => {
-                let areaCode = marker.get('marker_id');
+                const areaCode = marker.get('marker_id');
                 this.onSelectPracticeClick(areaCode);
             });
         }
@@ -249,10 +250,10 @@ export class PracticeSearchComponent implements OnInit, OnChanges {
 
     fitMapToPracticeResults(bounds: google.maps.LatLngBounds) {
         this.practiceMap.fitBounds(bounds);
-        let googleMapsEvent = google.maps.event;
+        const googleMapsEvent = google.maps.event;
         // Add bounds changed listener
-        let thisCom = this;
-        let zoomChangeBoundsListener =
+        const thisCom = this;
+        const zoomChangeBoundsListener =
             googleMapsEvent.addListenerOnce(this.practiceMap, 'bounds_changed', function () {
                 const maximumZoom = 13;
                 // Zoom out if to close

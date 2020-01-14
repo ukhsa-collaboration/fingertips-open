@@ -56,7 +56,7 @@ namespace PholioVisualisation.ServiceActionsTest
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
             var trendData = new PartitionDataForAllSexesBuilder().GetPartitionTrendData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, AgeIds.AllAges, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.IsNotNull(trendData.Limits);
             Assert.IsTrue(trendData.Labels.Select(x => x.Name).Contains("Male"));
@@ -67,7 +67,7 @@ namespace PholioVisualisation.ServiceActionsTest
         private static PartitionDataForAllSexes GetPartitionData(int indicatorId, int ageId)
         {
             var response = new PartitionDataForAllSexesBuilder().GetPartitionData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, ageId, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, ageId, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             return response;
         }
 

@@ -1,28 +1,28 @@
-<div class="row">
-    <div class="col-md-8">
-        &nbsp;
+<div *ngIf="legendConfig !== null">
+    <div class="row legend-link-container">
+        <div class="col w-100 float-right text-right">
+            <a class="legend-link" [innerHtml]="legendLinkText" (click)="toggleLegend()"></a>
+        </div>
     </div>
-    <div class="col-md-4 value-note-legend">
-        <span class="asterisk">*</span> a note is attached to the value, hover over to see more details
+    <div class="row" *ngIf="showLegend">
+        <div class="col-md-6">
+            <ft-legend-data-quality *ngIf="showDataQuality" [showDataQuality]="showDataQuality">
+            </ft-legend-data-quality>
+        </div>
+        <div class="col-md-6 text-right value-note-legend" *ngIf="showNoteLegend">
+            <span class="asterisk">*</span> a note is attached to the value, hover over to see more details
+        </div>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
-        <ft-legend-area-profiles [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB" [showQuintilesRAG]="showQuintilesRAG"
-            [showQuintilesBOB]="showQuintilesBOB" *ngIf="showAreaProfiles()"></ft-legend-area-profiles>
-        <ft-legend-map [showRAG3]="showRAG3" [showRAG5]="showRAG5" [showBOB]="showBOB" [showQuartiles]="showQuartiles"
-            [showQuintilesRAG]="showQuintilesRAG" [showQuintilesBOB]="showQuintilesBOB" [showContinuous]="showContinuous"
-            *ngIf="showMap()"></ft-legend-map>
-        <ft-legend-bob [legendType]="legendType" [keyType]="keyType"></ft-legend-bob>
-        <ft-legend-continuous [legendType]="legendType" [keyType]="keyType"></ft-legend-continuous>
-        <ft-legend-quartiles [legendType]="legendType" [keyType]="keyType"></ft-legend-quartiles>
-        <ft-legend-quintiles [legendType]="legendType" [keyType]="keyType"></ft-legend-quintiles>
-        <ft-legend-rag-3 [legendType]="legendType" [keyType]="keyType"></ft-legend-rag-3>
-        <ft-legend-rag-5 [legendType]="legendType" [keyType]="keyType"></ft-legend-rag-5>
+    <div class="row col" *ngIf="showBenchmarkAgainstGoal">
+        <ft-legend-benchmark-against-goal [legendConfig]="legendConfig"></ft-legend-benchmark-against-goal>
     </div>
-</div>
-<div class="row">
-    <div class="col-md-12">
+    <div class="row col" *ngIf="showLegend">
+        <ft-legend-map [legendConfig]="legendConfig" *ngIf="showMap"></ft-legend-map>
+        <ft-legend-trend [legendConfig]="legendConfig" *ngIf="showTrends || showAreaProfiles"></ft-legend-trend>
+        <ft-legend-compare-areas [legendConfig]="legendConfig" *ngIf="showCompareAreas"></ft-legend-compare-areas>
+        <ft-legend-inequalities [legendConfig]="legendConfig" *ngIf="showInequalities"></ft-legend-inequalities>
+    </div>
+    <div class="row col" *ngIf="canShowRecentTrends()">
         <ft-legend-recent-trends [showRecentTrends]="showRecentTrends"></ft-legend-recent-trends>
     </div>
 </div>

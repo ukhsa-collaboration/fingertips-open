@@ -56,13 +56,53 @@ namespace Fpm.MainUI
             container.RegisterType<INewDataDeploymentCount, NewDataDeploymentCount>();
             container.RegisterType<IProfileDetailsCopier, ProfileDetailsCopier>();
             container.RegisterType<IProfileMenuHelper, ProfileMenuHelper>();
+            container.RegisterType<IProfileDetailsCopier, ProfileDetailsCopier>();
+            container.RegisterType<IProfileMenuHelper, ProfileMenuHelper>();
+            container.RegisterType<IRemoveIndicatorChecker, RemoveIndicatorChecker>();
             container.RegisterType<ITimePeriodHelper, TimePeriodHelper>();
             container.RegisterType<ITimePeriodReader, TimePeriodReader>();
+            container.RegisterType<IUserDetails, UserDetails>();
 
             container.RegisterType<ISessionFactory>(new InjectionFactory(x => NHibernateSessionFactory.GetSession()));
-            container.RegisterType<IProfileRepository>(new InjectionFactory(x => new ProfileRepository(NHibernateSessionFactory.GetSession())));
-            container.RegisterType<ILookUpsRepository>(new InjectionFactory(x => new LookUpsRepository(NHibernateSessionFactory.GetSession())));
-            container.RegisterType<ICoreDataRepository>(new InjectionFactory(x => new CoreDataRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IProfilesReader>(new InjectionFactory(x => ReaderFactory.GetProfilesReader()));
+            container.RegisterType<IProfilesWriter>(new InjectionFactory(x => ReaderFactory.GetProfilesWriter()));
+
+            container.RegisterType<IProfileRepository>(new InjectionFactory(x =>
+                new ProfileRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<ILookUpsRepository>(new InjectionFactory(x =>
+                new LookUpsRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<ICoreDataRepository>(new InjectionFactory(x =>
+                new CoreDataRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IEmailRepository>(new InjectionFactory(x =>
+                new EmailRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IUserRepository>(new InjectionFactory(x =>
+                new UserRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IDocumentsRepository>(new InjectionFactory(x =>
+                new DocumentsRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IExceptionsRepository>(new InjectionFactory(x =>
+                new ExceptionsRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<ILoggingRepository>(new InjectionFactory(x =>
+                new LoggingRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IReportRepository>(new InjectionFactory(x =>
+                new ReportRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IUploadJobRepository>(new InjectionFactory(x =>
+                new UploadJobRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IUserFeedbackRepository>(new InjectionFactory(x =>
+                new UserFeedbackRepository(NHibernateSessionFactory.GetSession())));
+
+            container.RegisterType<IAreaTypeRepository>(new InjectionFactory(x =>
+                new AreaTypeRepository(NHibernateSessionFactory.GetSession())));
         }
     }
 }

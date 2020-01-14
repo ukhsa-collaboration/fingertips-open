@@ -1,9 +1,8 @@
-﻿
-using System;
-using System.Text;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
 
@@ -15,36 +14,53 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestPolarityAssignedFromGrouping()
         {
-            var polarity = PolarityIds.BlueOrangeBlue;
-            List<Grouping> grouping = new List<Grouping>();
-            grouping.Add(new Grouping { PolarityId = polarity });
+            // Assign
+            var polarity = PolarityIds.RagHighIsGood;
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, PolarityId = polarity }
+            };
 
-            var root = new GroupRootBuilder().BuildGroupRoots(grouping).First();
+            // Action
+            var root = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping).First();
 
+            // Assert
             Assert.AreEqual(polarity, root.PolarityId);
         }
 
         [TestMethod]
         public void TestAgeIdAssignedFromGrouping()
         {
-            var ageId = 200;
-            List<Grouping> grouping = new List<Grouping>();
-            grouping.Add(new Grouping { AgeId = ageId });
+            // Assign
+            var ageId = AgeIds.From4To5;
+            var indicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth;
 
-            var root = new GroupRootBuilder().BuildGroupRoots(grouping).First();
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { AgeId = ageId, IndicatorId = indicatorId }
+            };
 
+            // Action
+            var root = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping).First();
+
+            // Assert
             Assert.AreEqual(ageId, root.AgeId);
         }
 
         [TestMethod]
         public void TestSexIdAssignedFromGrouping()
         {
-            List<Grouping> grouping = new List<Grouping>();
-            grouping.Add(new Grouping { SexId = SexIds.Male });
-            grouping.Add(new Grouping { SexId = SexIds.Female });
+            // Assign
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male },
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Female }
+            };
 
-            var roots = new GroupRootBuilder().BuildGroupRoots(grouping);
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
+            // Assert
             Assert.AreEqual(SexIds.Male, roots[0].SexId);
             Assert.AreEqual(SexIds.Female, roots[1].SexId);
         }
@@ -52,133 +68,165 @@ namespace PholioVisualisation.DataConstructionTest
         [TestMethod]
         public void TestTwoGroupings()
         {
-            List<Grouping> grouping = new List<Grouping>();
+            // Assign
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male },
+                new Grouping { IndicatorId = IndicatorIds.DeprivationScoreIMD2015, SexId = SexIds.Persons }
+            };
 
-            grouping.Add(new Grouping { IndicatorId = 1, SexId = 1 });
-            grouping.Add(new Grouping { IndicatorId = 2, SexId = 1 });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
-
+            // Assert
             Assert.AreEqual(2, roots.Count);
         }
 
         [TestMethod]
         public void TestGroupingsAnnualAndQuarterlyGroupingsGiveTwoGroupRoots()
         {
-            List<Grouping> grouping = new List<Grouping>();
-
-            grouping.Add(new Grouping
+            // Assign
+            List<Grouping> grouping = new List<Grouping>
             {
-                IndicatorId = 1,
-                SexId = 1,
-                BaselineYear = 2001,
-                BaselineQuarter = -1,
-                DataPointYear = 2001,
-                DataPointQuarter = -1
-            });
+                new Grouping
+                {
+                    IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies,
+                    SexId = SexIds.Male,
+                    BaselineYear = 2001,
+                    BaselineQuarter = -1,
+                    DataPointYear = 2001,
+                    DataPointQuarter = -1
+                },
+                new Grouping
+                {
+                    IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies,
+                    SexId = SexIds.Male,
+                    BaselineYear = 2001,
+                    BaselineQuarter = 1,
+                    DataPointYear = 2001,
+                    DataPointQuarter = 1
+                }
+            };
 
-            grouping.Add(new Grouping
-            {
-                IndicatorId = 1,
-                SexId = 1,
-                BaselineYear = 2001,
-                BaselineQuarter = 1,
-                DataPointYear = 2001,
-                DataPointQuarter = 1
-            });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
-
+            // Assert
             Assert.AreEqual(2, roots.Count);
         }
 
         [TestMethod]
         public void TestGroupingsAnnualAndMonthlyGroupingsGiveTwoGroupRoots()
         {
-            List<Grouping> grouping = new List<Grouping>();
-
-            grouping.Add(new Grouping
+            // Assign
+            List<Grouping> grouping = new List<Grouping>
             {
-                IndicatorId = 1,
-                SexId = 1,
-                BaselineYear = 2001,
-                BaselineQuarter = -1,
-                DataPointYear = 2001,
-                DataPointQuarter = -1
-            });
+                new Grouping
+                {
+                    IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth,
+                    SexId = SexIds.Male,
+                    BaselineYear = 2009,
+                    BaselineQuarter = -1,
+                    DataPointYear = 2015,
+                    DataPointQuarter = -1
+                },
+                new Grouping
+                {
+                    IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth,
+                    SexId = SexIds.Male,
+                    BaselineYear = 2001,
+                    BaselineQuarter = -1,
+                    BaselineMonth = 1,
+                    DataPointYear = 2001,
+                    DataPointQuarter = -1,
+                    DataPointMonth = 1
+                }
+            };
 
-            grouping.Add(new Grouping
-            {
-                IndicatorId = 1,
-                SexId = 1,
-                BaselineYear = 2001,
-                BaselineQuarter = -1,
-                BaselineMonth = 1,
-                DataPointYear = 2001,
-                DataPointQuarter = -1,
-                DataPointMonth = 1
-            });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
-
+            // Assert
             Assert.AreEqual(2, roots.Count);
         }
 
         [TestMethod]
         public void TestStateSexSetCorrectly()
         {
-            List<Grouping> grouping = new List<Grouping>();
+            // Assign
+            List<Grouping> grouping = new List<Grouping>()
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male },
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Female },
+                new Grouping { IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies, SexId = SexIds.Persons }
+            };
 
-            grouping.Add(new Grouping { IndicatorId = 1, SexId = 1 });
-            grouping.Add(new Grouping { IndicatorId = 2, SexId = 1 });
-            grouping.Add(new Grouping { IndicatorId = 2, SexId = 4 });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
-
+            // Assert
             Assert.AreEqual(3, roots.Count);
-            Assert.IsFalse(roots[0].StateSex);
+            Assert.IsTrue(roots[0].StateSex);
             Assert.IsTrue(roots[1].StateSex);
-            Assert.IsTrue(roots[2].StateSex);
+            Assert.IsFalse(roots[2].StateSex);
         }
 
         [TestMethod]
-        public void TestAgeLabelSetCorrectly()
+        public void TestAgeLabelSetCorrectly_True()
         {
-            List<Grouping> grouping = new List<Grouping>();
+            // Assign: two groupings with same indicator id but different ages
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male, AgeId = AgeIds.From10To11 },
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male, AgeId = AgeIds.From0To4 }
+            };
 
-            grouping.Add(new Grouping { IndicatorId = 1, SexId = 1 });
-            grouping.Add(new Grouping { IndicatorId = 2, SexId = 1, AgeId = AgeIds.AllAges });
-            grouping.Add(new Grouping { IndicatorId = 2, SexId = 1, AgeId = AgeIds.From0To4 });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
+            // Assert
+            Assert.AreEqual(2, roots.Count);
+            Assert.AreEqual(2, roots.Select(x => x.StateAge == true).Count());
+        }
 
-            Assert.AreEqual(3, roots.Count);
+        [TestMethod]
+        public void TestAgeLabelSetCorrectly_False()
+        {
+            // Assign: two groupings with different indicator IDs
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies, SexId = SexIds.Male, AgeId = AgeIds.From0To4 },
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, SexId = SexIds.Male, AgeId = AgeIds.From10To11 }
+            };
+
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
+
+            // Assert
+            Assert.AreEqual(2, roots.Count);
             Assert.IsFalse(roots[0].StateAge);
-            Assert.IsTrue(roots[1].StateAge);
-            Assert.IsTrue(roots[2].StateAge);
+            Assert.IsFalse(roots[1].StateAge);
         }
 
         [TestMethod]
         public void TestOrderOfRootsIsSameAsGroupings()
         {
-            List<Grouping> grouping = new List<Grouping>();
+            // Assign
+            List<Grouping> grouping = new List<Grouping>
+            {
+                new Grouping {IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, Sequence = 1},
+                new Grouping {IndicatorId = IndicatorIds.ChildrenInLowIncomeFamilies, Sequence = 2},
+                new Grouping {IndicatorId = IndicatorIds.DeprivationScoreIMD2015, Sequence = 3}
+            };
 
-            grouping.Add(new Grouping { IndicatorId = 43, Sequence = 1 });
-            grouping.Add(new Grouping { IndicatorId = 2, Sequence = 2 });
-            grouping.Add(new Grouping { IndicatorId = 9, Sequence = 3 });
+            // Action
+            var roots = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping);
 
-            GroupRootBuilder builder = new GroupRootBuilder();
-            IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
-
+            // Assert
             // Do not want any reordering, e.g. by indicator ID
-            Assert.AreEqual(43, roots[0].IndicatorId);
-            Assert.AreEqual(2, roots[1].IndicatorId);
-            Assert.AreEqual(9, roots[2].IndicatorId);
+            Assert.AreEqual(IndicatorIds.HealthyLifeExpectancyAtBirth, roots[0].IndicatorId);
+            Assert.AreEqual(IndicatorIds.ChildrenInLowIncomeFamilies, roots[1].IndicatorId);
+            Assert.AreEqual(IndicatorIds.DeprivationScoreIMD2015, roots[2].IndicatorId);
 
             // Sequences are set
             Assert.AreEqual(1, roots[0].Sequence);
@@ -190,7 +238,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestNoGroupingsNoIndicatorIds()
         {
             List<Grouping> grouping = new List<Grouping>();
-            GroupRootBuilder builder = new GroupRootBuilder();
+            GroupRootBuilder builder = new GroupRootBuilder(new GroupDataReader());
             IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
 
             Assert.AreEqual(0, roots.Count);
@@ -200,10 +248,47 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestNoGroupingsSomeIndicatorIds()
         {
             List<Grouping> grouping = new List<Grouping>();
-            GroupRootBuilder builder = new GroupRootBuilder();
+            GroupRootBuilder builder = new GroupRootBuilder(new GroupDataReader());
             IList<GroupRoot> roots = builder.BuildGroupRoots(grouping);
 
             Assert.AreEqual(0, roots.Count);
+        }
+
+        [TestMethod]
+        public void TestPolarityIdSetCorrectlyWhenIsSearchProfile()
+        {
+            // Assign
+            const int profileId = 13;
+            const int polarity = PolarityIds.RagLowIsGood;
+            const int expectedPolarity = PolarityIds.RagHighIsGood;
+            var grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, PolarityId = polarity }
+            };
+
+            // Action
+            var root = new GroupRootBuilder(profileId, ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping).First();
+
+            // Assert
+            Assert.AreEqual(expectedPolarity, root.PolarityId);
+        }
+
+        [TestMethod]
+        public void TestPolarityIdSetCorrectlyWhenIsNotSearchProfile()
+        {
+            // Assign
+            const int polarity = PolarityIds.RagHighIsGood;
+            const int expectedPolarity = PolarityIds.RagHighIsGood;
+            var grouping = new List<Grouping>
+            {
+                new Grouping { IndicatorId = IndicatorIds.HealthyLifeExpectancyAtBirth, PolarityId = polarity }
+            };
+
+            // Action
+            var root = new GroupRootBuilder(ReaderFactory.GetGroupDataReader()).BuildGroupRoots(grouping).First();
+
+            // Assert
+            Assert.AreEqual(expectedPolarity, root.PolarityId);
         }
     }
 }

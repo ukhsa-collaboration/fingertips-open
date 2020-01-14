@@ -369,27 +369,6 @@ function getChildAreas(model) {
     }
 }
 
-function getNhsId() {
-    var areaCode = MT.model.areaCode;
-    ajaxGet('api/area/nhs_choices_area_id', 'area_code=' + areaCode,
-        function (obj) {
-            loaded.nhsId = obj;
-            ajaxMonitor.callCompleted();
-        });
-}
-
-function getConditionWord() {
-
-    switch (MT.model.profileId) {
-        case ProfileIds.Diabetes:
-            return 'diabetes';
-        case ProfileIds.Hypertension:
-            return 'recorded hypertension';
-    }
-
-    return '???';
-}
-
 function getContentText(contentKey) {
     var model = MT.model;
     var parameters = new ParameterBuilder(
@@ -503,7 +482,7 @@ MT.nav = {
 
         if (isMapWithNoData()) {
             // Ensure area details will be comparing similar areas
-            if (doesAreaTypeHaveNearestNeighbours() && isFeatureEnabled('enableNeighbourComparisonInLongerLives')) {
+            if (doesAreaTypeHaveNearestNeighbours()) {
                 similarAreaCode = getNearestNeighbourCode();
                 url = addSimilarAreaParameters(url, similarAreaCode);
                 setUrl(url);

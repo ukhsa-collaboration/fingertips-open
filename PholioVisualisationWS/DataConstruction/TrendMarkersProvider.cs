@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using PholioVisualisation.Analysis;
+﻿using PholioVisualisation.Analysis;
+using PholioVisualisation.Analysis.TrendMarkers;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace PholioVisualisation.DataConstruction
 {
@@ -40,6 +41,11 @@ namespace PholioVisualisation.DataConstruction
         {
             var trendMarkers = new Dictionary<string, TrendMarkerResult>();
 
+            if (grouping == null)
+            {
+                return trendMarkers;
+            }
+
             var areaCodeToTrendDataList = _trendReader
                 .GetTrendDataForMultipleAreas(grouping, areas.Select(x => x.Code).ToArray());
 
@@ -48,7 +54,7 @@ namespace PholioVisualisation.DataConstruction
             {
                 var dataList = areaCodeToTrendDataList[areaCode];
 
-                var result = GetTrendMarkerResult(indicatorMetadata, yearRange, dataList);
+                var result = GetTrendMarkerResult(indicatorMetadata, yearRange, dataList, grouping);
 
                 _trendBetweenTwoValuesCalculator.SetTrendMarkerFromDataList(dataList, result);
 
@@ -60,7 +66,7 @@ namespace PholioVisualisation.DataConstruction
 
 
         public TrendMarkerResult GetTrendMarkerResult(IndicatorMetadata indicatorMetadata,
-            int yearRange, IList<CoreDataSet> dataList)
+            int yearRange, IList<CoreDataSet> dataList, Grouping grouping)
         {
             var trendRequest = new TrendRequest
             {
@@ -68,6 +74,7 @@ namespace PholioVisualisation.DataConstruction
                 ValueTypeId = indicatorMetadata.ValueTypeId,
                 Data = dataList,
                 YearRange = yearRange,
+                Grouping = grouping
             };
 
             var result = _trendCalculator.GetResults(trendRequest);

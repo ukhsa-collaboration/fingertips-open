@@ -22,12 +22,12 @@ td {
     list-style-position: outside;
 }
 
-#introduction li, #recent-updates li, .phof-domains li {
-    margin-left: 10px;
-}
-
 #about-fingertips li {
     margin-left: 0;
+}
+
+#about-fingertips h3 {
+    margin-top: 30px;
 }
 
 #about-fingertips p {
@@ -37,7 +37,7 @@ td {
     line-height: 1.5;
 }
 
-#introduction p {
+#introduction p, .supporting-information p {
     font-size: 17px;
     margin-top: 12px;
 }
@@ -239,12 +239,7 @@ td {
     width: 75%;
     float: left;
 }
-
-    .supporting-information p {
-        padding: 10px 0;
-    }
-
-    .supporting-information h1 {
+.supporting-information h1 {
         padding-top: 10px;
         font-size: 2.5em;
     }
@@ -256,14 +251,24 @@ td {
     .supporting-information ul {
         list-style: disc;
         list-style-position: outside;
-        font-size: 15px;
+        font-size: 17px;
         padding: 10px 30px;
     }
 
-    .supporting-information li {
+.supporting-information ol {
+    list-style-position: outside;
+    font-size: 17px;
+    padding: 10px 30px;
+}
+
+    .supporting-information ul li {
         padding: 1px 0;
-        margin-top: 7px;
-        margin-bottom: 7px;
+        margin-left: -14px;
+    }
+
+    .supporting-information ol li {
+        padding: 1px 0;
+        margin-left: -10px;
     }
 
 .practice-profiles-domain-list h2 {
@@ -278,4 +283,11 @@ td {
 ------------------------------------------------------------ */
 .tab-options div {
     padding-left: 10px;
+}
+
+/* ------------------------------------------------------------
+	Embedded Tableau visualisation
+------------------------------------------------------------ */
+.tableauPlaceholder {
+    margin-left: -23%;
 }

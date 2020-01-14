@@ -7,13 +7,8 @@ using System.Collections.Generic;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class ReportRepository : RepositoryBase
+    public class ReportRepository : RepositoryBase, IReportRepository
     {
-        public ReportRepository() :
-            this(NHibernateSessionFactory.GetSession())
-        {
-        }
-
         public ReportRepository(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {

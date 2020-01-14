@@ -38,9 +38,9 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
             return categoryComparisonManager;
         }
 
-        public static IEnumerable<CoreDataSet> GetCoreDataForComparisonToWrite(ref IList<CoreDataSet> coreDataForComparison, IEnumerable<CoreDataSet> coreDataList)
+        public static IEnumerable<CoreDataSet> GetCoreDataForComparisonToWrite(ref IList<CoreDataSet> coreDataForComparison, IEnumerable<CoreDataSet> coreDataList, int categoryTypeId)
         {
-            var coreDataForComparisonAux = BodyPeriodSignificanceContainer.GetCoreDataForComparison(coreDataList);
+            var coreDataForComparisonAux = BodyPeriodSignificanceContainer.GetCoreDataForComparison(coreDataList, categoryTypeId);
 
             IList<CoreDataSet> coreDataForComparisonToWrite = null;
 

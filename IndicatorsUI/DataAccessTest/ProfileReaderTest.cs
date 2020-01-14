@@ -40,14 +40,15 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetProfileDetailsDefaultAreaType()
         {
-            Assert.AreEqual(102, PhofProfile().DefaultAreaType);
+            Assert.AreEqual(AreaTypeIds.England, 
+                SpecificProfile(ProfileUrlKeys.DevelopmentProfileForTesting).DefaultAreaType);
         }
 
         [TestMethod]
         public void TestGetProfileDetailsArePdfs()
         {
             Assert.IsTrue(SpecificProfile(ProfileUrlKeys.HealthProfiles).ArePdfs);
-            Assert.IsFalse(SpecificProfile(ProfileUrlKeys.LongerLives).ArePdfs);
+            Assert.IsFalse(SpecificProfile(ProfileUrlKeys.PublicHealthDashboard).ArePdfs);
         }
 
         [TestMethod]
@@ -77,15 +78,15 @@ namespace IndicatorsUI.DataAccessTest
         [TestMethod]
         public void TestGetProfileDomains()
         {
-            var domains = GetDomains(new[] { GroupIds.SevereMentalIllness_Finance });
+            var domains = GetDomains(new[] { GroupIds.SevereMentalIllness_RiskFactors });
             Assert.AreEqual(1, domains.Count);
         }
 
         [TestMethod]
         public void TestGetProfileDomainsSubHeading()
         {
-            var domains = GetDomains(new[] { 1000001 });
-            AssertContains("longer", domains[0].SubHeading.ToLower());
+            var domains = GetDomains(new[] { GroupIds.Dementia_PathwayOnAPage });
+            AssertContains("pathway", domains[0].SubHeading.ToLower());
         }
 
         [TestMethod]

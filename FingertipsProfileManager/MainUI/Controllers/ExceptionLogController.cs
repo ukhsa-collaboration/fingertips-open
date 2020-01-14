@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using Fpm.MainUI.Helpers;
 using Fpm.MainUI.ViewModels.ExceptionLog;
 using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.Exceptions;
 using Fpm.ProfileData.Repositories;
 
 namespace Fpm.MainUI.Controllers
@@ -12,17 +13,65 @@ namespace Fpm.MainUI.Controllers
     [RoutePrefix("exceptions")]
     public class ExceptionLogController : Controller
     {
-        private readonly ExceptionsRepository _exceptionLogRepository = new ExceptionsRepository();
+        private readonly IExceptionsRepository _exceptionLogRepository;
+
+        public ExceptionLogController(IExceptionsRepository exceptionLogRepository)
+        {
+            _exceptionLogRepository = exceptionLogRepository;
+        }
 
         [HttpGet]
-        [Route("")]
-        public ActionResult ExceptionIndex(int exceptionDays = 0, string exceptionServer = null)
+        [Route]
+        public ActionResult ExceptionIndex()
         {
-            var viewModel = new ExceptionIndexViewModel();
+            var viewModel = new ExceptionIndexViewModel()
+            {
+                ServerList = CommonUtilities.GetDistinctExceptionServers(),
+                ExceptionList = GetExceptions(0, new string[] { ExceptionOptions.AllServers }),
+                Server = ExceptionOptions.AllServers,
+                LiveServersFilterApplied = false,
+                ApiErrorsFilterApplied = false,
+                NumberOfDays = 0
+            };
 
-            viewModel.ServerList = CommonUtilities.GetDistinctExceptionServers();
-            GetAllExceptions(viewModel, exceptionDays, exceptionServer);
             return View(viewModel);
+        }
+
+        [HttpPost]
+        [Route("filtered-exceptions")]
+        public ActionResult FilteredExceptions(ExceptionIndexViewModel viewModel)
+        {
+            IList<ExceptionLog> exceptionList;
+
+            if (viewModel.LiveServersFilterApplied)
+            {
+                viewModel.ServerList = CommonUtilities.GetLiveExceptionServers();
+                
+                if (viewModel.Server == ExceptionOptions.AllServers)
+                {
+                    var servers = new[] { ServerNames.Live1, ServerNames.Live2 };
+                    exceptionList = GetExceptions(viewModel.NumberOfDays, servers);
+                }
+                else
+                {
+                    exceptionList = GetExceptions(viewModel.NumberOfDays, new string[] { viewModel.Server });
+                }
+            }
+            else
+            {
+                viewModel.ServerList = CommonUtilities.GetDistinctExceptionServers();
+
+                exceptionList = GetExceptions(viewModel.NumberOfDays, new string[] { viewModel.Server });
+            }
+
+            if (viewModel.ApiErrorsFilterApplied)
+            {
+                exceptionList = exceptionList.Where(x => x.Url.Contains("api/")).ToList();
+            }
+
+            viewModel.ExceptionList = exceptionList;
+
+            return View("ExceptionIndex", viewModel);
         }
 
         [Route("exception/{id}")]
@@ -39,17 +88,16 @@ namespace Fpm.MainUI.Controllers
             return PartialView("_ExceptionDetail", exception);
         }
 
-        private void GetAllExceptions(ExceptionIndexViewModel exceptions,
-            int exceptionDays, string exceptionServer)
+        private IList<ExceptionLog> GetExceptions(int exceptionDays, string[] exceptionServer)
         {
-            if (string.IsNullOrEmpty(exceptionServer))
+            if (exceptionServer == null)
             {
-                exceptionServer = Environment.MachineName;
+                exceptionServer = new string[] {Environment.MachineName};
             }
 
-            exceptions.ExceptionList = exceptionServer == ExceptionOptions.AllServers
+            return exceptionServer[0] == ExceptionOptions.AllServers
                 ? _exceptionLogRepository.GetExceptionsForAllServers(exceptionDays)
-                : _exceptionLogRepository.GetExceptionsByServer(exceptionDays, exceptionServer);
+                : _exceptionLogRepository.GetExceptionsForSpecificServers(exceptionDays, exceptionServer);
         }
     }
 }

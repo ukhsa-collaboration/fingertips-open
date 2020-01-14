@@ -28,18 +28,18 @@ namespace PholioVisualisation.ServiceActions
 
             InitMetadata(_grouping);
 
-            var timePeriod = TimePeriod.GetDataPoint(_grouping);
+            InitTimePeriod(profileId, _grouping);
 
             // Get Data
             IList<CoreDataSet> dataList = _groupDataReader.GetCoreDataForAllSexes(indicatorId,
-                timePeriod, areaCode, ageId);
+                _timePeriod, areaCode, ageId);
 
             // Define and order sexes
             var sexes = GetSexesFromDataList(dataList);
 
             // Process data list
             dataList = new CoreDataSetSorter(dataList).SortBySexId(sexes);
-            CalculateSignificances(areaCode, timePeriod, dataList);
+            CalculateSignificances(areaCode, _timePeriod, dataList);
             FormatData(dataList);
 
             return new PartitionDataForAllSexes

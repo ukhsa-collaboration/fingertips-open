@@ -11,27 +11,46 @@ namespace PholioVisualisation.PholioObjectsTest
     public class AreaTest
     {
         [TestMethod]
-        public void TestIsAreaType()
+        public void TestIsGpDeprivationDecile()
         {
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsGpDeprivationDecile);
+        }
 
+        [TestMethod]
+        public void TestIsShape()
+        {
             Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Shape }.IsShape);
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsShape);
+        }
 
-            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.CcgsPreApr2017 }.IsCcg);
-            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsCcg);
-
+        [TestMethod]
+        public void TestIsGpPractice()
+        {
             Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsGpPractice);
-            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.CcgsPreApr2017 }.IsGpPractice);
+            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.County }.IsGpPractice);
+        }
 
-            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Country}.IsCountry);
-            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice}.IsCountry);
+        [TestMethod]
+        public void TestIsCountry()
+        {
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.Country }.IsCountry);
+            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsCountry);
+        }
+
+        [TestMethod]
+        public void TestIsCcg()
+        {
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.CcgsPostApr2019 }.IsCcg);
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.CcgsPostApr2018 }.IsCcg);
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.CcgsPostApr2017 }.IsCcg);
+            Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.GpPractice }.IsCcg);
         }
 
         [TestMethod]
         public void TestIsPheCentre()
         {
-            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.PheCentreObsolete }.IsPheCentre);
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.PheCentresFrom2015 }.IsPheCentre);
+            Assert.IsTrue(new Area { AreaTypeId = AreaTypeIds.PheCentresFrom2013To2015 }.IsPheCentre);
             Assert.IsFalse(new Area { AreaTypeId = AreaTypeIds.Country }.IsPheCentre);
         }
 

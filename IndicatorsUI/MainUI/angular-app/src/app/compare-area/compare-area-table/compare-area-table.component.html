@@ -1,0 +1,123 @@
+<div id="indicator-details-box" style="width:100%;">
+  <table id="indicator-details-table" class="bordered-table" *ngIf="showDataTable()">
+    <thead>
+      <tr>
+        <th style="width:30%;">Area
+          <a class="columnSort" (click)="sortByArea()" title="Sort alphabetically by area"></a>
+        </th>
+        <th [ngClass]="{'hide': displayOption === 2}" *ngIf="displayRecentTrends()">
+          <div class="center">Recent
+            <br>Trend</div>
+        </th>
+        <th style="border-right: none;" [ngClass]="{'hide': displayOption === 2 || !isNearestNeighbourSelected()}">
+          <div class="center">Neighbour Rank</div>
+          <a class="columnSort" (click)="sortByRank()" title="Sort by rank"></a>
+        </th>
+        <th style="border-right: none;" [ngClass]="{'hide': displayOption == 2}">
+          <div class="center">Count</div>
+          <a class="columnSort" (click)="sortByCount()" title="Sort by count"></a>
+        </th>
+        <th style="border-right: none;">
+          <div class="center">Value</div>
+          <a class="columnSort" (click)="sortByValue()" title="Sort by values"></a>
+        </th>
+        <th class="bar">&nbsp;</th>
+        <th title="Lower confidence interval">
+          <div class="center" [ngClass]="{'hide': displayOption == 2}" [innerHtml]="columnHeaderLowerCI">
+          </div>
+          <div [ngClass]="{'hide': displayOption == 1}">
+            Lower
+            <br>CI
+          </div>
+        </th>
+        <th title="Upper confidence interval">
+          <div class="center" [ngClass]="{'hide': displayOption === 2}" [innerHtml]="columnHeaderUpperCI">
+          </div>
+          <div [ngClass]="{'hide': displayOption === 1}">
+            Upper
+            <br>CI
+          </div>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Parent area rows -->
+      <tr *ngFor="let row of comparatorAreaRows; let isFirstRow = first">
+        <td [innerHtml]="row.areaName"
+          [ngClass]="{'bold': comparatorId == row.comparatorId, 'comp-area-parent-area': true }"></td>
+        <td [innerHtml]="row.recentTrendImage" class="no-data" [ngClass]="{'hide': displayOption == 2}"
+          (mouseover)="showRecentTrendTooltip($event,row)" (mouseout)="hideTooltip()" *ngIf="displayRecentTrends()">
+        </td>
+        <td [innerHtml]="row.rank" class="no-data"
+          [ngClass]="{'hide': displayOption == 2 || !isNearestNeighbourSelected()}"></td>
+        <td [innerHtml]="row.count" class="no-data" [ngClass]="{'hide': displayOption == 2}" *ngIf="row.count == '-'">
+        </td>
+        <td [innerHtml]="row.count" class="numeric" [ngClass]="{'hide': displayOption == 2}" *ngIf="row.count != '-'">
+        </td>
+        <td [innerHtml]="row.value" class="numeric" (mouseover)="showValueNoteTooltip($event, row)"
+          (mouseout)="hideTooltip()"></td>
+        <td class="bar" [ngClass]="{'bar-first': isFirstRow}">
+          <div class="bar-box" *ngIf="row.isValue">
+            <img class="bar" [src]="row.barImage"
+              [ngStyle]="{'left.px': row.barImageLeft, 'width.px': row.barImageWidth}" *ngIf="row.barImageWidth > 0"
+              (mousemove)="showAreaNameTooltip($event,row)" (mouseout)="hideTooltip()" />
+            <img class="error" [src]="row.verticalLineImage1" [ngStyle]="{'left.px': row.verticalLineImage1Left}"
+              *ngIf="row.verticalLineImage1Left > 0" />
+            <img class="errorMid" [src]="row.horizontalLineImage"
+              [ngStyle]="{'left.px': row.horizontalLineImageLeft, 'width.px': row.horizontalLineImageWidth}"
+              *ngIf="row.horizontalLineImageWidth > 0" />
+            <img class="error" [src]="row.verticalLineImage2" [ngStyle]="{'left.px': row.verticalLineImage2Left}"
+              *ngIf="row.verticalLineImage2Left > 0" />
+          </div>
+        </td>
+        <td [innerHtml]="row.loCI" class="numeric"></td>
+        <td [innerHtml]="row.upCI" class="numeric"></td>
+      </tr>
+
+      <!-- Child area rows -->
+      <tr *ngFor="let row of nonComparatorAreaRows; let isLastRow = last" (mouseover)="highlightRow(row)"
+        (mouseout)="unHighlightRow()">
+        <td (click)="barAreaSelected(row.areaCode)"
+          [ngClass]="{'highlight-columns highlight-first-column': row.areaCode == selectedAreaCode}">
+          <div class="area-name-override" [innerHtml]="row.areaName"></div>
+        </td>
+        <td [innerHtml]="row.recentTrendImage" class="recent-trend no-data"
+          [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode, 'hide': displayOption == 2}"
+          (mouseover)="showRecentTrendTooltip($event,row)" (mouseout)="hideTooltip()" (click)="goToTrends(row)"
+          *ngIf="displayRecentTrends()"></td>
+        <td [innerHtml]="row.rank" class="no-data"
+          [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode, 'hide': displayOption == 2 || !isNearestNeighbourSelected()}">
+        </td>
+        <td [innerHtml]="row.count" class="no-data"
+          [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode, 'hide': displayOption == 2}"
+          *ngIf="row.count == '-'"></td>
+        <td [innerHtml]="row.count" class="numeric"
+          [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode, 'hide': displayOption == 2}"
+          *ngIf="row.count != '-'"></td>
+        <td [innerHtml]="row.value" class="numeric" [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode}"
+          (mouseover)="showValueNoteTooltip($event, row)" (mouseout)="hideTooltip()"></td>
+        <td (click)="barAreaSelected(row.areaCode)" class="bar"
+          [ngClass]="{'bar-last': isLastRow, 'highlight-columns highlight-barscale-column': row.areaCode == selectedAreaCode}">
+          <div class="bar-box" *ngIf="row.isValue">
+            <img class="bar" [src]="row.barImage"
+              [ngStyle]="{'left.px': row.barImageLeft, 'width.px': row.barImageWidth}" *ngIf="row.barImageWidth > 0"
+              (mousemove)="showAreaNameTooltip($event,row)" (mouseout)="hideTooltip()" />
+            <img class="error" [src]="row.verticalLineImage1" [ngStyle]="{'left.px': row.verticalLineImage1Left}"
+              *ngIf="row.verticalLineImage1Left > 0" />
+            <img class="errorMid" [src]="row.horizontalLineImage"
+              [ngStyle]="{'left.px': row.horizontalLineImageLeft, 'width.px': row.horizontalLineImageWidth}"
+              *ngIf="row.horizontalLineImageWidth > 0" />
+            <img class="error" [src]="row.verticalLineImage2" [ngStyle]="{'left.px': row.verticalLineImage2Left}"
+              *ngIf="row.verticalLineImage2Left > 0" />
+          </div>
+        </td>
+        <td [innerHtml]="row.loCI" class="numeric" [ngClass]="{'highlight-columns': row.areaCode == selectedAreaCode}">
+        </td>
+        <td [innerHtml]="row.upCI" class="numeric"
+          [ngClass]="{'highlight-columns highlight-last-column': row.areaCode == selectedAreaCode}"></td>
+      </tr>
+    </tbody>
+  </table>
+  <br />
+  <div class="trend-source" [innerHtml]="trendSource"></div>
+</div>

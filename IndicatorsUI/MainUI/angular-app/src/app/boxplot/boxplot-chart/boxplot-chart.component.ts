@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, SimpleChanges, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import {
+  Component, Input, Output, OnChanges, SimpleChanges,
+  ViewChild, ElementRef, AfterViewInit, EventEmitter
+} from '@angular/core';
 import { BoxplotData } from '../boxplot';
-
+import { AreaCodes } from '../../shared/constants';
 import * as Highcharts from 'highcharts';
-require('highcharts/modules/exporting')(Highcharts);
-require('highcharts/highcharts-more')(Highcharts);
 
 @Component({
   selector: 'ft-boxplot-chart',
@@ -13,7 +14,8 @@ require('highcharts/highcharts-more')(Highcharts);
 export class BoxplotChartComponent implements OnChanges, AfterViewInit {
 
   @Input() boxplotData: BoxplotData;
-  @ViewChild('chart') public chartEl: ElementRef;
+  @Output() emitBoxPlot = new EventEmitter();
+  @ViewChild('chart', { static: true }) public chartEl: ElementRef;
   chart: Highcharts.ChartObject;
 
   ngAfterViewInit() {
@@ -30,18 +32,21 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
       if (this.chartEl && this.chartEl.nativeElement) {
         chartContainer = this.chartEl.nativeElement;
         this.chart = new Highcharts.Chart(chartContainer, this.getChartOptions());
+        this.emitBoxPlot.emit({ 'chart': this.chart });
       }
     }
   }
 
   private getChartOptions(): Highcharts.Options {
 
-    let metadata = this.boxplotData.metadata;
-    let unitLabel = metadata.Unit.Label;
+    const metadata = this.boxplotData.metadata;
+    const yAxisLabel = metadata.Unit.Label;
 
     // Series
-    let seriesName = this.boxplotData.areaTypeName + ' in ' + this.boxplotData.comparatorName;
-    let series: any[] /*Highcharts.IndividualSeriesOptions[]*/ = [
+    const seriesName = this.boxplotData.isNearestNeighbour && this.boxplotData.comparatorCode !== AreaCodes.England
+      ? this.boxplotData.comparatorName
+      : this.boxplotData.areaTypeName + ' in ' + this.boxplotData.comparatorName;
+    const series: any[] /*Highcharts.IndividualSeriesOptions[]*/ = [
       {
         name: seriesName,
         data: this.getChartData()
@@ -49,7 +54,7 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
     ];
 
     // So accessible from tooltip
-    let boxplotData = this.boxplotData;
+    const boxplotData = this.boxplotData;
 
     return (
       {
@@ -57,6 +62,10 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
           type: 'boxplot',
           width: 820,
           animation: false
+        },
+
+        credits: {
+          enabled: false
         },
 
         title: {
@@ -77,7 +86,7 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
         yAxis: {
           min: this.boxplotData.min,
           title: {
-            text: unitLabel
+            text: yAxisLabel
           }
         },
 
@@ -94,11 +103,11 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
           followPointer: false,
           formatter: function () {
 
-            let period = this.x;
-            let index = boxplotData.periods.indexOf(period);
-            let stats = boxplotData.statsFormatted[index];
+            const period = this.x;
+            const index = boxplotData.periods.indexOf(period);
+            const stats = boxplotData.statsFormatted[index];
 
-            let tooltipContent = [
+            const tooltipContent = [
               '<b>', period, '</b><br/>',
               '<b>', seriesName, '</b><br/>',
               '95th Percentile: ', stats.P95, '<br/>',
@@ -111,18 +120,30 @@ export class BoxplotChartComponent implements OnChanges, AfterViewInit {
             return tooltipContent.join('');
           }
         },
-
+        exporting: {
+          enabled: true,
+          allowHTML: true,
+          chartOptions: {
+            title: {
+              text: boxplotData.indicatorName + ' for ' + boxplotData.areaTypeName + ' in ' + boxplotData.comparatorName,
+              style: {
+                fontSize: '10px',
+                align: 'center'
+              }
+            }
+          }
+        },
         series: series
       });
   }
 
   private getChartData(): number[][] {
 
-    let chartDataGrid: number[][] = [];
+    const chartDataGrid: number[][] = [];
 
-    for (let stats of this.boxplotData.stats) {
+    for (const stats of this.boxplotData.stats) {
 
-      let pointData: number[] = [];
+      const pointData: number[] = [];
       pointData[0] = this.getValue(stats.P5);
       pointData[1] = this.getValue(stats.P25);
       pointData[2] = this.getValue(stats.Median);

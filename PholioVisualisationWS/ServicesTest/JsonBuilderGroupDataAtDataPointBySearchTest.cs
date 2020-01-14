@@ -14,7 +14,7 @@ namespace PholioVisualisation.ServicesTest
     [TestClass]
     public class JsonBuilderGroupDataAtDataPointBySearchTest
     {
-        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
         [TestMethod]
         public void Test_Get_Data_For_Child_Areas()

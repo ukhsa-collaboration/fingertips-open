@@ -11,7 +11,7 @@ namespace PholioVisualisation.ServiceActions
 
         public PartitionDataForAllCategories GetPartitionData(int profileId,
             string areaCode, int indicatorId, int sexId, int ageId, int areaTypeId)
-                {
+        {
             var partitionData = new PartitionDataForAllCategories
             {
                 AreaCode = areaCode,
@@ -30,27 +30,35 @@ namespace PholioVisualisation.ServiceActions
 
             InitMetadata(_grouping);
 
-            var timePeriod = TimePeriod.GetDataPoint(_grouping);
-
-            var maxYear = _groupDataReader.GetCoreDataMaxYear(indicatorId);
-            if (timePeriod.Year != maxYear)
-            {
-                timePeriod.Year = maxYear;
-            }
+            InitTimePeriod(profileId, _grouping);
 
             // Get Data
             IList<CoreDataSet> categoryDataList = _groupDataReader.GetAllCategoryDataWithinParentArea(areaCode,
-                indicatorId, sexId, ageId, timePeriod);
+                indicatorId, sexId, ageId, _timePeriod);
 
-            CalculateSignificances(areaCode, timePeriod, categoryDataList);
+            CalculateSignificances(areaCode, _timePeriod, categoryDataList);
             FormatData(categoryDataList);
             FormatData(_specialCaseBenchmarkDataList);
 
-            //partitionData.CategoryTypes = GetCategoryTypes(categoryDataList);
             partitionData.CategoryTypes = GetCategoryTypes(areaCode, indicatorId, sexId, ageId);
 
             partitionData.Data = categoryDataList;
             return partitionData;
+        }
+
+        public IList<PartitionTrendData> GetPartitionTrendDataForAllCategories(int profileId,
+            string areaCode, int indicatorId, int ageId, int sexId, int areaTypeId)
+        {
+            var partitionTrendDataList = new List<PartitionTrendData>();
+            var categoryTypeIds = _groupDataReader.GetAllCategoryTypeIds(areaCode, indicatorId, sexId, ageId);
+
+            foreach (var categoryTypeId in categoryTypeIds)
+            {
+                var partitionTrendData = GetPartitionTrendData(profileId, areaCode, indicatorId, ageId, sexId, categoryTypeId, areaTypeId);
+                partitionTrendDataList.Add(partitionTrendData);
+            }
+
+            return partitionTrendDataList;
         }
 
         public PartitionTrendData GetPartitionTrendData(int profileId,
@@ -77,6 +85,7 @@ namespace PholioVisualisation.ServiceActions
                 IList<CoreDataSet> dataList = _groupDataReader
                     .GetAllCategoryDataWithinParentArea(areaCode, indicatorId, sexId, ageId, timePeriod)
                     .Where(x => x.CategoryTypeId == categoryTypeId).ToList();
+
                 dictionaryBuilder.AddDataForNextTimePeriod(dataList);
 
                 // Get coredata for selected area
@@ -99,6 +108,7 @@ namespace PholioVisualisation.ServiceActions
 
             // Format category data
             FormatData(allData);
+
             // Format area average            
             FormatData(areaAverageAccordingToTimePeriod);
             var limits = new LimitsBuilder().GetLimits(allData);

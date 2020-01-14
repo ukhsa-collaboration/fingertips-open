@@ -2,8 +2,10 @@
 using FingertipsUploadService.ProfileData;
 using FingertipsUploadService.Upload;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 
 namespace FingertipsUploadService.Helpers
 {
@@ -38,8 +40,9 @@ namespace FingertipsUploadService.Helpers
 
         private void ReadDataRows()
         {
-            var columnNames = UploadColumnNames.GetColumnNames(_dataTable);
-            var count = 1; // Count is 1 becuase we validate only the data not the header
+            var columnNames = GetColumnNames();
+
+            var count = 1; // Count is 1 because we validate only the data not the header
             while (_csvReader.Read())
             {
                 var row = _dataTable.NewRow();
@@ -78,6 +81,20 @@ namespace FingertipsUploadService.Helpers
                 }
                 _dataTable.Rows.Add(row);
             }
+        }
+
+        private IList<string> GetColumnNames()
+        {
+            var columnNames = UploadColumnNames.GetColumnNames(_dataTable);
+
+            // Ignore any extra columns
+            var expectedColumnNamesCount = UploadColumnNames.GetColumnNames().Count;
+            if (columnNames.Count > expectedColumnNamesCount)
+            {
+                columnNames = columnNames.Take(expectedColumnNamesCount).ToList();
+            }
+
+            return columnNames;
         }
 
         private static double ParseNumericCell(string fieldValue, string columnName)

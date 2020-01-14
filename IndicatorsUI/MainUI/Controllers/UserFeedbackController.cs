@@ -1,8 +1,8 @@
-﻿using IndicatorsUI.DataAccess;
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
+using IndicatorsUI.DataAccess;
 
 namespace IndicatorsUI.MainUI.Controllers
 {

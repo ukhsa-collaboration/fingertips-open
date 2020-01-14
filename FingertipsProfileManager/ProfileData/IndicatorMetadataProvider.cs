@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Fpm.ProfileData.Entities.Profile;
+using System.Collections.Generic;
 using System.Linq;
-using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.ProfileData
 {

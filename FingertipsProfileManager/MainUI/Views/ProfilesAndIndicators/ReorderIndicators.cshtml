@@ -7,15 +7,7 @@
 
 @section ExtraScripts
 {
-    <script src="@(AppConfig.AngularAppDistPath)main.js" type="text/javascript" defer></script>
-    <script src="@(AppConfig.AngularAppDistPath)polyfills.js" type="text/javascript" defer></script>
-    <script src="@(AppConfig.AngularAppDistPath)runtime.js" type="text/javascript" defer></script>
-    <script src="@(AppConfig.AngularAppDistPath)styles.js" type="text/javascript" defer></script>
-    <script src="@(AppConfig.AngularAppDistPath)vendor.js" type="text/javascript" defer></script>
-}
-
-@section AngularApp
-{
+    @Html.Partial("_AngularScripts")
 }
 
 <h2 class="subheading">Reorder Indicators</h2>

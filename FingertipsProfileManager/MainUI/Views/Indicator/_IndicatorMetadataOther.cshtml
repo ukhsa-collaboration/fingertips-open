@@ -1,0 +1,135 @@
+﻿@using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
+
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    var doesUserHaveWritePermission = Model.DoesUserHaveWritePermission();
+    var doesProfileOwnIndicator = Model.DoesProfileOwnIndicator();
+
+    var pleaseSelectOption = PleaseSelectOption.Required;
+    var dropdownStyle = "dropdown-not-selected";
+    var ownerProfileName = string.Empty;
+
+    var editAction = Model.IsEditAction;
+    if (editAction)
+    {
+        pleaseSelectOption = PleaseSelectOption.NotRequired;
+        dropdownStyle = "dropdown-selected";
+        ownerProfileName = CommonUtilities.GetProfile(Model.IndicatorMetadata.OwnerProfileId).Name;
+
+        if (!doesUserHaveWritePermission)
+        {
+            doesUserHaveWritePermission = Model.Profile.Id == ProfileIds.IndicatorsForReview && Model.Grouping.GroupId == GroupIds.InDevelopment;
+        }
+
+        if (!doesProfileOwnIndicator)
+        {
+            doesProfileOwnIndicator = Model.Profile.Id == ProfileIds.IndicatorsForReview && Model.Grouping.GroupId == GroupIds.InDevelopment;
+        }
+    }
+}
+
+<div>
+    @if (doesUserHaveWritePermission && doesProfileOwnIndicator == false)
+    {
+        <p class="warning">This metadata can only be changed in the profile (@ownerProfileName) that owns this indicator</p>
+    }
+    <label class="associated-detail-label">
+        Value type
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.ValueTypeId, CommonUtilities.GetIndicatorValueTypes(pleaseSelectOption),
+        new {@class = "indicator-dropdown " + dropdownStyle + " validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)"})
+</div>
+<div>
+    <label class="associated-detail-label">
+        CI method
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.CIMethodId, CommonUtilities.GetConfidenceIntervalMethods(pleaseSelectOption),
+        new { @class = "indicator-dropdown " + dropdownStyle + " validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        Unit
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.UnitId, CommonUtilities.GetUnits(pleaseSelectOption),
+        new { @class = "indicator-dropdown " + dropdownStyle + " validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        Denominator
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.DenominatorTypeId, CommonUtilities.GetDenominatorTypes(pleaseSelectOption),
+        new { @class = "indicator-dropdown " + dropdownStyle + " validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        Year type
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.YearTypeId, CommonUtilities.GetYearTypes(pleaseSelectOption),
+        new { @class = "indicator-dropdown " + dropdownStyle + " validate-required", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        Decimal places to display
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.DecimalPlacesDisplayed, CommonUtilities.GetListOfDecimalPlaces(),
+        new { @class = "indicator-dropdown ignore-validation" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        Goal
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.TargetId, CommonUtilities.GetListOfTargets(),
+        new { @class = "indicator-dropdown ignore-validation" })
+</div>
+
+<div>
+    <label class="associated-detail-label">
+        <small>Warn about small numbers<br>when uploading data</small>
+    </label>
+    @Html.DropDownListFor(x => x.IndicatorMetadata.DisclosureControlId, CommonUtilities.GetListOfDisclosureControl(),
+        new { @class = "indicator-dropdown ignore-validation", onchange = "dropdownChanged(this)", onfocus = "dropdownFocus(this)" })
+</div>
+<div>
+    <label class="associated-detail-label">
+        "New data" override date
+    </label>
+    @Html.HiddenFor(x => x.IndicatorMetadata.LatestChangeTimestampOverride)
+    @Html.TextBox("LatestChangeTimestampOverride", string.Format("{0:dd-MM-yyyy}", Model.IndicatorMetadata.LatestChangeTimestampOverride),
+        new { @class = "dropdown-selected timestamp-override indicator-dropdown" })
+</div>
+<br>
+@* Checkboxes *@
+@{
+    var htmlAttributes = new RouteValueDictionary();
+    // User can only change checkbox if profile is owner
+    if (editAction && !doesProfileOwnIndicator)
+    {
+        htmlAttributes["disabled"] = "disabled";
+    }
+}
+<div class="checkbox">
+    @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowSexWithIndicatorName, htmlAttributes)
+    <label>
+        Always show sex with indicator name
+    </label>
+</div>
+<div class="checkbox">
+    @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowAgeWithIndicatorName, htmlAttributes)
+    <label >
+        Always show age with indicator name
+    </label>
+</div>
+<div class="checkbox">
+    @Html.CheckBoxFor(x => x.IndicatorMetadata.AlwaysShowSpineChart, htmlAttributes)
+    <label >
+        Display spine chart even if < 75% of values are valid
+    </label>
+</div>
+<div class="checkbox">
+    @Html.CheckBoxFor(x => x.IndicatorMetadata.ShouldAveragesBeCalculated, htmlAttributes)
+    <label>
+        Automatically calculate aggregated values for higher level geographies
+    </label>
+</div>

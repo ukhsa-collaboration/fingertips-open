@@ -16,7 +16,7 @@ namespace PholioVisualisation.DataConstructionTest
             var areaCode = CategoryArea.New(CategoryTypeIds.DeprivationDecileCountyAndUA2010, 1).Code;
 
             var groupData = new GroupDataAtDataPointRepository().GetGroupDataProcessed(areaCode,
-                AreaTypeIds.CountyAndUnitaryAuthority, ProfileIds.Phof,GroupIds.Phof_WiderDeterminantsOfHealth);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, ProfileIds.Phof,GroupIds.Phof_WiderDeterminantsOfHealth);
             Assert.IsNotNull(groupData.GroupRoots);
         }
 
@@ -27,7 +27,7 @@ namespace PholioVisualisation.DataConstructionTest
                 NearestNeighbourTypeIds.Cipfa, AreaCodes.CountyUa_Cambridgeshire);
 
             var groupData = new GroupDataAtDataPointRepository().GetGroupDataProcessed(areaCode,
-                AreaTypeIds.CountyAndUnitaryAuthority, ProfileIds.Phof, GroupIds.Phof_WiderDeterminantsOfHealth);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, ProfileIds.Phof, GroupIds.Phof_WiderDeterminantsOfHealth);
 
             // Check group roots are defined
             var groupRoots = groupData.GroupRoots;

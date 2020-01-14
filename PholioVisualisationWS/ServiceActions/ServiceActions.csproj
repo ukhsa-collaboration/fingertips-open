@@ -72,15 +72,14 @@
     <Compile Include="PartitionDataForAllCategories.cs" />
     <Compile Include="PartitionDataForAllSexes.cs" />
     <Compile Include="PartitionDataForAllSexesBuilder.cs" />
-    <Compile Include="NationalValuesForPdfsAction.cs" />
     <Compile Include="ParameterCheck.cs" />
     <Compile Include="PartitionTrendData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QuinaryPopulationDataCsvAction.cs" />
     <Compile Include="QuinaryPopulationDataAction.cs" />
+    <Compile Include="QuinaryPopulationDataActionBase.cs" />
     <Compile Include="SpcForDsrLimitsAction.cs" />
     <Compile Include="SpcForDsrLimitsResponseObject.cs" />
-    <Compile Include="SpineChartDataAction.cs" />
-    <Compile Include="SupportingInformationForPdfsAction.cs" />
     <Compile Include="TrendMarkersAction.cs" />
     <Compile Include="ValueLimitsAction.cs" />
   </ItemGroup>
@@ -105,17 +104,9 @@
       <Project>{ee646860-6872-48b7-b67f-b2d717953139}</Project>
       <Name>Formatting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\KeyMessages\KeyMessages.csproj">
-      <Project>{b7dac9ea-b25d-4800-9ba2-4d01570306d7}</Project>
-      <Name>KeyMessages</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Parsers\Parsers.csproj">
       <Project>{B01455EA-2060-4176-99A2-C4EF7908193F}</Project>
       <Name>Parsers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PdfData\PdfData.csproj">
-      <Project>{f9692ced-664f-49c2-92ab-d558979138e0}</Project>
-      <Name>PdfData</Name>
     </ProjectReference>
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{ad4a4236-be35-4b2a-b49d-28d514949984}</Project>

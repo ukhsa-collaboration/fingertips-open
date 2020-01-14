@@ -12,13 +12,23 @@ using Fpm.Search;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("search")]
     public class SearchController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-       
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
+
+        private readonly IProfileRepository _profileRepository;
+
         private string _userName;
 
-        private ProfileRepository _profileRepository;
+        public SearchController(IProfilesReader reader, IProfilesWriter writer, IProfileRepository profileRepository)
+        {
+            _reader = reader;
+            _writer = writer;
+
+            _profileRepository = profileRepository;
+        }
 
         protected override void Initialize(RequestContext requestContext)
         {
@@ -26,6 +36,8 @@ namespace Fpm.MainUI.Controllers
             _userName = UserDetails.CurrentUser().Name;
         }
 
+        [Route("search-all")]
+        [HttpGet]
         public ActionResult SearchAll(string searchTerm, string indicatorId)
         {
             var model = new List<DomainIndicatorsSearchResult>();
@@ -67,7 +79,7 @@ namespace Fpm.MainUI.Controllers
 
                         // Assign the rest
                         GroupingPlusName groupingPlusNames = _profileRepository
-                            .GetGroupingPlusNames(grouping.IndicatorId, grouping.GroupId, grouping.AreaTypeId, profile.Id)
+                            .GetGroupingPlusNames(grouping.IndicatorId, grouping.GroupId, grouping.AreaTypeId, profile.Id, profile.AreIndicatorNamesDisplayedWithNumbers)
                             .First(x => x.SexId == grouping.SexId &&
                                         x.AgeId == grouping.AgeId &&
                                         x.YearRange == grouping.YearRange);
@@ -86,18 +98,8 @@ namespace Fpm.MainUI.Controllers
             return View("SearchAll", model);
         }
 
-        private void LoadProfileAndDomainDropdowns()
-        {
-            List<SelectListItem> listOfProfiles =
-                CommonUtilities.GetOrderedListOfProfilesForCurrentUser(new BaseDataModel())
-                .ToList();
-            ViewBag.listOfProfiles = listOfProfiles;
-
-            var domains = new ProfileMembers();
-            var defaultProfile = listOfProfiles.FirstOrDefault();
-            ViewBag.ListOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile, _profileRepository);
-        }
-
+        [Route("copy-multiple-indicators")]
+        [HttpGet]
         public ActionResult CopyMultipleIndicators(string selectedIndicators, string selectedDomainId, string selectedProfileId)
         {
             var indicatorPropertiesList = selectedIndicators.Split(',').ToArray();
@@ -124,17 +126,113 @@ namespace Fpm.MainUI.Controllers
             return RedirectToAction("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators", new { ProfileKey = selectedProfileId });
         }
 
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        [Route("remove-multiple-indicators")]
+        [HttpGet]
+        public ActionResult RemoveMultipleIndicators(string selectedIndicators)
         {
-            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
-            base.OnActionExecuting(filterContext);
+            var model = new List<RemoveIndicatorModel>();
+            var indicatorPropertiesList = selectedIndicators.Split(',').ToArray();
+
+            var indicatorDeleteChecker = new RemoveIndicatorChecker(_reader);
+            var allAreaTypes = CommonUtilities.GetAllAreaTypes();
+
+            var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
+
+            foreach (var indicatorPropertiesString in indicatorPropertiesList)
+            {
+                var indicatorProperties = indicatorPropertiesString.Split('~');
+                var profileUrlKey = indicatorProperties[0];
+                var groupId = int.Parse(indicatorProperties[1]);
+                var indicatorId = int.Parse(indicatorProperties[2]);
+                var areaTypeId = int.Parse(indicatorProperties[3]);
+                var sexId = int.Parse(indicatorProperties[4]);
+                var ageId = int.Parse(indicatorProperties[5]);
+
+                var profile = GetProfile(profileUrlKey);
+                var indicatorMetadata = _reader.GetIndicatorMetadata(indicatorId);
+
+                var grouping = CommonUtilities
+                    .GetGroupingsByIndicatorIds(new List<int> {indicatorId})
+                    .Distinct(new DistinctGroupComparer()).First(x => x.GroupId == groupId);
+
+                var groupingMetadata = _reader.GetGroupingMetadata(groupId);
+
+
+                // Assign the rest
+                GroupingPlusName groupingPlusName = _profileRepository
+                    .GetGroupingPlusNames(indicatorId, groupId, areaTypeId, profile.Id, profile.AreIndicatorNamesDisplayedWithNumbers)
+                    .First(x => x.SexId == sexId &&
+                                x.AgeId == ageId &&
+                                x.YearRange == grouping.YearRange);
+
+                groupingPlusName.AreaType = allAreaTypes.First(x => x.Id == areaTypeId).ShortName;
+                groupingPlusName.ComparatorMethodId = grouping.ComparatorMethodId;
+                groupingPlusName.ComparatorId = grouping.ComparatorId;
+
+                // Get the user group permissions and assign it to the model
+                var userGroupPermissions = CommonUtilities.GetProfileUserPermissions(userPermissions, profileUrlKey);
+                var userHasPermissionToProfile = userGroupPermissions != null;
+
+                var indicatorCanBeRemoved = userHasPermissionToProfile && indicatorDeleteChecker.CanIndicatorBeRemoved(profile.Id, indicatorMetadata, groupingPlusName);
+
+                var removeIndicatorModel = new RemoveIndicatorModel
+                {
+                    UrlKey = profileUrlKey,
+                    Profile = GetProfile(profileUrlKey),
+                    GroupName = groupingMetadata.GroupName,
+                    Indicator = groupingPlusName,
+                    IndicatorCanBeRemoved = indicatorCanBeRemoved,
+                    UserHasPermissionToProfile = userHasPermissionToProfile
+                };
+
+                model.Add(removeIndicatorModel);
+            }
+
+            return PartialView("_RemoveMultipleIndicatorsConfirmation", model);
         }
 
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
+        [Route("confirm-remove-multiple-indicators")]
+        [HttpGet]
+        public ActionResult ConfirmRemoveMultipleIndicators(string removeMultipleIndicatorDetails)
         {
-            _profileRepository.Dispose();
-            base.OnActionExecuted(filterContext);
+            var indicatorPropertiesList = removeMultipleIndicatorDetails.Split(',').ToArray();
+
+            foreach (var indicatorPropertiesString in indicatorPropertiesList)
+            {
+                var indicatorProperties = indicatorPropertiesString.Split('~');
+                var profileId = int.Parse(indicatorProperties[0]);
+                var groupId = int.Parse(indicatorProperties[1]);
+                var indicatorId = int.Parse(indicatorProperties[2]);
+                var areaTypeId = int.Parse(indicatorProperties[3]);
+                var sexId = int.Parse(indicatorProperties[4]);
+                var ageId = int.Parse(indicatorProperties[5]);
+
+                GroupingRemover groupingRemover = new GroupingRemover(_reader, _profileRepository);
+                groupingRemover.RemoveGroupings(profileId, groupId, indicatorId, areaTypeId, sexId, ageId);
+
+                // Reorder sequence
+                _writer.ReorderIndicatorSequence(groupId, areaTypeId);
+            }
+
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
 
+        private void LoadProfileAndDomainDropdowns()
+        {
+            List<SelectListItem> listOfProfiles =
+                CommonUtilities.GetOrderedListOfProfilesForCurrentUser(new BaseDataModel())
+                    .Where(x => x.Value != "indicators-for-review").ToList();
+
+            ViewBag.listOfProfiles = listOfProfiles;
+
+            var domains = new ProfileMembers();
+            var defaultProfile = listOfProfiles.FirstOrDefault();
+            ViewBag.ListOfDomains = CommonUtilities.GetOrderedListOfDomainsWithGroupId(domains, defaultProfile, _profileRepository);
+        }
+
+        private Profile GetProfile(string urlKey, int selectedDomainNumber = 0, int areaType = AreaTypeIds.Undefined)
+        {
+            return new ProfileBuilder(_reader, _profileRepository).Build(urlKey, selectedDomainNumber, areaType);
+        }
     }
 }

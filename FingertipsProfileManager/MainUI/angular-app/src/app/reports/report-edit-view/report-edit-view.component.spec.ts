@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { ReportsService } from 'app/services/reports.service';
+import { ReportsService } from '../../services/reports.service';
 import { ReportEditViewComponent } from './report-edit-view.component';
 import { FormsModule } from '@angular/forms';
 

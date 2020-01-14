@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Fpm.MainUI.ViewModels;
 using Fpm.MainUI.ViewModels.Profile;
@@ -15,6 +16,9 @@ namespace Fpm.MainUI.Mappers
             var profileViewModel = new ProfileViewModel();
             AutoMapper.Mapper.Map(profileDetails, profileViewModel);
                 
+            // Override contact user id to support multiple contacts
+            profileViewModel.ContactUserIds = profileDetails.ContactUserIds.Split(',').ToList();
+
             return profileViewModel;
         }
 
@@ -22,7 +26,10 @@ namespace Fpm.MainUI.Mappers
         {
             var profileDetails = new ProfileDetails();
             AutoMapper.Mapper.Map(profileViewModel, profileDetails);
-            
+
+            // Override contact user id to support multiple contacts
+            profileDetails.ContactUserIds = String.Join(",", profileViewModel.ContactUserIds);
+
             profileDetails.ArePdfs = profileViewModel.SelectedPdfAreaTypes != null &&
                                      profileViewModel.SelectedPdfAreaTypes.Any();
 

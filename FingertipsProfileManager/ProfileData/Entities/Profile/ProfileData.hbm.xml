@@ -28,6 +28,7 @@
     <property name="IsLive" column="is_profile_live"/>
     <property name="IsProfileViewable" column="is_profile_viewable"/>
     <property name="ShowDataQuality" column="show_data_quality"/>
+    <property name="ShowOfficialStatistic" column="is_official_statistic"/>
     <property name="IsNational" column="is_national"/>
     <property name="HasOwnFrontPage" column="has_own_front_page"/>
     <property name="DefaultAreaTypeId" column="default_area_type_id"/>
@@ -39,7 +40,7 @@
     <property name="ExtraCssFiles" column="extra_css_files"/>
     <property name="AccessControlGroup" column="access_control_group"/>
     <property name="DefaultFingertipsTabId" column="default_fingertips_tab_id"/>
-    <property name="ContactUserId" column="contact_user_id"/>
+    <property name="ContactUserIds" column="contact_user_id"/>
     <property name="SpineChartMinMaxLabelId" column="spinechart_minmax_label_id"/>
     <property name="EnumParentDisplay" column="enum_parent_display"/>
     <property name="ShouldBuildExcel" column="should_build_excel"/>
@@ -54,6 +55,7 @@
     
     <property name="LeadProfileForCollectionIds" column="lead_profile_for_collection_ids"/>
     <property name="NewDataDeploymentCount" column="new_data_deployment_count"/>
+    <property name="AreIndicatorNamesDisplayedWithNumbers" column="are_indicator_names_displayed_with_numbers"/>
   </class>
   
   <!-- GroupingMetadata class -->
@@ -118,6 +120,15 @@
     <property name="AlwaysShowSpineChart" column="alwaysshowspinechart"/>
     <property name="DisclosureControlId" column="disclosurecontrolid"/>
     <property name="LatestChangeTimestampOverride" column="latestchangetimestampoverride" />
+    <property name="PartitionAgeIds" column="partitionageids" />
+    <property name="PartitionSexIds" column="partitionsexids" />
+    <property name="PartitionAreaTypeIds" column="partitionareatypeids" />
+    <property name="AlwaysShowSexWithIndicatorName" column="alwaysshowsexwithindicatorname" />
+    <property name="AlwaysShowAgeWithIndicatorName" column="alwaysshowagewithindicatorname" />
+    <property name="ShouldAveragesBeCalculated" column="shouldaveragesbecalculated" />
+    <property name="NextReviewTimestamp" column="nextreviewtimestamp" />
+    <property name="Status" column="status"/>
+    <property name="DestinationProfileId" column="destinationprofileid"/>
   </class>
 
   <!-- IndicatorMetadataTextProperty class -->
@@ -135,6 +146,7 @@
     <property name="IsSearchable" column="issearchable"/>
     <property name="DisplayOrder" column="displayorderinfpm"/>
     <property name="IsOverridable" column="isoverridable"/>
+    <property name="IsInternalMetadata" column="isinternalmetadata"/>
 
   </class>
 
@@ -148,44 +160,52 @@
     <property name="IndicatorId" column="indicatorid" />
     <property name="ProfileId" column="profileid"/>
     <property name="Name" column="[1_name]"/>
-    <property name="NameLong" column="[2_namelong]" />
     <property name="Definition" type="StringClob">
       <column name="[3_Definition]" sql-type="text"/>
     </property>
     <property name="Rationale" type="StringClob">
       <column name="[4_Rationale]" sql-type="text"/>
     </property>
-    <property name="Policy" column="[5_Policy]" />
-    <property name="DataSource" column="[6_DataSource]" />
-    <property name="Producer" column="[7_Producer]" />
-    <property name="IndSourceLink" column="[8_IndSourceLink]" />
+    <property name="DataSource" column="[6_DataSource]" type="StringClob" />
+    <property name="Producer" column="[7_Producer]" type="StringClob" />
+    <property name="IndSourceLink" column="[8_IndSourceLink]" type="StringClob" />
     <property name="IndMethod" type="StringClob">
       <column name="[9_IndMethod]" sql-type="text"/>
     </property>
-    <property name="StandardPop" column="[10_StandardPop]" />
-    <property name="CIMethod" column="[11_CIMethod]" />
-    <property name="CountSource" column="[12_CountSource]" />
-    <property name="CountDefinition" column="[13_CountDefinition]" />
-    <property name="DenomSource" column="[14_DenomSource]" />
-    <property name="DenomDefinition" column="[15_DenomDefinition]" />
-    <property name="DiscControl" column="[16_DiscControl]" />
+    <property name="StandardPop" column="[10_StandardPop]" type="StringClob" />
+    <property name="CIMethod" column="[11_CIMethod]" type="StringClob" />
+    <property name="CountSource" column="[12_CountSource]" type="StringClob" />
+    <property name="CountDefinition" column="[13_CountDefinition]" type="StringClob" />
+    <property name="DenomSource" column="[14_DenomSource]" type="StringClob" />
+    <property name="DenomDefinition" column="[15_DenomDefinition]" type="StringClob" />
+    <property name="DiscControl" column="[16_DiscControl]" type="StringClob" />
     <property name="Caveats" type="StringClob">
       <column name="[17_Caveats]" sql-type="text"/>
     </property>
-    <property name="Copyright" column="[18_Copyright]" />
-    <property name="Reuse" column="[19_Reuse]" />
-    <property name="Links" column="[20_Links]" />
-    <property name="RefNum" column="[21_RefNum]" />
+    <property name="Copyright" column="[18_Copyright]" type="StringClob" />
+    <property name="Reuse" column="[19_Reuse]" type="StringClob" />
+    <property name="Links" column="[20_Links]" type="StringClob" />
+    <property name="RefNum" column="[21_RefNum]" type="StringClob" />
     <property name="Notes" type="StringClob">
       <column name="[22_Notes]" sql-type="text"/>
     </property>
-    <property name="Frequency" column="[23_Frequency]" />
-    <property name="Rounding" column="[24_Rounding]" />
+    <property name="Frequency" column="[23_Frequency]" type="StringClob" />
+    <property name="Rounding" column="[24_Rounding]" type="StringClob" />
     <property name="DataQuality" column="[25_DataQuality]" />
-    <property name="IndicatorContent" column="[26_IndicatorContent]" />
+    <property name="IndicatorContent" column="[26_IndicatorContent]" type="StringClob" />
     <property name="SpecificRationale" type="StringClob">
       <column name="[27_SpecificRationale]" sql-type="text"/>
     </property>
+    <property name="Keywords" column="[28_Keywords]" type="StringClob" />
+    <property name="EvidOfVariability" column="[29_EvidOfVariability]" type="StringClob" />
+    <property name="JustifConfIntMeth" column="[30_JustifConfIntMeth]" type="StringClob" />
+    <property name="QualityAssurance" column="[31_QualityAssurance]" type="StringClob" />
+    <property name="QualityImprPlan" column="[32_QualityImprPlan]" type="StringClob" />
+    <property name="JustiOfExclusions" column="[33_JustiOfExclusions]" type="StringClob" />
+    <property name="JustifOfDataSources" column="[34_JustifOfDataSources]" type="StringClob" />
+    <property name="SponsorStakeholders" column="[35_SponsorStakeholders]" type="StringClob" />
+    <property name="IndOwnerContDet" column="[36_IndOwnerContDet]" type="StringClob" />
+    <property name="Comments" column="[37_Comments]" type="StringClob" />
   </class>
 
   <!-- Indicator Audit class -->
@@ -340,6 +360,18 @@
     <property name="Subheading" column="subheading"/>
     <property name="Sequence" column="sequence"/>
   </class>
+
+  <!-- IndicatorMetadataReviewAudit class -->
+  <class name="IndicatorMetadataReviewAudit" table="FPM_IndicatorMetadataReviewAudit">
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+    <property name="IndicatorId" column="indicatorid"/>
+    <property name="AuditTypeId" column="audittypeid"/>
+    <property name="Notes" column="notes"/>
+    <property name="Timestamp" column="timestamp"/>
+    <property name="UserId" column="userid"/>
+  </class>
   
   <!-- SQL Queries -->
   <sql-query name="GetIndicatorMetadataTextValues">
@@ -385,9 +417,9 @@
     SELECT Distinct [1_Name] as IndicatorName, imtv.IndicatorID as IndicatorId, imtv.ProfileId as ProfileId,
     g.GroupId, g.Sequence, g.AgeId, g.SexId, AreaTypeId,
     YearRange, BaselineYear, BaselineQuarter, BaselineMonth, DatapointYear, DatapointQuarter, DatapointMonth,
-    s.Sex, cast(g.ComparatorConfidence as VARCHAR) as ComparatorConfidence ,
-    g.ComparatorMethodId, cm.ShortName as ComparatorMethod, im.YearTypeID as YearTypeId ,
-    L_Ages.Age
+    s.Sex, cast(g.ComparatorConfidence as VARCHAR) as ComparatorConfidence,
+    g.ComparatorMethodId, cm.ShortName as ComparatorMethod, im.YearTypeID as YearTypeId,
+    L_Ages.Age, [21_RefNum] as IndicatorNumber
     FROM IndicatorMetadataTextValues imtv
     INNER JOIN grouping g ON imtv.IndicatorID = g.IndicatorID
     INNER JOIN L_Sexes s ON g.SexID = s.SexID

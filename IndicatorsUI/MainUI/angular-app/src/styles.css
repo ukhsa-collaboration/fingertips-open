@@ -1,6 +1,34 @@
 /* You can add global styles to this file, and also import other style files */
 
 #download-container p {
-    line-height: 1.4em;
-    margin: 0;
-    }
+  line-height: 1.4em;
+  margin: 0;
+}
+
+/* Indicator header */
+.data-header-container {
+  border-bottom: 5px solid;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding-bottom: 5px;
+  font-weight: bold;
+}
+
+.data-main-header {
+  float: left;
+  font-size: 1.3em;
+  margin-left: -15px;
+}
+
+.sub-content {
+  font-size: 11px;
+  padding-top: 6px;
+  margin-left: 10px;
+}
+
+.data-secondary-header {
+  float: right;
+  font-size: 11px;
+  padding-top: 6px;
+  margin-right: -15px;
+}

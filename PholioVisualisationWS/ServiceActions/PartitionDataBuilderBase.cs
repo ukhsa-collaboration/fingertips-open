@@ -19,6 +19,7 @@ namespace PholioVisualisation.ServiceActions
         protected Grouping _grouping;
         protected IndicatorMetadata _indicatorMetadata;
         protected IndicatorMetadataSpecialCase _specialCase;
+        protected TimePeriod _timePeriod;
 
         protected void InitMetadata(Grouping grouping)
         {
@@ -27,6 +28,19 @@ namespace PholioVisualisation.ServiceActions
             _specialCase = _indicatorMetadata.HasSpecialCases
                 ? new IndicatorMetadataSpecialCase(_indicatorMetadata.SpecialCases)
                 : null;
+        }
+
+        protected void InitTimePeriod(int profileId, Grouping grouping)
+        {
+            _timePeriod = TimePeriod.GetDataPoint(grouping);
+
+            // If it is a search or profile id is not provided then
+            // get all data including the recent time period
+            if (profileId == ProfileIds.Undefined || profileId == ProfileIds.Search)
+            {
+                var maxYear = _groupDataReader.GetCoreDataMaxYear(grouping.IndicatorId);
+                _timePeriod.Year = maxYear;
+            }
         }
 
         protected void FormatData(IList<CoreDataSet> dataList)
@@ -75,7 +89,7 @@ namespace PholioVisualisation.ServiceActions
             return null;
         }
 
-        private IndicatorComparisonHelper GetIndicatorComparisonHelper()
+        protected IndicatorComparisonHelper GetIndicatorComparisonHelper()
         {
             var targetComparerProvider = new TargetComparerProvider(_groupDataReader, _areasReader);
             var indicatorComparisonHelper = new IndicatorComparisonHelper(_indicatorMetadata,
@@ -103,10 +117,10 @@ namespace PholioVisualisation.ServiceActions
             IList<TimePeriod> timePeriods)
         {
             int earliestIndexRemoved = dictionaryBuilder.RemoveEarlyEmptyYears();
+
             return earliestIndexRemoved > -1
                 ? timePeriods.Skip(earliestIndexRemoved + 1).ToList()
                 : timePeriods;
         }
-
     }
 }

@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstructionTest
         public static ParentArea GetRegion102()
         {
             return new ParentArea(AreaCodes.Gor_EastOfEngland,
-                AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
         }
 
         public static ParentArea GetShaForPct()

@@ -17,7 +17,7 @@ export class LightBoxIndicatorReorderComponent implements OnChanges {
   showLightBox = false;
   isInfoBox = false;
   lightBoxInputText: string;
-  errorMessage: string;
+  errorMessage = '';
 
   constructor(private ref: ChangeDetectorRef, private sanitizer: DomSanitizer) { }
 
@@ -48,7 +48,7 @@ export class LightBoxIndicatorReorderComponent implements OnChanges {
   }
 
   setLightBoxInputText() {
-    this.lightBoxInputText = (<HTMLInputElement>document.getElementById("txt-light-box")).value;
+    this.lightBoxInputText = (<HTMLInputElement>document.getElementById('txt-light-box')).value;
     this.closePopupAndEmit(true);
   }
 
@@ -62,7 +62,7 @@ export class LightBoxIndicatorReorderComponent implements OnChanges {
         this.isInfoBox = false;
         this.emitLightBoxInputText.emit(this.lightBoxInputText);
       } else {
-        this.errorMessage = "Please enter a valid " + this.lightBoxIndicatorReorderConfig.InputBoxLabelName;
+        this.errorMessage = 'Please enter a valid ' + this.lightBoxIndicatorReorderConfig.InputBoxLabelName;
         return false;
       }
     }

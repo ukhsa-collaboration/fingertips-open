@@ -9,7 +9,6 @@ namespace PholioVisualisation.Export
         private CoreDataCollector _parentCoreDataCollector = new CoreDataCollector();
         private CoreDataCollector _childCoreDataCollector = new CoreDataCollector();
 
-
         public IList<CoreDataSet> GetDataListForEngland(CoreDataSet coreData)
         {
             return _englandCoreDataCollector.GetDataListForArea(coreData);

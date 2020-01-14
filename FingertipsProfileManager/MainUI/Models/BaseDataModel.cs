@@ -40,9 +40,9 @@ namespace Fpm.MainUI.Models
                    UserGroupPermissions.ProfileId == Profile.Id;
         }
 
-        public bool IsArchiveProfile()
+        public bool IsUnassignedProfile()
         {
-            return Profile.Id == ProfileIds.ArchivedIndicators;
+            return Profile.Id == ProfileIds.UnassignedIndicators;
         }
     }
 }

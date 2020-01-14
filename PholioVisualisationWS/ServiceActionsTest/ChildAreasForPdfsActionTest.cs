@@ -9,7 +9,7 @@ namespace PholioVisualisation.ServiceActionsTest
     public class ChildAreasForPdfsActionTest
     {
         private const string parentCode = AreaCodes.Gor_SouthEast;
-        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
         [TestMethod]
         public void TestGetData_BenchmarkArea()

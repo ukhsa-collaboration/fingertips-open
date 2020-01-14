@@ -3,6 +3,7 @@ using PholioVisualisation.Export;
 using PholioVisualisation.Export.FileBuilder.Containers;
 using PholioVisualisation.Export.FileBuilder.Wrappers;
 using System.Collections.Generic;
+using PholioVisualisation.Export.FileBuilder.SupportModels;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.ExportTest.FileBuilder.Containers
@@ -22,8 +23,8 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         public void SetUp()
         {
 
-            _generalParameters = new IndicatorExportParameters { ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority };
-            _onDemandParameters = new OnDemandQueryParametersWrapper(_key, new List<int> { _key }, new Dictionary<int, IList<Inequality>> { { _key, null } },  new List<string> { _stringTest }, new List<int> { _key });
+            _generalParameters = new IndicatorExportParameters { ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 };
+            _onDemandParameters = new OnDemandQueryParametersWrapper(_key, new List<int> { _key }, new Dictionary<int, IList<InequalitySearch>> { { _key, null } },  new List<string> { _stringTest }, new List<int> { _key });
         }
 
         [TestMethod]

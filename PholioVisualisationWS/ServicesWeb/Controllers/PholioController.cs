@@ -232,10 +232,8 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                     throw new FingertipsException(errorMessage);
                 }
 
-                // Create an instance of fpm core dat set repository
-                CoreDataSetRepository repository = new CoreDataSetRepository();
-
                 // Replace core data sets for indicator
+                var repository = new CoreDataSetRepository();
                 repository.ReplaceCoreDataSetForAnIndicator(coreDataSets);
 
                 // Set the success to true

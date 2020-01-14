@@ -1,23 +1,45 @@
 ﻿/**
- * Open email dialog to enable users to share an indicator list
+ * Open dialog to enable users to share an indicator list
  */
-function openEmailDialog(e, publicId, listName) {
+function openShareIndicatorListDialog(e, publicId, listName) {
+    var href = $(e).prop('href');
 
     // Determine HTTP protocol
     var parser = document.createElement('a');
     parser.href = window.location.href;
     var protocol = parser.protocol;
+    var url = protocol + FT.url.bridge + 'indicator-list/view/' + publicId;
 
-    var subject = "Public Health Data";
+    // Display pop up asking to copy link to clipboard
+    tooltipManager.init();
+    var template = 'ShareIndicatorList';
+    templates.add(template,
+        '<div style="padding:15px;">' +
+            '<h2>Share indicator list</h2>' +
+            '<p style="margin-bottom: 10px;">' +
+                'Click on the button below to copy the URL to clipboard.' +
+                '<br>' +
+                'You can then share the copied URL by email.' +
+                '<br><br>' +
+                '<input type="text" id="indicator-list-url" class="indicator-list-url" value="' + url + '">' +
+            '</p>' +
+            '<div>' +
+                '<button class="btn btn-primary" onclick="copyToClipboard()">Copy to clipboard</button>' +
+                '<a class="btn" href="javascript:lightbox.hide();">Cancel</a>' +
+            '</div>' +
+        '</div>');
 
-    var newLine = '%0D%0A';
+    var html = templates.render(template, { href: href });
+    var popupWidth = 600;
+    var left = lightbox.getLeftForCenteredPopup(popupWidth);
+    var top = 300;
+    lightbox.show(html, top, left, popupWidth);
+}
 
-    var mailTo = [
-        "mailto:?subject=", subject, "&body=", newLine, newLine, listName, " ",
-        protocol, FT.url.bridge, "indicator-list/view/", publicId
-    ].join('');
-
-    window.location.href = mailTo;
+function copyToClipboard() {
+    var copyUrl = document.getElementById("indicator-list-url");
+    copyUrl.select();
+    document.execCommand("copy");
 }
 
 function deleteConfirm(e) {
@@ -29,7 +51,7 @@ function deleteConfirm(e) {
     tooltipManager.init();
     var template = 'confirm';
     templates.add(template, '<div style="padding:15px;"><h3>Are you sure you want to delete this list?</h3><br>' +
-        '<a style="width:70px;" class="btn btn-primary" href="{{href}}">OK</a><a class="btn" href="javascript:lightbox.hide();">Cancel</a></div>');
+        '<a id="btn-delete-confirm-indicator-list" style="width:70px;" class="btn btn-primary" href="{{href}}">OK</a><a class="btn" href="javascript:lightbox.hide();">Cancel</a></div>');
     var html = templates.render(template, { href: href });
     var popupWidth = 500;
     var left = lightbox.getLeftForCenteredPopup(popupWidth);
@@ -41,10 +63,8 @@ function deleteConfirm(e) {
 }
 
 function copyConfirm(e, publicId, listName) {
-    // URL of delete action
+    // URL of copy action
     var href = $(e).prop('href');
-
-    console.log(e);
 
     // Display pop up asking to confirm copying of the indicator list
     tooltipManager.init();
@@ -68,7 +88,7 @@ function copyConfirm(e, publicId, listName) {
     var popupWidth = 500;
     var left = lightbox.getLeftForCenteredPopup(popupWidth);
     var top = 400;
-        lightbox.show(html, top, left, popupWidth);
+    lightbox.show(html, top, left, popupWidth);
 
     // Ignore initial link click
     return false;

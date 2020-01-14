@@ -1,9 +1,11 @@
-import { Component, OnInit, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { Profile } from 'app/model/profile';
-import { ProfileService } from 'app/services/profile.service';
-import { Report } from 'app/model/report';
-import { ReportsService } from 'app/services/reports.service';
-import { Observable } from 'rxjs';
+
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Profile, AreaType } from '../model/profile';
+import { ProfileService } from '../services/profile.service';
+import { Report, ReportListView } from '../model/report';
+import { ReportsService } from '../services/reports.service';
+import { forkJoin } from 'rxjs';
+import { ReportStatus } from './reports';
 
 @Component({
   selector: 'app-reports',
@@ -17,7 +19,8 @@ export class ReportsComponent implements OnInit {
   profiles: Profile[];
   userProfiles: Profile[];
   reports: Report[];
-  selectedReport: Report;
+  areaTypes: AreaType[];
+  selectedReport: ReportListView;
 
   constructor(private profileService: ProfileService,
     private reportsService: ReportsService,
@@ -40,14 +43,38 @@ export class ReportsComponent implements OnInit {
     const profilesObservable = this.profileService.getAllProfiles();
     const userProfilesObservable = this.profileService.getUserProfiles();
     const reportsObservable = this.reportsService.getReports();
+    const areaTypesObservable = this.profileService.getAllAreaTypes();
 
-    Observable.forkJoin([profilesObservable, userProfilesObservable, reportsObservable]).subscribe(results => {
-      this.profiles = <Profile[]>results[0];
-      this.userProfiles = <Profile[]>results[1];
-      this.reports = <Report[]>results[2];
+    forkJoin([profilesObservable, userProfilesObservable,
+      reportsObservable, areaTypesObservable]).subscribe(results => {
 
-      this.ref.detectChanges();
+        this.profiles = <Profile[]>results[0];
+        this.userProfiles = <Profile[]>results[1];
+        this.reports = <Report[]>results[2];
+        this.areaTypes = this.getSupportedAreaTypes(<AreaType[]>results[3]);
+
+        this.ref.detectChanges();
+      });
+  }
+
+  getSupportedAreaTypes(areaTypes: AreaType[]): AreaType[] {
+    let supportedAreaTypes: AreaType[] = [];
+
+    supportedAreaTypes = areaTypes.filter(x => x.IsCurrent === true && x.IsSupported === true);
+
+    supportedAreaTypes.sort((areaTypeA: AreaType, areaTypeB: AreaType) => {
+      if (areaTypeA.ShortName > areaTypeB.ShortName) {
+        return 1;
+      }
+
+      if (areaTypeA.ShortName < areaTypeB.ShortName) {
+        return 0;
+      }
+
+      return 0;
     });
+
+    return supportedAreaTypes;
   }
 
   getReportViewStatus(status) {
@@ -59,10 +86,4 @@ export class ReportsComponent implements OnInit {
     this.status = listViewState.status;
     this.selectedReport = listViewState.selectedReport;
   }
-}
-
-export enum ReportStatus {
-  New = 0,
-  Edit = 1,
-  List = 2
 }

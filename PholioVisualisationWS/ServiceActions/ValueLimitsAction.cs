@@ -45,7 +45,7 @@ namespace PholioVisualisation.ServiceActions
             var groupings = groupDataReader
                 .GetGroupingsByGroupIdAndAreaTypeIdOrderedBySequence(groupId, areaTypeId);
 
-            return new GroupRootBuilder().BuildGroupRoots(groupings);
+            return new GroupRootBuilder(groupDataReader).BuildGroupRoots(groupings);
         }
     }
 }

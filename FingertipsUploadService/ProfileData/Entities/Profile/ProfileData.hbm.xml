@@ -21,6 +21,7 @@
 
     <property name="OwnerProfileId" column="ownerprofileId"/>
     <property name="DisclosureControlId" column="disclosurecontrolid"/>
+    <property name="Status" column="status"/>
   </class>
 
   <!--DisclosureControl-->

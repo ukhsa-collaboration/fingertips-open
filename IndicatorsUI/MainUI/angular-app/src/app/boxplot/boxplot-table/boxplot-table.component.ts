@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { BoxplotData } from '../boxplot';
+import { BoxplotDataForTable } from '../boxplot';
+import { CommaNumber } from '../../shared/shared';
 
 @Component({
   selector: 'ft-boxplot-table',
@@ -8,5 +9,15 @@ import { BoxplotData } from '../boxplot';
 })
 export class BoxplotTableComponent {
 
-  @Input() boxplotData: BoxplotData;
+  @Input() boxplotDataForTable: BoxplotDataForTable[];
+
+  getValueAndUnit(data: BoxplotDataForTable, value: string): string {
+    return new CommaNumber(value).unrounded() + data.unitLabel;
+  }
+
+  getTrendSource(): string {
+    if (this.boxplotDataForTable.length > 0) {
+      return this.boxplotDataForTable[0].trendSource;
+    }
+  }
 }

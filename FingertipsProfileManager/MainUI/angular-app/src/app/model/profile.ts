@@ -52,7 +52,9 @@ export class ReorderIndicator {
     IndicatorId?: number;
     IndicatorName: string;
     Sequence?: number;
+    SexId: number;
     Sex: string;
+    AgeId: number;
     Age: string;
     IsSubheading: boolean;
 }

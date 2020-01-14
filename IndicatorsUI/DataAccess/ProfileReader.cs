@@ -1,4 +1,5 @@
-﻿using NHibernate;
+﻿using System;
+using NHibernate;
 using NHibernate.Criterion;
 using IndicatorsUI.DomainObjects;
 using System.Collections.Generic;
@@ -88,12 +89,20 @@ namespace IndicatorsUI.DataAccess
                 CurrentSession.Clear();
             }
 
-            var contentItem = CurrentSession.CreateCriteria<ContentItem>()
-                .SetCacheable(true)
-                .Add(Restrictions.Eq("ContentKey", contentKey))
-                .Add(Restrictions.Eq("ProfileId", profileId))
-                .UniqueResult<ContentItem>();
-            return contentItem;
+            try
+            {
+                var contentItem = CurrentSession.CreateCriteria<ContentItem>()
+                    .SetCacheable(true)
+                    .Add(Restrictions.Eq("ContentKey", contentKey))
+                    .Add(Restrictions.Eq("ProfileId", profileId))
+                    .UniqueResult<ContentItem>();
+
+                return contentItem;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public IList<ProfileCollectionItem> GetProfileCollectionItems(int profilecollectionid)

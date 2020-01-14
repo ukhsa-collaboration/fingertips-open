@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
@@ -13,7 +14,9 @@ namespace PholioVisualisation.DataConstruction
         {
             this._groupDataReader = groupDataReader;
         }
-
+        /// <summary>
+        /// Retrieve benchmark data from database or else calculate the average
+        /// </summary>
         public CoreDataSet GetBenchmarkData(Grouping grouping, TimePeriod timePeriod,
             AverageCalculator averageCalculator, IArea parentArea)
         {
@@ -22,12 +25,28 @@ namespace PholioVisualisation.DataConstruction
             if (benchmarkData == null && averageCalculator != null)
             {
                 benchmarkData = averageCalculator.Average;
-                if (benchmarkData != null)
-                {
-                    SetAreaCode(parentArea, benchmarkData);
-                    benchmarkData.AgeId = grouping.AgeId;
-                    benchmarkData.SexId = grouping.SexId;
-                }
+                AssignDataProperties(grouping, timePeriod, parentArea, benchmarkData);
+            }
+
+            if (benchmarkData == null)
+            {
+                benchmarkData = CoreDataSet.GetNullObject(parentArea.Code);
+            }
+
+            return benchmarkData;
+        }
+
+        /// <summary>
+        /// Calculate the average
+        /// </summary>
+        public CoreDataSet CalculateBenchmarkDataAverage(Grouping grouping, TimePeriod timePeriod, AverageCalculator averageCalculator, IArea parentArea)
+        {
+            CoreDataSet benchmarkData = null;
+
+            if (averageCalculator != null)
+            {
+                benchmarkData = averageCalculator.Average;
+                AssignDataProperties(grouping, timePeriod, parentArea, benchmarkData);
             }
 
             if (benchmarkData == null)
@@ -54,6 +73,22 @@ namespace PholioVisualisation.DataConstruction
                 data.AreaCode = area.Code;
                 data.CategoryTypeId = CategoryTypeIds.Undefined;
                 data.CategoryId = CategoryIds.Undefined;
+            }
+        }
+
+        private void AssignDataProperties(Grouping grouping, TimePeriod timePeriod, IArea parentArea, CoreDataSet benchmarkData)
+        {
+            if (benchmarkData != null)
+            {
+                SetAreaCode(parentArea, benchmarkData);
+                benchmarkData.AgeId = grouping.AgeId;
+                benchmarkData.SexId = grouping.SexId;
+
+                // Assign time properties
+                benchmarkData.YearRange = timePeriod.YearRange;
+                benchmarkData.Year = timePeriod.Year;
+                benchmarkData.Quarter = timePeriod.Quarter;
+                benchmarkData.Month = timePeriod.Month;
             }
         }
 

@@ -59,7 +59,17 @@ namespace FingertipsUploadService.Upload
 
             ReplaceMinusOnesWithNull(data);
 
+            ReplaceMinusOneValueNoteWithNoNote(data);
+
             return data;
+        }
+
+        private static void ReplaceMinusOneValueNoteWithNoNote(UploadDataModel data)
+        {
+            if (data.ValueNoteId == UndefinedInt)
+            {
+                data.ValueNoteId = ValueNoteIds.NoNote;
+            }
         }
 
         private static void ReplaceMinusOnesWithNull(UploadDataModel data)

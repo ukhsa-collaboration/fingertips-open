@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using PholioVisualisation.Analysis;
+using PholioVisualisation.Analysis.TrendMarkers;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
 using PholioVisualisation.PholioObjects;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.DataConstructionTest
 {

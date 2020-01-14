@@ -1,17 +1,15 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IndicatorsReorderViewComponent } from './indicators-reorder-view.component';
-import { LightBoxComponent } from 'app/shared/component/light-box/light-box.component';
-import { LightBoxIndicatorReorderComponent } from 'app/shared/component/light-box-indicator-reorder/light-box-indicator-reorder.component';
-import { ProfileService } from 'app/services/profile.service';
-import { HttpService } from 'app/services/http.service';
-import { Http } from '@angular/http';
+import { LightBoxComponent } from '../../shared/component/light-box/light-box.component';
+import { LightBoxIndicatorReorderComponent } from '../../shared/component/light-box-indicator-reorder/light-box-indicator-reorder.component';
+import { ProfileService } from '../../services/profile.service';
+import { HttpService } from '../../services/http.service';
+import { HttpClient } from '@angular/common/http';
 
 describe('IndicatorsReorderViewComponent', () => {
 
     let component: IndicatorsReorderViewComponent;
-    let lightBoxComponent: LightBoxComponent;
-    let lightBoxIndicatorReorderComponent: LightBoxIndicatorReorderComponent;
     let fixture: ComponentFixture<IndicatorsReorderViewComponent>;
 
     let mockProfileService: any;
@@ -20,7 +18,7 @@ describe('IndicatorsReorderViewComponent', () => {
     beforeEach(async(() => {
 
         mockProfileService = jasmine.createSpyObj('ProfileService',
-            ['getAllAreaTypes', 'getDomainName', 'getGroupingPlusNames', 'getGroupingSubheadingsForProfile', 'saveReorderedIndicators',]);
+            ['getAllAreaTypes', 'getDomainName', 'getGroupingPlusNames', 'getGroupingSubheadingsForProfile', 'saveReorderedIndicators']);
         mockHttpService = jasmine.createSpyObj('HttpService', ['httpGet', 'httpPost']);
 
         TestBed.configureTestingModule({
@@ -33,7 +31,7 @@ describe('IndicatorsReorderViewComponent', () => {
             providers: [
                 { provide: ProfileService, useValue: mockProfileService },
                 { provide: HttpService, useValue: mockHttpService },
-                { provide: Http }
+                { provide: HttpClient }
             ]
         })
             .compileComponents();

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
@@ -10,11 +11,23 @@ namespace PholioVisualisation.DataConstruction
     {
         // set required: Automatically implemented properties must define both get and set accessors
         private IList<GroupRoot> GroupRoots { get; set; }
-        private GroupRoot root;
 
-        public GroupRootBuilder()
+        private GroupRoot root;
+        private readonly bool _isCommonestPolarity;
+        private readonly IGroupDataReader _groupDataReader;
+
+        public GroupRootBuilder(IGroupDataReader groupDataReader)
         {
             GroupRoots = new List<GroupRoot>();
+            _isCommonestPolarity = false;
+            _groupDataReader = groupDataReader;
+        }
+
+        public GroupRootBuilder(int profileId, IGroupDataReader groupDataReader)
+        {
+            GroupRoots = new List<GroupRoot>();
+            _isCommonestPolarity = PolarityHelper.ShouldUseCommonestPolarity(profileId);
+            _groupDataReader = groupDataReader;
         }
 
         public IList<GroupRoot> BuildGroupRoots(IList<Grouping> groupings)
@@ -28,8 +41,32 @@ namespace PholioVisualisation.DataConstruction
 
                 if (groupingsWithSameIndicatorId.Any())
                 {
-                    var stateSex = groupingsWithSameIndicatorId.Select(x => x.SexId).Distinct().Count() > 1;
-                    var stateAge = groupingsWithSameIndicatorId.Select(x => x.AgeId).Distinct().Count() > 1;
+                    // State sex
+                    bool stateSex;
+                    var alwaysShowSexWithIndicatorName =
+                        _groupDataReader.GetIndicatorMetadataAlwaysShowSexWithIndicatorName(indicatorId);
+
+                    if (alwaysShowSexWithIndicatorName)
+                    {
+                        stateSex = true;
+                    }
+                    else
+                    {
+                        stateSex = groupingsWithSameIndicatorId.Select(x => x.SexId).Distinct().Count() > 1;
+                    }
+
+                    // State age
+                    bool stateAge;
+                    var alwaysShowAgeWithIndicatorName =
+                        _groupDataReader.GetIndicatorMetadataAlwaysShowAgeWithIndicatorName(indicatorId);
+                    if (alwaysShowAgeWithIndicatorName)
+                    {
+                        stateAge = true;
+                    }
+                    else
+                    {
+                        stateAge = groupingsWithSameIndicatorId.Select(x => x.AgeId).Distinct().Count() > 1;
+                    }
 
                     var groupingsPerRoot = groupingsWithSameIndicatorId
                         .GroupBy(g => new {
@@ -63,8 +100,7 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        private void CreateNewRoot(List<Grouping> groupingsWithSameIndicatorIdSexIdAndAgeId,
-            bool stateSex, bool stateAge)
+        private void CreateNewRoot(List<Grouping> groupingsWithSameIndicatorIdSexIdAndAgeId, bool stateSex, bool stateAge)
         {
             // Get distinct comparator groupings (1 & 4) for these indicators
             var comparatorIds = groupingsWithSameIndicatorIdSexIdAndAgeId.Select(x => x.ComparatorId).Distinct();
@@ -81,6 +117,7 @@ namespace PholioVisualisation.DataConstruction
             GroupRoots.Add(root);
             AssignGroupings(newGroupings);
             AssignPropertiesFromGrouping(newGroupings.First());
+            SetPolarityId(root.IndicatorId);
             root.StateSex = stateSex;
             root.StateAge = stateAge;
         }
@@ -102,6 +139,21 @@ namespace PholioVisualisation.DataConstruction
             {
                 root.Add(grouping);
             }
+        }
+
+        private void SetPolarityId(int indicatorId)
+        {
+            if (_isCommonestPolarity)
+            {
+                var polarityId = PolarityHelper.GetCommonestPolarityForIndicator(indicatorId);
+
+                // Ensure groupings have consistent polarity with the root
+                root.PolarityId = polarityId;
+                foreach (var groupingA in root.Grouping)
+                {
+                    groupingA.PolarityId = polarityId;
+                }
+            } 
         }
     }
 }

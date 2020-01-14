@@ -1,7 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PholioVisualisation.PholioObjects;
-using System.Diagnostics;
-using System.Net;
 
 namespace PholioVisualisation.ServicesTest
 {
@@ -11,12 +9,27 @@ namespace PholioVisualisation.ServicesTest
     [TestClass]
     public class DataControllerEndPointTest
     {
+        /// <summary>
+        /// Try and get population data as this is compiled differently to other data
+        /// </summary>
+        [TestMethod]
+        public void TestGetAllDataAsCsvByProfileId_Populations()
+        {
+            var url = "all_data/csv/by_profile_id?" +
+                      "parent_area_type_id=" + AreaTypeIds.GoRegion +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
+                      "&profile_id=" + ProfileIds.Populations;
+            byte[] data = GetData(url);
+
+            TestHelper.IsData(data);
+        }
+
         [TestMethod]
         public void TestGetAllDataAsCsvByProfileId()
         {
             var url = "all_data/csv/by_profile_id?" +
                       "parent_area_type_id=" + AreaTypeIds.GoRegion +
-                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                       "&profile_id=" + ProfileIds.HealthProfiles;
             byte[] data = GetData(url);
 
@@ -28,7 +41,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "all_data/csv/by_group_id?" +
                       "parent_area_type_id=" + AreaTypeIds.GoRegion +
-                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                       "&group_id=" + GroupIds.Phof_HealthProtection;
             byte[] data = GetData(url);
 
@@ -40,8 +53,8 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "all_data/csv/by_indicator_id?" +
                       "parent_area_type_id=" + AreaTypeIds.GoRegion +
-                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
-                      "&indicator_ids=" + IndicatorIds.AdultSmokingPrevalence;
+                      "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
+                      "&indicator_ids=" + IndicatorIds.AgedOver85Years;
             byte[] data = GetData(url);
 
             TestHelper.IsData(data);
@@ -53,7 +66,7 @@ namespace PholioVisualisation.ServicesTest
             var url = "recent_trends/for_child_areas?" +
                       "parent_area_code=" + AreaCodes.England +
                       "&group_id=" + GroupIds.Phof_WiderDeterminantsOfHealth +
-                      "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                      "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                       "&indicator_id=" + IndicatorIds.ChildrenInLowIncomeFamilies +
                       "&sex_id=" + SexIds.Persons +
                       "&age_id=" + AgeIds.Under16;
@@ -67,7 +80,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "indicator_statistics?" +
                 "group_id=" + GroupIds.Phof_HealthProtection +
-                "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.England;
             byte[] data = GetData(url);
 
@@ -79,7 +92,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "partition_data/by_category?" +
                 "profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_code=" + AreaCodes.England +
                 "&indicator_id=" + IndicatorIds.LifeExpectancyAtBirth +
                 "&sex_id=" + SexIds.Male +
@@ -94,7 +107,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "partition_trend_data/by_category?" +
                 "profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_code=" + AreaCodes.England +
                 "&indicator_id=" + IndicatorIds.LifeExpectancyAtBirth +
                 "&sex_id=" + SexIds.Male +
@@ -110,7 +123,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "grouproot_summaries/by_profile_id?" +
                       "profile_id=" + ProfileIds.Phof +
-                      "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority;
+                      "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             byte[] data = GetData(url);
 
             TestHelper.IsData(data);
@@ -132,7 +145,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "partition_trend_data/by_sex?" +
                 "profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_code=" + AreaCodes.England +
                 "&indicator_id=" + IndicatorIds.LifeExpectancyAtBirth +
                 "&age_id=" + AgeIds.AllAges;
@@ -146,7 +159,7 @@ namespace PholioVisualisation.ServicesTest
         {
             var url = "partition_trend_data/by_age?" +
                 "profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_code=" + AreaCodes.England +
                 "&indicator_id=" + IndicatorIds.LifeExpectancyAtBirth +
                 "&sex_id=" + SexIds.Male;
@@ -198,7 +211,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetProfilesPerIndicator()
         {
             byte[] data = GetData("profiles_containing_indicators?" +
-                "area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&indicator_ids=" + IndicatorIds.AdultSmokingPrevalence2);
             TestHelper.IsData(data);
         }
@@ -208,7 +221,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("latest_data/single_indicator_for_all_areas?" +
                 "group_id=" + GroupIds.Phof_HealthcarePrematureMortality +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&comparator_id=" + ComparatorIds.England +
                 "&indicator_id=" + IndicatorIds.ExcessWinterDeaths +
@@ -223,7 +236,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetGroupDataAtDataPointForSpecificArea()
         {
             byte[] data = GetData("latest_data/specific_indicators_for_single_area?" +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_code=" + AreaCodes.CountyUa_Cumbria +
                 "&indicator_ids=" + IndicatorIds.ExcessWinterDeaths
                 );
@@ -235,7 +248,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("latest_data/all_indicators_in_profile_group_for_child_areas?" +
                 "group_id=" + GroupIds.Phof_HealthcarePrematureMortality +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&profile_id=" + ProfileIds.Phof
                 );
@@ -247,7 +260,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("latest_data/specific_indicators_for_child_areas?" +
                 "&profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&restrict_to_profile_ids=" + ProfileIds.Phof +
                 "&indicator_ids=" + IndicatorIds.ChildrenInLowIncomeFamilies
@@ -260,7 +273,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("trend_data/all_indicators_in_profile_group_for_child_areas?" +
                 "group_id=" + GroupIds.Phof_HealthcarePrematureMortality +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&profile_id=" + ProfileIds.Phof
                 );
@@ -272,7 +285,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("trend_data/specific_indicators_for_child_areas?" +
                 "&profile_id=" + ProfileIds.Phof +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&parent_area_code=" + AreaCodes.Gor_SouthEast +
                 "&restrict_to_profile_ids=" + ProfileIds.Phof +
                 "&indicator_ids=" + IndicatorIds.ChildrenInLowIncomeFamilies
@@ -285,7 +298,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("latest_data/all_indicators_in_multiple_profile_groups_for_multiple_areas?" +
                 "group_ids=" + GroupIds.Phof_HealthcarePrematureMortality +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority +
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 +
                 "&area_codes=" + AreaCodes.Gor_SouthEast +
                 "&comparator_area_codes=" + AreaCodes.England);
             TestHelper.IsData(data);
@@ -296,7 +309,7 @@ namespace PholioVisualisation.ServicesTest
         {
             byte[] data = GetData("profile_group_roots?" +
                 "group_id=" + GroupIds.Phof_HealthProtection +
-                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority);
+                "&area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             TestHelper.IsData(data);
         }
 
@@ -308,7 +321,7 @@ namespace PholioVisualisation.ServicesTest
             TestHelper.IsData(data);
 
             // Contains PHOF ID
-            TestHelper.AssertDataContainsString(data, "\"" + AreaTypeIds.DistrictAndUnitaryAuthority + "\"");
+            TestHelper.AssertDataContainsString(data, "\"" + AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019 + "\"");
         }
 
         [TestMethod]

@@ -1,0 +1,36 @@
+<div class="text-center" *ngIf="loading">
+  <img src="/images/ajax-loader.gif" />
+</div>
+<div *ngIf="!loading">
+  <h1 *ngIf="areJobsInQueue">Active upload jobs</h1>
+  <h1 *ngIf="!areJobsInQueue">No upload jobs either in progress or in the queue</h1>
+</div>
+<div *ngIf="!loading && areJobsInQueue">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>User</th>
+        <th>Status</th>
+        <th>File</th>
+        <th *ngIf="isCurrentUserAdmin">
+          Admin
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let job of activeJobs" [class]="getRowClass(job)">
+        <td>{{job.DateCreatedF}}</td>
+        <td>{{job.Username}}</td>
+        <td>{{job.StatusText}}</td>
+        <td>{{job.Filename}}</td>
+        <td *ngIf="isCurrentUserAdmin">
+          <small>{{job.Guid}}</small>&nbsp;
+          <button class="btn btn-danger" (click)="setJobToUnexpectedError(job)" *ngIf="job.Status === 200">
+            Set as failed job
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

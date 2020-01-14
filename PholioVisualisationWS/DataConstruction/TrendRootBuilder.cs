@@ -57,7 +57,8 @@ namespace PholioVisualisation.DataConstruction
             // Add parent areacode to child areas for nearest neighbours only 
             if (_isParentAreaNearestNeighbour)
             {
-                childAreaCodes.Insert(0, parentAreaCode.Substring(5));         
+                var childAreaCode = NearestNeighbourArea.GetAreaCodeFromNeighbourAreaCode(parentAreaCode);
+                childAreaCodes.Insert(0, childAreaCode);         
             }                              
             return childAreaCodes;
         }

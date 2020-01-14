@@ -31,6 +31,32 @@ function getIndicatorSpecifyingData(selectedIndicators) {
     };
 }
 
+function subscribeCleanValidationForMoveIndicators(){
+    $(document).on('click', '#selectedProfileId', function () {  validationText('confirmationMoveValidationText', ""); });
+    $(document).on('click', '#selectedDomainId', function () { validationText('confirmationMoveValidationText', ""); });
+    $(document).on('click', '#selectedAreaTypeId', function () { validationText('confirmationMoveValidationText', ""); });
+}
+
+function isValidMoveIndicatorsTo(){
+    var selectedIndicators = [];
+    var selectedIndicatorsTo = [];
+
+    selectedIndicators.push($('#selectedProfile option:selected').val());
+    selectedIndicators.push($('#selectedDomain option:selected').text());
+    selectedIndicators.push($('#SelectedAreaTypeId').val());
+
+
+    selectedIndicatorsTo.push($('#selectedProfileId option:selected').val());
+    selectedIndicatorsTo.push($('#selectedDomainId option:selected').text());
+    selectedIndicatorsTo.push($('#selectedAreaTypeId option:selected').val());
+
+    if (arraysEqual(selectedIndicators, selectedIndicatorsTo)) {
+        return false;
+    }else{
+        return true;
+    }
+}
+
 $(document).ready(function () {
 
     registerReloadPopUpDomains();
@@ -38,11 +64,57 @@ $(document).ready(function () {
     initTableSorter();
     initLaterDataLinks();
 
+    subscribeCleanValidationForMoveIndicators();
+
+    // When user clicks Confirm in the submit indicators for review dialogue
+    $(document).on('click', '#submit-indicators-for-review-confirm-button', function () {
+        loading();
+
+        var jdata = [];
+        $.each($('.indicator-id'), function (index, value) {
+            jdata.push(value.value);
+        });
+
+        $('#indicatorsToReviewDetails').val(jdata);
+        $('form#SubmitIndicatorsForReviewForm').submit();
+    });
+
+    // When user clicks Confirm in the awaiting revision dialogue
+    $(document).on('click', '#indicators-awaiting-revision-confirm-button', function () {
+        loading();
+
+        var jdata = [];
+        $.each($('.indicator-id'), function (index, value) {
+            jdata.push(value.value);
+        });
+
+        $('#indicatorsAwaitingRevisionDetails').val(jdata);
+        $('form#IndicatorsAwaitingRevisionForm').submit();
+    });
+
+    // When user clicks Confirm in the approve indicators dialogue
+    $(document).on('click', '#indicators-to-approve-confirm-button', function () {
+        loading();
+
+        var jdata = [];
+        $.each($('.indicator-id'), function (index, value) {
+            jdata.push(value.value);
+        });
+
+        $('#indicatorsToApproveDetails').val(jdata);
+        $('form#ApproveIndicatorsForm').submit();
+    });
+
     // When user clicks Confirm in the move indicators dialogue
     $(document).on('click', '#ConfirmMove', function () {
-        loading();
-        $('#indicatorTransferDetails').val(getIndicatorKeys());
-        $('form#MoveIndicatorForm').submit();
+        
+        if (isValidMoveIndicatorsTo()) {
+            loading();
+            $('#indicatorTransferDetails').val(getIndicatorKeys());
+            $('form#MoveIndicatorForm').submit();
+        }else {
+            validationText('confirmationMoveValidationText', "From and To must to be different to be moved");
+        }        
     });
 
     // When user clicks Confirm in the copy indicators dialogue
@@ -50,6 +122,18 @@ $(document).ready(function () {
         loading();
         $('#indicatorTransferDetails').val(getIndicatorKeys());
         $('form#CopyIndicatorForm').submit();
+    });
+
+    $(document).on('click', '#ConfirmRemove', function () {
+        loading();
+
+        var jdata = [];
+        $.each($('.indicator-id'), function (index, value) {
+            jdata.push(value.value);
+        });
+
+        $('#indicatorRemoveDetails').val(jdata);
+        $('form#RemoveIndicatorForm').submit();
     });
 
     $(document).on('click', '#ConfirmDelete', function () {
@@ -85,7 +169,18 @@ $(document).ready(function () {
     });
 
     $('.select-all-check-box').click(function () {
-        $('.indicator-check-box').attr('checked', $(this).is(':checked'));
+        $('.indicator-check-box').prop('checked', $(this).is(':checked'));
+    });
+
+    $('.indicator-check-box').change(function () {
+        var selectAll = true;
+        $($('.indicator-check-box')).each(function () {
+            if (!$(this).prop('checked')) {
+                selectAll = false;
+            }
+        });
+
+        $('.select-all-check-box').prop('checked', selectAll);
     });
 
     $('.sortHeader').click(function () {
@@ -148,7 +243,7 @@ $(document).ready(function () {
             if ($selectedDomains.length === 1) {
                 var $parent = $selectedDomains.siblings('.domain-id');
                 var $id = $parent.children(0).attr('value');
-                $('#Domainform').attr('action', '/DeleteDomain');
+                $('#Domainform').attr('action', '/profiles-and-indicators/delete-domain');
                 $('#Domainform').append('<input type="hidden" id="domainDeleteId" name="domainDeleteId" value="myvalue" />');
                 $('#domainDeleteId').val($id);
                 $('#save').addClass('save-required');
@@ -187,7 +282,7 @@ $(document).ready(function () {
             areaTypeId = $('#SelectedAreaTypeId').val(),
             groupId = $('#selected-group-id').val();
 
-        window.location.href = "/ReorderIndicators?profileId=" +
+        window.location.href = "/profiles-and-indicators/reorder-indicators?profileId=" +
             profileId +
             "&profileUrlKey=" +
             profileUrlKey +
@@ -200,28 +295,85 @@ $(document).ready(function () {
     });
 
     $('#audit_history').click(function () {
-        indicatorAction('/GetAudit', '#deleteIndicators', ' to see the history');
+        indicatorAction('/profiles-and-indicators/indicator-audit', '#deleteIndicators', ' to see the history');
     });
 
-    $('#delete-indicators-button').click(function () {
-        indicatorAction('/DeleteIndicators', '#deleteIndicators', 'remove');
+    $('#submit-indicators-for-review-button').click(function () {
+        indicatorAction('/profiles-and-indicators/submit-indicators-for-review', '#submitIndicatorsForReview', '<br>submit for review');
+    });
+
+    $('#resubmit-indicators-for-review-button').click(function () {
+        indicatorAction('/profiles-and-indicators/submit-indicators-for-review', '#submitIndicatorsForReview', '<br>resubmit for review');
+    });
+
+    $('#indicators-awaiting-revision-button').click(function() {
+        indicatorAction('/profiles-and-indicators/indicators-awaiting-revision', '#indicatorsAwaitingRevision', '<br>move back to \'Awaiting revision\'');
+    });
+
+    $('#approve-indicators-button').click(function() {
+        indicatorAction('/profiles-and-indicators/approve-indicators', '#approveIndicators', 'approve');
+    });
+
+    $('#remove-indicators-button').click(function () {
+        indicatorAction('/profiles-and-indicators/remove-indicators', '#removeIndicators', 'remove');
     });
 
     $('#move-indicators-button').click(function () {
-        indicatorAction('/MoveIndicators', '#moveIndicators', 'move');
+        indicatorAction('/profiles-and-indicators/move-indicators', '#moveIndicators', 'move');
     });
 
     $('#copy-indicators-button').click(function () {
-        indicatorAction('/CopyIndicators', '#copyIndicators', 'copy');
+        indicatorAction('/profiles-and-indicators/copy-indicators', '#copyIndicators', 'copy');
     });
 
-    $('.view-indicator-data-btn').click(function () {
-        var indicatorId = this.id.replace('view-data-', '');
-        var indicatorName = $(this).attr('indicatorname');
-        viewIndicatorData(indicatorId, indicatorName);
+    $('#withdraw-indicators-button').click(function() {
+        indicatorAction('/profiles-and-indicators/delete-indicators', '#deleteIndicators', 'withdraw');
+    });
+
+    $('#reject-indicators-button').click(function() {
+        indicatorAction('/profiles-and-indicators/delete-indicators', '#deleteIndicators', 'reject');
+    });
+
+    $('#download-metadata-button').click(function () {
+        var indicatorIds = '';
+        $.each($('.indicator-check-box'), function (index, value) {
+            if (value.checked) {
+                indicatorIds += value.value.split('~')[0] + ',';
+            }
+        });
+
+        if (indicatorIds.length > 0) {
+            indicatorIds = indicatorIds.substr(0, indicatorIds.length - 1);
+
+            $.ajax({
+                type: "get",
+                url: "/profiles-and-indicators/download-metadata",
+                data: { indicatorIds },
+                success: function (data) {
+                    console.log(data);
+                    var hiddenElement = document.createElement('a');
+                    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(data);
+                    hiddenElement.target = '_blank';
+                    hiddenElement.download = 'IndicatorMetadata.csv';
+                    hiddenElement.click();
+                },
+                error: function (xhr, error) {
+                    console.log(error);
+                }
+            });
+        } else {
+            showSimpleMessagePopUp('Please select some indicators to download metadata');
+        }
     });
 
     registerCopyDomains();
+
+    // New indicator confirmation popup
+    if ($('#is-new-indicator').val() === "True" && $('#new-indicator-id').val() !== '-1') {
+        lightbox.show($('#new-indicator-created-popup').html(), 300, 300, 400);
+        $('#is-new-indicator').val("False");
+        $('#new-indicator-id').val("-1");
+    }
 });
 
 function registerCopyDomains() {
@@ -231,8 +383,8 @@ function registerCopyDomains() {
         var $domainMenu = $('#TargetGroupId');
 
         $.ajax({
-            type: "post",
-            url: "/reloadDomains",
+            type: 'post',
+            url: '/profiles-and-indicators/reload-domains',
             data: { selectedProfile: $(profileMenuId).val() },
             success: function (data) {
                 repopulateDomainMenu($domainMenu, data);
@@ -256,7 +408,7 @@ function initLaterDataLinks() {
             $.ajax({
                 type: 'post',
                 dataType: 'json',
-                url: '/SetDataPoint',
+                url: '/profiles/set-data-point',
                 data: {
                     profileId: FT.model.profileId,
                     areaTypeId: FT.model.areaTypeId,
@@ -311,3 +463,18 @@ function indicatorAction(ajaxAction, popupId, action) {
     }
 }
 
+function arraysEqual(arr1, arr2) {
+    if(arr1.length !== arr2.length)
+        return false;
+    for(var i = arr1.length; i--;) {
+        if(arr1[i] !== arr2[i])
+            return false;
+    }
+
+    return true;
+}
+
+function validationText(labelId, text)
+{
+    $("#"+labelId).text(text);
+}

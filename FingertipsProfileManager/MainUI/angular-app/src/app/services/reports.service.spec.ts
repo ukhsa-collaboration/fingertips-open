@@ -22,7 +22,7 @@ describe('ReportsService', () => {
   });
 
   it('should ...',
-    async(inject([ReportsService], (reportsService: ReportsService) => {
-      expect(reportsService).toBeTruthy();
+    async(inject([ReportsService], (service: ReportsService) => {
+      expect(service).toBeTruthy();
     })));
 });

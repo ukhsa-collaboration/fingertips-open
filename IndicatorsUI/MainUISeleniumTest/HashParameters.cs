@@ -24,12 +24,6 @@ namespace IndicatorsUI.MainUISeleniumTest
             parameters.Add(areaCode);
         }
 
-        public void AddParentAreaTypeId(int parentAreaTypeId)
-        {
-            parameters.Add("pat");
-            parameters.Add(parentAreaTypeId.ToString());
-        }
-
         public void AddAreaTypeId(int areaTypeId)
         {
             parameters.Add("ati");

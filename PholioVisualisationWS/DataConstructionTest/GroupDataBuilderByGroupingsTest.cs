@@ -19,7 +19,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_HealthProtection,
                 ProfileId = ProfileIds.Phof,
                 ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 AssignData = false
             }.Build();
 
@@ -42,7 +42,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_HealthProtection,
                 ProfileId = ProfileIds.Phof,
                 ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
 
             Assert.IsTrue(data.GroupRoots.Count > 10);
@@ -62,7 +62,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_WiderDeterminantsOfHealth,
                 ProfileId = ProfileIds.Phof,
                 ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
 
             Assert.IsTrue(data.GroupRoots.Count > 15);
@@ -80,7 +80,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_WiderDeterminantsOfHealth,
                 ProfileId = ProfileIds.Phof,
                 ComparatorMap = GetComparatorMap(ComparatorMapBuilderTest.GetRegion102()),
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
 
             Assert.IsTrue(data.GroupRoots.Count > 0

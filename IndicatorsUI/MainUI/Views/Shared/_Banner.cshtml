@@ -26,7 +26,15 @@
                 // Size of title
                 var fontSize = TitleFont.GetSize(title, Model.ProfileId);
             }
-            <h1 style="@fontSize">@Html.Raw(title)</h1>
+            
+            <h1 style="@fontSize">
+                @Html.Raw(title)
+                @if (ViewBag.IndicatorListName != null && ViewBag.ShowEditLink == true)
+                {
+                    <a id="edit-indicator-list-link" class="edit-indicator-list-link" href="/user-account/indicator-list/edit?listId=@ViewBag.IndicatorListPublicId&redirect=true">Edit</a>
+                }
+            </h1>
+            
             @Html.Partial("_SearchBox")
         </div>
     </div>

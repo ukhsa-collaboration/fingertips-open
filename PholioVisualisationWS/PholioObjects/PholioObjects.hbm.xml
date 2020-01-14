@@ -74,18 +74,6 @@
 
   </class>
 
-  <!-- ProfileParentAreas class -->
-  <class name="ProfileParentAreas" table="ws_profileparentareas">
-
-    <id name="Id" column="id" type="int" unsaved-value="-1">
-    </id>
-
-    <property name="ProfileId" column="ProfileId"/>
-    <property name="ParentAreaTypeId" column="ParentAreaTypeId"/>
-    <property name="ParentAreaCodeString" column="ParentAreaCodes"/>
-
-  </class>
-
   <!-- ProfileConfig class -->
   <class name="ProfileConfig" table="ui_profiles">
 
@@ -104,6 +92,7 @@
     <property name="NewDataDeploymentCount" column="new_data_deployment_count"/>
     <property name="DefaultAreaTypeId" column="default_area_type_id"/>
     <property name="HasAnyData" column="has_any_data"/>
+    <property name="AreIndicatorNamesDisplayedWithNumbers" column="are_indicator_names_displayed_with_numbers"/>
   </class>
 
   <!-- LongerLivesProfile class -->
@@ -333,6 +322,18 @@
     <property name="ValueNoteId" column="valuenoteid"/>
   </class>
 
+  <!-- CoreDataSetChangeLog class -->
+  <class name="CoreDataSetChangeLog" table="coredataset_changelog">
+
+    <id name="Id" column="id" type="Int32" unsaved-value="-1">
+      <generator class="identity"/>
+    </id>
+
+    <property name="IndicatorId" column="indicatorid" />
+    <property name="AreaTypeId" column="areatypeid" />
+    <property name="DateUpdated" column="dateupdated" />
+  </class>
+
   <!-- Unit class -->
   <class name="Unit" table="l_units">
 
@@ -386,6 +387,11 @@
     <property name="LatestChangeTimestampOverride" column="LatestChangeTimestampOverride"/>
     <property name="ShouldNewDataBeHighlighted" column="ShouldNewDataBeHighlighted"/>
     <property name="SpecialCases" column="SpecialCases"/>
+    <property name="AlwaysShowSexWithIndicatorName" column="alwaysshowsexwithindicatorname"/>
+    <property name="AlwaysShowAgeWithIndicatorName" column="alwaysshowagewithindicatorname"/>
+    <property name="ShouldAveragesBeCalculated" column="shouldaveragesbecalculated"/>
+    <property name="Status" column="status"/>
+    <property name="DestinationProfileId" column="destinationprofileid"/>
 
     <many-to-one name="Unit" column="unitid" lazy="false"/>
     <many-to-one name="YearType" column="yeartypeid" lazy="false"/>
@@ -411,6 +417,7 @@
     <property name="IsSystemContent" column="issystemcontent"/>
     <property name="DisplayOrder" column="displayorder"/>
     <property name="SearchBoost" column="searchboost"/>
+    <property name="IsInternalMetadata" column="isinternalmetadata"/>
   </class>
 
 
@@ -424,14 +431,12 @@
     <property name="IndicatorId" column="indicatorid" />
     <property name="ProfileId" column="profileid"/>
     <property name="Name" column="[1_name]"/>
-    <property name="NameLong" column="[2_namelong]" />
     <property name="Definition" type="StringClob">
       <column name="[3_Definition]" sql-type="text"/>
     </property>
     <property name="Rationale" type="StringClob">
       <column name="[4_Rationale]" sql-type="text"/>
     </property>
-    <property name="Policy" column="[5_Policy]" />
     <property name="DataSource" column="[6_DataSource]" />
     <property name="Producer" column="[7_Producer]" />
     <property name="IndSourceLink" column="[8_IndSourceLink]" />
@@ -459,6 +464,18 @@
     <property name="Rounding" column="[24_Rounding]" />
     <property name="DataQuality" column="[25_DataQuality]" />
     <property name="IndicatorContent" column="[26_IndicatorContent]" />
+    <property name="SpecificRationale" type="StringClob">
+      <column name="[27_SpecificRationale]" sql-type="text"/>
+    </property>
+    <property name="Keywords" column="[28_Keywords]" />
+    <property name="EvidOfVariability" column="[29_EvidOfVariability]" />
+    <property name="JustifConfIntMeth" column="[30_JustifConfIntMeth]" />
+    <property name="QualityAssurance" column="[31_QualityAssurance]" />
+    <property name="QualityImprPlan" column="[32_QualityImprPlan]" />
+    <property name="JustiOfExclusions" column="[33_JustiOfExclusions]" />
+    <property name="JustifOfDataSources" column="[34_JustifOfDataSources]" />
+    <property name="SponsorStakeholders" column="[35_SponsorStakeholders]" />
+    <property name="IndOwnerContDet" column="[36_IndOwnerContDet]" />
   </class>
 
 
@@ -525,6 +542,7 @@
     </id>
 
     <property name="Name" column="age"/>
+    <property name="Sequence" column="sequence"/>
   </class>
 
 
@@ -555,17 +573,6 @@
     <property name="Url" column="url"/>
     <property name="Server" column="server"/>
 
-  </class>
-
-  <!-- KeyMessage Overrides -->
-  <class name="KeyMessageOverride" table="L_KeyMessageOverrides">
-    <id name="Id" column="id" type="Int32" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-    <property name="MessageId" column="messageid"/>
-    <property name="ProfileId" column="profileid"/>
-    <property name="AreaCode" column="areacode"/>
-    <property name="MessageText" column="messagetext"/>
   </class>
 
   <!-- CategorisedArea -->
@@ -607,14 +614,6 @@
     <property name="ShortName" column="shortname"/>
   </class>
 
-  <!-- NHS area mapping -->
-  <class name="AreaCodeNhsMapping" table="l_areacodenhsmapping">
-    <id name="AreaCode" column="AreaCode" type="string" unsaved-value="-1">
-      <generator class="identity"/>
-    </id>
-    <property name="NhsChoicesId" column="NhsChoicesId"/>
-  </class>
-
   <!-- ProfilePdf-->
   <class name="ProfilePdf" table="ui_profilepdfs">
     <composite-id>
@@ -645,6 +644,7 @@
     <property name="Parameters" column="parameters" />
     <property name="Notes" column="notes" />
     <property name="IsLive" column="islive" />
+    <property name="AreaTypeIds" column="areatypeids" />
   </class>
 
   <!-- SSRSReport Mapping -->
@@ -838,9 +838,11 @@
   </sql-query>
 
   <sql-query name="GetIndicatorMetadataTextValuesByGroupIds">
-    SELECT IndicatorID, imtv.ProfileId, [1_Name], [2_NameLong], [3_Definition], [4_Rationale], [5_Policy], [6_DataSource], [7_Producer], [8_IndSourceLink], [9_IndMethod],
+    SELECT IndicatorID, imtv.ProfileId, [1_Name], [3_Definition], [4_Rationale], [6_DataSource], [7_Producer], [8_IndSourceLink], [9_IndMethod],
     [10_StandardPop],[11_CIMethod], [12_CountSource],[13_CountDefinition],[14_DenomSource],[15_DenomDefinition],[16_DiscControl],[17_Caveats],[18_Copyright],
-    [19_Reuse],[20_Links],[21_RefNum],[22_Notes],[23_Frequency],[24_Rounding],[25_DataQuality],[26_IndicatorContent], ID
+    [19_Reuse],[20_Links],[21_RefNum],[22_Notes],[23_Frequency],[24_Rounding],[25_DataQuality],[26_IndicatorContent],[27_SpecificRationale],[ID],
+    [28_Keywords], [29_EvidOfVariability], [30_JustifConfIntMeth], [31_QualityAssurance], [32_QualityImprPlan], [33_JustiOfExclusions], [34_JustifOfDataSources],
+    [35_SponsorStakeholders], [36_IndOwnerContDet]
     FROM IndicatorMetadataTextValues imtv
     JOIN GroupingMetadata gm on imtv.ProfileId = gm.ProfileId
     WHERE gm.GroupID IN (:groupIds)

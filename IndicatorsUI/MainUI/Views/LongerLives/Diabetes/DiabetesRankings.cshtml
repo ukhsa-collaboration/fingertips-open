@@ -89,35 +89,7 @@
 
         @*Links underneath table comparison *@
         <div id="ranking-links" class="no-print">
-            <span class="pretext">
-                <img class="download" src="@(ViewBag.ImagesUrl)Mortality/download.png" />
-            </span>
-            <h5 class="posttext">Download</h5>
-            @ContentProvider.GetContent(ContentKeys.DownloadLink, Model.ProfileId)
-            <ul>
-                <li id="download_data_for_england"></li>
-                <li id="download_data_for_ccg"></li>
-            </ul>
-
-            <h5>More Information</h5>
-
-            <ul>
-                @if (Model.ProfileId == ProfileIds.SuicidePrevention)
-                {
-                    <li>@Html.Partial("_MentalHealthLink")</li>
-                }
-                else
-                {
-                    <li>@Html.Partial("_PhofLink", GroupIds.Phof_HealthImprovment)</li>
-                    if (Model.ProfileId == ProfileIds.PublicHealthDashboard)
-                    {
-                        <li>@Html.Partial("_HealthProfileLink")</li>
-                        <li>@Html.Partial("_FingertipsLink")</li>
-                    }
-                }
-                <li id="practice-profile-link" style="display: none;"><a href="javascript:goToPracticeProfiles();" class="external_link">View more data about this CCG at National General Practice Profiles</a></li>
-                <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data">About the data</a></li>
-            </ul>
+            @Html.Partial("_SideBarLinks")
         </div>
     </div>
     <div id="main_content">

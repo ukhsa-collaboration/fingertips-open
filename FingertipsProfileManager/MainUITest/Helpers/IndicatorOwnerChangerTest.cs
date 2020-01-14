@@ -24,7 +24,7 @@ namespace Fpm.MainUITest.Helpers
         [TestMethod]
         public void TestAssignIndicatorToProfile()
         {
-            const int indicatorId = IndicatorIds.PeopleWhoDieAtHome;
+            const int indicatorId = IndicatorIds.StaffEngagement;
 
             var changer = new IndicatorOwnerChanger(_profilesReader, _profileRepository);
 

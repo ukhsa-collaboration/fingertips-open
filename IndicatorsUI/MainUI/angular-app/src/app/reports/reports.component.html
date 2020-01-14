@@ -10,19 +10,23 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let report of reports">
-                    <td>{{report.Name}}</td>
-                    <td>{{report.Notes}}</td>
-                    <td class="format">
-                        <button class="btn btn-link" (click)="openReport(report, 'pdf')">PDF</button>
+                <tr *ngFor="let report of reportsToDisplay">
+                    <td>{{report.name}}</td>
+                    <td>{{report.notes}}</td>
+                    <td colspan="2" class="format not-available" *ngIf="!report.canBeDisplayed">
+                        Not available for this area type
                     </td>
-                    <td class="format">
-                        <button class="btn btn-link" (click)="openReport(report, 'word')">Word</button>
+                    <td class="format" *ngIf="report.canBeDisplayed">
+                        <button class="btn btn-link" (click)="openReport(report.id, 'pdf')">PDF</button>
+                    </td>
+                    <td class="format" *ngIf="report.canBeDisplayed">
+                        <button class="btn btn-link" (click)="openReport(report.id, 'word')">Word</button>
                     </td>
                 </tr>
             </tbody>
         </table>
-        <br><br>
+        <br>
+        <br>
         <div>Please note reports open in a separate tab or window. Reports may take a minute or two to load.</div>
         <br>
         <div [innerHtml]="extraNotes"></div>

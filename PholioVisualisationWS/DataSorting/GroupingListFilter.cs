@@ -38,6 +38,18 @@ namespace PholioVisualisation.DataSorting
             return groupings;
         }
 
+        public IEnumerable<Grouping> SelectForBaseLineTimePeriods(Grouping grouping)
+        {
+            if (groupings != null)
+            {
+                return groupings.Where(x =>
+                    x.BaselineYear == grouping.BaselineYear && x.BaselineQuarter == grouping.BaselineQuarter &&
+                    x.BaselineMonth == grouping.BaselineMonth).ToList();
+            }
+
+            return groupings;
+        }
+
         public IEnumerable<int> SelectDistinctComparatorIds()
         {
                 return groupings.Select(x => x.ComparatorId).Distinct();

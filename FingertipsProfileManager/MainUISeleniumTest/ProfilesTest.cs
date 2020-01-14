@@ -13,8 +13,9 @@ namespace Fpm.MainUISeleniumTest
     [TestClass]
     public class ProfilesTest : BaseUnitTest
     {
-        [TestMethod, TestCategory("ExcludeFromJenkins")]
-        public void Profiles_Page_Loads()
+
+        [TestInitialize]
+        public void TestInitialize()
         {
             LoadProfilesPage();
         }
@@ -27,8 +28,6 @@ namespace Fpm.MainUISeleniumTest
                 "ShouldBuildExcel", "HasTrendMarkers", "UseTargetBenchmarkByDefault",
                 "HasAnyData", "HasStaticReports"};
             var startingStates = new Dictionary<string, bool>();
-
-            LoadProfilesPage();
 
             // Click first profile link
             ClickFirstProfileLink();
@@ -62,7 +61,6 @@ namespace Fpm.MainUISeleniumTest
         [TestMethod, TestCategory("ExcludeFromJenkins")]
         public void TestAddRemoveUserToProfile()
         {
-            LoadProfilesPage();
             ClickFirstProfileLink();
             waitFor.EditProfilePageToLoad();
 
@@ -85,6 +83,24 @@ namespace Fpm.MainUISeleniumTest
             // Remove
             Driver.FindElement(By.Id("RemoveBtn")).Click();
             waitFor.ElementToNotContainText(userList, name);
+        }
+
+        [TestMethod]
+        public void TestMyPermissionLinkIsVisibleOnNavigationMenu()
+        {
+            var yourProfiles = Driver.FindElement(By.Id("your-profiles"));
+            Assert.IsTrue(yourProfiles.Displayed);
+        }
+
+        [TestMethod]
+        public void TestNewProfileButtonIsDisplayed()
+        {
+            // Navigate to profile manager page
+            Driver.FindElement(By.XPath("//*[@id='header']/nav[1]/ul/li[1]/a")).Click();
+            waitFor.ProfilesPageToLoad();
+
+            // New profile button must be displayed for admin users
+            Assert.IsTrue(Driver.FindElement(By.Id("create-profile-button")).Displayed);
         }
 
         private void ClickFirstProfileLink()

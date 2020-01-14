@@ -26,7 +26,7 @@
         <div class="standardWidth">
             <b>Profile:</b>
             @Html.DropDownListFor(model => model.ProfileId, Model.ProfileList,
-                new { @Id = "profileId", @Name = "profileId", @Class = "create-indicator-dropdown" })
+                new { @Id = "profileId", @Name = "profileId", @Class = "indicator-dropdown" })
             @Html.Hidden("sortBy", Model.SortBy)
             @Html.Hidden("ascending", Model.SortAscending)
         </div>

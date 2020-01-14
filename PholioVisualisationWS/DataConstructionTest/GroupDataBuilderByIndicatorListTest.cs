@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstructionTest
     public class GroupDataBuilderByIndicatorListTest
     {
         private const string IndicatorListPublicId = "2";
-        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+        private const int areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
         private Mock<IIndicatorListRepository> _repo;
         private Mock<SingleGroupingProvider> _singleGroupingProvider;

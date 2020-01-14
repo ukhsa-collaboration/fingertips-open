@@ -20,7 +20,7 @@ namespace PholioVisualisation.PholioObjects
         public string AreaCodesIgnoredForSpineChartString { get; set; }
 
         /// <summary>
-        /// Property is referred to in HNibernate string literals
+        /// Property is referred to in NHibernate string literals
         /// </summary>
         [JsonIgnore]
         public bool AreIndicatorsExcludedFromSearch { get; set; }
@@ -46,5 +46,7 @@ namespace PholioVisualisation.PholioObjects
         [JsonIgnore]
         public bool HasAnyData { get; set; }
         
+        [JsonIgnore]
+        public bool AreIndicatorNamesDisplayedWithNumbers { get; set; }
     }
 }

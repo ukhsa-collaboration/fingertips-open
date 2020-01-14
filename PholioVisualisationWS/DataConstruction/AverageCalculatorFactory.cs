@@ -11,10 +11,17 @@ namespace PholioVisualisation.DataConstruction
     {
         public static AverageCalculator New(IEnumerable<CoreDataSet> dataList, IndicatorMetadata indicatorMetadata)
         {
-            // Weighted average 
-            if (IsWeightedAverageValid(indicatorMetadata.ValueTypeId))
+            // Do not calculate averages if the flag is not set
+            // Return a null average calculator object instead
+            if (!indicatorMetadata.ShouldAveragesBeCalculated)
             {
-                return new WeightedAverageCalculator(new CoreDataSetFilter(dataList),
+                return new NullAverageCalculator();
+            }
+            
+            // Standard average 
+            if (IsStandardAverageValid(indicatorMetadata.ValueTypeId))
+            {
+                return new StandardAverageCalculator(new CoreDataSetFilter(dataList),
                     indicatorMetadata.Unit);
             }
 
@@ -28,7 +35,7 @@ namespace PholioVisualisation.DataConstruction
             }
         }
 
-        public static bool IsWeightedAverageValid(int valueTypeId)
+        public static bool IsStandardAverageValid(int valueTypeId)
         {
             switch (valueTypeId)
             {

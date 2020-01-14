@@ -57,7 +57,12 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             try
             {
                 var profile = ReaderFactory.GetProfileReader().GetProfile(profile_id);
-                profile.GroupMetadata = ReaderFactory.GetGroupDataReader().GetGroupingMetadataList(profile.GroupIds);
+
+                if (profile != null)
+                {
+                    profile.GroupMetadata = ReaderFactory.GetGroupDataReader().GetGroupingMetadataList(profile.GroupIds);
+                }
+                
                 return profile;
             }
             catch (Exception ex)
@@ -91,7 +96,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets name and sequence of specific profile groups
+        /// Get name and sequence of specific profile groups
         /// </summary>
         /// <param name="group_ids">Comma-separated list of profile group IDs</param>
         [HttpGet]
@@ -114,7 +119,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         }
 
         /// <summary>
-        /// Gets profile group subheadings for a specific area type and profile group
+        /// Get profile group subheadings for a specific area type and profile group
         /// </summary>
         [HttpGet]
         [Route("group_subheadings")]

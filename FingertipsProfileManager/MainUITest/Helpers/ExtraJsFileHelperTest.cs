@@ -19,7 +19,7 @@ namespace Fpm.MainUITest.Helpers
             Assert.IsFalse(helper.IsPopulationTab);
             Assert.IsFalse(helper.IsReportsTab);
             Assert.IsFalse(helper.IsScatterPlotTab);
-            Assert.AreEqual(CompareAreasOption.BarChartAndFunnelPlot, helper.CompareAreasOption);
+            Assert.IsFalse(helper.IsCompareAreasTab);
         }
 
         [TestMethod]
@@ -27,7 +27,7 @@ namespace Fpm.MainUITest.Helpers
         {
             var helper = new ExtraJsFileHelper();
 
-            Assert.AreEqual("PageTartanRug.js,PageMap.js,PageAreaTrends.js,PageBarChartAndFunnelPlot.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js", 
+            Assert.AreEqual("PageTartanRug.js,PageMap.js,PageAreaTrends.js,PageBarChart.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js", 
                 helper.GetExtraJsFiles());
         }
 
@@ -38,7 +38,7 @@ namespace Fpm.MainUITest.Helpers
 
             helper.IsMapTab = false;
 
-            Assert.AreEqual("PageTartanRug.js,PageAreaTrends.js,PageBarChartAndFunnelPlot.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js",
+            Assert.AreEqual("PageTartanRug.js,PageAreaTrends.js,PageBarChart.js,PageAreaProfile.js,PageMetadata.js,PageDownload.js",
                 helper.GetExtraJsFiles());
         }
     }

@@ -3,15 +3,21 @@ import {
     ViewChild, EventEmitter, OnChanges, SimpleChanges
 } from '@angular/core';
 import 'rxjs/rx';
+import { isDefined } from '@angular/compiler/src/util';
 import { GoogleMapService } from '../googleMap.service';
 import { IndicatorService } from '../../shared/service/api/indicator.service';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { CoreDataHelperService } from '../../shared/service/helper/coreDataHelper.service';
-import {
-    GroupRoot, CoreDataSet, IndicatorMetadata
-} from '../../typings/FT.d';
-import { ComparatorIds, AreaTypeIds, ParameterBuilder, AreaCodes } from '../../shared/shared';
+import { ParentAreaHelper, AreaHelper, DeviceServiceHelper, NewDataBadgeHelper } from '../../shared/shared';
+import { ComparatorIds, AreaTypeIds, Tabs, AreaCodes } from '../../shared/constants';
 import * as _ from 'underscore';
+import { DownloadService } from '../../shared/service/api/download.service';
+import { DeviceDetectorService } from '../../../../node_modules/ngx-device-detector';
+import { LightBoxConfig, LightBoxTypes } from '../../shared/component/light-box/light-box';
+import { CsvConfig, CsvData, CsvDataHelper } from '../../shared/component/export-csv/export-csv';
+import { TrendMarkerLabelProvider } from '../../shared/classes/trendmarker-label-provider';
+import { TimePeriod } from '../../shared/classes/time-period';
+import { CoreDataSet, GroupRoot, IndicatorMetadata, TrendMarkerResult } from '../../typings/FT';
 
 @Component({
     selector: 'ft-google-map',
@@ -21,7 +27,7 @@ import * as _ from 'underscore';
 })
 export class GoogleMapComponent implements OnChanges {
     map: google.maps.Map;
-    @ViewChild('googleMap') mapEl: ElementRef;
+    @ViewChild('googleMap', { static: true }) mapEl: ElementRef;
     @Output() mapInit = new EventEmitter();
     @Output() hoverAreaCodeChanged = new EventEmitter();
     @Output() selectedAreaChanged = new EventEmitter();
@@ -35,6 +41,7 @@ export class GoogleMapComponent implements OnChanges {
     @Input() sortedCoreData: Map<string, CoreDataSet> = null;
     @Input() benchmarkIndex: number = null;
 
+    isNearestNeighbours = false;
     subNationalButtonClass: string;
     nationalButtonClass: string;
     formattedParentAreaName: string;
@@ -73,20 +80,31 @@ export class GoogleMapComponent implements OnChanges {
     /*black boundry on polygon with bold border -represent that polygon is in table */
     unselectedPolyOption: google.maps.PolygonOptions = { strokeColor: '#333333', strokeWeight: 1 };
 
+    // Lightbox
+    lightBoxConfig: LightBoxConfig;
+
+    // Csv export
+    public csvConfig: CsvConfig;
+
     constructor(private mapService: GoogleMapService,
-        private indicatorService: IndicatorService, private ftHelperService: FTHelperService,
-        private coreDataHelper: CoreDataHelperService
+        private indicatorService: IndicatorService,
+        private ftHelperService: FTHelperService,
+        private coreDataHelper: CoreDataHelperService,
+        private downloadService: DownloadService,
+        private deviceService: DeviceDetectorService
     ) { }
 
     ngOnChanges(changes: SimpleChanges) {
+        this.isNearestNeighbours = this.ftHelperService.isNearestNeighbours();
+
         if (changes['areaTypeId']) {
             if (this.areaTypeId) {
                 this.loadMap();
-                this.loadPolygon(this.areaTypeId, this.path);
+                this.loadBoundaries(this.areaTypeId, this.path);
             }
         }
         if (changes['currentAreaCode']) {
-            let areaCode = changes['currentAreaCode'].currentValue;
+            const areaCode = changes['currentAreaCode'].currentValue;
             if (areaCode) {
                 this.highlightPolygon(this.currentAreaCode);
             } else {
@@ -94,15 +112,15 @@ export class GoogleMapComponent implements OnChanges {
             }
         }
         if (changes['refreshColour']) {
-            let localRefreshColour = changes['refreshColour'].currentValue;
-            if (localRefreshColour !== undefined) {
+            const localRefreshColour = changes['refreshColour'].currentValue;
+            if (localRefreshColour) {
                 if (this.areaCodeColour) {
                     this.colourFillPolygon(true);
                 }
             }
         }
         if (changes['selectedAreaList']) {
-            let localSelectedAreaList = changes['selectedAreaList'].currentValue;
+            const localSelectedAreaList = changes['selectedAreaList'].currentValue;
             if (localSelectedAreaList) {
                 this.removeSelectedPolygon();
             }
@@ -118,7 +136,7 @@ export class GoogleMapComponent implements OnChanges {
     removeSelectedPolygon() {
         if (this.map) {
             for (let i = 0; i < this.currentPolygons.length; i++) {
-                let areaCode = this.currentPolygons[i].get('areaCode');
+                const areaCode = this.currentPolygons[i].get('areaCode');
                 if (!_.contains(this.selectedAreaList, areaCode)) {
                     this.currentPolygons[i].setOptions(this.grayPolyOption);
                 } else {
@@ -143,7 +161,7 @@ export class GoogleMapComponent implements OnChanges {
 
     onOpacitySelectionChange(opacity): void {
         this.fillOpacity = opacity / 100;
-        this.loadPolygon(this.areaTypeId, this.path);
+        this.loadBoundaries(this.areaTypeId, this.path);
     }
 
     loadMap() {
@@ -172,7 +190,7 @@ export class GoogleMapComponent implements OnChanges {
                 this.onOverlaySelectionChange(this.baseMaps[0]);
             }
             if (this.areaTypeId) {
-                this.loadPolygon(this.areaTypeId, this.path);
+                this.loadBoundaries(this.areaTypeId, this.path);
             }
 
             this.mapInit.emit({
@@ -211,7 +229,7 @@ export class GoogleMapComponent implements OnChanges {
             this.map.mapTypes.set(noTiles, new NoTileMapType());
             this.setMapCenter();
             google.maps.event.addListener(this.map, 'idle', event => {
-                let bounds = this.map.getCenter();
+                const bounds = this.map.getCenter();
                 google.maps.event.trigger(this.map, 'resize');
                 this.map.setCenter(bounds);
             });
@@ -228,7 +246,7 @@ export class GoogleMapComponent implements OnChanges {
         }
     }
 
-    loadPolygon(areaTypeId: number, path: string) {
+    loadBoundaries(areaTypeId: number, path: string) {
         if (this.map && this.areaTypeId && !this.isBoundaryNotSupported) {
             this.mapService.loadBoundries(areaTypeId, path)
                 .subscribe(
@@ -247,7 +265,7 @@ export class GoogleMapComponent implements OnChanges {
     }
 
     removePolygon(): void {
-        if (this.currentPolygons !== undefined) {
+        if (isDefined(this.currentPolygons)) {
             this.currentPolygons.forEach(element => {
                 element.setMap(null);
             });
@@ -257,12 +275,12 @@ export class GoogleMapComponent implements OnChanges {
 
     getPolygonCoordinates(coordinates): Array<Array<google.maps.LatLng>> {
 
-        let coords: Array<Array<google.maps.LatLng>> = [];
+        const coords: Array<Array<google.maps.LatLng>> = [];
         for (let i = 0; i < coordinates.length; i++) {
             for (let j = 0; j < coordinates[i].length; j++) {
-                let path: Array<google.maps.LatLng> = [];
+                const path: Array<google.maps.LatLng> = [];
                 for (let k = 0; k < coordinates[i][j].length; k++) {
-                    let coord = new google.maps.LatLng(coordinates[i][j][k][1], coordinates[i][j][k][0]);
+                    const coord = new google.maps.LatLng(coordinates[i][j][k][1], coordinates[i][j][k][0]);
                     path.push(coord);
                 }
                 coords.push(path);
@@ -278,12 +296,12 @@ export class GoogleMapComponent implements OnChanges {
             let overDate = null;
             let overAreaCode = null;
 
-            let infoWindow: google.maps.InfoWindow = new google.maps.InfoWindow();
+            const infoWindow: google.maps.InfoWindow = new google.maps.InfoWindow();
 
             for (let x = 0; x < boundry.features.length; x++) {
-                let areaCode = boundry.features[x].properties.AreaCode;
-                let coordinates = boundry.features[x].geometry.coordinates;
-                let coords = this.getPolygonCoordinates(coordinates);
+                const areaCode = boundry.features[x].properties.AreaCode;
+                const coordinates = boundry.features[x].geometry.coordinates;
+                const coords = this.getPolygonCoordinates(coordinates);
 
                 // Set polygon fill colour
                 let fillColour = '#B0B0B2';
@@ -291,7 +309,7 @@ export class GoogleMapComponent implements OnChanges {
                     fillColour = this.areaCodeColour.get(areaCode);
                 }
 
-                let polygon = new google.maps.Polygon({
+                const polygon = new google.maps.Polygon({
                     paths: coords,
                     strokeColor: '#333333',
                     strokeOpacity: 0.8,
@@ -310,7 +328,7 @@ export class GoogleMapComponent implements OnChanges {
                     overDate = new Date();
 
                     // Display tooltip
-                    let tooltip = this.getToolTipContent(areaCode);
+                    const tooltip = this.getToolTipContent(areaCode);
                     if (tooltip) {
                         infoWindow.setContent(tooltip);
                         this.setInfoWindowPosition(event, infoWindow);
@@ -329,7 +347,7 @@ export class GoogleMapComponent implements OnChanges {
                     // Wait in case immediate mouseover event and this mouseover event was
                     // caused by mouse moving over the infowindow
                     setTimeout(function () {
-                        let time = new Date().getTime();
+                        const time = new Date().getTime();
                         if (time - overDate.getTime() > 25 && areaCode === overAreaCode) {
                             infoWindow.close();
                         }
@@ -350,7 +368,7 @@ export class GoogleMapComponent implements OnChanges {
     }
 
     setPolygonBorderColour(polygon) {
-        let currentAreaCode = polygon.get('areaCode');
+        const currentAreaCode = polygon.get('areaCode');
         if (_.contains(this.selectedAreaList, currentAreaCode)) {
             polygon.setOptions(this.blackSelectedPolyOption);
         } else {
@@ -359,40 +377,41 @@ export class GoogleMapComponent implements OnChanges {
     }
 
     setInfoWindowPosition(event, infoWindow) {
-        let pos: google.maps.LatLng = event.latLng;
+        const pos: google.maps.LatLng = event.latLng;
         infoWindow.setPosition(new google.maps.LatLng(pos.lat() + 0.02, pos.lng()));
     }
 
     getToolTipContent(areaCode: string): string {
         this.hoverAreaCodeChanged.emit({ areaCode: areaCode });
-        let currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
-        let data: IndicatorMetadata = this.ftHelperService.getMetadata(currentGrpRoot.IID);
-        let unit = data.Unit;
+        const currentGrpRoot: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
+        const data: IndicatorMetadata = this.ftHelperService.getMetadata(currentGrpRoot.IID);
+        const unit = data.Unit;
         let areaName = '';
         if (areaCode) {
             areaName = this.ftHelperService.getAreaName(areaCode);
         }
         let value = '';
-        if (unit !== undefined && this.sortedCoreData[areaCode] !== undefined
-            && this.ftHelperService.isValuePresent(this.sortedCoreData[areaCode].ValF)) {
+        if (unit && isDefined(this.sortedCoreData[areaCode]) &&
+            this.ftHelperService.isValuePresent(this.sortedCoreData[areaCode].ValF)) {
             value = this.sortedCoreData !== null ? '<br>' + this.coreDataHelper.valueWithUnit(unit).
                 getFullLabel(this.sortedCoreData[areaCode].ValF)
                 : '<br>-';
         }
-        let toolTipcontent;
+
+        let tooltipContent;
         if (areaName !== '' || value !== '') {
-            toolTipcontent = '<b>' + areaName + '</b>' + value;
+            tooltipContent = '<b>' + areaName + '</b>' + value;
         }
-        return toolTipcontent;
+        return tooltipContent;
     }
 
     highlightPolygon(areaCode): void {
         if (this.map) {
             const polygon: google.maps.Polygon = _.where(this.currentPolygons, { areaCode: areaCode })[0];
             if (this.selectedPolygon) {
-                let areaCode = this.selectedPolygon.get('areaCode');
+                const selectedPolygonAreaCode = this.selectedPolygon.get('areaCode');
                 this.selectedPolygon.setMap(null);
-                if (_.contains(this.selectedAreaList, areaCode)) {
+                if (_.contains(this.selectedAreaList, selectedPolygonAreaCode)) {
                     this.selectedPolygon.setOptions(this.blackSelectedPolyOption);
                 } else {
                     this.selectedPolygon.setOptions(this.grayPolyOption);
@@ -418,53 +437,67 @@ export class GoogleMapComponent implements OnChanges {
         const parentTypeId = this.ftHelperService.getParentTypeId();
         const areaTypeId = this.ftHelperService.getAreaTypeId();
 
-        if (parentTypeId !== null && parentTypeId !== undefined &&
-            areaTypeId !== null && areaTypeId !== undefined) {
+        if (isDefined(parentTypeId) && parentTypeId !== null
+            && isDefined(areaTypeId)) {
 
-            const key = parentTypeId.toString() + "-" + areaTypeId.toString() + "-";
-            const areaMappings: string[] = this.ftHelperService.getAreaMappingsForParentCode(key);
+            const isSubnationalComparator = this.benchmarkIndex === ComparatorIds.SubNational;
+
+            // Mapping between parent and child areas if subnational comparator
+            let areaMappings = null;
+            if (isSubnationalComparator) {
+                const key = parentTypeId.toString() + '-' + areaTypeId.toString() + '-';
+                areaMappings = this.ftHelperService.getAreaMappingsForParentCode(key);
+
+                const areaCode = this.ftHelperService.getFTModel().areaCode;
+                if (_.findIndex(areaMappings, areaCode) === -1) {
+                    areaMappings.push(areaCode);
+                }
+            }
 
             if (this.map) {
-                let regionPolygons: Array<google.maps.Polygon> = [];
+                const subnationalPolygons: Array<google.maps.Polygon> = [];
+                const undefinedColour = '#B0B0B2';
+
                 for (let i = 0; i < (this.currentPolygons.length); i++) {
-                    let polygon = this.currentPolygons[i];
+                    const polygon = this.currentPolygons[i];
 
                     // Set polygon fill colour
                     polygon.setMap(null);
-                    let areaCode = polygon.get('areaCode');
+                    const areaCode = polygon.get('areaCode');
                     let color = this.areaCodeColour.get(areaCode);
 
                     // Region tab button clicked
-                    if (this.benchmarkIndex === ComparatorIds.SubNational &&
+                    if (isSubnationalComparator &&
                         areaMappings.findIndex(x => x.toString() === areaCode) === -1) {
 
-                        color = '#B0B0B2';
+                        color = undefinedColour;
                     }
 
                     // Set to default color if not defined
                     if (color === undefined) {
-                        color = '#B0B0B2';
+                        color = undefinedColour;
                     }
 
                     polygon.set('fillColor', color);
                     polygon.setMap(this.map);
 
-                    if (this.benchmarkIndex === ComparatorIds.SubNational &&
+                    if (isSubnationalComparator &&
                         areaMappings.findIndex(x => x.toString() === areaCode) !== -1) {
 
-                        let coreDataset = this.sortedCoreData[areaCode];
+                        const coreDataset = this.sortedCoreData[areaCode];
                         if (coreDataset) {
-                            regionPolygons.push(polygon);
+                            subnationalPolygons.push(polygon);
                         }
                     }
                 }
 
-                /*if Benchmark is region, center and zoom in into that region */
+                // Centre on map area
                 if (center) {
-                    if (regionPolygons.length > 0 && this.benchmarkIndex !== ComparatorIds.National) {
+                    if (subnationalPolygons.length > 0 && isSubnationalComparator && !this.isNearestNeighbours) {
+                        // Benchmark is subnational, center and zoom in into that region
                         const bounds = new google.maps.LatLngBounds();
-                        for (let i = 0; i < regionPolygons.length; i++) {
-                            bounds.extend(this.getPolygonBounds(regionPolygons[i]).getCenter());
+                        for (let i = 0; i < subnationalPolygons.length; i++) {
+                            bounds.extend(this.getPolygonBounds(subnationalPolygons[i]).getCenter());
                         }
                         this.map.fitBounds(bounds);
                         this.map.setCenter(bounds.getCenter());
@@ -475,13 +508,21 @@ export class GoogleMapComponent implements OnChanges {
                             this.map.setZoom(7);
                         }
                     }
-                    if (this.benchmarkIndex === ComparatorIds.National) {
+                    if (this.benchmarkIndex === ComparatorIds.National ||
+                        (isSubnationalComparator && this.isNearestNeighbours)) {
+                        // Centre on
                         this.setMapCenter();
                     }
                 }
 
-                const parentAreaName = this.ftHelperService.getParentArea().Name;
-                if (parentAreaName !== undefined) {
+                // Label for subnational option
+                if (this.isNearestNeighbours) {
+                    const model = this.ftHelperService.getFTModel();
+                    const area = this.ftHelperService.getArea(model.areaCode);
+                    const nnAreaName = new AreaHelper(area).getShortAreaNameToDisplay();
+                    this.formattedParentAreaName = nnAreaName + ' and neighbours';
+                } else {
+                    const parentAreaName = new ParentAreaHelper(this.ftHelperService).getParentAreaName();
                     this.formattedParentAreaName = 'All in ' + parentAreaName;
                 }
 
@@ -493,62 +534,157 @@ export class GoogleMapComponent implements OnChanges {
     }
 
     getPolygonBounds(polygon: google.maps.Polygon) {
-        let bounds = new google.maps.LatLngBounds();
+        const bounds = new google.maps.LatLngBounds();
         polygon.getPath().forEach(function (element, index) { bounds.extend(element); });
         return bounds;
     }
 
     onExportClick(event: MouseEvent) {
-        event.preventDefault();
-        let chartTitle = this.buildChartTitle();
-        let root = this.ftHelperService.getCurrentGroupRoot();
-        let indicatorName = this.ftHelperService.getMetadataHash()[root.IID].Descriptive.Name +
-            this.ftHelperService.getSexAndAgeLabel(root);
+        // Download map does not work on IE
+        // Check whether the browser is IE
+        if (new DeviceServiceHelper(this.deviceService).isIE()) {
+            // Display lightbox informing user to use a different browser
+            const config = new LightBoxConfig();
+            config.Type = LightBoxTypes.Ok;
+            config.Title = 'Browser not compatible';
+            config.Html = 'Exporting the map as an image is not supported by Internet Explorer. Please use a different browser.'
+            config.Height = 200;
+            config.Top = 500;
+            this.lightBoxConfig = config;
+        } else {
+            event.preventDefault();
+            const chartTitle = this.buildChartTitle();
+            const root = this.ftHelperService.getCurrentGroupRoot();
+            const indicatorName = this.ftHelperService.getMetadataHash()[root.IID].Descriptive.Name +
+                this.ftHelperService.getSexAndAgeLabel(root);
 
-        // Define html to display the title
-        let title = '<b>Map of ' + this.ftHelperService.getAreaTypeName() +
-            's in ' + this.ftHelperService.getCurrentComparator().Name +
-            ' for ' + indicatorName + '<br/> (' + chartTitle + ')</b>';
+            // Define html to display the title
+            const title = '<b>Map of ' + this.ftHelperService.getAreaTypeName() +
+                's in ' + this.ftHelperService.getCurrentComparator().Name +
+                ' for ' + indicatorName + '<br/> (' + chartTitle + ')</b>';
 
-        // Define script to hide the zoom in, zoom out and full screen buttons
-        let script = '<script>$(".gmnoprint").hide(); $(".gm-fullscreen-control").hide();</script>';
+            // Define script to hide the zoom in, zoom out and full screen buttons
+            let script = '<script>$(".gmnoprint").hide(); $(".gm-fullscreen-control").hide();</script>';
 
-        // Inject both the title html and button hide script
-        $('<div id="map-export-title" style="text-align: center; font-family:Arial;">' +
-            title + script + '</div>').appendTo(this.mapEl.nativeElement);
+            // Inject both the title html and button hide script
+            $('<div id="map-export-title" style="text-align: center; font-family:Arial;">' +
+                title + script + '</div>').appendTo(this.mapEl.nativeElement);
 
-        // Download as image
-        this.ftHelperService.saveElementAsImage(this.mapEl.nativeElement, 'Map');
+            // Hide "Scroll to zoom" message and background in case displayed
+            $('.gm-style-pbt').hide();
+            $('.gm-style-pbc').hide();
 
-        // Define script to show the zoom in, zoom out and full screen buttons
-        script = '<script>$(".gmnoprint").show(); $(".gm-fullscreen-control").show();</script>';
+            // Download as image
+            this.ftHelperService.saveElementAsImage(this.mapEl.nativeElement, 'Map');
 
-        // Inject button show script
-        $('<div id="show-buttons">' + script + '</div>').appendTo(this.mapEl.nativeElement);
+            // Define script to show the zoom in, zoom out and full screen buttons
+            script = '<script>$(".gmnoprint").show(); $(".gm-fullscreen-control").show();</script>';
 
-        // Remove the injected html and scripts
-        $('#map-export-title').remove();
-        $('#show-buttons').remove();
+            // Inject button show script
+            $('<div id="show-buttons">' + script + '</div>').appendTo(this.mapEl.nativeElement);
 
-        // Log export image event
-        this.ftHelperService.logEvent('ExportImage', 'Map');
+            // Remove the injected html and scripts
+            $('#map-export-title').remove();
+            $('#show-buttons').remove();
+
+            // Log export image event
+            this.ftHelperService.logEvent('ExportImage', 'Map');
+        }
     }
 
     onExportCsvFileClick(event: MouseEvent) {
+        const csvData: CsvData[] = [];
 
-        var urls = this.ftHelperService.getURL();
-        var model = this.ftHelperService.getFTModel();
+        const indicatorId = this.ftHelperService.getIid();
+        const indicatorName = this.ftHelperService.getIndicatorName(indicatorId);
+        const areaTypeName = this.ftHelperService.getAreaTypeName();
+        const areaList = this.ftHelperService.getAreaList();
+        const root = this.ftHelperService.getCurrentGroupRoot();
+        const comparatorId = this.ftHelperService.getComparatorId();
 
-        var parameters = new ParameterBuilder()
-        .add('parent_area_type_id', this.getParentTypeId(model))
-        .add('child_area_type_id', model.areaTypeId)
-        .add('profile_id', model.profileId)
-        .add('areas_code', this.selectedAreaList.toString())
-        .add('indicator_ids', this.indicatorService.getIid())
-        .add('parent_area_code', this.getParentAreaCode(model));        
-  
-        var url = urls.corews + 'api/latest/no_inequalities_data/csv/by_indicator_id?' + parameters.build();
-        window.open(url.toLowerCase(), '_blank');
+        this.currentPolygons.forEach(polygon => {
+            const areaCode: string = polygon['areaCode'];
+            const fillColor: string = polygon['fillColor'];
+
+            if (fillColor.toUpperCase() !== '#B0B0B2') {
+                const area = areaList.find(x => x.Code === areaCode);
+                const areaName = isDefined(area) ? area.Name : '';
+
+                const data = this.addCsvRow(areaCode, indicatorId, indicatorName, areaName, areaTypeName, root);
+                csvData.push(data);
+            }
+        });
+
+        this.csvConfig = new CsvConfig();
+        this.csvConfig.tab = Tabs.Map;
+        this.csvConfig.csvData = csvData;
+    }
+
+    addCsvRow(areaCode: string, indicatorId: number, indicatorName: string,
+        areaName: string, areaTypeName: string, root: GroupRoot): CsvData {
+
+        const data = new CsvData();
+        const coreData: CoreDataSet = this.sortedCoreData[areaCode];
+
+        data.indicatorId = indicatorId.toString();
+        data.indicatorName = indicatorName
+
+        const parentAreaHelper = new ParentAreaHelper(this.ftHelperService);
+
+        if (this.benchmarkIndex === ComparatorIds.National) {
+            data.parentCode = AreaCodes.England;
+            data.parentName = 'England';
+        } else {
+            data.parentCode = parentAreaHelper.getParentAreaCode();
+            data.parentName = parentAreaHelper.getParentAreaNameForCSV();
+        }
+
+        data.areaCode = areaCode;
+        data.areaName = areaName;
+        data.areaType = areaTypeName;
+
+        data.sex = root.Sex.Name;
+        data.age = root.Age.Name;
+
+        data.categoryType = CsvDataHelper.getDisplayValue(coreData.CategoryTypeId);
+        data.category = CsvDataHelper.getDisplayValue(coreData.CategoryId);
+        data.timePeriod = root.Grouping[0].Period;
+        data.value = CsvDataHelper.getDisplayValue(coreData.Val);
+        data.lowerCiLimit95 = CsvDataHelper.getDisplayValue(coreData.LoCI);
+        data.upperCiLimit95 = CsvDataHelper.getDisplayValue(coreData.UpCI);
+        data.lowerCiLimit99_8 = CsvDataHelper.getDisplayValue(coreData.LoCI99_8);
+        data.upperCiLimit99_8 = CsvDataHelper.getDisplayValue(coreData.UpCI99_8);
+        data.count = CsvDataHelper.getDisplayValue(coreData.Count);
+        data.denominator = CsvDataHelper.getDisplayValue(coreData.Denom);
+
+        data.valueNote = '';
+        if (isDefined(coreData.NoteId)) {
+            data.valueNote = this.ftHelperService.newValueNoteTooltipProvider().getTextFromNoteId(coreData.NoteId);
+        }
+
+        data.recentTrend = '';
+        if (isDefined(root.RecentTrends)) {
+            const recentTrends: TrendMarkerResult = root.RecentTrends[coreData.AreaCode];
+            if (isDefined(recentTrends)) {
+                data.recentTrend = new TrendMarkerLabelProvider(root.PolarityId).getLabel(recentTrends.Marker);
+            }
+        }
+
+        data.comparedToEnglandValueOrPercentiles = CsvDataHelper.getSignificanceValue(coreData,
+            root.PolarityId, ComparatorIds.National, root.ComparatorMethodId);
+
+        data.comparedToRegionValueOrPercentiles = CsvDataHelper.getSignificanceValue(coreData,
+            root.PolarityId, ComparatorIds.SubNational, root.ComparatorMethodId);
+
+        data.timePeriodSortable = new TimePeriod(root.Grouping[0]).getSortableNumber();
+
+        const hasDataChanged = this.ftHelperService.hasDataChanged(root);
+        const isNewData = NewDataBadgeHelper.isNewData(hasDataChanged);
+        data.newData = isNewData ? 'New data' : '';
+
+        data.comparedToGoal = CsvDataHelper.getSignificanceValue(coreData, root.PolarityId, ComparatorIds.Target, root.ComparatorMethodId);
+
+        return data;
     }
 
     buildChartTitle(): string {
@@ -570,62 +706,28 @@ export class GoogleMapComponent implements OnChanges {
         if (this.ftHelperService.getParentTypeId() === AreaTypeIds.Country) {
             this.nationalButtonClass = 'button-selected';
             this.subNationalButtonClass = 'hidden';
-        } else if (this.benchmarkIndex === undefined || this.benchmarkIndex === ComparatorIds.National) {
+            return;
+        }
+
+        if (this.benchmarkIndex === undefined || this.benchmarkIndex === ComparatorIds.National) {
             this.nationalButtonClass = 'button-selected';
             this.subNationalButtonClass = '';
-        } else {
+            return;
+        }
+
+        if (this.benchmarkIndex === ComparatorIds.SubNational) {
             this.nationalButtonClass = '';
             this.subNationalButtonClass = 'button-selected';
+            return;
         }
     }
 
-    private getParentAreaCode(model){
-
-        if (model.nearestNeighbour !== null || this.benchmarkIndex === 4
-            || !this.isSelectedBenchmarkOptionIntoBorder()){
-            return AreaCodes.England;
-        }
-        return model.parentCode;
-    }
-
-    private getParentTypeId(model) : string{
-        var optionsElements = $("#parentAreaTypesMenu option");
-
-        if (this.isSelectedOptionIntoBorder(model.parentTypeId))
-        {
-            return model.parentTypeId;
-        }
-        return optionsElements.first().attr("value");
-    }
-
-    private isSelectedOptionIntoBorder(value) : boolean{
-        
-        var optionsElements = $("#parentAreaTypesMenu option");
-        var selectedElement =  $("#parentAreaTypesMenu option[value="+ value +"]");
-        var borderOptionElement = $("#parentAreaTypesMenu option[value='-98']"); //-98 is a index used to separate values into the list
-        
-        var borderOptionElementIndex = this.getSelectedElementIndex(optionsElements, borderOptionElement);
-        var selectedElementIndex = this.getSelectedElementIndex(optionsElements, selectedElement);
-        
-        return borderOptionElementIndex > selectedElementIndex;
-    }
-
-    private isSelectedBenchmarkOptionIntoBorder() : boolean{
-        var optionsElements = $("#parentAreaTypesMenu option");
-        var benchmarkSelected = $("#comparator option:selected").text();
-        var areasGroupedBySelected = $("#parentAreaTypesMenu option:contains("+ benchmarkSelected + ")");
-        var selectedElementIndex = optionsElements.index(areasGroupedBySelected);
-
-        var borderOptionElement = $("#parentAreaTypesMenu option[value='-98']"); //-98 is a index used to separate values into the list   
-        var borderOptionElementIndex = this.getSelectedElementIndex(optionsElements, borderOptionElement);
-
-        return borderOptionElementIndex > selectedElementIndex;
-    }
-
-    private getSelectedElementIndex(optionsElements, selectedOptionElement) : number{
-        return optionsElements.index(selectedOptionElement);
+    updateLightBoxActionConfirmed(event) {
+        // Lightbox button event
+        // Place holder in case required in future
     }
 }
+
 export class NoTileMapType implements google.maps.MapType {
     tileSize = new google.maps.Size(1024, 1024);
     maxZoom = 20;

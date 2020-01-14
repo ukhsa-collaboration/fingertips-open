@@ -19,8 +19,10 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
 
         private CsvBuilderIndicatorDataBodyPeriodWriter _bodyPeriodWriter;
         private LookUpManager _lookUpManager;
+        private SingleIndicatorFileWriter fileWriter;
 
-        public IndicatorDataBodyContainer(IndicatorMetadataProvider indicatorMetadataProvider, ExportAreaHelper areaHelper, IAreasReader areasReader, CsvBuilderAttributesForBodyContainer attributesForBodyContainer)
+        public IndicatorDataBodyContainer(IndicatorMetadataProvider indicatorMetadataProvider, ExportAreaHelper areaHelper,
+            IAreasReader areasReader, CsvBuilderAttributesForBodyContainer attributesForBodyContainer)
         {
             _indicatorMetadataProvider = indicatorMetadataProvider;
             _areaHelper = areaHelper;
@@ -32,38 +34,69 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
 
         public byte[] GetIndicatorDataFile(int indicatorId)
         {
-            var fileWriter = new SingleIndicatorFileWriter(indicatorId, _attributesForBodyContainer.GeneralParameters);
-
             byte[] content;
-            // Don't recalculate if exist
-            if (HasBeenWrittenFileFromCache(fileWriter, out content))
-                return content;
+            fileWriter = new SingleIndicatorFileWriter(indicatorId, _attributesForBodyContainer);
+            var shouldUseCache = ShouldUseFileCache(_attributesForBodyContainer.GeneralParameters.ParentAreaCode);
 
-            Grouping grouping; IndicatorMetadata indicatorMetadata;
-            if (HasBeenIgnoreFileWriterSettings(indicatorId, fileWriter, out grouping, out indicatorMetadata))
+            // Read file from cache
+            if (shouldUseCache)
+            {
+                content = TryReadFileFromCache();
+                if (content != null)
+                {
+                    return content;
+                }
+            }
+
+            // Build data file
+            Grouping grouping;
+            IndicatorMetadata indicatorMetadata;
+            if (HasBeenIgnoreFileWriterSettings(indicatorId, out grouping, out indicatorMetadata))
+            {
+                // Empty file
                 return new byte[] { };
+            }
 
-            WriteIndicatorDataBodyInFile(indicatorId, indicatorMetadata, grouping, ref fileWriter);
+            WriteIndicatorDataBodyInFile(indicatorId, indicatorMetadata, grouping);
 
-            return fileWriter.GetFileContent();
+            content = fileWriter.GetFileContent();
+
+            // Write file to cache
+            if (shouldUseCache)
+            {
+                fileWriter.SaveFile(content);
+            }
+
+            return content;
         }
 
-        private void WriteIndicatorDataBodyInFile(int indicatorId, IndicatorMetadata indicatorMetadata, Grouping grouping, ref SingleIndicatorFileWriter fileWriter)
+        private void WriteIndicatorDataBodyInFile(int indicatorId, IndicatorMetadata indicatorMetadata, Grouping grouping)
         {
-            _bodyPeriodWriter = new CsvBuilderIndicatorDataBodyPeriodWriter(indicatorMetadata, grouping, _areaHelper, _attributesForBodyContainer.GroupDataReader,
-                                                                            _attributesForBodyContainer.GeneralParameters, _attributesForBodyContainer.OnDemandParameters, AssistanceComparer);
+            _bodyPeriodWriter = new CsvBuilderIndicatorDataBodyPeriodWriter(indicatorMetadata, grouping, _areaHelper,
+                _attributesForBodyContainer.GroupDataReader, _areasReader, _attributesForBodyContainer.GeneralParameters,
+                _attributesForBodyContainer.OnDemandParameters, AssistanceComparer);
 
-            _bodyPeriodWriter.WritePeriodsForIndicatorBodyInFile(indicatorId, ref fileWriter);
+            _bodyPeriodWriter.WritePeriodsForIndicatorBodyInFile(indicatorId, fileWriter, grouping);
         }
 
-        private static bool HasBeenWrittenFileFromCache(SingleIndicatorFileWriter fileWriter, out byte[] bytes)
+        private bool ShouldUseFileCache(string parentAreaCode)
         {
-            bytes = null;
-            bytes = fileWriter.TryLoadFile();
-            return bytes != null;
+            // File download related to area list must never be from cache
+            if (Area.IsAreaListAreaCode(parentAreaCode))
+            {
+                return false;
+            }
+
+            return fileWriter.UseFileCache;
         }
 
-        private bool HasBeenIgnoreFileWriterSettings(int indicatorId, SingleIndicatorFileWriter fileWriter, out Grouping grouping, out IndicatorMetadata indicatorMetadata)
+        private byte[] TryReadFileFromCache()
+        {
+            return fileWriter.TryLoadFile();
+        }
+
+        private bool HasBeenIgnoreFileWriterSettings(int indicatorId,
+            out Grouping grouping, out IndicatorMetadata indicatorMetadata)
         {
             // Ignore the indicator if no grouping found
             if (!HasGroupingAndIndicatorMetadata(indicatorId, out grouping, out indicatorMetadata)) return true;
@@ -71,7 +104,7 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
             // Lazy initialisation (would not be necessary if cached files are available)
             _areaHelper.Init();
 
-            InitFileWriter(grouping, indicatorMetadata, fileWriter);
+            InitFileWriter(grouping, indicatorMetadata);
             InitComparer(grouping);
 
             return false;
@@ -80,13 +113,16 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
         private bool HasGroupingAndIndicatorMetadata(int indicatorId, out Grouping grouping, out IndicatorMetadata indicatorMetadata)
         {
             indicatorMetadata = null;
-            if (!_attributesForBodyContainer.HasGrouping(indicatorId, _attributesForBodyContainer.OnDemandParameters.GroupIds, out grouping)) return false;
+            if (!_attributesForBodyContainer.HasGrouping(indicatorId, _attributesForBodyContainer.OnDemandParameters.GroupIds, out grouping))
+            {
+                return false;
+            }
 
             indicatorMetadata = FindIndicatorMetadata(grouping);
             return true;
         }
 
-        private void InitFileWriter(Grouping grouping, IndicatorMetadata indicatorMetadata, SingleIndicatorFileWriter fileWriter)
+        private void InitFileWriter(Grouping grouping, IndicatorMetadata indicatorMetadata)
         {
             var trendMarkerLabelProvider = new TrendMarkerLabelProvider(grouping.PolarityId);
             var significanceFormatter = new SignificanceFormatter(grouping.PolarityId, grouping.ComparatorMethodId);
@@ -104,7 +140,12 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
 
         private IndicatorMetadata FindIndicatorMetadata(Grouping grouping)
         {
-            return _indicatorMetadataProvider.GetIndicatorMetadata(new List<Grouping> { grouping }, _attributesForBodyContainer.AttributesForIndicators.IndicatorMetadataTextOption).First();
+            var indicatorMetadataTextOption =
+                _attributesForBodyContainer.AttributesForIndicators.IndicatorMetadataTextOption;
+
+            var profileId = _attributesForBodyContainer.OnDemandParameters.ProfileId;
+
+            return _indicatorMetadataProvider.GetIndicatorMetadata(new List<Grouping> { grouping }, indicatorMetadataTextOption, profileId).First();
         }
 
         /// <summary>
@@ -123,8 +164,13 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
                         _attributesForBodyContainer.GeneralParameters.ParentAreaTypeId,
                         _attributesForBodyContainer.GeneralParameters.ChildAreaTypeId
                     };
+                    string publicId = null;
+                    if (Area.IsAreaListAreaCode(_attributesForBodyContainer.GeneralParameters.ParentAreaCode))
+                    {
+                        publicId = _attributesForBodyContainer.GeneralParameters.ParentAreaCode;
+                    }
                     var categoryTypeIds = _areasReader.GetAllCategoryTypes().Select(x => x.Id).ToList();
-                    _lookUpManager = new LookUpManager(_pholioReader, _areasReader, allAreaTypes, categoryTypeIds);
+                    _lookUpManager = new LookUpManager(_pholioReader, _areasReader, allAreaTypes, categoryTypeIds, publicId);
                 }
                 return _lookUpManager;
             }

@@ -1,10 +1,11 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, AfterViewInit } from '@angular/core';
 import { ProfileService } from '../../services/profile.service';
 import { GroupingPlusName, GroupingSubheading, ReorderIndicator, AreaType } from '../../model/profile';
-import { LightBoxTypes, LightBoxConfig } from '../../shared/component/light-box/light-box.component';
+import { LightBoxConfig, LightBoxTypes } from '../../shared/component/light-box/light-box';
 import { LightBoxIndicatorReorderConfig } from '../../shared/component/light-box-indicator-reorder/light-box-indicator-reorder.component';
-import { Observable } from 'rxjs';
-import { SpinnerComponent } from 'app/shared/component/spinner/spinner.component';
+import { forkJoin } from 'rxjs';
+import { SpinnerComponent } from '../../shared/component/spinner/spinner.component';
+// @ts-ignore: error TS2304: Cannot find name 'JQueryStatic'.
 declare let $: JQueryStatic;
 
 @Component({
@@ -15,7 +16,7 @@ declare let $: JQueryStatic;
 })
 export class IndicatorsReorderViewComponent implements OnInit {
 
-  @ViewChild(SpinnerComponent) spinner;
+  @ViewChild(SpinnerComponent, { static: true }) spinner;
 
   profileId: number;
   profileUrlKey: string;
@@ -35,7 +36,14 @@ export class IndicatorsReorderViewComponent implements OnInit {
   lightBoxIndicatorReorderConfig: LightBoxIndicatorReorderConfig;
   subheading: string;
   subheadingToEdit: string;
-  errorMessage: string;
+  errorMessage = '';
+
+  currentLighBoxId: number;
+
+  // The sequence will start negativaly and to add a subheading will be a decrease.
+  // in this way it won't be any interferences with indicatorsIds
+  readonly sequenceFistElementNegative = -2;
+  readonly sequenceFirstElementIndicators = 1;
 
   constructor(private profileService: ProfileService, private ref: ChangeDetectorRef) { }
 
@@ -51,6 +59,9 @@ export class IndicatorsReorderViewComponent implements OnInit {
 
     // Load indicators and subheadings data
     this.loadData();
+
+    // Initialize lightBox count
+    this.currentLighBoxId = this.sequenceFistElementNegative;
   }
 
   // Load the indicators and subheadings data from the database
@@ -58,7 +69,7 @@ export class IndicatorsReorderViewComponent implements OnInit {
     const areaTypesObservable = this.profileService.getAllAreaTypes();
     const domainNameObservable = this.profileService.getDomainName(this.groupId, this.domainSequence);
 
-    Observable.forkJoin([areaTypesObservable, domainNameObservable]).subscribe(results => {
+    forkJoin([areaTypesObservable, domainNameObservable]).subscribe(results => {
       this.areaTypes = <AreaType[]>results[0];
       this.domainName = <string>results[1];
 
@@ -68,7 +79,7 @@ export class IndicatorsReorderViewComponent implements OnInit {
     const groupingPlusNamesObservable = this.profileService.getGroupingPlusNames(this.profileUrlKey, this.domainSequence, this.areaTypeId);
     const groupingSubheadingsObservable = this.profileService.getGroupingSubheadingsForProfile(this.profileId);
 
-    Observable.forkJoin([groupingPlusNamesObservable, groupingSubheadingsObservable]).subscribe(results => {
+    forkJoin([groupingPlusNamesObservable, groupingSubheadingsObservable]).subscribe(results => {
       this.groupingPlusNames = <GroupingPlusName[]>results[0];
       this.allgroupingSubheadings = <GroupingSubheading[]>results[1];
 
@@ -102,7 +113,9 @@ export class IndicatorsReorderViewComponent implements OnInit {
       IndicatorId: groupingSubheading.SubheadingId,
       IndicatorName: groupingSubheading.Subheading,
       Sequence: groupingSubheading.Sequence,
+      SexId: -1,
       Sex: '',
+      AgeId: -1,
       Age: '',
       IsSubheading: true
     }
@@ -124,9 +137,11 @@ export class IndicatorsReorderViewComponent implements OnInit {
       IndicatorId: groupingPlusName.IndicatorId,
       IndicatorName: groupingPlusName.IndicatorName,
       Sequence: groupingPlusName.Sequence,
+      SexId: groupingPlusName.SexId,
       Sex: groupingPlusName.Sex,
+      AgeId: groupingPlusName.AgeId,
       Age: groupingPlusName.Age,
-      IsSubheading: false,
+      IsSubheading: false
     }
 
     this.reorderIndicators.push(reorderIndicator);
@@ -135,35 +150,8 @@ export class IndicatorsReorderViewComponent implements OnInit {
   // Save subheading details and indicators sequence changes to the database
   save() {
     // Define an array by reading all the rows displayed
-    const rows = Array.from($('.tablesorter-dataRow'));
-
-    // Update the sequence for indicators
-    let sequenceCounter = 0;
-    rows.forEach(row => {
-      const isSubheading = row.children[0].textContent;
-      if (isSubheading === 'false') {
-        sequenceCounter++;
-        const indicatorId = Number(row.children[2].textContent);
-        const sex = row.children[4].textContent.toLowerCase();
-        this.groupingPlusNames.find(x => x.IndicatorId === indicatorId && x.Sex.toLowerCase() === sex).Sequence = sequenceCounter;
-      }
-    });
-
-    // Update the sequence for subheadings
-    rows.forEach(row => {
-      const isSubheading = row.children[0].textContent;
-      if (isSubheading === 'true') {
-        // Read the subheading id
-        const subheadingId = Number(row.children[2].textContent);
-        if (subheadingId !== -1) {
-          // Update the sequence number if it is not -1
-          this.groupingSubheadings.find(x => x.SubheadingId === subheadingId).Sequence = Number(row.children[1].textContent);
-        } else {
-          // Set the sequence number to 1
-          this.groupingSubheadings.find(x => x.SubheadingId === subheadingId).Sequence = 1;
-        }
-      }
-    });
+    const rows = this.getindicatorsElementsFromTable();
+    this.updateSequences(rows);
 
     // Save the details
     const formData: FormData = new FormData();
@@ -180,6 +168,7 @@ export class IndicatorsReorderViewComponent implements OnInit {
         (response) => {
           // Saved successfully, go back to the previous page
           this.goToParentPage();
+          this.currentLighBoxId = this.sequenceFistElementNegative;
         },
         (error) => {
           this.errorMessage = 'Unable to save the changes, please try again.<br>' +
@@ -233,12 +222,17 @@ export class IndicatorsReorderViewComponent implements OnInit {
       AreaTypeId: this.areaTypeId,
       GroupId: this.groupId,
       Sequence: 1,
-      SubheadingId: -1,
-      Subheading: this.subheading,
+      SubheadingId: this.currentLighBoxId,
+      Subheading: this.subheading
     }
 
     this.groupingSubheadings.push(groupingSubheading);
     this.addGroupingSubheadingToReorderIndicatorList(groupingSubheading, true);
+
+    // Adding one to the current number of lightboxes
+    // It is decreasing to make differences between lightbox id that will be negative number
+    // and indicators id that it will be positive always
+    this.currentLighBoxId--;
   }
 
   // Show light box for edit subheading confirmation
@@ -326,8 +320,12 @@ export class IndicatorsReorderViewComponent implements OnInit {
     const filteredGroupingSubheadings: GroupingSubheading[] = [];
 
     groupingSubheadingsOfOtherAreaTypes.forEach(groupingSubheadingsOfOtherAreaType => {
-      if (this.groupingSubheadings.findIndex(x => x.Subheading.toLowerCase() === groupingSubheadingsOfOtherAreaType.Subheading.toLowerCase()) === -1) {
-        if (filteredGroupingSubheadings.findIndex(x => x.Subheading.toLowerCase() === groupingSubheadingsOfOtherAreaType.Subheading.toLowerCase()) === -1) {
+      if (this.groupingSubheadings.findIndex(x => x.Subheading.toLowerCase() ===
+        groupingSubheadingsOfOtherAreaType.Subheading.toLowerCase()) === -1) {
+
+        if (filteredGroupingSubheadings.findIndex(x => x.Subheading.toLowerCase() ===
+          groupingSubheadingsOfOtherAreaType.Subheading.toLowerCase()) === -1) {
+
           filteredGroupingSubheadings.push(groupingSubheadingsOfOtherAreaType);
         }
       }
@@ -363,9 +361,39 @@ export class IndicatorsReorderViewComponent implements OnInit {
       }
     }
   }
+
+  getindicatorsElementsFromTable(): HTMLElement[] {
+    return Array.from($('.tablesorter-dataRow'));
+  }
+
+  // Add the proper sequence for elements into the table position
+  updateSequences(rows: HTMLElement[]) {
+
+    let sequenceIndicatorsCounter = this.sequenceFirstElementIndicators;
+    rows.forEach(row => {
+
+      const tds = (<HTMLTableRowElement>row).children;
+
+      const isSubheading = tds[0].textContent;
+      const sexId = Number(tds[1].textContent);
+      const ageId = Number(tds[2].textContent);
+      const contentId = Number(tds[4].textContent);
+
+      if (isSubheading === 'false') {
+        this.groupingPlusNames.find(x => x.IndicatorId === contentId &&
+          x.SexId === sexId &&
+          x.AgeId === ageId).Sequence = sequenceIndicatorsCounter;
+
+        sequenceIndicatorsCounter++;
+      } else {
+        this.groupingSubheadings.find(x => x.SubheadingId === contentId).Sequence = sequenceIndicatorsCounter;
+      }
+    });
+  }
 }
 
 $(function () {
+
   // JQuery UI methods should be cast to <any> to avoid compile time errors
   (<any>$('tbody')).sortable({
     items: '> tr',
@@ -376,24 +404,28 @@ $(function () {
       // Update the sequence for indicators
       let sequenceCounter = 0;
       rows.forEach(row => {
-        const isSubheading = row.children[0].textContent;
+        const tds = (<HTMLTableRowElement>row).children;
+        const isSubheading = tds[0].textContent;
         if (isSubheading === 'false') {
           sequenceCounter++;
-          row.children[1].textContent = sequenceCounter.toString();
+          tds[3].textContent = sequenceCounter.toString();
         }
       });
 
       // Update the sequence for subheadings
       let rowCounter = 0;
       rows.forEach(row => {
-        const isSubheading = row.children[0].textContent;
+        const tds = (<HTMLTableRowElement>row).children;
+        const isSubheading = tds[0].textContent;
+        const td = tds[3];
         if (isSubheading === 'true') {
-          let td = row.children[1];
           $(td).addClass('white');
-          if (rows[rowCounter + 1].children[0].textContent === 'true') {
-            td.textContent = "1";
+
+          const tdsNextRow = (<HTMLTableRowElement>rows[rowCounter + 1]).children;
+          if (tdsNextRow[0].textContent === 'true') {
+            td.textContent = '1';
           } else {
-            td.textContent = rows[rowCounter + 1].children[1].textContent;
+            td.textContent = tdsNextRow[3].textContent;
           }
         }
 

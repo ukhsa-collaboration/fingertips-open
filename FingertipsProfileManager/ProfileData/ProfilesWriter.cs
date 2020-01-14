@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData.Entities.LookUps;
+﻿using Fpm.ProfileData.Entities.LookUps;
 using Fpm.ProfileData.Entities.Profile;
 using NHibernate;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.ProfileData
 {
-    public class ProfilesWriter : ProfilesReader
+    public class ProfilesWriter : ProfilesReader, IProfilesWriter
     {
         public ProfilesWriter(ISessionFactory sessionFactory)
             : base(sessionFactory)
@@ -225,6 +225,19 @@ namespace Fpm.ProfileData
             }
         }
 
+        public void UpdateCategoryType(CategoryType categoryType)
+        {
+            var fromDatabase = GetCategoryType(categoryType.Id);
+
+            // Copy properties to object retrieved from the database
+            fromDatabase.Name = categoryType.Name;
+            fromDatabase.ShortName = categoryType.ShortName;
+            fromDatabase.Description = categoryType.Description;
+            fromDatabase.Notes = categoryType.Notes;
+
+            UpdateObject(fromDatabase);
+        }
+
         private void DeleteObject(object objectToDelete)
         {
             if (objectToDelete != null)
@@ -318,19 +331,6 @@ namespace Fpm.ProfileData
             to.PolarityId = @from.PolarityId;
             to.LegendHtml = @from.LegendHtml;
             to.UseCIsForLimitComparison = @from.UseCIsForLimitComparison;
-        }
-
-        public void UpdateCategoryType(CategoryType categoryType)
-        {
-            var fromDatabase = GetCategoryType(categoryType.Id);
-
-            // Copy properties to object retrieved from the database
-            fromDatabase.Name = categoryType.Name;
-            fromDatabase.ShortName = categoryType.ShortName;
-            fromDatabase.Description = categoryType.Description;
-            fromDatabase.Notes = categoryType.Notes;
-
-            UpdateObject(fromDatabase);
         }
     }
 }

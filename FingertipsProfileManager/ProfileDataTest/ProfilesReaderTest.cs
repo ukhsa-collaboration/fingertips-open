@@ -23,7 +23,7 @@ namespace Fpm.ProfileDataTest
                 IndicatorId = IndicatorIds.ObesityYear6,
                 AgeId = AgeIds.Years10To11,
                 SexId = SexIds.Persons,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPre2019
             };
             IList<TimePeriod> periods = Reader().GetCoreDataSetTimePeriods(grouping);
             Assert.IsTrue(periods.Any());
@@ -161,6 +161,14 @@ namespace Fpm.ProfileDataTest
         }
 
         [TestMethod]
+        public void TestGetProfilesEditableByUser()
+        {
+            var details = Reader().GetProfilesEditableByUser(FpmUserIds.PaulCollingwood);
+            Assert.IsNotNull(details);
+            Assert.IsTrue(details.Count > 0);
+        }
+
+        [TestMethod]
         public void TestGetProfileIdFromUrlKey()
         {
             var id = Reader().GetProfileIdFromUrlKey(UrlKeys.Phof);
@@ -202,7 +210,7 @@ namespace Fpm.ProfileDataTest
 
             IList<Grouping> groupings = Reader().GetGroupings(
                 new List<int> {GroupIds.PhofWiderDeterminantsOfHealth},
-                AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeIds.CountyAndUnitaryAuthorityPre2019,
                 IndicatorIds.ChildrenInPoverty,
                 SexIds.Persons,
                 AgeIds.LessThan16,
@@ -214,7 +222,7 @@ namespace Fpm.ProfileDataTest
             foreach (Grouping grouping in groupings)
             {
                 Assert.AreEqual(GroupIds.PhofWiderDeterminantsOfHealth, grouping.GroupId);
-                Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthority, grouping.AreaTypeId);
+                Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthorityPre2019, grouping.AreaTypeId);
                 Assert.AreEqual(IndicatorIds.ChildrenInPoverty, grouping.IndicatorId);
                 Assert.AreEqual(SexIds.Persons, grouping.SexId);
                 Assert.AreEqual(AgeIds.LessThan16, grouping.AgeId);
@@ -225,11 +233,12 @@ namespace Fpm.ProfileDataTest
         [TestMethod]
         public void TestGetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId()
         {
-            IList<Grouping> groupings = Reader().GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId(
+            IList<Grouping> groupings = Reader().GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexIdAndAgeId(
                 GroupIds.PhofWiderDeterminantsOfHealth,
-                AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeIds.CountyAndUnitaryAuthorityPre2019,
                 IndicatorIds.ChildrenInPoverty,
-                SexIds.Persons
+                SexIds.Persons,
+                AgeIds.LessThan16
                 );
 
             Assert.IsTrue(groupings.Any());
@@ -237,9 +246,10 @@ namespace Fpm.ProfileDataTest
             foreach (Grouping grouping in groupings)
             {
                 Assert.AreEqual(GroupIds.PhofWiderDeterminantsOfHealth, grouping.GroupId);
-                Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthority, grouping.AreaTypeId);
+                Assert.AreEqual(AreaTypeIds.CountyAndUnitaryAuthorityPre2019, grouping.AreaTypeId);
                 Assert.AreEqual(IndicatorIds.ChildrenInPoverty, grouping.IndicatorId);
                 Assert.AreEqual(SexIds.Persons, grouping.SexId);
+                Assert.AreEqual(AgeIds.LessThan16, grouping.AgeId);
             }
         }
 
@@ -258,13 +268,13 @@ namespace Fpm.ProfileDataTest
                 new List<int>
                 {
                     GroupIds.SevereMentalIllness_Prevalence,
-                    GroupIds.SevereMentalIllness_Finance
+                    GroupIds.PhofWiderDeterminantsOfHealth
                 });
 
             Assert.AreEqual(2, metadata.Count);
 
-            Assert.IsTrue(metadata[0].GroupName.ToLower().Contains("prevalence"));
-            Assert.IsTrue(metadata[1].GroupName.ToLower().Contains("finance"));
+            Assert.IsTrue(metadata[0].GroupName.ToLower().Contains("wider determinants"));
+            Assert.IsTrue(metadata[1].GroupName.ToLower().Contains("prevalence"));
         }
 
         [TestMethod]
@@ -311,7 +321,7 @@ namespace Fpm.ProfileDataTest
             IList<IndicatorText> list = reader.GetIndicatorTextValues(
                 IndicatorIds.HipFractures, properties, ProfileIds.ProfileThatDoesNotExist);
             Assert.IsNull(list[0].ValueSpecific);
-            Assert.IsTrue(list[0].ValueGeneric.Contains("4.14"));
+            Assert.IsTrue(list[0].ValueGeneric.Contains("Hip"));
             Assert.IsTrue(list.Count > 10);
         }
 
@@ -326,11 +336,11 @@ namespace Fpm.ProfileDataTest
             Assert.IsTrue(areas.Any());
 
             //Test for County/UA 
-            areas = reader.GetAreas("Cam", AreaTypeIds.CountyAndUnitaryAuthority);
+            areas = reader.GetAreas("Cam", AreaTypeIds.CountyAndUnitaryAuthorityPre2019);
             Assert.IsTrue(areas.Any());
 
             //Test for LA/UA 
-            areas = reader.GetAreas("Cam", AreaTypeIds.DistrictAndUnitaryAuthority);
+            areas = reader.GetAreas("Cam", AreaTypeIds.DistrictAndUnitaryAuthorityPre2019);
             Assert.IsTrue(areas.Any());
 
             //Test for CCG - Not Found 
@@ -459,7 +469,7 @@ namespace Fpm.ProfileDataTest
         {
             var doc = new Document
             {
-                ProfileId = ProfileIds.Diabetes,
+                ProfileId = ProfileIds.DevelopmentProfileForTesting,
                 FileName = name,
                 FileData = new byte[] {0x1, 0x2, 0x3, 0x4, 0x5},
                 UploadedBy = "Doris",
@@ -470,7 +480,7 @@ namespace Fpm.ProfileDataTest
 
         private IList<Document> GetDocumentsFromDb()
         {
-            return Reader().GetDocumentsWithoutFileData(ProfileIds.Diabetes);
+            return Reader().GetDocumentsWithoutFileData(ProfileIds.Phof);
         }
 
         private static ProfilesReader Reader()

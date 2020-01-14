@@ -100,8 +100,7 @@
     <Compile Include="JsonBuilderParentAreaGroupsTest.cs" />
     <Compile Include="LogExceptionTest.cs" />
     <Compile Include="EntitiesControllerEndPointTest.cs" />
-    <Compile Include="NonPublicServicesControllerEndPointTest.cs" />
-    <Compile Include="PdfDataTest.cs" />
+    <Compile Include="IndicatorListControllerEndPointTest.cs" />
     <Compile Include="PholioControllerEndPointTest.cs" />
     <Compile Include="ProfilesControllerEndPointTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -138,6 +137,14 @@
     <ProjectReference Include="..\Services\Services.csproj">
       <Project>{7F25ED64-20A5-491A-BA93-04DDDDAD0C4C}</Project>
       <Name>Services</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserDataTest\UserDataTest.csproj">
+      <Project>{3860F267-D928-46DE-B306-EE35E1939B43}</Project>
+      <Name>UserDataTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UserData\UserData.csproj">
+      <Project>{F8A2D703-7140-4AC7-80CD-2B81DEC1770F}</Project>
+      <Name>UserData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

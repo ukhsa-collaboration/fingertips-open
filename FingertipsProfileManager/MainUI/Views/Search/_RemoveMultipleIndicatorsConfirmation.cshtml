@@ -1,0 +1,137 @@
+﻿@using Fpm.MainUI
+@using Fpm.MainUI.Models
+@model List<RemoveIndicatorModel>
+
+@{
+    var indicatorsCanBeRemoved = Model.Where(x => x.IndicatorCanBeRemoved == true);
+    var indicatorsCannotBeRemoved = Model.Where(x => x.IndicatorCanBeRemoved == false  && x.UserHasPermissionToProfile == true);
+    var indicatorsNoPermissionForUserOnProfile = Model.Where(x => x.UserHasPermissionToProfile == false);
+}
+
+<script src="@(AppConfig.JsPath)PageSearchResults.js" type="text/javascript"></script>
+
+<div id="removeIndicatorsConfirmation" style="display: none;">
+    @using (Html.BeginForm("ConfirmRemoveMultipleIndicators", "Search", FormMethod.Get, new { id = "RemoveMultipleIndicatorsForm" }))
+    {
+    <div>
+        <h2>Remove indicators</h2>
+
+        @if (indicatorsNoPermissionForUserOnProfile.Any())
+        {
+            <h3>
+                The following indicators cannot be removed as you do not have permission to their profiles
+            </h3>
+            <table class="grid">
+                <tr>
+                    <th>Profile</th>
+                    <th>Domain</th>
+                    <th>Area type</th>
+                    <th>IndicatorId</th>
+                    <th>Indicator</th>
+                </tr>
+                @foreach (var data in indicatorsNoPermissionForUserOnProfile)
+                {
+                    <tr>
+                        <td class="left">
+                            @data.Profile.Name
+                        </td>
+                        <td class="left">
+                            @data.GroupName
+                        </td>
+                        <td class="left">
+                            @data.Indicator.AreaType
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorId
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorName (@data.Indicator.Sex) (@data.Indicator.Age)
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+
+        @if (indicatorsCannotBeRemoved.Any())
+        {
+            <h3>
+                The following indicators cannot be removed as they are used in other profiles
+            </h3>
+            <table class="grid">
+                <tr>
+                    <th>Profile</th>
+                    <th>Domain</th>
+                    <th>Area type</th>
+                    <th>IndicatorId</th>
+                    <th>Indicator</th>
+                </tr>
+                @foreach (var data in indicatorsCannotBeRemoved)
+                {
+                    <tr>
+                        <td class="left">
+                            @data.Profile.Name
+                        </td>
+                        <td class="left">
+                            @data.GroupName
+                        </td>
+                        <td class="left">
+                            @data.Indicator.AreaType
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorId
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorName (@data.Indicator.Sex) (@data.Indicator.Age)
+                        </td>
+                    </tr>
+                }
+            </table>
+        }
+
+        @if (indicatorsCanBeRemoved.Any())
+        {
+            <h3>
+                The following indicators will be removed
+            </h3>
+            <table class="grid">
+                <tr>
+                    <th>Profile</th>
+                    <th>Domain</th>
+                    <th>Area type</th>
+                    <th>Indicator Id</th>
+                    <th>Indicator</th>
+                </tr>
+                @foreach (var data in indicatorsCanBeRemoved)
+                {
+                    var hiddenVal = string.Format("{0}~{1}~{2}~{3}~{4}~{5}", data.Profile.Id, data.Indicator.GroupId, data.Indicator.IndicatorId, data.Indicator.AreaTypeId, data.Indicator.SexId, data.Indicator.AgeId);
+                    @Html.Hidden("indicator-to-remove" + data.Indicator.IndicatorId, hiddenVal, new { @class = "indicator-id" })
+
+                    <tr>
+                        <td class="left">
+                            @data.Profile.Name
+                        </td>
+                        <td class="left">
+                            @data.GroupName
+                        </td>
+                        <td class="left">
+                            @data.Indicator.AreaType
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorId
+                        </td>
+                        <td class="left">
+                            @data.Indicator.IndicatorName (@data.Indicator.Sex) (@data.Indicator.Age)
+                        </td>
+                    </tr>
+                }
+            </table>
+            @Html.Hidden("removeMultipleIndicatorDetails")
+            <p>
+                <input class="btn btn-primary" id="remove-multiple-indicators-confirm-button" type="button" value="Confirm" />
+                <input class="btn btn-default" id="Cancel" onclick="lightbox.hide()" value="Cancel" style="width: 80px;" />
+            </p>
+        }
+
+    </div>
+    }
+</div>

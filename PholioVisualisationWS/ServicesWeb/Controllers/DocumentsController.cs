@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Management;
 using Newtonsoft.Json;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataAccess.Repositories;
@@ -82,10 +81,11 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                     success = false;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Error identified, set the success to false
                 success = false;
+                Log(ex);
             }
 
             // Set and return the http response message

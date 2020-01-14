@@ -1,7 +1,0 @@
-<form [formGroup]="profileListForm">
-  <select formControlName="profileListControl" class="form-control" (change)="profileChange($event)">
-    <option *ngFor="let userProfile of userProfiles" [value]="userProfile.Id">
-      {{ userProfile.Name }}
-    </option>
-  </select>
-</form>

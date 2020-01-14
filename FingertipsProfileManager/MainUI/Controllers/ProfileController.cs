@@ -17,24 +17,39 @@ using System.Web.Routing;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("profiles")]
     public class ProfileController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
 
-        private ProfileRepository _profileRepository;
-        private UserRepository _userRepository;
-        private LookUpsRepository _lookUpsRepository;
+        private readonly IProfileRepository _profileRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ILookUpsRepository _lookUpsRepository;
 
-        private string _userName;
+        private int _userId;
+
+        public ProfileController(IProfilesReader reader, IProfilesWriter writer,
+            IProfileRepository profileRepository, IUserRepository userRepository,
+            ILookUpsRepository lookUpsRepository)
+        {
+            _reader = reader;
+            _writer = writer;
+
+            _profileRepository = profileRepository;
+            _userRepository = userRepository;
+            _lookUpsRepository = lookUpsRepository;
+        }
 
         protected override void Initialize(RequestContext requestContext)
         {
             base.Initialize(requestContext);
-            _userName = UserDetails.CurrentUser().Name;
+            var user = UserDetails.CurrentUser();
+            _userId = user.Id;
         }
 
         [AdminUsersOnly]
+        [Route]
         public ActionResult ProfileIndex()
         {
             var model = new ProfileGridModel
@@ -42,7 +57,8 @@ namespace Fpm.MainUI.Controllers
                 SortBy = "Sequence",
                 SortAscending = true,
                 CurrentPageIndex = 1,
-                PageSize = 200
+                PageSize = 200,
+                ShowNewProfileButton = true
             };
 
             GetAllProfiles(model);
@@ -53,8 +69,32 @@ namespace Fpm.MainUI.Controllers
             return View(model);
         }
 
+        [Route("profiles-editable-by-user")]
         [HttpGet]
-        [Route("CreateProfile")]
+        public ActionResult ProfilesEditableByUser()
+        {
+            var model = new ProfileGridModel
+            {
+                SortBy = "Sequence",
+                SortAscending = true,
+                CurrentPageIndex = 1,
+                PageSize = 200,
+                ShowNewProfileButton = false,
+                UserId = _userId
+            };
+
+            GetProfilesEditableByUser(model);
+
+            var systemProfileIds = new List<int> { ProfileIds.UnassignedIndicators, ProfileIds.IndicatorsForReview };
+
+            ViewBag.UserProfiles = model.ProfileGrid.Where(x => systemProfileIds.Contains(x.Id) == false).ToList();
+            ViewBag.SystemProfiles = model.ProfileGrid.Where(x => systemProfileIds.Contains(x.Id)).ToList();
+
+            return View("UserProfiles", model);
+        }
+
+        [HttpGet]
+        [Route("create-profile")]
         public ActionResult CreateProfile()
         {
             var profileViewModel = new ProfileViewModel()
@@ -69,13 +109,13 @@ namespace Fpm.MainUI.Controllers
 
             ViewBag.AllUsers = _userRepository.GetAllFpmUsers().ToProfileUserList();
 
-            ViewBag.ContactUserId = GetFpmUserList();
+            ViewBag.ContactUserIds = GetFpmUserList();
 
             return View("CreateProfile", profileViewModel);
         }
 
         [HttpPost]
-        [Route("CreateProfile")]
+        [Route("create-profile")]
         public ActionResult CreateProfile(ProfileViewModel profileViewModel)
         {
             profileViewModel.ProfileUsers = JsonConvert.DeserializeObject<IEnumerable<ProfileUser>>(Request["ProfileUsers"]);
@@ -93,7 +133,7 @@ namespace Fpm.MainUI.Controllers
             return RedirectToAction("ProfileIndex");
         }
 
-        [Route("EditProfile")]
+        [Route("edit-profile")]
         [HttpGet]
         public ActionResult EditProfile(string profileKey)
         {
@@ -114,6 +154,9 @@ namespace Fpm.MainUI.Controllers
             profileViewModel.AllUsers = new SelectList(allUsers, "Id", "Name");
 
             ViewBag.SkinId = new SelectList(_lookUpsRepository.GetSkins(), "Id", "Name");
+            ViewBag.FpmUsers = _userRepository.GetAllFpmUsers();
+
+            ViewBag.SelectedContactUserIds = String.Join(",", profileViewModel.ContactUserIds);
 
             DefineNonAdminProfileProperties(profileViewModel);
 
@@ -121,7 +164,7 @@ namespace Fpm.MainUI.Controllers
 
         }
 
-        [Route("EditProfile")]
+        [Route("edit-profile")]
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "UpdateProfile")]
         public ActionResult EditProfile(ProfileViewModel profileViewModel)
@@ -133,7 +176,7 @@ namespace Fpm.MainUI.Controllers
             return RedirectToAction("ProfileIndex");
         }
 
-        [Route("EditProfile")]
+        [Route("copy-profile")]
         [HttpPost]
         [MultipleButton(Name = "action", Argument = "CopyProfile")]
         public ActionResult CopyProfile(ProfileViewModel profileViewModel)
@@ -162,6 +205,7 @@ namespace Fpm.MainUI.Controllers
             return RedirectToAction("ProfileIndex");
         }
 
+        [Route("set-data-point")]
         [HttpPost]
         public ActionResult SetDataPoint(int profileId, int areaTypeId, int indicatorId,
             int sexId, int ageId, int year, int quarter, int month, int yearRange)
@@ -188,33 +232,7 @@ namespace Fpm.MainUI.Controllers
             return Json("Saved OK");
         }
 
-        [HttpPost]
-        public ActionResult CreateNewFromOld(int? selectedDecimalPlaces, int? selectedTargetId, string selectedProfileId, string selectedDomain,
-            int selectedAreaType, int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod,
-            string selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType,
-            int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
-            int selectedDenominatorType, string userMTVChanges, int startYear, int endYear, int startQuarterRange,
-            int endQuarterRange, int startMonthRange, int endMonthRange, DateTime? latestChangeTimestamp)
-        {
-            var profileId = _reader.GetProfileDetails(selectedProfileId/*urlkey*/).Id;
-            var groupId = int.Parse(selectedDomain);
-
-            int newIndicatorId = SaveIndicatorAs(profileId, groupId, selectedAreaType, selectedSex,
-                selectedAge, selectedComparator, selectedComparatorMethod, selectedComparatorConfidence,
-                selectedYearType, selectedYearRange, selectedValueType, selectedCiMethodType,
-                selectedPolarityType, selectedUnitType, selectedDenominatorType, userMTVChanges, startYear, endYear,
-                startQuarterRange, endQuarterRange, startMonthRange, endMonthRange, selectedDecimalPlaces, selectedTargetId, latestChangeTimestamp);
-
-            var newList = new List<string>();
-            newList.Add(selectedProfileId);
-            newList.Add(selectedAreaType.ToString());
-            newList.Add(newIndicatorId.ToString());
-            newList.Add(selectedDomain);
-
-            return Json(newList);
-        }
-
-        [Route("profile/AddProfileUser")]
+        [Route("profile/add-profile-user")]
         [HttpPost]
         public ActionResult AddProfileUser(int profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
         {
@@ -240,7 +258,7 @@ namespace Fpm.MainUI.Controllers
         }
 
         [HttpPost]
-        [Route("profile/RemoveProfileUser")]
+        [Route("profile/remove-profile-user")]
         public ActionResult RemoveProfileUser(int profileId, [Bind(Include = "FpmUserId")]EditUserViewModel viewModel)
         {
             var userId = viewModel.FpmUserId;
@@ -256,7 +274,8 @@ namespace Fpm.MainUI.Controllers
             return PartialView("_UserPermissions", profileUsers);
         }
 
-        [Route("profile/EditProfileNonAdmin")]
+        [Route("profile/edit-profile-non-admin")]
+        [HttpGet]
         public ActionResult EditProfileNonAdmin(int profileId = ProfileIds.Undefined)
         {
             var user = UserDetails.CurrentUser();
@@ -276,18 +295,30 @@ namespace Fpm.MainUI.Controllers
 
             ViewBag.ProfileId = profileId;
 
+            if (profileIndexViewModel.ProfileViewModel != null)
+            {
+                ViewBag.SelectedContactUserIds = String.Join(",", profileIndexViewModel.ProfileViewModel.ContactUserIds);
+            }
+            else
+            {
+                ViewBag.SelectedContactUserIds = "1";
+            }
+
             return View("EditProfileNonAdmin", profileIndexViewModel);
         }
 
-        [Route("profile/NonAdminProfileDetails")]
+        [Route("profile/non-admin-profile-details")]
         [HttpGet]
         public ActionResult NonAdminProfileDetails(int profileId)
         {
             var profileViewModel = GetProfileViewModel(profileId);
+
+            ViewBag.SelectedContactUserIds = String.Join(",", profileViewModel.ContactUserIds);
+
             return PartialView("_NonAdminProfileDetails", profileViewModel);
         }
 
-        [Route("profile/NonAdminProfileDetails")]
+        [Route("profile/non-admin-profile-details")]
         [HttpPost]
         public ActionResult NonAdminProfileDetails(ProfileViewModel profileViewModel)
         {
@@ -299,15 +330,17 @@ namespace Fpm.MainUI.Controllers
 
             profile.DefaultAreaTypeId = profileViewModel.DefaultAreaTypeId;
             profile.Name = profileViewModel.Name;
-            profile.ContactUserId = profileViewModel.ContactUserId;
+            profile.ContactUserIds = String.Join(",", profileViewModel.ContactUserIds);
             profile.DefaultFingertipsTabId = profileViewModel.DefaultFingertipsTabId;
             profile.SpineChartMinMaxLabelId = profileViewModel.SpineChartMinMaxLabelId;
             profile.StartZeroYAxis = profileViewModel.StartZeroYAxis;
             profile.ShowDataQuality = profileViewModel.ShowDataQuality;
+            profile.ShowOfficialStatistic = profileViewModel.ShowOfficialStatistic;
             profile.HasTrendMarkers = profileViewModel.HasTrendMarkers;
             profile.UseTargetBenchmarkByDefault = profileViewModel.UseTargetBenchmarkByDefault;
             profile.IsChangeFromPreviousPeriodShown = profileViewModel.IsChangeFromPreviousPeriodShown;
             profile.NewDataDeploymentCount = profileViewModel.NewDataDeploymentCount;
+            profile.AreIndicatorNamesDisplayedWithNumbers = profileViewModel.AreIndicatorNamesDisplayedWithNumbers;
 
             SetExtraJsFiles(profileViewModel, profile);
             SetFrontPageAreaSearchAreaTypes(profileViewModel, profile);
@@ -319,31 +352,25 @@ namespace Fpm.MainUI.Controllers
             return Json(new { IsSaved = true }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult RedirectToNew(string redirectUrl, string areaType)
-        {
-            return RedirectToAction("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators",
-                new { ProfileKey = redirectUrl, SelectedAreaTypeId = areaType });
-        }
-
-
+        [Route("all-profiles")]
         [HttpGet]
-        [Route("profile/user-profiles")]
-        public ActionResult GetUserProfiles()
-        {
-            var profiles = UserDetails.CurrentUser().GetProfilesUserHasPermissionsTo()
-                     .Where(x => x.Id != ProfileIds.ArchivedIndicators & x.Id != ProfileIds.UnassignedIndicators)
-                .OrderBy(x => x.Name)
-                .ToList();
-            // Only return the required properties 
-            var result = profiles.Select(x => new { x.Id, x.Name });
-            return Json(result, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpGet]
-        [Route("profile/all-profiles")]
         public ActionResult GetAllProfiles()
         {
             var result = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
+            return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [Route("user-profiles")]
+        [HttpGet]
+        public ActionResult GetUserProfiles()
+        {
+            var profiles = UserDetails.CurrentUser().GetProfilesUserHasPermissionsTo()
+                .Where(x => x.Id != ProfileIds.UnassignedIndicators)
+                .OrderBy(x => x.Name)
+                .ToList();
+
+            // Only return the required properties 
+            var result = profiles.Select(x => new { x.Id, x.Name });
             return Json(result, JsonRequestBehavior.AllowGet);
         }
 
@@ -361,21 +388,6 @@ namespace Fpm.MainUI.Controllers
             {
                 AutoMapper.Mapper.Map(new ExtraJsFileHelper(profileDetails.ExtraJsFiles), profileViewModel);
             }
-
-            var options = new List<object>
-            {
-                new
-                {
-                    Option = CompareAreasOption.BarChartAndFunnelPlot,
-                    Label = "Bar chart and funnel plot"
-                },
-                new
-                {
-                    Option = CompareAreasOption.BarChartOnly,
-                    Label = "Bar chart only"
-                }
-            };
-            ViewBag.CompareAreasOption = new SelectList(options, "Option", "Label");
         }
 
         private ProfileDetails GetProfileDetailsFromViewModel(ProfileViewModel profileViewModel)
@@ -409,41 +421,6 @@ namespace Fpm.MainUI.Controllers
             var extraJsFileHelper = new ExtraJsFileHelper();
             AutoMapper.Mapper.Map(profileViewModel, extraJsFileHelper);
             profile.ExtraJsFiles = extraJsFileHelper.GetExtraJsFiles();
-        }
-
-        private int SaveIndicatorAs(int profileId, int groupId, int selectedAreaType,
-         int selectedSex, int selectedAge, int selectedComparator, int selectedComparatorMethod,
-         string selectedComparatorConfidence, int selectedYearType, int selectedYearRange, int selectedValueType,
-         int selectedCiMethodType, int selectedPolarityType, int selectedUnitType,
-         int selectedDenominatorType, string mtvText, int startYear, int endYear, int startQuarterRange,
-         int endQuarterRange, int startMonthRange, int endMonthRange, int? selectedDecimalPlaces, int? selectedTargetId,
-         DateTime? latestChangeTimestamp)
-        {
-            IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
-
-            int nextIndicatorId;
-
-            nextIndicatorId = _profileRepository.GetNextIndicatorId();
-
-            if (string.IsNullOrWhiteSpace(mtvText) == false)
-            {
-                var indicatorMetadataTextItems = new IndicatorMetadataTextParser().Parse(mtvText);
-
-                new IndicatorMetadataTextCreator(_profileRepository).CreateNewIndicatorTextValues(
-                    profileId, indicatorMetadataTextItems, properties, nextIndicatorId, _userName);
-
-                _profileRepository.CreateGroupingAndMetadata(profileId, groupId,
-                    nextIndicatorId, selectedAreaType, selectedSex, selectedAge, selectedComparator,
-                    selectedComparatorMethod,
-                    Convert.ToDouble(selectedComparatorConfidence), selectedYearType, selectedYearRange,
-                    selectedValueType, selectedCiMethodType,
-                     selectedPolarityType, selectedUnitType,
-                    selectedDenominatorType, startYear, endYear,
-                    startQuarterRange, endQuarterRange, startMonthRange,
-                    endMonthRange, _userName, selectedDecimalPlaces, selectedTargetId, latestChangeTimestamp);
-            }
-
-            return nextIndicatorId;
         }
 
         private ProfileViewModel GetProfileViewModel(int profileId)
@@ -486,30 +463,17 @@ namespace Fpm.MainUI.Controllers
             model.ProfileGrid = _reader.GetProfiles().OrderBy(x => x.Name).ToList();
         }
 
+        private void GetProfilesEditableByUser(ProfileGridModel model)
+        {
+            model.ProfileGrid = _reader.GetProfilesEditableByUser(model.UserId).OrderBy(x => x.Name).ToList();
+        }
+
         private IEnumerable<SelectListItem> GetFpmUserList()
         {
             return new SelectList(_userRepository.GetAllFpmUsers()
                 .OrderBy(x => x.DisplayName)
                 .Select(x => new SelectListItem { Text = x.DisplayName, Value = x.Id.ToString() })
                 .ToList(), "Value", "Text");
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
-            _userRepository = new UserRepository();
-            _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _profileRepository.Dispose();
-            _userRepository.Dispose();
-            _lookUpsRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
         }
 
         private void DefineNonAdminProfileProperties(ProfileViewModel viewModel)
@@ -521,7 +485,7 @@ namespace Fpm.MainUI.Controllers
             ViewBag.AvailableAreaTypes = _reader.GetAreaTypes(profileId).ToProfileAreaTypeList();
             ViewBag.DefaultAreaTypeId = new SelectList(_reader.GetSupportedAreaTypes(), "Id", "ShortName");
             ViewBag.DefaultFingertipsTabId = new SelectList(GetListOfFingertipsTabs(), "Value", "Text");
-            ViewBag.ContactUserId = GetFpmUserList();
+            ViewBag.ContactUserIds = GetFpmUserList();
             ViewBag.SpineChartMinMaxLabelId = new SelectList(_reader.GetSpineChartMinMaxLabelOptions(), "Id", "Description");
             ViewBag.FrontPageAreaSearchAreaTypes = new FrontPageAreaSearchOptions().GetOptions(
                 viewModel.FrontPageAreaSearchAreaTypes);

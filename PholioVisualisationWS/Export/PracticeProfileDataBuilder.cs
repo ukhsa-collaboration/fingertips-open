@@ -171,7 +171,7 @@ namespace PholioVisualisation.Export
             {
                 IList<Grouping> groupings = groupDataReader.GetGroupingsByGroupId(groupId);
 
-                IList<GroupRoot> roots = new GroupRootBuilder().BuildGroupRoots(groupings);
+                IList<GroupRoot> roots = new GroupRootBuilder(groupDataReader).BuildGroupRoots(groupings);
 
                 IndicatorMetadataCollection metadataCollection =
                     IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(groupings);
@@ -313,7 +313,7 @@ namespace PholioVisualisation.Export
 
         private static void AddCcgParent(Dictionary<string, Area> map, string code, IList<Area> parentAreas)
         {
-            var area = parentAreas.FirstOrDefault(a => a.AreaTypeId == AreaTypeIds.CcgsPreApr2017);
+            var area = parentAreas.FirstOrDefault(a => AreaType.IsCcgAreaTypeId(a.AreaTypeId));
             AddArea(area, map, code);
         }
 

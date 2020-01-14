@@ -11,9 +11,9 @@ function goToMapPage() {
     if (!areIndicatorsInDomain() && FT.model.areaTypeId !== AreaTypeIds.Practice) {
         // Search results empty
         displayNoData();
+        callAngularEvent('NoDataDisplayed', { 'isEnglandAreaType': isEnglandAreaType() });
     } else {
-        callAngularEvent('MapSelected');
-        unlock();
+        callAngularEvent('MapSelected', { 'isEnglandAreaType': isEnglandAreaType() });
     }
 }
 

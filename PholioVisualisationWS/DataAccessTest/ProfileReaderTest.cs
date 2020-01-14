@@ -50,17 +50,17 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetProfilePdfs()
         {
-            var areaTypes = Reader().GetProfilePdfs(ProfileIds.ChildAndMaternalHealth);
+            var pdfs = Reader().GetProfilePdfs(ProfileIds.ChildAndMaternalHealth);
 
-            Assert.IsNotNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsNull(areaTypes.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.Subregion));
+            Assert.IsNotNull(pdfs.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.CountyAndUnitaryAuthority));
+            Assert.IsNull(pdfs.FirstOrDefault(x => x.AreaTypeId == AreaTypeIds.Subregion));
         }
 
         [TestMethod]
         public void TestGetAreaCodesToIgnoreEverywhere()
         {
             IList<string> codes = Reader()
-                .GetAreaCodesToIgnore(ProfileIds.LongerLives)
+                .GetAreaCodesToIgnore(ProfileIds.HealthProfiles)
                 .AreaCodesIgnoredEverywhere;
             Assert.AreEqual(3, codes.Count);
             Assert.IsTrue(codes.Contains(AreaCodes.CountyUa_Bedfordshire));
@@ -105,7 +105,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetProfilesForIndicatorsWithOneIndicator()
         {
             var indicators = new List<int> {IndicatorIds.LifeExpectancyAtBirth};
-            var profilesForIndicators = Reader().GetProfilesForIndicators(indicators, AreaTypeIds.CountyAndUnitaryAuthority);
+            var profilesForIndicators = Reader().GetProfilesForIndicators(indicators, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.IsTrue(profilesForIndicators.Count > 0);
             Assert.AreEqual(profilesForIndicators[0].IndicatorId, IndicatorIds.LifeExpectancyAtBirth);
         }
@@ -117,7 +117,7 @@ namespace PholioVisualisation.DataAccessTest
             const int indicator2 = IndicatorIds.LifeExpectancyAtBirth;
 
             var indicators = new List<int> { indicator1, indicator2};
-            var profilesForIndicators = Reader().GetProfilesForIndicators(indicators, AreaTypeIds.CountyAndUnitaryAuthority);
+            var profilesForIndicators = Reader().GetProfilesForIndicators(indicators, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             // Assert
             Assert.IsTrue(profilesForIndicators.Count > 0);

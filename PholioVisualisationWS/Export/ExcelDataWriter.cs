@@ -135,7 +135,6 @@ namespace PholioVisualisation.Export
             names = names.Distinct().ToList();
 
             names.Remove(IndicatorMetadataTextColumnNames.Name);
-            names.Remove(IndicatorMetadataTextColumnNames.NameLong);
             names.Remove(IndicatorMetadataTextColumnNames.Definition);
 
             IList<IndicatorMetadataTextProperty> properties = IndicatorMetadataProvider.Instance.IndicatorMetadataTextProperties;

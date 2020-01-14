@@ -8,6 +8,9 @@ using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using System;
 using System.Collections.Generic;
+using PholioVisualisation.Export.FileBuilder.Containers;
+using PholioVisualisation.Export.FileBuilder.SupportModels;
+using PholioVisualisation.Export.FileBuilder.Wrappers;
 
 namespace PholioVisualisation.ExportTest.FileBuilder.Writers
 {
@@ -20,6 +23,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Writers
         private Mock<PholioReader> _pholioReaderMock;
         private IndicatorExportParameters _generalParameters;
         private IndicatorMetadata _indicatorMetadata;
+        private CsvBuilderAttributesForBodyContainer _parameters;
 
         private IndicatorExportParameters _indicatorExportParameters;
         private AreaFactory _areaFactory;
@@ -33,9 +37,11 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Writers
             _generalParameters = new IndicatorExportParameters();
             _indicatorMetadata = new IndicatorMetadata { Unit = new Unit { Value = 1 }, Descriptive = new Dictionary<string, string>{{"Name", "NameTest"}},YearType = new YearType()};
 
+            _parameters = new CsvBuilderAttributesForBodyContainer(_generalParameters, new OnDemandQueryParametersWrapper(1, new List<int>(), new Dictionary<int, IList<InequalitySearch>>(), null, new List<int>(), true));
+
             _indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
             _areaFactory = new AreaFactory(_areasReaderMock.Object);
-            _areaHelper = new ExportAreaHelper(_areasReaderMock.Object, _indicatorExportParameters, _areaFactory);
+            _areaHelper = new ExportAreaHelper(_areasReaderMock.Object, _indicatorExportParameters);
 
             _areasReaderMock.Setup(x => x.GetCategoryTypes(It.IsAny<IList<int>>())).Returns(new List<CategoryType> ());
             _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area { Code = "SubNationalTest", Name = "NameTest", ShortName = "shortNameTest"});
@@ -46,7 +52,7 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Writers
             _areasReaderMock.Setup(x => x.GetAreasByAreaTypeId(It.IsAny<int>())).Returns(new List<IArea>{ new Area{ AreaTypeId = AreaTypeIds.District, Code = "SubNationalTest", Name = "NameTest", ShortName = "ShortNameTest"}});
             _areaHelper.Init();
 
-            _singleIndicatorFileWriter = new SingleIndicatorFileWriter(1, _generalParameters);
+            _singleIndicatorFileWriter = new SingleIndicatorFileWriter(1, _parameters);
 
             _pholioReaderMock.Setup(x => x.GetAllAges()).Returns(new List<Age> { new Age { Id = 1, Name = "AgeTest"}});
             _pholioReaderMock.Setup(x => x.GetAllSexes()).Returns(new List<Sex> { new Sex { Id = 0, Name = "SexName", Sequence = 1 }});

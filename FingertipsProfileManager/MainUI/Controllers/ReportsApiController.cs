@@ -1,42 +1,43 @@
-﻿using Fpm.MainUI.ViewModels.Report;
+﻿using Fpm.MainUI.Helpers;
+using Fpm.MainUI.ViewModels.Report;
 using Fpm.ProfileData.Entities.Report;
 using Fpm.ProfileData.Repositories;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web.Mvc;
 
 namespace Fpm.MainUI.Controllers
 {
     public class ReportsApiController : Controller
     {
-        private readonly ReportRepository _repo = new ReportRepository();
+        private readonly IReportRepository _reportRepository;
+
+        public ReportsApiController(IReportRepository reportRepository)
+        {
+            _reportRepository = reportRepository;
+        }
 
         [Route("api/reports/")]
         public ActionResult All()
         {
-            var reports = _repo.GetAllReports();
-            var mappings = _repo.GetAllMapping();
+            var reports = _reportRepository.GetAllReports();
+            var mappings = _reportRepository.GetAllMapping();
 
-            var response = new List<ReportViewModel>();
+            var reportViewModels = new List<ReportViewModel>();
 
             foreach (var report in reports)
             {
                 var profiles = mappings.Where(x => x.ReportId == report.Id).Select(x => x.ProfileId).ToList();
-
-                response.Add(new ReportViewModel
-                {
-                    Id = report.Id,
-                    Name = report.Name,
-                    File = report.File,
-                    Parameters = report.Parameters.Split(',').ToList(),
-                    Profiles = profiles,
-                    Notes = report.Notes,
-                    IsLive = report.IsLive
-                });
+                var reportViewModel = GetReportViewModel(report, profiles);
+                reportViewModels.Add(reportViewModel);
             }
 
-            var json = JsonConvert.SerializeObject(response);
+            reportViewModels = reportViewModels.OrderBy(x => x.Name).ToList();
+
+            var json = JsonConvert.SerializeObject(reportViewModels);
             return Content(json, "application/json");
         }
 
@@ -44,21 +45,14 @@ namespace Fpm.MainUI.Controllers
         [Route("api/reports/{id}")]
         public ActionResult GetReport(int id)
         {
-            var report = _repo.GetReportById(id);
-            var profilesForReport = _repo.GetMappingByReportId(id);
+            var report = _reportRepository.GetReportById(id);
+            var profilesForReport = _reportRepository.GetMappingByReportId(id);
 
-            var response = new ReportViewModel
-            {
-                Id = report.Id,
-                Name = report.Name,
-                File = report.File,
-                Parameters = report.Parameters.Split(',').ToList(),
-                Profiles = profilesForReport.Where(x => x.ReportId == report.Id).Select(x => x.ProfileId).ToList(),
-                Notes = report.Notes,
-                IsLive = report.IsLive
-            };
+            var profiles = profilesForReport.Where(x => x.ReportId == report.Id).Select(x => x.ProfileId).ToList();
 
-            var json = JsonConvert.SerializeObject(response);
+            var reportViewModel = GetReportViewModel(report, profiles);
+
+            var json = JsonConvert.SerializeObject(reportViewModel);
             return Content(json, "application/json");
         }
 
@@ -66,8 +60,19 @@ namespace Fpm.MainUI.Controllers
         [Route("api/reports/{id}")]
         public ActionResult Delete(int id)
         {
-            _repo.DeleteReportById(id);
-            return Content("delete reports");
+            try
+            {
+                _reportRepository.DeleteReportById(id);
+
+                var json = JsonConvert.SerializeObject(string.Empty);
+                return Content(json, "application/json");
+            }
+            catch (Exception exception)
+            {
+                ExceptionLogger.LogException(exception, "Global.asax");
+            }
+
+            return new HttpStatusCodeResult(HttpStatusCode.InternalServerError);
         }
 
         [Route("api/reports/new")]
@@ -81,11 +86,12 @@ namespace Fpm.MainUI.Controllers
                 File = model.File,
                 Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : "",
                 Notes = model.Notes,
-                IsLive = model.IsLive
+                IsLive = model.IsLive,
+                AreaTypeIds = model.AreaTypeIds != null ? string.Join(",", model.AreaTypeIds) : ""
             };
 
 
-            var reportId = _repo.AddReport(report);
+            var reportId = _reportRepository.AddReport(report);
 
             if (model.Profiles != null)
             {
@@ -97,13 +103,13 @@ namespace Fpm.MainUI.Controllers
                         ProfileId = profile
                     };
 
-                    _repo.AddProfileMapping(mapping);
+                    _reportRepository.AddProfileMapping(mapping);
                 }
             }
 
-            return Content("all reports");
+            var json = JsonConvert.SerializeObject(report);
+            return Content(json, "application/json");
         }
-
 
 
         [Route("api/reports/new")]
@@ -117,13 +123,14 @@ namespace Fpm.MainUI.Controllers
                 File = model.File,
                 Parameters = model.Parameters != null ? string.Join(",", model.Parameters) : "",
                 Notes = model.Notes,
-                IsLive = model.IsLive
+                IsLive = model.IsLive,
+                AreaTypeIds = model.AreaTypeIds != null ? string.Join(",", model.AreaTypeIds) : ""
             };
 
-            _repo.UpdateReport(report);
+            _reportRepository.UpdateReport(report);
 
 
-            _repo.DeleteMappingForReport(model.Id);
+            _reportRepository.DeleteMappingForReport(model.Id);
 
             if (model.Profiles != null)
             {
@@ -135,11 +142,29 @@ namespace Fpm.MainUI.Controllers
                         ProfileId = profile
                     };
 
-                    _repo.AddProfileMapping(mapping);
+                    _reportRepository.AddProfileMapping(mapping);
                 }
             }
 
-            return Content("update reports");
+            var json = JsonConvert.SerializeObject(report);
+            return Content(json, "application/json");
+        }
+
+        private static ReportViewModel GetReportViewModel(Report report, List<int> profiles)
+        {
+            var response = new ReportViewModel
+            {
+                Id = report.Id,
+                Name = report.Name,
+                File = report.File,
+                Parameters = report.Parameters.Split(',').ToList(),
+                Profiles = profiles,
+                Notes = report.Notes,
+                IsLive = report.IsLive,
+                AreaTypeIds = report.AreaTypeIds != null ? report.AreaTypeIds.Split(',').ToList() : new List<string>()
+            };
+
+            return response;
         }
     }
 }

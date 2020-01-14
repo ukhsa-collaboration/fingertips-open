@@ -13,7 +13,7 @@ namespace PholioVisualisation.DataConstruction
         {
             Unit unit = indicatorMetadata.Unit;
 
-            if (AverageCalculatorFactory.IsWeightedAverageValid(indicatorMetadata.ValueTypeId) == false)
+            if (AverageCalculatorFactory.IsStandardAverageValid(indicatorMetadata.ValueTypeId) == false)
             {
                 return;
             }
@@ -25,7 +25,7 @@ namespace PholioVisualisation.DataConstruction
 
                 if (RuleAreEnoughPracticeValuesByPopulation.Validates(validData, ccgPopulation))
                 {
-                    Average = WeightedAverageCalculator.CalculateAverage(validData, unit);
+                    Average = StandardAverageCalculator.CalculateAverage(validData, unit);
                     Average.AreaCode = ccgPopulation.AreaCode;
                 }
             }

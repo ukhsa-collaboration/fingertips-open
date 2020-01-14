@@ -13,11 +13,11 @@ namespace PholioVisualisation.DataAccessTest.Repositories
         public void Test_GetAreaTypeComponents()
         {
             var components = new AreaTypeComponentRepository()
-                .GetAreaTypeComponents(AreaTypeIds.CountyAndUnitaryAuthority);
+                .GetAreaTypeComponents(AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
-            Assert.AreEqual(2, components.Count);
+            Assert.AreEqual(4, components.Count);
             Assert.IsTrue(components.Select(x => x.ComponentAreaTypeId)
-                .Contains(AreaTypeIds.County));
+                .Contains(AreaTypeIds.CountyUnchanged));
         }
     }
 }

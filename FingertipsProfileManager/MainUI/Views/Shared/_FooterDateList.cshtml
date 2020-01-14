@@ -1,10 +1,13 @@
 ﻿@using System.Globalization
 @using Fpm.ProfileData.Repositories
 @{
-    var dates = new MonthlyReleaseRepository().GetUpcomingMonthlyReleases(6).Select(x => x.ReleaseDate);
+    var dates = new MonthlyReleaseRepository()
+        .GetUpcomingMonthlyReleases(6)
+        .Where(x => x.ReleaseDate > DateTime.Now)
+        .Select(x => x.ReleaseDate);
 }
 <ul class="list-unstyled">
-    @foreach (var date in dates.Where(x => x > DateTime.Now).Take(6))
+    @foreach (var date in dates)
     {
         <li>@date.DayOfWeek.ToString().Substring(0, 3) @date.Day @date.ToString("MMM", CultureInfo.InvariantCulture) @date.Year</li>
     }

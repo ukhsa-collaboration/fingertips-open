@@ -6,6 +6,7 @@ import { PopulationChartComponent } from './population-chart/population-chart.co
 import { PopulationSummaryComponent } from './population-summary/population-summary.component';
 import { RegisteredPersonsTableComponent } from './registered-persons-table/registered-persons-table.component';
 import { MetadataModule } from '../metadata/metadata.module';
+import { PopulationTableComponent } from './population-table/population-table.component';
 
 @NgModule({
     imports: [
@@ -17,7 +18,8 @@ import { MetadataModule } from '../metadata/metadata.module';
         PopulationComponent,
         PopulationChartComponent,
         PopulationSummaryComponent,
-        RegisteredPersonsTableComponent
+        RegisteredPersonsTableComponent,
+        PopulationTableComponent
     ],
     exports: [
         PopulationComponent

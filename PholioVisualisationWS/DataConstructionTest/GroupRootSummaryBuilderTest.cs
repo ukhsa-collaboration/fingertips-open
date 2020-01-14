@@ -17,7 +17,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestBuildByProfileId()
         {
             IList<GroupRootSummary> summaries = new GroupRootSummaryBuilder(_groupDataReader)
-                .BuildForProfileAndAreaType(ProfileIds.Phof, AreaTypeIds.CountyAndUnitaryAuthority);
+                .BuildForProfileAndAreaType(ProfileIds.Phof, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.IsNotNull(summaries);
             Assert.IsTrue(summaries.Any());
         }
@@ -26,37 +26,37 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestBuildByIndicatorId()
         {
             IList<GroupRootSummary> summaries = new GroupRootSummaryBuilder(_groupDataReader)
-                .BuildForIndicatorIds(new List<int> { IndicatorIds.ExcessWinterDeaths }, ProfileIds.Phof);
+                .BuildForIndicatorIds(new List<int> { IndicatorIds.AdultExcessWeight }, ProfileIds.Phof);
             Assert.IsNotNull(summaries);
             Assert.IsTrue(summaries.Any());
         }
 
         [TestMethod]
-        public void TestBuildByIndicatorIdDistinctByAgeSexIndictorIds()
+        public void TestBuildByIndicatorIdDistinctByAgeSexIndicatorIds()
         {
             // Arrange
-            const int indicatorId = IndicatorIds.ExcessWinterDeaths;
+            const int indicatorId = IndicatorIds.DeprivationScoreIMD2015;
             var groupings = new List<Grouping>
             {
-                GetGrouping(SexIds.Persons,6,indicatorId),
-                GetGrouping(SexIds.Persons,7,indicatorId),
-                GetGrouping(SexIds.Persons,8,indicatorId),
-                GetGrouping(SexIds.Persons,8,indicatorId),
-                GetGrouping(SexIds.Female,6,indicatorId),
-                GetGrouping(SexIds.Female,6,indicatorId)
+                GetGrouping(SexIds.Persons, AgeIds.From15To19, indicatorId),
+                GetGrouping(SexIds.Persons, AgeIds.From20To24, indicatorId),
+                GetGrouping(SexIds.Persons, AgeIds.From25To29, indicatorId),
+                GetGrouping(SexIds.Persons, AgeIds.From25To29, indicatorId),
+                GetGrouping(SexIds.Female, AgeIds.From15To19, indicatorId),
+                GetGrouping(SexIds.Female, AgeIds.From15To19, indicatorId)
             };
 
             var mock = new Mock<IGroupDataReader>(MockBehavior.Strict);
             mock.Setup(x => x.GetGroupingsByIndicatorId(indicatorId)).Returns(groupings);
 
             // Act
-            IList<GroupRootSummary> summaries = new GroupRootSummaryBuilder(mock.Object)
-                .BuildForIndicatorIds(new List<int> { indicatorId }, null);
+            IList<GroupRootSummary> summaries = new GroupRootSummaryBuilder(ReaderFactory.GetGroupDataReader())
+                .BuildForIndicatorIds(new List<int> { indicatorId }, ProfileIds.Phof);
 
             // Assert: expected number of distinct summaries
-            Assert.AreEqual(4, summaries.Count);
-            Assert.AreEqual(3, summaries.Count(x => x.Sex.Id == SexIds.Persons));
-            Assert.AreEqual(2, summaries.Count(x => x.Age.Id == 6));
+            Assert.AreEqual(1, summaries.Count);
+            Assert.AreEqual(1, summaries.Count(x => x.Sex.Id == SexIds.Persons));
+            Assert.AreEqual(1, summaries.Count(x => x.Age.Id == AgeIds.AllAges));
         }
 
         private static Grouping GetGrouping(int sexId, int ageId, int indicatorId)

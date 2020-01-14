@@ -24,6 +24,16 @@ namespace Fpm.MainUISeleniumTest
                 By.ClassName("a-modal"));
         }
 
+        public void UserIndexPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver, By.Id("create-new-user"));
+        }
+
+        public void CreateUserPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver, By.Id("Confirm"));
+        }
+
         public void EditUserPageToLoad()
         {
             SeleniumHelper.WaitForExpectedElement(driver,
@@ -48,6 +58,21 @@ namespace Fpm.MainUISeleniumTest
                 By.Id("main"));
         }
 
+        public void ProfilesAndIndicatorsPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver, By.Id("tbl-profiles-and-indicators"));
+        }
+
+        public void EditIndicatorPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver, By.XPath("//a[@id='ui-id-1']"));
+        }
+
+        public void EditIndicatorMetadataReviewTabToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver, By.Id("IndicatorMetadataReviewAudit_Notes"));
+        }
+
         public void ContentIndexPageToLoad()
         {
             SeleniumHelper.WaitForExpectedElement(driver,
@@ -56,7 +81,12 @@ namespace Fpm.MainUISeleniumTest
 
         public void ReportsIndexPageToLoad()
         {
-            SeleniumHelper.WaitForExpectedElement(driver, By.Name("newReportButton"));
+            SeleniumHelper.WaitForExpectedElement(driver, By.Id("newReportButton"));
+        }
+
+        public void ReportsEditPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver, By.Id("saveReportButton"));
         }
 
         public void LookupTablesPageToLoad()
@@ -73,8 +103,28 @@ namespace Fpm.MainUISeleniumTest
 
         public void EditCategoryPageToLoad()
         {
+            SeleniumHelper.ThreadWait(3);
             SeleniumHelper.WaitForExpectedElement(driver,
                 By.Id("save"));
+        }
+
+        public void ReorderIndicatorsPageToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("reorder-add-subheading"));
+        }
+
+        public void ReorderIndicatorsTableToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.XPath("//*[@id='table']/tbody"));
+        }
+
+        public void AddSubheadingPopupToLoad()
+        {
+            ThreadWait(3);
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Id("btn-save-subheading"));
         }
 
         public void IFrameToLoad()
@@ -89,13 +139,42 @@ namespace Fpm.MainUISeleniumTest
                 By.Id("batchUploadForm"));
         }
 
+        public void CopyIndicatorsPopupToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElement(driver,
+                By.Id("copyIndicators"));
+        }
+
+        public void IndicatorRowToLoad(int indicatorId)
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Name(indicatorId + "_selected"));
+        }
+
+        public void InfoBoxPopupToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Id("infoBox"));
+        }
+
+        public void SubmitIndicatorsForReviewPopupToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Id("submit-indicators-for-review-confirm-button"));
+        }
+
+        public void IndicatorsAwaitingRevisionPopupToLoad()
+        {
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver,
+                By.Id("indicators-awaiting-revision-confirm-button"));
+        }
+
         /// <summary>
         /// Wait for an element to be present on the page.
         /// </summary>
         public void ExpectedElementToBePresent(By element)
         {
-            new WebDriverWait(driver, TimeSpan.FromSeconds(TimeoutLimitInSeconds))
-                .Until(ExpectedConditions.ElementExists(element));
+            SeleniumHelper.WaitForExpectedElementToBeVisible(driver, element);
         }
 
         public void ElementToContainText(IWebElement element, string text)

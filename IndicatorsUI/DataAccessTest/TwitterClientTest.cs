@@ -8,7 +8,8 @@ namespace IndicatorsUI.DataAccessTest
     [TestClass]
     public class TwitterClientTest
     {
-        [TestMethod]
+        // Tweet not pulled anymore
+        [TestMethod, TestCategory("ExcludeFromJenkins")]
         public void GetTweetsTest()
         {
             TwitterAccountSetting account = ReaderFactory.GetTwitterSettingReadr().GetSettings("PHoutcomes");

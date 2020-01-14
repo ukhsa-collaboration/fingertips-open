@@ -1,18 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Fpm.ProfileData;
+using Fpm.ProfileData.Entities.Profile;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IProfileMenuHelper
-    {
-        SelectList GetProfilesUserHasPermissionToExcludingSpecialProfiles(UserDetails user);
-        SelectList GetProfilesUserHasPermissionToIncludingSpecialProfiles(UserDetails user);
-        SelectList GetAllProfiles(ProfilesReader profilesReader);
-    }
-
     public class ProfileMenuHelper : IProfileMenuHelper
     {
         public static SelectList GetProfileListForCurrentUser()
@@ -29,7 +22,7 @@ namespace Fpm.MainUI.Helpers
         public SelectList GetProfilesUserHasPermissionToExcludingSpecialProfiles(UserDetails user)
         {
             var profiles = user.GetProfilesUserHasPermissionsTo()
-                .Where(x => x.Id != ProfileIds.ArchivedIndicators & x.Id != ProfileIds.UnassignedIndicators)
+                .Where(x => x.Id != ProfileIds.UnassignedIndicators && x.Id != ProfileIds.IndicatorsForReview)
                 .OrderBy(x => x.Name)
                 .ToList();
 
@@ -49,7 +42,7 @@ namespace Fpm.MainUI.Helpers
             return GetSelectList(profiles);
         }
 
-        public SelectList GetAllProfiles(ProfilesReader profilesReader)
+        public SelectList GetAllProfiles(IProfilesReader profilesReader)
         {
             var profiles = profilesReader.GetProfiles()
                 .OrderBy(x => x.Name)

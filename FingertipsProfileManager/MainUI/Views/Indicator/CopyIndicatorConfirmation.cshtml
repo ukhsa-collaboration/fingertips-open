@@ -1,0 +1,24 @@
+﻿@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    var profiles = ((IEnumerable<SelectListItem>) ViewBag.Profiles).Where(x => x.Value != "indicators-for-review").ToList();
+}
+
+<div id="copy-indicator-popup" style="display: none;">
+    <h3>
+        Copy metadata to create new indicator in:
+    </h3>
+    <div>
+        <p>
+            <label class="short-associated-detail-label">Profile</label>
+            @Html.DropDownList("ProfileSelectedToCopy", profiles, "Please select...",
+                new { @class = "indicator-dropdown", onchange = "triggerProfileChangeEvent(this)" })
+        </p>
+    </div>
+    <p>
+        <input class="medium-button" id="confirm-copy-indicator" type="button" value="Confirm" />
+    </p>
+    <p>
+        <input class="medium-button" id="cancel-copy-indicator" value="Cancel" />
+    </p>
+</div>

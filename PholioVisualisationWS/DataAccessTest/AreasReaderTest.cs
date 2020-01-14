@@ -28,7 +28,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetParentAreasFromChildAreaId()
         {
             var map = Reader().GetParentAreasFromChildAreaId(
-                AreaTypeIds.GoRegion, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaTypeIds.GoRegion, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             // Assert: about 150 LAs
             Assert.IsTrue(map.Keys.Count > 140 && map.Keys.Count < 160);
@@ -38,7 +38,7 @@ namespace PholioVisualisation.DataAccessTest
         public void TestGetParentAreasForGpChildAreaId()
         {
             var map = Reader().GetParentAreasFromChildAreaId(
-                AreaTypeIds.CcgsPreApr2017, AreaTypeIds.GpPractice);
+                AreaTypeIds.CcgsPostApr2019, AreaTypeIds.GpPractice);
 
             Assert.IsTrue(map.Keys.Any());
         }
@@ -53,7 +53,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetParentAreaGroupsForChildAreaType()
         {
-            var areaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority;
+            var areaTypeId = AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019;
             IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForChildAreaType(areaTypeId);
 
             // Assert: all child areas match expected type ID
@@ -94,7 +94,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetParentAreaGroup_DeprivationDecileRetrieved()
         {
-            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Phof);
+            IList<ParentAreaGroup> parentAreaGroups = Reader().GetParentAreaGroupsForProfile(ProfileIds.Undefined);
             Assert.IsNotNull(parentAreaGroups.FirstOrDefault(x => x.CategoryTypeId.HasValue));
         }
 
@@ -186,7 +186,7 @@ namespace PholioVisualisation.DataAccessTest
         [TestMethod]
         public void TestGetAreaType()
         {
-            var id = AreaTypeIds.CcgsPreApr2017;
+            var id = AreaTypeIds.CcgsPostApr2019;
             IAreasReader reader = ReaderFactory.GetAreasReader();
             var areaType = reader.GetAreaType(id);
             Assert.AreEqual(id, areaType.Id);
@@ -198,7 +198,7 @@ namespace PholioVisualisation.DataAccessTest
             IAreasReader reader = ReaderFactory.GetAreasReader();
 
             // Multiple area types
-            Assert.AreEqual(2, reader.GetAreaTypes(new List<int> { AreaTypeIds.Sha, AreaTypeIds.CountyAndUnitaryAuthority }).Count);
+            Assert.AreEqual(2, reader.GetAreaTypes(new List<int> { AreaTypeIds.Sha, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019 }).Count);
 
             // One area type
             AreaType areaType = reader.GetAreaTypes(new List<int> { AreaTypeIds.Sha }).First();
@@ -215,8 +215,8 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<AreaAddress> areas = reader.GetAreaWithAddressByAreaTypeId(AreaTypeIds.GpPractice);
-            Assert.IsTrue(areas.Count > 7000, "Less than expected areas: " + areas.Count);
-            Assert.AreEqual("TS10 1TZ", areas.First(x => x.Code == "A81015").Postcode);
+            Assert.IsTrue(areas.Count > 6000, "Less than expected areas: " + areas.Count);
+            Assert.AreEqual("TS10 4NW", areas.First(x => x.Code == "A81018").Postcode);
         }
 
         [TestMethod]
@@ -241,11 +241,11 @@ namespace PholioVisualisation.DataAccessTest
             int count = reader.GetAreaCountForAreaType(AreaTypeIds.Pct);
             Assert.IsTrue(count > 100 && count < 200);
 
-            count = reader.GetAreaCountForAreaType(AreaTypeIds.CountyAndUnitaryAuthority);
+            count = reader.GetAreaCountForAreaType(AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.IsTrue(count > 100 && count < 200);
 
             count = reader.GetAreaCountForAreaType(AreaTypeIds.GpPractice);
-            Assert.IsTrue(count > 7000 && count < 9000);
+            Assert.IsTrue(count > 6000 && count < 8000);
         }
 
         [TestMethod]
@@ -287,7 +287,7 @@ namespace PholioVisualisation.DataAccessTest
             int count = reader.GetChildAreaCount(AreaCodes.Sha_EastOfEngland, AreaTypeIds.Pct);
             Assert.IsTrue(count > 10 && count < 20);
             count = reader.GetChildAreaCount(AreaCodes.Pct_Sheffield, AreaTypeIds.GpPractice);
-            Assert.IsTrue(count > 80 && count < 100);
+            Assert.IsTrue(count > 70 && count < 90);
         }
 
         [TestMethod]
@@ -295,7 +295,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             var area = new CategoryArea(AreaCodes.DeprivationDecile_Utla3);
-            int count = reader.GetChildAreaCount(area, AreaTypeIds.CountyAndUnitaryAuthority);
+            int count = reader.GetChildAreaCount(area, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.IsTrue(count > 10 && count < 20);
         }
 
@@ -323,7 +323,7 @@ namespace PholioVisualisation.DataAccessTest
             IAreasReader reader = ReaderFactory.GetAreasReader();
 
             // Area code and child area type id mismatch
-            IList<string> areas = reader.GetParentCodesFromChildAreaId(AreaTypeIds.CountyAndUnitaryAuthority);
+            IList<string> areas = reader.GetParentCodesFromChildAreaId(AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
             Assert.IsTrue(areas.Count > 50);
             Assert.IsTrue(areas.Contains(AreaCodes.Gor_London));
 
@@ -384,7 +384,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<CategorisedArea> categories = reader.GetCategorisedAreasForOneCategory(AreaTypeIds.Country,
-                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUA2010,
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, CategoryTypeIds.DeprivationDecileCountyAndUA2010,
                 7);
 
             Assert.IsTrue(categories.Count > 0 && categories.Count < 20/*more than one tenth of 150*/);
@@ -395,7 +395,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             IAreasReader reader = ReaderFactory.GetAreasReader();
             IList<CategorisedArea> categories = reader.GetCategorisedAreasForAllCategories(AreaTypeIds.Country,
-                AreaTypeIds.CountyAndUnitaryAuthority, CategoryTypeIds.DeprivationDecileCountyAndUA2010);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, CategoryTypeIds.DeprivationDecileCountyAndUA2010);
 
             // Expect ~150 areas
             Assert.IsTrue(categories.Count > 100 && categories.Count < 200);
@@ -447,7 +447,7 @@ namespace PholioVisualisation.DataAccessTest
         {
             List<IArea> areasWithNhsNotUppercase = new List<IArea>();
 
-            var ccgs = ReaderFactory.GetAreasReader().GetAreasByAreaTypeId(AreaTypeIds.CcgsPreApr2017);
+            var ccgs = ReaderFactory.GetAreasReader().GetAreasByAreaTypeId(AreaTypeIds.CcgsPostApr2019);
             foreach (var ccg in ccgs)
             {
                 if (ccg.Name.Contains("Nhs") || ccg.ShortName.Contains("Nhs"))
@@ -466,13 +466,6 @@ namespace PholioVisualisation.DataAccessTest
         {
             var areaTypes = ReaderFactory.GetAreasReader().GetSupportedAreaTypes();
             Assert.IsTrue(areaTypes.Any());
-        }
-
-        [TestMethod]
-        public void TestGetNhsId()
-        {
-            var nhsId = ReaderFactory.GetAreasReader().GetNhsChoicesAreaId("A81001");
-            Assert.IsTrue(nhsId == "36798");
         }
 
         [TestMethod]

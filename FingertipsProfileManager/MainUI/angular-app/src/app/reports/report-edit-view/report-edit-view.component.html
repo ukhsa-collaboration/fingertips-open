@@ -1,60 +1,66 @@
 <div *ngIf="validationError" class="alert alert-warning">
     <strong>Warning!</strong> {{validationError}}
 </div>
-<div class="col-lg-12 pull-right">
+<div class="row col-md-12 pull-right">
     <div class="pull-left">
-        <button class="btn btn-primary" (click)="saveReport()">Save</button>
-        <button class="btn btn-default" (click)="cancelReport()">Cancel</button>
+        <button id="saveReportButton" class="btn btn-primary" (click)="saveReport()">Save</button>
+        <button id="cancelReportButton" class="btn btn-default" (click)="cancelReport()">Cancel</button>
     </div>
     <div class="pull-right">
-        <button *ngIf="selectedReport.id > 0" class="btn btn-danger" (click)="deleteReportConfirmation(selectedReport)">Delete</button>
+        <button id="deleteReportButton" *ngIf="selectedReport.id > 0" class="btn btn-danger" (click)="deleteReportConfirmation(selectedReport)">Delete</button>
     </div>
-    <br />
-    <br />
-    <br />
 </div>
-<div>
+<div class="row col-md-12 ">
     <form class="form-horizontal">
         <!-- Notes -->
         <div class="form-group">
-            <label for="reportName" class="control-label col-xs-2">Report Name</label>
-            <div class="col-xs-8">
-                <input name="reportName" [(ngModel)]="selectedReport.name" class="form-control" type="text" />
+            <label for="reportName" class="control-label col-md-2">Report name</label>
+            <div class="col-md-8">
+                <input id="reportName" name="reportName" [(ngModel)]="selectedReport.name" class="form-control" type="text" />
             </div>
         </div>
         <!-- Filename -->
         <div class="form-group">
-            <label for="fileName" class="control-label col-xs-2">File Name</label>
-            <div class="col-xs-8">
-                <input name="fileName" [(ngModel)]="selectedReport.file" class="form-control" type="text" />
+            <label for="fileName" class="control-label col-md-2">File name</label>
+            <div class="col-md-8">
+                <input id="fileName" name="fileName" [(ngModel)]="selectedReport.file" class="form-control" type="text" />
             </div>
         </div>
         <!-- Notes -->
         <div class="form-group">
-            <label for="notes" class="control-label col-xs-2">Notes</label>
-            <div class="col-xs-8">
-                <textarea name="notes" [(ngModel)]="selectedReport.notes" class="form-control" type="text"></textarea>
+            <label for="notes" class="control-label col-md-2">Notes</label>
+            <div class="col-md-8">
+                <textarea id="notes" name="notes" [(ngModel)]="selectedReport.notes" class="form-control" type="text"></textarea>
             </div>
         </div>
-
         <!-- IsLive -->
         <div class="form-group">
-            <label for="isLive" class="control-label col-xs-2">Live</label>
-            <div class="col-xs-8">
-                <input name="isLive" [(ngModel)]="selectedReport.isLive" class="form-control" type="checkbox" />
+            <label for="isLive" class="control-label col-md-2">Live</label>
+            <div class="col-md-8">
+                <input id="isLive" name="isLive" [(ngModel)]="selectedReport.isLive" class="form-control" type="checkbox" />
             </div>
         </div>
-
-        <br />
-        <br />
         <!--Profiles -->
-        <app-report-profiles (getProfiles)="getProfiles($event)" [selectedProfiles]="selectedReport.profiles"
-            [userProfiles]="userProfiles"></app-report-profiles>
-
-        <br />
-        <br />
+        <div class="form-group">
+            <label for="profiles" class="control-label col-md-2">Profiles</label>
+            <div class="col-md-8">
+                <ng-select2 [data]="profileOptionData" [options]="options" name="profiles" [(ngModel)]="selectedProfiles" (valueChanged)="onProfileChanged($event)"></ng-select2>
+            </div>
+        </div>
         <!--Parameters -->
-        <app-report-parameters (getParameters)="getParameters($event)" [selectedParameters]="selectedReport.parameters"></app-report-parameters>
+        <div class="form-group">
+            <label for="parameters" class="control-label col-md-2">Parameters</label>
+            <div class="col-md-8">
+                <ng-select2 [data]="parameterOptionData" [options]="options" name="parameters" [(ngModel)]="selectedParameters" (valueChanged)="onParameterChanged($event)"></ng-select2>
+            </div>
+        </div>
+        <!--Area types-->
+        <div class="form-group">
+            <label for="areaTypes" class="control-label col-md-2">Area types</label>
+            <div class="col-md-8">
+                <ng-select2 [data]="areaTypeOptionData" [options]="options" name="areaTypes" [(ngModel)]="selectedAreaTypes" (valueChanged)="onAreaTypeChanged($event)"></ng-select2>
+            </div>
+        </div>
     </form>
     <ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)"></ft-light-box>
 </div>

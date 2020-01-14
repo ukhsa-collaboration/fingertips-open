@@ -6,11 +6,6 @@ using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public interface IMonthlyReleaseRepository
-    {
-        IList<MonthlyRelease> GetUpcomingMonthlyReleases(int count);
-    }
-
     public class MonthlyReleaseRepository : RepositoryBase, IMonthlyReleaseRepository
     {
         // poor man injection, should be removed when we use DI containers

@@ -3,6 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import { IndicatorService } from '../shared/service/api/indicator.service';
 import { PopulationComponent } from './population.component';
+import { ExportCsvComponent } from '../shared/component/export-csv/export-csv.component';
 
 describe('PopulationComponent', () => {
     let component: PopulationComponent;
@@ -17,7 +18,10 @@ describe('PopulationComponent', () => {
         mockFTHelperService = jasmine.createSpyObj('FTHelperService', ['']);
 
         TestBed.configureTestingModule({
-            declarations: [PopulationComponent],
+            declarations: [
+                PopulationComponent,
+                ExportCsvComponent
+            ],
             schemas: [CUSTOM_ELEMENTS_SCHEMA],
             providers: [
                 { provide: IndicatorService, useValue: mockIndicatorService },

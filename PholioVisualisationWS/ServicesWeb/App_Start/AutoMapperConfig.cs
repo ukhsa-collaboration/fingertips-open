@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using PholioVisualisation.UserData.IndicatorLists;
 
 namespace PholioVisualisation.ServicesWeb
 {

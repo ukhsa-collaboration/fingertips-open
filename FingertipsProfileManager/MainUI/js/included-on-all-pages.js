@@ -145,7 +145,7 @@ function registerReloadPopUpDomains() {
 
         $.ajax({
             type: "post",
-            url: "/reloadDomains",
+            url: "/profiles-and-indicators/reload-domains",
             data: { selectedProfile: $('#selectedProfileId').val() },
             success: function (data) {
                 repopulateDomainMenu($domainMenu, data);
@@ -187,7 +187,7 @@ function initSearchElements() {
             body = $('body');
         if (searchTerm.length > 2 || searchId.length > 0) {
             body.addClass('loading');
-            location.href = '/SearchAll?searchTerm=' + searchTerm + '&IndicatorId=' + searchId;
+            location.href = '/search/search-all?searchTerm=' + searchTerm + '&IndicatorId=' + searchId;
         } else {
             showSimpleMessagePopUp('Please enter an indicator ID or<br>at least 3 characters of text to search on');
             body.removeClass('loading');
@@ -242,7 +242,10 @@ function popupwindow(url, title, w, h) {
 }
 
 ComparatorMethodIds = {
-    Undefined : -1,
+    Undefined: -1,
+    SingleOverlappingCIsForOneCILevel: 1,
+    SpcForProportions: 5,
+    SpcForDsr: 6,
     SuicidePlanDefined: 14,
     Quintiles: 15,
     Quartiles: 16,

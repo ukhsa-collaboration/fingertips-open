@@ -31,5 +31,8 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonIgnore]
         public int SearchBoost { get; set; }
+
+        [JsonIgnore]
+        public int IsInternalMetadata { get; set; }
     }
 }

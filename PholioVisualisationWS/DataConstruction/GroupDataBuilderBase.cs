@@ -52,8 +52,11 @@ namespace PholioVisualisation.DataConstruction
                         GroupData.Areas = GetChildAreas();
                     }
 
-                    GroupData.InitIndicatorMetadata(
-                        IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(Groupings));
+                    IndicatorMetadataCollection indicatorMetadataCollection =
+                        IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(Groupings);
+
+                    GroupData.InitIndicatorMetadata(indicatorMetadataCollection);
+
                     BuildGroupRoots();
 
                     if (AssignData)
@@ -91,7 +94,7 @@ namespace PholioVisualisation.DataConstruction
 
         private void BuildGroupRoots()
         {
-            var rootBuilder = new GroupRootBuilder();
+            var rootBuilder = new GroupRootBuilder(ProfileId, GroupDataReader);
             GroupData.GroupRoots = rootBuilder.BuildGroupRoots(Groupings);
         }
 
@@ -132,9 +135,7 @@ namespace PholioVisualisation.DataConstruction
                 }
                 else
                 {
-                    var comparatorArea = NearestNeighbourArea.IsNearestNeighbourAreaCode(comparatorDetails.Area.Code)
-                         ? AreaFactory.NewArea(AreasReader, comparatorDetails.Area.Code.Substring(5))
-                         : comparatorDetails.Area;
+                    var comparatorArea = comparatorDetails.Area;
 
                     // Only get subnational data, do not want to prefetch England data as usually won't be needed
                     var dataList = grouping.ComparatorId == ComparatorIds.Subnational
@@ -178,10 +179,9 @@ namespace PholioVisualisation.DataConstruction
             foreach (var groupRoot in GroupData.GroupRoots)
             {
                 var indicatorMetadata = metadataCollection.GetIndicatorMetadataById(groupRoot.IndicatorId);
-                var timePeriod = TimePeriod.GetDataPoint(groupRoot.FirstGrouping);
 
-                groupRoot.DateChanges = _dateChangeHelper.GetIndicatorDateChange(timePeriod,
-                    indicatorMetadata, newDataDeploymentCount);
+                groupRoot.DateChanges = _dateChangeHelper.GetIndicatorDateChange(indicatorMetadata,
+                    newDataDeploymentCount, groupRoot.AreaTypeId);
             }
         }
 

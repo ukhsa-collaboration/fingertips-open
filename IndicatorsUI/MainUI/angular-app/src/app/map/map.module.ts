@@ -12,14 +12,23 @@ import { TypeaheadModule } from 'ngx-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { CoreDataHelperService } from '../shared/service/helper/coreDataHelper.service';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
-import { LegendModule } from 'app/shared/component/legend/legend.module';
+import { LegendModule } from '../shared/component/legend/legend.module';
+import { DeviceDetectorService } from 'ngx-device-detector';
+import { LightBoxModule } from '../shared/component/light-box/light-box.module';
+import { ExportCsvModule } from '../shared/component/export-csv/export-csv.module';
+import { AgmCoreModule } from '@agm/core';
 
 @NgModule({
   imports: [
     CommonModule,
     TypeaheadModule.forRoot(),
     FormsModule,
-    LegendModule
+    LegendModule,
+    LightBoxModule,
+    ExportCsvModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyCyj06EYBaz66Rgi_wTeSmqI1_qBZxtuos'
+    })
   ],
   declarations: [
     GoogleMapComponent,
@@ -37,7 +46,8 @@ import { LegendModule } from 'app/shared/component/legend/legend.module';
     IndicatorService,
     AreaService,
     CoreDataHelperService,
-    FTHelperService
+    FTHelperService,
+    DeviceDetectorService
   ]
 })
 export class MapModule { }

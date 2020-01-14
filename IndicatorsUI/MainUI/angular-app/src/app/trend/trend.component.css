@@ -1,0 +1,54 @@
+.area-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.region-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.new-data-badge-container {
+  float: left;
+  font-size: 1.3em;
+}
+
+.tab-options {
+  float: none !important;
+}
+
+.sparkline-indicator {
+  cursor: pointer;
+}
+
+.trend-top-margin {
+  margin-top: 60px;
+}
+
+.trend-header,
+.multi-trend-header {
+  float: left;
+  clear: both;
+}
+
+.multi-trend-header {
+  padding: 30px 0 0 0;
+  width: 98%;
+  margin-left: 1%;
+  margin-right: 1%;
+  font-weight: bold;
+  height: 63px;
+}
+
+.trend-header {
+  padding: 20px 0 5px 0;
+  border-bottom: 5px solid #0b0c0c;
+  width: 100%;
+  font-weight: bold;
+}
+
+.trendChart {
+  width: 400px;
+  height: 300px;
+  float: left;
+}

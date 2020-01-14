@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
+import { FTHelperService } from '../helper/ftHelper.service';
 import { Parameters } from './parameters';
 import { HttpService } from './http.service'
 
@@ -13,7 +13,7 @@ export class ContentService {
   }
 
   getContent(profileId: number, key: string): Observable<string> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addProfileId(profileId);
     params.addKey(key);
 

@@ -35,28 +35,12 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void TestGetAllAreaTypeIdsUsedInProfile()
-        {
-            var areaTypeIds = AreaTypeListProvider()
-                .GetAllAreaTypeIdsUsedInProfile(ProfileIds.Phof);
-
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.County), 
-                "Should return individual child area types");
-            Assert.IsFalse(areaTypeIds.Contains(AreaTypeIds.CountyAndUnitaryAuthority), 
-                "Should not return composite child area types");
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.GoRegion),
-                "Should return parent area types");
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.Country), 
-                "Should return country area types");
-        }
-
-        [TestMethod]
         public void TestGetParentAreaTypeIdsUsedInProfile()
         {
             var areaTypeIds = AreaTypeListProvider()
-                .GetParentAreaTypeIdsUsedInProfile(ProfileIds.Phof);
+                .GetParentAreaTypeIdsUsedInProfile(ProfileIds.Amr);
 
-            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.PheCentresFrom2015));
+            Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.Subregion));
         }
 
         [TestMethod]
@@ -66,16 +50,6 @@ namespace PholioVisualisation.DataConstructionTest
                 .GetParentAreaTypeIdsUsedInProfile(ProfileIds.CancerServices, AreaTypeIds.GpPractice);
 
             Assert.IsTrue(areaTypeIds.Contains(AreaTypeIds.CcgsPostApr2018));
-        }
-
-        [TestMethod]
-        public void TestGetCategoryTypeIdsUsedInProfile()
-        {
-            var categoryTypeIds = AreaTypeListProvider()
-                .GetCategoryTypeIdsForExport();
-
-            Assert.IsTrue(categoryTypeIds.Contains(CategoryTypeIds.DeprivationDecileCountyAndUA2010));
-            Assert.IsFalse(categoryTypeIds.Contains(CategoryTypeIds.LimitsForHealthProfilesLifeExpectancyChart));
         }
 
         [TestMethod]

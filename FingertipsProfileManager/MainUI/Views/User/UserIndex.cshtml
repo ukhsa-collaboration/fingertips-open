@@ -13,7 +13,7 @@
     <h2 class="subheading">Users of FPM</h2>
 
     <div class="button-box clearfix">
-        <input class="btn btn-primary" type="button" value="New User" onclick="location.href='@Url.Action("CreateUser", "User")    '" />
+        <input class="btn btn-primary" type="button" id="create-new-user" value="New User" onclick="location.href='@Url.Action("CreateUser", "User")    '" />
         <input class="btn" type="button" id="audit_history" value="Show History" />
         <input class="btn" type="button" id="toggle-current-users" value="Show inactive users" />
     </div>
@@ -26,6 +26,7 @@
                 <th class="header">User Name</th>
                 <th class="header">Display Name</th>
                 <th class="header">Is Admin</th>
+                <th class="header">Is Reviewer</th>
                 <th class="header">Is Current</th>
                 <th>
                     Select @Html.CheckBox("select-all", false, new { @class = "select-all-check-box" })
@@ -43,6 +44,9 @@
                 </td>
                 <td class="center">
                     @(item.IsAdministrator ? "Yes" : "No")
+                </td>
+                <td class="center">
+                    @(item.IsReviewer ? "Yes" : "No")
                 </td>
                 <td class="center">
                     @(item.IsCurrent ? "Yes" : "No")

@@ -1,0 +1,8 @@
+<div class="row">
+  <div class="col">
+    <input [(ngModel)]="indicatorName" [typeahead]="indicatorNames" (typeaheadLoading)="changeTypeaheadLoading($event)"
+      (typeaheadNoResults)="changeTypeaheadNoResults($event)" (typeaheadOnSelect)="typeaheadOnSelect($event)"
+      typeaheadOptionsLimit="25" placeholder="[Start typing to select an indicator]" [typeaheadWaitMs]="200"
+      [typeaheadMinLength]="1" class="form-control" id="indicator-search-text" autocomplete="off">
+  </div>
+</div>

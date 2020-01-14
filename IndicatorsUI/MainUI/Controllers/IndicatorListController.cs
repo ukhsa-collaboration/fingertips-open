@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.Mvc;
 using AutoMapper;
 using IndicatorsUI.MainUI.Models.UserList;
 using System.ComponentModel.DataAnnotations;
 using IndicatorsUI.DataAccess;
-using IndicatorsUI.DomainObjects;
 using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.MainUI.Models.UserAccess;
 using IndicatorsUI.UserAccess;
@@ -168,7 +166,7 @@ namespace IndicatorsUI.MainUI.Controllers
         }
 
         [Route("edit")]
-        public ActionResult Edit(string listId)
+        public ActionResult Edit(string listId, bool redirect)
         {
             // Check user is logged in
             if (IsUserSignedIn() == false)
@@ -184,6 +182,7 @@ namespace IndicatorsUI.MainUI.Controllers
             }
 
             ViewBag.Title = "Edit";
+            ViewBag.Redirect = redirect;
             var indicatorList = _indicatorListRepository.GetListByPublicId(listId);
             var indicatorListVm = Mapper.Map<IndicatorListViewModel>(indicatorList);
             return View("CreateIndicatorList", indicatorListVm);

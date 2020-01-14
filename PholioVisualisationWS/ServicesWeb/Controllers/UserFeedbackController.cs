@@ -12,9 +12,8 @@ namespace PholioVisualisation.ServicesWeb.Controllers
     {
         private UserFeedbackRepository _repo = new UserFeedbackRepository();
 
-
         /// <summary>
-        /// Creates a new user feedback
+        /// Creates a new bit of user feedback
         /// </summary>
         /// <param name="userFeedback"></param>
         [HttpPost]
@@ -31,7 +30,6 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <summary>
         /// Returns all the user feedbacks
         /// </summary>
-        /// <returns></returns>
         [HttpGet]
         [Route("user_feedback")]
         public IList<UserFeedback> Get()
@@ -45,7 +43,6 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// Find user feedback by id
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
         [HttpGet]
         [Route("user_feedback/{id}")]
         public UserFeedback FindById(int id)

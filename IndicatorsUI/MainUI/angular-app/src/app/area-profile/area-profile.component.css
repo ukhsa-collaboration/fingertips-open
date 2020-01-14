@@ -1,82 +1,103 @@
 /* Indicator name */
 
 tr td:first-child {
-    color: #2e3191;
-    cursor: pointer;
+  color: #2e3191;
+  cursor: pointer;
 }
 
 
 /* Period header */
 
 tr th:nth-child(2) {
-    text-align: center;
+  text-align: center;
 }
 
 
 /* Period */
 
 tr td:nth-child(2) {
-    text-align: center;
+  text-align: center;
 }
 
 
-/* Recent trendn */
+/* Recent trend */
 
 tr td:nth-child(3) {
-    text-align: center;
-    cursor: pointer;
+  text-align: center;
+  cursor: pointer;
 }
 
 tr:hover td {
-    border-top-color: #333;
-    border-bottom-color: #333;
-    background: #fffdea;
+  border-top-color: #333;
+  border-bottom-color: #333;
+  background: #fffdea;
 }
 
 tr:hover td:first-child {
-    border-left-color: #333;
+  border-left-color: #333;
 }
 
 tr:hover td:last-child {
-    border-right-color: #333;
+  border-right-color: #333;
 }
 
 #england-header {
-    position: relative;
-    min-width: 386px;
+  position: relative;
+  min-width: 386px;
 }
 
-.export-chart-box, .export-chart-box-csv {
-    padding-top: 20px;
+.export-chart-box,
+.export-chart-box-csv {
+  margin-top: 20px;
 }
 
 #export-link-csv-area-profile {
-    display: inline-block;     
-    position: relative;    
-    z-index: 1;     
-    padding: 2em;     
-    margin: -2em;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  padding-left: 2em;
+  margin: -2em;
 }
 
 #single-area-table {
-    table-layout: auto;
-    margin: 8px auto 30px auto;
+  table-layout: auto;
+  margin: 8px auto 30px auto;
 }
 
 #no-spine-box {
-    width: 233px;
-    top: 94px;
-    left: 75px;
-    line-height: 1.5em;
-    font-weight: normal;
-    position: absolute;
-    border: 2px solid #ddd;
-    background: #FFFFF0;
-    z-index: 10;
-    box-shadow: 0 0 2px #888;
+  width: 233px;
+  top: 94px;
+  left: 75px;
+  line-height: 1.5em;
+  font-weight: normal;
+  position: absolute;
+  border: 2px solid #ddd;
+  background: #FFFFF0;
+  z-index: 10;
+  box-shadow: 0 0 2px #888;
 }
 
 #no-spine-box p {
-    padding: 5px;
-    margin: 0;
+  padding: 5px;
+  margin: 0;
+}
+
+.area-profiles-export-table-link {
+  background: #FFF url("~/images/save-image-icon.png") left center no-repeat;
+  padding: 5px 27px;
+  color: #1F0AA1 !important;
+}
+
+.area-profiles-export-csv-link {
+  background: #FFF url("~/images/download24.png") left center no-repeat;
+  padding: 5px 27px;
+  color: #1F0AA1 !important;
+}
+
+.area-profiles-export-container {
+  margin-top: 20px;
+}
+
+.area-profiles-spine-chart-image-container {
+  text-align: right;
 }

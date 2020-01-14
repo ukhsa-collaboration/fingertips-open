@@ -22,6 +22,14 @@ namespace PholioVisualisation.ServicesWebTest.Controllers
         }
 
         [TestMethod]
+        public void Test_Get_Metadata_For_Indicator_That_Does_Not_Exist()
+        {
+            var response = new IndicatorMetadataController().GetIndicatorMetadataFileForIndicatorList(
+                IndicatorIds.IndicatorThatDoesNotExist.ToString());
+            Assert.IsNotNull(response);
+        }
+
+        [TestMethod]
         public void Test_Get_Metadata_For_Single_Indicator_With_Only_Indicator_Id()
         {
             var response = new IndicatorMetadataController().GetIndicatorMetadataFileForIndicatorList(

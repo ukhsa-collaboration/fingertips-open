@@ -33,7 +33,7 @@ namespace PholioVisualisation.ServicesTest
         public void TestGetCoreDataSets()
         {
             byte[] data = EndPointTestHelper.GetData("coredata?" +
-                                                     "indicator_id=" + IndicatorIds.IndicatorHasNoData);
+                                                     "indicator_id=" + IndicatorIds.IndicatorThatDoesNotExist);
             TestHelper.IsData(data);
         }
     }

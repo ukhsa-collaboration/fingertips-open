@@ -45,6 +45,13 @@
     </div>
 
     <div class="row form-group">
+        <label class="col-md-2 col-form-label">Is Reviewer</label>
+        <div class="col-md-4">
+            @Html.CheckBoxFor(model => model.IsReviewer, new { @class = "form-control" })
+        </div>
+    </div>
+
+    <div class="row form-group">
         <label class="col-md-2 col-form-label">Is Current</label>
         <div class="col-md-4">
             @Html.CheckBoxFor(model => model.IsCurrent, new { @class = "form-control" })
@@ -53,7 +60,7 @@
 
     <div class="row form-group ">
         <div class="col-md-12">
-            <input class="btn btn-primary" id="Confirm" type="submit" value="Confirm" name="action:UpdateUser" />
+            <input class="btn btn-primary" id="Confirm" type="submit" value="Save" name="action:UpdateUser" />
             <input class="btn btn-secondary" id="CancelBtn" type="button" onclick="location.href = '@Url.Action("UserIndex")'" value="Cancel" />
         </div>
     </div>

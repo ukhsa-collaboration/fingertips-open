@@ -13,7 +13,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Fpm.MainUI</RootNamespace>
     <AssemblyName>Fpm.MainUI</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <FileUpgradeFlags>
@@ -58,6 +58,9 @@
       <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CsvHelper, Version=12.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.12.2.1\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
     <Reference Include="FoolproofValidation, Version=0.9.5851.39121, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Foolproof.0.9.4518\lib\net45\FoolproofValidation.dll</HintPath>
       <Private>True</Private>
@@ -86,6 +89,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.4.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -160,7 +166,8 @@
     <Compile Include="App_Start\UnityMvcActivator.cs" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\DocumentsController.cs" />
-    <Compile Include="Controllers\IndicatorEditController.cs" />
+    <Compile Include="Controllers\GroupingSubheadingsController.cs" />
+    <Compile Include="Controllers\IndicatorController.cs" />
     <Compile Include="Controllers\LiveUpdateController.cs" />
     <Compile Include="Controllers\LookUpTablesController.cs" />
     <Compile Include="Controllers\ExceptionLogController.cs" />
@@ -169,14 +176,16 @@
     <Compile Include="Controllers\ProfilesAndIndicatorsController.cs" />
     <Compile Include="Controllers\ReportsApiController.cs" />
     <Compile Include="Controllers\ReportsController.cs" />
+    <Compile Include="Controllers\UploadApiController.cs" />
     <Compile Include="Controllers\UserFeedbackController.cs" />
+    <Compile Include="Controllers\UsersApiController.cs" />
+    <Compile Include="Helpers\AgeSelectListBuilder.cs" />
     <Compile Include="Helpers\AjaxOnlyAttribute.cs" />
     <Compile Include="Helpers\ApplicationConfiguration.cs" />
     <Compile Include="Helpers\AreaTypeSelectListBuilder.cs" />
     <Compile Include="Helpers\CommonUtilities.cs" />
     <Compile Include="Controllers\ContentController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\IndicatorNewController.cs" />
     <Compile Include="Controllers\AreasController.cs" />
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
@@ -186,18 +195,34 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\CoreDataSetFormatter.cs" />
-    <Compile Include="Helpers\CurrentUser.cs" />
+    <Compile Include="Helpers\CsvStreamHelper.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\ExtraJsFileHelper.cs" />
     <Compile Include="Helpers\FileNameHelper.cs" />
     <Compile Include="Helpers\FrontPageAreaSearchOptions.cs" />
     <Compile Include="Helpers\FusStatus.cs" />
+    <Compile Include="Helpers\GroupingRemover.cs" />
     <Compile Include="Helpers\IFingertipsTabs.cs" />
+    <Compile Include="Helpers\IIndicatorMetadataTextChanger.cs" />
+    <Compile Include="Helpers\IIndicatorMetadataTextCreator.cs" />
+    <Compile Include="Helpers\IIndicatorMetadataTextParser.cs" />
+    <Compile Include="Helpers\IIndicatorOwnerChanger.cs" />
+    <Compile Include="Helpers\INewDataDeploymentCount.cs" />
+    <Compile Include="Helpers\IProfileDetailsCopier.cs" />
+    <Compile Include="Helpers\IProfileMenuHelper.cs" />
+    <Compile Include="Helpers\IRemoveIndicatorChecker.cs" />
+    <Compile Include="Helpers\ITimePeriodHelper.cs" />
+    <Compile Include="Helpers\ITimePeriodReader.cs" />
+    <Compile Include="Helpers\IUserDetails.cs" />
+    <Compile Include="Helpers\ProfilesAndIndicatorsHelper.cs" />
+    <Compile Include="Helpers\RemoveIndicatorChecker.cs" />
     <Compile Include="Helpers\IndicatorMetadataTextChanger.cs" />
     <Compile Include="Helpers\IndicatorMetadataTextCreator.cs" />
     <Compile Include="Helpers\IndicatorOwnerChanger.cs" />
     <Compile Include="Helpers\ProfileDetailsCopier.cs" />
     <Compile Include="Helpers\ProfileMenuHelper.cs" />
     <Compile Include="Helpers\NewDataTimeSpanInDaysOptions.cs" />
+    <Compile Include="Helpers\SexSelectListBuilder.cs" />
     <Compile Include="Helpers\TimePeriodReader.cs" />
     <Compile Include="Helpers\TooltipHelper.cs" />
     <Compile Include="Helpers\UIHelper.cs" />
@@ -211,6 +236,12 @@
     <Compile Include="Helpers\PleaseSelectOption.cs" />
     <Compile Include="Helpers\ProfileDetailsCleaner.cs" />
     <Compile Include="Mappers\Mapper.cs" />
+    <Compile Include="Models\ApproveIndicatorsModel.cs" />
+    <Compile Include="Models\IndicatorsBackToInDevelopmentModel.cs" />
+    <Compile Include="Models\RemoveIndicatorModel.cs" />
+    <Compile Include="Models\RemoveIndicatorsModel.cs" />
+    <Compile Include="Models\RemoveMultipleIndicatorsModel.cs" />
+    <Compile Include="Models\SubmitIndicatorsForReviewModel.cs" />
     <Compile Include="ViewModels\Areas\AreasIndexViewModel.cs" />
     <Compile Include="ViewModels\Areas\AreaDetailViewModel.cs" />
     <Compile Include="Models\AdminModel.cs" />
@@ -219,6 +250,7 @@
     <Compile Include="ViewModels\EmbeddedContent\EmbeddedHtmlPage.cs" />
     <Compile Include="ViewModels\ExceptionLog\ExceptionIndexViewModel.cs" />
     <Compile Include="Models\LookupModel.cs" />
+    <Compile Include="ViewModels\Indicator\IndicatorViewModel.cs" />
     <Compile Include="ViewModels\ProfileCollections\ProfileCollectionGridModel.cs" />
     <Compile Include="Helpers\Dynamic.cs" />
     <Compile Include="Helpers\MyAuthorizeAttribute.cs" />
@@ -230,7 +262,6 @@
     <Compile Include="Models\MoveIndicatorsModel.cs" />
     <Compile Include="Models\DeleteIndicatorsModel.cs" />
     <Compile Include="Models\Error.cs" />
-    <Compile Include="Models\IndicatorEdit.cs" />
     <Compile Include="Models\IndicatorGridModel.cs" />
     <Compile Include="Models\ProfileIndex.cs" />
     <Compile Include="Models\ProfileMembers.cs" />
@@ -238,7 +269,6 @@
     <Compile Include="Models\UserGridModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Routes\CoreRoutes.cs" />
     <Compile Include="ViewModels\EditUserViewModel.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\BrowseDataViewModel.cs" />
     <Compile Include="ViewModels\ProfilesAndIndicators\CoreDataSetViewModel.cs" />
@@ -259,13 +289,6 @@
     <Compile Include="ViewModels\Profile\ProfileIndexViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AngularApps\reports\reports-app.js" />
-    <Content Include="AngularApps\reports\view\reports-index.html" />
-    <Content Include="AngularApps\reports\view\reports-edit.html" />
-    <Content Include="AngularApps\upload\upload-app.js" />
-    <Content Include="AngularApps\upload\view\upload-index.html" />
-    <Content Include="AngularApps\upload\view\upload-progress.html" />
-    <Content Include="AngularApps\upload\view\upload-queue.html" />
     <Content Include="Client Scripts\mvcfoolproof.unobtrusive.js" />
     <Content Include="Client Scripts\mvcfoolproof.unobtrusive.min.js" />
     <Content Include="Client Scripts\MvcFoolproofJQueryValidation.js" />
@@ -286,6 +309,7 @@
     <Content Include="css\profile-manager.css" />
     <Content Include="css\dashboard.css" />
     <Content Include="css\ProfilesAndIndicators\BrowseIndicatorDataFullPage.css" />
+    <Content Include="css\select2.min.css" />
     <Content Include="css\TableSorter.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -297,8 +321,6 @@
     <Content Include="images\navigate-previous.png" />
     <Content Include="images\reorder.png" />
     <Content Include="images\SimpleUpload.png" />
-    <Content Include="js\angular-route.js" />
-    <Content Include="js\angular.js" />
     <Content Include="js\es5-sham.min.js" />
     <Content Include="js\es5-shim.min.js" />
     <Content Include="js\jquery-3.3.1.min.js" />
@@ -320,6 +342,7 @@
     <Content Include="js\ProfileCollections\profile-collections.js" />
     <Content Include="js\jquery.watermark.min.js" />
     <Content Include="js\Profile\profile.js" />
+    <Content Include="js\select2.min.js" />
     <Content Include="js\UserFeedback\userfeedback.js" />
     <Content Include="js\User\user.js" />
     <Content Include="js\jquery.tablesorter.js" />
@@ -424,7 +447,6 @@
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\IndicatorNew\IndicatorNew.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\ListIndicatorsInProfile.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_CopySelectedIndicators.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_IndicatorAudit.cshtml" />
@@ -463,11 +485,10 @@
     <Content Include="Views\Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Views\IndicatorEdit\IndicatorEdit.cshtml" />
     <Content Include="Views\Shared\_LayoutPage.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_GridEditDomains.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_DeleteSelectedIndicators.cshtml" />
-    <Content Include="Views\Upload\Index.cshtml" />
+    <Content Include="Views\Upload\UploadIndex.cshtml" />
     <Content Include="Views\Content\EditContentItem.cshtml" />
     <Content Include="Views\Shared\_EditMetaDataText.cshtml" />
     <Content Include="Views\User\UserIndex.cshtml" />
@@ -490,7 +511,7 @@
     <Content Include="Views\Documents\_DocumentsTable.cshtml" />
     <Content Include="Views\EmbeddedContent\EmbeddedHtmlPage.cshtml" />
     <Content Include="Views\Content\ViewContentItemInOwnPage.cshtml" />
-    <Content Include="Views\Reports\Index.cshtml" />
+    <Content Include="Views\Reports\ReportsIndex.cshtml" />
     <Content Include="Views\Profile\_FingertipsTabOptions.cshtml" />
     <Content Include="Views\LookUpTables\_AreaTypes.cshtml" />
     <Content Include="Views\LookUpTables\EditAreaType.cshtml" />
@@ -498,12 +519,31 @@
     <Content Include="Views\ProfilesAndIndicators\_IndicatorFilter.cshtml" />
     <Content Include="Views\Content\_ContentErrorMessage.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\_CoreDataChange.cshtml" />
-    <Content Include="Views\IndicatorEdit\_LatestChangeOverride.cshtml" />
-    <Content Include="Views\UserFeedback\Index.cshtml" />
+    <Content Include="Views\UserFeedback\UserFeedbackIndex.cshtml" />
     <Content Include="Views\LookUpTables\EditCategoryType.cshtml" />
     <Content Include="Views\LiveUpdate\ProfileLiveUpdate.cshtml" />
     <Content Include="Views\ProfilesAndIndicators\ReorderIndicators.cshtml" />
-    <Content Include="Views\Shared\_IndicatorMetadataComments.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_SubmitIndicatorsForReview.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_IndicatorsAwaitingRevision.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_ApproveIndicators.cshtml" />
+    <Content Include="Views\Indicator\CreateIndicator.cshtml" />
+    <Content Include="Views\Indicator\EditIndicator.cshtml" />
+    <Content Include="Views\Indicator\_IndicatorMetadataText.cshtml" />
+    <Content Include="Views\Indicator\_IndicatorMetadataOther.cshtml" />
+    <Content Include="Views\Indicator\_ProfileDataSelection.cshtml" />
+    <Content Include="Views\Indicator\_InternalMetadata.cshtml" />
+    <Content Include="Views\Indicator\_SaveConfirmation.cshtml" />
+    <Content Include="Views\Indicator\_IndicatorHeader.cshtml" />
+    <Content Include="Views\Indicator\CopyIndicatorConfirmation.cshtml" />
+    <Content Include="Views\Indicator\_IndicatorMetadataTextPropertyInfo.cshtml" />
+    <Content Include="Views\UserFeedback\SingleUserFeedbackItem.cshtml" />
+    <Content Include="Views\Shared\_AngularScripts.cshtml" />
+    <Content Include="Views\Indicator\_IndicatorMetadataReview.cshtml" />
+    <Content Include="Views\ProfilesAndIndicators\_RemoveSelectedIndicators.cshtml" />
+    <Content Include="Views\Search\_RemoveMultipleIndicatorsConfirmation.cshtml" />
+    <Content Include="Views\Profile\UserProfiles.cshtml" />
+    <Content Include="Views\Profile\_UserProfilesTable.cshtml" />
+    <Content Include="Views\Profile\_SystemProfilesTable.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -513,8 +553,11 @@
     <Folder Include="js\css\" />
     <Folder Include="Upload Templates\" />
     <Folder Include="Uploads\" />
+    <Folder Include="Views\GroupingSubheadings\" />
     <Folder Include="Views\ProfilesAndIndicatorsApi\" />
     <Folder Include="Views\ReportsApi\" />
+    <Folder Include="Views\UploadApi\" />
+    <Folder Include="Views\UsersApi\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ProfileData\ProfileData.csproj">
@@ -593,9 +636,6 @@
     <Content Include="packages.config">
       <SubType>Designer</SubType>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Views\_ViewStart.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Shared\_UserPermissions.cshtml" />

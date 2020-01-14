@@ -3,6 +3,7 @@ import {
     ViewChild, EventEmitter, OnChanges, SimpleChanges
 } from '@angular/core';
 import 'rxjs/rx';
+import { isDefined } from '@angular/compiler/src/util';
 import { GoogleMapService } from '../googleMap.service';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 
@@ -13,7 +14,7 @@ import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 })
 export class GoogleMapSimpleComponent implements OnChanges {
     map: google.maps.Map;
-    @ViewChild('googleMap') mapEl: ElementRef;
+    @ViewChild('googleMap', { static: true }) mapEl: ElementRef;
     @Output() mapInit = new EventEmitter();
     @Output() selectedAreaChanged = new EventEmitter();
     @Input() areaTypeId: number = null;
@@ -139,7 +140,7 @@ export class GoogleMapSimpleComponent implements OnChanges {
     }
 
     removePolygon(): void {
-        if (this.currentPolygons !== undefined) {
+        if (isDefined(this.currentPolygons)) {
             this.currentPolygons.forEach(element => {
                 element.setMap(null);
             });
@@ -245,7 +246,7 @@ export class GoogleMapSimpleComponent implements OnChanges {
                 polygon.setMap(null);
                 const areaCode = polygon.get('areaCode');
                 const areaCodeInSelectedAreas = this.selectedAreas.find(x => x.Code === areaCode);
-                if (areaCodeInSelectedAreas !== null && areaCodeInSelectedAreas !== undefined) {
+                if (isDefined(areaCodeInSelectedAreas) && areaCodeInSelectedAreas) {
                     polygon.set('fillColor', '#7FFF92');
                 } else {
                     polygon.set('fillColor', '#63A1C3');

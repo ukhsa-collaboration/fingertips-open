@@ -67,5 +67,25 @@ namespace PholioVisualisation.DataSortingTest
             var filteredGroupings = new GroupingListFilter(groupings).SelectForAreaTypeIds(null);
             Assert.AreEqual(1, filteredGroupings.Count());
         }
+
+        [TestMethod]
+        public void TestSelectForBaseLineTimePeriods()
+        {
+            var groupings = new List<Grouping>
+            {
+                new Grouping {BaselineYear = 2010, BaselineQuarter = -1, BaselineMonth = -1},
+                new Grouping {BaselineYear = 2010, BaselineQuarter = -1, BaselineMonth = -1},
+                new Grouping {BaselineYear = 2001, BaselineQuarter = -1, BaselineMonth = -1},
+                new Grouping {BaselineYear = 2001, BaselineQuarter = -1, BaselineMonth = -1},
+                new Grouping {BaselineYear = 2010, BaselineQuarter = -1, BaselineMonth = -1},
+                new Grouping {BaselineYear = 2010, BaselineQuarter = -1, BaselineMonth = -1}
+            };
+
+            var grouping = new Grouping() { BaselineYear = 2010, BaselineQuarter = -1, BaselineMonth =  -1 };
+
+            var filteredGroupings = new GroupingListFilter(groupings).SelectForBaseLineTimePeriods(grouping);
+            Assert.AreEqual(4, filteredGroupings.Count());
+            Assert.AreEqual(2010, filteredGroupings.FirstOrDefault().BaselineYear);
+        }
     }
 }

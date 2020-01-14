@@ -1,23 +1,18 @@
 ﻿namespace PholioVisualisation.Export.FileBuilder
 {
-    public interface IDataFileBuilder<T>
+    public interface IFileBuilderWriter
     {
-        T GetDataFile();
+        byte[] GetHeader();
+        byte[] GetBody();
     }
 
-    public interface IFileBuilderWriter<T>
+    public interface IBuilderHeaderWriter
     {
-        T GetHeader();
-        T GetBody();
+        byte[] GetHeader();
     }
 
-    public interface IBuilderHeaderWriter<T>
+    public interface IBuilderBodyWriter
     {
-        T GetHeader();
-    }
-
-    public interface IBuilderBodyWriter<T>
-    {
-        T GetBody();
+        byte[] GetBody();
     }
 }

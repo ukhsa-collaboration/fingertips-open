@@ -81,9 +81,15 @@ namespace PholioVisualisation.DataAccess
         public IDictionary<string, IList<CoreDataSet>> GetTrendDataForSpecificCategoryForMultiplesAreas(
             Grouping grouping, int categoryTypeId, int categoryId, params string[] areaCodes)
         {
-            var allData = new List<CoreDataSet>();
+            var d = new Dictionary<string, IList<CoreDataSet>>();
+
+            if (grouping == null)
+            {
+                return d;
+            }
 
             // Query the database 1000 areas at a time, for large numbers of areas the query will fail otherwise
+            var allData = new List<CoreDataSet>();
             var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
@@ -103,7 +109,6 @@ namespace PholioVisualisation.DataAccess
             }
 
             // Transform data list for all areas to dictionary of areacode to data list
-            var d = new Dictionary<string, IList<CoreDataSet>>();
             var currentAreaCode = "";
             List<CoreDataSet> currentList = null;
             foreach (var coreDataSet in allData)

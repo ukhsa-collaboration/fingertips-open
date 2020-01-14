@@ -15,14 +15,14 @@
       <div class="grouping-subheading-list">
         <div *ngFor="let groupingSubheading of this.lightBoxIndicatorReorderConfig.GroupingSubheadings;">
           <a (click)="setSubheading(groupingSubheading.Subheading)">
-            {{groupingSubheading.Subheading }}
+            {{ groupingSubheading.Subheading }}
           </a>
         </div>
       </div>
     </div>
     <div class="buttons">
-      <button class="btn btn-primary active ok" (click)="setLightBoxInputText()" [innerHtml]="this.lightBoxIndicatorReorderConfig.OkButtonText">OK</button>
-      <button class="btn btn-link active" (click)="cancel()" [innerHtml]="this.lightBoxIndicatorReorderConfig.CancelButtonText">Cancel</button>
+      <button id="btn-save-subheading" class="btn btn-primary active ok" (click)="setLightBoxInputText()" [innerHtml]="this.lightBoxIndicatorReorderConfig.OkButtonText">OK</button>
+      <button id="btn-cancel-save-subheading" class="btn btn-link active" (click)="cancel()" [innerHtml]="this.lightBoxIndicatorReorderConfig.CancelButtonText">Cancel</button>
     </div>
     <div class="error-message" [innerHtml]="this.errorMessage">
       &nbsp;

@@ -14,7 +14,7 @@ namespace PholioVisualisation.DataAccessTest
     {
         public const string ParentAreaCode = AreaCodes.Gor_EastOfEngland;
 
-        public const int ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+        public const int ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
 
         [TestMethod]
         public void TestBuildWithProfile()

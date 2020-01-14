@@ -15,54 +15,64 @@
 
     <h2 class="subheading">Profiles in Fingertips</h2>
 
-    <input type="button" class="btn btn-primary" value="New Profile" onclick="location.href='@Url.Action("CreateProfile", "Profile")'" />
+    @if (Model.ShowNewProfileButton)
+    {
+        <input type="button" id="create-profile-button" class="btn btn-primary" value="New Profile" onclick="location.href='@Url.Action("CreateProfile", "Profile")'" />
+    }
 
     @if (Model.ProfileGrid.Count > 0)
     {
-    <table id="tbl-profiles" class="grid sortable">
-        <thead>
-            <tr>
-                <th class="header">ID</th>
-                <th class="header">Name</th>
-                <th class="header">Url Key</th>
-                <th class="header">Live</th>
-                <th class="header">PDFs</th>
-                <th class="header" style="width:80px;">Default area type</th>
-                <th class="header">Contact</th>
-            </tr>
-        </thead>
-        @foreach (var item in Model.ProfileGrid)
-        {
-            <tr class="@(item.IsLive ? "live" : "not-live")">
-                <td class="left">
-                    @item.Id
-                </td>
-                <td class="left">
-                    @Html.ActionLink(item.Name, "EditProfile", new { profileKey = item.UrlKey },
-                           new { @class = "profile-link" })
-                </td>
-                <td class="left">
-                    @item.UrlKey
-                </td>
-                <td class="left">
-                    @(item.IsLive ? "Yes" : "No")
-                </td>
-                <td class="left">
-                    @(item.ArePdfs ? "Yes" : "No")
-                </td>
-                <td class="left">
-                    @item.DefaultAreaTypeId
-                </td>
-                <td class="left">
-                    @(userLookup[item.ContactUserId])
-                </td>
-            </tr>
-        }
-    </table>
+        <table id="tbl-profiles" class="grid sortable">
+            <thead>
+                <tr>
+                    <th class="header">ID</th>
+                    <th class="header">Name</th>
+                    <th class="header">Url Key</th>
+                    <th class="header">Live</th>
+                    <th class="header">PDFs</th>
+                    <th class="header" style="width:80px;">Default area type</th>
+                    <th class="header">Contact</th>
+                </tr>
+            </thead>
+            @foreach (var item in Model.ProfileGrid)
+            {
+                var userContacts = new List<string>();
+
+                <tr class="@(item.IsLive ? "live" : "not-live")">
+                    <td class="left">
+                        @item.Id
+                    </td>
+                    <td class="left">
+                        @Html.ActionLink(item.Name, "EditProfile", new { profileKey = item.UrlKey },
+                               new { @class = "profile-link" })
+                    </td>
+                    <td class="left">
+                        @item.UrlKey
+                    </td>
+                    <td class="left">
+                        @(item.IsLive ? "Yes" : "No")
+                    </td>
+                    <td class="left">
+                        @(item.ArePdfs ? "Yes" : "No")
+                    </td>
+                    <td class="left">
+                        @item.DefaultAreaTypeId
+                    </td>
+                    <td class="left">
+                        @foreach (var userId in item.ContactUserIds.Split(','))
+                        {
+                            var userDisplayName = userLookup[Convert.ToInt32(userId)];
+                            userContacts.Add(userDisplayName);
+                        }
+                        @(String.Join(", ", userContacts))
+                    </td>
+                </tr>
+            }
+        </table>
     }
     else
     {
-    <label>No content items have been created for this profile.</label>
+        <label>No content items have been created for this profile.</label>
     }
 
 </div>

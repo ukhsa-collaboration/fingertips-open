@@ -3,56 +3,96 @@
 
 <!-- Download data for profile -->
 <div [hidden]="!showProfile">
-    <h3 [innerHtml]="'Profile: ' + profileName"> </h3>
-    <button class="btn btn-link" (click)="exportProfileData(nationalCode)">{{allLabel}}</button>
-    <button class="btn btn-link" (click)="exportProfileData(parentCode)" [hidden]="!showSubnational">
-          {{parentLabel}}</button>
-    <button class="btn btn-link" (click)="exportProfileMetadata()">Indicator definitions</button>
+  <h3 [innerHtml]="'Profile: ' + profileName"> </h3>
+  <button class="btn btn-link" (click)="exportProfileData(nationalCode)" [hidden]="!showNational">{{allLabel}}</button>
+  <button class="btn btn-link truncate" (click)="exportProfileData(parentCode)"
+    [hidden]="!showSubnational">{{parentLabel}}</button>
+  <button class="btn btn-link" (click)="exportProfileNearestNeighboursData()"
+    [hidden]="!isNearestNeighbours">{{nearestNeighboursLabel}}</button>
+  <button class="btn btn-link" (click)="exportProfileMetadata()">Indicator definitions</button>
 </div>
 
 <!-- Download data for domain -->
 <div [hidden]="!showGroup">
-    <h3 [innerHtml]="'Domain: ' + groupName"></h3>
-    <button class="btn btn-link" (click)="exportGroupData(nationalCode)">{{allLabel}}</button>
-    <button class="btn btn-link" (click)="exportGroupData(parentCode)" [hidden]="!showSubnational">{{parentLabel}}</button>
-    <button class="btn btn-link" (click)="exportGroupMetadata()">Indicator definitions</button>
+  <h3 [innerHtml]="'Domain: ' + groupName"></h3>
+  <button class="btn btn-link" (click)="exportGroupData(nationalCode)" [hidden]="!showNational">{{allLabel}}</button>
+  <button class="btn btn-link truncate" (click)="exportGroupData(parentCode)"
+    [hidden]="!showSubnational">{{parentLabel}}</button>
+  <button class="btn btn-link" (click)="exportGroupNearestNeighboursData()"
+    [hidden]="!isNearestNeighbours">{{nearestNeighboursLabel}}</button>
+  <button class="btn btn-link" (click)="exportGroupMetadata()">Indicator definitions</button>
 </div>
 
 <!-- Download data for search results / list of indicators -->
 <div [hidden]="!showAllIndicators">
-    <h3>All indicators</h3>
-    <button class="btn btn-link" (click)="exportAllIndicatorData(nationalCode)">{{allLabel}}</button>
-    <button class="btn btn-link" (click)="exportAllIndicatorData(parentCode)" [hidden]="!showSubnational">{{parentLabel}}</button>
-    <button class="btn btn-link" (click)="exportAllIndicatorMetadata()">Indicator definitions</button>
+  <h3>All indicators</h3>
+  <button class="btn btn-link" (click)="exportAllIndicatorData(nationalCode)"
+    [hidden]="!showNational">{{allLabel}}</button>
+  <button class="btn btn-link truncate" (click)="exportAllIndicatorData(parentCode)"
+    [hidden]="!showSubnational">{{parentLabel}}</button>
+  <button class="btn btn-link" (click)="exportAllIndicatorMetadata()">Indicator definitions</button>
 </div>
 
 <!-- Download data for single indicator -->
 <h3 [innerHtml]="'Indicator: ' + indicatorName"></h3>
-<button class="btn btn-link" (click)="exportIndicatorData(nationalCode)">{{allLabel}}</button>
-<button class="btn btn-link" (click)="exportIndicatorData(parentCode)" [hidden]="!showSubnational">{{parentLabel}}</button>
+<button class="btn btn-link" (click)="exportIndicatorData(nationalCode)" [hidden]="!showNational">{{allLabel}}</button>
+<button class="btn btn-link truncate" (click)="exportIndicatorData(parentCode)"
+  [hidden]="!showSubnational">{{parentLabel}}</button>
+<button class="btn btn-link" (click)="exportIndicatorNearestNeighboursData()"
+  [hidden]="!isNearestNeighbours">{{nearestNeighboursLabel}}</button>
 <button class="btn btn-link" (click)="exportIndicatorMetadata()">Indicator definition</button>
 
 <!-- Download data for practice addresses -->
 <div [hidden]="!showAddresses">
-    <h3>GP practice addresses</h3>
-    <button class="btn btn-link" (click)="exportAddresses(nationalCode)">{{allLabel}}</button>
-    <button class="btn btn-link" (click)="exportAddresses(parentCode)" [hidden]="!showSubnational">{{parentLabel}}</button>
+  <h3>GP practice addresses</h3>
+  <button class="btn btn-link" (click)="exportAddresses(nationalCode)">{{allLabel}}</button>
+  <button class="btn btn-link truncate" (click)="exportAddresses(parentCode)"
+    [hidden]="!showSubnational">{{parentLabel}}</button>
 </div>
 
 <!-- Download data for populations -->
 <div [hidden]="!showPopulation">
-    <h3>Population age distribution</h3>
-    <button class="btn btn-link" (click)="exportPopulation(nationalCode)">{{allLabel}}</button>
-    <button class="btn btn-link" (click)="exportPopulation(parentCode)" [hidden]="!showSubnational">{{parentLabel}}</button>
+  <h3>Population age distribution</h3>
+  <button class="btn btn-link" (click)="exportPopulation(nationalCode)">{{allLabel}}</button>
+  <button class="btn btn-link truncate" (click)="exportPopulation(parentCode)"
+    [hidden]="!showSubnational">{{parentLabel}}</button>
 </div>
 
-<p *ngIf="isEnvironmentTest">Data files for many profiles are pre-built every night so any data that has been uploaded or changed today will not be included.
-    <br>
-    <br> Downloaded data is only available if your machine is on the PHE network.
+<p *ngIf="isEnvironmentTest">Data files for many profiles are pre-built every night so any data that has been uploaded
+  or changed today will not be included.
+  <br>
+  <br> Downloaded data is only available if your machine is on the PHE network.
 </p>
 
 <h2 class="secondary-heading">Get the data with R</h2>
-<p>The <a style="display:inline;" href="https://cran.r-project.org/web/packages/fingertipsR/index.html" target="_blank">fingertipsR</a> package allows you to download public health data using R</p>
+<p>The
+  <a style="display:inline;" href="https://cran.r-project.org/web/packages/fingertipsR/index.html"
+    target="_blank">fingertipsR</a> package allows you to download public health data using R</p>
+
+<h2 class="secondary-heading">Get the data with Python</h2>
+<p>The
+  <a style="display:inline;" href="https://fingertips-py.readthedocs.io/en/latest" target="_blank">fingertips_py</a>
+  package allows you to download public health data using Python</p>
 
 <h2 class="secondary-heading">Public Health Data API</h2>
-<p>The <a style="display:inline;" href="{{apiUrl}}" target="_blank">Fingertips API</a> (Chrome or Firefox only) allows public health data to be retrieved in either JSON or CSV formats</p>
+<p>The
+  <a style="display:inline;" href="{{apiUrl}}" target="_blank">Fingertips API</a> (Chrome or Firefox only) allows public
+  health data to be retrieved in either JSON or CSV formats</p>
+
+<h2 class="secondary-heading">Data sharing and reuse</h2>
+<p>
+  You may re-use this information (excluding logos) free of charge in any format or medium, under the terms of the Open
+  Government Licence v.3.0 To view this licence, visit OGL. Where we have identified any third party copyright
+  information you will need to obtain permission from the copyright holders concerned.
+</p>
+<br>
+<p>
+  <strong>Please cite any use of this website as follows specifying the date of access:</strong>
+  <br>
+  'Public Health England. Public Health Profiles. [Date accessed]
+  <br>
+  <a style="display:inline;" href="https://fingertips.phe.org.uk" target="_blank">https://fingertips.phe.org.uk</a>
+  &copy; Crown
+  copyright
+  [Year]'
+</p>

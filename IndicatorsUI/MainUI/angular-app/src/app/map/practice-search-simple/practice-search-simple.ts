@@ -1,4 +1,4 @@
-import { LatitudeLongitude } from '../../typings/FT.d';
+import { LatitudeLongitude } from '../../typings/FT';
 
 export class AutoCompleteResult {
     polygonAreaCode: string;

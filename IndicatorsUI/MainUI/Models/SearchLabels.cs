@@ -11,7 +11,7 @@ namespace IndicatorsUI.MainUI.Models
 
         public static SearchLabels New(int areaTypeId)
         {
-            if (areaTypeId == AreaTypeIds.CountyAndUnitaryAuthority)
+            if (areaTypeId == AreaTypeIds.CountyAndUnitaryAuthorityPre2019)
             {
                 return new SearchLabels
                 {

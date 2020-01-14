@@ -1,44 +1,46 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, ComponentFactoryResolver, ApplicationRef, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { ReportsService } from './services/reports.service';
 import { ProfileService } from './services/profile.service';
-import { ReportsComponent } from './reports/reports.component';
-import { ReportParametersComponent } from './reports/report-parameters/report-parameters.component';
-import { ReportProfilesComponent } from './reports/report-profiles/report-profiles.component';
-import { ReportListViewComponent } from './reports/report-list-view/report-list-view.component';
-import { ReportEditViewComponent } from './reports/report-edit-view/report-edit-view.component';
 import { IndicatorsReorderViewComponent } from './indicators/indicators-reorder-view/indicators-reorder-view.component';
-import { HttpService } from './services/http.service';
 import { SharedModule } from './shared/shared.module';
+import { ReportsModule } from './reports/reports.module';
+import { UploadModule } from './upload/upload.module';
+import { LightBoxModule } from './shared/component/light-box/light-box.module';
+import { LightBoxIndicatorReorderModule } from './shared/component/light-box-indicator-reorder/light-box-indicator-reorder.module';
+import { ReportsComponent } from './reports/reports.component';
+import { NgSelect2Module } from 'ng-select2';
+import { UploadComponent } from './upload/upload.component';
+import { UsersService } from './services/users.service';
 
-const rootComponents = [ReportsComponent, IndicatorsReorderViewComponent];
+const rootComponents = [ReportsComponent, IndicatorsReorderViewComponent, UploadComponent];
 
 @NgModule({
   declarations: [
-    ReportsComponent,
-    ReportParametersComponent,
-    ReportProfilesComponent,
-    ReportListViewComponent,
-    ReportEditViewComponent,
     IndicatorsReorderViewComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule,
+    HttpClientModule,
     SharedModule,
-    ReactiveFormsModule
+    NgSelect2Module,
+    ReportsModule,
+    UploadModule,
+    ReactiveFormsModule,
+    LightBoxModule,
+    LightBoxIndicatorReorderModule
   ],
   providers: [
     ReportsService,
     ProfileService,
-    HttpService
+    UsersService
   ],
   entryComponents: rootComponents
   // Instead of bootstraping a single component, with overriding mechanism, multiple components are bootstrapped
-  //bootstrap: [AppComponent]
+  // bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(private resolver: ComponentFactoryResolver) { }

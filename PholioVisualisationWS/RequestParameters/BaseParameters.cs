@@ -1,7 +1,7 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Web;
+using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.RequestParameters
 {
@@ -85,6 +85,13 @@ namespace PholioVisualisation.RequestParameters
                     if (int.TryParse(bit, out val))
                     {
                         list.Add(val);
+                    }
+                    // Parsing int fails for values greater than 2147483647.
+                    // To keep it fail safe, return a number which is not in use.
+                    // Also prevents later code throwing exceptions if no IDs in list
+                    else
+                    {
+                        list.Add(UndefinedInteger);
                     }
                 }
             }

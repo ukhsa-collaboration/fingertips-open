@@ -23,11 +23,8 @@ namespace PholioVisualisation.PholioObjects
         /// <summary>
         ///     Required by NHibernate to map to CoreDataSet table.
         /// </summary>
-        [JsonProperty]
+        [JsonIgnore]
         public int UniqueId { get; set; }
-
-        [JsonProperty]
-        public int Uid { get; set; }
 
         [JsonProperty]
         public int IndicatorId { get; set; }
@@ -149,6 +146,25 @@ namespace PholioVisualisation.PholioObjects
         {
             var data = GetNullObject();
             data.AreaCode = areaCode;
+            data.CategoryTypeId = -1;
+            data.CategoryId = -1;
+            data.SexId = -1;
+            data.AgeId = -1;
+            return data;
+        }
+
+        public static CoreDataSet GetNullObject(string areaCode, TimePeriod timePeriod)
+        {
+            var data = GetNullObject();
+            data.AreaCode = areaCode;
+            data.Year = timePeriod.Year;
+            data.YearRange = timePeriod.YearRange;
+            data.Quarter = timePeriod.Quarter;
+            data.Month = timePeriod.Month;
+            data.CategoryTypeId = -1;
+            data.CategoryId = -1;
+            data.SexId = -1;
+            data.AgeId = -1;
             return data;
         }
 
@@ -165,6 +181,10 @@ namespace PholioVisualisation.PholioObjects
             data.Count = NullValue;
             data.Denominator = NullValue;
             data.Denominator2 = NullValue;
+            data.CategoryTypeId = -1;
+            data.CategoryId = -1;
+            data.SexId = -1;
+            data.AgeId = -1;
         }
 
         /// <summary>

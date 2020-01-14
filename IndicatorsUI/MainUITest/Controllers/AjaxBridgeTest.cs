@@ -14,18 +14,6 @@ namespace IndicatorsUI.MainUITest.Controllers
     public class AjaxBridgeTest
     {
         [TestMethod]
-        public void TestGetPdfSpineChartData()
-        {
-            var json = GetJson("api/pdf/spine_chart?" +
-                "profile_id=" + ProfileIds.Phof +
-                "&area_codes=" + AreaCodes.Derby +
-                "&child_area_type_id=" + AreaTypeIds.CountyAndUnitaryAuthority);
-
-            Assert.IsTrue(json.Contains("IndicatorId"),
-                "Both IndicatorsUI and PholioVisualisationWS need to be running for this to work");
-        }
-
-        [TestMethod]
         public void Test_Api_Call()
         {
             var json = GetJson("api/value_notes");

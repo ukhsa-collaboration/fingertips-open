@@ -1,59 +1,51 @@
-﻿using System.Collections.Generic;
+﻿using Fpm.ProfileData;
+using System.Collections.Generic;
 using System.Linq;
-using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface ITimePeriodHelper
-    {
-        string GetDatapointString();
-        string GetBaselineString();
-        string GetLatestPeriodString();
-        TimePeriod GetPeriodIfLaterThanDatapoint();
-    }
-
     public class TimePeriodHelper : ITimePeriodHelper
     {
-        private TimePeriodReader timePeriodReader = new TimePeriodReader();
-        private GroupingPlusName grouping;
-        private TimePeriod baseline;
-        private TimePeriod datapoint;
-        private TimePeriod latestPeriod;
+        private readonly TimePeriodReader _timePeriodReader = new TimePeriodReader();
+        private readonly GroupingPlusName _grouping;
+        private readonly TimePeriod _baseline;
+        private readonly TimePeriod _datapoint;
+        private TimePeriod _latestPeriod;
 
         public TimePeriodHelper(GroupingPlusName grouping)
         {
-            this.grouping = grouping;
-            this.baseline = TimePeriod.GetBaseline(grouping);
-            this.datapoint = TimePeriod.GetDataPoint(grouping);
+            this._grouping = grouping;
+            this._baseline = TimePeriod.GetBaseline(grouping);
+            this._datapoint = TimePeriod.GetDataPoint(grouping);
         }
 
         public string GetDatapointString()
         {
-            return timePeriodReader.GetPeriodString(datapoint, grouping.YearTypeId);
+            return _timePeriodReader.GetPeriodString(_datapoint, _grouping.YearTypeId);
         }
 
         public string GetBaselineString()
         {
-            return timePeriodReader.GetPeriodString(baseline, grouping.YearTypeId);
+            return _timePeriodReader.GetPeriodString(_baseline, _grouping.YearTypeId);
         }
 
         public string GetLatestPeriodString()
         {
-            return timePeriodReader.GetPeriodString(latestPeriod, grouping.YearTypeId);
+            return _timePeriodReader.GetPeriodString(_latestPeriod, _grouping.YearTypeId);
         }
 
         public TimePeriod GetPeriodIfLaterThanDatapoint()
         {
             var reader = ReaderFactory.GetProfilesReader();
-            var periods = reader.GetCoreDataSetTimePeriods(grouping);
+            var periods = reader.GetCoreDataSetTimePeriods(_grouping);
 
             if (periods.Any())
             {
                 IEnumerable<TimePeriod> relevantPeriods;
-                if (datapoint.IsMonthly)
+                if (_datapoint.IsMonthly)
                 {
                     relevantPeriods = periods.Where(x => x.Month != TimePeriod.Undefined);
-                } else if (datapoint.IsQuarterly)
+                } else if (_datapoint.IsQuarterly)
                 {
                     relevantPeriods = periods.Where(x => x.Quarter != TimePeriod.Undefined);
                 } else
@@ -67,9 +59,9 @@ namespace Fpm.MainUI.Helpers
                 if (relevantPeriods.Any())
                 {
                     var last = relevantPeriods.Last();
-                    if (last.IsLaterThan(datapoint))
+                    if (last.IsLaterThan(_datapoint))
                     {
-                        latestPeriod = last;
+                        _latestPeriod = last;
                         return last;
                     }
                 }

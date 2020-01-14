@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NHibernate.Util;
 using PholioVisualisation.Analysis;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
@@ -18,9 +19,9 @@ namespace PholioVisualisation.Export.FileBuilder.Writers
         private readonly MultipleCoreDataCollector _coreDataCollector;
 
         private readonly BodyPeriodWriterContainer _bodyPeriodWriterContainer;
-        
-        public CsvBuilderIndicatorDataBodyPeriodWriter(IndicatorMetadata indicatorMetadata, Grouping grouping, ExportAreaHelper areaHelper, IGroupDataReader groupDataReader,
-                                                        IndicatorExportParameters generalParameters, OnDemandQueryParametersWrapper onDemandQueryParameters, IndicatorComparer comparer = null)
+
+        public CsvBuilderIndicatorDataBodyPeriodWriter(IndicatorMetadata indicatorMetadata, Grouping grouping, ExportAreaHelper areaHelper, IGroupDataReader groupDataReader, IAreasReader areasReader,
+            IndicatorExportParameters generalParameters, OnDemandQueryParametersWrapper onDemandQueryParameters, IndicatorComparer comparer = null)
         {
             _areaHelper = areaHelper;
 
@@ -30,47 +31,51 @@ namespace PholioVisualisation.Export.FileBuilder.Writers
             // Data collectors for calculating recent trends
             _coreDataCollector = new MultipleCoreDataCollector();
 
-            _bodyPeriodWriterContainer = new BodyPeriodWriterContainer(generalParameters, onDemandQueryParameters, indicatorMetadata, areaHelper, groupDataReader, _timePeriods, _coreDataCollector, grouping, comparer);
+            _bodyPeriodWriterContainer = new BodyPeriodWriterContainer(generalParameters, onDemandQueryParameters, indicatorMetadata,
+                areaHelper, groupDataReader, areasReader, _timePeriods, _coreDataCollector, grouping, comparer);
         }
 
-        public void WritePeriodsForIndicatorBodyInFile(int indicatorId, ref SingleIndicatorFileWriter fileWriter)
+        public void WritePeriodsForIndicatorBodyInFile(int indicatorId, SingleIndicatorFileWriter fileWriter, Grouping grouping)
         {
             foreach (var timePeriod in _timePeriods)
             {
-                WriteSinglePeriodInFile(indicatorId, timePeriod, ref fileWriter);
+                WriteSinglePeriodInFile(indicatorId, timePeriod, fileWriter, grouping);
             }
         }
 
-        private void WriteSinglePeriodInFile(int indicatorId, TimePeriod timePeriod, ref SingleIndicatorFileWriter fileWriter)
+        private void WriteSinglePeriodInFile(int indicatorId, TimePeriod timePeriod, SingleIndicatorFileWriter fileWriter, Grouping grouping)
         {
             var timeString = _timePeriodFormatter.Format(timePeriod);
             var sortableTimePeriod = timePeriod.ToSortableNumber();
 
             try
             {
+                // Write England data
                 IList<CoreDataSet> englandCoreDataForComparison = null;
-                var englandCoreData = _bodyPeriodWriterContainer.WriteProcessedData(indicatorId, timePeriod, timeString, sortableTimePeriod, ref fileWriter,
-                                                                                    ref englandCoreDataForComparison, null, _areaHelper.England.Code);
+                var englandCoreData = _bodyPeriodWriterContainer.WriteProcessedNationalData(indicatorId, timePeriod, timeString,
+                    sortableTimePeriod, fileWriter, ref englandCoreDataForComparison, grouping, _areaHelper.England.Code);
 
-                // This collection into england data list is necessary for trends calculations
-                _coreDataCollector.AddEnglandDataList(englandCoreData);
-
+                // Write parent data
                 var parentCoreDataForComparison = BodyPeriodComparisonContainer.CloneCoreDataForComparison(englandCoreDataForComparison);
-                var parentCoreData = _bodyPeriodWriterContainer.WriteProcessedData(indicatorId, timePeriod, timeString, sortableTimePeriod, ref fileWriter,
-                                                                                    ref parentCoreDataForComparison, _areaHelper.England, _areaHelper.ParentAreaCodes);
+                var parentCoreData = _bodyPeriodWriterContainer.WriteProcessedSubNationalData(indicatorId, timePeriod,
+                    timeString, sortableTimePeriod, fileWriter, ref parentCoreDataForComparison, grouping);
 
-                // This collection into parent data list is necessary for trends calculations
+                // Write child data
+                var childCoreData = _bodyPeriodWriterContainer.WriteChildProcessedData(indicatorId, timePeriod,
+                    timeString, sortableTimePeriod, fileWriter, englandCoreDataForComparison,
+                    parentCoreDataForComparison, grouping);
+
+                // Collect data for trends calculations
+                _coreDataCollector.AddEnglandDataList(englandCoreData);
                 _coreDataCollector.AddParentDataList(parentCoreData);
-
-                // Child data
-                var childCoreData = _bodyPeriodWriterContainer.WriteChildProcessedData(indicatorId, timePeriod, timeString, sortableTimePeriod, ref fileWriter, englandCoreDataForComparison, parentCoreDataForComparison);
-
                 _coreDataCollector.AddChildDataList(childCoreData);
             }
             catch (Exception ex)
             {
-                throw new FingertipsException(string.Format(
-                    "It could not be built data for indicator {0} and time period {1}", indicatorId, timePeriod), ex);
+                throw new FingertipsException(
+                    string.Format(
+                        "CSV data could not be built for indicator {0} and time period {1}.{2}Additional information: {3}",
+                        indicatorId, timePeriod, Environment.NewLine, ex.Message), ex);
             }
         }
     }

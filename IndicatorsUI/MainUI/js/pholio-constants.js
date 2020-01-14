@@ -28,6 +28,16 @@ var AreaTypeIds = {
     CCGPreApr2017: 153,
     CCGSince2018: 154,
     Uk: 159,
+    LAUnchanged: 160,
+    LANew2019: 161,
+    LAObsolete2019: 162,
+    CcgSinceApr2019: 165,
+    UAUnchanged: 170,
+    UANew2019: 171,
+    UAObsolete2019: 172,
+    UAFutureAreas: 173,
+    DistrictUASince2019: 201,
+    CountyUASince2019: 202,
     AreaList: 30000
 };
 

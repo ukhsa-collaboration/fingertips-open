@@ -1,0 +1,36 @@
+<div class="right-align" *ngIf="isAdminUser">
+  <strong>User:</strong>&nbsp;<span>{{selectedUser.DisplayName}}</span>&nbsp;
+  <small><a class="change-user-link" (click)="toggleUserDropdown()">Change user</a></small>
+
+  <div *ngIf="showUserDropdown">
+    <ng-select2 [data]="userOptionData" [options]="options" name="users" [(ngModel)]="selectedUser"
+      (valueChanged)="onUserChange($event)"></ng-select2>
+  </div>
+</div>
+<div>
+  <div>
+    <h3>Your pending files</h3>
+  </div>
+  <div id="progress-menu" class="row">
+    <div class="col-md-2">
+      <span class="in-progress">
+        In progress:<span class="progress-count" [innerHtml]="inProgressCount"></span>
+      </span>
+    </div>
+    <div class="col-md-2">
+      <span class="in-queue">
+        In the queue:<span class="progress-count" [innerHtml]="inQueueCount"></span>
+      </span>
+    </div>
+    <div class="col-md-3">
+      <span class="awaiting-confirmation">
+        Awaiting confirmation:<span class="progress-count" [innerHtml]="awaitingConfirmationCount"></span>
+      </span>
+    </div>
+  </div>
+  <div>
+    <h3>Your files</h3>
+  </div>
+  <app-upload-progress-table [selectedUser]="selectedUser"
+    (emitUploadJobProgress)="updateUploadJobProgressMembers($event)"></app-upload-progress-table>
+</div>

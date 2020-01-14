@@ -11,7 +11,7 @@ namespace PholioVisualisation.DataConstructionTest
     public class ProfileUrlTest
     {
         private const int GroupId = GroupIds.HealthProfiles_OurCommunities;
-        private const int AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+        private const int AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
         private ProfilePerIndicator profile;
 
         [TestInitialize]

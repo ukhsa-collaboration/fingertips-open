@@ -9,11 +9,20 @@ namespace IndicatorsUI.MainUI.Helpers
         private IList<int> _searchAreaTypeIds;
         private int _profileId;
 
-        private List<int> excludedAreaTypes = new List<int>
+        private static List<int> areaTypesWithPlacenameSearch = new List<int>
         {
-            AreaTypeIds.CcgPostApr2017, AreaTypeIds.CcgSince2018
+            AreaTypeIds.CcgPreApr2017,
+            AreaTypeIds.CountyAndUnitaryAuthorityPre2019,
+            AreaTypeIds.DistrictAndUAPreApr2019
         };
 
+        private static List<int> ccgs = new List<int>{
+            AreaTypeIds.CcgPreApr2017,
+            AreaTypeIds.CcgPostApr2017,
+            AreaTypeIds.CcgSince2018,
+            AreaTypeIds.CcgSinceApr2019
+        };
+ 
         public AreaSearchHelper(int profileId, string searchAreaTypeIds)
         {
             _searchAreaTypeIds = new IntListStringParser(searchAreaTypeIds).IntList;
@@ -24,7 +33,7 @@ namespace IndicatorsUI.MainUI.Helpers
         {
             get
             {
-                return _searchAreaTypeIds.Any(x => excludedAreaTypes.Contains(x) == false);
+                return _searchAreaTypeIds.Any(x => areaTypesWithPlacenameSearch.Contains(x));
             }
         }
 
@@ -55,8 +64,7 @@ namespace IndicatorsUI.MainUI.Helpers
 
         private bool IsCcg()
         {
-            return _searchAreaTypeIds
-                .Any(x => x == AreaTypeIds.CcgPreApr2017 || x == AreaTypeIds.CcgPostApr2017);
+            return _searchAreaTypeIds.Any(x => ccgs.Contains(x));
         }
     }
 }

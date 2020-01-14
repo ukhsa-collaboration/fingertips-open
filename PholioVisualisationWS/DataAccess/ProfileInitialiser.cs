@@ -28,7 +28,8 @@ namespace PholioVisualisation.DataAccess
                     Name = profileConfig.Name,
                     UrlKey = profileConfig.UrlKey,
                     IsNational = profileConfig.IsNational,
-                    HasTrendMarkers = profileConfig.HasTrendMarkers
+                    HasTrendMarkers = profileConfig.HasTrendMarkers,
+                    AreIndicatorNamesDisplayedWithNumbers = profileConfig.AreIndicatorNamesDisplayedWithNumbers
                 };
             }
         }

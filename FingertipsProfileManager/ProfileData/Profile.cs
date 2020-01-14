@@ -1,9 +1,7 @@
-﻿using System;
+﻿using Fpm.ProfileData.Entities.LookUps;
+using Fpm.ProfileData.Entities.Profile;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Fpm.ProfileData.Entities.LookUps;
-using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.ProfileData
 {
@@ -25,11 +23,12 @@ namespace Fpm.ProfileData
         public int SelectedDomain { get; set; }
         public bool AreIndicatorsToBeListed { get; set; }
         public bool IsProfileViewable { get; set; }
-        public int ContactUserId { get; set; }
+        public List<string> ContactUserIds { get; set; }
+        public bool AreIndicatorNamesDisplayedWithNumbers { get; set; }
 
         public GroupingMetadata GetSelectedGroupingMetadata(int selectedDomainNumber)
         {
-                return GroupingMetadatas.Where(x => x.Sequence == selectedDomainNumber).FirstOrDefault();
+            return GroupingMetadatas.Where(x => x.Sequence == selectedDomainNumber).FirstOrDefault();
         }
     }
 }

@@ -234,7 +234,7 @@ namespace Fpm.ProfileDataTest
         public void TestSaveNewThenDeleteGroupingMetadata()
         {
             // Save new metadata
-            var metadata = writer.NewGroupingMetadata(name1, Sequence1, ProfileIds.Diabetes);
+            var metadata = writer.NewGroupingMetadata(name1, Sequence1, ProfileIds.DevelopmentProfileForTesting);
             var groupId = metadata.GroupId;
 
             // Check metadata was persisted
@@ -279,7 +279,7 @@ namespace Fpm.ProfileDataTest
         {
             var doc = new Document
             {
-                ProfileId = ProfileIds.Diabetes,
+                ProfileId = ProfileIds.DevelopmentProfileForTesting,
                 FileName = Guid.NewGuid().ToString(),
                 FileData = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5 },
                 UploadedBy = "Test User",
@@ -323,7 +323,7 @@ namespace Fpm.ProfileDataTest
         public void TestCopyIndicatorMetadataTextValue()
         {
             var reader = ReaderFactory.GetProfilesReader();
-            const int targetProfile = ProfileIds.Diabetes;
+            const int targetProfile = ProfileIds.DevelopmentProfileForTesting;
             const int indicatorId = IndicatorIds.ChildrenInPoverty;
 
             // get an indicator metadata text values from database
@@ -336,10 +336,8 @@ namespace Fpm.ProfileDataTest
                 IndicatorId = indicatorId,
                 ProfileId = targetProfile,
                 Name = indicatorTextValues.Name,
-                NameLong = indicatorTextValues.NameLong,
                 Definition = indicatorTextValues.Definition,
                 Rationale = indicatorTextValues.Rationale,
-                Policy = indicatorTextValues.Policy,
                 DataSource = indicatorTextValues.DataSource,
                 Producer = indicatorTextValues.Producer,
                 IndMethod = indicatorTextValues.IndMethod,
@@ -360,8 +358,18 @@ namespace Fpm.ProfileDataTest
                 Rounding = indicatorTextValues.Rounding,
                 DataQuality = indicatorTextValues.DataQuality,
                 IndicatorContent = indicatorTextValues.IndicatorContent,
-                SpecificRationale = indicatorTextValues.SpecificRationale
-            };
+                SpecificRationale = indicatorTextValues.SpecificRationale,
+                Keywords = indicatorTextValues.Keywords,
+                EvidOfVariability = indicatorTextValues.EvidOfVariability,
+                JustifConfIntMeth = indicatorTextValues.JustifConfIntMeth,
+                QualityAssurance = indicatorTextValues.QualityAssurance,
+                QualityImprPlan = indicatorTextValues.QualityImprPlan,
+                JustiOfExclusions = indicatorTextValues.JustiOfExclusions,
+                JustifOfDataSources = indicatorTextValues.JustifOfDataSources,
+                SponsorStakeholders = indicatorTextValues.SponsorStakeholders,
+                IndOwnerContDet = indicatorTextValues.IndOwnerContDet,
+                Comments =  indicatorTextValues.Comments
+    };
 
             // Delete existing metadata text values
             writer.DeleteOverriddenIndicatorMetadataTextValue(copy);
@@ -375,7 +383,6 @@ namespace Fpm.ProfileDataTest
             Assert.AreNotEqual(copy,copyFromDb);
             Assert.AreEqual(copy.IndicatorId, copyFromDb.IndicatorId);
             Assert.AreEqual(copy.ProfileId, copyFromDb.ProfileId);
-            Assert.AreEqual(copy.NameLong, copyFromDb.NameLong);
         }
 
     }

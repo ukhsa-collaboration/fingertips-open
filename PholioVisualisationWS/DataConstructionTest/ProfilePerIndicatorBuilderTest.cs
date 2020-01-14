@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataConstructionTest
         public void TestEmptyIndicatorList()
         {
             var builder = new ProfilePerIndicatorBuilder(true);
-            var result = builder.Build(new List<int>(), AreaTypeIds.DistrictAndUnitaryAuthority);
+            var result = builder.Build(new List<int>(), AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
 
             // Assert: result is returned
             Assert.IsNotNull(result);
@@ -56,7 +56,7 @@ namespace PholioVisualisation.DataConstructionTest
                 IndicatorIds.ChildrenInLowIncomeFamilies
             };
             var builder = new ProfilePerIndicatorBuilder(isEnvironmentLive);
-            return builder.Build(indicators, AreaTypeIds.DistrictAndUnitaryAuthority);
+            return builder.Build(indicators, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019);
         }
     }
 }

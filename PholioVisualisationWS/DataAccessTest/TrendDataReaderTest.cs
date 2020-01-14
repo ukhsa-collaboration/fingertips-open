@@ -58,17 +58,17 @@ namespace PholioVisualisation.DataAccessTest
         {
             Grouping grouping = new Grouping
             {
-                IndicatorId = IndicatorIds.AdultSmokingPrevalence,
-                BaselineYear = 2009,
+                IndicatorId = IndicatorIds.LandlordHomeRepossessions,
+                BaselineYear = 2011,
                 BaselineQuarter = 2,
-                DataPointYear = 2010,
-                YearRange = 1,
+                DataPointYear = 2012,
+                YearRange = 5,
                 DataPointQuarter = 3,
-                SexId = SexIds.Persons,
-                AgeId = AgeIds.Over18
+                SexId = SexIds.NotApplicable,
+                AgeId = AgeIds.NotApplicable
             };
 
-            IList<CoreDataSet> data = reader.GetTrendData(grouping, AreaCodes.CountyUa_Cambridgeshire);
+            IList<CoreDataSet> data = reader.GetTrendData(grouping, AreaCodes.CountyUa_CentralBedfordshire);
 
             Assert.AreEqual(6, data.Count);
 
@@ -95,21 +95,21 @@ namespace PholioVisualisation.DataAccessTest
         {
             Grouping grouping = new Grouping
             {
-                IndicatorId = 734,
-                BaselineYear = 2008,
+                IndicatorId = IndicatorIds.CDifficileInfectionCounts,
+                BaselineYear = 2017,
                 BaselineQuarter = -1,
-                BaselineMonth = 6,
-                DataPointYear = 2011,
+                BaselineMonth = 3,
+                DataPointYear = 2018,
                 YearRange = 1,
                 DataPointQuarter = -1,
-                DataPointMonth = 1,
-                SexId = 4,
-                AgeId = 204
+                DataPointMonth = 2,
+                SexId = SexIds.Persons,
+                AgeId = AgeIds.AllAges
             };
 
-            IList<CoreDataSet> data = reader.GetTrendData(grouping, AreaCodes.CountyUa_CityOfLondon);
+            IList<CoreDataSet> data = reader.GetTrendData(grouping, AreaCodes.England);
 
-            Assert.AreEqual(32, data.Count);
+            Assert.AreEqual(12, data.Count);
 
             StringBuilder sb = new StringBuilder();
 

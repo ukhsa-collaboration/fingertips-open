@@ -1,4 +1,5 @@
 import { Component, OnChanges, Input, Output, SimpleChanges, EventEmitter, ChangeDetectorRef } from '@angular/core';
+import { LightBoxWithInputConfig, LightBoxWithInputTypes } from './light-box-with-input';
 
 @Component({
   selector: 'ft-light-box-with-input',
@@ -47,7 +48,7 @@ export class LightBoxWithInputComponent implements OnChanges {
   }
 
   confirm() {
-    this.lightBoxInputText = (<HTMLInputElement>document.getElementById("info-box-text-input")).value;
+    this.lightBoxInputText = (<HTMLInputElement>document.getElementById('info-box-text-input')).value;
     this.closePopupAndEmit(true);
   }
 
@@ -68,7 +69,7 @@ export class LightBoxWithInputComponent implements OnChanges {
         }
         this.emitLightBoxInputText.emit(this.lightBoxInputText);
       } else {
-        this.errorMessage = "Please enter a valid area list name";
+        this.errorMessage = 'Please enter a valid area list name';
         return false;
       }
     }
@@ -86,16 +87,3 @@ export class LightBoxWithInputComponent implements OnChanges {
     return true;
   }
 }
-
-export class LightBoxWithInputConfig {
-  public Type: number;
-  public Html: string;
-  public Title: string;
-  public Height: number;
-  public InputText: string;
-}
-
-export class LightBoxWithInputTypes {
-  public static readonly Ok = 1
-  public static readonly OkCancel = 2;
-};

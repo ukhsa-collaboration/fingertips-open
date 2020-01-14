@@ -34,7 +34,7 @@ namespace PholioVisualisation.ServiceActions
 
                 var groupings = _groupingListProvider.GetGroupings(profileIds, indicatorIds, areaTypeId);
 
-                var groupRoots = new GroupRootBuilder().BuildGroupRoots(groupings);
+                var groupRoots = new GroupRootBuilder(_groupDataReader).BuildGroupRoots(groupings);
 
                 foreach (var groupRoot in groupRoots)
                 {

@@ -1,10 +1,10 @@
 import { Component, HostListener, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/Rx';
+import 'rxjs/rx';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
 import {
   GroupRoot
-} from '../typings/FT.d';
+} from '../typings/FT';
 
 @Component({
   selector: 'ft-metadata',
@@ -12,13 +12,13 @@ import {
   styleUrls: ['./metadata.component.css']
 })
 export class MetadataComponent {
-  @ViewChild('table') table;
+  @ViewChild('table', { static: true }) table;
 
   constructor(private ftHelperService: FTHelperService, ) { }
 
   @HostListener('window:MetadataSelected', ['$event'])
   public onOutsideEvent(event): void {
-    let root: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
+    const root: GroupRoot = this.ftHelperService.getCurrentGroupRoot();
     this.table.displayMetadataForGroupRoot(root);
   }
 }

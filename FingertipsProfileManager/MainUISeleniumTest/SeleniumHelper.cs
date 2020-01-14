@@ -13,7 +13,7 @@ namespace Fpm.MainUISeleniumTest
         public static void WaitForExpectedElement(IWebDriver driver, By element, int timeoutInSeconds = 30)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
-                .Until(ExpectedConditions.ElementExists(element));
+                .Until(c => c.FindElement(element));
         }
 
         /// <summary>
@@ -22,16 +22,7 @@ namespace Fpm.MainUISeleniumTest
         public static void WaitForExpectedElementToBeVisible(IWebDriver driver, By element, int timeoutInSeconds = 30)
         {
             new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
-                .Until(ExpectedConditions.ElementIsVisible(element));
-        }
-
-        /// <summary>
-        /// Wait for an element to be clickable on the page.
-        /// </summary>
-        public static void WaitForExpectedElementToBeClickable(IWebDriver driver, By element, int timeoutInSeconds = 30)
-        {
-            new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds))
-                .Until(ExpectedConditions.ElementToBeClickable(element));
+                .Until(c => c.FindElement(element).Displayed);
         }
 
         /// <summary>

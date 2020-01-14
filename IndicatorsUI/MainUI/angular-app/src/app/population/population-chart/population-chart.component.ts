@@ -1,14 +1,16 @@
-import { Component, Input, ViewChild, SimpleChanges, ElementRef } from '@angular/core';
+import { Component, Input, ViewChild, SimpleChanges, ElementRef, OnChanges } from '@angular/core';
 import { Populations, PopulationMaxFinder } from '../population';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
-import { IndicatorService } from '../../shared/service/api/indicator.service';
-import { AreaCodes, SexIds, HC, Colour, ParameterBuilder } from '../../shared/shared';
-import {
-  FTModel, Population
-} from '../../typings/FT.d';
+import { Colour, ParentAreaHelper, CategoryAreaCodeHelper, AreaHelper } from '../../shared/shared';
+import { SexIds, HC, AreaTypeIds } from '../../shared/constants';
+import { AreaCodes } from '../../shared/constants';
 import * as _ from 'underscore';
 
 import * as Highcharts from 'highcharts';
+import { DownloadService } from '../../shared/service/api/download.service';
+import { FTModel } from '../../typings/FT';
+import { isDefined } from '@angular/compiler/src/util';
+
 require('highcharts/modules/exporting')(Highcharts);
 require('highcharts/highcharts-more')(Highcharts);
 
@@ -17,9 +19,10 @@ require('highcharts/highcharts-more')(Highcharts);
   templateUrl: './population-chart.component.html',
   styleUrls: ['./population-chart.component.css']
 })
-export class PopulationChartComponent {
+export class PopulationChartComponent implements OnChanges {
 
   @Input() populations: Populations;
+
   private chartTitle: string;
   private chartColours = {
     label: '#333',
@@ -28,10 +31,11 @@ export class PopulationChartComponent {
   }
   private chartTextStyle;
 
-  @ViewChild('chart') public chartEl: ElementRef;
+  @ViewChild('chart', { static: true }) public chartEl: ElementRef;
   chart: Highcharts.ChartObject;
 
-  constructor(private ftHelperService: FTHelperService, private indicatorService: IndicatorService) {
+  constructor(private ftHelperService: FTHelperService,
+    private downloadService: DownloadService) {
     this.chartTextStyle = {
       color: this.chartColours.label,
       fontWeight: 'normal',
@@ -50,28 +54,29 @@ export class PopulationChartComponent {
   }
 
   private isAnyData(): boolean {
-    return !_.isUndefined(this.populations);
+    return isDefined(this.populations);
   }
 
   private getChartOptions(): any /*Highcharts.Options*/ {
-    let model: FTModel = this.ftHelperService.getFTModel();
-    let max = new PopulationMaxFinder().getMaximumValue(this.populations);
+    const model: FTModel = this.ftHelperService.getFTModel();
+    const max = new PopulationMaxFinder().getMaximumValue(this.populations);
+    const isAreaEngland = model.areaTypeId === AreaTypeIds.Country;
 
     // Populations
-    let areaPopulation = this.populations.areaPopulation;
-    let areaParentPopulation = this.populations.areaParentPopulation;
-    let nationalPopulation = this.populations.nationalPopulation;
+    const areaPopulation = this.populations.areaPopulation;
+    const areaParentPopulation = this.populations.areaParentPopulation;
+    const nationalPopulation = this.populations.nationalPopulation;
 
     // Labels
-    let subtitle = nationalPopulation.IndicatorName + ' ' + nationalPopulation.Period;
-    let maleString = ' (Male)';
-    let femaleString = ' (Female)';
+    const subtitle = nationalPopulation.IndicatorName + ' ' + nationalPopulation.Period;
+    const maleString = ' (Male)';
+    const femaleString = ' (Female)';
     this.chartTitle = '<div style="text-align:center;">Age Profile<br><span style="font-size:12px;">' + subtitle + '</span></div>';
 
-    let series = [];
+    const series = [];
 
     // Area series
-    let areaName = this.ftHelperService.getAreaName(model.areaCode);
+    const areaName = this.ftHelperService.getAreaName(model.areaCode);
     series.push(
       {
         name: areaName + maleString,
@@ -86,29 +91,33 @@ export class PopulationChartComponent {
       }
     );
 
-    // Parent area series
-    let isParentNotEngland = model.parentCode.toUpperCase() !== AreaCodes.England;
-    let isParentNotUk = model.parentCode.toUpperCase() !== AreaCodes.Uk;
+    // Subnational parent
+    if (model.parentTypeId !== AreaTypeIds.Country &&
+      !isAreaEngland) {
 
-    if (isParentNotEngland && isParentNotUk) {
-      let parentAreaName = this.ftHelperService.getParentArea().Name;
-      let parentColour = this.chartColours.pink;
+      let showedAreaName = '';
+      if (AreaHelper.isAreaList(model.parentCode)) {
+        showedAreaName = new ParentAreaHelper(this.ftHelperService).getParentAreaNameWithFirstLetterUpperCase();
+      } else {
+        showedAreaName = new ParentAreaHelper(this.ftHelperService).getParentAreaName();
+      }
+
+      const parentColour = this.chartColours.pink;
       series.push({
-        name: parentAreaName,
+        name: showedAreaName,
         data: areaParentPopulation.Values[SexIds.Male],
         color: parentColour,
       },
         {
-          name: parentAreaName + femaleString,
+          name: showedAreaName + femaleString,
           data: areaParentPopulation.Values[SexIds.Female],
           color: parentColour,
           showInLegend: false
         });
     }
 
-    if (isParentNotUk)
-    {
-      // England series
+    // England line
+    if (!isAreaEngland) {
       series.push(
         {
           name: 'England',
@@ -201,7 +210,7 @@ export class PopulationChartComponent {
 
             // Get series name
             let name = this.series.name;
-            let alreadyHasSexLabel = new RegExp(/e[\)]$/);
+            const alreadyHasSexLabel = new RegExp(/e[\)]$/);
             if (!alreadyHasSexLabel.test(name)) {
               name += maleString;
             }
@@ -221,7 +230,7 @@ export class PopulationChartComponent {
 
   public exportChart() {
 
-    let chartTitle = this.chartTitle;
+    const chartTitle = this.chartTitle;
     this.chart.exportChart({ type: 'image/png' }, {
       chart: {
         spacingTop: 70,
@@ -248,26 +257,30 @@ export class PopulationChartComponent {
     this.ftHelperService.logEvent('ExportImage', 'Population');
   }
 
-  public exportChartAsCsv(){
-
-    var urls = this.ftHelperService.getURL();
-    var model = this.ftHelperService.getFTModel();
-
-    var parameters = new ParameterBuilder()
-    .add('parent_area_type_id', model.parentTypeId)
-    .add('child_area_type_id', model.areaTypeId)
-    .add('areas_code', model.areaCode)
-    .add('parent_area_code', this.getParentAreaCode(model));
-
-    var url = urls.corews + 'api/latest/population/csv?' + parameters.build();
-    window.open(url.toLowerCase(), '_blank');
+  public exportChartAsCsv() {
+    const model = this.ftHelperService.getFTModel();
+    const parentAreaTypeId = model.parentTypeId;
+    const childAreaTypeId = model.areaTypeId;
+    const areasCode = this.getAreaCode(model);
+    const parentAreaCode = this.getParentAreaCode(model);
+    const categoryAreaCode = CategoryAreaCodeHelper.getCategoryAreaCode(model.parentCode);
+    this.downloadService.csvDownloadLatestPopulationData(parentAreaTypeId, childAreaTypeId, areasCode, parentAreaCode, categoryAreaCode);
   }
 
-  private getParentAreaCode(model){
-    
-    if (model.nearestNeighbour !== null){
-        return AreaCodes.England;
+  private getAreaCode(model) {
+    if (model.nearestNeighbour !== null) {
+      return model.nearestNeighbour;
     }
+
+    return model.areaCode;
+  }
+
+  private getParentAreaCode(model: FTModel): string {
+
+    if (model.nearestNeighbour !== null) {
+      return AreaCodes.England;
+    }
+
     return model.parentCode;
   }
 }

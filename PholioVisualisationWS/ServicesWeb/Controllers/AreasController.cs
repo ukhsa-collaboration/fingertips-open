@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using PholioVisualisation.UserData;
@@ -200,7 +201,10 @@ namespace PholioVisualisation.ServicesWeb.Controllers
             catch (Exception ex)
             {
                 Log(ex);
-                throw;
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(ex.Message)
+                };
             }
         }
 
@@ -211,6 +215,7 @@ namespace PholioVisualisation.ServicesWeb.Controllers
         /// <param name="profile_id">Profile ID</param>
         /// <param name="template_profile_id">Template profile ID [optional]</param>
         /// <param name="retrieve_ignored_areas">Whether to retrieve areas that are ignored for the profile [yes or no accepted] [optional]</param>
+        /// <param name="user_id">Ignore this parameter</param>
         [HttpGet]
         [Route("areas/by_area_type")]
         public IList<IArea> GetAreasOfAreaType(int area_type_id, int profile_id = ProfileIds.Undefined,
@@ -491,6 +496,9 @@ namespace PholioVisualisation.ServicesWeb.Controllers
                 nameValues.Add(ParameterNames.PolygonAreaTypeId, polygon_area_type_id.ToString());
                 nameValues.Add(ParameterNames.ParentAreaTypesToIncludeInResults, parent_areas_to_include_in_results);
                 nameValues.Add(ParameterNames.AreEastingAndNorthingRequired, include_coordinates.ToString());
+
+                var areaType = ReaderFactory.GetAreasReader().GetAreaType(polygon_area_type_id);
+
 
                 var parameters = new AreaLookupParameters(nameValues);
                 return new JsonpBuilderAreaLookup(parameters).GetGeographicalSearchResults();

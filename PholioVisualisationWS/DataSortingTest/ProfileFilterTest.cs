@@ -15,7 +15,7 @@ namespace PholioVisualisation.DataSortingTest
         {
             var ids = new List<int>
             {
-                ProfileIds.Phof, ProfileIds.Archived, ProfileIds.Search, ProfileIds.Unassigned
+                ProfileIds.Phof, ProfileIds.Search, ProfileIds.Unassigned
             };
 
             var filteredIds = ProfileFilter.RemoveSystemProfileIds(ids);

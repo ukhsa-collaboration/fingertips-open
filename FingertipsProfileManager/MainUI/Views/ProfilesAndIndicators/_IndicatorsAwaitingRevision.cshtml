@@ -1,0 +1,40 @@
+﻿@using Fpm.MainUI.Models
+@model IndicatorsAwaitingRevisionModel
+<div id="indicatorsAwaitingRevision" style="display: none;">
+    @using (Html.BeginForm("ConfirmIndicatorsAwaitingRevision", "ProfilesAndIndicators", FormMethod.Post, new {id = "IndicatorsAwaitingRevisionForm" }))
+    {
+        <div>
+            <h3>Request revisions</h3>
+        </div>
+        if (Model.IndicatorsAwaitingRevision != null && Model.IndicatorsAwaitingRevision.Any())
+        {
+            <div>
+                The following indicators will be moved back to 'Awaiting revision':
+                <br />
+                <table class="grid">
+                    @foreach (var indicator in Model.IndicatorsAwaitingRevision)
+                    {
+                        @Html.Hidden("indicator-awaiting-revision" + indicator.IndicatorId, indicator.IndicatorId + "~" + indicator.SexId + "~" + indicator.AgeId, new { @class = "indicator-id" })
+                        <tr>
+                            <td class="left">@indicator.IndicatorId</td>
+                            <td class="left">
+                                @indicator.IndicatorName (@indicator.Sex) (@indicator.Age)
+                            </td>
+                        </tr>
+                    }
+                </table>
+            </div>
+        }
+        <div>
+            @Html.HiddenFor(x => x.FromGroupId)
+            @Html.HiddenFor(x => x.ToGroupId)
+            @Html.HiddenFor(x => x.AreaTypeId)
+            @Html.Hidden("indicatorsAwaitingRevisionDetails")
+            <p>
+                <input class="btn btn-primary" id="indicators-awaiting-revision-confirm-button" type="button" value="Confirm" />
+                <input class="btn btn-default" id="Cancel" onclick="lightbox.hide()" value="Cancel" style="width: 80px;"/>
+            </p>
+        </div>
+    }
+</div>
+

@@ -89,6 +89,7 @@
     <Compile Include="GroupDataAtDataPointRepository.cs" />
     <Compile Include="GroupDataBuilderByIndicatorList.cs" />
     <Compile Include="GroupingDifferentiator.cs" />
+    <Compile Include="PolarityHelper.cs" />
     <Compile Include="GroupingValidator.cs" />
     <Compile Include="GroupRootComparisonManager.cs" />
     <Compile Include="GroupRootSummaryBuilder.cs" />
@@ -109,9 +110,11 @@
     <Compile Include="ParentAreasOfChildAreasBuilder.cs" />
     <Compile Include="PartitionTrendDataDictionaryBuilder.cs" />
     <Compile Include="PostcodeProvider.cs" />
+    <Compile Include="PracticeSummary.cs" />
     <Compile Include="ProfileIdListProvider.cs" />
     <Compile Include="ProfilePerIndicatorBuilder.cs" />
     <Compile Include="ProfileUrl.cs" />
+    <Compile Include="QuinaryPopulationCalculator.cs" />
     <Compile Include="RankDataList.cs" />
     <Compile Include="ShapeCoreDataSetProvider.cs" />
     <Compile Include="AreaListProvider.cs" />
@@ -138,7 +141,7 @@
     <Compile Include="TargetComparerHelper.cs" />
     <Compile Include="TargetComparerProvider.cs" />
     <Compile Include="TrendMarkersProvider.cs" />
-    <Compile Include="WeightedAverageCalculator.cs" />
+    <Compile Include="StandardAverageCalculator.cs" />
     <Compile Include="ValueDataProcessor.cs" />
     <Compile Include="DataPointOffsetCalculator.cs" />
     <Compile Include="DataProcessor.cs" />
@@ -154,7 +157,6 @@
     <Compile Include="GroupRootTrendBuilderMonthly.cs" />
     <Compile Include="GroupRootTrendBuilderQuarterly.cs" />
     <Compile Include="GroupRootTrendBuilderYearly.cs" />
-    <Compile Include="ICacheable.cs" />
     <Compile Include="IndicatorMetadataCollection.cs" />
     <Compile Include="IndicatorMetadataProvider.cs" />
     <Compile Include="ITimePeriodTextListBuilder.cs" />

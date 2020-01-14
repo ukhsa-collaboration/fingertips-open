@@ -31,22 +31,22 @@ function handleAjaxFailure(e) {
 function getAreaTypeNamePlural(areaTypeId) {
     return areaTypeId === AreaTypeIds.CCGPreApr2017 ? 'CCGs' :
         areaTypeId === AreaTypeIds.CountyUA ? 'Counties & Unitary Authorities' :
-        areaTypeId === AreaTypeIds.DistrictUA ? 'Districts & Unitary Authorities' :
-        'General Practices';
+            areaTypeId === AreaTypeIds.DistrictUA ? 'Districts & Unitary Authorities' :
+                'General Practices';
 }
 
 function getAreaTypeNameSingular(areaTypeId) {
     return areaTypeId === AreaTypeIds.CCGPreApr2017 ? 'CCG' :
         areaTypeId === AreaTypeIds.CountyUA ? 'County & Unitary Authority' :
-        areaTypeId === AreaTypeIds.DistrictUA ? 'District & Unitary Authority' :
-        'General Practice';
+            areaTypeId === AreaTypeIds.DistrictUA ? 'District & Unitary Authority' :
+                'General Practice';
 }
 
 function getSimpleAreaTypeName() {
     var areaTypeId = MT.model.parentAreaType;
     return areaTypeId === AreaTypeIds.CountyUA ? 'County/UA' :
         areaTypeId === AreaTypeIds.DistrictUA ? 'District/UA' :
-        'CCG';
+            'CCG';
 }
 
 function getSimpleAreaTypeNamePlural(areaTypeId) {
@@ -211,7 +211,7 @@ function getIndicatorMetadata(groupId, getDefinition, getSystemContent) {
     } else {
 
         var parameters = new ParameterBuilder(
-            ).add('include_system_content', getSystemContent
+        ).add('include_system_content', getSystemContent
             ).add('group_ids', groupId
             ).add('include_definition', getDefinition);
 
@@ -228,7 +228,7 @@ function getAreaValuesCallback(obj) {
     loaded.areaValues[ajaxMonitor.state.indicatorKey] = obj;
 
     if (typeof (rootIndexesToGet) !== 'undefined' &&
-            rootIndexesToGet.length) {
+        rootIndexesToGet.length) {
         // Remove the index that has been fetched
         rootIndexesToGet = _.without(rootIndexesToGet, rootIndexesToGet[0]);
     }
@@ -328,7 +328,7 @@ function getDecileData(model) {
         var categoryTypeId = getDecileCategoryTypeId(model.areaTypeId);
 
         var parameters = new ParameterBuilder(
-            ).add('profile_id', model.profileId
+        ).add('profile_id', model.profileId
             ).add('category_type_id', categoryTypeId
             ).add('child_area_type_id', model.areaTypeId);
 
@@ -552,9 +552,9 @@ function AreaDetailsDataManager() {
 
             var parameters = new ParameterBuilder(
             ).add('profile_id', modelCopy.profileId
-            ).add('group_id', modelCopy.groupId
-            ).add('area_code', modelCopy.areaCode
-            ).add('child_area_type_id', modelCopy.areaTypeId);
+                ).add('group_id', modelCopy.groupId
+                ).add('area_code', modelCopy.areaCode
+                ).add('child_area_type_id', modelCopy.areaTypeId);
 
             ajaxGet('api/area_details',
                 parameters.build(),
@@ -679,28 +679,15 @@ function getSignificanceText(sig, groupRoot) {
 
     suffix = ' average';
     if (comparatorMethodId === ComparatorMethodIds.Quartiles) {
-        if (isFeatureEnabled('useLongerLivesBestWorstLabels')) {
-            switch (sig) {
-                case 1:
-                    return 'best';
-                case 2:
-                    return 'better than average rank';
-                case 3:
-                    return 'worse than average rank';
-                case 4:
-                    return 'worst';
-            }
-        } else {
-            switch (sig) {
-                case 1:
-                    return 'substantially above' + suffix;
-                case 2:
-                    return 'above' + suffix;
-                case 3:
-                    return 'below' + suffix;
-                case 4:
-                    return 'substantially below' + suffix;
-            }
+        switch (sig) {
+            case 1:
+                return 'best';
+            case 2:
+                return 'better than average rank';
+            case 3:
+                return 'worse than average rank';
+            case 4:
+                return 'worst';
         }
     }
 

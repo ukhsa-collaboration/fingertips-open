@@ -43,7 +43,7 @@ namespace PholioVisualisation.Services
             sf.LineAlignment = StringAlignment.Center;
 
             g.Clear(Color.White);
-            g.DrawString("Earlier data is not available for both indicators", font, brush, atpoint, sf);
+            g.DrawString("Data is not available for both indicators", font, brush, atpoint, sf);
             g.Dispose();
             image.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
         }
@@ -62,6 +62,7 @@ namespace PholioVisualisation.Services
             collection = new PracticeValueCollectionBuilder
             {
                 AreaCode = Parameters.AreaCode,
+                AreaTypeId = Parameters.AreaTypeId,
                 ParentAreaCode = Parameters.ParentAreaCode,
                 DataPointOffset = Parameters.DataPointOffset,
                 TopAreaCode = AreaCodes.England,
@@ -72,7 +73,7 @@ namespace PholioVisualisation.Services
                 SexId1 = Parameters.SexId1,
                 SexId2 = Parameters.SexId2,
                 AgeId1 = Parameters.AgeId1,
-                AgeId2 = Parameters.AgeId2,
+                AgeId2 = Parameters.AgeId2
             }.Build(axis1, axis2);
 
             if (axis1 == null)

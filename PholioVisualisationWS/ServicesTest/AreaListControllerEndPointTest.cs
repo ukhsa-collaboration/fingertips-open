@@ -4,6 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using PholioVisualisation.PholioObjects;
+using PholioVisualisation.UserData;
+using PholioVisualisation.UserData.Repositories;
+using PholioVisualisation.UserDataTest;
 
 namespace PholioVisualisation.ServicesTest
 {
@@ -13,9 +17,25 @@ namespace PholioVisualisation.ServicesTest
     [TestClass]
     public class AreaListControllerEndPointTest
     {
-        public const string UserId = "58189c36-969d-4e13-95c9-67a01832ab24";
-        public const int AreaListId = 10;
-        public const string PublicId = "al-ZY6zmuVONE";
+        public const string UserId = FingertipsUserIds.TestUser;
+        public const string PublicId = AreaListCodes.TestListId;
+        public int _areaListId;
+
+        private AreaListTestHelper _areaListTestHelper = new  AreaListTestHelper();
+
+        [TestInitialize]
+        public void TestInitialize()
+        {
+            var codes = new List<string> { AreaCodes.CountyUa_Cambridgeshire };
+            _areaListTestHelper = new AreaListTestHelper();
+            _areaListId = _areaListTestHelper.CreateTestList(codes);
+        }
+
+        [TestCleanup]
+        public void TestCleanup()
+        {
+            _areaListTestHelper.DeleteTestList();
+        }
 
         [TestMethod]
         public void TestGetAreaLists()
@@ -27,7 +47,7 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetAreaList()
         {
-            byte[] data = EndPointTestHelper.GetData("arealist?area_list_id=" + AreaListId);
+            byte[] data = EndPointTestHelper.GetData("arealist?area_list_id=" + _areaListId);
             TestHelper.IsData(data);
         }
 
@@ -42,7 +62,7 @@ namespace PholioVisualisation.ServicesTest
         [TestMethod]
         public void TestGetAreaListAreaCodes()
         {
-            byte[] data = EndPointTestHelper.GetData("arealist/areacodes?area_list_id=" + AreaListId);
+            byte[] data = EndPointTestHelper.GetData("arealist/areacodes?area_list_id=" + _areaListId);
             TestHelper.IsData(data);
         }
     }

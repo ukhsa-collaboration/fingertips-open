@@ -15,10 +15,16 @@ namespace Fpm.MainUI.Controllers
     [RoutePrefix("profile-collections")]
     public class ProfileCollectionsController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private ProfileRepository _profileRepository;
+        private readonly IProfilesReader _reader;
+        private readonly IProfileRepository _profileRepository;
 
-        [Route("")]
+        public ProfileCollectionsController(IProfilesReader reader, IProfileRepository profileRepository)
+        {
+            _reader = reader;
+            _profileRepository = profileRepository;
+        }
+
+        [Route]
         public ActionResult ProfileCollectionsIndex()
         {
             var model = new ProfileCollectionGridViewModel
@@ -111,20 +117,6 @@ namespace Fpm.MainUI.Controllers
         private void GetAllProfileCollections(ProfileCollectionGridViewModel viewModel)
         {
             viewModel.ProfileCollectionGrid = _reader.GetProfileCollections().OrderBy(x => x.CollectionName).ToList();
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _profileRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
         }
     }
 }

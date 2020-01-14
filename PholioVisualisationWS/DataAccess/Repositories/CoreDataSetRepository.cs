@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Criterion;
-using NHibernate.Transform;
 using PholioVisualisation.PholioObjects;
+using System;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.DataAccess.Repositories
 {
     public interface ICoreDataSetRepository
     {
         void Save(CoreDataSet coreDataSet);
+        void Delete(CoreDataSet coreDataSet);
         TimePeriod GetLastestTimePeriodOfCoreData(int indicatorId, int yearRange);
+        void ReplaceCoreDataSetForAnIndicator(IList<CoreDataSet> coreDataSets);
+        CoreDataSetChangeLog GetCoreDataSetChangeLog(int indicatorId, int areaTypeId);
     }
 
     public class CoreDataSetRepository : RepositoryBase, ICoreDataSetRepository
@@ -101,5 +103,12 @@ namespace PholioVisualisation.DataAccess.Repositories
             };
         }
 
+        public CoreDataSetChangeLog GetCoreDataSetChangeLog(int indicatorId, int areaTypeId)
+        {
+            return CurrentSession.CreateCriteria<CoreDataSetChangeLog>()
+                .Add(Restrictions.Eq("IndicatorId", indicatorId))
+                .Add(Restrictions.Eq("AreaTypeId", areaTypeId))
+                .UniqueResult<CoreDataSetChangeLog>();
+        }
     }
 }

@@ -28,6 +28,8 @@
             <thead>
                 <tr class="tablesorter-headerRow">
                     <th scope="col" class="hidden">Is Subheading</th>
+                    <th scope="col" class="hidden">Sex Id</th>
+                    <th scope="col" class="hidden">Age Id</th>
                     <th scope="col">Seq</th>
                     <th scope="col">Id</th>
                     <th scope="col">Indicator name</th>
@@ -38,6 +40,8 @@
             <tbody>
                 <tr *ngFor="let indicator of reorderIndicators;" class="tablesorter-dataRow">
                     <td class="hidden">{{indicator.IsSubheading}}</td>
+                    <td class="hidden">{{indicator.SexId}}</td>
+                    <td class="hidden">{{indicator.AgeId}}</td>
                     <td class="col-seq" [ngClass]="{white: indicator.IsSubheading}">
                         {{indicator.Sequence}}
                     </td>

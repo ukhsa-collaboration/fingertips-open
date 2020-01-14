@@ -35,10 +35,23 @@ namespace PholioVisualisation.DataConstruction
             return new GroupingListUniquifier(groupings).GetUniqueGroupings();
         }
 
+        /// <summary>
+        /// Returns the list of groupings.
+        /// This method is used during search and indicator list
+        /// </summary>
+        /// <param name="indicatorIds"></param>
+        /// <param name="searchMode"></param>
+        /// <returns></returns>
         public IList<Grouping> GetGroupings(IList<int> indicatorIds)
         {
+            // Fetch the group ids from all the profiles
+            // as it is either a search or indicator list
             var groupIds = _profileReader.GetGroupIdsFromAllProfiles();
+
+            // Retrieve the groupings based on the group ids and indicator ids
             var groupings = _groupDataReader.GetGroupingsByGroupIdsAndIndicatorIds(groupIds, indicatorIds);
+
+            // Return unique groupings
             return new GroupingListUniquifier(groupings).GetUniqueGroupings();
         }
 

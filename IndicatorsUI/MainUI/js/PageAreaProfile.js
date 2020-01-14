@@ -1,21 +1,20 @@
 'use strict';
 
-function goToAreaProfilePage(areaCode) {
-
-    FT.menus.area.setCode(areaCode);
+function goToAreaProfilePage() {
 
     setPageMode(PAGE_MODES.AREA_SPINE);
 
     if (!areIndicatorsInDomain()) {
         displayNoData();
+        callAngularEvent('NoDataDisplayed', { 'isEnglandAreaType': isEnglandAreaType() });
     } else {
         showSpinner();
-        callAngularEvent('AreaProfileSelected');
+        callAngularEvent('AreaProfileSelected', { 'isEnglandAreaType': isEnglandAreaType() });
     }
 }
 
 pages.add(PAGE_MODES.AREA_SPINE, {
-    id: 'areas',
+    id: 'area-profile',
     title: 'Area<br>profiles',
     goto: goToAreaProfilePage,
     gotoName: 'goToAreaProfilePage',

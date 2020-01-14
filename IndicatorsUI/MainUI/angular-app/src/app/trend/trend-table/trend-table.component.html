@@ -1,0 +1,59 @@
+<div class="trend-marker" (mouseover)="showRecentTrendTooltip($event)" (mouseout)="hideTooltip()"
+  *ngIf="displayRecentTrends()">
+  Recent trend:
+  <span [innerHtml]="recentTrendImage"></span>
+</div>
+<div id="key-ad-hoc" class="key-container" *ngIf="showAdhocKey" [innerHtml]="htmlAdhocKey"
+  style="display: block;overflow: hidden;"></div>
+<table class="bordered-table w100" cellspacing="0">
+  <thead class="data-header">
+    <tr>
+      <th class="trendPeriod" rowspan="2">Period</th>
+      <th colspan="5">{{areaName}}</th>
+      <!-- Subnational column-->
+      <th rowspan="2" [innerHtml]="selectedParentName" *ngIf="shouldShowSubnationalColumn"
+        class="trend-neighbours-average">
+      </th>
+      <th rowspan="2" *ngIf="shouldShowEnglandColumn">England</th>
+    </tr>
+    <tr>
+      <th class="trendSig"></th>
+      <th>Count</th>
+      <th>Value</th>
+      <th title="Lower Confidence Interval">Lower CI</th>
+      <th title="Upper Confidence Interval">Upper CI</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let row of trendRows">
+      <!-- Period -->
+      <td class="center" [innerHtml]="row.period"></td>
+      <!-- Significance -->
+      <td class="center">
+        <img [src]="row.trendImage" (mouseover)="highlightTrendValueAndComparator($event, row)"
+          (mouseout)="unhighlightValueAndComparator()" *ngIf="!showAdhocKey">
+        <img [src]="row.trendImage" (mouseover)="highlightTrendValueWithTarget($event, row)"
+          (mouseout)="unhighlightValueAndComparator()" *ngIf="showAdhocKey">
+      </td>
+      <!-- Count -->
+      <td class="numeric" [innerHtml]="row.count"></td>
+      <!-- Value -->
+      <td class="numeric" [innerHtml]="row.value" [ngClass]="{'coloured bold': row.highlightAreaValue === true}"
+        (mouseover)="showValueNoteTooltip($event, row)" (mouseout)="hideTooltip()"></td>
+      <!-- Lower CI -->
+      <td class="numeric" [innerHtml]="row.lowerCI" [ngClass]="{'light': row.hoverCI === true}"></td>
+      <!-- Upper CI -->
+      <td class="numeric" [innerHtml]="row.upperCI" [ngClass]="{'light': row.hoverCI === true}"></td>
+      <!-- Subnational -->
+      <td class="numeric valueNote" [innerHtml]="row.subNational"
+        (mouseover)="showSubNationalValueNoteTooltip($event, row)" (mouseout)="hideTooltip()"
+        (mousemove)="positionTooltip($event)" [ngClass]="{'coloured bold': row.highlightSubnational === true}"
+        *ngIf="shouldShowSubnationalColumn"></td>
+      <!-- England -->
+      <td class="numeric" [innerHtml]="row.national" (mouseover)="showNationalValueNoteTooltip($event, row)"
+        (mouseout)="hideTooltip()" (mousemove)="positionTooltip($event)"
+        [ngClass]="{'coloured bold': row.highlightEngland === true}" *ngIf="shouldShowEnglandColumn"></td>
+    </tr>
+  </tbody>
+</table>
+<div class="trend-source" [innerHtml]="trendSource"></div>

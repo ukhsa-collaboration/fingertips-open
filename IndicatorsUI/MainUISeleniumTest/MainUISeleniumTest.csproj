@@ -49,6 +49,9 @@
       <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="CsvHelper, Version=12.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.12.1.2\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Iesi.Collections, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\Iesi.Collections.4.0.3\lib\net40\Iesi.Collections.dll</HintPath>
       <Private>True</Private>
@@ -82,6 +85,9 @@
       <HintPath>..\packages\Newtonsoft.Json.10.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.4.4000\lib\net40\NHibernate.dll</HintPath>
+    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
@@ -93,6 +99,7 @@
     <Reference Include="System.Configuration">
       <HintPath>..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Configuration.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.1.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
@@ -132,13 +139,11 @@
       <HintPath>..\packages\WebActivatorEx.2.2.0\lib\net40\WebActivatorEx.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="WebDriver, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.WebDriver.3.11.2\lib\net45\WebDriver.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="WebDriver, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.WebDriver.3.141.0\lib\net45\WebDriver.dll</HintPath>
     </Reference>
-    <Reference Include="WebDriver.Support, Version=3.11.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selenium.Support.3.11.2\lib\net45\WebDriver.Support.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="WebDriver.Support, Version=3.141.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selenium.Support.3.141.0\lib\net45\WebDriver.Support.dll</HintPath>
     </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -160,46 +165,57 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="FingertipsHelper.cs" />
+    <Compile Include="Fingertips\FingertipsExportImagesTest.cs" />
+    <Compile Include="Fingertips\FingertipsLegendTest.cs" />
+    <Compile Include="Fingertips\FingertipsNoDataMessageTest.cs" />
+    <Compile Include="Fingertips\FingertipsEnglandParentAreaTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabMapTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabOverviewTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabTrendsTest.cs" />
+    <Compile Include="Helpers\AreaListHelper.cs" />
+    <Compile Include="Helpers\CsvRow.cs" />
+    <Compile Include="Helpers\DownloadFileHelper.cs" />
+    <Compile Include="Helpers\FingertipsHelper.cs" />
     <Compile Include="Fingertips\FingertipsAreaListTest.cs" />
-    <Compile Include="Fingertips\FingertipsDownloadCsvFile.cs" />
-    <Compile Include="Fingertips\FingertipsAreaProfileAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsTrendsForAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsPopulationForAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsCompareAreasForAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsScatterplotForAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsPageTartanRugAreaTypeEngland.cs" />
-    <Compile Include="Fingertips\FingertipsDownloadTest.cs" />
+    <Compile Include="Fingertips\FingertipsExportCsvTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabAreaProfilesTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabTrendsForAreaTypeEnglandTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabPopulationForAreaTypeEngland.cs" />
+    <Compile Include="Fingertips\FingertipsTabCompareAreasForAreaTypeEngland.cs" />
+    <Compile Include="Fingertips\FingertipsTabCompareIndicatorsForAreaTypeEngland.cs" />
+    <Compile Include="Fingertips\FingertipsTabOverviewAreaTypeEngland.cs" />
+    <Compile Include="Fingertips\FingertipsTabDownloadReportsTest.cs" />
     <Compile Include="Fingertips\FingertipsAreaSearchTest.cs" />
     <Compile Include="Fingertips\FingertipsBookmarkTest.cs" />
-    <Compile Include="Fingertips\FingertipsDataTest.cs" />
+    <Compile Include="Fingertips\FingertipsAllTabsTest.cs" />
     <Compile Include="Fingertips\FingertipsBaseUnitTest.cs" />
-    <Compile Include="Fingertips\FingertipsEnglandTest.cs" />
-    <Compile Include="Fingertips\FingertipsGPPracticeMapTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabEnglandTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabMapGpPracticeTest.cs" />
     <Compile Include="Fingertips\FingertipsIndicatorListTest.cs" />
     <Compile Include="Fingertips\FingertipsIndicatorSearchTest.cs" />
-    <Compile Include="Fingertips\FingertipsMetadataTest.cs" />
-    <Compile Include="Fingertips\FingertipsPopulationTest.cs" />
-    <Compile Include="Fingertips\FingertipsScatterPlotTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabDefinitionsTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabPopulationTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabCompareIndicatorsTest.cs" />
     <Compile Include="Fingertips\FingertipsContentTest.cs" />
     <Compile Include="HashParameters.cs" />
-    <Compile Include="KnownFolders.cs" />
     <Compile Include="PublicHealthDashboard\PagePublicHealthDashboardAreaDetailsTest.cs" />
     <Compile Include="PublicHealthDashboard\PagePublicHealthDashboardRankingsTest.cs" />
     <Compile Include="PublicHealthDashboard\PagePublicHealthDashboardMapTest.cs" />
-    <Compile Include="PublicHealthDashboard\PublicHealthDashboardTest.cs" />
+    <Compile Include="PublicHealthDashboard\PublicHealthDashboardBaseTest.cs" />
+    <Compile Include="PublicHealthDashboard\PublicHealthDashboardLandingPageTest.cs" />
     <Compile Include="PublicHealthDashboardHelper.cs" />
     <Compile Include="NavigateTo.cs" />
-    <Compile Include="PHOF\PhofCompareAreasTest.cs" />
-    <Compile Include="PHOF\PhofUpdateDelayedMessageTest.cs" />
-    <Compile Include="PHOF\PhofDataTest.cs" />
-    <Compile Include="PHOF\PhofGoToRecentTrends.cs" />
-    <Compile Include="Fingertips\FingertipsInequalitiesTest.cs" />
-    <Compile Include="PHOF\PhofNearestNeighboursTest.cs" />
-    <Compile Include="TestConstants.cs" />
-    <Compile Include="TestHelper.cs" />
-    <Compile Include="SeleniumLookUps.cs" />
-    <Compile Include="SeleniumHelper.cs" />
+    <Compile Include="Fingertips\FingertipsTabCompareAreasTest.cs" />
+    <Compile Include="Fingertips\FingertipsUpdateDelayedMessageTest.cs" />
+    <Compile Include="Fingertips\FingertipsStateManagementTest.cs" />
+    <Compile Include="Fingertips\FingertipsTabInequalitiesTest.cs" />
+    <Compile Include="Fingertips\FingertipsNearestNeighboursTest.cs" />
+    <Compile Include="Helpers\QueryBuilderHelper.cs" />
+    <Compile Include="RepositoryContainer.cs" />
+    <Compile Include="Helpers\RepositoryHelper.cs" />
+    <Compile Include="Helpers\TestHelper.cs" />
+    <Compile Include="SeleniumConstants.cs" />
+    <Compile Include="Helpers\SeleniumHelper.cs" />
     <Compile Include="JasmineTestRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseUnitTest.cs" />
@@ -246,8 +262,7 @@
   <PropertyGroup>
     <PreBuildEvent>xcopy "C:\fingertips\3rdPartyLibraries\selenium\geckodriver.exe" "$(TargetDir)" /i /d /y
 
-xcopy "C:\fingertips\3rdPartyLibraries\selenium\chromedriver.exe" "$(TargetDir)" /i /d /y
-</PreBuildEvent>
+xcopy "C:\fingertips\3rdPartyLibraries\selenium\chromedriver.exe" "$(TargetDir)" /i /d /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

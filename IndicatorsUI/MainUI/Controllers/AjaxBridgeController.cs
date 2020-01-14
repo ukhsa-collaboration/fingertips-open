@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Web;
 using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
@@ -33,7 +31,7 @@ namespace IndicatorsUI.MainUI.Controllers
             if (serviceParameters.Contains("no_cache") ||
                 serviceAction2 == "csv")
             {
-                // Must provide uncached responeses
+                // Must provide uncached responses
                 json = GetJsonFromWebServices(ajaxUrl.WebServicesUrl);
                 CachePolicyHelper.SetNoCaching(HttpContext.Response.Cache);
             }

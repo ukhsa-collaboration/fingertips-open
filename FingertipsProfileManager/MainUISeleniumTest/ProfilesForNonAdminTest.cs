@@ -95,8 +95,5 @@ namespace Fpm.MainUISeleniumTest
             navigateTo.ProfilesForNonAdminPage();
             waitFor.ProfilesForNonAdminToLoad();
         }
-
-
-
     }
 }

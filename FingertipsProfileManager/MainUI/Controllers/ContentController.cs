@@ -2,26 +2,30 @@
 using Fpm.MainUI.Models;
 using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.EnterpriseServices.Internal;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Newtonsoft.Json;
 
 namespace Fpm.MainUI.Controllers
 {
     [RoutePrefix("content")]
     public class ContentController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
+
+        public ContentController(IProfilesReader reader, IProfilesWriter writer)
+        {
+            _reader = reader;
+            _writer = writer;
+        }
 
         [Route("content-index")]
         public ActionResult ContentIndex(int profileId = ProfileIds.Undefined)
@@ -71,6 +75,9 @@ namespace Fpm.MainUI.Controllers
                 return View("CreateContentItem", contentItem);
             }
 
+            CleanContent(contentItem);
+
+            // Check not duplicate content key
             var keyExist = _reader.GetContentItem(contentItem.ContentKey, contentItem.ProfileId);
             if (keyExist != null)
             {
@@ -79,26 +86,12 @@ namespace Fpm.MainUI.Controllers
                 return View("CreateContentItem", contentItem);
             }
 
-            // Check content
-            var content = contentItem.IsPlainText ? formatPlainText(contentItem.Content) : contentItem.Content;
-            if (content == null)
-            {
-                content = String.Empty;
-            }
-
             // Save new content item
             var newContentItem = _writer.NewContentItem(contentItem.ProfileId,
-                contentItem.ContentKey, contentItem.Description, contentItem.IsPlainText, content);
+                contentItem.ContentKey, contentItem.Description, contentItem.IsPlainText, contentItem.Content);
             AuditContentChange(newContentItem, "CREATED");
 
             return RedirectToAction("ContentIndex", new { profileId = contentItem.ProfileId });
-        }
-
-        [Route("content-audit-list")]
-        public ActionResult GetContentAuditList(IEnumerable<int> contentIds)
-        {
-            var contentAuditList = _reader.GetContentAuditList(contentIds.ToList());
-            return PartialView("_ContentAudit", contentAuditList);
         }
 
         [Route("update-content-item")]
@@ -109,12 +102,9 @@ namespace Fpm.MainUI.Controllers
             var newContentItem = new ContentItem();
             AutoMapper.Mapper.Map(contentItem, newContentItem);
 
-            // Convert to plain text
-            if (contentItem.IsPlainText)
-            {
-                newContentItem.Content = formatPlainText(contentItem.Content);
-            }
+            CleanContent(newContentItem);
 
+            // Check not duplicate content key
             var existingContent = _reader.GetContentItem(contentItem.ContentKey, contentItem.ProfileId);
             if (existingContent != null && existingContent.Id != newContentItem.Id)
             {
@@ -125,17 +115,18 @@ namespace Fpm.MainUI.Controllers
                 return View("EditContentItem", contentItem);
             }
 
-            // Check content
-            if (newContentItem.Content == null)
-            {
-                newContentItem.Content = string.Empty;
-            }
-
             _writer.UpdateContentItem(newContentItem);
 
             AuditContentChange(newContentItem, contentItem.Content);
 
             return RedirectToAction("ContentIndex", new { profileId = contentItem.ProfileId });
+        }
+
+        [Route("content-audit-list")]
+        public ActionResult GetContentAuditList(IEnumerable<int> contentIds)
+        {
+            var contentAuditList = _reader.GetContentAuditList(contentIds.ToList());
+            return PartialView("_ContentAudit", contentAuditList);
         }
 
         private static string GetDuplicateContentKeyMessage(ContentItem contentItem)
@@ -229,10 +220,29 @@ namespace Fpm.MainUI.Controllers
 
         private string formatPlainText(string content)
         {
+            if (content == null)
+            {
+                return string.Empty;
+            }
+
             //Persist any line breaks if plain text
             var replacedLineBreaksContent = Regex.Replace(content, "(<br />)", "\r\n");
             var removedHTMLContent = Regex.Replace(replacedLineBreaksContent, "<.*?>", string.Empty);
             return Regex.Replace(removedHTMLContent, "(\r\n|\n)", "<br />");
+        }
+
+        private void CleanContent(ContentItem contentItem)
+        {
+            var content = contentItem.IsPlainText ? formatPlainText(contentItem.Content) : contentItem.Content;
+            if (content == null)
+            {
+                content = String.Empty;
+            }
+
+            contentItem.Content = content;
+
+            // Ensure content key is always lower case
+            contentItem.ContentKey = contentItem.ContentKey.ToLower();
         }
 
         private void AuditContentChange(ContentItem contentItem, string oldContent)

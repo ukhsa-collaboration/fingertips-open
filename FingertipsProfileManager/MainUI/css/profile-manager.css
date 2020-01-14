@@ -132,6 +132,7 @@ TEXTAREA {
     color: #666;
     width: 15%;
     text-align: right;
+    padding-right: 3px;
 }
 
     .property-heading.mandatory-label {
@@ -140,7 +141,13 @@ TEXTAREA {
         text-align: right;
     }
 
-#shared-indicators, #archived-indicators {
+.mandatory-label-info {
+    color: #ff0000;
+    width: 100%;
+    text-align: left;
+}
+
+#shared-indicators, #unassigned-indicators {
     margin: 20px 0 3px 0;
     font-weight: bold;
     font-size: 15px;
@@ -157,11 +164,32 @@ TEXTAREA {
     font-size: 12px;
 }
 
+.data-partition-table {
+    width: 100%;
+    margin-top: 30px;
+    float: left;
+}
+
+.data-partitions-heading {
+    font-weight: bold;
+}
+
+.data-partition {
+    padding-bottom: 10px;
+}
+
+.data-partition select {
+    width: 500px;
+}
+
+.data-partition .info-tooltip {
+    top: 8px;
+}
+
 /*----------------------------------------
  Exceptions
 ------------------------------------------*/
-
-#exceptionDays {
+    #exceptionDays {
     width: 60px;
 }
 
@@ -170,6 +198,7 @@ TEXTAREA {
     padding-bottom: 5px;
     width: 80%;
     display: inline-block;
+    word-break: break-word;
 }
 
 .exception-detail-label {
@@ -178,7 +207,7 @@ TEXTAREA {
     font-weight: bold;
     display: inline-block;
     width: 12%;
-    padding-right: 2%;
+    margin-right: 10px;
     text-align: right;
     margin-top: 5px;
 }
@@ -196,9 +225,31 @@ TEXTAREA {
     padding-left: 8px;
 }
 
-.indicator-text {
+.indicator-text,
+.indicator-internal-metadata-text,
+.indicator-review-notes {
     width: 100%;
     margin: 2px 0;
+    font-size: 14pt;
+    font-weight: normal;
+}
+
+td.indicator-internal-metadata-text {
+    padding: 12px 3px;
+}
+
+.indicator-review-notes {
+    margin-left: -15px;
+}
+
+.indicator-review-timestamp span {
+    font-size: 11pt;
+    font-weight: bold;
+    color: #666;
+}
+
+table.grid td.text-left {
+    text-align: left;
 }
 
 .indicator-text-editor {
@@ -372,9 +423,15 @@ TEXTAREA {
     margin-bottom: 10px;
 }
 
-.divRight {
+div.right {
     display: block;
     float: right;
+}
+
+div.left {
+    display: block;
+    float: left;
+    padding-right: 6px;
 }
 
 .divSequence {
@@ -408,6 +465,28 @@ TEXTAREA {
         text-align: right;
         width: 80px;
         border-right: 1px solid #999;
+    }
+
+.info-table-small {
+    margin: 10px 0;
+    width: 90%;
+}
+
+    .info-table-small td {
+        padding: 3px;
+    }
+
+        .info-table-small td:last-child {
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+    .info-table-small tr td:first-child {
+        font-weight: bold;
+        text-align: right;
+        width: 200px;
+        font-size: 11pt;
+        color: #666;
     }
 
 .summary-table {
@@ -586,7 +665,7 @@ input[type=checkbox] {
     margin-bottom: 5px;
 }
 
-select, .indicator, .year-Range, .timestamp-override {
+select, .indicator, .year-Range, .timestamp-override, .next-review-timestamp {
     border: 2px solid #003399;
     background: #E5F0FF;
     border-radius: 4px;
@@ -671,8 +750,12 @@ a.upload-error {
     color: #666;
 }
 
-.confirm-new-indicator input {
+#confirm-new-indicator input {
     margin-top: 30px;
+}
+
+#confirm-new-indicator label {
+    font-size: 16px;
 }
 
 .copy-multiple-label {
@@ -1829,6 +1912,7 @@ label.btn-file {
     margin: 20px 0;
     padding-right: 6px!important;
     width: 150px;
+    color: #fff !important;
 }
 
 #upload-container p {
@@ -1887,7 +1971,7 @@ tr.in-progress-bg {
     background-color: #E2EFDA;
 }
 
-#progress-menu .awaiting-confirmation-bg,
+.awaiting-confirmation-bg,
 .awaiting-confirmation-bg a,
 .awaiting-confirmation-bg a:hover {
     background-color: #C00000;
@@ -1895,7 +1979,7 @@ tr.in-progress-bg {
 }
 
 
-    #progress-menu .awaiting-confirmation-bg a {
+    .awaiting-confirmation-bg a {
         text-decoration: underline;
         cursor: pointer;
     }
@@ -1952,26 +2036,37 @@ tr.in-progress-bg {
     width: 300px;
 }
 
-.chosen-container-simple .chosen-simple {
-    background: #E5F0FF !important;
+/*----------------------------------------
+    Chosen overrides 
+------------------------------------------*/
+
+.chosen-container-single .chosen-single {
+    height: 31px !important;
+    padding-top: 3px !important;
     border: 2px solid #003399 !important;
-    border-radius: 4px;
+    background: #E5F0FF !important;
+}
+.chosen-container-single .chosen-single span {
     font-weight: normal !important;
+    font-size: 11pt;
+    color: black;
+}
+.chosen-container-single .chosen-single div b {
+    margin-top: 2px;
 }
 
 /*----------------------------------------
     Dynamic tooltips 
 ------------------------------------------*/
-
-.js .info-tooltip {
-    background-image: url(/images/info.png);
-    cursor: pointer;
-    display: inline-block;
-    height: 25px;
-    position: relative;
-    width: 25px;
-    background-repeat: no-repeat;
-}
+    .js .info-tooltip {
+        background-image: url(/images/info.png);
+        cursor: pointer;
+        display: inline-block;
+        height: 25px;
+        position: relative;
+        width: 25px;
+        background-repeat: no-repeat;
+    }
 
 .js a.text-tooltip {
     color: red;
@@ -2168,11 +2263,16 @@ LI.site-link {
 /*----------------------------------------
     Area search
 ------------------------------------------*/
-#searches p {
-    font-weight: bold;
-    padding-top: 15px;
-    padding-left: 30px;
+#searches {
+    float: left;
 }
+
+    #searches p {
+        float: left;
+        font-weight: bold;
+        padding-top: 15px;
+        padding-left: 30px;
+    }
 
 #searchText {
     padding: 3px 6px;
@@ -2309,6 +2409,17 @@ LI.site-link {
     padding-right: 10px;
 }
 
+#indicator-review-buttons {
+    margin-left: 100px;
+    float: left;
+}
+#tabs-2 .checkbox {
+    padding-left: 300px;
+}
+#tabs-2 .checkbox label {
+    padding-left: 3px;
+    font-weight: bold;
+}
 /*----------------------------------------
    Content
 ------------------------------------------*/
@@ -2367,6 +2478,10 @@ LI.site-link {
     float: left;
 }
 
+.small-font {
+    font-size: small;
+}
+
 #profile-area-types-container {
     font-size: 11pt;
 }
@@ -2395,6 +2510,11 @@ LI.site-link {
 
 .view-indicator-data-btn {
     font-size: 10px;
+}
+
+#btn-delete-filteredData {
+    float: right;
+    margin-bottom: 10px;
 }
 
 #tbl-view-data {
@@ -2626,6 +2746,19 @@ LI.site-link {
     margin-top: 10px;
 }
 
+#confirmationMoveValidationText {
+    position: fixed;
+    font-weight: bold;
+    color: #ff0000;
+}
+
+/*----------------------------------------
+  Profile edit
+------------------------------------------*/
+
+.profile-options input {
+    margin-top: 0;
+}
 
 
 /*----------------------------------------
@@ -2635,9 +2768,34 @@ LI.site-link {
     border-collapse:collapse; table-layout:fixed; width:1150px;
 }
 
+.btn-list .btn {
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+/*----------------------------------------
+  Your profiles
+------------------------------------------*/
+
+.user-profiles tr:hover td{
+    background: #eaffc9;
+}
+.user-profiles tr:hover td {
+    background: #eaffc9;
+}
+
+.user-profiles a.profile-link {
+    display: block;
+    min-width: 100px;
+    text-align: center;
+}
+
+.user-profiles td {
+    font-size: 16px !important;
+}
 /*----------------------------------------
   Live updates
-------------------------------------------*/ 
+------------------------------------------*/
 #live-update-table td:nth-child(2) {
     text-align: left;
 }

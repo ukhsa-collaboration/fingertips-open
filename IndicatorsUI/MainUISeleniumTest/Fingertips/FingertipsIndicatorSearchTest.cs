@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using IndicatorsUI.MainUISeleniumTest.Helpers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 
@@ -8,37 +9,37 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     public class FingertipsIndicatorSearchTest : FingertipsBaseUnitTest
     {
         [TestMethod]
-        public void TestSearchResults()
+        public void Test_Search_Results()
         {
             CheckSearchFindsSomeIndicators(driver, "hip");
         }
 
         [TestMethod]
-        public void CheckSearchIndicatorsPerProfilesPopUpDisplays()
+        public void Check_Search_Indicators_Per_Profiles_Pop_Up_Displays()
         {
             CheckSearchIndicatorsPerProfilesPopUpDisplays(driver, "hip");
         }
 
         [TestMethod]
-        public void TestNoSearchResultsFound()
+        public void Test_No_Search_Results_Found()
         {
             CheckSearchFindsNoMatchingIndicators(driver, "zxzxzxzx");
         }
 
         [TestMethod]
-        public void TestAllTabsLoadForSearchResults()
+        public void Test_All_Tabs_Load_For_Search_Results()
         {
             navigateTo.FingertipsIndicatorSearchResults("falls");
-            waitFor.FingertipsTartanRugToLoad();
+            waitFor.FingertipsOverviewTabToLoad();
 
-            FingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast(driver);
+            fingertipsHelper.SelectEachFingertipsTabInTurnAndCheckDownloadIsLast();
         }
 
         [TestMethod]
-        public void TestAreaTypesWithNoResultsAreNotDisplayed()
+        public void Test_Area_Types_With_No_Results_Are_Not_Displayed()
         {
             navigateTo.FingertipsIndicatorSearchResults("hiv");
-            waitFor.FingertipsTartanRugToLoad();
+            waitFor.FingertipsOverviewTabToLoad();
 
             var html = driver.FindElement(By.Id("searchResultText")).Text;
             Assert.IsTrue(html.Contains("Region"));
@@ -46,22 +47,22 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         }
 
         [TestMethod]
-        public void CheckSearchFindsIndicators()
+        public void Check_Search_Finds_Indicators()
         {
             CheckSearchFindsSomeIndicators(driver, "smoking");
         }
 
-        public static void CheckSearchFindsSomeIndicators(IWebDriver driver, string searchText)
+        public void CheckSearchFindsSomeIndicators(IWebDriver driver, string searchText)
         {
             new NavigateTo(driver).FingertipsIndicatorSearchResults(searchText);
-            new WaitFor(driver).FingertipsTartanRugToLoad();
-            CheckTartanRugHasLoaded(driver);          
+            new WaitFor(driver).FingertipsOverviewTabToLoad();
+            fingertipsHelper.CheckTartanRugHasLoaded();          
         }
 
         public static void CheckSearchIndicatorsPerProfilesPopUpDisplays(IWebDriver driver, string searchText)
         {
             new NavigateTo(driver).FingertipsIndicatorSearchResults(searchText);
-            new WaitFor(driver).FingertipsTartanRugToLoad();
+            new WaitFor(driver).FingertipsOverviewTabToLoad();
             CheckProfilesPerIndicatorLinkExists(driver);
             CheckProfilesPerIndicatorPopup(driver);
         }

@@ -16,7 +16,7 @@ namespace PholioVisualisation.ExportTest
         {
             var lookUpManager = new LookUpManager(ReaderFactory.GetPholioReader(),
                 ReaderFactory.GetAreasReader(),
-                new List<int>{AreaTypeIds.CcgsPreApr2017},
+                new List<int>{AreaTypeIds.CcgsPostApr2019},
                 new List<int>{CategoryTypeIds.EthnicGroups5});
 
             // Assert property names

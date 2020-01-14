@@ -145,9 +145,13 @@ div.tartan-text {
 }
 
 #left-tartan-table {
-    border-right: none;
+    border-right: none !important;
     table-layout: fixed;
     float: left;
+}
+
+#rightTartanTable {
+    border-left: none !important;
 }
 
 .scroll-pane {
@@ -352,7 +356,7 @@ td.rug-subheading {
     text-align: center;
 }
 
-.not-compared {
+#tartan-legend-container .not-compared {
     background-color: #fff;
     border: 1px solid #ccc;
     width: 80px;
@@ -364,45 +368,16 @@ td.rug-subheading {
     margin-left: 18px;
 }
 
-/* ------------------------------------------------------------
-	Bar chart legend
------------------------------------------------------------- */
-.bar-compared-with-text {
+#keyTartanRug {
     float: left;
-    font-size: 11px;
-    margin-right: 15px;
-}
-
-.bar-chart-legend-outer-box {
-    float: left;
-    font-size: 11px;
-    margin-right: 15px;
-}
-
-.bar-chart-legend-box {
-    float: left;
-    margin-left: 2px;
-    padding: 2px 0px 2px 0px;
-    text-align: center;
-}
-
-.bar-chart-not-compared {
-    background-color: #fff;
-    border: 1px solid #ccc;
-    width: 80px;
-    height: 19px;
+    width: 100%;
+    padding-top: 9px;
 }
 
 /* ------------------------------------------------------------
 	Spine chart legend
 ------------------------------------------------------------ */
 .spine-compared-with-text {
-    float: left;
-    font-size: 11px;
-    margin-right: 15px;
-}
-
-.spine-chart-legend-outer-box {
     float: left;
     font-size: 11px;
     margin-right: 15px;
@@ -429,7 +404,10 @@ td.rug-subheading {
     color: #333;
 }
 
-.target.bobLower .unit, .target.worse .unit, .target.worst .unit {
+.target.bobLower .unit,
+.target.bobLowest .unit,
+.target.worse .unit,
+.target.worst .unit {
     color: white;
 }
 
@@ -465,10 +443,6 @@ td.rug-subheading {
     top: 1px;
 }
 
-.data-quality-table div {
-    height: 12px;
-}
-
 .data-quality-table .label {
     padding-left: 4px;
 }
@@ -484,8 +458,8 @@ td.rug-subheading {
 
 .data-quality-table {
     font-size: 11px;
-    color: #777;
-    margin: 0 0 0 30px;
+    color: #333;
+    margin: 0 0 16px 0;
 }
 
 #data-quality-key {
@@ -568,8 +542,7 @@ td.key-box-right {
 
 .key-table {
     font-size: 11px;
-    color: #777;
-    float: left;
+    color: #333;
 }
 
 #map-key-part2 div {
@@ -593,7 +566,7 @@ td.key-box-right {
 #value-note-legend {
     float: right;
     font-size: 11px;
-    color: #777;
+    color: #333;
     text-align: right;
     width: 160px;
 }
@@ -603,6 +576,20 @@ td.key-box-right {
      color:#333;
      position:relative;
      top:4px;
+}
+
+.overview-legend-link-container {
+    margin: -28px -8px 0 0;
+}
+
+.overview-legend-link {
+    font-size: 12px;
+    text-decoration: none;
+    color: #1f0aa1 !important;
+}
+
+.overview-legend-container {
+    margin-top: 10px;
 }
 
 #spine-table, #barTable {
@@ -655,42 +642,6 @@ td.coloured {
 .light {
     background: #cfcfe2;
 }
-
-.trend-container {
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    margin-top: 6px;
-    margin-bottom: 20px;
-    float: left;
-}
-
-.trendChart {
-    width: 400px;
-    height: 300px;
-    float: left;
-}
-
-.trend-header, .multi-trend-header {
-    float: left;
-    clear: both;
-}
-
-.multi-trend-header {
-    padding: 30px 0 0 0;
-    width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
-    font-weight: bold;
-}
-
-.trend-header {
-    padding: 20px 0 5px 0;
-    border-bottom: 5px solid #0b0c0c;
-    width: 100%;
-    font-weight: bold;
-}
-
 .trendPeriod {
     width: 85px;
 }
@@ -708,6 +659,10 @@ td.coloured {
     width: 40px;
 }
 
+.trend-neighbours-average {
+    width: 70px;
+}
+
 .trend-source {
     width: 100%;
     text-align: left;
@@ -715,6 +670,7 @@ td.coloured {
     font-style: italic;
     font-size: 11px;
     overflow-wrap: break-word;
+    word-break: break-all;
 }
 
     .trend-source p {
@@ -752,10 +708,6 @@ td span.value-note-symbol {
 
 td span.unit {
     color: #777;
-}
-
-#trend-sort-multi-charts {
-    float: left;
 }
 
 /* ------------------------------------------------------------
@@ -843,7 +795,7 @@ td span.unit {
 .target-legend {
     margin-bottom: 3px;
     float: left;
-    width: 370px;
+    /*width: 370px;*/
 }
 
 #single-area-table THEAD {
@@ -871,18 +823,18 @@ td span.unit {
 #inequalities-partition-menu {
     margin-top: -6px;
     margin-right: 10px;
-    width: 20%;
     float: right;
 }
 
     #inequalities-partition-menu p {
         padding: 5px;
         margin: 0;
+        margin-left: 14px;
     }
 
     #inequalities-partition-menu a {
         display: block;
-        width: 100%;
+        width: 90%;
         float: left;
         clear: both;
         padding: 5px;
@@ -998,12 +950,10 @@ td span.unit {
     }
 
 #scatter-key-box {
-    position: relative;
     float: left;
     margin-top: 0;
-    top: 15px;
     padding-left: 15px;
-    left: 100px;
+    left: 75px;
 }
 
 #scatter-key-table TD {
@@ -1019,6 +969,11 @@ td span.unit {
 
 .noLeft {
     border-left: 0 none #fff;
+}
+
+.scatter-gp-label img {
+    margin-top: -7px;
+    margin-right: 2px;
 }
 
 /* ------------------------------------------------------------
@@ -1076,6 +1031,10 @@ td span.unit {
     color: #1f0aa1 !important;
 }
 
+.a-link:hover {
+    text-decoration: underline !important;
+}
+
 /* ------------------------------------------------------------
 	Tabs and view menus
 ------------------------------------------------------------ */
@@ -1115,7 +1074,7 @@ td span.unit {
 }
 
 #nearest-neighbour-links {
-    margin-top: -18px;
+    margin-top: -6px;
 }
 
 #nearest-neighbour-links a {
@@ -1150,6 +1109,7 @@ td span.unit {
 
     .nearest-neighbour-selected-area h2 {
         display: inline-block;
+        font-size: 24px;
     }
 
 /*----------------------------------------
@@ -1211,6 +1171,15 @@ td span.unit {
 }
 
 #trend-marker-legend img {
+    padding-left: 15px;
+    padding-right: 2px;
+}
+
+#overview-trend-marker-legend table {
+    margin-top: 15px;
+}
+
+#overview-trend-marker-legend img {
     padding-left: 15px;
     padding-right: 2px;
 }
@@ -1370,7 +1339,7 @@ div.decile-spacer {
 }
 
 /*----------------------------------------
-	Definitions (cannot go in Angular 2 CSS file)
+	Definitions (cannot go in Angular CSS file)
 ------------------------------------------*/
 
 .definition-table {
@@ -1392,6 +1361,7 @@ div.decile-spacer {
 
 .definition-table td {
     padding: 2px 3px 2px 3px;
+    word-break: break-word;
 }
 
 .definition-table table {
@@ -1537,7 +1507,7 @@ ul.left-menu {
 }
 
 #benchmark-box select {
-    width: 150px;
+    width: 160px;
 }
 
 #indicatorMenu {
@@ -1680,7 +1650,8 @@ div.no-indicator-data {
 	Sparkline view options
 ------------------------------------------------------------ */
 div.sparkline-indicator {
-    width: 240px;
+    width: 250px;
+    height: 220px;
 }
 
 img.sparkline-indicator {
@@ -1759,13 +1730,6 @@ div.sparkline-indicator, img.sparkline-area {
     display: none;
 }
 
-.filter-indicator-wrapper-england {
-    position: relative;
-    right: 100px;
-    top: -30px;
-    display: block;
-}
-
 .better-99 {
     background: url("../images/best.png");
 }
@@ -1788,8 +1752,14 @@ div.sparkline-indicator, img.sparkline-area {
     color: #fff;
 }
 
+.bob-lowest {
+    background: url("../images/bobLowest.png");
+    color: #fff;
+}
+
 .bob-lower {
     background: url("../images/bobLower.png");
+    color: #fff;
 }
 
 .bob-similar {
@@ -1798,6 +1768,10 @@ div.sparkline-indicator, img.sparkline-area {
 
 .bob-higher {
     background: url("../images/bobHigher.png");
+}
+
+.bob-highest {
+    background: url("../images/bobHighest.png");
 }
 
 .quartiles-low {
@@ -1865,11 +1839,15 @@ div.sparkline-indicator, img.sparkline-area {
 
 .continuous-range
 {
-    width: 200px !important;
     background: url("../images/continuous_range.png") repeat-y scroll center center;
 }
 
 .continuous-highest {
     background: url("../images/continuous_high.png");
     color: #fff;
+}
+
+/* To override ngx-dropdown references to icomoon */
+label [class^="nsdicon-"], li [class^="nsdicon-"], button [class^="nsdicon-"] {
+    font-family: FontAwesome !important;
 }

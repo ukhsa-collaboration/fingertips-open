@@ -39,7 +39,7 @@ namespace PholioVisualisation.ServiceActionsTest
                 .GetAreaTypeIdToIndicatorIdsWithData("smoking", new List<int> {ProfileIds.Phof});
 
             // Assert: expected area type
-            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthority;
+            var areaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019;
             Assert.IsTrue(areaTypeIdToIndicatorIds.ContainsKey(areaTypeId));
 
             // Assert: expected indicator ID for area type

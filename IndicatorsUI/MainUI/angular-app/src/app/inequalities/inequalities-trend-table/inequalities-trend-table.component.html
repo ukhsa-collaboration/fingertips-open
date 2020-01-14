@@ -1,0 +1,20 @@
+<div id="inequalities-trend-table" class="inequalities-trend-table">
+  <table *ngIf="rowData" class="bordered-table table-hover table">
+    <thead>
+      <tr>
+        <th></th>
+        <th *ngFor="let header of columnHeaders" [innerHtml]="header"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of rowData">
+        <td [innerHtml]="data.period"></td>
+        <td *ngFor="let value of data.valueData" [innerHtml]="value.ValF" [ngClass]="{'text-center': value.ValF === '-' || value.ValF === '*'}"
+          (mouseover)="showRecentTrendTooltip($event,value)" (mouseout)="hideTooltip()" (mousemove)="repositionTooltip($event)"></td>
+      </tr>
+      <tr>
+        <td [innerHtml]="getTrendSource()" [colSpan]="getNumberOfColumnsToSpan()" class="inequalities-trend-source"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>

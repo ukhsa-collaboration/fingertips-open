@@ -9,11 +9,11 @@ namespace Fpm.ProfileData
         public const string ContentIntroduction = "<h2>Introduction</h2><p>Please change this introduction in FPM</p>";
         public const string ContentRecentUpdates = "<h3>Jun 2016</h3><p>First version released</p>";
 
-        private readonly ProfilesWriter profilesWriter;
+        private readonly IProfilesWriter profilesWriter;
         private int profileId;
         private string userName;
 
-        public DefaultProfileContentWriter(ProfilesWriter profilesWriter, int profileId, string userName)
+        public DefaultProfileContentWriter(IProfilesWriter profilesWriter, int profileId, string userName)
         {
             this.profilesWriter = profilesWriter;
             this.profileId = profileId;

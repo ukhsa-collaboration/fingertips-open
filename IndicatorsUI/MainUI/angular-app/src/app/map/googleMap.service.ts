@@ -1,9 +1,8 @@
-import { Injectable, ElementRef, EventEmitter } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import 'rxjs/rx';
-import { Observable } from 'rxjs/Observable';
-import { FTModel, FTRoot } from '../typings/FT.d';
+import { Injectable, EventEmitter } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 import { FTHelperService } from '../shared/service/helper/ftHelper.service';
+import { catchError } from 'rxjs/operators';
 
 
 @Injectable()
@@ -11,7 +10,7 @@ export class GoogleMapService {
   isLoaded = new EventEmitter();
   map: google.maps.Map;
 
-  constructor(private http: Http, private ftHelperservice: FTHelperService) { }
+  constructor(private http: HttpClient, private ftHelperservice: FTHelperService) { }
 
   loadMap(mapDiv: Element, mapOptions: google.maps.MapOptions): google.maps.Map {
     this.map = null;
@@ -21,13 +20,13 @@ export class GoogleMapService {
     return this.map;
   }
 
-  loadBoundries(areaTypeId: number, path: string): any {
+  loadBoundries(areaTypeId: number, path: string): Observable<any> {
     const baseUrl: string = path + 'maps/' + areaTypeId + '/geojson/boundaries.js';
-    return this.http.get(baseUrl).map(res => res.json()).catch(this.handleError);
+    return this.http.get(baseUrl).pipe(catchError(error => { return this.handleError(error) }));
   }
 
-  private handleError(error: any) {
-    const errorMessage: string = 'Unsupported map type. Maps are not available for this area type.';
-    return Observable.throw(errorMessage);
+  private handleError(errorResponse: HttpErrorResponse) {
+    console.error(errorResponse);
+    return throwError(errorResponse.error.message);
   }
 }

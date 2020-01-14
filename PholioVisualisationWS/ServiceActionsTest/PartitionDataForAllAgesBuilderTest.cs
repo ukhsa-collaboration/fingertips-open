@@ -16,7 +16,7 @@ namespace PholioVisualisation.ServiceActionsTest
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
             var data = new PartitionDataForAllAgesBuilder().GetPartitionData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, SexIds.Male, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, SexIds.Male, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.AreEqual(AreaCodes.England, data.AreaCode);
             Assert.AreEqual(SexIds.Male, data.SexId);
@@ -31,7 +31,7 @@ namespace PholioVisualisation.ServiceActionsTest
             var indicatorId = IndicatorIds.LifeExpectancyAtBirth;
 
             var trendData = new PartitionDataForAllAgesBuilder().GetPartitionTrendData(ProfileIds.Phof,
-                AreaCodes.England, indicatorId, SexIds.Male, AreaTypeIds.CountyAndUnitaryAuthority);
+                AreaCodes.England, indicatorId, SexIds.Male, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019);
 
             Assert.IsNotNull(trendData.Limits);
             Assert.IsTrue(trendData.Labels.Select(x => x.Name).Contains("All ages"));

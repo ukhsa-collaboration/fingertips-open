@@ -21,7 +21,7 @@ namespace PholioVisualisation.Export
             _polarities = polarities;
         }
 
-        public byte[] GetFileForGroups(IList<int> groupIds)
+        public byte[] GetFileForGroups(IList<int> groupIds, int profileId = ProfileIds.Undefined)
         {
             var groupings = new List<Grouping>();
 
@@ -30,13 +30,13 @@ namespace PholioVisualisation.Export
                 groupings.AddRange(GetGroupingsForGroup(groupId));
             }
 
-            return GetFileForMultipleIndicators(groupings);
+            return GetFileForMultipleIndicators(groupings, profileId);
         }
 
-        public byte[] GetFileForSpecifiedIndicators(IList<int> indicatorIds, int? profileId)
+        public byte[] GetFileForSpecifiedIndicators(IList<int> indicatorIds, int profileId)
         {
             var groupings = GetGroupingsFromIndicatorIds(indicatorIds, profileId);
-            return GetFileForMultipleIndicators(groupings);
+            return GetFileForMultipleIndicators(groupings, profileId);
         }
 
         private List<Grouping> GetGroupingsForGroup(int group_id)
@@ -48,40 +48,50 @@ namespace PholioVisualisation.Export
             return groupings;
         }
 
-        private IList<Grouping> GetGroupingsFromIndicatorIds(IList<int> indicatorIds, int? profileId)
+        private IList<Grouping> GetGroupingsFromIndicatorIds(IList<int> indicatorIds, int profileId)
         {
             IList<Grouping> groupings;
-            if (profileId.HasValue)
+            if (profileId == ProfileIds.Undefined)
             {
-                groupings = _groupingListProvider.GetGroupings(new List<int> { profileId.Value },
-                    indicatorIds);
+                // Request came from either search or indicator list
+                groupings = _groupingListProvider.GetGroupings(indicatorIds);
             }
             else
             {
-                groupings = _groupingListProvider.GetGroupings(indicatorIds);
+                groupings = _groupingListProvider.GetGroupings(new List<int> { profileId },
+                    indicatorIds);
             }
             return groupings;
         }
 
-        private byte[] GetFileForMultipleIndicators(IList<Grouping> groupings)
+        private byte[] GetFileForMultipleIndicators(IList<Grouping> groupings, int profileId = ProfileIds.Undefined)
         {
-            if (groupings.Any() == false) return null;
+            var props = GetIndicatorMetadataTextProperties();
 
-            var metadataList = _indicatorMetadataProvider.GetIndicatorMetadata(groupings,
-            IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific);
-
-            // Sort metadata according to grouping order
-            var orderedMetadata = new List<IndicatorMetadata>();
-            var orderedPolarities = new List<Polarity>();
-            foreach (var indicatorId in groupings.Select(x => x.IndicatorId).Distinct())
+            if (groupings.Any())
             {
-                var polarity = GetMostCommonPolarity(groupings, indicatorId);
-                orderedPolarities.Add(polarity);
-                orderedMetadata.Add(metadataList.First(x => x.IndicatorId == indicatorId));
-            }
+                var metadataList = _indicatorMetadataProvider.GetIndicatorMetadata(groupings,
+                    IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific, profileId);
 
-            return new MultipleIndicatorMetadataFileWriter().GetMetadataFileAsBytes(orderedMetadata, orderedPolarities,
-                GetIndicatorMetadataTextProperties());
+                // Sort metadata according to grouping order
+                var orderedMetadata = new List<IndicatorMetadata>();
+                var orderedPolarities = new List<Polarity>();
+                foreach (var indicatorId in groupings.Select(x => x.IndicatorId).Distinct())
+                {
+                    var polarity = GetMostCommonPolarity(groupings, indicatorId);
+                    orderedPolarities.Add(polarity);
+                    orderedMetadata.Add(metadataList.First(x => x.IndicatorId == indicatorId));
+                }
+
+                return new MultipleIndicatorMetadataFileWriter().GetMetadataFileAsBytes(
+                    orderedMetadata, orderedPolarities, props);
+            }
+            else
+            {
+                // No indicator groupings
+                return new MultipleIndicatorMetadataFileWriter().GetMetadataFileAsBytes(
+                    new List<IndicatorMetadata>(), new List<Polarity>(), props);
+            }
         }
 
         /// <summary>

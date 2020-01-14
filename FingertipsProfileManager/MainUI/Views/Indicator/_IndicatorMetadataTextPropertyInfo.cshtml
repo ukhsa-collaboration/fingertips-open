@@ -1,0 +1,16 @@
+﻿@using Fpm.ProfileData.Entities.Profile
+@model IndicatorMetadataTextProperty
+
+<span class="info-tooltip right">
+    <i>@Model.Definition</i>
+</span>
+@if (Model.IsSearchable)
+{
+    <br />
+    <span title="This text is used for a Fingertips indicator search">Searchable</span>
+}
+@if (Model.IsHtml)
+{
+    <br />
+    <span title="This property can be displayed as either HTML or plain text">HTML</span>
+}

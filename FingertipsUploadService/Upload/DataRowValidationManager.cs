@@ -45,18 +45,21 @@ namespace FingertipsUploadService.Upload
             ValidateDoubleType(UploadColumnNames.Denominator2);
             ValidateValueNoteId();
             ValidateCategoryTypeIdAndCategoryId();
+            ValidateCIs();
 
             return _validationFailures;
         }
 
         private void ValidateCategoryTypeIdAndCategoryId()
         {
-            UploadValidationFailure uploadValidationFailure;
-            uploadValidationFailure = _rowValidator.ValidateCategoryTypeIdAndCategoryId(_allowedData.Categories);
-            if (uploadValidationFailure != null)
-            {
-                _validationFailures.Add(uploadValidationFailure);
-            }
+            var uploadValidationFailure = _rowValidator.ValidateCategoryTypeIdAndCategoryId(_allowedData.Categories);
+            AddFailure(uploadValidationFailure);
+        }
+
+        private void ValidateCIs()
+        {
+            var uploadValidationFailure = _rowValidator.ValidateCIs();
+            AddFailure(uploadValidationFailure);
         }
 
         private void ValidateValueNoteId()
@@ -72,11 +75,7 @@ namespace FingertipsUploadService.Upload
                 //Ensure this is a value note id in the DB
                 var valueNoteId = (int)_row.Field<double>(columnName);
                 var uploadValidationFailure = _rowValidator.ValidateValueNoteId(valueNoteId, _allowedData.ValueNoteIds);
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -107,11 +106,7 @@ namespace FingertipsUploadService.Upload
             {
                 //Ensure this is a valid Area Code in the DB
                 var uploadValidationFailure = _rowValidator.ValidateArea(_allowedData.AreaCodes);
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -128,11 +123,7 @@ namespace FingertipsUploadService.Upload
                 //Ensure this is a valid Sex Id in the DB
                 var sexId = (int)_rowValidator.Row.Field<double>(columnName);
                 var uploadValidationFailure = _rowValidator.ValidateSexId(sexId, _allowedData.SexIds);
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -149,11 +140,7 @@ namespace FingertipsUploadService.Upload
                 //Validate the Age Id Value
                 var ageId = (int)_row.Field<double>(columnName);
                 var uploadValidationFailure = _rowValidator.ValidateAgeId(ageId, _allowedData.AgeIds);
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -169,11 +156,7 @@ namespace FingertipsUploadService.Upload
             {
                 //Validate the Quarter Value
                 var uploadValidationFailure = _rowValidator.ValidateMonth();
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -189,11 +172,7 @@ namespace FingertipsUploadService.Upload
             {
                 //Validate the Quarter Value
                 var uploadValidationFailure = _rowValidator.ValidateQuarter();
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -208,11 +187,7 @@ namespace FingertipsUploadService.Upload
             else
             {
                 var uploadValidationFailure = _rowValidator.ValidateYearRange();
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -228,11 +203,7 @@ namespace FingertipsUploadService.Upload
             {
                 //Ensure this is a valid Year value
                 var uploadValidationFailure = _rowValidator.ValidateYear();
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
             }
         }
 
@@ -247,11 +218,16 @@ namespace FingertipsUploadService.Upload
             else
             {
                 var uploadValidationFailure = _rowValidator.ValidateIndicatorId();
-                if (uploadValidationFailure != null)
-                {
-                    //There was an error so log it
-                    _validationFailures.Add(uploadValidationFailure);
-                }
+                AddFailure(uploadValidationFailure);
+            }
+        }
+
+        private void AddFailure(UploadValidationFailure uploadValidationFailure)
+        {
+            if (uploadValidationFailure != null)
+            {
+                //There was an error so log it
+                _validationFailures.Add(uploadValidationFailure);
             }
         }
     }

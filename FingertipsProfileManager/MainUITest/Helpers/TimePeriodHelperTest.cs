@@ -42,7 +42,7 @@ namespace Fpm.MainUITest.Helpers
                 DatapointQuarter = TimePeriod.Undefined,
                 DatapointMonth = TimePeriod.Undefined,
                 YearRange = 1,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPre2019
             };
 
             var timePeriodHelper = new TimePeriodHelper(grouping);

@@ -1,9 +1,8 @@
-﻿using System.Linq;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
+using System.Linq;
 
 namespace Fpm.MainUI.Helpers
 {
-
     public class FileNameHelper
     {
         public enum Uniqueness
@@ -13,9 +12,9 @@ namespace Fpm.MainUI.Helpers
             Unique
         }
 
-        private readonly ProfilesReader _reader;
+        private readonly IProfilesReader _reader;
 
-        public FileNameHelper(ProfilesReader reader)
+        public FileNameHelper(IProfilesReader reader)
         {
             _reader = reader;
         }

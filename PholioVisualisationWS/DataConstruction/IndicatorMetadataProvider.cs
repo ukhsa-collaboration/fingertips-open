@@ -1,5 +1,6 @@
 ﻿using PholioVisualisation.DataAccess;
 using PholioVisualisation.PholioObjects;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,13 +15,13 @@ namespace PholioVisualisation.DataConstruction
 
     public class IndicatorMetadataProvider
     {
-        private IGroupDataReader reader = ReaderFactory.GetGroupDataReader();
+        private IGroupDataReader _groupDataReader = ReaderFactory.GetGroupDataReader();
+        private IProfileReader _profileReader = ReaderFactory.GetProfileReader();
 
         private List<IndicatorMetadataTextProperty> properties;
 
         public string[] TruncatedPropertyNames = new[] {
                     IndicatorMetadataTextColumnNames.Name,
-                    IndicatorMetadataTextColumnNames.NameLong,
                     IndicatorMetadataTextColumnNames.DataSource
                 };
 
@@ -44,7 +45,21 @@ namespace PholioVisualisation.DataConstruction
             {
                 if (properties == null)
                 {
-                    properties = reader.GetIndicatorMetadataTextProperties().ToList();
+                    properties = _groupDataReader.GetIndicatorMetadataTextProperties().ToList();
+                }
+
+                // Should be a deep copy if expect any changes
+                return properties.AsReadOnly();
+            }
+        }
+
+        public IList<IndicatorMetadataTextProperty> IndicatorMetadataTextPropertiesIncludingInternalMetadata
+        {
+            get
+            {
+                if (properties == null)
+                {
+                    properties = _groupDataReader.GetIndicatorMetadataTextPropertiesIncludingInternalMetadata().ToList();
                 }
 
                 // Should be a deep copy if expect any changes
@@ -54,7 +69,7 @@ namespace PholioVisualisation.DataConstruction
 
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings, IndicatorMetadataTextOptions option)
         {
-            IList<IndicatorMetadata> indicatorMetadataList = reader.GetIndicatorMetadata(groupings, IndicatorMetadataTextProperties);
+            IList<IndicatorMetadata> indicatorMetadataList = _groupDataReader.GetIndicatorMetadata(groupings, IndicatorMetadataTextProperties);
 
             if (option == IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific)
             {
@@ -64,9 +79,36 @@ namespace PholioVisualisation.DataConstruction
             return indicatorMetadataList;
         }
 
+        public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings, IndicatorMetadataTextOptions option, int profileId)
+        {
+            var indicatorMetadataTextProperties = profileId == ProfileIds.IndicatorsForReview
+                ? IndicatorMetadataTextPropertiesIncludingInternalMetadata
+                : IndicatorMetadataTextProperties;
+
+            IList<IndicatorMetadata> indicatorMetadataList = _groupDataReader.GetIndicatorMetadata(groupings, indicatorMetadataTextProperties, profileId);
+
+            if ( option == IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific)
+            {
+                OverrideGenericTextMetadata(groupings, indicatorMetadataList);
+            }
+
+            // Prepend indicator number to name
+            var profileConfig = _profileReader.GetProfileConfig(profileId);
+            if (profileConfig != null)
+            {
+                var areIndicatorNamesDisplayedWithNumbers = profileConfig.AreIndicatorNamesDisplayedWithNumbers;
+                if (areIndicatorNamesDisplayedWithNumbers)
+                {
+                    AddNumberToName(indicatorMetadataList);
+                }
+            }
+
+            return indicatorMetadataList;
+        }
+
         public IndicatorMetadata GetIndicatorMetadata(Grouping grouping)
         {
-            IndicatorMetadata indicatorMetadata = reader.GetIndicatorMetadata(grouping, IndicatorMetadataTextProperties);
+            IndicatorMetadata indicatorMetadata = _groupDataReader.GetIndicatorMetadata(grouping, IndicatorMetadataTextProperties);
             OverrideGenericTextMetadata(
                 new List<Grouping> { grouping },
                 new List<IndicatorMetadata> { indicatorMetadata });
@@ -75,28 +117,55 @@ namespace PholioVisualisation.DataConstruction
 
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds)
         {
-            return reader.GetIndicatorMetadata(indicatorIds, IndicatorMetadataTextProperties);
+            return _groupDataReader.GetIndicatorMetadata(indicatorIds, IndicatorMetadataTextProperties);
         }
 
         public IndicatorMetadata GetIndicatorMetadata(int indicatorId)
         {
-            return reader.GetIndicatorMetadata(indicatorId, IndicatorMetadataTextProperties);
+            return _groupDataReader.GetIndicatorMetadata(indicatorId, IndicatorMetadataTextProperties);
+        }
+
+        public IndicatorMetadataCollection GetIndicatorMetadataCollection(IList<Grouping> groupings, int profileId)
+        {
+            var indicatorMetadata = GetIndicatorMetadata(groupings,
+                IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific, profileId);
+            return new IndicatorMetadataCollection(indicatorMetadata);
         }
 
         public IndicatorMetadataCollection GetIndicatorMetadataCollection(IList<Grouping> groupings)
         {
-            return new IndicatorMetadataCollection(
-                GetIndicatorMetadata(groupings, IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific));
+            var indicatorMetadata = GetIndicatorMetadata(groupings,
+                IndicatorMetadataTextOptions.OverrideGenericWithProfileSpecific);
+
+            return new IndicatorMetadataCollection(indicatorMetadata);
         }
 
         public IndicatorMetadataCollection GetIndicatorMetadataCollection(Grouping grouping)
         {
-            return GetIndicatorMetadataCollection(new List<Grouping> { grouping });
+            var groupDataReader = ReaderFactory.GetGroupDataReader();
+            GroupingMetadata groupingMetadata = groupDataReader.GetGroupingMetadata(grouping.GroupId);
+
+            return GetIndicatorMetadataCollection(new List<Grouping> { grouping }, groupingMetadata.ProfileId);
+        }
+
+        private void AddNumberToName(IList<IndicatorMetadata> indicatorMetadataList)
+        {
+            foreach (var indicatorMetadata in indicatorMetadataList)
+            {
+                var text = indicatorMetadata.Descriptive;
+
+                var number = IndicatorMetadataTextColumnNames.IndicatorNumber;
+                if (text.ContainsKey(number))
+                {
+                    text[IndicatorMetadataTextColumnNames.Name] =
+                        String.Format("{0} - {1}", text[number], text[IndicatorMetadataTextColumnNames.Name]);
+                }
+            }
         }
 
         private void OverrideGenericTextMetadata(IList<Grouping> groupings, IList<IndicatorMetadata> genericIndicatorMetadata)
         {
-            IList<IndicatorMetadata> specificIndicatorMetadataList = reader.GetGroupSpecificIndicatorMetadataTextValues(
+            IList<IndicatorMetadata> specificIndicatorMetadataList = _groupDataReader.GetGroupSpecificIndicatorMetadataTextValues(
                 groupings, IndicatorMetadataTextProperties);
 
             if (specificIndicatorMetadataList.Count > 0)
@@ -131,7 +200,7 @@ namespace PholioVisualisation.DataConstruction
 
         /// <summary>
         /// Replaces the complete descriptive metadata with one where
-        /// only selected properties are retained, e.g. Name, NameLong, Source
+        /// only selected properties are retained, e.g. Name, Source
         /// </summary>
         public void ReduceDescriptiveMetadata(IList<IndicatorMetadata> indicatorMetadataList)
         {

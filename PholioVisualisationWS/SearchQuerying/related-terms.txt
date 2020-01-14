@@ -5,7 +5,7 @@ falls > hip fractures
 physical activity > obesity, diabetes
 stroke > blood pressure
 alcohol > liver disease
-flu > excess winter deaths, respiratory disease
+flu > respiratory disease
 deprivation > low income, free school meal, jobseeker
 obesity > physically active, diabetes
 diabetes > obesity, physically active
@@ -14,6 +14,7 @@ overweight > physically active, obesity
 mental health > depression, dementia, self-harm
 dementia > depression
 self harm > deliberate injuries, suicide, depression
-suicide > self harm, deliberate injuries, depression
+# suicide - Removed because of unrelated results: deliberate injuries, depression
+suicide > self harm
 substance misuse > alcohol, smoking, drug, opiate
 a and e > accident emergency

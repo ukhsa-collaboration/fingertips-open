@@ -11,20 +11,11 @@ namespace PholioVisualisation.DataConstruction
 {
     public interface IAreaTypeListProvider
     {
-        /// <summary>
-        /// Returns every area type ID used in a profile including child, parent
-        /// and England area types.
-        /// </summary>
-        /// <param name="profileId">Profile ID</param>
-        /// <returns>List of area type IDs</returns>
-        List<int> GetAllAreaTypeIdsUsedInProfile(int profileId);
-
         IList<AreaType> GetChildAreaTypesUsedInProfiles(IEnumerable<int> profileIds);
         IList<int> GetChildAreaTypeIdsUsedInProfiles(IEnumerable<int> profileIds);
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId);
         IList<int> GetParentAreaTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetParentAreaTypeIdsUsedForChildAreaType(int childAreaTypeId);
-        IList<int> GetCategoryTypeIdsForExport();
         IList<int> GetParentCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId);
         IList<int> GetCategoryTypeIdsUsedForChildAreaType(int childAreaTypeId);
     }
@@ -34,9 +25,6 @@ namespace PholioVisualisation.DataConstruction
         private IGroupIdProvider groupdIdProvider;
         private IAreasReader areasReader;
         private IGroupDataReader groupDataReader;
-
-        //TODO inject via constructor
-        private IAreaTypeIdSplitter _areaTypeIdSplitter = new AreaTypeIdSplitter(new AreaTypeComponentRepository());
 
         public AreaTypeListProvider(IGroupIdProvider groupdIdProvider,
             IAreasReader areasReader, IGroupDataReader groupDataReader)
@@ -60,22 +48,6 @@ namespace PholioVisualisation.DataConstruction
         public IList<AreaType> GetSupportedAreaTypes()
         {
             return areasReader.GetSupportedAreaTypes();
-        }
-
-        public List<int> GetAllAreaTypeIdsUsedInProfile(int profileId)
-        {
-            var compositeChildAreaTypeIds = GetChildAreaTypeIdsUsedInProfiles(
-                new List<int> { profileId });
-            var childAreaTypeIds = _areaTypeIdSplitter.GetComponentAreaTypeIds(compositeChildAreaTypeIds);
-
-            var compositeParentAreaTypeIds = GetParentAreaTypeIdsUsedInProfile(profileId);
-            var parentAreaTypeIds = _areaTypeIdSplitter.GetComponentAreaTypeIds(compositeParentAreaTypeIds);
-
-            var allAreaTypeIds = new List<int>();
-            allAreaTypeIds.AddRange(childAreaTypeIds);
-            allAreaTypeIds.AddRange(parentAreaTypeIds);
-            allAreaTypeIds.Add(AreaTypeIds.Country);
-            return allAreaTypeIds;
         }
 
         public IList<AreaType> GetChildAreaTypesUsedInProfiles(IEnumerable<int> profileIds)
@@ -162,15 +134,6 @@ namespace PholioVisualisation.DataConstruction
                 .ToList();
 
             return parentAreaTypeIds;
-        }
-
-        public IList<int> GetCategoryTypeIdsForExport()
-        {
-            return areasReader
-                .GetAllCategoryTypes()
-                .Where(x => CategoryTypeIdsExcludedForExport.Ids.Contains(x.Id) == false)
-                .Select(x => x.Id)
-                .ToList();
         }
 
         public IList<int> GetParentCategoryTypeIdsUsedInProfile(int profileId, int childAreaTypeId)

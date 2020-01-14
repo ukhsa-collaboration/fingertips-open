@@ -27,7 +27,7 @@ namespace PholioVisualisation.DataConstructionTest
                 LowerLimit = 1,
                 PolarityId = PolarityIds.RagHighIsGood
             });
-            comparisonManager.CompareToCalculateSignficance(root, metadata);
+            comparisonManager.CompareToCalculateSignificance(root, metadata);
 
             // Local data is compared against target
             Assert.AreEqual(Significance.Better,
@@ -46,7 +46,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             IndicatorMetadata metadata = new IndicatorMetadata();
             GroupRoot root = new GroupRoot();
-            GetComparisonManager().CompareToCalculateSignficance(root, metadata);
+            GetComparisonManager().CompareToCalculateSignificance(root, metadata);
             Assert.AreEqual(0, root.Data.Count);
             Assert.AreEqual(0, root.Grouping.Count);
         }
@@ -59,7 +59,7 @@ namespace PholioVisualisation.DataConstructionTest
             AddRegionalData(root);
             AddNationalData(root);
 
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
             Assert.AreEqual((int)Significance.Better,
                 root.Grouping[0].ComparatorData.Significance[ComparatorIds.England]);
         }
@@ -87,7 +87,7 @@ namespace PholioVisualisation.DataConstructionTest
             root.Grouping[0].ComparatorId = -1;
             root.Data.Add(new CoreDataSet { Value = 10, LowerCI95 = 9, UpperCI95 = 11 });
 
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
             Assert.AreEqual(0, root.Data[0].Significance.Count);
         }
 
@@ -96,7 +96,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             GroupRoot root = new GroupRoot();
             AddRegionalData(root);
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
         }
 
         [TestMethod]
@@ -104,7 +104,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             GroupRoot root = new GroupRoot();
             AddNationalData(root);
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
         }
 
         [TestMethod]
@@ -114,7 +114,7 @@ namespace PholioVisualisation.DataConstructionTest
             AddRegionalData(root);
             AddNationalData(root);
             root.Grouping[1].ComparatorData = null;
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
         }
 
         [TestMethod]
@@ -124,7 +124,7 @@ namespace PholioVisualisation.DataConstructionTest
             AddRegionalData(root);
             AddNationalData(root);
             root.Grouping[0].ComparatorData = null;
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
         }
 
         private static void AddNationalData(GroupRoot root)
@@ -152,7 +152,7 @@ namespace PholioVisualisation.DataConstructionTest
             }
 
             // Act
-            GetComparisonManager().CompareToCalculateSignficance(root, GetMetadata());
+            GetComparisonManager().CompareToCalculateSignificance(root, GetMetadata());
 
             // Assert: no comparison made 
             Assert.AreEqual(0, root.Grouping[0].ComparatorData.Significance.Count);

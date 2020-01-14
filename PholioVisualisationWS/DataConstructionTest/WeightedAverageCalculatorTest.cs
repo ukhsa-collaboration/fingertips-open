@@ -13,21 +13,14 @@ namespace PholioVisualisation.DataConstructionTest
     public class WeightedAverageCalculatorTest
     {
         [TestMethod]
-        public void TestAverageReturnCoreDataSetHasDefaultValues()
+        public void Test_Average_CoreDataSet_Has_Default_Values()
         {
-            var denominator = 4;
-            var count = 8;
-
-            var dataList = new List<CoreDataSet> {
-                new CoreDataSet{Value = 2, Count = count, Denominator = denominator}
-            };
+            var dataList = GetValidDataList();
 
             var coreDataSetFilter = CoreDataSetFilter(dataList);
-            var average = new WeightedAverageCalculator(coreDataSetFilter, Unit(1)).Average;
+            var average = new StandardAverageCalculator(coreDataSetFilter, Unit(1)).Average;
 
-            // Assert: check values
-            Assert.AreEqual(count, average.Count);
-            Assert.AreEqual(denominator, average.Denominator);
+            // Assert: check default values
             Assert.AreEqual(ValueData.NullValue, average.Denominator2);
             Assert.IsNull(average.LowerCI95);
             Assert.IsNull(average.UpperCI95);
@@ -36,47 +29,59 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
         [TestMethod]
-        public void TestAverage()
+        public void Test_Average_Can_Be_Calculated()
         {
-            var dataList = new List<CoreDataSet> {
-                new CoreDataSet{Value = 2, Count = 8, Denominator = 4},
-                new CoreDataSet{Value = 4, Count = 32, Denominator = 8}
-            };
+            var dataList = GetValidDataList();
 
             var coreDataSetFilter = CoreDataSetFilter(dataList);
-            var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(1));
-            Assert.AreEqual(Round(3.33333), Round(calculator.Average.Value));
+            var calculator = new StandardAverageCalculator(coreDataSetFilter, Unit(1));
+
+            // Assert: check calculated values
+            var average = calculator.Average;
+            Assert.AreEqual(Round(3.3), Round(average.Value));
+            Assert.AreEqual(40, average.Count);
+            Assert.AreEqual(12, average.Denominator);
         }
 
         [TestMethod]
         public void TestAverageUsesUnit()
         {
-            var dataList = new List<CoreDataSet> {
-                new CoreDataSet{Value = 20, Count = 8, Denominator = 4}
-            };
+            var dataList = GetValidDataList();
 
             var coreDataSetFilter = CoreDataSetFilter(dataList);
-            var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(10));
-            Assert.AreEqual(Round(20), Round(calculator.Average.Value));
+            var calculator = new StandardAverageCalculator(coreDataSetFilter, Unit(10));
+
+            // Assert: unit used
+            var average = calculator.Average;
+            Assert.AreEqual(Round(33.3), Round(average.Value));
         }
 
         [TestMethod]
-        public void TestAverageAssessmentOfWhetherAverageIsValidOnFirstCoreDataSetObjectUsesUnit()
+        public void Test_Average_Assessment_Of_Whether_Average_Is_Valid_On_First_CoreDataSet_Uses_Unit()
         {
-            var dataList = new List<CoreDataSet> {
-                new CoreDataSet{Value = 20, Count = 8, Denominator = 4}
-            };
+            var dataList = GetValidDataList();
 
             var coreDataSetFilter = CoreDataSetFilter(dataList);
-            var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(10));
+            var calculator = new StandardAverageCalculator(coreDataSetFilter, Unit(10));
             Assert.IsNotNull(calculator.Average);
         }
 
         [TestMethod]
-        public void TestAverageReturnsNullForEmptyDataList()
+        public void Test_Average_Not_Calculated_For_Empty_Data_List()
         {
             var coreDataSetFilter = CoreDataSetFilter(new List<CoreDataSet> { });
-            var calculator = new WeightedAverageCalculator(coreDataSetFilter, Unit(1));
+            var calculator = new StandardAverageCalculator(coreDataSetFilter, Unit(1));
+            Assert.IsNull(calculator.Average);
+        }
+
+        [TestMethod]
+        public void Test_Average_Not_Calculated_When_Only_One_Value()
+        {
+            var dataList = new List<CoreDataSet> {
+                new CoreDataSet{Value = 2, Count = 1, Denominator = 1}
+            };
+            var coreDataSetFilter = CoreDataSetFilter(dataList);
+            var calculator = new StandardAverageCalculator(coreDataSetFilter, Unit(1));
             Assert.IsNull(calculator.Average);
         }
 
@@ -96,9 +101,19 @@ namespace PholioVisualisation.DataConstructionTest
         }
 
 
+        private static List<CoreDataSet> GetValidDataList()
+        {
+            var dataList = new List<CoreDataSet>
+            {
+                new CoreDataSet {Value = 2, Count = 8, Denominator = 4},
+                new CoreDataSet {Value = 4, Count = 32, Denominator = 8}
+            };
+            return dataList;
+        }
+
         private static double Round(double d)
         {
-            return Math.Round(d, 4);
+            return Math.Round(d, 1);
         }
     }
 }

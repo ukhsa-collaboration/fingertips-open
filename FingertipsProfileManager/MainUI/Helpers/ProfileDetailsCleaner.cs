@@ -1,5 +1,4 @@
-﻿using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.Profile;
+﻿using Fpm.ProfileData.Entities.Profile;
 
 namespace Fpm.MainUI.Helpers
 {

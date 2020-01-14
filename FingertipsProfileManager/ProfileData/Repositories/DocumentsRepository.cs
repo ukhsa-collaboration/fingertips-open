@@ -3,9 +3,8 @@ using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class DocumentsRepository : RepositoryBase
+    public class DocumentsRepository : RepositoryBase, IDocumentsRepository
     {
-        // poor man injection, should be removed when we use DI containers
         public DocumentsRepository()
             : this(NHibernateSessionFactory.GetSession())
         {

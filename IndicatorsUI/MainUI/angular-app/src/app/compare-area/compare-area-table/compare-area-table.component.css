@@ -1,0 +1,43 @@
+.highlight-columns {
+    border-top-color: rgb(102, 102, 102);
+    border-bottom-color: rgb(102, 102, 102);
+}
+
+.highlight-first-column {
+    border-left-color: rgb(102, 102, 102);
+    cursor: pointer;
+}
+
+
+.highlight-barscale-column {
+    cursor: pointer;
+}
+
+.highlight-last-column {
+    border-right-color: rgb(102, 102, 102);
+}
+
+.hide {
+    display: none;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.area-name-override {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    color: #1f0aa1;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+}
+
+.trend-source p {
+    font-size: 11px !important;
+}
+td.recent-trend {
+    cursor:pointer;
+}

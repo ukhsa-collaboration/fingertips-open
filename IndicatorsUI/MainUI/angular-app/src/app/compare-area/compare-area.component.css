@@ -1,0 +1,69 @@
+.area-tab-caption {
+    float: left;
+    margin-right: 10px;
+    font-weight: bold;
+    padding-top: 6px;
+}
+
+.area-tab-buttons {
+    float: left;
+    margin-right: 10px;
+}
+
+.export-table-link-container {
+    float: left;
+    padding-top: 6px;
+    padding-left: 20px;
+    background: #fff url(~/images/save-image-icon.png) left center no-repeat;
+    color: #1f0aa1;
+}
+
+.data-header-container {
+    border-bottom: 5px solid;
+    margin-left: 15px;
+    margin-right: 15px;
+    padding-bottom: 5px;
+    font-weight: bold;
+}
+
+.data-main-header {
+    float: left;
+    font-size: 1.3em;
+    margin-left: -15px;
+}
+
+.sub-content {
+    font-size: 11px;
+    padding-top: 6px;
+    margin-left: 10px;
+}
+
+.data-secondary-header {
+    float: right;
+    font-size: 11px;
+    padding-top: 6px;
+    margin-right: -15px;
+}
+
+.tab-options {
+    float: none !important;
+}
+
+.no-funnel-plot {
+    text-align:  center;
+    vertical-align: middle;
+    line-height: 400px;
+}
+
+.new-data-badge-container {
+    float: left;
+    font-size: 1.3em;
+}
+
+.do-not-display-for-england {
+    width: 100%;
+    height: 400px;
+    padding-top: 190px;
+    text-align: center;
+    font-size: 17px;
+}

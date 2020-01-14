@@ -3,7 +3,7 @@ import { ArealistManageComponent } from './arealist-manage.component';
 import { AreaListService } from '../../shared/service/api/arealist.service';
 import { AreaService } from '../../shared/service/api/area.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';

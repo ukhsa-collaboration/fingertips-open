@@ -2,9 +2,7 @@
 using Fpm.MainUI.Models;
 using Fpm.MainUI.ViewModels.ProfilesAndIndicators;
 using Fpm.ProfileData;
-using Fpm.ProfileData.Entities.DataAudit;
 using Fpm.ProfileData.Entities.Profile;
-using Fpm.ProfileData.Entities.User;
 using Fpm.ProfileData.Repositories;
 using Newtonsoft.Json;
 using System;
@@ -12,34 +10,57 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic;
 using System.Net;
-using System.Net.Http;
+using System.Text;
 using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Fpm.MainUI.Controllers
 {
+    [RoutePrefix("profiles-and-indicators")]
     public class ProfilesAndIndicatorsController : Controller
     {
         public const string IndexView = "ListIndicatorsInProfile";
 
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
 
-        private ProfileRepository _profileRepository;
-        private LookUpsRepository _lookUpsRepository;
-        private CoreDataRepository _coreDataRepository;
+        private readonly IProfileRepository _profileRepository;
+        private readonly ILookUpsRepository _lookUpsRepository;
+        private readonly ICoreDataRepository _coreDataRepository;
+        private readonly IEmailRepository _emailRepository;
 
         private string _userName;
+        private readonly int _sequenceFistElementNegative = -2;
+        private readonly ProfilesAndIndicatorsHelper _helper;
 
-        public ProfilesAndIndicatorsController()
-        { }
-
-        public ProfilesAndIndicatorsController(ProfileRepository profileRepository,
-            LookUpsRepository lookUpsRepository, CoreDataRepository coreDataRepository)
+        /// <summary>
+        /// Accessor that ensures username is defined.
+        /// </summary>
+        public string UserName
         {
+            get
+            {
+                if (_userName == null)
+                {
+                    _userName = UserDetails.CurrentUser().Name;
+                }
+                return _userName;
+            }
+        }
+
+        public ProfilesAndIndicatorsController(IProfilesReader reader, IProfilesWriter writer,
+            IProfileRepository profileRepository, ILookUpsRepository lookUpsRepository,
+            ICoreDataRepository coreDataRepository, IEmailRepository emailRepository)
+        {
+            _reader = reader;
+            _writer = writer;
+
             _profileRepository = profileRepository;
             _lookUpsRepository = lookUpsRepository;
             _coreDataRepository = coreDataRepository;
+            _emailRepository = emailRepository;
+
+            _helper = new ProfilesAndIndicatorsHelper(reader, writer, profileRepository);
         }
 
         protected override void Initialize(RequestContext requestContext)
@@ -48,13 +69,13 @@ namespace Fpm.MainUI.Controllers
             _userName = UserName;
         }
 
-        [Route("TestPage")]
+        [Route("test-page")]
         public ActionResult Test()
         {
             return Content("Test");
         }
 
-        [Route("")]
+        [Route("~/")]
         [Route("profile/indicators")]
         public ActionResult ListIndicatorsInProfile(int profileId = ProfileIds.Undefined)
         {
@@ -128,7 +149,8 @@ namespace Fpm.MainUI.Controllers
         [Route("profile/indicators/specific")]
         public ActionResult ListIndicatorsInProfileSpecific(int? domainSequence, int? indicatorId, string resetArea,
             int selectedAreaTypeId = -1, string search_text = "", string sortBy = "Sequence",
-            bool ascending = true, int page = 1, int pageSize = 200, string profileKey = null)
+            bool ascending = true, int page = 1, int pageSize = 200, string profileKey = null,
+            int newIndicatorId = -1, bool isNewIndicator = false)
         {
             var model = new IndicatorGridModel
             {
@@ -205,29 +227,21 @@ namespace Fpm.MainUI.Controllers
                 }
             }
 
+            ViewBag.IsNewIndicator = isNewIndicator;
+            ViewBag.NewIndicatorId = newIndicatorId;
+
             return View(IndexView, model);
-        }
-
-        public int GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(string selectedProfile, int domainNumber, int areaTypeId)
-        {
-            var model = new ProfileMembers
-            {
-                UrlKey = selectedProfile,
-                Profile = CommonUtilities.GetProfile(selectedProfile, domainNumber, areaTypeId, _profileRepository)
-            };
-
-            IList<GroupingMetadata> groupingMetadatas = model.Profile.GroupingMetadatas;
-
-            return groupingMetadatas.FirstOrDefault(x => x.Sequence == domainNumber).GroupId;
         }
 
         /// <summary>
         /// Remove indicators from a profile
         /// </summary>
-        public ActionResult DeleteIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey,
+        [HttpGet]
+        [Route("remove-indicators")]
+        public ActionResult RemoveIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey,
             string selectedProfileName, int selectedDomainId, string selectedDomainName, int selectedAreaTypeId)
         {
-            var model = new DeleteIndicatorsModel
+            var model = new RemoveIndicatorsModel
             {
                 UrlKey = selectedProfileUrlkey,
                 Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
@@ -238,62 +252,67 @@ namespace Fpm.MainUI.Controllers
                 IndicatorsThatCantBeRemoved = null,
             };
 
+            // Get the user group permissions and assign it to the model
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
+            model.UserGroupPermissions = CommonUtilities.GetProfileUserPermissions(userPermissions, model.UrlKey);
 
-            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
-
+            // Get the list of indicators considered for deletion
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
-            var indicatorList = GetSpecifiedIndicatorNames(indicatorSpecifiers, model.Profile.IndicatorNames);
+            var indicatorList = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers, model.Profile.IndicatorNames);
 
+            // Categorise the indicators into two separate lists
+            // first with the indicators that cannot be removed
+            // second with the indicators that can be removed
             var cannotRemove = new List<GroupingPlusName>();
             var canRemove = new List<GroupingPlusName>();
+
+            // Loop through the indicator list
+            var indicatorDeleteChecker = new RemoveIndicatorChecker(_reader);
             foreach (var indicator in indicatorList)
             {
-                model.IndicatorMetadata = new IndicatorMetadata { OwnerProfileId = _reader.GetIndicatorMetadata(indicator.IndicatorId).OwnerProfileId };
+                // Find out the profile that owns the indicator
+                var indicatorMetadata = _reader.GetIndicatorMetadata(indicator.IndicatorId);
 
-                //check to see if the indicator is being used in more than one domain
-                var indicatorGrouping = _reader.DoesIndicatorExistInMoreThanOneGroup(indicator.IndicatorId, indicator.AgeId, indicator.SexId);
+                // Assign the indicator metadata to the model
+                model.IndicatorMetadata = indicatorMetadata;
 
-                if (indicatorGrouping.GroupBy(x => x.GroupId).Count() > 1)
+                if (indicatorDeleteChecker.CanIndicatorBeRemoved(model.Profile.Id, indicatorMetadata, indicator))
                 {
-                    //                    if (model.DoesProfileOwnIndicator())
-                    //                    {
-                    //                        //If the profile owns the indicator, check to see if this is the last occurance within this profile that is being deleted
-                    //                        var groupIds = _reader.GetGroupingIds(model.Profile.Id);
-                    //                        var indicatorGroups = _reader.GetGroupingByIndicatorId(new List<int> { indicator.IndicatorId });
-                    //
-                    //                        var uniqueIndicatorGroups = new List<Grouping>();
-                    //                        foreach (Grouping @group in indicatorGroups.Where(group => groupIds.Contains(@group.GroupId)).Where(@group => uniqueIndicatorGroups.All(x => x.AreaTypeId != @group.AreaTypeId)))
-                    //                        {
-                    //                            uniqueIndicatorGroups.Add(@group);
-                    //                        }
-                    //
-                    //                        var lastIndicatorOccuranceInProfile = uniqueIndicatorGroups.Count == 1;
-                    //
-                    //                        if (!lastIndicatorOccuranceInProfile)
-                    //                        {
-                    //                            canRemove.Add(indicator);
-                    //                        }
-                    //                        else
-                    //                        {
-                    //                            cannotRemove.Add(indicator);
-                    //                        }
-                    //                    }
-                    //                    else
-                    {
-                        //Indicator Can Be Deleted because it is being used elsewhere and we ARE NOT trying to delete the owner 
-                        canRemove.Add(indicator);
-                    }
+                    canRemove.Add(indicator);
                 }
                 else
                 {
-                    //Indicator Can Be Deleted because it is NOT being used elsewhere
-                    canRemove.Add(indicator);
+                    cannotRemove.Add(indicator);
                 }
             }
 
+            // Assign the list to the models
             model.IndicatorsThatCantBeRemoved = cannotRemove;
-            model.IndicatorsToDelete = canRemove;
+            model.IndicatorsToRemove = canRemove;
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_RemoveSelectedIndicators", model);
+            }
+
+            return View(IndexView);
+        }
+
+        /// <summary>
+        /// Delete indicators permanently from the system
+        /// </summary>
+        [Route("delete-indicators")]
+        [HttpGet]
+        public ActionResult DeleteIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey,
+            string selectedProfileName, int selectedDomainId, string selectedDomainName, int selectedAreaTypeId)
+        {
+            var model = new DeleteIndicatorsModel
+            {
+                Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId)
+            };
+
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
+            model.IndicatorsToDelete = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers, model.Profile.IndicatorNames);
 
             if (Request.IsAjaxRequest())
             {
@@ -303,28 +322,64 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
-        private static List<GroupingPlusName> GetSpecifiedIndicatorNames(List<IndicatorSpecifier> indicatorSpecifiers, IList<GroupingPlusName> allIndicators)
+        [Route("download-metadata")]
+        [HttpGet]
+        public FileContentResult DownloadMetadata(string indicatorIds)
         {
-            List<GroupingPlusName> indicatorList = new List<GroupingPlusName>();
-            foreach (var indicatorSpecifier in indicatorSpecifiers)
-            {
-                var indicatorId = indicatorSpecifier.IndicatorId;
-                var sexId = indicatorSpecifier.SexId;
-                var ageId = indicatorSpecifier.AgeId;
+            var indicatorIdList = indicatorIds.Split(',').Select(int.Parse).ToList();
+            var indicatorMetadataList = _reader.GetIndicatorMetadata(indicatorIdList).ToList();
 
-                var selectedIndicator =
-                    allIndicators
-                        .Where(x => x.IndicatorId == indicatorId)
-                        .Where(x => x.SexId == sexId)
-                        .Where(x => x.AgeId == ageId)
-                        .ToList()
-                        .FirstOrDefault();
+            var data = CsvStreamHelper.GetCsvDataForMetadataDownload(indicatorMetadataList);
 
-                indicatorList.Add(selectedIndicator);
-            }
-            return indicatorList;
+            return new FileContentResult(data, "text/csv");
         }
 
+        [Route("download-metadata1")]
+        [HttpGet]
+        public FileContentResult DownloadMetadata1(string indicatorIds)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            var isHeaderRow = true;
+            var indicatorIdStringList = indicatorIds.Split(',').ToList();
+            foreach (var indicatorIdString in indicatorIdStringList)
+            {
+                var indicatorMetadata = _reader.GetIndicatorMetadata(int.Parse(indicatorIdString));
+
+                var indicatorMetadataTextProperties = _reader.GetIndicatorMetadataTextProperties();
+                var indicatorMetadataTextValues = (List<IndicatorText>) _reader.GetIndicatorTextValues(int.Parse(indicatorIdString),
+                    indicatorMetadataTextProperties, indicatorMetadata.OwnerProfileId);
+
+                // Header row
+                string values;
+                if (isHeaderRow)
+                {
+                    values = string.Empty;
+
+                    foreach (var indicatorMetadataTextValue in indicatorMetadataTextValues)
+                    {
+                        values += indicatorMetadataTextValue.IndicatorMetadataTextProperty.DisplayName + ",";
+                    }
+
+                    sb.AppendLine(values);
+
+                    isHeaderRow = false;
+                }
+
+                // Data row
+                values = string.Empty;
+                foreach (var indicatorMetadataTextValue in indicatorMetadataTextValues)
+                {
+                    values += indicatorMetadataTextValue.ValueGeneric + ",";
+                }
+                sb.AppendLine(values);
+            }
+
+            return new FileContentResult(new System.Text.UTF8Encoding().GetBytes(sb.ToString()), "text/csv");
+        }
+
+        [Route("indicator-audit")]
+        [HttpGet]
         public ActionResult GetAudit(IEnumerable<string> jdata)
         {
             string[] selectedIndicators = jdata.ToArray();
@@ -340,6 +395,8 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
+        [Route("move-indicators")]
+        [HttpGet]
         public ActionResult MoveIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey, string selectedProfileName,
             int selectedDomainId, string selectedDomainName, int selectedAreaTypeId)
         {
@@ -354,7 +411,8 @@ namespace Fpm.MainUI.Controllers
                 IndicatorsThatCantBeTransferred = null,
             };
 
-            var listOfProfiles = GetOrderedListOfProfilesForCurrentUser(model);
+            var listOfProfiles = GetOrderedListOfProfilesForCurrentUser(model)
+                .Where(x => x.Value != "indicators-for-review").ToList();
 
             var domains = new ProfileMembers();
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
@@ -364,10 +422,10 @@ namespace Fpm.MainUI.Controllers
 
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
 
-            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
+            model.UserGroupPermissions = CommonUtilities.GetProfileUserPermissions(userPermissions, model.UrlKey);
 
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
-            model.IndicatorsToTransfer = GetSpecifiedIndicatorNames(indicatorSpecifiers,
+            model.IndicatorsToTransfer = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers,
                 model.Profile.IndicatorNames);
 
             ViewBag.SexList = _lookUpsRepository.GetSexes();
@@ -383,6 +441,8 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
+        [Route("copy-indicators")]
+        [HttpGet]
         public ActionResult CopyIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey,
             string selectedProfileName, int selectedDomainId, string selectedDomainName, int selectedAreaTypeId)
         {
@@ -398,7 +458,9 @@ namespace Fpm.MainUI.Controllers
             };
 
             // List of profiles
-            var listOfProfiles = GetOrderedListOfProfilesForCurrentUser(model);
+            var listOfProfiles = GetOrderedListOfProfilesForCurrentUser(model)
+                .Where(x => x.Value != "indicators-for-review").ToList();
+
             var defaultProfile = listOfProfiles.FirstOrDefault(x => x.Selected) ?? listOfProfiles.FirstOrDefault();
             defaultProfile.Selected = true;
 
@@ -413,14 +475,14 @@ namespace Fpm.MainUI.Controllers
 
             // User permissions
             var userPermissions = CommonUtilities.GetUserGroupPermissionsByUserId(_reader.GetUserByUserName(_userName).Id);
-            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
+            model.UserGroupPermissions = CommonUtilities.GetProfileUserPermissions(userPermissions, model.UrlKey);
 
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
-            model.IndicatorsToTransfer = GetSpecifiedIndicatorNames(indicatorSpecifiers,
+            model.IndicatorsToTransfer = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers,
                 model.Profile.IndicatorNames);
 
+            ViewBag.Profiles = listOfProfiles;
             ViewBag.SexList = _lookUpsRepository.GetSexes();
-
             ViewBag.AgeList = _lookUpsRepository.GetAges();
 
             if (Request.IsAjaxRequest())
@@ -431,13 +493,90 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
+        [Route("submit-indicators-for-review")]
+        [HttpGet]
+        public ActionResult SubmitIndicatorsForReview(IEnumerable<string> jdata, string selectedProfileUrlkey,
+            int selectedDomainId, int selectedAreaTypeId)
+        {
+            var model = new SubmitIndicatorsForReviewModel
+            {
+                UrlKey = selectedProfileUrlkey,
+                Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
+                FromGroupId = selectedDomainId == 1 ? GroupIds.InDevelopment : GroupIds.AwaitingRevision,
+                ToGroupId = GroupIds.UnderReview,
+                AreaTypeId = selectedAreaTypeId
+            };
+
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
+            model.IndicatorsToReview = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers,
+                model.Profile.IndicatorNames);
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_SubmitIndicatorsForReview", model);
+            }
+
+            return View(IndexView);
+        }
+
+        [Route("indicators-awaiting-revision")]
+        [HttpGet]
+        public ActionResult IndicatorsAwaitingRevision(IEnumerable<string> jdata, string selectedProfileUrlkey,
+            int selectedDomainId, int selectedAreaTypeId)
+        {
+            var model = new IndicatorsAwaitingRevisionModel
+            {
+                UrlKey = selectedProfileUrlkey,
+                Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
+                FromGroupId = GroupIds.UnderReview,
+                ToGroupId = GroupIds.AwaitingRevision,
+                AreaTypeId = selectedAreaTypeId
+            };
+
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
+            model.IndicatorsAwaitingRevision = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers,
+                model.Profile.IndicatorNames);
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_IndicatorsAwaitingRevision", model);
+            }
+
+            return View(IndexView);
+        }
+
+        [Route("approve-indicators")]
+        [HttpGet]
+        public ActionResult ApproveIndicators(IEnumerable<string> jdata, string selectedProfileUrlkey,
+            int selectedDomainId, int selectedAreaTypeId)
+        {
+            var model = new ApproveIndicatorsModel
+            {
+                UrlKey = selectedProfileUrlkey,
+                Profile = GetProfile(selectedProfileUrlkey, selectedDomainId, selectedAreaTypeId),
+                AreaTypeId = selectedAreaTypeId
+            };
+
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(jdata.ToArray());
+            model.IndicatorsToApprove = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers,
+                model.Profile.IndicatorNames);
+
+            if (Request.IsAjaxRequest())
+            {
+                return PartialView("_ApproveIndicators", model);
+            }
+
+            return View(IndexView);
+        }
+
+        [Route("reload-domains")]
         [HttpPost]
         public JsonResult ReloadDomains(string selectedProfile)
         {
             var model = new ProfileMembers
             {
                 UrlKey = selectedProfile,
-                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.CountyAndUnitaryAuthority, _profileRepository)
+                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.CountyAndUnitaryAuthorityPre2019, _profileRepository)
             };
 
             IList<GroupingMetadata> groupingMetadatas = model.Profile.GroupingMetadatas;
@@ -446,6 +585,7 @@ namespace Fpm.MainUI.Controllers
             return Json(domains);
         }
 
+        [Route("delete-domain")]
         [HttpPost]
         public ActionResult DeleteDomain(ProfileMembers pm, int domainDeleteId)
         {
@@ -478,6 +618,7 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
+        [Route("save-grid-domains")]
         [HttpPost]
         public ActionResult SaveGridDomains(ProfileMembers pm, string newDomain)
         {
@@ -513,6 +654,8 @@ namespace Fpm.MainUI.Controllers
             return View(IndexView);
         }
 
+        [Route("confirm-copy-indicators")]
+        [HttpGet]
         public ActionResult ConfirmCopyIndicators(CopyIndicatorsModel cim,
             string indicatorTransferDetails, bool copyMetadataOption)
         {
@@ -577,13 +720,15 @@ namespace Fpm.MainUI.Controllers
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
 
+        [Route("confirm-move-indicators")]
+        [HttpGet]
         public ActionResult ConfirmMoveIndicators(MoveIndicatorsModel mim, string selectedProfileId,
             List<int> selectedDomainId, int selectedAreaTypeId, string indicatorTransferDetails)
         {
-            var groupId = GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(mim.UrlKey, mim.DomainIndex, mim.AreaTypeId);
+            var groupId = _helper.GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(mim.UrlKey, mim.DomainIndex, mim.AreaTypeId);
             var modelCount = 0;
 
-            //There are indicators to delete (move to the archive domain)
+            //There are indicators to remove (move to the unassigned domain)
             var indicatorSpecifierStrings = indicatorTransferDetails.Split(',').ToList();
             var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
 
@@ -595,7 +740,7 @@ namespace Fpm.MainUI.Controllers
 
                 //Don't move if identical indicator already exists in destination.
                 if (!_profileRepository.IndicatorGroupingsExist(indicatorId,
-                    Convert.ToInt32(selectedDomainId[0]), mim.AreaTypeId, ageId,
+                    Convert.ToInt32(selectedDomainId[0]), selectedAreaTypeId, ageId,
                     sexId))
                 {
                     var currentIndicator = mim.IndicatorsToTransfer[modelCount];
@@ -625,22 +770,22 @@ namespace Fpm.MainUI.Controllers
                 modelCount++;
             }
 
-            _profileRepository.Dispose();
-
             _writer.ReorderIndicatorSequence(groupId, mim.AreaTypeId);
 
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
 
-        public ActionResult ConfirmDeleteIndicators(DeleteIndicatorsModel indicatorsModel, string indicatorDeleteDetails)
+        [Route("confirm-remove-indicators")]
+        [HttpGet]
+        public ActionResult ConfirmRemoveIndicators(RemoveIndicatorsModel indicatorsModel, string indicatorRemoveDetails)
         {
-            if (indicatorDeleteDetails != string.Empty)
+            if (indicatorRemoveDetails != string.Empty)
             {
                 var areaTypeId = indicatorsModel.SelectedAreaTypeId;
-                var groupId = GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(
-                    indicatorsModel.UrlKey, indicatorsModel.DomainId, areaTypeId);
+                var groupId = _helper.GetSelectedGroupIdUsingProfileKeyDomainAndAreaTypeId(indicatorsModel.UrlKey,
+                    indicatorsModel.DomainId, areaTypeId);
 
-                var indicatorSpecifierStrings = indicatorDeleteDetails.Split(',').ToList();
+                var indicatorSpecifierStrings = indicatorRemoveDetails.Split(',').ToList();
                 var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
 
                 foreach (var indicatorSpecifier in indicatorSpecifiers)
@@ -650,47 +795,9 @@ namespace Fpm.MainUI.Controllers
                     var ageId = indicatorSpecifier.AgeId;
                     var profileId = indicatorsModel.Profile.Id;
 
-                    var indicatorMetadata = _reader.GetIndicatorMetadata(indicatorId);
-
-                    if (indicatorMetadata.OwnerProfileId == profileId)
-                    {
-                        // Indicator owned by profile
-
-                        var groupings = GetGroupingsForIndicatorInProfile(profileId, indicatorId);
-
-                        var distinctGroupingsForProfile =
-                            GetDistinctGroupingsByGroupIdAndAreaTypeId(groupings);
-
-                        if (distinctGroupingsForProfile.Count > 1)
-                        {
-                            //This isn't the last occurance of this indicator in this profile so it doesn't need to be archived and can simply be deleted from the grouping table
-                            DeleteFromGrouping(groupId, indicatorId, areaTypeId, sexId, ageId);
-                        }
-                        else
-                        {
-                            //Indicator is owned by the profile so archive it
-                            _profileRepository.ArchiveIndicatorFromGrouping(groupId, indicatorId,
-                                areaTypeId, sexId, ageId);
-
-                            //Set the indicator ownership to the archive profile
-                            new IndicatorOwnerChanger(_reader, _profileRepository)
-                            .AssignIndicatorToProfile(indicatorId, ProfileIds.ArchivedIndicators);
-
-                            _profileRepository.LogAuditChange("Indicator " + indicatorId +
-                                " (Area: " + areaTypeId + ", SexId:" + sexId +
-                                ", AgeId:" + ageId + " )  has been archived.",
-                                indicatorId, null, _userName, DateTime.Now,
-                                CommonUtilities.AuditType.Delete.ToString());
-                        }
-                    }
-                    else
-                    {
-                        // Indicator not owned by profile
-                        DeleteFromGrouping(groupId, indicatorId, areaTypeId, sexId, ageId);
-                    }
+                    GroupingRemover groupingRemover = new GroupingRemover(_reader, _profileRepository);
+                    groupingRemover.RemoveGroupings(profileId, groupId, indicatorId, areaTypeId, sexId, ageId);
                 }
-
-                _profileRepository.Dispose();
 
                 _writer.ReorderIndicatorSequence(groupId, areaTypeId);
             }
@@ -698,8 +805,128 @@ namespace Fpm.MainUI.Controllers
             return Redirect(Request.UrlReferrer.AbsoluteUri);
         }
 
+        [Route("confirm-delete-indicators")]
         [HttpGet]
-        [Route("BrowseData/full-page/{indicatorId}")]
+        public ActionResult ConfirmDeleteIndicators(DeleteIndicatorsModel model, string indicatorDeleteDetails)
+        {
+            if (indicatorDeleteDetails != string.Empty)
+            {
+                var indicatorSpecifierStrings = indicatorDeleteDetails.Split(',').ToList();
+                var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
+
+                foreach (var indicatorSpecifier in indicatorSpecifiers)
+                {
+                    var indicatorId = indicatorSpecifier.IndicatorId;
+
+                    _profileRepository.DeleteIndicator(indicatorId);
+
+                    var auditMessage = string.Format("Indicator {0} deleted permanently from the system.", indicatorId);
+                    _profileRepository.LogAuditChange(auditMessage, indicatorId, null, _userName, DateTime.Now,
+                        CommonUtilities.AuditType.Delete.ToString());
+                }
+            }
+
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
+        }
+
+        [Route("confirm-submit-indicators-for-review")]
+        [HttpPost]
+        public ActionResult ConfirmSubmitIndicatorsForReview(SubmitIndicatorsForReviewModel model, string indicatorsToReviewDetails)
+        {
+            var fromGroupId = model.FromGroupId;
+            var toGroupId = model.ToGroupId;
+            var areaTypeId = model.AreaTypeId;
+            var domainNumber = fromGroupId == GroupIds.InDevelopment ? 1 : 3;
+
+            var profile = GetProfile(UrlKeys.IndicatorsForReview, domainNumber, areaTypeId);
+
+            var indicatorSpecifierStrings = indicatorsToReviewDetails.Split(',').ToList();
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
+            var indicators = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers, profile.IndicatorNames);
+            var urlReferrer = Request.UrlReferrer;
+
+            foreach (var indicator in indicators)
+            {
+                _helper.MoveIndicatorInDb(fromGroupId, toGroupId, areaTypeId, indicator.IndicatorId, indicator.SexId, indicator.AgeId, IndicatorStatus.UnderReview);
+
+                var indicatorNameWithSexAndAgeLabel = CommonUtilities.GetIndicatorNameWithSexAndAgeLabel(indicator);
+                var indicatorUrl = CommonUtilities.GetIndicatorUrl(urlReferrer.Scheme, urlReferrer.Authority,
+                    urlReferrer.AbsolutePath, UrlKeys.IndicatorsForReview, 2, areaTypeId);
+
+                var notifyEmailTemplate = fromGroupId == GroupIds.InDevelopment
+                    ? NotifyEmailTemplates.IndicatorSubmittedForReview
+                    : NotifyEmailTemplates.IndicatorSubmittedForReviewAfterRevision;
+
+                EmailHelper emailHelper = new EmailHelper(_emailRepository, notifyEmailTemplate, indicator.IndicatorId, indicatorNameWithSexAndAgeLabel, indicatorUrl);
+                emailHelper.SendEmail();
+            }
+
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
+        }
+
+        [Route("confirm-indicators-awaiting-revision")]
+        [HttpPost]
+        public ActionResult ConfirmIndicatorsAwaitingRevision(IndicatorsAwaitingRevisionModel model, string indicatorsAwaitingRevisionDetails)
+        {
+            var fromGroupId = model.FromGroupId;
+            var toGroupId = model.ToGroupId;
+            var areaTypeId = model.AreaTypeId;
+
+            var profile = GetProfile(UrlKeys.IndicatorsForReview, 2, areaTypeId);
+
+            var indicatorSpecifierStrings = indicatorsAwaitingRevisionDetails.Split(',').ToList();
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
+            var indicators = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers, profile.IndicatorNames);
+            var urlReferrer = Request.UrlReferrer;
+
+            foreach (var indicator in indicators)
+            {
+                _helper.MoveIndicatorInDb(fromGroupId, toGroupId, areaTypeId, indicator.IndicatorId, indicator.SexId, indicator.AgeId, IndicatorStatus.ChangesRequested);
+
+                var indicatorNameWithSexAndAgeLabel = CommonUtilities.GetIndicatorNameWithSexAndAgeLabel(indicator);
+                var indicatorUrl = CommonUtilities.GetIndicatorUrl(urlReferrer.Scheme, urlReferrer.Authority,
+                    urlReferrer.AbsolutePath, UrlKeys.IndicatorsForReview, 3, areaTypeId);
+
+                EmailHelper emailHelper = new EmailHelper(_emailRepository, NotifyEmailTemplates.IndicatorAwaitingRevision, indicator.IndicatorId, indicatorNameWithSexAndAgeLabel, indicatorUrl);
+                emailHelper.SendEmail();
+            }
+
+            return Redirect(urlReferrer.AbsoluteUri);
+        }
+
+        [Route("confirm-approve-indicators")]
+        [HttpPost]
+        public ActionResult ConfirmApproveIndicators(ApproveIndicatorsModel model, string indicatorsToApproveDetails)
+        {
+            var areaTypeId = model.AreaTypeId;
+            var indicatorSpecifierStrings = indicatorsToApproveDetails.Split(',').ToList();
+            var indicatorSpecifiers = IndicatorSpecifierParser.Parse(indicatorSpecifierStrings);
+            var profile = GetProfile(UrlKeys.IndicatorsForReview, 2, areaTypeId);
+            var indicators = CommonUtilities.GetSpecifiedIndicatorNames(indicatorSpecifiers, profile.IndicatorNames);
+            var urlReferrer = Request.UrlReferrer;
+
+            foreach (var indicator in indicators)
+            {
+                var indicatorMetadata = _reader.GetIndicatorMetadata(indicator.IndicatorId);
+                _profileRepository.ChangeIndicatorProfile(indicator.IndicatorId, indicatorMetadata.DestinationProfileId, IndicatorStatus.Approved);
+
+                var destinationProfile = _profileRepository.GetProfileDetailsById(indicatorMetadata.DestinationProfileId);
+                var indicatorNameWithSexAndAgeLabel = CommonUtilities.GetIndicatorNameWithSexAndAgeLabel(indicator);
+                var indicatorUrl = CommonUtilities.GetIndicatorUrl(urlReferrer.Scheme, urlReferrer.Authority,
+                    urlReferrer.AbsolutePath, destinationProfile.UrlKey, 1, areaTypeId);
+
+                EmailHelper emailHelper = new EmailHelper(_emailRepository, NotifyEmailTemplates.IndicatorApprovedNotificationToCreatedUser, indicator.IndicatorId, indicatorNameWithSexAndAgeLabel, indicatorUrl);
+                emailHelper.SendEmail();
+
+                emailHelper = new EmailHelper(_emailRepository, NotifyEmailTemplates.IndicatorApprovedNotificationToIMRG, indicator.IndicatorId, indicatorNameWithSexAndAgeLabel, indicatorUrl);
+                emailHelper.SendEmail();
+            }
+
+            return Redirect(Request.UrlReferrer.AbsoluteUri);
+        }
+
+        [HttpGet]
+        [Route("browse-data/full-page/{indicatorId}")]
         public ActionResult BrowseIndicatorDataFullPage(int indicatorId)
         {
             IList<IndicatorMetadataTextProperty> properties = _reader.GetIndicatorMetadataTextProperties();
@@ -713,7 +940,7 @@ namespace Fpm.MainUI.Controllers
 
         [HttpGet]
         [AjaxOnly]
-        [Route("BrowseData/{indicatorId}")]
+        [Route("browse-data/{indicatorId}")]
         public ActionResult BrowseIndicatorData(int indicatorId)
         {
             int rowsCount;
@@ -726,7 +953,7 @@ namespace Fpm.MainUI.Controllers
                     RowsFound = rowsCount,
                     CanDeleteDataSet = _coreDataRepository.CanDeleteDataSet(indicatorId, UserName)
                 },
-                DataChange = GetDataChangeAudit(indicatorId)
+                DataChange = _helper.GetDataChangeAudit(indicatorId)
             };
 
             PopulateFilterDataDropDownLists(model);
@@ -735,10 +962,10 @@ namespace Fpm.MainUI.Controllers
 
         [HttpPost]
         [AjaxOnly]
-        [Route("BrowseData")]
+        [Route("browse-data")]
         public ActionResult BrowseIndicatorData(BrowseDataViewModel model)
         {
-            var filters = GetFilters(model);
+            var filters = _helper.GetFilters(model);
             int rowsCount;
             var results = new CoreDataSetViewModel()
             {
@@ -751,19 +978,20 @@ namespace Fpm.MainUI.Controllers
 
         [HttpPost]
         [AjaxOnly]
-        [Route("DeleteData")]
+        [Route("delete-data")]
         public ActionResult DeleteIndicatorData(BrowseDataViewModel model)
         {
-            var filters = GetFilters(model);
+            var filters = _helper.GetFilters(model);
 
             var coreDataSetViewModel = new CoreDataSetViewModel();
+            coreDataSetViewModel.CanDeleteDataSet = _coreDataRepository.CanDeleteDataSet(model.IndicatorId, _userName);
 
             try
             {
                 var rowsDeleted = _coreDataRepository.DeleteCoreDataSet(model.IndicatorId, filters, _userName);
+                coreDataSetViewModel.RowsFound = rowsDeleted;
                 coreDataSetViewModel.DeleteStatus = true;
-                coreDataSetViewModel.Message = string.Format("{0} rows have been deleted",
-                    rowsDeleted);
+                coreDataSetViewModel.Message = string.Format("{0} rows have been deleted", rowsDeleted);
             }
             catch (Exception exception)
             {
@@ -775,7 +1003,17 @@ namespace Fpm.MainUI.Controllers
             return PartialView("_CoreData", coreDataSetViewModel);
         }
 
-        [Route("ReorderIndicators")]
+        /// <summary>
+        /// Reorder indicators
+        /// </summary>
+        /// <param name="profileId">Profile id</param>
+        /// <param name="profileUrlKey">Profile url key</param>
+        /// <param name="domainSequence">Sequence number of the domain associated with the profile</param>
+        /// <param name="areaTypeId">Area type id</param>
+        /// <param name="groupId">Group id</param>
+        /// <returns>Reorder indicators view model</returns>
+        [Route("reorder-indicators")]
+        [HttpGet]
         public ActionResult ReorderIndicators(int profileId, string profileUrlKey, int domainSequence, int areaTypeId, int groupId)
         {
             var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
@@ -790,142 +1028,13 @@ namespace Fpm.MainUI.Controllers
             return View("ReorderIndicators", reorderIndicatorsViewModel);
         }
 
-        [Route("DomainName")]
-        public ActionResult GetDomainName(int groupId, int domainSequence)
-        {
-            string domainName = _profileRepository.GetDomainName(groupId, domainSequence);
-            return Json(domainName, JsonRequestBehavior.AllowGet);
-        }
-
         /// <summary>
-        /// Get the indicators with names for profile, area type and grouping sequence
+        /// Save reordered indicators
         /// </summary>
-        /// <param name="profileUrlKey">Profile url key</param>
-        /// <param name="sequenceNumber">Sequence number of the group associated with the profile</param>
-        /// <param name="areaTypeId">Area type id</param>
-        /// <returns>List of grouping plus name objects</returns>
-        [Route("ProfileGroupingIndicators")]
-        public ActionResult GetGroupingPlusNames(string profileUrlKey, int sequenceNumber, int areaTypeId)
-        {
-            Profile profile = new ProfileBuilder(_profileRepository).Build(profileUrlKey, sequenceNumber, areaTypeId);
-            IList<GroupingPlusName> groupingPlusNames = profile.IndicatorNames;
-
-            return Json(groupingPlusNames, JsonRequestBehavior.AllowGet);
-        }
-
-        [Route("grouping-subheadings/by-area-type-and-group")]
-        public ActionResult GetGroupingSubheadings(int areaTypeId, int groupId)
-        {
-            IList<GroupingSubheading> groupingSubheadings = _profileRepository.GetGroupingSubheadings(areaTypeId, groupId);
-            return Json(groupingSubheadings, JsonRequestBehavior.AllowGet);
-        }
-
-        [Route("grouping-subheadings/by-profile")]
-        public ActionResult GetGroupingSubheadingsForProfile(int profileId)
-        {
-            var groupIds = _reader.GetGroupingIds(profileId);
-
-            IList<GroupingSubheading> groupingSubheadings = _profileRepository.GetGroupingSubheadingsByGroupIds(groupIds);
-            return Json(groupingSubheadings, JsonRequestBehavior.AllowGet);
-        }
-
+        /// <param name="formCollection"></param>
+        /// <returns></returns>
         [HttpPost]
-        [Route("ProfileGroupingIndicators/AddGroupingSubheadings")]
-        public ActionResult AddGroupingSubheadings(FormCollection formCollection)
-        {
-            var profileId = Convert.ToInt32(formCollection["profileId"]);
-            var profileUrlKey = formCollection["profileUrlKey"];
-            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
-            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
-            var groupId = Convert.ToInt32(formCollection["groupId"]);
-            var subheading = formCollection["subheading"];
-            var sequence = -1;
-
-            var groupingSubheading = new GroupingSubheading
-            {
-                GroupId = groupId,
-                AreaTypeId = areaTypeId,
-                Sequence = sequence,
-                Subheading = subheading
-            };
-
-            _profileRepository.SaveGroupingSubheading(groupingSubheading);
-
-            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
-            {
-                ProfileId = profileId,
-                ProfileUrlKey = profileUrlKey,
-                DomainSequence = domainSequence,
-                AreaTypeId = areaTypeId,
-                GroupId = groupId
-            };
-
-            return View("ReorderIndicators", reorderIndicatorsViewModel);
-        }
-
-        [HttpPost]
-        [Route("ProfileGroupingIndicators/EditGroupingSubheadings")]
-        public ActionResult EditGroupingSubheadings(FormCollection formCollection)
-        {
-            var profileId = Convert.ToInt32(formCollection["profileId"]);
-            var profileUrlKey = formCollection["profileUrlKey"];
-            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
-            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
-            var groupId = Convert.ToInt32(formCollection["groupId"]);
-            var sequence = Convert.ToInt32(formCollection["sequence"]);
-            var subheading = formCollection["subheading"];
-            var subheadingId = Convert.ToInt32(formCollection["subheadingId"]);
-
-            var groupingSubheading = new GroupingSubheading
-            {
-                GroupId = groupId,
-                AreaTypeId = areaTypeId,
-                Sequence = sequence,
-                Subheading = subheading,
-                SubheadingId = subheadingId
-            };
-
-            _profileRepository.UpdateGroupingSubheading(groupingSubheading);
-
-            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
-            {
-                ProfileId = profileId,
-                ProfileUrlKey = profileUrlKey,
-                DomainSequence = domainSequence,
-                AreaTypeId = areaTypeId,
-                GroupId = groupId
-            };
-
-            return View("ReorderIndicators", reorderIndicatorsViewModel);
-        }
-
-        [HttpPost]
-        [Route("ProfileGroupingIndicators/DeleteGroupingSubheadings")]
-        public ActionResult DeleteGroupingSubheadings(FormCollection formCollection)
-        {
-            var profileId = Convert.ToInt32(formCollection["profileId"]);
-            var profileUrlKey = formCollection["profileUrlKey"];
-            var domainSequence = Convert.ToInt32(formCollection["domainSequence"]);
-            var areaTypeId = Convert.ToInt32(formCollection["areaTypeId"]);
-            var groupId = Convert.ToInt32(formCollection["groupId"]);
-            var groupingSubheadingId = Convert.ToInt32(formCollection["groupingSubheadingId"]);
-
-            _profileRepository.DeleteGroupingSubheading(groupingSubheadingId);
-
-            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
-            {
-                ProfileId = profileId,
-                ProfileUrlKey = profileUrlKey,
-                DomainSequence = domainSequence,
-                AreaTypeId = areaTypeId,
-                GroupId = groupId
-            };
-
-            return View("ReorderIndicators", reorderIndicatorsViewModel);
-        }
-
-        [HttpPost]
-        [Route("ProfileGroupingIndicators/SaveReorderedIndicators")]
+        [Route("save-reordered-indicators")]
         public ActionResult SaveReorderedIndicators(FormCollection formCollection)
         {
             var profileId = Convert.ToInt32(formCollection["profileId"]);
@@ -936,24 +1045,60 @@ namespace Fpm.MainUI.Controllers
             var groupingPlusNames = JsonConvert.DeserializeObject<IList<GroupingPlusName>>(formCollection["groupingPlusNames"]);
             var groupingSubheadings = JsonConvert.DeserializeObject<IList<GroupingSubheading>>(formCollection["groupingSubheadings"]);
 
-            // Update groupings
-            foreach (var groupingPlusName in groupingPlusNames)
+            try
             {
-                var groupings = _reader.GetGroupingsByGroupIdAreaTypeIdIndicatorIdAndSexId(groupId,
-                    groupingPlusName.AreaTypeId, groupingPlusName.IndicatorId, groupingPlusName.SexId);
+                _helper.UpdateGroupings(groupingPlusNames, groupId);
 
-                foreach (var grouping in groupings)
-                {
-                    grouping.Sequence = groupingPlusName.Sequence;
-                }
+                // Delete grouping subheadings
+                DeleteMissingSubheadings(areaTypeId, groupId, groupingSubheadings);
 
-                _writer.UpdateGroupingList(groupings);
+                // Update grouping subheadings
+                UpdateNewSubheadingData(groupingSubheadings);
+
+                return new HttpStatusCodeResult(HttpStatusCode.OK, "Saved reordered indicators");
             }
+            catch (Exception exception)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, exception.Message);
+            }
+        }
 
-            // Update grouping subheadings
+        /// <summary>
+        /// Get the indicators with names for profile, area type and grouping sequence
+        /// </summary>
+        /// <param name="profileUrlKey">Profile url key</param>
+        /// <param name="sequenceNumber">Sequence number of the group associated with the profile</param>
+        /// <param name="areaTypeId">Area type id</param>
+        /// <returns>List of grouping plus name objects</returns>
+        [Route("profile-grouping-indicators")]
+        [HttpGet]
+        public ActionResult GetGroupingPlusNames(string profileUrlKey, int sequenceNumber, int areaTypeId)
+        {
+            Profile profile = new ProfileBuilder(_reader, _profileRepository).Build(profileUrlKey, sequenceNumber, areaTypeId);
+            IList<GroupingPlusName> groupingPlusNames = profile.IndicatorNames;
+
+            return Json(groupingPlusNames, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// Get group name by group id and sequence
+        /// </summary>
+        /// <param name="groupId">Group id</param>
+        /// <param name="domainSequence">Sequence number of the domain</param>
+        /// <returns>Domain name</returns>
+        [Route("domain-name")]
+        [HttpGet]
+        public ActionResult GetDomainName(int groupId, int domainSequence)
+        {
+            string domainName = _profileRepository.GetDomainName(groupId, domainSequence);
+            return Json(domainName, JsonRequestBehavior.AllowGet);
+        }
+
+        public void UpdateNewSubheadingData(IList<GroupingSubheading> groupingSubheadings)
+        {
             foreach (var groupingSubheading in groupingSubheadings)
             {
-                if (groupingSubheading.SubheadingId == -1)
+                if (groupingSubheading.SubheadingId <= _sequenceFistElementNegative)
                 {
                     _profileRepository.SaveGroupingSubheading(groupingSubheading);
                 }
@@ -962,90 +1107,96 @@ namespace Fpm.MainUI.Controllers
                     _profileRepository.UpdateGroupingSubheading(groupingSubheading);
                 }
             }
+        }
 
-            // Delete grouping subheadings
+        public void DeleteMissingSubheadings(int areaTypeId, int groupId, IList<GroupingSubheading> groupingSubheadings)
+        {
             var groupingSubheadingsInDb = _profileRepository.GetGroupingSubheadings(areaTypeId, groupId);
             foreach (var groupingSubheadingInDb in groupingSubheadingsInDb)
             {
-                if (groupingSubheadings.FirstOrDefault(x => x.Subheading == groupingSubheadingInDb.Subheading) == null)
+                if (groupingSubheadings.FirstOrDefault(x => x.SubheadingId > _sequenceFistElementNegative && x.SubheadingId == groupingSubheadingInDb.SubheadingId) == null)
                 {
                     _profileRepository.DeleteGroupingSubheading(groupingSubheadingInDb.SubheadingId);
                 }
             }
+        }
 
-            var reorderIndicatorsViewModel = new ReorderIndicatorsViewModel
+        private Profile GetProfile(string urlKey, int selectedDomainNumber = 0, int areaType = AreaTypeIds.Undefined)
+        {
+            return new ProfileBuilder(_reader, _profileRepository).Build(urlKey, selectedDomainNumber, areaType);
+        }
+
+        public void GetProfiles(IndicatorGridModel model)
+        {
+            var profiles = _reader.GetProfiles().OrderBy(x => x.Name);
+            IList<ProfileDetails> profilesWithAssignedIndicators = profiles.ToList();
+
+            var listOfProfiles = CommonUtilities.GetOrderedListOfProfiles(profilesWithAssignedIndicators);
+            model.ProfileList = listOfProfiles;
+
+            var firstOrDefault = model.ProfileList.FirstOrDefault();
+            if (firstOrDefault != null)
             {
-                ProfileId = profileId,
-                ProfileUrlKey = profileUrlKey,
-                DomainSequence = domainSequence,
-                AreaTypeId = areaTypeId,
-                GroupId = groupId
+                model.ProfileKey = firstOrDefault.Value;
+            }
+        }
+
+        private void GetDomains(IndicatorGridModel model, int? domainSequence)
+        {
+            var reloadedDomains = ReloadGridDomains(model.ProfileKey, _profileRepository);
+
+            if (domainSequence.HasValue)
+            {
+                model.SelectedGroupId =
+                    reloadedDomains.Where(x => x.Sequence == domainSequence).Select(x => x.GroupId).FirstOrDefault();
+            }
+            else
+            {
+                model.SelectedGroupId = reloadedDomains.Select(x => x.GroupId).FirstOrDefault();
+            }
+
+            model.DomainList = new SelectList(reloadedDomains.OrderBy(g => g.Sequence), "Sequence", "GroupName");
+        }
+
+        private IList<GroupingMetadata> ReloadGridDomains(string selectedProfile, IProfileRepository profileRepository)
+        {
+            var model = new ProfileMembers
+            {
+                UrlKey = selectedProfile,
+                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.Undefined, profileRepository)
             };
 
-            return View("ReorderIndicators", reorderIndicatorsViewModel);
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            if (_profileRepository == null) _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
-            if (_coreDataRepository == null) _coreDataRepository = new CoreDataRepository(NHibernateSessionFactory.GetSession());
-            if (_lookUpsRepository == null) _lookUpsRepository = new LookUpsRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        /// <summary>
-        /// Accessor that ensures username is defined.
-        /// </summary>
-        private string UserName
-        {
-            get
-            {
-                if (_userName == null)
-                {
-                    _userName = UserDetails.CurrentUser().Name;
-                }
-                return _userName;
-            }
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _profileRepository.Dispose();
-            _lookUpsRepository.Dispose();
-            _coreDataRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
-        }
-
-        private Dictionary<string, object> GetFilters(BrowseDataViewModel model)
-        {
-            var filters = new Dictionary<string, object>();
-
-            if (model.AgeId > UIHelper.ShowAll) filters.Add(CoreDataFilters.AgeId, model.AgeId);
-            if (model.SexId > UIHelper.ShowAll) filters.Add(CoreDataFilters.SexId, model.SexId);
-            if (model.AreaTypeId > 0) filters.Add(CoreDataFilters.AreaTypeId, model.AreaTypeId);
-            if (model.CategoryTypeId > 0) filters.Add(CoreDataFilters.CategoryTypeId, model.CategoryTypeId);
-            if (model.Month > 0) filters.Add(CoreDataFilters.Month, model.Month);
-            if (model.Year > 0) filters.Add(CoreDataFilters.Year, model.Year);
-            if (model.Quarter > 0) filters.Add(CoreDataFilters.Quarter, model.Quarter);
-            if (model.YearRange > 0) filters.Add(CoreDataFilters.YearRange, model.YearRange);
-
-            // Add area code
-            var areaCode = model.AreaCode;
-            if (string.IsNullOrWhiteSpace(areaCode) == false)
-            {
-                filters.Add(CoreDataFilters.AreaCode, model.AreaCode.Trim());
-            }
-
-            return filters;
+            return model.Profile.GroupingMetadatas;
         }
 
         private void AssignContactDetails(Profile profile, IndicatorGridModel model)
         {
-            var profileContact = _reader.GetUserByUserId(profile.ContactUserId);
-            model.ContactUserName = profileContact.DisplayName;
-            model.EmailAddress = profileContact.EmailAddress;
+            var profileContacts = _reader.GetUserListByUserIds(profile.ContactUserIds);
+            var profileContactNames = new List<string>();
+            var profileContactEmailAddresses = new List<string>();
+
+            foreach (var fpmUser in profileContacts)
+            {
+                profileContactNames.Add(fpmUser.DisplayName);
+                profileContactEmailAddresses.Add(fpmUser.EmailAddress);
+            }
+
+            model.ContactUserNames = String.Join(", ", profileContactNames);
+            model.EmailAddresses = String.Join(", ", profileContactEmailAddresses);
+        }
+
+        private static void AssignAreaTypeData(IndicatorGridModel model, Profile profile)
+        {
+            var builder = new AreaTypeSelectListBuilder(profile.AreaTypes, profile.SelectedAreaType);
+            model.SelectedAreaTypeId = builder.SelectedAreaTypeId;
+            model.AreaTypeList = builder.SelectListItems;
+        }
+
+        private void AssignUserPermissionsToIndicatorGridModel(IndicatorGridModel model)
+        {
+            var userPermissions = _helper.GetUserGroupPermissions();
+            model.UserHasAssignedPermissions = userPermissions.Any();
+            model.UserGroupPermissions = CommonUtilities.GetProfileUserPermissions(userPermissions, model.UrlKey);
         }
 
         private void PopulateFilterDataDropDownLists(BrowseDataViewModel model)
@@ -1067,37 +1218,13 @@ namespace Fpm.MainUI.Controllers
             }
             ViewBag.CategoryTypeId = new SelectList(categoryTypes, "Id", "Name");
 
-            ViewBag.YearRange = _coreDataRepository.GetYearRanges(model.IndicatorId).ConvertToSelectListWithAnyOption(); ;
+            ViewBag.YearRange = _coreDataRepository.GetYearRanges(model.IndicatorId).ConvertToSelectListWithAnyOption();
 
             ViewBag.Year = _coreDataRepository.GetYears(model.IndicatorId).ConvertToSelectListWithAnyOption();
 
-            ViewBag.Month = _coreDataRepository.GetMonths(model.IndicatorId).ConvertToSelectListWithAnyOption(); ;
+            ViewBag.Month = _coreDataRepository.GetMonths(model.IndicatorId).ConvertToSelectListWithAnyOption();
 
-            ViewBag.Quarter = _coreDataRepository.GetQuarters(model.IndicatorId).ConvertToSelectListWithAnyOption(); ;
-        }
-
-        private static List<Grouping> GetDistinctGroupingsByGroupIdAndAreaTypeId(IEnumerable<Grouping> groupings)
-        {
-            var distinctGroupingsForProfile = new List<Grouping>();
-            foreach (Grouping grouping in groupings)
-            {
-                var isAlreadyFound = false;
-                foreach (var distinctGrouping in distinctGroupingsForProfile)
-                {
-                    if (grouping.GroupId == distinctGrouping.GroupId &&
-                        grouping.AreaTypeId == distinctGrouping.AreaTypeId)
-                    {
-                        isAlreadyFound = true;
-                        break;
-                    }
-                }
-
-                if (isAlreadyFound == false)
-                {
-                    distinctGroupingsForProfile.Add(grouping);
-                }
-            }
-            return distinctGroupingsForProfile;
+            ViewBag.Quarter = _coreDataRepository.GetQuarters(model.IndicatorId).ConvertToSelectListWithAnyOption();
         }
 
         private IEnumerable<SelectListItem> GetOrderedListOfProfilesForCurrentUser(BaseDataModel model)
@@ -1105,124 +1232,6 @@ namespace Fpm.MainUI.Controllers
             var listOfProfiles = CommonUtilities.GetOrderedListOfProfilesForCurrentUser(model);
             ViewBag.listOfProfiles = listOfProfiles;
             return listOfProfiles;
-        }
-
-        private UserGroupPermissions GetProfileUserPermissions(IEnumerable<UserGroupPermissions> userPermissions, string urlKey)
-        {
-            return userPermissions.FirstOrDefault(
-                x => x.ProfileId == _reader.GetProfileIdFromUrlKey(urlKey));
-        }
-
-        private Profile GetProfile(string urlKey, int selectedDomainNumber = 0, int areaType = AreaTypeIds.Undefined)
-        {
-            return new ProfileBuilder(_profileRepository).Build(urlKey, selectedDomainNumber, areaType);
-        }
-
-        private static void AssignAreaTypeData(IndicatorGridModel model, Profile profile)
-        {
-            var builder = new AreaTypeSelectListBuilder(profile.AreaTypes, profile.SelectedAreaType);
-            model.SelectedAreaTypeId = builder.SelectedAreaTypeId;
-            model.AreaTypeList = builder.SelectListItems;
-        }
-
-        private IList<GroupingMetadata> ReloadGridDomains(string selectedProfile, ProfileRepository profileRepository)
-        {
-            var model = new ProfileMembers
-            {
-                UrlKey = selectedProfile,
-                Profile = CommonUtilities.GetProfile(selectedProfile, 1, AreaTypeIds.Undefined, profileRepository)
-            };
-
-            return model.Profile.GroupingMetadatas;
-        }
-
-        private void AssignUserPermissionsToIndicatorGridModel(IndicatorGridModel model)
-        {
-            var userPermissions = GetUserGroupPermissions();
-            model.UserHasAssignedPermissions = userPermissions.Any();
-            model.UserGroupPermissions = GetProfileUserPermissions(userPermissions, model.UrlKey);
-        }
-
-        private IEnumerable<Grouping> GetGroupingsForIndicatorInProfile(int profileId, int indicatorId)
-        {
-            var groupingsForAllProfiles = _reader
-                .GetGroupingByIndicatorId(new List<int> { indicatorId });
-
-            var profileGroupIds = _reader.GetGroupingIds(profileId);
-
-            var groupingsForCurrentProfile = groupingsForAllProfiles
-                .Where(x => profileGroupIds.Contains(x.GroupId));
-
-            return groupingsForCurrentProfile;
-        }
-
-        private void DeleteFromGrouping(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId)
-        {
-            // Profile doesn't own the indicator so actually deleted it from the grouping table 
-            _profileRepository.DeleteIndicatorFromGrouping(groupId, indicatorId, areaTypeId, sexId, ageId);
-
-            // Also delete from the IndicatorMetadataTextValue table (where it has an overridden groupId)
-            _profileRepository.DeleteOverriddenMetadataTextValues(indicatorId, groupId);
-
-            _profileRepository.LogAuditChange("Indicator " + indicatorId + " (Area: " + areaTypeId +
-                                       ", SexId:" + sexId + ", AgeId:" + ageId + " )  has been deleted.",
-                indicatorId, null, _userName, DateTime.Now, CommonUtilities.AuditType.Delete.ToString());
-        }
-
-        private List<UserGroupPermissions> GetUserGroupPermissions()
-        {
-            var fpmUser = _reader.GetUserByUserName(_userName);
-            List<UserGroupPermissions> userPermissions = fpmUser != null
-                ? CommonUtilities.GetUserGroupPermissionsByUserId(fpmUser.Id).ToList()
-                : new List<UserGroupPermissions>();
-            return userPermissions;
-        }
-
-        private void GetDomains(IndicatorGridModel model, int? domainSequence)
-        {
-            var reloadedDomains = ReloadGridDomains(model.ProfileKey, _profileRepository);
-
-            if (domainSequence.HasValue)
-            {
-                model.SelectedGroupId =
-                    reloadedDomains.Where(x => x.Sequence == domainSequence).Select(x => x.GroupId).FirstOrDefault();
-            }
-            else
-            {
-                model.SelectedGroupId = reloadedDomains.Select(x => x.GroupId).FirstOrDefault();
-            }
-
-            model.DomainList = new SelectList(reloadedDomains.OrderBy(g => g.Sequence), "Sequence", "GroupName");
-        }
-
-        private void GetProfiles(IndicatorGridModel model)
-        {
-            var profiles = _reader.GetProfiles().OrderBy(x => x.Name);
-            IList<ProfileDetails> profilesWithAssignedIndicators = profiles.ToList();
-            var listOfProfiles = CommonUtilities.GetOrderedListOfProfiles(profilesWithAssignedIndicators);
-            model.ProfileList = listOfProfiles;
-            var firstOrDefault = model.ProfileList.FirstOrDefault();
-            if (firstOrDefault != null) model.ProfileKey = firstOrDefault.Value;
-        }
-
-        private DataChange GetDataChangeAudit(int indicatorId)
-        {
-            try
-            {
-                var url = ApplicationConfiguration.CoreWsUrl + "api/data_changes?indicator_id=" + indicatorId;
-                string json;
-                using (WebClient wc = new WebClient())
-                {
-                    json = wc.DownloadString(url);
-                }
-
-                var dataChange = JsonConvert.DeserializeObject<DataChange>(json);
-                return dataChange;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
         }
     }
 }

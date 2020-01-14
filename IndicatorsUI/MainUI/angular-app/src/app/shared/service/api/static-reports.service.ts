@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { HttpService } from './http.service'
 import { Parameters } from './parameters';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
-import {
-  AreaType
-} from '../../../typings/FT.d';
+import { FTHelperService } from '../helper/ftHelper.service';
+import { AreaType } from '../../../typings/FT';
 
 @Injectable()
 export class StaticReportsService {
@@ -16,7 +14,7 @@ export class StaticReportsService {
 
   public doesStaticReportExist(profileKey: string, fileName: string,
     timePeriod: string): Observable<boolean> {
-    let params = new Parameters(this.version);
+    const params = new Parameters(this.version);
     params.addProfileKey(profileKey);
     params.addFileName(fileName);
     if (timePeriod) {

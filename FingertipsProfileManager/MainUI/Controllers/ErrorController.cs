@@ -12,16 +12,16 @@ namespace Fpm.MainUI.Controllers
     {
         private const string ViewName = "Error";
 
-        private Error error = new Error();
+        private Error _error = new Error();
 
         public ActionResult Http404(string url)
         {
             ExceptionLogger.LogException(new Exception("Page not found"), Request.Url.AbsoluteUri);
             HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
 
-            error = new Error { Message = "Sorry, that page could not be found..." };
+            _error = new Error { Message = "Sorry, that page could not be found..." };
 
-            return View(ViewName, error);
+            return View(ViewName, _error);
         }
 
         public ActionResult Http500(Exception exception)
@@ -31,13 +31,13 @@ namespace Fpm.MainUI.Controllers
             HttpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             if (exception != null)
             {
-                error = new Error
+                _error = new Error
                             {
                                 Message = "Sorry, an unexpected error has occured..." 
                             };
             }
 
-            return View(ViewName, error);
+            return View(ViewName, _error);
         }
 
         public static ActionResult InvokeHttp404(HttpContextBase httpContext)

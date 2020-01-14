@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using IndicatorsUI.DomainObjects;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
-using IndicatorsUI.DomainObjects;
 
 namespace IndicatorsUI.MainUI.Models.UserAccess
 {
@@ -22,5 +18,6 @@ namespace IndicatorsUI.MainUI.Models.UserAccess
         [Required(ErrorMessage = "Password field is required and should not be empty")]
         public string Password { get; set; }
         public bool KeepUserLoggedIn { get; set; }
+        public string ReturnUrl { get; set; }
     }
 }

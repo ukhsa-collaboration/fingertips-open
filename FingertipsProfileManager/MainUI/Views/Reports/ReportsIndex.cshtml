@@ -1,0 +1,21 @@
+﻿@using System.Web.Optimization
+
+@{
+    ViewBag.Title = "FPM - Reports";
+    Layout = "~/Views/Shared/_LayoutPage.cshtml";
+}
+
+@section ExtraScripts
+{
+    @Html.Partial("_AngularScripts")
+}
+
+@Scripts.Render("~/js/select2.min.js")
+
+<div class="standardWidth">
+    <h2 class="subheading">Reports</h2>
+</div>
+
+<div class="container">
+    <app-reports></app-reports>
+</div>

@@ -1,6 +1,5 @@
-function loading() {
-    $('body').addClass('loading');    
-}
+var areEmptyShown,
+    showEmpty;
 
 // Also see LookUps.Frequencies in C#
 FREQUENCIES = {
@@ -9,126 +8,102 @@ FREQUENCIES = {
     Monthly: '3'
 };
 
-function setInputNotSelected($menu) {
-    $menu.removeClass('dropdown-selected').addClass('dropdown-not-selected');
-}
-
-function setInputSelected($menu) {
-    $menu.removeClass('dropdown-not-selected').addClass('dropdown-selected');
-}
-
-function showHideComparatorConfidence() {
-
-
-    var comparatorMethodId = parseInt($('#ComparatorMethodId').val());
-
-    // Display comparator confidence
-    var $comparatorConfidenceDiv = $('#comparatorConfidenceDiv'),
-        $comparatorConfidence = $('#ComparatorConfidence');
-
-    var methodsThatDontNeedConfidenceLevel = [
-        ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
-        ComparatorMethodIds.Quartiles, ComparatorMethodIds.Quintiles,
-        ComparatorMethodIds.SingleOverlappingCIsForTwoCILevels];
-
-    if (_.contains(methodsThatDontNeedConfidenceLevel , comparatorMethodId)) {
-        // User does not need to select comparator confidence
-        setInputSelected($comparatorConfidence);
-        $comparatorConfidenceDiv.hide();
-        $comparatorConfidence[0].selectedIndex = 0;
-    } else {
-        $comparatorConfidenceDiv.show();
-        if ($comparatorConfidence.val() === '-1') {
-            setInputNotSelected($comparatorConfidence);
-        }
-    }
-
-    // Display polarity
-    var $polarity = $('#polarity-container');
-
-    var methodsThatDontNeedPolarity = [
-        ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
-        ComparatorMethodIds.Quartiles];
-
-    if (_.contains(methodsThatDontNeedPolarity, comparatorMethodId)) {
-        // User does not need to select polarity
-        $polarity.hide();
-
-        // Select "Not applicable"
-        $('#PolarityId option[value="-1"]').prop('selected', true);
-    } else {
-        $polarity.show();
-    }
-
-};
-
-function checkMandatoryFields() {
-
-    // Check than none of the mandatory text fields are empty or only whitespace
-    var ids = ['v1', 'v2', 'v3', 'v6'];
-    for (var i in ids) {
-        var $element = $('#' + ids[i]);
-        var text = $element.val();
-        if (text.trim().length === 0) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 $(document).ready(function () {
-    initShowEmptyMetadataFields();
-    loadDefaultTextMetadata();
-    registerReloadPopUpDomains();
+    var $addIndicatorButton = $('#add-indicator'),
+        $confirmAddIndicatorButton = $('#confirm-create-indicator'),
+        $updateIndicatorButton = $('#update-indicator'),
+        $copyIndicatorButton = $('#copy-indicator'),
+        $confirmCopyIndicatorButton = $('#confirm-copy-indicator'),
+        $cancelCopyIndicatorButton = $('#cancel-copy-indicator'),
+        $backButton = $('#back'),
+        $withdrawIndicatorsButton = $('#withdraw-indicators-button'),
+        $rejectIndicatorsButton = $('#reject-indicators-button');
 
-    var $selectedProfile = $('#selectedProfile');
-    $selectedProfile.live('change', function () {
-        reloadDomains($selectedProfile);
-    });
 
-    var $saveButton = $('#save'),
-        $saveNewButton = $('.save-new-indicator');
+    // Add indicator
+    $addIndicatorButton.click(function () {
 
-    $saveButton.click(function () {
-        updateShowSpineChartValue();
-        if (checkFieldLength()) {
-            if (checkMandatoryFields()) {
-                loading();
-                $('.create-indicator-dropdown').removeAttr('disabled');
-                $('.indicator-text').removeAttr('disabled');
-                $('form#IndicatorEditForm').submit();
-                configurePermissions();
-            } else {
-                showSimpleMessagePopUp('Please complete all the required text fields');
-            }
+        var validationResult = validate();
+        if (validationResult.trim().length === 0) {
+            $('#profile-name').text($('#UrlKey option:selected').text());
+            $('#DestinationProfileUrlKey').val($('#UrlKey').val());
+            $('#domain-name').text($("#Grouping_GroupId option:selected").text());
+
+            lightbox.show($('#save-indicator-popup').html(), 300, 300, 700);
+        } else {
+            showValidationMessagePopUp(validationResult);
         }
     });
 
-    $saveNewButton.removeAttr('href');
+    // Add indicator confirmation
+    $confirmAddIndicatorButton.live('click', function () {
+        $('#DomainSequence').val(1);
+        $('#create-indicator-form').submit();
+    });
 
-    $saveNewButton.click(function () {
-        updateShowSpineChartValue();
-        if (checkFieldLength()) {
-            if (checkMandatoryFields() && $(this).hasClass('save-required')) {
-                var selectedProfile = $selectedProfile.find(':selected')[0].text;
-                $('#popupDiv #popup-profile-confirm-label').text(selectedProfile);
-                var selectedDomain = $('#popup-domain-confirm-label').text($('#selectedDomain').find(':selected').text())[0].innerText;
-                $('#popupDiv #popup-domain-confirm-label').text(selectedDomain);
-                lightbox.show($('#popupDiv').html(), 250, 300, 600);
-            } else {
-                showSimpleMessagePopUp('Please complete all the required fields');
-            }
+    // Update indicator
+    $updateIndicatorButton.click(function () {
+
+        enableDropdownsAndInputs();
+
+        var validationResult = validate();
+        if (validationResult.trim().length === 0) {
+            $('#edit-indicator-form').submit();
+        } else {
+            showValidationMessagePopUp(validationResult);
         }
     });
 
-    $('#saveAs').live('click', function () {
-        lightbox.show($('#confirmNewFromOld').html(), 300, 300, 700);
+    // Copy indicator
+    $copyIndicatorButton.live('click', function () {
+        lightbox.show($('#copy-indicator-popup').html(), 300, 300, 700);
     });
+
+    // Copy indicator confirmation
+    $confirmCopyIndicatorButton.live('click', function () {
+        $('#CopyToProfileUrlKey').val($('#ProfileSelectedToCopy').val());
+
+        enableDropdownsAndInputs();
+
+        $('#edit-indicator-form').submit();
+    });
+
+    // Cancel copy indicator confirmation
+    $cancelCopyIndicatorButton.live('click', function () {
+        $('#CopyToProfileUrlKey').val('');
+        $('#CopyToDomainId').val(0);
+
+        lightbox.hide();
+    });
+
+    // Go back to previous page
+    $backButton.click(function () {
+        history.back();
+    });
+
+    // Withdraw indicator button
+    $withdrawIndicatorsButton.click(function() {
+        lightbox.show($('#delete-indicator-popup').html(), 300, 300, 700);
+    });
+
+    // Reject indicator button
+    $rejectIndicatorsButton.click(function() {
+        lightbox.show($('#delete-indicator-popup').html(), 300, 300, 700);
+    });
+
+    // Decide whether empty fields can be shown
+    var isEditAction = $('#IsEditAction').val();
+    if (isEditAction === "True") {
+        // Configure permissions
+        configurePermissions();
+
+        areEmptyShown = false;
+    } else {
+        areEmptyShown = true;
+    }
 
     // Called when any drop down is changed
-    $('.create-indicator-dropdown, .save-as-indicator-dropdown').change(function () {
-
+    $('.indicator-dropdown, .save-as-indicator-dropdown').change(function () {
         var $menu = $(this);
 
         if (!$menu.hasClass('ignore-validation')) {
@@ -138,299 +113,170 @@ $(document).ready(function () {
                 setInputSelected($menu);
             }
         }
-
-        configureSaveButton();
-        checkIsReadOnly();
-    });
-
-    $('.return-url').click(function () {
-        $('body').addClass('loading');
-    });
-
-    $('.year-Range').keydown(function (e) {
-
-        var keyCode = e.keyCode;
-
-        if (keyCode == 8 || keyCode == 9 || keyCode == 46) {
-            return true;
-        }
-
-        if ((keyCode > 95 && keyCode < 106) || (keyCode > 46 && keyCode < 59)) {
-            if ($(this).val().length > 3) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        return false;
-    });
-
-    $('.year-Range').blur(function () {
-        if ($(this).val().length < 4) {
-            $(this).addClass('dropdown-not-selected');
-        }
-        checkAllMandatoryFields();
     });
 
     $('#selectedFrequency').change(function () {
         showCorrectFrequency($(this).val());
-        checkAllMandatoryFields();
     });
 
     $('#ComparatorMethodId').change(function () {
         showHideComparatorConfidence();
-        checkAllMandatoryFields();
     });
-
-    var showCorrectFrequency = function (frequency) {
-
-        switch (frequency) {
-            case '1':
-                $('#quarterly-range-selection').hide();
-                $('#monthly-range-selection').hide();
-
-                setInputSelected($(this));
-                setInputSelected($('#startQuarterRange'));
-                setInputSelected($('#endQuarterRange'));
-                setInputSelected($('#startMonthRange'));
-                setInputSelected($('#endMonthRange'));
-                break;
-            case '2':
-                $('#monthly-range-selection').hide();
-                $('#quarterly-range-selection').show();
-
-                setInputSelected($('#startMonthRange'));
-                setInputSelected($('#endMonthRange'));
-                break;
-            case '3':
-                $('#quarterly-range-selection').hide();
-                $('#monthly-range-selection').show();
-
-                setInputSelected($('#startQuarterRange'));
-                setInputSelected($('#endQuarterRange'));
-                break;
-            case '-1':
-                $('#quarterly-range-selection').hide();
-                $('#monthly-range-selection').hide();
-                break;
-            default:
-        }
-    };
-
-    var checkAllMandatoryFields = function () {
-        configureSaveButton();
-        checkIsReadOnly();
-    };
-
-    var checkIsReadOnly = function () {
-        var isReadOnly = $('#isReadOnly');
-        if (isReadOnly.val() == 'True') {
-            $saveButton.hide();
-        }
-    };
 
     var validateGenericDropdowns = function () {
         var dropdownsToValidate = $('.validate-required');
-        for (var i in dropdownsToValidate) {
-            var $menu = $(dropdownsToValidate[i]);
-            if (isPleaseSelectSelected($menu)) {
 
-                setInputNotSelected($menu);
-
-                $saveButton.addClass('save-new-indicator');
-                $saveButton.removeClass('save-required');
-                $('.save-new-indicator').removeAttr('href');
+        $.each(dropdownsToValidate, function() {
+            if (isPleaseSelectSelected($(this))) {
+                setInputNotSelected($(this));
             }
-        }
+        });
 
         showHideComparatorConfidence();
-
-        configurePermissions();
     };
 
-    var configurePermissions = function () {
-        if ($('#doesUserHaveWritePermission').val() == 'False') {
-            //Disable all three tab elements - The user doesn't have write permissions to this profile
-            $('.create-indicator-dropdown').attr('disabled', 'True');
-            $('.indicator-text').attr('disabled', 'True');
-            $saveButton.hide();
-        } else if ($('#doesProfileOwnIndicator').val() == 'False' && $('#doesUserHaveWritePermission').val() == 'True') {
-            // The user has write permission to this profile but the selected profile 
-            // doesn't own the indicator. Only allow text value override and access to the grouping tab elements
-            $('#tabs-1 .indicator-text').attr('disabled', 'True');
-            $('#tabs-1 .overridden').removeAttr('disabled');
-            $('#tabs-2 .create-indicator-dropdown').attr('disabled', 'True');
-            $('#tabs-2 .indicator-text').attr('disabled', 'True');
-        }
-    };
-
-    var startQuarter, endQuarter, startMonth, endMonth;
-
-    var setPeriodRanges = function (frequency) {
-
-        startQuarter = '-1';
-        endQuarter = '-1';
-        startMonth = '-1';
-        endMonth = '-1';
-
-        if (frequency == FREQUENCIES.Quarterly) {
-            startQuarter = $('#startQuarterRange').val();
-            endQuarter = $('#endQuarterRange').val();
-        }
-
-        if (frequency == FREQUENCIES.Monthly) {
-            startMonth = $('#startMonthRange').val();
-            endMonth = $('#endMonthRange').val();
-        }
-    };
-
-    function initialiseMtvValues() {
-        var mtvValues = '';
-        var mtvFields = $('.mtvArea');
-
-        for (var i = 0; i < mtvFields.length; i++) {
-            var mtvfield = mtvFields[i];
-
-            mtvValues += mtvfield.id.replace('v', '') + '¬' + encodeURI(mtvfield.value) + '¬';
-        }
-
-        $('#userMTVChanges').val(mtvValues.slice(0, -1));
-    }
-
-    $('#confirm-ok').live('click', function () {
-        updateShowSpineChartValue();
-        // Save new indicator
-        var frequency = $('#selectedFrequency').val();
-        setPeriodRanges(frequency);
-
-            $.ajax({
-                type: 'post',
-                url: '/SaveNewIndicator',
-                data: {
-                    //Tab 1
-                    userMTVChanges: $('#userMTVChanges').val(),
-                    selectedProfileId: $('#selectedProfile').val(),
-                    selectedDomain: $('#selectedDomain').val(),
-
-                    //Tab 2                    
-                    selectedValueType: $('#selectedValueType').val(),
-                    selectedCIMethodType: $('#selectedCIMethodType').val(),
-                    selectedPolarityType: $('#selectedPolarityType').val(),
-                    selectedUnitType: $('#selectedUnitType').val(),
-                    selectedDenominatorType: $('#selectedDenominatorType').val(),
-                    selectedYearType: $('#selectedYearType').val(),
-                    selectedDecimalPlaces: $('#selectedDecimalPlaces').val(),
-                    selectedTargetId: $('#selectedTargetId').val(),
-                    latestChangeTimestamp: $('#latestChangeTimestamp').val(),
-
-                //Tab 3
-                selectedAreaType: $('#selectedAreaType').val(),
-                selectedSex: $('#selectedSex').val(),
-                selectedAge: $('#selectedAge').val(),
-                selectedComparator: $('#selectedComparator').val(),
-                selectedComparatorMethod: $('#selectedComparatorMethod').val(),
-                selectedComparatorConfidence: $('#selectedComparatorConfidence').val(),
-                selectedYearRange: $('#selectedYearRange').val(),
-                timeFrequency: frequency,
-                startYear: $('#startYear').val(),
-                endYear: $('#endYear').val(),
-                startQuarterRange: startQuarter,
-                endQuarterRange: endQuarter,
-                startMonthRange: startMonth,
-                endMonthRange: endMonth
-            },
-            success: function (data) {
-                $('#confirm-new-indicator').hide();
-                $('#indicator-created').show();
-                $('#popup-domain-new-indicator-label').text(data);
-            },
-            error: function (xhr, error) {
-                alert('An error has occurred - Please contact the site Administrator.');
-            }
-        });
-    });
-
-    $('#confirmOldFromNew').live('click', function () {
-        updateShowSpineChartValue();
-        // Save as
-        var frequency = $('#selectedFrequency').val();
-        setPeriodRanges(frequency);
-
-        initialiseMtvValues();
-        $.ajax({
-            type: 'post',
-            dataType: 'json',
-            url: '/CreateNewFromOld',
-            data: {
-                //Tab 1
-                userMTVChanges: $('#userMTVChanges').val(),
-                selectedProfileId: $('#selectedProfileId').val(),
-                selectedDomain: $('#selectedDomainId').val(),
-
-                //Tab 2                    
-                selectedValueType: $('#valueTypeId').val(),
-                selectedCIMethodType: $('#CIMethodID').val(),
-                selectedPolarityType: $('#PolarityId').val(),
-                selectedUnitType: $('#UnitId').val(),
-                selectedDenominatorType: $('#DenominatorTypeID').val(),
-                selectedYearType: $('#YearTypeId').val(),
-                selectedDecimalPlaces: $('#DecimalPlaces').val(),
-                selectedTargetId: $('#TargetId').val(),
-                latestChangeTimestamp: $('#latestChangeTimestamp').val(),
-
-
-                //Tab 3
-                selectedAreaType: $('#AreaTypeId').val(),
-                selectedSex: $('#SexId').val(),
-                selectedAge: $('#AgeId').val(),
-                selectedComparator: $('#ComparatorId').val(),
-                selectedComparatorMethod: $('#ComparatorMethodId').val(),
-                selectedComparatorConfidence: $('#ComparatorConfidence').val(),
-                selectedYearRange: $('#YearRange').val(),
-                timeFrequency: $('#selectedFrequency').val(),
-                startYear: $('#BaselineYear').val(),
-                endYear: $('#DatapointYear').val(),
-                startQuarterRange: startQuarter,
-                endQuarterRange: endQuarter,
-                startMonthRange: startMonth,
-                endMonthRange: endMonth
-            },
-            success: function (data) {
-                $('#newIndicatorId').html(data[2]);
-                $('#redirectUrl').val(data[0]);
-                $('#areaType').val(data[1]);
-                $('#domainSequence').val(data[3]);
-                lightbox.show($('#newFromOldSuccess').html(), 300, 300, 700);
-            },
-            error: function (xhr, error) {
-                alert('An error has occurred - Please contact the site Administrator.');
-            }
-        });
-    });
-
-    $('#created-ok').click(function () {
-        console.log('3');
-        $.ajax({
-            url: 'profiles'
-        });
-    });
-
-    showCorrectFrequency($('#selectedFrequency').val());
-    validateGenericDropdowns();
-
-    $('#AgeId,#selectedAge').chosen({ search_contains: true });
+    // Set chosen style for age selection drop down
+    $('#Grouping_AgeId').chosen({ search_contains: true });
 
     // JQuery UI datepicker
-    $('#latestChangeTimestamp').datepicker({
+    $('#LatestChangeTimestampOverride').datepicker({
         dateFormat: 'dd-mm-yy',
-        onSelect:function(dateText,inst) {}
+        onSelect:function(dateText, inst) {
+            $('#IndicatorMetadata_LatestChangeTimestampOverride').val(dateText);
+        }
+    }).val();
+    $('#NextReviewTimestamp').datepicker({
+        dateFormat: 'dd-mm-yy',
+        onSelect: function(dateText, inst) {
+            $('#IndicatorMetadata_NextReviewTimestamp').val(dateText);
+        }
     }).val();
 
     if ($('#ComparatorMethodId').val() === ComparatorMethodIds.Quintiles.toString()) {
         $('#PolarityId').children('option[value="99"]').hide();
     }
+
+    showCorrectFrequency($('#selectedFrequency').val());
+
+    // Initialise
+    Initialise();
+
+    // Apply Select2 styles for partition age ids, partition
+    // sex ids and partition area type ids drop downs
+    ApplySelect2Styles();
+
+    // Sort indicator metadata text properties
+    sortIndicatorMetadataTextProperties();
+
+    // Validate drop downs
+    validateGenericDropdowns();
 });
+
+function enableDropdownsAndInputs() {
+    $('.indicator-dropdown').removeAttr('disabled');
+    $('.indicator-text').removeAttr('disabled');
+    $('.indicator-internal-metadata-text').removeAttr('disabled');
+}
+
+function configurePermissions() {
+    var userWritePermission = $('#user-write-permission').val().toLowerCase(),
+        profileOwnIndicator = $('#profile-own-indicator').val().toLowerCase();
+
+
+    if (userWritePermission === 'false') {
+        //Disable all three tab elements - The user doesn't have write permissions to this profile
+        $('.indicator-dropdown').attr('disabled', true);
+        $('.indicator-text').attr('disabled', true);
+        $('.indicator-internal-metadata-text').attr('disabled', true);
+        $('#update-indicator').hide();
+    } else if (profileOwnIndicator === 'false' && userWritePermission === 'true') {
+        // The user has write permission to this profile but the selected profile 
+        // doesn't own the indicator. Only allow text value override and access to the grouping tab elements
+        $('#tabs-1 .indicator-text').attr('disabled', true);
+        $('#tabs-1 .overridden').removeAttr('disabled');
+        $('#tabs-2 .indicator-dropdown').attr('disabled', true);
+        $('#tabs-2 .indicator-text').attr('disabled', true);
+        $('#tabs-4 .indicator-text').attr('disabled', true);
+        $('#tabs-4 .overridden').removeAttr('disabled');
+    }
+}
+
+function Initialise() {
+    displayComparatorConfidence();
+    triggerTimeSeriesEvent($('#Grouping_TimeSeries'));
+    initShowEmptyMetadataFields();
+    setUpEmptyFields();
+}
+
+function displayComparatorConfidence() {
+    var comparatorMethodId = $('#Grouping_ComparatorMethodId').val(),
+        $comparatorConfidenceDiv = $('#comparator-confidence'),
+        $comparatorConfidenceDropdown = $('#Grouping_ComparatorConfidence');
+
+    if (comparatorMethodId === ComparatorMethodIds.SpcForDsr.toString() ||
+        comparatorMethodId === ComparatorMethodIds.SpcForProportions.toString()) {
+        $comparatorConfidenceDiv.show();
+    } else {
+        $comparatorConfidenceDiv.hide();
+        $comparatorConfidenceDropdown.val('-1');
+    }
+}
+
+function ApplySelect2Styles() {
+    // Set partition age ids
+    SetPartitionAgeIds();
+
+    // Set partition sex ids
+    SetPartitionSexIds();
+
+    // Set partition areatype ids
+    SetPartitionAreaTypeIds();
+
+    // Select2 style
+    ApplySelect2Style('partition-age-ids');
+    ApplySelect2Style('partition-sex-ids');
+    ApplySelect2Style('partition-areatype-ids');
+}
+
+function SetPartitionAgeIds() {
+    var partitionAgeIds = $('#hdn-partition-age-ids').val();
+    if (partitionAgeIds) {
+        $.each(partitionAgeIds.split(","), function (i, e) {
+            $("#PartitionAgeIds option[value='" + e + "']").prop("selected", true);
+            $('#PartitionAgeIds').trigger('change.select2');
+        });
+    }
+}
+
+function SetPartitionSexIds() {
+    var partitionSexIds = $('#hdn-partition-sex-ids').val();
+    if (partitionSexIds) {
+        $.each(partitionSexIds.split(","), function (i, e) {
+            $("#PartitionSexIds option[value='" + e + "']").prop("selected", true);
+            $('#PartitionSexIds').trigger('change.select2');
+        });
+    }
+}
+
+function SetPartitionAreaTypeIds() {
+    var partitionAreaTypeIds = $('#hdn-partition-areatype-ids').val();
+    if (partitionAreaTypeIds) {
+        $.each(partitionAreaTypeIds.split(","), function (i, e) {
+            $("#PartitionAreaTypeIds option[value='" + e + "']").prop("selected", true);
+            $('#PartitionAreaTypeIds').trigger('change.select2');
+        });
+    }
+}
+
+function ApplySelect2Style(element) {
+    if ($('.' + element).length) {
+        $('.' + element).select2();
+    }
+
+    if ($('#' + element).length) {
+        $('#' + element).select2();
+    }
+}
 
 function isPleaseSelectSelected($menu) {
     return $menu.find('option:selected').text().indexOf('Please ') === 0;
@@ -443,26 +289,23 @@ function toggleShowEmpty() {
 }
 
 function setUpEmptyFields() {
-
-    var textAreas = $('.mtvArea');
+    var textAreas = $('.indicator-text');
 
     if (areEmptyShown) {
         showEmpty.html('Hide empty fields');
-
-        // Show all rows
         textAreas.parent().parent().show();
     } else {
         showEmpty.html('Show empty fields');
 
-        for (var i in textAreas) {
-            var $textArea = $(textAreas[i]);
+        $.each(textAreas, function(){
+            var $textArea = $(this);
             var val = $textArea.attr('value');
             if (val === '' &&
                 $textArea.parent().parent().length === 1/*so that all rows are not hidden*/) {
                 // Hide the row
                 $textArea.parent().parent().hide();
             }
-        }
+        });
     }
 }
 
@@ -479,55 +322,18 @@ function initShowEmptyMetadataFields() {
     }
 }
 
-function setuserMTVChanges() {
-
-    var val = [];
-    for (var i in changes) {
-
-        var id = i;
-        if (isPropertyOverridden(i)) {
-            id += 'o';
-        }
-
-        val.push(id);
-        val.push(changes[i]);
-    }
-
-    $('#userMTVChanges').val(val.join('¬'));
-}
-
-function dropdownFocus(e) {
-    var jq = $(e);
-
-    var startdropdownValue = jq.attr('start-dropdown-value');
-    if (typeof (startdropdownValue) === 'undefined') {
-        jq.attr('start-dropdown-value', jq.val());
-    }
-
-    jq.addClass(ENTERED);
-}
-
 function dropdownChanged(e) {
 
     var $menu = $(e);
     var startDropdownValue = $menu.attr('start-dropdown-value');
 
     var dropdownValue = $menu.val();
-    var key = $menu.attr('id').replace('v', ''); // Why do this???
-    var profileName = $('.profile-title').text();
-    var domainName = $('#domainName').val();
-    var indicatorName = $('#indicatorName').val();
     var $polarity = $('#PolarityId');
 
     if (dropdownValue !== startDropdownValue) {
-        // Changed
-        otherChanges[key] = key + ' changed from ' + encodeURI(startDropdownValue) +
-            ' to ' + encodeURI(dropdownValue) + ' in ' + profileName + ' - (' + domainName + ' / ' + indicatorName + ')';
         $menu.addClass(CHANGED);
     } else {
-        // Text unaltered
         $menu.removeClass(CHANGED);
-        delete otherChanges[key];
     }
 
     if ($('#ComparatorMethodId').val() === ComparatorMethodIds.Quintiles.toString()) {
@@ -544,18 +350,6 @@ function dropdownChanged(e) {
         $polarity.children('option[value="1"]').text("RAG - High is good");
         $polarity.children('option[value="0"]').text("RAG - Low is good");
     }
-
-    setuserOtherChanges();
-}
-
-function setuserOtherChanges() {
-
-    var val = [];
-    for (var i in otherChanges) {
-        val.push(otherChanges[i]);
-    }
-
-    $('#userOtherChanges').val(val.join('¬'));
 }
 
 function dropdownChanged_IndicatorNew(e) {
@@ -573,130 +367,6 @@ function dropdownChanged_IndicatorNew(e) {
         $polarity.children('option[value="-1"]').text("Not applicable");
         $polarity.children('option[value="1"]').text("RAG - High is good");
         $polarity.children('option[value="0"]').text("RAG - Low is good");
-    }
-}
-
-function checkIsReadOnly() {
-    if ($('#isReadOnly').val() === 'True') {
-        var $saveButton = $('#save');
-        $saveButton.hide();
-    }
-};
-
-function textKeyDown(e) {
-
-    if (!isSaveRed) {
-        saveRequired();
-    }
-
-    if (!wasKeyPressForCurrentProperty) {
-        wasKeyPressForCurrentProperty = true;
-        var jq = $(e);
-        if (!jq.hasClass(CHANGED)) {
-            jq.addClass(CHANGED);
-        }
-    }
-
-    checkIsReadOnly();
-}
-
-function checkIfSaveRequired() {
-    if (!_.size(changes)) {
-        var saveButton = $('#save');
-        saveButton.removeClass('save-required').hide();
-        isSaveRed = false;
-    }
-}
-
-function saveRequired() {
-    isSaveRed = true;
-    if ($('.mandatory-input').length == 0) {
-        var saveButton = $('#save');
-        saveButton.show().addClass('save-required');
-    }
-}
-
-function isPropertyOverridden(id) {
-    return _.any(overridden, function (overriddenId) { return id == overriddenId });
-}
-
-function override(propertyId) {
-    if (!isPropertyOverridden(propertyId)) {
-        overridden.push(propertyId);
-        var jq = $('#override' + propertyId);
-        // change the css for text field
-        $('#v' + propertyId).addClass('overridden').removeAttr('disabled').select().focus();
-
-        var parent = jq.parent();
-        // remove calling DOM
-        $('#override' + propertyId).remove();
-
-        // add clear override 
-        var clearOverride = ' <span id="override-v' + propertyId +
-            '" class="overridden-label" title="The original metadata has been overridden" onclick="clearOverride(this)"><strong>Clear Override</strong></span>';
-        parent.prepend(clearOverride);
-    }
-}
-
-function textOut(e) {
-    var jq = $(e);
-    jq.removeClass(ENTERED);
-
-    if (wasKeyPressForCurrentProperty) {
-        var startText = jq.attr('start-text');
-
-        var text = jq.val();
-        var key = jq.attr('id').replace('v', '');
-
-        if (text !== startText) {
-            // Changed
-            changes[key] = encodeURI(text);
-            jq.addClass(CHANGED);
-        } else {
-            // Text unaltered
-            jq.removeClass(CHANGED);
-            delete changes[key];
-        }
-
-        if (jq.hasClass('mandatory-input')) {
-
-            var cssClass = 'mandatory-success';
-            if (text.length > 0) {
-                jq.addClass(cssClass);
-            } else {
-                jq.removeClass(cssClass);
-            }
-        }
-
-        configureSaveButton();
-        checkIfSaveRequired();
-        setuserMTVChanges();
-        checkIsReadOnly();
-    }
-}
-
-function textEnter(e) {
-    wasKeyPressForCurrentProperty = false;
-    var jq = $(e);
-
-    var startText = jq.attr('start-text');
-    if (typeof (startText) === 'undefined') {
-        jq.attr('start-text', jq.val());
-    }
-
-    jq.addClass(ENTERED);
-
-    if (jq.hasClass('html-allowed')) {
-        showEditor(jq);
-
-        $('#editor-done').click(function () {
-            var originalField = $('#' + $('#textValueId').val());
-            originalField.val(tinyMCE.activeEditor.getContent());
-
-            wasKeyPressForCurrentProperty = true;
-            textOut(originalField);
-            lightbox.hide();
-        });
     }
 }
 
@@ -735,126 +405,446 @@ function showEditor(object) {
     });
 }
 
-function reloadDomains($selectedProfile) {
-    console.log('4');
-    var $selectedDomain = $('#selectedDomain');
+function triggerTimeSeriesEvent(e) {
+    var timeSeriesValue = $(e).val();
+
+    switch (timeSeriesValue) {
+    case '1':
+        $('#quarterly-range-selection').hide();
+        $('#monthly-range-selection').hide();
+
+        setInputSelected($(this));
+        setInputSelected($('#startQuarterRange'));
+        setInputSelected($('#endQuarterRange'));
+        setInputSelected($('#startMonthRange'));
+        setInputSelected($('#endMonthRange'));
+        break;
+    case '2':
+        $('#monthly-range-selection').hide();
+        $('#quarterly-range-selection').show();
+
+        setInputSelected($('#startMonthRange'));
+        setInputSelected($('#endMonthRange'));
+        break;
+    case '3':
+        $('#quarterly-range-selection').hide();
+        $('#monthly-range-selection').show();
+
+        setInputSelected($('#startQuarterRange'));
+        setInputSelected($('#endQuarterRange'));
+        break;
+    case '-1':
+        $('#quarterly-range-selection').hide();
+        $('#monthly-range-selection').hide();
+        break;
+    default:
+    }
+}
+
+function triggerProfileChangeEvent(e) {
+    var profileUrlKey = $(e).val(),
+        domain;
+
+    if (e.name === "UrlKey") {
+        domain = $('#Grouping_GroupId');
+    } else {
+        domain = $('#DomainSelectedToCopy');
+        $('#CopyToProfileUrlKey').val(profileUrlKey);
+    }
+    
+    domain.empty();
+
     $.ajax({
         type: 'post',
-        url: '/reloadDomains',
-        data: { selectedProfile: $selectedProfile.val() },
-        success: function (data) {
-            $selectedDomain.empty();
-            setInputSelected($selectedProfile);
-            setInputSelected($selectedDomain);
-            $.each(data, function (key, value) {
-                $selectedDomain.append($('<option value="' + value.Text + '"></option>').val(value.Value).html(value.Text));
-            });
+        url: '/profiles-and-indicators/reload-domains',
+        data: { selectedProfile: profileUrlKey },
+        success: function(data) {
+            setInputSelected($(e));
+            setInputSelected(domain);
+            $.each(data,
+                function(key, value) {
+                    domain.append($('<option value="' + value.Text + '"></option>').val(value.Value).html(value.Text));
+                });
+
+            triggerDomainSelectedToCopyEvent(domain);
         },
-        error: function () { }
+        error: function() {}
     });
 }
 
-function checkFieldLength() {
+function triggerDomainChangeEvent(e) {
+    $('#DomainSequence').val($(e).prop('selectedIndex') + 1);
+}
 
-    var properties = [
-        [1, 'Indicator name', 255],
-        [2, 'Indicator full name', 500],
-        [25, 'Data Quality', 1]
-    ];
+function triggerDomainSelectedToCopyEvent(e) {
+    var domain = $(e).val();
+    $('#CopyToDomainId').val(domain);
+}
+
+function triggerComparatorMethodChangedEvent(e) {
+    var comparatorMethodId = $(e).val(),
+        polarityIdElement = $("#Grouping_PolarityId"),
+        polarityId = polarityIdElement.val();
+
+    displayComparatorConfidence();
+
+    if (comparatorMethodId === ComparatorMethodIds.Quintiles.toString()) {
+        if (polarityId === PolarityIds.UseBlues.toString()) {
+            polarityIdElement.val(PolarityIds.NotApplicable);
+        }
+        polarityIdElement.children('option[value="99"]').hide();
+        polarityIdElement.children('option[value="-1"]').text("No judgement");
+        polarityIdElement.children('option[value="1"]').text("High is good");
+        polarityIdElement.children('option[value="0"]').text("Low is good");
+    } else {
+        polarityIdElement.children('option[value="99"]').show();
+        polarityIdElement.children('option[value="-1"]').text("Not applicable");
+        polarityIdElement.children('option[value="1"]').text("RAG - High is good");
+        polarityIdElement.children('option[value="0"]').text("RAG - Low is good");
+    }
+}
+
+function loading() {
+    $('body').addClass('loading');
+}
+
+function setInputNotSelected($menu) {
+    $menu.removeClass('dropdown-selected').addClass('dropdown-not-selected');
+}
+
+function setInputSelected($menu) {
+    $menu.removeClass('dropdown-not-selected').addClass('dropdown-selected');
+}
+
+function showHideComparatorConfidence() {
+    var comparatorMethodId = parseInt($('#ComparatorMethodId').val());
+
+    // Display comparator confidence
+    var $comparatorConfidenceDiv = $('#comparatorConfidenceDiv'),
+        $comparatorConfidence = $('#ComparatorConfidence');
+
+    var methodsThatDontNeedConfidenceLevel = [
+        ComparatorMethodIds.Undefined, ComparatorMethodIds.SuicidePlanDefined,
+        ComparatorMethodIds.Quartiles, ComparatorMethodIds.Quintiles,
+        ComparatorMethodIds.SingleOverlappingCIsForTwoCILevels];
+
+    if (_.contains(methodsThatDontNeedConfidenceLevel, comparatorMethodId)) {
+        // User does not need to select comparator confidence
+        setInputSelected($comparatorConfidence);
+        $comparatorConfidenceDiv.hide();
+        $comparatorConfidence[0].selectedIndex = 0;
+    } else {
+        $comparatorConfidenceDiv.show();
+        if ($comparatorConfidence.val() === '-1') {
+            setInputNotSelected($comparatorConfidence);
+        }
+    }
+
+    // Display polarity
+    var $polarity = $('#polarity-container');
+
+    // Polarity might be needed for recent trends even if no comparison of significances
+    var methodsThatDontNeedPolarity = [
+        ComparatorMethodIds.SuicidePlanDefined,
+        ComparatorMethodIds.Quartiles];
+
+    if (_.contains(methodsThatDontNeedPolarity, comparatorMethodId)) {
+        // User does not need to select polarity
+        $polarity.hide();
+
+        // Select "Not applicable"
+        $('#PolarityId option[value="-1"]').prop('selected', true);
+    } else {
+
+        $polarity.show();
+    }
+}
+
+function showCorrectFrequency(frequency) {
+    switch (frequency) {
+        case '1':
+            $('#quarterly-range-selection').hide();
+            $('#monthly-range-selection').hide();
+
+            setInputSelected($(this));
+            setInputSelected($('#startQuarterRange'));
+            setInputSelected($('#endQuarterRange'));
+            setInputSelected($('#startMonthRange'));
+            setInputSelected($('#endMonthRange'));
+            break;
+        case '2':
+            $('#monthly-range-selection').hide();
+            $('#quarterly-range-selection').show();
+
+            setInputSelected($('#startMonthRange'));
+            setInputSelected($('#endMonthRange'));
+            break;
+        case '3':
+            $('#quarterly-range-selection').hide();
+            $('#monthly-range-selection').show();
+
+            setInputSelected($('#startQuarterRange'));
+            setInputSelected($('#endQuarterRange'));
+            break;
+        case '-1':
+            $('#quarterly-range-selection').hide();
+            $('#monthly-range-selection').hide();
+            break;
+        default:
+    }
+}
+
+function validate() {
+    var message = "";
+
+    message = message + checkFieldLength();
+    message = message + checkMandatoryFields();
+
+    if (message.trim().length > 0) {
+        message =
+            "<div style='float: left; margin-left: 5px; font-size: 16px; font-weight: bold;'>Please address the validation error(s) below:</div><br><br><br>" +
+            message;
+    }
+
+    return message;
+}
+
+function checkFieldLength() {
+    var validationMessage = "",
+        properties = [
+            ['IndicatorMetadataTextValue_Name', 'Indicator name', 255],
+            ['IndicatorMetadataTextValue_DataQuality', 'Data Quality', 1]
+        ];
 
     for (var i in properties) {
         var property = properties[i];
         var id = property[0];
         var maxLength = property[2];
-        if ($('#v' + id).val().length > maxLength) {
+        if ($('#' + id).val().length > maxLength) {
             var propertyName = property[1];
-            showSimpleMessagePopUp(propertyName + ' cannot be more than ' + maxLength + ' characters');
-            return false;
+            validationMessage = validationMessage + "<div style='float: left; margin-left: 5px; font-size: 14px;'>" +
+                propertyName + ' cannot be more than ' + maxLength;
+
+            if (propertyName === "Data Quality") {
+                validationMessage = validationMessage + ' character.';
+            } else {
+                validationMessage = validationMessage + ' characters.';
+            }
+
+            validationMessage = validationMessage + '</div><br><br>';
         }
     }
 
-    return true;
+    return validationMessage;
 }
 
-function configureSaveButton() {
+function checkMandatoryFields() {
+    var validationMessage = "",
+        isEditAction = $('#IsEditAction').val(),
+        indicatorName = $('#IndicatorMetadataTextValue_Name').val().trim(),
+        definition = $('#IndicatorMetadataTextValue_Definition').val().trim(),
+        dataSource = $('#IndicatorMetadataTextValue_DataSource').val().trim(),
+        valueType = $('#IndicatorMetadata_ValueTypeId').val(),
+        ciMethod = $('#IndicatorMetadata_CIMethodId').val(),
+        unit = $('#IndicatorMetadata_UnitId').val(),
+        denominatorType = $('#IndicatorMetadata_DenominatorTypeId').val(),
+        yearType = $('#IndicatorMetadata_YearTypeId').val(),
+        profile = $('#UrlKey').val(),
+        domain = $('#Grouping_GroupId').val(),
+        areaType = $('#Grouping_AreaTypeId').val(),
+        sex = $('#Grouping_SexId').val(),
+        comparatorMethod = $('#Grouping_ComparatorMethodId').val(),
+        comparatorConfidence = $('Grouping_ComparatorConfidence').val(),
+        polarity = $('#Grouping_PolarityId').val(),
+        yearRange = $('#Grouping_YearRange').val(),
+        timeSeries = $('#Grouping_TimeSeries').val(),
+        startYear = $('#Grouping_BaselineYear').val(),
+        endYear = $('#Grouping_DataPointYear').val();
 
-    var $saveButton = $('#save');
-    var $saveNewButton = $('.save-new-indicator');
-    var $notSelected = $('.dropdown-not-selected');
+    // Tab1
+    if (indicatorName.length === 0 ||
+        definition.length === 0 ||
+        dataSource.length === 0) {
 
-    if (($('.mandatory-input').length === $('.mandatory-success').length) &&
-        $notSelected.length === 0 && checkMandatoryFields()) {
-        $saveButton.show();
-        $saveButton.addClass('save-required');
-        $saveNewButton.attr('href', '#');
-    } else {
-        $saveButton.removeClass('save-required');
-        $saveNewButton.removeAttr('href');
+        validationMessage = getValidationMessage(validationMessage,
+            "Complete the mandatory fields in <b>Step 1 - Indicator Metadata Text</b> tab.");
     }
+
+    // Tab2
+    if (valueType === "-1" ||
+        ciMethod === "-1" ||
+        unit === "-1" ||
+        denominatorType === "-1" ||
+        yearType === "-1") {
+
+        validationMessage = getValidationMessage(validationMessage,
+            "Select valid option from the mandatory dropdowns in <b>Step 2 - Indicator Metadata Other</b> tab.");
+    }
+
+    // Tab 3
+    if ((!isEditAction && (profile === "-1" || domain === "-1")) ||
+        areaType === "-1" ||
+        sex === "-99") {
+
+        validationMessage = getValidationMessage(validationMessage,
+            "Select valid option from the mandatory dropdowns in <b>Step 3 - Profile Data Selection</b> tab.>");
+    }
+
+    // Tab 3: Time
+    if (yearRange === "-1" ||
+        timeSeries === "-1" ||
+        startYear === "-1" ||
+        endYear === "-1" ||
+        startYear > endYear ||
+        startYear < 1950 || endYear < 1950) {
+
+        validationMessage = getValidationMessage(validationMessage,
+            "Invalid time fields in <b>Step 3 - Profile Data Selection</b> tab");
+    }
+
+    return validationMessage;
 }
 
-function clearOverride(e) {
+function getValidationMessage(validationMessage, message) {
+    return validationMessage +
+        "<div style='float: left; margin-left: 5px; font-size: 14px;'>" +
+        message +
+        "</div><br><br>";
+}
+
+function textEnter(e) {
+    wasKeyPressForCurrentProperty = false;
     var jq = $(e);
-    var propertyId = jq.attr('id').split('-').pop();
-    var propertyIdNumber = propertyId.substring(1, propertyId.length);
-    var $property = $('#' + propertyId);
 
-    var fieldText = indicatorDefaultMetadata[1 + parseInt(propertyIdNumber)];
-    // add default property text 
-    $property.val(fieldText);
-    // remove the css class
-    $property.removeClass('overridden');
-
-    // make the save button red
-    if (!isSaveRed) {
-        saveRequired();
+    var startText = jq.attr('start-text');
+    if (typeof (startText) === 'undefined') {
+        jq.attr('start-text', jq.val());
     }
 
-    // add override link
-    var parent = jq.parent();
+    jq.addClass(ENTERED);
 
-    var overrideLink = '<a id="override' + propertyIdNumber +
-        '" title="Override this metadata" href="javascript:override('
-        + propertyIdNumber + ')">Override</a>';
-    parent.prepend(overrideLink);
+    if (jq.hasClass('html-allowed')) {
+        showEditor(jq);
 
-    // add changes to changes array
-    changes[propertyIdNumber] = encodeURI($property.val());
-    setuserMTVChanges();
+        $('#editor-done').click(function () {
+            var originalField = $('#' + $('#textValueId').val());
+            originalField.val(tinyMCE.activeEditor.getContent());
 
-    // check and remove from overridden array, if exists
-    if (isPropertyOverridden(propertyIdNumber)) {
-        var indexOfOverride = overridden.indexOf(propertyIdNumber);
-        overridden.splice(indexOfOverride, 1);
-    }
-
-    // remove calling DOM object
-    $('#' + jq.attr('id')).remove();
-}
-
-function loadDefaultTextMetadata() {
-    var selectedIndicatorId = $('#indicatorId').val();
-
-    // Indicator ID will not be defined if new indicator is being created
-    if (!_.isUndefined(selectedIndicatorId)) {
-        $.ajax({
-            type: 'GET',
-            url: '/indicator/metadata/' + selectedIndicatorId,
-            success: function (data) {
-                indicatorDefaultMetadata = data;
-            },
-            error: function (err) {
-                console.log(err);
-            }
+            wasKeyPressForCurrentProperty = true;
+            textOut(originalField);
+            lightbox.hide();
         });
-
     }
 }
 
-function updateShowSpineChartValue() {
-    var $showSpineChart = $('#ShouldAlwaysShowSpineChart');
-    var isChecked = $showSpineChart.is(':checked');
-    $('#AlwaysShowSpineChart').val(isChecked);
+function textOut(e) {
+    var jq = $(e);
+    jq.removeClass(ENTERED);
+
+    if (wasKeyPressForCurrentProperty) {
+        var startText = jq.attr('start-text');
+
+        var text = jq.val();
+        var key = jq.attr('id').replace('v', '');
+
+        if (text !== startText) {
+            // Changed
+            changes[key] = encodeURI(text);
+            jq.addClass(CHANGED);
+        } else {
+            // Text unaltered
+            jq.removeClass(CHANGED);
+            delete changes[key];
+        }
+
+        if (jq.hasClass('mandatory-input')) {
+
+            var cssClass = 'mandatory-success';
+            if (text.length > 0) {
+                jq.addClass(cssClass);
+            } else {
+                jq.removeClass(cssClass);
+            }
+        }
+    }
+}
+
+function dropdownFocus(e) {
+    var jq = $(e);
+
+    var startdropdownValue = jq.attr('start-dropdown-value');
+    if (typeof (startdropdownValue) === 'undefined') {
+        jq.attr('start-dropdown-value', jq.val());
+    }
+
+    jq.addClass(ENTERED);
+}
+
+function override(item) {
+    var overrideItem = $('#override-' + item);
+
+    if (overrideItem.text() === 'Override') {
+        overrideItem.text('Clear override');
+        overrideItem.attr('title', 'The original metadata has been overridden');
+
+        if (item === 'ref-num') {
+            $('#IndicatorMetadataTextValue_RefNum').addClass('overridden').removeAttr('disabled').select().focus();
+        }
+
+        if (item === 'specific-rationale') {
+            $('#IndicatorMetadataTextValue_SpecificRationale').addClass('overridden').removeAttr('disabled').select().focus();
+        }
+
+    } else {
+        overrideItem.text('Override');
+        overrideItem.attr('title', 'Override this metadata');
+
+        if (item === 'ref-num') {
+            $('#IndicatorMetadataTextValue_RefNum').removeClass('overridden').attr('disabled', 'true');
+        }
+
+        if (item === 'specific-rationale') {
+            $('#IndicatorMetadataTextValue_SpecificRationale').removeClass('overridden').attr('disabled', 'true');
+        }
+    }
+}
+
+function showValidationMessagePopUp(html) {
+
+    lightbox.show('<div id="simple-message-popup">' + html + '<br><input class="medium-button" type="button" onclick="lightbox.hide()"  value="OK" /></div>',
+        250/*top*/, 0/*left*/, 652/*width*/);
+}
+
+function sortIndicatorMetadataTextProperties() {
+    var rows = $('#text-properties tbody  tr').get();
+
+    rows.sort(function (a, b) {
+
+        var A = $(a).attr("id");
+        if (A !== undefined) {
+            A = Number(A.replace("row-", ""));
+        }
+
+        var B = $(b).attr("id");
+        if (B !== undefined) {
+            B = Number(B.replace("row-", ""));
+        }
+
+        if (A < B) {
+            return -1;
+        }
+
+        if (A > B) {
+            return 1;
+        }
+
+        return 0;
+
+    });
+
+    $.each(rows, function (index, row) {
+        $('#text-properties').children('tbody').append(row);
+    });
 }
 
 indicatorDefaultMetadata = [];
@@ -865,7 +855,6 @@ CHANGED = 'text-changed';
 ENTERED = 'text-entered';
 startText = null;
 changes = {};
-otherChanges = {};
 NAME_LENGTH = 255;
 LONG_NAME_LENGTH = 500;
 DATA_QUALITY_LENGTH = 1;

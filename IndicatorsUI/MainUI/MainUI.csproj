@@ -235,7 +235,6 @@
     <Compile Include="Controllers\AreaListController.cs" />
     <Compile Include="Controllers\UserFeedbackController.cs" />
     <Compile Include="Helpers\AreaSearchHelper.cs" />
-    <Compile Include="Helpers\EmailSender.cs" />
     <Compile Include="Helpers\IdentityWrapper.cs" />
     <Compile Include="Configuration\IndicatorListMappingProfile.cs" />
     <Compile Include="Controllers\HtmlController.cs" />
@@ -250,6 +249,7 @@
     <Compile Include="Helpers\MeasurementProtocolDownloadFiles.cs" />
     <Compile Include="Helpers\GoogleAnalyticsEventLogger.cs" />
     <Compile Include="Helpers\NearestNeighbourHelper.cs" />
+    <Compile Include="Helpers\NotifyMessageHelper.cs" />
     <Compile Include="Helpers\PublicIdGenerator.cs" />
     <Compile Include="Helpers\QuartilesLabelHelper.cs" />
     <Compile Include="Helpers\ResponseHelper.cs" />
@@ -491,8 +491,6 @@
     <Content Include="jsTest\jasmine-jquery.js" />
     <Content Include="jsTest\LongerLives\Diabetes\PageDiabetesRankingsSpec.js" />
     <Content Include="jsTest\LongerLives\Diabetes\SiteDiabetesSpec.js" />
-    <Content Include="jsTest\PageAreaTrendsSpec.js" />
-    <Content Include="jsTest\PageInequalitiesSpec.js" />
     <Content Include="jsTest\PagePopulationSpec.js" />
     <Content Include="jsTest\PageTartanRugSpec.js" />
     <Content Include="jsTest\SiteKeyIndicatorsSpec.js" />
@@ -526,7 +524,6 @@
     <Content Include="js\mortality-jquery-ui-1.10.3.custom.min.js" />
     <Content Include="js\PageAreaProfile.js" />
     <Content Include="js\PageAreaTrends.js" />
-    <Content Include="js\PageBarChartAndFunnelPlot.js" />
     <Content Include="js\PageBarChart.js" />
     <Content Include="js\PageDownload.js" />
     <Content Include="js\PageInequalities.js" />
@@ -541,7 +538,6 @@
     <Content Include="Views\Search\Data.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_AreaMenu.cshtml" />
-    <Content Include="bower.json" />
     <Content Include=".bowerrc" />
     <None Include=".bin\bower.cmd" />
     <None Include=".bin\git.cmd" />
@@ -617,9 +613,10 @@
     <Content Include="Views\AreaList\AreaListIndex.cshtml" />
     <Content Include="Views\AreaList\CreateAreaList.cshtml" />
     <Content Include="Views\AreaList\EditAreaList.cshtml" />
+    <Content Include="site.webmanifest" />
+    <Content Include="Views\ProfileCollectionWithFrontPage\SupportingInformation.cshtml" />
+    <Content Include="Views\LongerLives\_SideBarLinks.cshtml" />
     <None Include="Views\Shared\_Banner.cshtml" />
-    <Content Include="Views\Shared\_KeyBarChart.cshtml" />
-    <Content Include="Views\Shared\_SortMultipleCharts.cshtml" />
     <Content Include="Views\Shared\Data.cshtml" />
     <Content Include="Views\Shared\_PageContainers.cshtml" />
     <Content Include="Views\Shared\_IndicatorsMenu.cshtml" />
@@ -629,10 +626,6 @@
     <None Include="Views\Shared\_Domains.cshtml" />
     <Content Include="Views\Shared\_KeyTartanRug.cshtml" />
     <Content Include="Views\Shared\_Key.cshtml" />
-    <Content Include="Views\Shared\_KeySpineChart.cshtml">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="Views\Shared\_KeyInequality.cshtml" />
     <Content Include="Views\Shared\_ParentTypeMenu.cshtml" />
     <Content Include="Views\Shared\_JavaScriptAndCssForContentPage.cshtml" />
     <Content Include="Views\Shared\_JavaScriptAndCssExtraForAreaSearch.cshtml" />

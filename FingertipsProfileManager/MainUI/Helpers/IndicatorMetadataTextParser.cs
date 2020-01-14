@@ -1,25 +1,18 @@
-﻿using System;
+﻿using Fpm.ProfileData;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Fpm.ProfileData;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IIndicatorMetadataTextParser
-    {
-        IList<IndicatorMetadataTextItem> Parse(string concaternatedMetadataProperties);
-    }
-
     public class IndicatorMetadataTextParser : IIndicatorMetadataTextParser
     {
         public const char Separator = '¬';
 
-        public IList<IndicatorMetadataTextItem> Parse(string concaternatedMetadataProperties)
+        public IList<IndicatorMetadataTextItem> Parse(string concatenatedMetadataProperties)
         {
             var items = new List<IndicatorMetadataTextItem>();
 
-            var bits = concaternatedMetadataProperties.Split(Separator);
+            var bits = concatenatedMetadataProperties.Split(Separator);
 
             for (int i = 0; i < bits.Length; i += 2)
             {

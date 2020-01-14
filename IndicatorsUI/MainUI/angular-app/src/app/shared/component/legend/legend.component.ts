@@ -1,4 +1,6 @@
 import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { PageType } from '../../constants';
+import { LegendConfig } from './legend';
 
 @Component({
     selector: 'ft-legend',
@@ -7,91 +9,85 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 })
 export class LegendComponent implements OnChanges {
 
-    @Input() pageType: PageType = null;
-    @Input() keyType: KeyType = null;
-    @Input() legendType: LegendType = null;
-    @Input() showRAG3: Boolean = null;
-    @Input() showRAG5: Boolean = null;
-    @Input() showBOB: Boolean = null;
-    @Input() showQuartiles: Boolean = null;
-    @Input() showQuintilesRAG: Boolean = null;
-    @Input() showQuintilesBOB: Boolean = null;
-    @Input() showContinuous: Boolean = null;
-    @Input() showRecentTrends: Boolean = null;
+    @Input() legendConfig: LegendConfig = null;
+    @Input() showRecentTrends: boolean = null;
+    @Input() showDataQuality: boolean = null;
+
+    showAreaProfiles = false;
+    showCompareAreas = false;
+    showEngland = false;
+    showInequalities = false;
+    showMap = false;
+    showNoteLegend = true;
+    showOverview = false;
+    showTrends = false;
+    showLegend = false;
+    showBenchmarkAgainstGoal = false;
+    legendLinkText = '';
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['pageType']) {
-            if (this.pageType) {
-            }
-        }
-        if (changes['keyType']) {
-            if (this.keyType) {
-            }
-        }
-        if (changes['legendType']) {
-            if (this.legendType) {
+
+        if (changes['legendConfig']) {
+            if (this.legendConfig) {
+                this.legendDisplayer();
             }
         }
     }
 
-    showOverview(): Boolean {
-        return this.pageType === PageType.Overview;
+    legendDisplayer() {
+        const pageType = this.legendConfig.pageType;
+
+        switch (pageType) {
+            case PageType.AreaProfiles:
+                this.showAreaProfiles = true;
+                break;
+
+            case PageType.CompareAreas:
+                this.showCompareAreas = true;
+                break;
+
+            case PageType.England:
+                this.showEngland = true;
+                break;
+
+            case PageType.Inequalities:
+                this.showInequalities = true;
+                this.showNoteLegend = false;
+                break;
+
+            case PageType.Map:
+                this.showMap = true;
+                break;
+
+            case PageType.Overview:
+                this.showOverview = true;
+                break;
+
+            case PageType.Trends:
+                this.showTrends = true;
+                break;
+        }
+
+        // Decide whether to display the legend by default
+        // and set the link text accordingly
+        this.showLegend = this.legendConfig.ftHelper.getLegendDisplayStatus();
+        this.setLegendLinkText();
+
+        // Decide whether to display benchmark against goal
+        this.showBenchmarkAgainstGoal = this.legendConfig.showBenchmarkAgainstGoal;
     }
 
-    showMap(): Boolean {
-        return this.pageType === PageType.Map;
+    toggleLegend() {
+        this.showLegend = !this.showLegend;
+        this.legendConfig.ftHelper.setLegendDisplayStatus(this.showLegend);
+        this.setLegendLinkText();
     }
 
-    showTrends(): Boolean {
-        return this.pageType === PageType.Trends;
+    setLegendLinkText() {
+        this.legendLinkText = this.showLegend ? 'Hide legend' : 'Show legend';
     }
 
-    showCompareAreas(): Boolean {
-        return this.pageType === PageType.CompareAreas;
+    canShowRecentTrends() {
+        return this.showLegend && this.showRecentTrends;
     }
-
-    showAreaProfiles(): Boolean {
-        return this.pageType === PageType.AreaProfiles;
-    }
-
-    showInequalities(): Boolean {
-        return this.pageType === PageType.Inequalities;
-    }
-
-    showEngland(): Boolean {
-        return this.pageType === PageType.England;
-    }
-}
-
-export class PageType {
-    public static readonly None = 0;
-    public static readonly Overview = 1;
-    public static readonly Map = 2;
-    public static readonly Trends = 3;
-    public static readonly CompareAreas = 4;
-    public static readonly AreaProfiles = 5;
-    public static readonly Inequalities = 6;
-    public static readonly England = 7;
-}
-
-export class KeyType {
-    public static readonly None = 0;
-    public static readonly BarChart = 1;
-    public static readonly ValueNote = 2;
-    public static readonly SpineChart = 3;
-    public static readonly TartanRug = 4;
-    public static readonly InEquality = 5;
-    public static readonly RecentTrends = 6;
-    public static readonly DataQuality = 7;
-}
-
-export class LegendType {
-    public static readonly None = 0;
-    public static readonly RAG3 = 1;
-    public static readonly RAG5 = 2;
-    public static readonly BOB = 3;
-    public static readonly NotCompared = 4;
-    public static readonly Quintiles = 5;
-    public static readonly Quartiles = 6;
-    public static readonly Continuous = 7;
 }

@@ -1,0 +1,83 @@
+﻿@using Fpm.MainUI.Helpers
+@model Fpm.MainUI.ViewModels.Indicator.IndicatorViewModel
+
+@{
+    var reviewAudits = Model.IndicatorMetadataReviewAudits;
+    var currentUser = UserDetails.CurrentUser();
+    var isReviewer = currentUser.IsReviewer;
+    var reviewDate = Model.IndicatorMetadata.NextReviewTimestamp;
+}
+
+@if (isReviewer)
+{
+    <div class="row col">
+        <b>Add reviewer notes</b>
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            @Html.TextAreaFor(x => x.IndicatorMetadataReviewAudit.Notes,
+                new {@class = "indicator-review-notes", rows="4"})
+        </div>
+
+        <div class="col-md-5 indicator-review-timestamp">
+            <span>Set next review date</span>
+            @Html.HiddenFor(x => x.IndicatorMetadata.NextReviewTimestampInitialValue)
+            @Html.HiddenFor(x => x.IndicatorMetadata.NextReviewTimestamp)
+            @Html.TextBox("NextReviewTimestamp", "", new { @class = "dropdown-selected next-review-timestamp" })
+            @if (reviewDate.HasValue)
+            {
+                <p class="warning">Current review date is @reviewDate.Value.ToShortDateString()</p>
+            }
+        </div>
+    </div>
+}
+
+@* Display next review date *@
+@if (isReviewer == false && reviewDate.HasValue)
+{
+    <div class="row col">
+        <p class="warning">Next review date is @reviewDate.Value.ToShortDateString()</p>
+    </div>
+}
+else
+{
+    <br>
+}
+
+@* Display review audit table *@
+@if (reviewAudits.Count > 0)
+{
+    <div class="row col">
+        <b>Review history</b>
+    </div>
+    <div class="row col">
+        <table id="tbl-review-history" class="grid" width="90%">
+            <thead>
+                <tr>
+                    <th class="header col-md-2">Date</th>
+                    <th class="header col-md-8">Notes</th>
+                    <th class="header col-md-2">User</th>
+                </tr>
+            </thead>
+            @foreach (var audit in reviewAudits)
+            {
+                <tr>
+                    <td>@audit.Timestamp.ToShortDateString()</td>
+                    <td class="text-left">@audit.Notes</td>
+                    <td>
+                        @{
+                            var userDisplayName = string.Empty;
+                            var user = Model.FpmUsers.FirstOrDefault(x => x.Id == audit.UserId);
+                            if (user != null)
+                            {
+                                userDisplayName = user.DisplayName;
+                            }
+                        }
+
+                        @userDisplayName
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}

@@ -90,11 +90,8 @@ namespace Fpm.MainUITest.Helpers
             {
                 if (indicatorMetadataTextProperty.IsMandatory)
                 {
-                    indicatorMetadataTextItems.Add(new IndicatorMetadataTextItem
-                    {
-                        PropertyId = indicatorMetadataTextProperty.PropertyId,
-                        Text = IndicatorText
-                    });
+                    var indicatorMetadataTextItem = CreateIndicatorMetadataTextItem(indicatorMetadataTextProperty);
+                    indicatorMetadataTextItems.Add(indicatorMetadataTextItem);
                 }
             }
             return indicatorMetadataTextItems;
@@ -128,6 +125,21 @@ namespace Fpm.MainUITest.Helpers
         {
             indicatorMetadataTextItems.First(x => x.PropertyId == propertyId)
                 .Text = new string('a', 5000);
+        }
+
+        private static IndicatorMetadataTextItem CreateIndicatorMetadataTextItem(IndicatorMetadataTextProperty indicatorMetadataTextProperty)
+        {
+            var indicatorMetadataTextItem = new IndicatorMetadataTextItem
+            {
+                PropertyId = indicatorMetadataTextProperty.PropertyId,
+                Text = IndicatorText
+            };
+            if (indicatorMetadataTextItem.PropertyId == 25)
+            {
+                indicatorMetadataTextItem.Text = "1";
+            }
+
+            return indicatorMetadataTextItem;
         }
     }
 }

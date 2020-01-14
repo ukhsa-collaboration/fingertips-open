@@ -12,11 +12,20 @@ namespace Fpm.MainUI.Controllers
     [RoutePrefix("admin")]
     public class AdminController : Controller
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
-        private readonly ProfilesWriter _writer = ReaderFactory.GetProfilesWriter();
-        private ProfileRepository _profileRepository;
+        private readonly IProfilesReader _reader;
+        private readonly IProfilesWriter _writer;
 
-        [Route("")]
+        private IProfileRepository _profileRepository;
+
+        public AdminController(IProfilesReader reader, IProfilesWriter writer, IProfileRepository profileRepository)
+        {
+            _reader = reader;
+            _writer = writer;
+
+            _profileRepository = profileRepository;
+        }
+
+        [Route]
         public ActionResult Admin()
         {
             var model = new AdminModel
@@ -110,20 +119,6 @@ namespace Fpm.MainUI.Controllers
             {
                 _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
             }
-        }
-
-        protected override void OnActionExecuting(ActionExecutingContext filterContext)
-        {
-            _profileRepository = new ProfileRepository(NHibernateSessionFactory.GetSession());
-
-            base.OnActionExecuting(filterContext);
-        }
-
-        protected override void OnActionExecuted(ActionExecutedContext filterContext)
-        {
-            _profileRepository.Dispose();
-
-            base.OnActionExecuted(filterContext);
         }
     }
 }

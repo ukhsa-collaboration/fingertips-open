@@ -8,24 +8,19 @@ namespace PholioVisualisation.DataAccess
     {
         private const string Quote = "\"";
         private const string EscapedQuote = "\"\"";
-        private readonly static char[] CharactersThatMustBeQuoted = { ',', '"', '\n' };
+        private static readonly char[] CharactersThatMustBeQuoted = { ',', '"', '\n' };
 
-        private List<string> headerItems = new List<string>();
-        private List<List<string>> rowItemsList = new List<List<string>>();
+        private object[] headerItems = {};
+        private readonly List<object[]> rowItemsList = new List<object[]>();
 
         public void AddHeader(params object[] items)
         {
-            headerItems = GetStringList(items);
+            headerItems = items;
         }
 
         public void AddLine(params object[] items)
         {
-            rowItemsList.Add(GetStringList(items));
-        }
-
-        private static List<string> GetStringList(IEnumerable<object> items)
-        {
-            return items.Select(x => x.ToString()).ToList();
+            rowItemsList.Add(items);
         }
 
         public byte[] WriteAsBytes()
@@ -55,14 +50,22 @@ namespace PholioVisualisation.DataAccess
             return bytes;
         }
 
-        private static string GetLine(List<string> rowItemsList)
+        private static string GetLine(object[] rowItemsList)
         {
-            var line = string.Join(",", rowItemsList.Select(Escape));
+            var items = rowItemsList.Select(Escape);
+            var line = string.Join(",", items);
             return line;
         }
 
-        private static string Escape(string s)
+        private static object Escape(object o)
         {
+            if (o is string == false)
+            {
+                return o;
+            }
+
+            string s = (string)o;
+
             if (s.Contains(Quote))
             {
                 s = s.Replace(Quote, EscapedQuote);

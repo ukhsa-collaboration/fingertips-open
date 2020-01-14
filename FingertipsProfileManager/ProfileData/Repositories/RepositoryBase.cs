@@ -17,6 +17,12 @@ namespace Fpm.ProfileData.Repositories
 
         internal ITransaction transaction = null;
 
+        /// <summary>
+        /// Parameter-less constructor to allow mocking
+        /// </summary>
+        internal RepositoryBase()
+        { }
+
         public RepositoryBase(ISessionFactory sessionFactory)
         {
             this.sessionFactory = sessionFactory;

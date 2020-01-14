@@ -1,0 +1,50 @@
+.content-align-right {
+  text-align: right;
+}
+
+table {
+  width: 70%;
+}
+
+.table thead th {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.decorate-male {
+  background-color: #5555E6;
+  color: #fff;
+}
+
+.decorate-female {
+  background-color: #C2CCFF;
+}
+
+#table-box {
+  float: left;
+  margin-top: 10px;
+}
+
+table tr td {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+tr.all-ages td:first-child {
+  font-weight: bold;
+}
+
+#quinary-tooltip-box {
+  position: relative;
+  width: 100%;
+}
+
+#quinary-tooltip-box div {
+  position: absolute;
+}
+
+.trend-period {
+  font-size: 11px;
+  padding-top: 6px;
+  margin-left: 10px;
+  float: left;
+}

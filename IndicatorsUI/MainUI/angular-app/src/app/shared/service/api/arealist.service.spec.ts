@@ -1,9 +1,7 @@
-import { TestBed, getTestBed, async, inject } from '@angular/core/testing';
-import { BaseRequestOptions, Response, HttpModule, Http, XHRBackend } from '@angular/http';
-import { ResponseOptions } from '@angular/http';
+import { TestBed, async, inject } from '@angular/core/testing';
+import { HttpClientModule } from '@angular/common/http';
 import { AreaListService } from './arealist.service';
 import { FTHelperService } from '../helper/ftHelper.service';
-import { AreaTypeIds } from '../../shared';
 import { HttpService } from './http.service';
 import { Observable } from 'rxjs';
 
@@ -24,7 +22,7 @@ describe('AreaList Service', () => {
                 { provide: HttpService, useValue: httpService }
             ],
             imports: [
-                HttpModule
+                HttpClientModule
             ]
         });
 
@@ -35,7 +33,7 @@ describe('AreaList Service', () => {
     it('should get area lists',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     Id: 6029,
                     ListName: 'Acc1',
@@ -46,18 +44,18 @@ describe('AreaList Service', () => {
 
             areaListService.getAreaLists('73585a17-85cb-4d7d-af08-bdce449b6c71')
                 .subscribe(
-                    (data) => {
-                        expect(data[0].Id).toBe(6029);
-                        expect(data[0].ListName).toBe('Acc1');
-                        expect(data[0].AreaTypeId).toBe(118);
-                        expect(data[0].PublicId).toBe('dI8niPkZM0');
+                    (areaLists) => {
+                        expect(areaLists[0].Id).toBe(6029);
+                        expect(areaLists[0].ListName).toBe('Acc1');
+                        expect(areaLists[0].AreaTypeId).toBe(118);
+                        expect(areaLists[0].PublicId).toBe('dI8niPkZM0');
                     });
         })));
 
     it('should get area list',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     Id: 6029,
                     ListName: 'Acc1',
@@ -68,18 +66,18 @@ describe('AreaList Service', () => {
 
             areaListService.getAreaList(6029)
                 .subscribe(
-                    (data) => {
-                        expect(data[0].Id).toBe(6029);
-                        expect(data[0].ListName).toBe('Acc1');
-                        expect(data[0].AreaTypeId).toBe(118);
-                        expect(data[0].PublicId).toBe('dI8niPkZM0');
+                    (areaList) => {
+                        expect(areaList[0].Id).toBe(6029);
+                        expect(areaList[0].ListName).toBe('Acc1');
+                        expect(areaList[0].AreaTypeId).toBe(118);
+                        expect(areaList[0].PublicId).toBe('dI8niPkZM0');
                     });
         })));
 
     it('should get area list by public id',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     Id: 6029,
                     ListName: 'Acc1',
@@ -90,18 +88,18 @@ describe('AreaList Service', () => {
 
             areaListService.getAreaListByPublicId('dI8niPkZM0', '73585a17-85cb-4d7d-af08-bdce449b6c71')
                 .subscribe(
-                    (data) => {
-                        expect(data[0].Id).toBe(6029);
-                        expect(data[0].ListName).toBe('Acc1');
-                        expect(data[0].AreaTypeId).toBe(118);
-                        expect(data[0].PublicId).toBe('dI8niPkZM0');
+                    (areaList) => {
+                        expect(areaList[0].Id).toBe(6029);
+                        expect(areaList[0].ListName).toBe('Acc1');
+                        expect(areaList[0].AreaTypeId).toBe(118);
+                        expect(areaList[0].PublicId).toBe('dI8niPkZM0');
                     });
         })));
 
     it('should get area codes from area list id',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     AreaListId: 6029
                 }];
@@ -109,15 +107,15 @@ describe('AreaList Service', () => {
 
             areaListService.getAreaCodesFromAreaListId(6029)
                 .subscribe(
-                    (data) => {
-                        expect(data[0].AreaListId).toBe(6029);
+                    (areaCodes) => {
+                        expect(areaCodes[0].AreaListId).toBe(6029);
                     });
         })));
 
     it('should get areas from area list area codes',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     AreaTypeId: 118,
                     Code: 'RCF'
@@ -130,16 +128,16 @@ describe('AreaList Service', () => {
 
             areaListService.getAreasFromAreaListAreaCodes(areaListAreaCodes)
                 .subscribe(
-                    (data) => {
-                        expect(data[0].AreaTypeId).toBe(118);
-                        expect(data[0].Code).toBe('RCF');
+                    (areas) => {
+                        expect(areas[0].AreaTypeId).toBe(118);
+                        expect(areas[0].Code).toBe('RCF');
                     });
         })));
 
     it('should get areas with address from area list area codes',
         async(inject([AreaListService], (areaListService: AreaListService) => {
 
-            let data = [
+            const data = [
                 {
                     AreaTypeId: 118,
                     Code: 'RCF'
@@ -152,9 +150,9 @@ describe('AreaList Service', () => {
 
             areaListService.getAreasWithAddressFromAreaListAreaCodes(areaListAreaCodes)
                 .subscribe(
-                    (data) => {
-                        expect(data[0].AreaTypeId).toBe(118);
-                        expect(data[0].Code).toBe('RCF');
+                    (areas) => {
+                        expect(areas[0].AreaTypeId).toBe(118);
+                        expect(areas[0].Code).toBe('RCF');
                     });
         })));
 });

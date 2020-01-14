@@ -1,18 +1,22 @@
-﻿@using Fpm.MainUI.Helpers
+﻿@using System.Web.Optimization
+@using Fpm.MainUI.Helpers
 @model Fpm.MainUI.ViewModels.Profile.ProfileViewModel
-
 
 @{
     var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+    var selectedContactUserIds = ViewBag.SelectedContactUserIds;
 }
 
-@if (isUserAdmin) {
-<div class="row form-group">
-    <label class="col-md-3 col-form-label">ID:</label>
-    <div class="col-md-4">
-        @Model.Id
+@Scripts.Render("~/js/select2.min.js")
+
+@if (isUserAdmin)
+{
+    <div class="row form-group">
+        <label class="col-md-3 col-form-label">ID:</label>
+        <div class="col-md-4">
+            @Model.Id
+        </div>
     </div>
-</div>
 }
 
 <div class="row form-group" id="edit-profile-non-admin">
@@ -37,9 +41,10 @@
 </div>
 
 <div class="row form-group">
-    <label class="col-md-3 col-form-label">Profile contact:</label>
+    <label class="col-md-3 col-form-label">Profile contact(s):</label>
     <div class="col-md-4">
-        @Html.DropDownListFor(model => model.ContactUserId, null)
+        @Html.DropDownListFor(model => model.ContactUserIds, null, new { @class = "profile-contacts", multiple = "multiple" })
+        <input type="hidden" id="hdn-contact-user-ids" value="@selectedContactUserIds" />
     </div>
 </div>
 

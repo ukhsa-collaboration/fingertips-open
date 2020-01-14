@@ -1,4 +1,5 @@
-﻿using Fpm.MainUI;
+﻿using System;
+using Fpm.MainUI;
 using Fpm.MainUI.Mappers;
 using Fpm.MainUI.ViewModels;
 using Fpm.ProfileData.Entities.Profile;
@@ -26,14 +27,15 @@ namespace Fpm.MainUITest
             {
                 Id = 5,
                 Name = "Test Profile",
-                ContactUserId = 10
+                ContactUserIds = "10"
             };
 
             // Act
             var result = profileDetail.ToProfileViewModel();
+            var contactUserIds = String.Join(",", result.ContactUserIds);
 
             // Assert
-            Assert.IsTrue(result.ContactUserId == profileDetail.ContactUserId &&
+            Assert.IsTrue(contactUserIds == profileDetail.ContactUserIds &&
                           result.Id == profileDetail.Id &&
                           result.Name == profileDetail.Name);
         }
@@ -41,19 +43,22 @@ namespace Fpm.MainUITest
         [TestMethod]
         public void ToProfileDetails_Returns_Model_WithSameValues()
         {
+            var contactUserIds = new List<string>();
+            contactUserIds.Add("10");
+
             // Arrange
             var profileViewModel = new ProfileViewModel()
             {
                 Id = 5,
                 Name = "Test Profile",
-                ContactUserId = 10,
+                ContactUserIds = contactUserIds
             };
 
             // Act
             var result = profileViewModel.ToProfileDetails();
 
             // Assert
-            Assert.IsTrue(result.ContactUserId == profileViewModel.ContactUserId &&
+            Assert.IsTrue(result.ContactUserIds == String.Join(",", profileViewModel.ContactUserIds) &&
                           result.Id == profileViewModel.Id &&
                           result.Name == profileViewModel.Name);
         }
@@ -61,12 +66,15 @@ namespace Fpm.MainUITest
         [TestMethod]
         public void ToProfileDetails_Returns_Model_With_Correct_ArePDfs_Flag()
         {
+            var contactUserIds = new List<string>();
+            contactUserIds.Add("10");
+
             // Arrange
             var profileViewModel = new ProfileViewModel()
             {
                 Id = 5,
                 Name = "Test Profile",
-                ContactUserId = 10,
+                ContactUserIds = contactUserIds,
                 SelectedPdfAreaTypes = new List<ProfileAreaType>()
                 {
                     new ProfileAreaType() {Id = 10, Value ="Test Area 1" },
@@ -85,12 +93,15 @@ namespace Fpm.MainUITest
         [TestMethod]
         public void ToProfileDetails_Returns_Model_With_UserPermissions()
         {
+            var contactUserIds = new List<string>();
+            contactUserIds.Add("10");
+
             // Arrange
             var profileViewModel = new ProfileViewModel()
             {
                 Id = 5,
                 Name = "Test Profile",
-                ContactUserId = 10,
+                ContactUserIds = contactUserIds,
                 ProfileUsers = new List<ProfileUser>()
                 {
                     new ProfileUser() {Id = 10, Name ="Test Name 1" },

@@ -7,7 +7,7 @@ using PholioVisualisation.PholioObjects;
 
 namespace PholioVisualisation.DataConstruction
 {
-    public class GroupData : ICacheable
+    public class GroupData
     {
         public IList<IArea> Areas { get; set; }
 
@@ -44,8 +44,12 @@ namespace PholioVisualisation.DataConstruction
         public void Clear()
         {
             GroupRoots = new List<GroupRoot>();
-            InitIndicatorMetadata(IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(
-                new List<Grouping>()));
+
+            IndicatorMetadataCollection indicatorMetadataCollection =
+                IndicatorMetadataProvider.Instance.GetIndicatorMetadataCollection(new List<Grouping>(), ProfileIds.Undefined);
+
+            InitIndicatorMetadata(indicatorMetadataCollection);
+
             Areas = new List<IArea>();
         }
 

@@ -16,5 +16,7 @@ namespace Fpm.ProfileData.Entities.Report
         public string Notes { get; set; }
         [JsonProperty(PropertyName = "isLive")]
         public bool IsLive { get; set; }
+        [JsonProperty(PropertyName = "areaTypeIds")]
+        public string AreaTypeIds { get; set; }
     }
 }

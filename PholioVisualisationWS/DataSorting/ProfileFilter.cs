@@ -9,12 +9,11 @@ namespace PholioVisualisation.DataSorting
         private static readonly List<int> SystemProfileIds = new List<int>
         {
             ProfileIds.Search,
-            ProfileIds.Archived,
             ProfileIds.Unassigned
         };
 
         /// <summary>
-        /// Removes system profiles: search, archived indicators and unassigned indicators.
+        /// Removes system profiles: search and unassigned indicators.
         /// </summary>
         public static IList<int> RemoveSystemProfileIds(IList<int> profileIds)
         {
@@ -24,7 +23,7 @@ namespace PholioVisualisation.DataSorting
         }
 
         /// <summary>
-        /// Removes system profiles: search, archived indicators and unassigned indicators.
+        /// Removes system profiles: search and unassigned indicators.
         /// </summary>
         public static IList<ProfileConfig> RemoveSystemProfiles(IList<ProfileConfig> profiles)
         {
@@ -34,7 +33,7 @@ namespace PholioVisualisation.DataSorting
         }
 
         /// <summary>
-        /// Removes system profiles: search, archived indicators and unassigned indicators.
+        /// Removes system profiles: search and unassigned indicators.
         /// </summary>
         public static IList<ProfilePerIndicator> RemoveSystemProfiles(IList<ProfilePerIndicator> profiles)
         {

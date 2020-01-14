@@ -35,6 +35,7 @@ namespace PholioVisualisation.SearchQuerying
 
             foreach (var line in lines)
             {
+                // Skip comments and empty lines
                 if (string.IsNullOrWhiteSpace(line) == false && line[0].Equals('#') == false)
                 {
                     // Split line into trimmed words

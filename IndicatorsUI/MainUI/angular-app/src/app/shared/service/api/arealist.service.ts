@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Response } from '@angular/http';
-import 'rxjs/rx';
 import { Observable } from 'rxjs/Observable';
-import { AreaList, AreaType, Area, AreaListAreaCode } from '../../../typings/FT.d';
-import { FTHelperService } from '../../service/helper/ftHelper.service';
+import { FTHelperService } from '../helper/ftHelper.service';
 import { Parameters } from './parameters';
 import { HttpService } from './http.service'
+import { AreaList, AreaListAreaCode, Area } from '../../../typings/FT';
 
 @Injectable()
 export class AreaListService {
@@ -20,7 +18,7 @@ export class AreaListService {
         params.addUserId(userId);
         params.addNoCache();
 
-        return this.httpService.httpGet('api/arealists', params);
+        return this.httpService.httpGet('api/arealists', params, false);
     }
 
     getAreaList(areaListId: number): Observable<AreaList> {
@@ -31,10 +29,7 @@ export class AreaListService {
         return this.httpService.httpGet('api/arealist', params);
     }
 
-    getAreaListByPublicId(
-        publicId: string,
-        userId: string
-    ): Observable<AreaList> {
+    getAreaListByPublicId(publicId: string, userId: string): Observable<AreaList> {
         const params = new Parameters(this.version);
         params.addPublicId(publicId);
         params.addUserId(userId);

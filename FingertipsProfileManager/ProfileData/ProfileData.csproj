@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Fpm.ProfileData</RootNamespace>
     <AssemblyName>Fpm.ProfileData</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -117,6 +117,11 @@
     <Compile Include="AreaTypeIdSplitter.cs" />
     <Compile Include="Entities\DataAudit\DataChange.cs" />
     <Compile Include="Entities\Documents\DocumentContent.cs" />
+    <Compile Include="Entities\Email\Email.cs" />
+    <Compile Include="Entities\Email\IndicatorApproved.cs" />
+    <Compile Include="Entities\Email\IndicatorAwaitingRevision.cs" />
+    <Compile Include="Entities\Email\IndicatorCreated.cs" />
+    <Compile Include="Entities\Email\IndicatorSubmittedForReview.cs" />
     <Compile Include="Entities\JobError\UploadJobError.cs" />
     <Compile Include="Entities\Job\UploadJob.cs" />
     <Compile Include="Entities\Job\UploadJobStatus.cs" />
@@ -139,10 +144,12 @@
     <Compile Include="Entities\Profile\DisclosureControl.cs" />
     <Compile Include="Entities\Profile\GroupingSubheading.cs" />
     <Compile Include="Entities\Profile\Indicator.cs" />
+    <Compile Include="Entities\Profile\IndicatorMetadataReviewAudit.cs" />
     <Compile Include="Entities\Report\Report.cs" />
     <Compile Include="Entities\Report\ReportsProfileMapping.cs" />
     <Compile Include="Entities\UserFeedback\UserFeedback.cs" />
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="IndicatorDetail.cs" />
     <Compile Include="IndicatorMetadataProvider.cs" />
     <Compile Include="IndicatorMetadataTextItem.cs" />
     <Compile Include="Entities\Profile\ComparatorConfidence.cs" />
@@ -156,6 +163,8 @@
     <Compile Include="Entities\LookUps\KeyColour.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Entities\LookUps\Polarity.cs" />
+    <Compile Include="IProfileReader.cs" />
+    <Compile Include="IProfilesWriter.cs" />
     <Compile Include="ProfilesWriter.cs" />
     <Compile Include="Entities\Exceptions\ExceptionLog.cs" />
     <Compile Include="FpmException.cs" />
@@ -164,8 +173,22 @@
     <Compile Include="Entities\LookUps\IndicatorValueType.cs" />
     <Compile Include="Repositories\AreaTypeRepository.cs" />
     <Compile Include="Repositories\DocumentsRepository.cs" />
+    <Compile Include="Repositories\EmailRepository.cs" />
     <Compile Include="Repositories\ExceptionsRepository.cs" />
+    <Compile Include="Repositories\IAreaTypeRepository.cs" />
+    <Compile Include="Repositories\ICoreDataRepository.cs" />
+    <Compile Include="Repositories\IDocumentsRepository.cs" />
+    <Compile Include="Repositories\IEmailRepository.cs" />
+    <Compile Include="Repositories\IExceptionsRepository.cs" />
     <Compile Include="Repositories\IFpmUploadRepository.cs" />
+    <Compile Include="Repositories\ILoggingRepository.cs" />
+    <Compile Include="Repositories\ILookUpsRepository.cs" />
+    <Compile Include="Repositories\IMonthlyReleaseRepository.cs" />
+    <Compile Include="Repositories\IProfileRepository.cs" />
+    <Compile Include="Repositories\IReportRepository.cs" />
+    <Compile Include="Repositories\IUploadJobRepository.cs" />
+    <Compile Include="Repositories\IUserFeedbackRepository.cs" />
+    <Compile Include="Repositories\IUserRepository.cs" />
     <Compile Include="Repositories\LoggingRepository.cs" />
     <Compile Include="Repositories\LookUpsRepository.cs" />
     <Compile Include="Repositories\CoreDataRepository.cs" />
@@ -253,6 +276,7 @@
     <Content Include="Client Scripts\MvcFoolproofJQueryValidation.min.js" />
     <Content Include="Client Scripts\MvcFoolproofValidation.js" />
     <Content Include="Client Scripts\MvcFoolproofValidation.min.js" />
+    <EmbeddedResource Include="Entities\Email\email.hbm.xml" />
     <EmbeddedResource Include="Entities\MonthlyRelease\monthlyrelease.hbm.xml" />
     <EmbeddedResource Include="Entities\UserFeedback\userfeedback.hbm.xml">
       <SubType>Designer</SubType>

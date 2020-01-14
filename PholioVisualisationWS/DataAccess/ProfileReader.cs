@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.Transform;
@@ -93,11 +92,11 @@ namespace PholioVisualisation.DataAccess
 
         public virtual IList<int> GetGroupIdsFromSpecificProfiles(IList<int> profileIds)
         {
-            var groupIds = CurrentSession.CreateCriteria<GroupingMetadata>()
-                .Add(Restrictions.In(PropertyProfileId, profileIds.ToArray()))
-                .SetProjection(Projections.Property("Id"))
-                .List<int>();
-            return groupIds;
+            var q = CurrentSession.CreateSQLQuery(
+                "SELECT DISTINCT g.GroupID FROM GroupingMetadata g JOIN UI_Profiles p ON g.ProfileID = p.id WHERE g.ProfileID in (:profileIds) and exclude_indicators_from_search <> :AreIndicatorsExcludedFromSearch");
+            q.SetParameterList("profileIds", profileIds);
+            q.SetParameter("AreIndicatorsExcludedFromSearch", true);
+            return q.List<int>();
         }
 
         public virtual IList<int> GetGroupIdsForProfile(int profileId)

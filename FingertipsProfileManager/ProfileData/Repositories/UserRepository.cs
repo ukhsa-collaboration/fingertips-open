@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Fpm.ProfileData.Entities.User;
+﻿using Fpm.ProfileData.Entities.User;
 using NHibernate;
+using System;
+using System.Collections.Generic;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class UserRepository : RepositoryBase
+    public class UserRepository : RepositoryBase, IUserRepository
     {
+        public UserRepository()
+            : this(NHibernateSessionFactory.GetSession())
+        { }
 
-        // poor man injection, should be removed when we use DI containers
-        public UserRepository() : this(NHibernateSessionFactory.GetSession())
-        {
-        }
-
-        public UserRepository(ISessionFactory sessionFactory) : base(sessionFactory) { }
-
-
+        public UserRepository(ISessionFactory sessionFactory)
+            : base(sessionFactory) { }
 
         public void DeleteUserGroupPermissions(int profileId, int userId)
         {
@@ -59,8 +54,11 @@ namespace Fpm.ProfileData.Repositories
             return q.List<FpmUser>();
         }
 
-        public bool CreateUserItem(FpmUser user, string loggedInUser)
+        public bool CreateUser(FpmUser user, string loggedInUser)
         {
+            // All new users should be current
+            user.IsCurrent = true;
+
             try
             {
                 transaction = CurrentSession.BeginTransaction();
@@ -81,7 +79,7 @@ namespace Fpm.ProfileData.Repositories
             return false;
         }
 
-        public bool UpdateUserItem(FpmUser user, string loggedInUser)
+        public bool UpdateUser(FpmUser user, string loggedInUser)
         {
             try
             {

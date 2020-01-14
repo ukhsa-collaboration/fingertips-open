@@ -1,0 +1,22 @@
+﻿@using IndicatorsUI.DomainObjects
+@using IndicatorsUI.MainUI.Helpers
+<span class="pretext">
+    <img class="download" src="@(ViewBag.ImagesUrl)Mortality/download.png" />
+</span>
+<h5 class="posttext">Download</h5>
+@ContentProvider.GetContent(ContentKeys.DownloadLink, Model.ProfileId)
+<ul>
+    <li id="download_data_for_england"><a href="https://fingertipsws.phe.org.uk/api/all_data/csv/by_profile_id?profile_id=140&child_area_type_id=102&parent_area_type_id=15&parent_area_code=E92000001" class="external_link" target="_blank">Download Public Health Dashboard data for England</a></li>
+</ul>
+
+<h5>More Information</h5>
+
+<ul>
+    <li>@Html.Partial("_PhofLink")</li>
+    <li>@Html.Partial("_HealthProfileLink")</li>
+    <li><a href="https://fingertips.phe.org.uk/profile/wider-determinants" class="external_link" target="_blank">
+        View more data in the Wider Determinants of Health profile
+    </a></li>
+    <li>@Html.Partial("_FingertipsLink")</li>
+    <li><a href="/topic/@ViewBag.ProfileUrlKey/about-data">About the data</a></li>
+</ul>

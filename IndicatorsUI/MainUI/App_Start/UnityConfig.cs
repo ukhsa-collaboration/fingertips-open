@@ -2,6 +2,7 @@
 using IndicatorsUI.UserAccess.UserList.Repository;
 using System;
 using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataAccess.Repository;
 using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.UserAccess;
 using Unity;
@@ -50,11 +51,11 @@ namespace IndicatorsUI.MainUI
             // Registered type mappings
             container.RegisterType<IIndicatorListRepository, IndicatorListRepo>();
             container.RegisterType<IIdentityWrapper, IdentityWrapper>();
-            container.RegisterType<IEmailSender, EmailSender>();
             container.RegisterType<IUserAccessDbContext, UserAccessDbContext>();
             container.RegisterType<IExceptionLoggerWrapper, ExceptionLoggerWrapper>();
             container.RegisterType<IUserAccountHelper, UserAccountHelper>();
             container.RegisterType<IPublicIdGenerator, PublicIdGenerator>();
+            container.RegisterType<IEmailRepository, EmailRepository>();
 
             // Register reader created by factory method
             container.RegisterType<ProfileReader>(new InjectionFactory(x => ReaderFactory.GetProfileReader()));

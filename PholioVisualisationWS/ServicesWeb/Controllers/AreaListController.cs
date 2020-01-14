@@ -11,7 +11,7 @@ using PholioVisualisation.UserData.Repositories;
 namespace PholioVisualisation.ServicesWeb.Controllers
 {
     /// <summary>
-    /// This controller contains actions to manage the area list
+    /// This controller contains actions to manage the user defined area lists
     /// </summary>
     [RoutePrefix("api")]
     public class AreaListController : BaseController

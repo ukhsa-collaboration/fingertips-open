@@ -41,6 +41,12 @@
       <HintPath>..\packages\Castle.Core.4.2.1\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Moq, Version=4.7.145.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.7.145\lib\net45\Moq.dll</HintPath>
@@ -50,6 +56,7 @@
       <HintPath>..\..\FingertipsProfileManager\lib\SpreadsheetGear.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -70,7 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AddressFileBuilderTest.cs" />
-    <Compile Include="DataFileBuilderTest.cs" />
     <Compile Include="ExportAreaHelperTest.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodWriterContainerTest.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodTrendContainerTest.cs" />
@@ -78,8 +84,12 @@
     <Compile Include="FileBuilder\Containers\BodyPeriodSignificanceContainerTest.cs" />
     <Compile Include="FileBuilder\Containers\BodyPeriodComparisonContainerTest.cs" />
     <Compile Include="FileBuilder\Containers\IndicatorDataBodyContainerTest.cs" />
+    <Compile Include="FileBuilder\Dtos\InequalitySearchDtoTest.cs" />
     <Compile Include="FileBuilder\IndicatorDataCsvFileBuilderTest.cs" />
     <Compile Include="FileBuilder\DataFileBuilderBaseTest.cs" />
+    <Compile Include="FileBuilder\SupportModels\CategoryInequalitySearchTest.cs" />
+    <Compile Include="FileBuilder\SupportModels\SexAgeInequalitySearchTest.cs" />
+    <Compile Include="FileBuilder\Wrappers\InequalitySearchTest.cs" />
     <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyWriterTest.cs" />
     <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataBodyPeriodWriterTest.cs" />
     <Compile Include="FileBuilder\Writers\CsvBuilderIndicatorDataWriterTest.cs" />
@@ -136,6 +146,14 @@
     <ProjectReference Include="..\PholioObjects\PholioObjects.csproj">
       <Project>{AD4A4236-BE35-4B2A-B49D-28D514949984}</Project>
       <Name>PholioObjects</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServicesTest\ServicesTest.csproj">
+      <Project>{FDDDDCAE-5BC9-41E2-815C-E974CDBC8F8B}</Project>
+      <Name>ServicesTest</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ServicesWebTest\ServicesWebTest.csproj">
+      <Project>{057D3E4C-7B0D-49CB-861D-3321A27718F7}</Project>
+      <Name>ServicesWebTest</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

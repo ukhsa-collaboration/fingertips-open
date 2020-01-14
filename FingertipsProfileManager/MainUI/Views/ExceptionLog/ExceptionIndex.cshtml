@@ -6,70 +6,90 @@
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
 @{
     ViewBag.Title = "FPM - Exception Log";
+
+    var liveServersButtonStyle = "btn btn-secondary";
+    var apiErrorsButtonStyle = "btn btn-secondary";
+
+    if (Model.LiveServersFilterApplied)
+    {
+        liveServersButtonStyle = "btn btn-primary";
+    }
+
+    if (Model.ApiErrorsFilterApplied)
+    {
+        apiErrorsButtonStyle = "btn btn-primary";
+    }
 }
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 @Scripts.Render("~/exception-log.js")
 
-<div class="standardWidth">
+<div class="container">
     <h2 class="subheading">Exception log</h2>
 
-        <div>
-            @using (Html.BeginForm("ExceptionIndex", "ExceptionLog", FormMethod.Get, new { id = "reloadExceptions" }))
-            {
-                <div>
-                    <span>
-                        <b>Days:</b>
-                        @Html.DropDownList("exceptionDays", new SelectList(CommonUtilities.GetExceptionDays(), "Text", "Value", "0"), new { @class = "create-indicator-dropdown", @Id = "exceptionDays" })
-                    </span>
-
-                    <span>
-                        <b>Server:</b>
-                        @Html.DropDownList("exceptionServer", new SelectList(Model.ServerList, "Text", "Value", Server.MachineName), new { @class = "create-indicator-dropdown", @Id = "exceptionServer" })
-                    </span>
-                </div>
-            }
+    <div class="row">
+        @using (Html.BeginForm("FilteredExceptions", "ExceptionLog", FormMethod.Post, new {id = "reload-exceptions-form" }))
+        {
+        <div class="col-md-4">
+            <b>Days:</b>
+            @Html.DropDownListFor(x => x.NumberOfDays, new SelectList(CommonUtilities.GetExceptionDays(), "Text", "Value", "0"),
+                new { @class = "indicator-dropdown", onchange = "triggerNumberOfDaysChangedEvent(this)" })
+            <b>Server:</b>
+            @Html.DropDownListFor(x => x.ServerList, new SelectList(Model.ServerList, "Text", "Value", Server.MachineName),
+                new { @class = "indicator-dropdown", onchange = "triggerServerListChangedEvent(this)" })
         </div>
+
+            @Html.HiddenFor(x => x.LiveServersFilterApplied)
+            @Html.HiddenFor(x => x.ApiErrorsFilterApplied)
+            @Html.HiddenFor(x => x.Server)
+
+            <div class="col-md-2">
+                <b>@Model.ExceptionList.Count</b> exceptions
+            </div>
+
+            <div class="col-md-4">
+                <b>Filters:</b>
+                <input id="live-servers" type="button" value="Live servers" class="@liveServersButtonStyle" />
+                <input id="api-errors" type="button" value="API errors" class="@apiErrorsButtonStyle"/>
+            </div>
+        }
+    </div>
+    
+
 
     <table class="grid sortable">
         <thead>
-            <tr>
-                <th class="header">Date</th>
-                <th class="header">Time</th>
-                <th class="header">Server</th>
-                <th class="header">Application</th>
-                <th class="header">Message</th>
-                <th class="header">Type</th>
-                <th class="header">Username</th>
-                <th class="header">URL</th>
-            </tr>
+        <tr>
+            <th class="header">Date</th>
+            <th class="header">Server</th>
+            <th class="header">Message</th>
+            <th class="header">Type</th>
+            <th class="header">URL</th>
+            <th class="header">Username</th>
+        </tr>
         </thead>
 
         @foreach (var item in Model.ExceptionList)
         {
             <tr>
-                <td class="left">                    
-                    <a class="exception-detail-link show-spinner" id="@item.Id.ToString()" href="#">@item.Date.ToShortDateString()</a>                   
-                </td>
                 <td class="left">
-                    @item.Date.ToShortTimeString()
+                    <a class="exception-detail-link show-spinner" id="@item.Id.ToString()" href="#">@item.Date.ToShortDateString()</a>
+                    <br>@item.Date.ToShortTimeString()
                 </td>
                 <td class="left">
                     @item.Server
+                    <br>@item.Application
                 </td>
                 <td class="left">
-                    @item.Application
-                </td>
-                <td class="left">                    
                     @item.Message
                 </td>
                 <td class="left">
                     @item.Type
                 </td>
                 <td class="left">
-                    @item.UserName
+                    <a href="@item.Url" target="_blank">@item.Url</a>
                 </td>
                 <td class="left">
-                    @item.Url
+                    @item.UserName
                 </td>
             </tr>
         }

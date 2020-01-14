@@ -1,23 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System.Linq;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IProfileDetailsCopier
-    {
-        int CreateCopy(ProfileDetails sourceProfile);
-        void CopyContentItems(int sourceProfileId, int newProfileId);
-    }
-
     public class ProfileDetailsCopier : IProfileDetailsCopier
     {
-        private ProfileRepository _profileRepository;
-        private ProfilesWriter _profilesWriter;
+        private readonly IProfileRepository _profileRepository;
+        private readonly IProfilesWriter _profilesWriter;
 
-        public ProfileDetailsCopier(ProfileRepository profileRepository, ProfilesWriter profilesWriter)
+        public ProfileDetailsCopier(IProfileRepository profileRepository, IProfilesWriter profilesWriter)
         {
             _profileRepository = profileRepository;
             _profilesWriter = profilesWriter;

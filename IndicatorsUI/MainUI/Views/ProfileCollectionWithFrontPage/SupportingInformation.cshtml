@@ -1,0 +1,12 @@
+﻿@using IndicatorsUI.DomainObjects
+@model IndicatorsUI.MainUI.Models.PageModel
+@{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+@section headContent {
+    @Html.Partial("_JavaScriptAndCssForContentPage")
+}
+<div class="full-width title-divider"></div>
+<div class="standard-width clearfix">
+    <div class="supporting-information">
+        @(((ContentItem)ViewBag.SupportingInformationContentItem).HtmlEncodedString)
+    </div>
+</div>

@@ -557,7 +557,8 @@ function getElementIdFromJQueryEvent(e) {
 * @static
 */
 FT.config = {
-
+    highChartsFileIncluded: false,
+    displayLegend: true
 }
 
 /**
@@ -578,6 +579,9 @@ FT.model = {
     nearestNeighbour: null,
     groupRoots: null,
     filterIndicatorPeriod: null,
+    yAxisSelectedIndicatorId: null,
+    yAxisSelectedSexId: null,
+    yAxisSelectedAgeId: null,
 
     /**
     * Resets the model.
@@ -839,10 +843,10 @@ MutuallyExclusiveDisplay.prototype = {
 }
 
 function toggleQuintileLegend(element, useQuintileColouring) {
-    if (!useQuintileColouring) {
-        element.hide();
-    } else {
+    if (useQuintileColouring) {
         element.show();
+    } else {
+        element.hide();
     }
 }
 
@@ -1167,6 +1171,10 @@ function getColourFromSignificance(significance, useRag, colours, useQuintileCol
                     return colours.same;
                 case 3:
                     return colours.bobHigher;
+                case 4:
+                    return colours.bobLowest;
+                case 5:
+                    return colours.bobHighest;
             }
         }
     }
@@ -1533,6 +1541,14 @@ function getComparatorId() {
 
 function showTopicMenu() {
     $('#profile-topic-menu').toggle();
+}
+
+function adjustScrollTop() {
+    // Adjust viewport if user otherwise would not be able to see the chart information
+    var $window = $(window);
+    if ($window.scrollTop() > 450/*point at which user controls no longer visible*/) {
+        $window.scrollTop(140/*display from domain options*/);
+    }
 }
 
 // Constants

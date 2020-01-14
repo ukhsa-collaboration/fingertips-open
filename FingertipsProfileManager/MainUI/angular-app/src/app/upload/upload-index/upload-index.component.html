@@ -1,0 +1,62 @@
+<form id="batchUploadForm" method="POST" action="/api/upload/upload-file" enctype="multipart/form-data">
+  <div>
+    <h1>Select a file to upload</h1>
+  </div>
+  <div>
+    Upload an Excel spreadsheet or CSV file for a batch of indicators.
+  </div>
+  <div *ngIf="!fileReadyForUpload">
+    <label id="BrowseForFileButton" class="btn btn-primary btn-file">
+      Browse for file<input type="file" style="display: none;" id="batch-excel-file" name="excelFile" size="47"
+        (change)="setFileName($event)">
+    </label>
+  </div>
+  <div *ngIf="fileReadyForUpload">
+    <br>
+    <div class="row">
+      <div class="col-md-3">
+        <label for="selectedFileName">File name</label>
+      </div>
+      <div class="col-md-4">
+        <input id="selectedFileName" [value]="fileName" class="form-control" disabled="disabled" />
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-3">
+        <label for="selectActionOptions">
+          Action if rows in uploaded file would replace existing rows in PHOLIO
+        </label>
+      </div>
+      <div class="col-md-4">
+        <select id="selectActionOptions" class="form-control selectpicker"
+          (change)="onSelectActionOptionsChange($event)">
+          <option value="true">Ask for confirmation</option>
+          <option value="false">Automatically replace existing PHOLIO data</option>
+        </select>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-md-3"></div>
+      <div class="col-md-4">
+        <input type="button" id="uploadButton" value="Upload" class="btn btn-success" (click)="uploadFile()" />
+        &nbsp;
+        <input type="reset" id="cancelButton" value="Cancel" class="btn btn-danger" (click)="cancel()" />
+      </div>
+    </div>
+  </div>
+  <br><br>
+  <div>
+    <a href="{{batchTemplateUrl}}">
+      <small>
+        Download the latest Excel template (last updated {{batchLastUpdated}})
+      </small>
+    </a>
+  </div>
+  <div class="row col allowed-filetypes standardWidth" *ngIf="!fileTypeAllowed">
+    <strong>
+      Wrong file type, only allowed files are csv, xls and xlsx
+    </strong>
+  </div>
+</form>

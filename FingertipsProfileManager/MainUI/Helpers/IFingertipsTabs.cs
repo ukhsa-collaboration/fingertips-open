@@ -1,13 +1,5 @@
-﻿using System;
-
-namespace Fpm.MainUI.Helpers
+﻿namespace Fpm.MainUI.Helpers
 {
-    public enum CompareAreasOption
-    {
-        BarChartOnly,
-        BarChartAndFunnelPlot
-    }
-
     /// <summary>
     /// The visualisation tabs that are displayed in Fingertips.
     /// </summary>
@@ -20,6 +12,6 @@ namespace Fpm.MainUI.Helpers
         bool IsReportsTab { get; set; }
         bool IsBoxPlotTab { get; set; }
         bool IsInequalitiesTab { get; set; }
-        CompareAreasOption CompareAreasOption { get; set; }
+        bool IsCompareAreasTab { get; set; }
     }
 }

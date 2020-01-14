@@ -1,0 +1,91 @@
+<div class="container" id="compare-indicators-container" style="display:none;">
+  <!-- Y-axis indicator -->
+  <div class="row" *ngIf="!isEnglandAreaSelected">
+    <div class="col-md-2 font-weight-bold">
+      Indicator on Y axis:
+    </div>
+    <div id="y-axis-indicator" class="col-md-10">
+      {{yAxisSelectedIndicatorName}}
+      <br>
+      <a id="change-indicator" class="a-link" (click)="toggleIndicatorDropdown()">Change indicator on Y axis</a>
+    </div>
+  </div>
+  <div class="row" *ngIf="showIndicatorDropdown">
+    <div class="col-md-2"></div>
+    <div class="col-md-10">
+      <ft-indicator-dropdown [indicatorNames]="indicatorNames"
+        (emitIndicatorNameSelected)="yAxisIndicatorChanged($event)">
+      </ft-indicator-dropdown>
+    </div>
+  </div>
+  <!-- Area display options-->
+  <div id="compare-indicator-tabs" class="row tab-options" *ngIf="!isEnglandAreaSelected && isAnyData">
+    <div class="col">
+      <span>Areas </span>
+      <button [class]="subNationalButtonClass" (click)="displaySubnationalAreas()"
+        [innerHTML]="formattedParentAreaName"></button>
+      <button [class]="nationalButtonClass" (click)="displayAllAreasInEngland()">All in England</button>
+    </div>
+  </div>
+  <!-- HC scatter chart -->
+  <div class="row top-margin-10" *ngIf="!showChartImage() && !isEnglandAreaSelected && isAnyData">
+    <div id="scatter-plot-chart" class="col">
+      <div class="export-chart-box">
+        <a id="compare-indicators-export-image" class="export-link" (click)="onExportChartAsImage()">Export chart
+          as
+          image</a>
+      </div>
+      <div id="export-chart-box-csv" class="export-chart-box-csv">
+        <a id="export-link-csv-scatter" class="export-link-csv" (click)="onExportChartAsCsv($event)">Export chart
+          as CSV
+          file</a>
+      </div>
+      <div class="row">
+        <div class="col-md-9">
+          <ft-scatter-plot-chart [dataSeries]="dataSeries" [selectedOptions]="selectedOptions"
+            (emitChart)="updateChart($event)">
+          </ft-scatter-plot-chart>
+        </div>
+        <div class="col-md-4">
+          <div id="scatterplot-filters">
+            <input type="checkbox" id="selectedAreaFilter" [ngModel]="shouldHighlightSelectedArea"
+              (ngModelChange)="shouldHighlightSelectedAreaChanged($event);">Highlight
+            <span [innerText]="selectedAreaName"></span>
+            <br />
+            <input type="checkbox" id="r2Filter" [ngModel]="r2Filter" (ngModelChange)="r2FilterChanged($event);">Add
+            regression line & R&#178;
+            <br />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Small area image chart-->
+  <div class="row top-margin-30" *ngIf="showChartImage() && isAnyData">
+    <div class="col">
+      <div class="row">
+        <div class="col-md-12" id="scatter-key-box">
+          <div [innerHtml]="scatterPractice" class="scatter-gp-label scatter-gp-practice-label"></div>
+          <div [innerHtml]="scatterParent" class="scatter-gp-label scatter-gp-parent-label"></div>
+          <div [innerHtml]="scatterOther" class="scatter-gp-label scatter-gp-other-label"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="imageChart" [innerHtml]="imageChart"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="!isEnglandAreaSelected && !isAnyData">
+    <div class="col-md-2"></div>
+    <div class="col-md-8 no-data">
+      <span id="compare-indicators-no-data-message" [innerHtml]="noDataMessage"></span>
+    </div>
+    <div class="col-md-2"></div>
+  </div>
+  <div class="row col do-not-display-for-england" *ngIf="isEnglandAreaSelected && !isAnyData">
+    <div>Not applicable for England data</div>
+  </div>
+  <ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>
+</div>

@@ -1,83 +1,103 @@
 ﻿@model IndicatorsUI.MainUI.Models.PageModel
 <div id="keyTartanRug" style="display: none;">
-    <div class="row">
-        <div id="value-note-legend" class="col-md-12">
-            <span>*</span> a note is attached to the value, hover over to see more details
+    <div class="row overview-legend-link-container">
+        <div class="col w-100 float-right text-right">
+            <a class="overview-legend-link" onclick="javascript: toggleLegend(false);">Show legend</a>
         </div>
     </div>
-    <div id="tartan-rag-and-bob-section" class="row" style="display: none">
-        <div class="col-md-12">
-            <div class="tartan-compared-with-text">
-                <i>Compared with benchmark:</i>
+    <div id="tartan-legend-container" class="overview-legend-container">
+        <div class="row">
+            <div class="col-md-6">
+                @Html.Partial("_KeyDataQuality")
             </div>
-            <div id="tartan-legend-rag-5" class="outer-tartan-legend-box">
-                <div class="tartan-legend-box better-99">Better 99.8%</div>
-                <div class="tartan-legend-box better-95">Better 95%</div>
-                <div class="tartan-legend-box similar">Similar</div>
-                <div class="tartan-legend-box worse-95">Worse 95%</div>
-                <div class="tartan-legend-box worse-99">Worse 99.8%</div>
+            <div id="value-note-legend" class="col-md-6">
+                <span>*</span> a note is attached to the value, hover over to see more details
             </div>
-            <div id="tartan-legend-rag-3" class="outer-tartan-legend-box">
-                <div class="tartan-legend-box better-95">Better</div>
-                <div class="tartan-legend-box similar">Similar</div>
-                <div class="tartan-legend-box worse-95">Worse</div>
-            </div>
-            <div id="tartan-legend-bob" class="outer-tartan-legend-box left-margin">
-                <div class="tartan-legend-box bob-lower">Lower</div>
-                <div class="tartan-legend-box bob-similar">Similar</div>
-                <div class="tartan-legend-box bob-higher">Higher</div>
-            </div>
-            <div class="outer-tartan-legend-box left-margin">
-                <div class="tartan-legend-box not-compared">
-                    Not compared
+        </div>
+        <div id="tartan-rag-and-bob-section" class="row" style="display: none">
+            <div class="col">
+                <div class="tartan-compared-with-text">
+                    <i>Compared with benchmark:</i>
+                </div>
+                <div id="tartan-legend-rag-5" class="outer-tartan-legend-box">
+                    <div class="tartan-legend-box better-99">Better 99.8%</div>
+                    <div class="tartan-legend-box better-95">Better 95%</div>
+                    <div class="tartan-legend-box similar">Similar</div>
+                    <div class="tartan-legend-box worse-95">Worse 95%</div>
+                    <div class="tartan-legend-box worse-99">Worse 99.8%</div>
+                </div>
+                <div id="tartan-legend-rag-3" class="outer-tartan-legend-box">
+                    <div class="tartan-legend-box better-95">Better</div>
+                    <div class="tartan-legend-box similar">Similar</div>
+                    <div class="tartan-legend-box worse-95">Worse</div>
+                </div>
+                <div id="tartan-legend-bob-5" class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box bob-lowest">Lowest</div>
+                    <div class="tartan-legend-box bob-lower">Lower</div>
+                    <div class="tartan-legend-box bob-similar">Similar</div>
+                    <div class="tartan-legend-box bob-higher">Higher</div>
+                    <div class="tartan-legend-box bob-highest">Highest</div>
+                </div>
+                <div id="tartan-legend-bob-3" class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box bob-lower">Lower</div>
+                    <div class="tartan-legend-box bob-similar">Similar</div>
+                    <div class="tartan-legend-box bob-higher">Higher</div>
+                </div>
+                <div class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box not-compared">
+                        Not compared
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div id="tartan-quintile-key-table" class="row" style="display: none">
-        <div class="col-md-12">
-            <span class="tartan-compared-with-text">
-                <i>Quintiles:</i>
-            </span>
-            <div id="tartan-quintile-rag" class="outer-tartan-legend-box left-margin">
-                <div class="tartan-legend-box rag-quintiles-1">
-                    Best
+        <div id="tartan-quintile-key-table" class="row" style="display: none">
+            <div class="col">
+                <span class="tartan-compared-with-text">
+                    <i>Quintiles:</i>
+                </span>
+                <div id="tartan-quintile-rag" class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box rag-quintiles-1">
+                        Best
+                    </div>
+                    <div class="tartan-legend-box rag-quintiles-2">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box rag-quintiles-3">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box rag-quintiles-4">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box rag-quintiles-5">
+                        Worst
+                    </div>
                 </div>
-                <div class="tartan-legend-box rag-quintiles-2">
-                    &nbsp;
+                <div id="tartan-quintile-bob" class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box bob-quintiles-1">
+                        Low
+                    </div>
+                    <div class="tartan-legend-box bob-quintiles-2">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box bob-quintiles-3">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box bob-quintiles-4">
+                        &nbsp;
+                    </div>
+                    <div class="tartan-legend-box bob-quintiles-5">
+                        High
+                    </div>
                 </div>
-                <div class="tartan-legend-box rag-quintiles-3">
-                    &nbsp;
-                </div>
-                <div class="tartan-legend-box rag-quintiles-4">
-                    &nbsp;
-                </div>
-                <div class="tartan-legend-box rag-quintiles-5">
-                    Worst
-                </div>
-            </div>
-            <div id="tartan-quintile-bob" class="outer-tartan-legend-box left-margin">
-                <div class="tartan-legend-box bob-quintiles-1">
-                    Low
-                </div>
-                <div class="tartan-legend-box bob-quintiles-2">
-                    &nbsp;
-                </div>
-                <div class="tartan-legend-box bob-quintiles-3">
-                    &nbsp;
-                </div>
-                <div class="tartan-legend-box bob-quintiles-4">
-                    &nbsp;
-                </div>
-                <div class="tartan-legend-box bob-quintiles-5">
-                    High
-                </div>
-            </div>
-            <div class="outer-tartan-legend-box left-margin">
-                <div class="tartan-legend-box not-compared">
-                    Not applicable
+                <div class="outer-tartan-legend-box left-margin">
+                    <div class="tartan-legend-box not-compared">
+                        Not applicable
+                    </div>
                 </div>
             </div>
         </div>
+        @Html.Partial("_KeyRecentTrends")
     </div>
 </div>
+<!-- Placing the tab option buttons here. Will be migrated to angular in future -->
+<div id="tab-specific-options" class="row col tab-options clearfix"></div>

@@ -9,5 +9,8 @@ namespace PholioVisualisation.PholioObjects
 
         [JsonProperty]
         public string Name { get; set; }
+
+        [JsonProperty]
+        public float Sequence { get; set; }
     }
 }

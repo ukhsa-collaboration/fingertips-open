@@ -32,10 +32,12 @@
     switch (profileId)
     {
         case ProfileIds.Tobacco:
-        case ProfileIds.Phof:
         case ProfileIds.LiverDisease:
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>
+            break;
+        case ProfileIds.Phof:
+            <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.FurtherInfo, profileId).Link)</li>
             break;
         case ProfileIds.HealthProfiles:
             <li class="site-link">@(new SupportingPage(profileUrlKey, ContentKeys.Faqs, profileId).Link)</li>

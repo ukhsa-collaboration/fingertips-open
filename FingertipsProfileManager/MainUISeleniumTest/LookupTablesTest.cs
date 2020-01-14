@@ -44,8 +44,12 @@ namespace Fpm.MainUISeleniumTest
         {
             get
             {
-                SwithToIFrameWindow(FrameNames.Description);
-                _categoryTypeDescriptionTextArea = Driver.FindElement(By.Id("tinymce"));
+                if (_categoryTypeDescriptionTextArea == null)
+                {
+                    SwitchToIFrameWindow(FrameNames.Description);
+                    _categoryTypeDescriptionTextArea = Driver.FindElement(By.Id("tinymce"));
+                }
+
                 return _categoryTypeDescriptionTextArea;
             }
             set
@@ -58,8 +62,12 @@ namespace Fpm.MainUISeleniumTest
         {
             get
             {
-                SwithToIFrameWindow(FrameNames.Notes);
-                _categoryTypeNotesTextArea = Driver.FindElement(By.Id("tinymce"));
+                if (_categoryTypeNotesTextArea == null)
+                {
+                    SwitchToIFrameWindow(FrameNames.Notes);
+                    _categoryTypeNotesTextArea = Driver.FindElement(By.Id("tinymce"));
+                }
+
                 return _categoryTypeNotesTextArea;
             }
             set
@@ -75,11 +83,6 @@ namespace Fpm.MainUISeleniumTest
         {
             // Navigate to the categories page
             LoadCategoriesPage();
-
-            // Get the handle of the parent window
-            // The web page to be tested uses couple of tinymce controls which are iframes
-            // Having the handle of is essential to swap to and fro to access the corresponding controls
-            WindowHandle = Driver.CurrentWindowHandle;
 
             // Load a category to edit
             LoadEditCategoryPage();
@@ -155,6 +158,9 @@ namespace Fpm.MainUISeleniumTest
 
         private void CheckUpdatedValues()
         {
+            CategoryTypeDescriptionTextArea = null;
+            CategoryTypeNotesTextArea = null;
+
             TestHelper.AssertElementTextIsEqual(CategoryTypeDescription, CategoryTypeDescriptionTextArea);
             TestHelper.AssertElementTextIsEqual(CategoryTypeNotes, CategoryTypeNotesTextArea);
             TestHelper.AssertElementTextIsEqual(CategoryTypeName, CategoryTypeNameTextBox.GetAttribute("value"));
@@ -163,10 +169,10 @@ namespace Fpm.MainUISeleniumTest
         private void SwitchToParentWindow()
         {
             // Switch to the parent window
-            Driver.SwitchTo().Window(WindowHandle);
+            Driver.SwitchTo().DefaultContent();
         }
 
-        private void SwithToIFrameWindow(FrameNames frameName)
+        private void SwitchToIFrameWindow(FrameNames frameName)
         {
             // Switch to the parent window first
             SwitchToParentWindow();
@@ -175,10 +181,10 @@ namespace Fpm.MainUISeleniumTest
             switch (frameName)
             {
                 case FrameNames.Description:
-                    Driver.SwitchTo().Frame(Driver.FindElement(By.Id("Description_ifr")));
+                    Driver.SwitchTo().Frame(0);
                     break;
                 case FrameNames.Notes:
-                    Driver.SwitchTo().Frame(Driver.FindElement(By.Id("Notes_ifr")));
+                    Driver.SwitchTo().Frame(1);
                     break;
             }
 

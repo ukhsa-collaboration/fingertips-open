@@ -67,11 +67,12 @@ namespace PholioVisualisation.DataConstructionTest
             AddNullData(builder);
             AddValidData(builder);
 
+            // Act
             var index = builder.RemoveEarlyEmptyYears();
 
             // Assert
-            Assert.AreEqual(1, index);
             Assert.AreEqual(1, builder.Dictionary[Sex2].Count, "Expect 1 data point because two were removed");
+            Assert.AreEqual(1, index);
         }
 
         private static PartitionTrendDataDictionaryBuilder GetPartitionTrendDataDictionaryBuilderWithDataAdded()

@@ -32,22 +32,6 @@ namespace Fpm.MainUITest.Helpers
         }
 
         [TestMethod]
-        public void TestGetTestSiteUrl_DoNotIncludePracticeCodeInUrl()
-        {
-            IndicatorGridModel model = new IndicatorGridModel
-            {
-                ProfileKey = urlKey,
-                SelectedGroupId = 1,
-                SelectedAreaTypeId = 7
-            };
-
-            string url = CommonUtilities.GetTestSiteUrl(model);
-            Assert.IsFalse(url.Contains("ati/7"));
-            Assert.IsTrue(url.Contains("gid/1"));
-            Assert.IsTrue(url.Contains(urlKey + "#"));
-        }
-
-        [TestMethod]
         public void TestGetMonths()
         {
             Assert.AreEqual(12, CommonUtilities.GetMonths().Count());
@@ -63,8 +47,8 @@ namespace Fpm.MainUITest.Helpers
         public void TestGetPolarities_PleaseSelectOptionIncludedAsRequested()
         {
             Assert.AreEqual(
-                CommonUtilities.GetListOfPolarityTypes(PleaseSelectOption.NotRequired).Count() +1,
-                CommonUtilities.GetListOfPolarityTypes(PleaseSelectOption.Required).Count()
+                CommonUtilities.GetListOfPolarityTypes(PleaseSelectOption.NotRequired, ComparatorMethodIds.NoComparison).Count() +1,
+                CommonUtilities.GetListOfPolarityTypes(PleaseSelectOption.Required, ComparatorMethodIds.NoComparison).Count()
                 );
         }
 

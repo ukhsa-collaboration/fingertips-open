@@ -5,8 +5,27 @@
 
 var areaSearch = {};
 
-
 areaSearch.state = {};
+
+var ccgs = [AreaTypeIds.CCGPreApr2017, AreaTypeIds.CCGPostApr2017, AreaTypeIds.CCGSince2018, AreaTypeIds.CcgSinceApr2019];
+var countiesUas = [AreaTypeIds.CountyUA, AreaTypeIds.CountyUASince2019];
+var districtUas = [AreaTypeIds.DistrictUA, AreaTypeIds.DistrictUASince2019];
+var Uas = [AreaTypeIds.UnitaryAuthority, AreaTypeIds.UAUnchanged, AreaTypeIds.UANew2019,
+    AreaTypeIds.UAObsolete2019, AreaTypeIds.UAFutureAreas
+];
+var districts = [AreaTypeIds.LANew2019, AreaTypeIds.LAUnchanged, AreaTypeIds.District, AreaTypeIds.LAObsolete2019]; 
+
+var areaTypeNameHash = {};
+
+function addAreaTypeNames(areaTypeIdList, name) {
+    for (var i in areaTypeIdList) {
+        areaTypeNameHash[areaTypeIdList[i]] = name;
+    }
+}
+
+addAreaTypeNames(ccgs, 'CCGs');
+addAreaTypeNames(countiesUas, 'Counties / Unitary Authorities');
+addAreaTypeNames(districtUas, 'Districts');
 
 /**
 * Hides the area search components and shows the spinner.
@@ -30,16 +49,16 @@ areaSearch.init = function () {
 
     // Area type to include in the search results
     var areaTypeId = areaSearch.getAreaTypeForSearchResults();
+    FT.model.areaTypeId = areaTypeId;
 
     // Set parent area
-    ns.state.parentAreaType = areaTypeId === AreaTypeIds.CCGPreApr2017 ||
-        areaTypeId === AreaTypeIds.CCGPostApr2017 || areaTypeId === AreaTypeIds.CCGSince2018
+    ns.state.parentAreaType = _.contains(ccgs, areaTypeId)
         ? AreaTypeIds.Subregion
         : AreaTypeIds.Region;
 
     // Init area search menu
     var areaSearchSelector = '#area-search-text';
-    initAreaSearch(areaSearchSelector, false, [areaTypeId]);
+    initAreaSearch(areaSearchSelector, false, FT.config.frontPageAreaSearchAreaTypes);
     $(areaSearchSelector).show();
 
     // Populate region menu
@@ -53,16 +72,24 @@ areaSearch.init = function () {
 * @class areaSearch.getAreaTypeForSearchResults
 */
 areaSearch.getAreaTypeForSearchResults = function () {
+
+    var areaTypeId = getDistrictUaAreaType();
+    return areaTypeId !== null ? areaTypeId : FT.config.frontPageAreaSearchAreaTypes[0];
+}
+
+function getDistrictUaAreaType()
+{
     var areaTypeIds = FT.config.frontPageAreaSearchAreaTypes;
 
     // Use district and UA in preference to County UA
-    if (_.some(areaTypeIds,
-        function (areaType) { return areaType === AreaTypeIds.DistrictUA; })) {
-        return AreaTypeIds.DistrictUA;
+    var ids = _.filter(areaTypeIds,
+        function (id) {
+            return _.contains(districtUas, id);
+        });
+    if (ids.length) {
+        return ids[0];
     }
-
-    // Otherwise use the first area type by default
-    return areaTypeIds[0];
+    return null;
 }
 
 /**
@@ -90,8 +117,8 @@ areaSearch.showParentMenu = function () {
         setTimeout(function () {
             var profileUrl = ns.getProfileUrlPart();
             setUrl(profileUrl + '/area-search-results/' + $menu.val() +
-             '?search_type=' + ns.searchTypes.listChildAreas +
-             '&place_name=' + placeName);
+                '?search_type=' + ns.searchTypes.listChildAreas +
+                '&place_name=' + placeName);
         }, 0);
     });
 
@@ -138,9 +165,9 @@ function areaSearchResultSelected($noMatches, result) {
     setTimeout(function () {
         var profileUrl = areaSearch.getProfileUrlPart();
         setUrl(profileUrl +
-         '/area-search-results/' + result.PolygonAreaCode +
-         '?place_name=' + placeName +
-         '&search_type=' + searchType);
+            '/area-search-results/' + result.PolygonAreaCode +
+            '?place_name=' + placeName +
+            '&search_type=' + searchType);
     }, 0);
 }
 
@@ -167,9 +194,17 @@ areaSearchResults.init = function () {
 
     ns.initTimePeriod();
 
+    // Init back to search link
+    $('#back-to-search').bind('click', function (e) {
+        e.preventDefault();
+
+        setUrl(areaSearch.getProfileUrlPart());
+    });
+
     // Check in case ignored area, e.g. Isles of Scilly
     if (_.contains(state.areasToIgnore, state.parentAreaCode)) {
         $('#no-data-message').show();
+        hideSpinner();
         return;
     }
 
@@ -184,13 +219,6 @@ areaSearchResults.init = function () {
     } else {
         ns.getDataForParentArea(areaTypeIds);
     }
-
-    // Init back to search link
-    $('#back-to-search').bind('click', function (e) {
-        e.preventDefault();
-
-        setUrl(areaSearch.getProfileUrlPart());
-    });
 };
 
 areaSearchResults.getDataForPlaceNameSearch = function (areaTypeIds) {
@@ -215,10 +243,11 @@ areaSearchResults.getDataForParentArea = function (areaTypeIds) {
     ajaxGet('api/areas/by_area_code',
         'area_codes=' + state.parentAreaCode,
         function (areaList) {
-
-            if (areaList.length === 1 && areaList[0].AreaTypeId === AreaTypeIds.District) {
+            var areaTypeId = areaList[0].AreaTypeId;
+            if (areaList.length === 1 &&
+                (_.contains(districts, areaTypeId))) {
                 // Where user has selected a district
-                loaded.areaLists[AreaTypeIds.DistrictUA] = areaList;
+                loaded.areaLists[getDistrictUaAreaType()] = areaList;
                 ajaxMonitor.callCompleted();
             } else {
                 loaded.areaLists[areaTypeIds[0]] = areaList;
@@ -296,7 +325,7 @@ areaSearchResults.AreaListProcessor = function (areaList, areaTypeId) {
     */
     this.assignCompositeAreaTypeId = function () {
         _.each(areaList, function (area) {
-                area.CompositeAreaTypeId = areaTypeId;
+            area.CompositeAreaTypeId = areaTypeId;
         });
         return this;
     };
@@ -307,7 +336,7 @@ areaSearchResults.AreaListProcessor = function (areaList, areaTypeId) {
     */
     this.removeUAs = function () {
         areaList = _.filter(areaList, function (area) {
-            return area.AreaTypeId !== AreaTypeIds.UnitaryAuthority;
+            return !_.contains(Uas, area.AreaTypeId);
         });
         return this;
     };
@@ -337,10 +366,6 @@ areaSearchResults.findAreaFromCode = function (areaList, areaCode) {
         function (area) { return area.Code === areaCode; });
 }
 
-areaSearchResults.isAreaTypeIncluded = function (areaTypeId) {
-    return _.some(FT.config.frontPageAreaSearchAreaTypes, function (id) { return id === areaTypeId; });
-}
-
 /**
 * Prepares the view model for the area search results.
 * @class areaSearchResults.prepareViewModel
@@ -355,17 +380,9 @@ areaSearchResults.prepareViewModel = function () {
         return areaType.Id;
     });
 
-    // Init area type names
-    var areaTypeNames = [];
-    var areaTypeNameHash = {
-        153: 'CCGs',
-        102:'Counties / Unitary Authorities', 
-        101:'Districts'
-    };
-
     // Process area lists
-
     var areaLists = [];
+    var areaTypeNames = [];
     for (var i in areaTypeIds) {
 
         var areaTypeId = areaTypeIds[i];
@@ -375,15 +392,19 @@ areaSearchResults.prepareViewModel = function () {
 
             var processor = new areaSearchResults.AreaListProcessor(areaList, areaTypeId);
 
-            if (areaTypeId === AreaTypeIds.DistrictUA && ns.isAreaTypeIncluded(AreaTypeIds.CountyUA)) {
-                // Don't want to display UAs twice
-                processor.removeUAs();
+            if (_.contains(districtUas, areaTypeId)) {
+
+                var isCountyUa = _.some(areaTypeIds, function (id) { return _.contains(countiesUas, id); });
+                if (isCountyUa) {
+                    // Don't want to display UAs twice
+                    processor.removeUAs();
+                }
             }
 
             // Determine whether PDF report is available
             if (FT.config
                 .hasStaticReports ||
-                _.some(areaTypesIdsWithPdfs, function(id) { return id === areaTypeId; })) {
+                _.some(areaTypesIdsWithPdfs, function (id) { return id === areaTypeId; })) {
                 processor.assignHasReport();
             }
 
@@ -426,9 +447,9 @@ areaSearchResults.getParentAreaOfPlaceName = function (areaTypeId) {
                     loaded.areaLists[areaTypeId] = areaList;
                     ajaxMonitor.callCompleted();
                 });
-    
+
         },
-    areaTypeId, false, [areaTypeId]);
+        areaTypeId, false, [areaTypeId]);
 }
 
 /**
@@ -455,8 +476,8 @@ areaSearchResults.ensureParentAreaCodeIsDefined = function (areaLists) {
 
         // Get parent areas
         var parameters = new ParameterBuilder(
-            ).add('child_area_code', areaCode
-            ).add('parent_area_type_ids', AreaTypeIds.Region);
+        ).add('child_area_code', areaCode
+        ).add('parent_area_type_ids', AreaTypeIds.Region);
 
         ajaxGet('api/area/parent_areas',
             parameters.build(),
@@ -468,84 +489,83 @@ areaSearchResults.ensureParentAreaCodeIsDefined = function (areaLists) {
 
 /**
 * Event handler for download link click
-* @class areaSearchResults.exportPdf
+* @class areaSearchResults.openReportSelected
 */
-areaSearchResults.exportPdf = function (areaCode, areaTypeId) {
-    FT.model.areaTypeId = areaTypeId;
-    var area = areaSearchResults.findAreaFromCode(loaded.areaLists[areaTypeId], areaCode);
+areaSearchResults.openReportSelected = function (areaCode, areaTypeId, areaName) {
 
-    downloadCachedPdf(areaCode);
-
-    // areaHash will not be defined from area search result but area will be 
-    var areaName = isDefined(area) ? area.Name : areaHash[areaCode].Name;
-
+    downloadReport(areaCode, areaName);
     logEvent('Download', 'PDF', areaName);
 }
 
 /**
 * Downloads a cached PDF. DUPLICATED IN ANGULAR DOWNLOAD COMPONENTS.
 */
-function downloadCachedPdf(areaCode) {
-
-    var profileId = FT.model.profileId;
-    var url;
+function downloadReport(areaCode, areaName) {
 
     if (FT.config.hasStaticReports) {
-        downloadStaticReport(areaCode);
-        return;
-    } else if (profileId === ProfileIds.Liver) {
+        checkStaticReportExistsThenDownload(areaCode, areaName);
+    } else if (FT.model.profileId === ProfileIds.Liver) {
         // Liver profiles
-        url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
-    } 
-    else {
-        url = getPdfUrl(areaCode);
+        var url = 'http://www.endoflifecare-intelligence.org.uk/profiles/liver-disease/' + areaCode + '.pdf';
+        areaSearchResults.openFile(url);
     }
-
-    areaSearchResults.openFile(url);
 }
 
 areaSearchResults.openFile = function (url) {
     window.open(url.toLowerCase(), '_blank');
 }
 
-function getPdfUrl(areaCode) {
-
-    var profileId = FT.model.profileId;
-
-    // Determine host
-    var url = FT.url.pdf + profileUrlKey;
-    if (profileId === ProfileIds.HealthProfiles) {
-        url = url + '/' + areaSearchResults.timePeriod;
+function getReportExtension() {
+    // Health Profiles switched from PDF to HTML reports from 2019
+    if (FT.model.profileId === ProfileIds.HealthProfiles) {
+        var year = parseInt(areaSearchResults.timePeriod);
+        if (year > 2018) {
+            return 'html';
+        }
     }
-
-    // Return URL with parameters
-    return url + '/' + areaCode + '.pdf';
+    return 'pdf';
 }
 
-function downloadStaticReport(areaCode) {
+function checkStaticReportExistsThenDownload(areaCode, areaName) {
+
+    var fileName = areaCode + '.' + getReportExtension();
+    var timePeriod = areaSearchResults.timePeriod;
+
     var parameters = new ParameterBuilder(
     ).add('profile_key', profileUrlKey
-    ).add('file_name', areaCode + '.pdf');
+    ).add('file_name', fileName);
 
     // Time period (if required)
-    if (areaSearchResults.timePeriod) {
-        parameters.add('time_period', areaSearchResults.timePeriod);
+    if (timePeriod) {
+        parameters.add('time_period', timePeriod);
     }
 
     var parametersString = parameters.build();
-    checkStaticReportExistsThenDownload(parametersString);
-}
-
-function checkStaticReportExistsThenDownload(parametersString) {
 
     // Check report exists
     ajaxGet('api/static-reports/exists',
         parametersString,
         function (doesReportExist) {
             if (doesReportExist) {
+
                 // Download report
-                var url = FT.url.corews + 'static-reports?' + parametersString;
-                window.open(url.toLowerCase(), '_blank');
+                var url;
+                if (parametersString.indexOf('.html') > -1) {
+                    // HTML - open file
+                    url = FT.url.bridge + 'static-reports/' + profileUrlKey + '/';
+                    if (timePeriod) {
+                        url += timePeriod + '/';
+                    }
+
+                    // Area name is appended to help track in GA
+                    url += fileName + '?area-name=' + areaName;
+                } else {
+                    // PDF - Download file
+                    url = FT.url.corews + 'static-reports?' + parametersString;
+                }
+
+                areaSearchResults.openFile(url);
+
             } else {
                 var html = '<div style="padding:15px;"><h3>Sorry, this document is not available</h3></div>';
                 var popupWidth = 800;
@@ -555,7 +575,6 @@ function checkStaticReportExistsThenDownload(parametersString) {
             }
         });
 }
-
 
 /**
 * Displays the view model for the area search results.
@@ -573,8 +592,8 @@ areaSearchResults.displayAreaLists = function (viewModel) {
 
     // Area results
     templates.add('results', '{{#showAreaTypeHeader}}<h3>{{areaTypeName}}</h3>{{/showAreaTypeHeader}}<table class="area-search-results" class="bordered-table">' +
-    '{{#areas}}<tr><td>{{Name}}</td><td class="web-links"><a class="pLink" href="/profile/{{profileUrlKey}}/data#page/1/ati/{{CompositeAreaTypeId}}/are/{{Code}}">View data</a></td>' +
-    '<td>{{#hasReport}}<a class="pLink" href="javascript:areaSearchResults.exportPdf(\'{{Code}}\',{{CompositeAreaTypeId}})">Download report</a>{{/hasReport}}</td></tr>{{/areas}}</table>');
+        '{{#areas}}<tr><td>{{Name}}</td><td class="web-links"><a class="pLink" href="/profile/{{profileUrlKey}}/data#page/1/ati/{{CompositeAreaTypeId}}/are/{{Code}}">View data</a></td>' +
+        '<td>{{#hasReport}}<a class="pLink" href="javascript:areaSearchResults.openReportSelected(\'{{Code}}\',{{CompositeAreaTypeId}},\'{{Name}}\')">Download report</a>{{/hasReport}}</td></tr>{{/areas}}</table>');
 
     for (var i in viewModel.areaLists) {
 
@@ -647,7 +666,7 @@ areaSearchResults.timePeriod = null;
 * AJAX call to determine whether or not PDFs are available for the current profile and area type.
 * @class areaSearchResults.getArePdfsAvailable
 */
-areaSearchResults.getArePdfsAvailable = function() {
+areaSearchResults.getArePdfsAvailable = function () {
     var model = FT.model;
     var profileId = model.profileId;
 

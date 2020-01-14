@@ -1,18 +1,43 @@
-﻿@using Fpm.MainUI
+﻿@using System.Web.Optimization
+@using Fpm.MainUI
 @using Fpm.MainUI.Helpers
+@using Fpm.ProfileData
 @model Fpm.MainUI.Models.IndicatorGridModel
+
 @{ Layout = "~/Views/Shared/_LayoutPage.cshtml"; }
+
 @{
     ViewBag.Title = "FPM - Profiles & indicators";
     var isUserAdmin = UserDetails.CurrentUser().IsAdministrator;
+    var isUserReviewer = UserDetails.CurrentUser().IsReviewer;
+
+    var isNewIndicator = false;
+    if (ViewBag.IsNewIndicator != null)
+    {
+        isNewIndicator = ViewBag.IsNewIndicator;
+    }
+
+    var newIndicatorId = -1;
+    if (ViewBag.NewIndicatorId != null)
+    {
+        newIndicatorId = ViewBag.NewIndicatorId;
+    }
+
+    var userHasAssignedProfiles = Model.UserHasAssignedPermissions ? "block" : "none";
+    var userHasWritePermissions = Model.UserGroupPermissions == null ? "none" : "inline";
+    var isUnassignedProfile = Model.IsUnassignedProfile() ? "none" : "inline";
+
+    var hideManageDomainsButton = Model.Profile.Id == ProfileIds.IndicatorsForReview && isUserAdmin == false;
+    var hideNewButton = Model.Profile.Id == ProfileIds.IndicatorsForReview && Model.SelectedGroupId != GroupIds.AwaitingRevision;
+
+    var isReadOnlyMode = CommonUtilities.IsReadOnlyMode();
 }
 
 <link href="@(AppConfig.CssPath)TableSorter.css" rel="stylesheet" type="text/css" />
 <script src="@(AppConfig.JsPath)jquery.watermark.min.js" type="text/javascript"></script>
 
-<script src="@(AppConfig.JsPath)PageProfilesAndIndicators.js" type="text/javascript"></script>
-<script src="@(AppConfig.JsPath)PageCoreData.js" type="text/javascript"></script>
-
+@Scripts.Render("~/PageProfilesAndIndicators.js")
+@Scripts.Render("~/PageCoreData.js")
 
 <script type="text/javascript">
     FT = {
@@ -24,9 +49,15 @@
 </script>
 
 <div class="standardWidth">
-
-    @using (Html.BeginForm("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators", FormMethod.Get, new { id = "IndicatorManagementForm" }))
+    @using (Html.BeginForm("ListIndicatorsInProfileSpecific", "ProfilesAndIndicators", FormMethod.Get, 
+    new { id = "IndicatorManagementForm" }))
     {
+        @Html.Hidden("is-new-indicator", isNewIndicator)
+        @Html.Hidden("new-indicator-id", newIndicatorId)
+        @Html.Hidden("sortBy", Model.SortBy)
+        @Html.Hidden("ascending", Model.SortAscending)
+        @Html.Hidden("resetArea", "false")
+
         <div class="subheading clearfix">
             <h2 style="float: left;">Profiles & indicators</h2>
 
@@ -38,7 +69,9 @@
             }
 
             <div class="right-info clearfix">
-                Profile contact: <a href="mailto:@Model.EmailAddress?subject=@Model.Profile.Name" title="Send an email regarding the current profile">@Model.ContactUserName</a>
+                Profile contact(s): <a href="mailto:@Model.EmailAddresses?subject=@Model.Profile.Name" title="Send an email regarding the current profile">
+                    @Model.ContactUserNames
+                </a>
             </div>
         </div>
 
@@ -54,69 +87,129 @@
         <div class="button-box clearfix">
             <b>Profile:</b>
             @Html.DropDownListFor(model => model.ProfileKey, Model.ProfileList, new { Id = "selectedProfile" })
-           
+
             @if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
             {
                 <b>Domain:</b>
-                @Html.DropDownListFor(model => model.DomainSequence, Model.DomainList, new {Id = "selectedDomain"})
+                @Html.DropDownListFor(model => model.DomainSequence, Model.DomainList, new { Id = "selectedDomain" })
             }
+
             @if (Model.AreaTypeList != null)
             {
                 <b>Area:</b>
                 @Html.DropDownListFor(model => model.Profile.SelectedAreaType, Model.AreaTypeList,
-                    new { Id = "SelectedAreaTypeId", Name = "SelectedAreaTypeId", style = "max-width: 200px;" })
+        new { Id = "SelectedAreaTypeId", Name = "SelectedAreaTypeId", style = "max-width: 200px;" })
             }
-            @Html.Hidden("sortBy", Model.SortBy)
-            @Html.Hidden("ascending", Model.SortAscending)
-            <input type="hidden" id="resetArea" name="resetArea" value="false" />
         </div>
 
         @Html.Partial("_IndicatorFilter")
         @Html.Partial("_IndicatorList")
     }
+
     @Html.Partial("_GridEditDomains")
-    @{
-        var userHasAssignedProfiles = Model.UserHasAssignedPermissions ? "block" : "none";
-        var userHasWritePermissions = Model.UserGroupPermissions == null ? "none" : "inline";
-        var isArchiveProfile = Model.IsArchiveProfile() ? "none" : "inline";
-    }
+
     <div class="button-box" style="display: @userHasAssignedProfiles">
         <input type="hidden" id="selected-group-id" value="@Model.SelectedGroupId" />
         <input type="hidden" id="profile-id" value="@Model.Profile.Id" />
-        @if (CommonUtilities.IsReadOnlyMode())
-        {
-            <input type="button" id="edit_Domains" value="Manage Domains" disabled="disabled" style="display: @userHasWritePermissions"/>
+        @{
+            @* Manage domain *@
+            if (hideManageDomainsButton == false)
+            {
+                <div class="left">
+                    <input class="btn btn-primary" type="button" id="edit_Domains" value="Manage domains" disabled="@isReadOnlyMode" style="display: @userHasWritePermissions" />
+                </div>
+            }
 
-
-            <input type="button" id="reorder-indicators" value="Reorder Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-            <input type="button" value="New Indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")    ' " disabled=" disabled"/>
-
-            <div class="divRight">
-                <input type="button" id="audit_history" value="Show History"/>
-                <input type="button" id="delete-indicators-button" value="Remove Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-                <input type="button" id="move-indicators-button" value="Move Indicators" disabled="disabled" style="display: @userHasWritePermissions"/>
-                <input type="button" id="copy-indicators-button" value="Copy Indicators" disabled="disabled"/>
-            </div>
-
-        }
-        else
-        {
-            <input type="button" id="edit_Domains" value="Manage domains" style="display: @userHasWritePermissions"/>
             if (CommonUtilities.IsDomainListAvailable(Model.DomainList))
             {
-                <input type="button" id="reorder-indicators" value="Reorder indicators" style="display: @userHasWritePermissions"/>
-                <input type="button" value="New indicator" onclick="location.href = '@Url.Action("IndicatorNew", "IndicatorNew")'"/>
-                <div class="divRight">
-                    <input type="button" id="audit_history" value="Show history"/>
-                    <input type="button" id="delete-indicators-button" value="Remove indicators" style="display: @userHasWritePermissions"/>
-                    <input type="button" id="move-indicators-button" value="Move indicators" style="display: @userHasWritePermissions"/>
-                    <input type="button" id="copy-indicators-button" value="Copy indicators" style="display: @isArchiveProfile"/>
+                <div class="left">
+                    <input class="btn btn-primary" type="button" id="reorder-indicators" value="Reorder indicators" disabled="@isReadOnlyMode" style="display: @userHasWritePermissions" />
+
+                    @* New indicator *@
+                    @if (hideNewButton == false)
+                    {
+                        <input class="btn btn-primary" type="button" value="New indicator" onclick="location.href = '@Url.Action("CreateIndicator", "Indicator")'"
+                            data-toggle="tooltip" data-placement="bottom" disabled="@isReadOnlyMode"
+                                title="Create a new indicator. The indicator will be created in the 'Indicators for Review' profile. Once the metadata and data are ready you can submit it for review by IMRG." />
+                    }
+                </div>
+
+                <div id="indicator-review-buttons">
+                    @* Indicator review buttons *@
+                    @if (Model.Profile.Id == ProfileIds.IndicatorsForReview)
+                    {
+                        if (Model.SelectedGroupId == GroupIds.UnderReview && isUserReviewer)
+                        {
+                            <input class="btn btn-warning" type="button" id="indicators-awaiting-revision-button" value="Request revisions"
+                                data-toggle="tooltip" data-placement="bottom"
+                                    title="Move the selected indicators to 'Awaiting revision' for further changes" />
+
+                            <input class="btn btn-success" type="button" id="approve-indicators-button" value="Approve"
+                                data-toggle="tooltip" data-placement="bottom"
+                                    title="The selected indicators will be approved and moved to the destination profiles" />
+
+                            <input class="btn btn-danger" type="button" id="reject-indicators-button" value="Reject indicators"
+                                data-toggle="tooltip" data-placement="bottom"
+                                    title="Reject the selected indicators. All the data and metadata will be completely removed and no archive will be retained." />
+                        }
+
+                        @* Submit for review *@
+                        if (Model.SelectedGroupId == GroupIds.InDevelopment)
+                        {
+                            <input class="btn btn-success" type="button" id="submit-indicators-for-review-button" value="Submit for review"
+                                data-toggle="tooltip" data-placement="bottom"
+                                    title="Submit the selected indicators for review by IMRG" />
+
+                            <input class="btn btn-danger" type="button" id="withdraw-indicators-button" value="Withdraw indicators"
+                                data-toggle="tooltip" data-placement="bottom"
+                                    title="Withdraw the selected indicators. All the data and metadata will be completely removed and no archive will be retained." />
+                        }
+
+                        @* Awaiting revision *@
+                        if (Model.SelectedGroupId == GroupIds.AwaitingRevision)
+                        {
+                            <input class="btn btn-success" type="button" id="resubmit-indicators-for-review-button" value="Resubmit for review"
+                                   data-toggle="tooltip" data-placement="bottom"
+                                   title="Resubmit the selected indicators for review by IMRG" />
+                        }
+
+                        <input class="btn btn-secondary" type="button" id="download-metadata-button" value="Download metadata"
+                            data-toggle="tooltip" data-placement="bottom"
+                                title="Download all the text metadata for the selected indicators" />
+                    }
+                </div>
+
+                <div class="right">
+                    <input class="btn btn-secondary" type="button" id="audit_history" value="Show history" />
+
+                    @* Remove indicators, move indicators, copy indicators *@
+                    @if (Model.Profile.Id != ProfileIds.IndicatorsForReview)
+                    {
+                        <input class="btn btn-warning" type="button" id="remove-indicators-button" value="Remove indicators" disabled="@isReadOnlyMode" style="display: @userHasWritePermissions" />
+                        <input class="btn btn-primary" type="button" id="move-indicators-button" value="Move indicators" disabled="@isReadOnlyMode" style="display: @userHasWritePermissions" />
+                        <input class="btn btn-primary" type="button" id="copy-indicators-button" value="Copy indicators" disabled="@isReadOnlyMode" style="display: @isUnassignedProfile" />
+                    }
                 </div>
             }
         }
     </div>
 
     <div class="a-modal">
-        <!-- Place at bottom of page -->
+    <!-- Place at bottom of page -->
+    </div>
+</div>
+<div id="new-indicator-created-popup" style="display: none;">
+    <div style="width: 100%; height: 140px;">
+        <h4>
+            <div style="height: 100px;">
+                <p class="sub-title">
+                    Indicator confirmation
+                </p>
+                <p class="confirm-sub-title">
+                    You have created a new indicator: <span id="new-indicator-id">@newIndicatorId</span>
+                </p>
+            </div>
+        </h4>
+        <input id="indicator-created-confirmation" class="medium-button" type="button" value="OK" onclick="lightbox.hide()" />
     </div>
 </div>

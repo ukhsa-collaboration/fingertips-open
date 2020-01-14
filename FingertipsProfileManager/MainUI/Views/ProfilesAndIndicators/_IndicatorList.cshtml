@@ -1,8 +1,14 @@
-﻿@using Fpm.MainUI.Helpers
+﻿@using System.Web.Mvc.Html
+@using Fpm.MainUI.Helpers
 @model Fpm.MainUI.Models.IndicatorGridModel
+
+@{
+    var profile = Model.Profile;
+}
+
 @if (Model.IndicatorNamesGrid != null)
 {
-    <table class="grid sortable">
+    <table id="tbl-profiles-and-indicators" class="grid sortable">
         <thead>
         <tr>
             <th class="header">Seq</th>
@@ -47,10 +53,14 @@
                     @item.Sequence
                 </td>
                 <td class="center">
-                    <a class="edit-link" href="@(Model.GetIndicatorUrl(item.IndicatorId, item.AgeId, item.SexId))">@item.IndicatorId</a>
+                    @Html.ActionLink(item.IndicatorId.ToString(), "EditIndicator", "Indicator",
+                        new { urlKey = Model.UrlKey, areaType = profile.SelectedAreaType, domain = profile.SelectedDomain, indicatorId = item.IndicatorId, sexId = item.SexId, ageId = item.AgeId },
+                        new { @class = "edit-link" })
                 </td>
                 <td class="left">
-                    <a class="edit-link" href="@(Model.GetIndicatorUrl(item.IndicatorId, item.AgeId, item.SexId))">@item.IndicatorName</a>
+                    @Html.ActionLink(item.IndicatorName, "EditIndicator", "Indicator",
+                        new { urlKey = Model.UrlKey, areaType = profile.SelectedAreaType, domain = profile.SelectedDomain, indicatorId = item.IndicatorId, sexId = item.SexId, ageId = item.AgeId },
+                        new { @class = "edit-link" })
                 </td>
                 <td class="center">
                     @item.Sex
@@ -98,7 +108,7 @@
                 </td>
                 <td class="center">
                     <input type="button" class="view-indicator-data-btn" id="view-data-@item.IndicatorId"
-                           value="View Data" indicatorname="@item.IndicatorName"/>
+                           value="View data" indicatorname="@item.IndicatorName"/>
                 </td>
             </tr>
         }

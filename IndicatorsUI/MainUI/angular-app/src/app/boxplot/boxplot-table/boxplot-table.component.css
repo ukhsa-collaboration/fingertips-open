@@ -18,11 +18,30 @@
     border-bottom: 1px solid #eceeef;
 }
 
-.boxplot-table tr th:first-child {
-    min-width: 39px;
+tbody tr td {
+    text-align: right;
+    width:80px;
 }
 
-.boxplot-table tr td:first-child {
+tbody tr td:first-child {
     font-size: 11px;
     font-style: normal;
+    min-width: 39px;
+    text-align:center;
+}
+
+.boxplot-table td span {
+    float: left;
+}
+
+.boxplot-trend-source {
+    border: 0;
+    padding: 5px 0 0 0;
+    text-align: left !important;
+    font-style: italic;
+    overflow-wrap: break-word;
+}
+
+.boxplot-trend-source:hover {
+    background-color: #fff;
 }

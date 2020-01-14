@@ -166,9 +166,8 @@ namespace PholioVisualisation.SearchIndexing
         private void AddParentAreaCodes(PostcodeParentAreas parentAreas, Document doc)
         {
             AddParentAreaMapping(doc, AreaTypeIds.GoRegion, parentAreas.AreaCode6);
-            AddParentAreaMapping(doc, AreaTypeIds.CountyAndUnitaryAuthority, parentAreas.AreaCode102);
-            AddParentAreaMapping(doc, AreaTypeIds.DistrictAndUnitaryAuthority, parentAreas.AreaCode101);
-            AddParentAreaMapping(doc, AreaTypeIds.CcgsPreApr2017, parentAreas.AreaCode153);
+            AddParentAreaMapping(doc, AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019, parentAreas.AreaCode102);
+            AddParentAreaMapping(doc, AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019, parentAreas.AreaCode101);
             AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2013To2015, parentAreas.AreaCode103);
             AddParentAreaMapping(doc, AreaTypeIds.PheCentresFrom2015, parentAreas.AreaCode104);
 

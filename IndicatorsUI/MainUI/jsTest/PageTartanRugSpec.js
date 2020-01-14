@@ -50,7 +50,7 @@ describe('TartanRugCellBuilder', function () {
         var hasTrendMarker = false;
 
         return new TartanRugCellBuilder(data, columnNumber, rowNumber,
-            comparisonConfig, trendMarkerMode, hasTrendMarker).getHtml();
+            comparisonConfig, trendMarkerMode, hasTrendMarker, '').getHtml();
     };
 
     it('validate generated HTML', function () {
@@ -137,11 +137,15 @@ describe('Tests for csv download files code', function (){
         indicatorIdList = {};
         indicatorIdList.getAllIds = function(){ return 1;};
 
-        spyOn(window, 'getAreasCodeDisplayed').and.returnValue([{Code: "fakeAreaCode"}]);
-        spyOn(tartanRug, 'getParentAreaCode').and.returnValue("fakeParentAreaCode");
         spyOn(window, 'downloadLatestNoInequalitiesDataCsvFileByIndicator');
         spyOn(window, 'downloadLatestNoInequalitiesDataCsvFileByGroup');
-        
+
+        // Return dummy values from global functions
+        spyOn(window, 'getAreasCodeDisplayed').and.returnValue([{ Code: "fakeAreaCode" }]);
+        spyOn(window, 'getParentAreaCode').and.returnValue("fakeParentAreaCode");
+        spyOn(window, 'isCategoryAreacode').and.returnValue(false);
+        spyOn(window, 'getChildAreas').and.returnValue([]);
+
         spyOn( window, 'open' ).and.callFake( function() {
             return true;
         });

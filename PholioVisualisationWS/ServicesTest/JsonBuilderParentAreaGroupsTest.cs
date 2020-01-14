@@ -20,8 +20,8 @@ namespace PholioVisualisation.ServicesTest
             var parameters = new ParentAreaGroupsParameters(nameValues);
             var areaTypes =  new JsonBuilderParentAreaGroups(parameters).GetChildAreaTypeIdToParentAreaTypes();
 
-            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsFalse(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPreApr2017));
+            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019));
+            Assert.IsFalse(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPostApr2019));
         }
 
         [TestMethod]
@@ -32,8 +32,8 @@ namespace PholioVisualisation.ServicesTest
             var parameters = new ParentAreaGroupsParameters(nameValues);
             var areaTypes = new JsonBuilderParentAreaGroups(parameters).GetChildAreaTypeIdToParentAreaTypes();
 
-            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthority));
-            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPreApr2017));
+            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019));
+            Assert.IsTrue(areaTypes.Select(x => x.Id).ToList().Contains(AreaTypeIds.CcgsPostApr2019));
         }
     }
 }

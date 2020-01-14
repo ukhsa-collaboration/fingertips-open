@@ -1,15 +1,18 @@
 .btn-link {
-    color: #2e3191;
-    padding: 3px 0 0 0;
-    width: 100%;
-    text-align: left;
-    margin: 1px 0;
-    font-size: 16px;
+  color: #2e3191;
+  padding: 3px 0 0 0;
+  width: 100%;
+  text-align: left;
+  margin: 1px 0;
+  font-size: 16px;
 }
 
- img.pdf {
-    cursor: pointer;
-    height: 300px;
-    border: 2px solid #eee;
-    float: right;
-    }
+img.pdf {
+  cursor: pointer;
+  border: 2px solid #eee;
+  float: right;
+}
+
+img.no-cursor {
+  cursor: default;
+}

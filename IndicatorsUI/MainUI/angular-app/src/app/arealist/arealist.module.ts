@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpModule } from '@angular/http';
+import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ArealistIndexComponent } from './arealist-index/arealist-index.component';
 import { ArealistManageComponent } from './arealist-manage/arealist-manage.component';
@@ -8,15 +8,17 @@ import { GoogleMapSimpleComponent } from '../map/google-map-simple/google-map-si
 import { ArealistAreasComponent } from '../shared/component/arealist/arealist-areas/arealist-areas.component';
 import { PracticeSearchSimpleComponent } from '../map/practice-search-simple/practice-search-simple.component';
 import { TypeaheadModule } from 'ngx-bootstrap';
-import { LightBoxComponent } from '../shared/component/light-box/light-box.component';
-import { LightBoxWithInputComponent } from 'app/shared/component/light-box-with-input/light-box-with-input.component';
+import { LightBoxModule } from '../shared/component/light-box/light-box.module';
+import { LightBoxWithInputModule } from '../shared/component/light-box-with-input/light-box-with-input.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        HttpModule,
+        HttpClientModule,
         FormsModule,
         ReactiveFormsModule,
+        LightBoxModule,
+        LightBoxWithInputModule,
         TypeaheadModule.forRoot()
     ],
     declarations: [
@@ -24,17 +26,13 @@ import { LightBoxWithInputComponent } from 'app/shared/component/light-box-with-
         ArealistManageComponent,
         GoogleMapSimpleComponent,
         ArealistAreasComponent,
-        PracticeSearchSimpleComponent,
-        LightBoxComponent,
-        LightBoxWithInputComponent
+        PracticeSearchSimpleComponent
     ],
     exports: [
         ArealistIndexComponent,
         ArealistManageComponent,
         GoogleMapSimpleComponent,
-        ArealistAreasComponent,
-        LightBoxComponent,
-        LightBoxWithInputComponent
+        ArealistAreasComponent
     ]
 })
 export class ArealistModule { }

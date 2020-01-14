@@ -1,22 +1,26 @@
-﻿using System;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
+using NHibernate.Transform;
+using PholioVisualisation.DataAccess.Repositories;
 using PholioVisualisation.PholioObjects;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NHibernate.Transform;
-using PholioVisualisation.DataAccess.Repositories;
 
 namespace PholioVisualisation.DataAccess
 {
     public interface IGroupDataReader
     {
         IList<int> GetIndicatorIdsByGroupIdAndAreaTypeId(int groupId, int areaTypeId);
+        GroupingMetadata GetGroupingMetadata(int groupId);
         IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds);
         IList<int> GetGroupIdsOfProfile(int profileId);
         Grouping GetGroupingsByGroupIdAndIndicatorId(int groupId, int indicatorId);
+        IList<Grouping> GetGroupingListByGroupIdIndicatorIdAreaType(int groupId, int indicatorId, int areaTypeId);
+        IList<Grouping> GetGroupingListByIndicatorIdAreaType(int indicatorId, int areaTypeId);
         int GetCommonestPolarityForIndicator(int indicatorId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorId(List<int> groupIds, int indicatorId);
         IList<Grouping> GetGroupings(int groupId, int indicatorId, int areaTypeId, int sexId, int ageId);
@@ -29,7 +33,7 @@ namespace PholioVisualisation.DataAccess
         IList<Grouping> GetGroupingsByIndicatorId(int indicatorId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIdsAndAreaType(IList<int> groupIds,
         IList<int> indicatorIds, int areaTypeId);
-        IList<Grouping> GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int areaTypeId, 
+        IList<Grouping> GetGroupingByAreaTypeIdAndIndicatorIdAndSexIdAndAgeId(int areaTypeId,
             int indicatorId, int sexId, int ageId);
         IList<GroupingData> GetAvailableDataByIndicatorIdAndAreaTypeId(int? indicatorId, int? areaTypeId);
         IList<Grouping> GetGroupingsByGroupIdsAndIndicatorIds(IList<int> groupIds, IList<int> indicatorIds);
@@ -68,9 +72,6 @@ namespace PholioVisualisation.DataAccess
         CoreDataSet GetCoreDataForCategoryArea(Grouping grouping,
             TimePeriod timePeriod, ICategoryArea categoryArea);
 
-        IList<CoreDataSet> GetCoreDataForCategoryTypeIds(Grouping grouping,
-            TimePeriod timePeriod, params int[] categoryTypeIds);
-
         CoreDataSet GetCoreDataForCategory(Grouping grouping,
             TimePeriod timePeriod, string areaCode, int categoryTypeId, int categoryId);
 
@@ -94,10 +95,17 @@ namespace PholioVisualisation.DataAccess
         int GetCoreDataCountAtDataPoint(Grouping grouping);
         IList<CoreDataSet> GetCoreDataForAllAreasOfType(Grouping grouping, TimePeriod period);
         int GetCoreDataCountWhereBothCI95AreMinusOne();
+        int GetCoreDataCountWhereBothCI998AreMinusOne();
         IList<CoreDataSet> GetCoreDataForIndicatorId(int indicatorId);
 
         IList<double> GetOrderedCoreDataValidValuesForAllAreasOfType(Grouping grouping, TimePeriod period,
             IEnumerable<string> ignoredAreaCodes);
+
+        bool GetIndicatorMetadataAlwaysShowSexWithIndicatorName(int indicatorId);
+        bool GetIndicatorMetadataAlwaysShowAgeWithIndicatorName(int indicatorId);
+
+        IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties, int profileId);
 
         IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
@@ -108,8 +116,16 @@ namespace PholioVisualisation.DataAccess
         IndicatorMetadata GetIndicatorMetadata(int indicatorId,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
+        IndicatorMetadata GetIndicatorMetadata(int indicatorId,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties,
+            int profileId);
+
         IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
+
+        IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties,
+            int profileId);
 
         IList<IndicatorMetadataTextValue> GetIndicatorMetadataTextValues(int indicatorId);
 
@@ -117,6 +133,7 @@ namespace PholioVisualisation.DataAccess
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties);
 
         IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties();
+        IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextPropertiesIncludingInternalMetadata();
 
         IList<int> GetAllIndicatorIds();
 
@@ -215,6 +232,13 @@ namespace PholioVisualisation.DataAccess
             return (from g in groupings select g.IndicatorId).Distinct().ToList();
         }
 
+        public GroupingMetadata GetGroupingMetadata(int groupId)
+        {
+            return CurrentSession.CreateCriteria<GroupingMetadata>()
+                .Add(Restrictions.Eq("Id", groupId))
+                .UniqueResult<GroupingMetadata>();
+        }
+
         public virtual IList<GroupingMetadata> GetGroupingMetadataList(IList<int> groupIds)
         {
             // Guard clause to avoid case where query will fail to execute
@@ -250,6 +274,25 @@ namespace PholioVisualisation.DataAccess
             q.SetParameter(ParameterGroupId, groupId);
             q.SetParameter(ParameterIndicatorId, indicatorId);
             return q.List<Grouping>().FirstOrDefault();
+        }
+
+        public IList<Grouping> GetGroupingListByGroupIdIndicatorIdAreaType(int groupId, int indicatorId, int areaTypeId)
+        {
+            IQuery q = CurrentSession.CreateQuery(
+                "from Grouping g where g.GroupId = :groupId and g.IndicatorId = :indicatorId and g.AreaTypeId = :areaTypeId order by g.DataPointYear");
+            q.SetParameter(ParameterGroupId, groupId);
+            q.SetParameter(ParameterIndicatorId, indicatorId);
+            q.SetParameter(ParameterAreaType, areaTypeId);
+            return q.List<Grouping>();
+        }
+
+        public IList<Grouping> GetGroupingListByIndicatorIdAreaType(int indicatorId, int areaTypeId)
+        {
+            IQuery q = CurrentSession.CreateQuery(
+                "from Grouping g where g.IndicatorId = :indicatorId and g.AreaTypeId = :areaTypeId order by g.DataPointYear");
+            q.SetParameter(ParameterIndicatorId, indicatorId);
+            q.SetParameter(ParameterAreaType, areaTypeId);
+            return q.List<Grouping>();
         }
 
         public IList<Grouping> GetGroupingsByGroupIdsAndIndicatorId(List<int> groupIds, int indicatorId)
@@ -477,6 +520,16 @@ namespace PholioVisualisation.DataAccess
         }
 
         /// <summary>
+        /// This should always be zero. FUS should have converted double -1 to nulls.
+        /// </summary>
+        public int GetCoreDataCountWhereBothCI998AreMinusOne()
+        {
+            return CurrentSession.QueryOver<CoreDataSet>()
+                .Where(x => x.LowerCI99_8 == ValueData.NullValue && x.UpperCI99_8 == ValueData.NullValue)
+                .RowCount();
+        }
+
+        /// <summary>
         /// Gets the list of core data set based on the indicator id
         /// </summary>
         /// <param name="indicatorId">The indicator id</param>
@@ -586,24 +639,6 @@ namespace PholioVisualisation.DataAccess
                 .UniqueResult<CoreDataSet>();
         }
 
-        public virtual IList<CoreDataSet> GetCoreDataForCategoryTypeIds(Grouping grouping,
-            TimePeriod timePeriod, params int[] categoryTypeIds)
-        {
-            return CurrentSession.CreateCriteria<CoreDataSet>()
-                .Add(Restrictions.Eq("IndicatorId", grouping.IndicatorId))
-                .Add(Restrictions.Eq("Year", timePeriod.Year))
-                .Add(Restrictions.Eq("YearRange", timePeriod.YearRange))
-                .Add(Restrictions.Eq("Quarter", timePeriod.Quarter))
-                .Add(Restrictions.Eq("Month", timePeriod.Month))
-                .Add(Restrictions.Eq("SexId", grouping.SexId))
-                .Add(Restrictions.Eq("AgeId", grouping.AgeId))
-                .Add(Restrictions.In("CategoryTypeId", categoryTypeIds))
-                .AddOrder(new Order("CategoryTypeId", true))
-                .AddOrder(new Order("AreaCode", true))
-                .AddOrder(new Order("CategoryId", true))
-                .List<CoreDataSet>();
-        }
-
         public CoreDataSet GetCoreDataForCategory(Grouping grouping, TimePeriod timePeriod,
             string areaCode, int categoryTypeId, int categoryId)
         {
@@ -624,35 +659,35 @@ namespace PholioVisualisation.DataAccess
         public IList<CoreDataSet> GetAllCategoryDataWithinParentArea(string parentAreaCode,
                 int indicatorId, int sexId, int ageId, TimePeriod timePeriod)
         {
-                 return CurrentSession.CreateCriteria<CoreDataSet>()
-                .Add(Restrictions.Eq("IndicatorId", indicatorId))
-                .Add(Restrictions.Eq("Year", timePeriod.Year))
-                .Add(Restrictions.Eq("YearRange", timePeriod.YearRange))
-                .Add(Restrictions.Eq("Quarter", timePeriod.Quarter))
-                .Add(Restrictions.Eq("Month", timePeriod.Month))
-                .Add(Restrictions.Eq("AreaCode", parentAreaCode))
-                .Add(Restrictions.Eq("SexId", sexId))
-                .Add(Restrictions.Eq("AgeId", ageId))
-                .Add(Restrictions.Not(Restrictions.Eq("CategoryTypeId", -1)))
-                .Add(Restrictions.Not(Restrictions.Eq("CategoryId", -1)))
-                .AddOrder(new Order("CategoryTypeId", true))
-                .AddOrder(new Order("CategoryId", true))
-                .List<CoreDataSet>();
+            return CurrentSession.CreateCriteria<CoreDataSet>()
+           .Add(Restrictions.Eq("IndicatorId", indicatorId))
+           .Add(Restrictions.Eq("Year", timePeriod.Year))
+           .Add(Restrictions.Eq("YearRange", timePeriod.YearRange))
+           .Add(Restrictions.Eq("Quarter", timePeriod.Quarter))
+           .Add(Restrictions.Eq("Month", timePeriod.Month))
+           .Add(Restrictions.Eq("AreaCode", parentAreaCode))
+           .Add(Restrictions.Eq("SexId", sexId))
+           .Add(Restrictions.Eq("AgeId", ageId))
+           .Add(Restrictions.Not(Restrictions.Eq("CategoryTypeId", -1)))
+           .Add(Restrictions.Not(Restrictions.Eq("CategoryId", -1)))
+           .AddOrder(new Order("CategoryTypeId", true))
+           .AddOrder(new Order("CategoryId", true))
+           .List<CoreDataSet>();
         }
 
         public IList<int> GetAllCategoryTypeIds(string areaCode, int indicatorId, int sexId, int ageId)
         {
             var list = new List<int>();
             string sql =
-                "SELECT Distinct CategoryTypeID FROM CoreDataSet WHERE IndicatorID ="+ indicatorId + " AND SexID = "+ sexId + " AND " +
-                "AgeID = "+ ageId + " AND AreaCode = '"+ areaCode + "' AND CategoryTypeID != -1";
+                "SELECT Distinct CategoryTypeID FROM CoreDataSet WHERE IndicatorID =" + indicatorId + " AND SexID = " + sexId + " AND " +
+                "AgeID = " + ageId + " AND AreaCode = '" + areaCode + "' AND CategoryTypeID != -1";
 
             var q = CurrentSession.CreateSQLQuery(sql);
             var result = q.List<Int16>();
-            
+
             foreach (var catTypeId in result)
             {
-               
+
                 list.Add(Convert.ToInt16(catTypeId));
             }
 
@@ -873,6 +908,29 @@ namespace PholioVisualisation.DataAccess
             return q.List<int>();
         }
 
+        public bool GetIndicatorMetadataAlwaysShowSexWithIndicatorName(int indicatorId)
+        {
+            return CurrentSession.Query<IndicatorMetadata>()
+                .Where(x => x.IndicatorId == indicatorId)
+                .Select(x => x.AlwaysShowSexWithIndicatorName)
+                .Single<bool>();
+        }
+
+        public bool GetIndicatorMetadataAlwaysShowAgeWithIndicatorName(int indicatorId)
+        {
+            return CurrentSession.Query<IndicatorMetadata>()
+                .Where(x => x.IndicatorId == indicatorId)
+                .Select(x => x.AlwaysShowAgeWithIndicatorName)
+                .Single<bool>();
+        }
+
+        public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties, int profileId)
+        {
+            var indicatorIds = groupings.Select(x => x.IndicatorId).Distinct().ToList();
+            return GetIndicatorMetadata(indicatorIds, indicatorMetadataTextProperties, profileId);
+        }
+
         public IList<IndicatorMetadata> GetIndicatorMetadata(IList<Grouping> groupings,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties)
         {
@@ -883,7 +941,10 @@ namespace PholioVisualisation.DataAccess
         public IndicatorMetadata GetIndicatorMetadata(Grouping grouping,
             IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties)
         {
-            return GetIndicatorMetadata(grouping.IndicatorId, indicatorMetadataTextProperties);
+            GroupingMetadata groupingMetadata = GetGroupingMetadata(grouping.GroupId);
+            int profileId = groupingMetadata.ProfileId;
+
+            return GetIndicatorMetadata(grouping.IndicatorId, indicatorMetadataTextProperties, profileId);
         }
 
         public IndicatorMetadata GetIndicatorMetadata(int indicatorId,
@@ -892,7 +953,20 @@ namespace PholioVisualisation.DataAccess
             IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
             q.SetParameter("indicatorId", indicatorId);
             IndicatorMetadata metadata = q.UniqueResult<IndicatorMetadata>();
-            AddIndicatorMetadataText(indicatorMetadataTextProperties, metadata);
+            AddIndicatorMetadataText(indicatorMetadataTextProperties, -1, metadata);
+            return metadata;
+        }
+
+        public IndicatorMetadata GetIndicatorMetadata(int indicatorId,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties,
+            int profileId)
+        {
+            IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId = :indicatorId");
+            q.SetParameter("indicatorId", indicatorId);
+            IndicatorMetadata metadata = q.UniqueResult<IndicatorMetadata>();
+
+            AddIndicatorMetadataText(indicatorMetadataTextProperties, profileId, metadata);
+
             return metadata;
         }
 
@@ -916,7 +990,35 @@ namespace PholioVisualisation.DataAccess
 
                 if (metadatas.Any())
                 {
-                    AddIndicatorMetadataText(indicatorMetadataTextProperties, metadatas.ToArray());
+                    AddIndicatorMetadataText(indicatorMetadataTextProperties, -1, metadatas.ToArray());
+                    allMetadata.AddRange(metadatas);
+                }
+            }
+
+            return allMetadata;
+        }
+
+        public IList<IndicatorMetadata> GetIndicatorMetadata(IList<int> indicatorIds,
+            IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties, int profileId)
+        {
+            if (indicatorIds.Count == 0)
+            {
+                return new List<IndicatorMetadata>();
+            }
+
+            var allMetadata = new List<IndicatorMetadata>();
+
+            // Query the database 1000 areas at a time, for large numbers of items the query will fail otherwise
+            var splitter = new LongListSplitter<int>(indicatorIds);
+            while (splitter.AnyLeft())
+            {
+                IQuery q = CurrentSession.CreateQuery("from IndicatorMetadata i where i.IndicatorId in (:indicatorIds)");
+                q.SetParameterList("indicatorIds", splitter.NextItems());
+                IList<IndicatorMetadata> metadatas = q.List<IndicatorMetadata>();
+
+                if (metadatas.Any())
+                {
+                    AddIndicatorMetadataText(indicatorMetadataTextProperties, profileId, metadatas.ToArray());
                     allMetadata.AddRange(metadatas);
                 }
             }
@@ -941,29 +1043,28 @@ namespace PholioVisualisation.DataAccess
         {
             List<IndicatorMetadata> metadataList = new List<IndicatorMetadata>();
 
-            if (groupings.Count > 0)
+            if (groupings.Any())
             {
+                var groupIds = groupings.Select(x => x.GroupId).Distinct().ToArray();
 
-                List<int> ids = new List<int>();
-                ids.AddRange(groupings.Select(x => x.GroupId).Distinct());
-
+                // Get metadata text values
                 IQuery q = CurrentSession.GetNamedQuery("GetIndicatorMetadataTextValuesByGroupIds");
-                q.SetParameterList("groupIds", ids.ToArray());
-                IList results = q.List();
+                q.SetParameterList("groupIds", groupIds);
+                IList overridingMetadataTextValueList = q.List();
 
-                foreach (IList<object> result in results)
+                foreach (IList<object> overridingMetadataTextValue in overridingMetadataTextValueList)
                 {
                     IndicatorMetadata metadata = new IndicatorMetadata();
-                    metadata.IndicatorId = (int)result[0];
+                    metadata.IndicatorId = (int)overridingMetadataTextValue[0];
                     metadataList.Add(metadata);
-                    metadata.Descriptive = GetTextValues(indicatorMetadataTextProperties, result);
+                    metadata.Descriptive = GetTextValues(indicatorMetadataTextProperties, overridingMetadataTextValue);
                 }
             }
 
             return metadataList;
         }
 
-        private void AddIndicatorMetadataText(IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties,
+        private void AddIndicatorMetadataText(IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties, int profileId = ProfileIds.Undefined,
             params IndicatorMetadata[] metadata)
         {
             // Order by ID to be consistent with text value results
@@ -991,29 +1092,36 @@ namespace PholioVisualisation.DataAccess
             for (int metadataIndex = 0; metadataIndex < metadataOrdered.Count; metadataIndex++)
             {
                 metadataOrdered[metadataIndex].Descriptive = GetTextValues(
-                    indicatorMetadataTextProperties, (IList<object>)baseTextMetadata[metadataIndex]);
+                    indicatorMetadataTextProperties, (IList<object>)baseTextMetadata[metadataIndex], profileId);
             }
         }
 
         private static IDictionary<string, string> GetTextValues(IList<IndicatorMetadataTextProperty> indicatorMetadataTextProperties,
-            IList<object> values)
+            IList<object> overridingMetadataTextValue, int profileId = ProfileIds.Undefined)
         {
             // Add 2 to skip IndicatorID and GroupID
             int valueIndex = 2;
 
             IDictionary<string, string> textValues = new Dictionary<string, string>();
-            foreach (var indicatorMetadataTextProperty in  indicatorMetadataTextProperties)
+            foreach (var indicatorMetadataTextProperty in indicatorMetadataTextProperties)
             {
                 // Skip ID
-                if (values[valueIndex] is int)
+                if (overridingMetadataTextValue[valueIndex] is int)
                 {
                     valueIndex++;
                 }
 
-                var  text = (string)values[valueIndex];
+                var text = (string)overridingMetadataTextValue[valueIndex];
                 if (string.IsNullOrEmpty(text) == false)
                 {
-                    textValues.Add(indicatorMetadataTextProperty.ColumnName, text);
+                    textValues.Add(indicatorMetadataTextProperty.ColumnName, text.Trim());
+                }
+                else
+                {
+                    if (profileId == ProfileIds.IndicatorsForReview)
+                    {
+                        textValues.Add(indicatorMetadataTextProperty.ColumnName, string.Empty);
+                    }
                 }
 
                 valueIndex++;
@@ -1024,8 +1132,24 @@ namespace PholioVisualisation.DataAccess
         public IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextProperties()
         {
             return CurrentSession.CreateCriteria<IndicatorMetadataTextProperty>()
-                .Add(Restrictions.Not(Restrictions.Eq("PropertyId", IndicatorMetadataTextPropertyIds.SpecificRationale))) // DO NOT expose specific rationale yet
+                .Add(Restrictions.Eq("IsInternalMetadata", 0))
                 .List<IndicatorMetadataTextProperty>();
+        }
+
+        public IList<IndicatorMetadataTextProperty> GetIndicatorMetadataTextPropertiesIncludingInternalMetadata()
+        {
+            var indicatorMetadataTextProperties = GetIndicatorMetadataTextProperties();
+
+            var internalMetadataTextProperties = CurrentSession.CreateCriteria<IndicatorMetadataTextProperty>()
+                .Add(!Restrictions.Eq("IsInternalMetadata", 0))
+                .List<IndicatorMetadataTextProperty>();
+
+            foreach (var internalMetadataTextProperty in internalMetadataTextProperties)
+            {
+                indicatorMetadataTextProperties.Add(internalMetadataTextProperty);
+            }
+
+            return indicatorMetadataTextProperties;
         }
 
         //Inequalities: Category Type and Category are NOT -1 and standard: -1
@@ -1044,7 +1168,7 @@ namespace PholioVisualisation.DataAccess
             var splitter = new LongListSplitter<string>(areaCodes);
             while (splitter.AnyLeft())
             {
-                var nextData = GetCoreDataForAreaCodesInequalities(indicatorId, 
+                var nextData = GetCoreDataForAreaCodesInequalities(indicatorId,
                     period, excludedCategoryTypeIds, splitter.NextItems());
                 allData.AddRange(nextData);
             }

@@ -69,7 +69,7 @@ namespace PholioVisualisation.DataConstructionTest
             {
                 new ParentAreaGroup
                 {
-                    ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                    ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                     ParentAreaTypeId = AreaTypeIds.OnsClusterGroup2001,
                     Sequence = 2
                 },
@@ -83,7 +83,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             return new ParentAreaGroup
             {
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 ParentAreaTypeId = AreaTypeIds.GoRegion,
                 Sequence = 1
             };
@@ -93,7 +93,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             return new ParentAreaGroup
             {
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 CategoryTypeId = CategoryTypeIds.DeprivationDecileCountyAndUA2010,
                 Sequence = 2
             };
@@ -103,7 +103,7 @@ namespace PholioVisualisation.DataConstructionTest
         {
             return new ParentAreaGroup
             {
-                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                ChildAreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 ParentAreaTypeId = AreaTypeIds.GoRegion,
                 Sequence = 3
             };
@@ -115,7 +115,7 @@ namespace PholioVisualisation.DataConstructionTest
             {
                 new ParentAreaGroup
                 {
-                    ChildAreaTypeId = AreaTypeIds.CcgsPreApr2017,
+                    ChildAreaTypeId = AreaTypeIds.CcgsPostApr2019,
                     ParentAreaTypeId = AreaTypeIds.GoRegion,
                 },
                 ParentAreaGroup1(),

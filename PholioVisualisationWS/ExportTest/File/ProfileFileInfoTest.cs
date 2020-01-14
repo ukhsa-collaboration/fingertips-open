@@ -22,9 +22,9 @@ namespace PholioVisualisation.ExportTest.File
             ProfileFileInfo info = new ProfileFileInfo(
                profileId,
                 new List<string> { "A" },
-                AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaTypeIds.PheCentreObsolete);
-            Assert.AreEqual(profileId + "-A-102-43.xlsx", info.FileName);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
+                AreaTypeIds.GoRegion);
+            Assert.AreEqual(profileId + "-A-102-6.xlsx", info.FileName);
         }
 
         [TestMethod]
@@ -35,9 +35,9 @@ namespace PholioVisualisation.ExportTest.File
             ProfileFileInfo info = new ProfileFileInfo(
                profileId,
                 new List<string> { "A" },
-                AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaTypeIds.PheCentreObsolete);
-            Assert.AreEqual(profileId + "-A-102-43.xlsx", info.FileName);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
+                AreaTypeIds.GoRegion);
+            Assert.AreEqual(profileId + "-A-102-6.xlsx", info.FileName);
         }
 
         [TestMethod]
@@ -47,7 +47,7 @@ namespace PholioVisualisation.ExportTest.File
                 ProfileIds.Phof,
                 new List<string> { "A" },
                 AreaTypeIds.Pct,
-                AreaTypeIds.PheCentreObsolete);
+                AreaTypeIds.GoRegion);
             Assert.AreEqual("xlsx", fileInfo.FileExtension);
         }
 
@@ -55,45 +55,45 @@ namespace PholioVisualisation.ExportTest.File
         public void TestFileName()
         {
             ProfileFileInfo maker = new ProfileFileInfo(
-                ProfileIds.SubstanceMisuse,
+                ProfileIds.HealthAssetsProfile,
                 new List<string> { "A" },
                 AreaTypeIds.Pct,
-                AreaTypeIds.PheCentreObsolete);
-            Assert.AreEqual(ProfileIds.SubstanceMisuse + "-A-2-43.xlsx", maker.FileName);
+                AreaTypeIds.GoRegion);
+            Assert.AreEqual(ProfileIds.HealthAssetsProfile + "-A-2-6.xlsx", maker.FileName);
         }
 
         [TestMethod]
         public void TestFileNameWithMoreThanOneAreaCode()
         {
             ProfileFileInfo maker = new ProfileFileInfo(
-                ProfileIds.SubstanceMisuse,
+                ProfileIds.HealthAssetsProfile,
                 new List<string> { "A", "B" },
                 AreaTypeIds.Pct,
-                AreaTypeIds.PheCentreObsolete);
-            Assert.AreEqual(ProfileIds.SubstanceMisuse + "-A-B-2-43.xlsx", maker.FileName);
+                AreaTypeIds.GoRegion);
+            Assert.AreEqual(ProfileIds.HealthAssetsProfile + "-A-B-2-6.xlsx", maker.FileName);
         }
 
         [TestMethod]
         public void TestAreaCodesSortedAlphabetically()
         {
             ProfileFileInfo maker = new ProfileFileInfo(
-                ProfileIds.SubstanceMisuse,
+                ProfileIds.HealthAssetsProfile,
                 new List<string> { "X", "A", "B" },
                 AreaTypeIds.Pct,
-                AreaTypeIds.PheCentreObsolete);
-            Assert.AreEqual(ProfileIds.SubstanceMisuse + "-A-B-X-2-43.xlsx", maker.FileName);
+                AreaTypeIds.GoRegion);
+            Assert.AreEqual(ProfileIds.HealthAssetsProfile + "-A-B-X-2-6.xlsx", maker.FileName);
         }
 
         [TestMethod]
         public void TestFilePath()
         {
             ProfileFileInfo maker = new ProfileFileInfo(
-                ProfileIds.SubstanceMisuse,
+                ProfileIds.HealthAssetsProfile,
                  new List<string> { "A" },
-                AreaTypeIds.CountyAndUnitaryAuthority,
-                AreaTypeIds.PheCentreObsolete);
+                AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
+                AreaTypeIds.GoRegion);
 
-            var expectedFileName = ProfileIds.SubstanceMisuse + "-A-102-43.xlsx";
+            var expectedFileName = ProfileIds.HealthAssetsProfile + "-A-102-6.xlsx";
             var expectedFilePath = Path.Combine(ApplicationConfiguration.Instance.ExportFileDirectory, expectedFileName);
             Assert.AreEqual(expectedFilePath, maker.FilePath);
         }

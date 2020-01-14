@@ -28,16 +28,19 @@ namespace PholioVisualisation.Export.File
             return null;
         }
 
-        public byte[] SaveFile(byte[] content)
+        public void SaveFile(byte[] content)
         {
             // Check whether file is already cached
             if (ApplicationConfiguration.Instance.UseFileCache)
             {
                 var filePath = GetFilePath();
-                System.IO.File.WriteAllBytes(filePath, content);
-            }
 
-            return null;
+                // Only write if file does not exist
+                if (System.IO.File.Exists(filePath) == false)
+                {
+                    System.IO.File.WriteAllBytes(filePath, content);
+                }
+            }
         }
 
         private string GetFilePath()

@@ -1,8 +1,6 @@
 ﻿using IndicatorsUI.DataAccess;
 using IndicatorsUI.DataConstruction;
-using IndicatorsUI.DomainObjects;
 using IndicatorsUI.MainUI.Caching;
-using IndicatorsUI.MainUI.Helpers;
 using System.Web.Mvc;
 
 namespace IndicatorsUI.MainUI.Controllers

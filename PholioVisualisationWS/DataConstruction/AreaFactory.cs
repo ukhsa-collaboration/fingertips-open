@@ -22,7 +22,7 @@ namespace PholioVisualisation.DataConstruction
 
         public static IArea NewArea(IAreasReader areasReader, string areaCode)
         {
-            if (areaCode == null)
+            if (string.IsNullOrEmpty(areaCode))
             {
                 throw new FingertipsException("Area code was null");
             }

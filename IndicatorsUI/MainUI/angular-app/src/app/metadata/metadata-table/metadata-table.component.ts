@@ -1,19 +1,19 @@
 import {
-  Component, HostListener, Input, ViewChild, ElementRef, Output,
+  Component, ViewChild, ElementRef, Output,
   EventEmitter
 } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
-import {
-  FTModel, FTRoot, GroupRoot, IndicatorMetadata, TooltipManager, IndicatorMetadataTextProperty,
-  KeyValuePair, ComparatorMethod, ProfilePerIndicator
-} from '../../typings/FT.d';
+import { forkJoin } from 'rxjs';
 import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
-import { TooltipHelper } from '../../shared/shared';
+import { SexAndAgeLabelHelper } from '../../shared/shared';
 import { IndicatorService } from '../../shared/service/api/indicator.service';
 import { ProfileService } from '../../shared/service/api/profile.service';
-import * as _ from 'underscore';
 import { DatePipe } from '@angular/common';
-
+import {
+  IndicatorMetadataTextProperty, ProfilePerIndicator, IndicatorMetadata,
+  GroupRoot, KeyValuePair, ComparatorMethod, FTModel
+} from '../../typings/FT';
+import { isDefined } from '@angular/compiler/src/util';
+import { ProfileIds } from '../../shared/constants';
 
 @Component({
   selector: 'ft-metadata-table',
@@ -23,19 +23,26 @@ import { DatePipe } from '@angular/common';
 export class MetadataTableComponent {
 
   @Output() isReady = new EventEmitter<boolean>();
-  @ViewChild('table') table: ElementRef;
+  @ViewChild('table', { static: true }) table: ElementRef;
 
   public rows: MetadataRow[];
   private tempRows: MetadataRow[];
   private showDataQuality: boolean;
+  private includeInternalMetadata: boolean;
   private readonly NotApplicable: string = 'n/a';
   private metadataProperties: IndicatorMetadataTextProperty[];
   private indicatorProfiles: Map<number, ProfilePerIndicator[]>;
+  private model: FTModel;
 
   constructor(private ftHelperService: FTHelperService,
     private indicatorService: IndicatorService,
     private profileService: ProfileService) {
+
     this.showDataQuality = ftHelperService.getFTConfig().showDataQuality;
+    this.model = ftHelperService.getFTModel();
+
+    // Display internal metadata for 'Indicators for review' profile
+    this.includeInternalMetadata = this.model.profileId === ProfileIds.IndicatorsForReview ? true : false;
   }
 
   public showInLightbox() {
@@ -50,17 +57,18 @@ export class MetadataTableComponent {
     this.isReady.emit(false);
 
     // Get data by AJAX
-    let metadataPropertiesObservable = this.indicatorService.getIndicatorMetadataProperties();
-    let metadataObservable = this.indicatorService.getIndicatorMetadata(root.Grouping[0].GroupId);
-    let indicatorProfilesObservable = this.profileService.getIndicatorProfiles([root.IID]);
+    const metadataPropertiesObservable = this.indicatorService.getIndicatorMetadataProperties(this.includeInternalMetadata);
+    const metadataObservable = this.indicatorService.getIndicatorMetadata(root.Grouping[0].GroupId);
+    const indicatorProfilesObservable = this.profileService.getIndicatorProfiles([root.IID]);
 
-    Observable.forkJoin([metadataPropertiesObservable, metadataObservable, indicatorProfilesObservable]).subscribe(results => {
+    forkJoin([metadataPropertiesObservable, metadataObservable, indicatorProfilesObservable]).subscribe(results => {
 
       this.metadataProperties = results[0];
-      let metadataHash: Map<number, IndicatorMetadata> = results[1];
+      const metadataHash: Map<number, IndicatorMetadata> = results[1];
       this.indicatorProfiles = results[2];
 
-      let indicatorMetadata = metadataHash[root.IID];
+      const indicatorMetadata = metadataHash[root.IID];
+
       this.displayMetadata(indicatorMetadata, root);
 
       this.ftHelperService.showAndHidePageElements();
@@ -77,23 +85,19 @@ export class MetadataTableComponent {
     this.isReady.emit(false);
 
     // Get data by AJAX
-    let metadataPropertiesObservable = this.indicatorService.getIndicatorMetadataProperties();
-    let metadataObservable = this.indicatorService.getIndicatorMetadataByIndicatorId(indicatorId, restrictToProfileIds);
+    const metadataPropertiesObservable = this.indicatorService.getIndicatorMetadataProperties(this.includeInternalMetadata);
+    const metadataObservable = this.indicatorService.getIndicatorMetadataByIndicatorId(indicatorId, restrictToProfileIds);
 
-    Observable.forkJoin([metadataPropertiesObservable, metadataObservable]).subscribe(results => {
+    forkJoin([metadataPropertiesObservable, metadataObservable]).subscribe(results => {
 
       this.metadataProperties = results[0];
-      let metadataHash: Map<number, IndicatorMetadata> = results[1];
+      const metadataHash: Map<number, IndicatorMetadata> = results[1];
       this.indicatorProfiles = null;
 
-      let indicatorMetadata = metadataHash[indicatorId];
+      const indicatorMetadata = metadataHash[indicatorId];
       this.displayMetadata(indicatorMetadata);
       this.isReady.emit(true);
     });
-  }
-
-  private displayMetadataForAjaxResults() {
-
   }
 
   private displayMetadata(indicatorMetadata: IndicatorMetadata, root?: GroupRoot): void {
@@ -101,7 +105,7 @@ export class MetadataTableComponent {
     this.tempRows = new Array<MetadataRow>();
 
     // Assign key variables
-    let descriptive = indicatorMetadata.Descriptive;
+    const descriptive = indicatorMetadata.Descriptive;
 
     // Define IDs
     let propertyIndex, benchmarkingMethodId, benchmarkingSigLevel;
@@ -126,13 +130,13 @@ export class MetadataTableComponent {
 
     // Initial indicator text properties
     for (propertyIndex = 0; propertyIndex < this.metadataProperties.length; propertyIndex++) {
-      let property = this.metadataProperties[propertyIndex];
+      const property = this.metadataProperties[propertyIndex];
       if (property.Order > 59) {
         break;
       }
 
-      // Do not dislay name as full name is displayed
-      if ((property.ColumnName !== 'Name')) {
+      // Do not include internal metadata here
+      if (property.Order > 0) {
         this.addMetadataRowByProperty(descriptive, property);
       }
     }
@@ -144,7 +148,7 @@ export class MetadataTableComponent {
     this.addMetadataRowByProperty(descriptive, this.metadataProperties[propertyIndex++]);
 
     // Unit
-    let unit = indicatorMetadata.Unit.Label;
+    const unit = indicatorMetadata.Unit.Label;
     if (unit) {
       this.addMetadataRow('Unit', indicatorMetadata.Unit.Label);
     }
@@ -168,34 +172,34 @@ export class MetadataTableComponent {
 
     // Benchmarking method
     if (benchmarkingMethodId) {
-      let row = new MetadataRow('Benchmarking method', '');
+      const row = new MetadataRow('Benchmarking method', '');
       this.tempRows.push(row);
       this.assignBenchmarkingMethod(row, benchmarkingMethodId);
     }
 
     // Benchmarking significance level
     if (benchmarkingSigLevel) {
-      let text = (benchmarkingSigLevel <= 0) ?
+      const text = (benchmarkingSigLevel <= 0) ?
         this.NotApplicable :
         benchmarkingSigLevel + '%';
       this.addMetadataRow('Benchmarking significance level', text);
     }
 
     // Confidence interval method
-    let ciMethod = indicatorMetadata.ConfidenceIntervalMethod;
+    const ciMethod = indicatorMetadata.ConfidenceIntervalMethod;
     if (ciMethod) {
 
       this.addMetadataRow('Confidence interval method', ciMethod.Name);
 
       // Display CI method description
-      let cimDescription = ciMethod.Description;
+      const cimDescription = ciMethod.Description;
       if (cimDescription) {
         this.addMetadataRow('Confidence interval methodology', cimDescription);
       }
     }
 
     // Confidence level
-    let confidenceLevel = indicatorMetadata.ConfidenceLevel;
+    const confidenceLevel = indicatorMetadata.ConfidenceLevel;
     if (confidenceLevel > -1) {
       this.addMetadataRow('Confidence level', confidenceLevel + '%');
     }
@@ -206,6 +210,14 @@ export class MetadataTableComponent {
       propertyIndex++;
     }
 
+    if (this.includeInternalMetadata) {
+      const internalMetadata = this.metadataProperties.filter(x => x.Order === 0);
+
+      for (propertyIndex = 0; propertyIndex < internalMetadata.length; propertyIndex++) {
+        this.addMetadataRowByProperty(descriptive, this.metadataProperties[propertyIndex]);
+      }
+    }
+
     this.addIndicatorProfiles(indicatorMetadata.IID);
 
     // Trigger view refresh
@@ -214,12 +226,12 @@ export class MetadataTableComponent {
 
   private addIndicatorProfiles(indicatorId: number) {
 
-    let indicatorProfiles = this.indicatorProfiles;
+    const indicatorProfiles = this.indicatorProfiles;
 
     if (indicatorProfiles) {
-      let profiles: string[] = [];
+      const profiles: string[] = [];
       for (let i = 0; i < indicatorProfiles[indicatorId].length; i++) {
-        let profilePerIndicator: ProfilePerIndicator = indicatorProfiles[indicatorId][i];
+        const profilePerIndicator: ProfilePerIndicator = indicatorProfiles[indicatorId][i];
         profiles.push('<a href="' + profilePerIndicator.Url + '" target="_blank">' + profilePerIndicator.ProfileName + '</a>')
       }
 
@@ -233,33 +245,81 @@ export class MetadataTableComponent {
 
   private addMetadataRowByProperty(textMetadata: KeyValuePair<string, string>[], property: IndicatorMetadataTextProperty): void {
 
-    let columnName = property.ColumnName;
+    const columnName = property.ColumnName;
 
     if (textMetadata !== null && textMetadata.hasOwnProperty(columnName)) {
-      let text = textMetadata[columnName];
+      const text = textMetadata[columnName];
 
-      if (!_.isUndefined(text) && text !== '') {
+      if (isDefined(text) && text !== '') {
 
         let displayText: string;
-        if ((columnName === 'DataQuality') && this.showDataQuality) {
-          // Add data quality flags instead of number
-          let dataQualityCount = parseInt(text);
-          displayText = this.ftHelperService.getIndicatorDataQualityHtml(text) + ' ' +
-            this.ftHelperService.getIndicatorDataQualityTooltipText(dataQualityCount);
+        if (columnName === 'Name') {
+          const groupRoot = this.ftHelperService.getCurrentGroupRoot();
+          const sexAndAgeLabel = new SexAndAgeLabelHelper(groupRoot).getSexAndAgeLabel();
+          displayText = text + sexAndAgeLabel;
+        } else if (columnName === 'DataQuality' && this.showDataQuality) {
+          displayText = this.getDataQualityHtml(text, displayText);
+        } else if (columnName === 'Rationale' || columnName === 'SpecificRationale') {
+
+          if (columnName === 'SpecificRationale') {
+            if (this.existRationaleData(textMetadata)) {
+              return;
+            } else {
+              property.DisplayName = 'Rationale';
+            }
+          }
+          displayText = this.getRationaleSpecificRationaleHtml(textMetadata);
         } else {
           displayText = text;
         }
 
-        let row = new MetadataRow(property.DisplayName, displayText);
+        const row = new MetadataRow(property.DisplayName, displayText);
         this.tempRows.push(row);
+      } else {
+        if (this.model.profileId === ProfileIds.IndicatorsForReview) {
+          const row = new MetadataRow(property.DisplayName, '');
+          this.tempRows.push(row);
+        }
       }
     }
   }
 
+  private existRationaleData(textMetadata: KeyValuePair<string, string>[]): boolean {
+    return textMetadata['Rationale'] !== undefined;
+  }
+
+  private existSpecificRationaleData(textMetadata: KeyValuePair<string, string>[]): boolean {
+    return textMetadata['SpecificRationale'] !== undefined;
+  }
+
+  private getRationaleSpecificRationaleHtml(textMetadata: KeyValuePair<string, string>[]) {
+
+    let displayText = '';
+    if (this.existRationaleData(textMetadata)) {
+      displayText = textMetadata['Rationale'];
+    }
+
+    if (this.existSpecificRationaleData(textMetadata)) {
+      if (displayText !== '') {
+        displayText = displayText.concat('<br>');
+      }
+      displayText = displayText.concat(textMetadata['SpecificRationale']);
+    }
+    return displayText;
+  }
+
+  private getDataQualityHtml(text: any, displayText: string) {
+    // Add data quality flags instead of number
+    const dataQualityCount = parseInt(text, 10);
+    displayText = this.ftHelperService.getIndicatorDataQualityHtml(text) + ' ' +
+      this.ftHelperService.getIndicatorDataQualityTooltipText(dataQualityCount);
+    return displayText;
+  }
+
   private assignBenchmarkingMethod(row: MetadataRow, benchmarkingMethodId: number) {
-    let metadataObservable = this.indicatorService.getBenchmarkingMethod(benchmarkingMethodId).subscribe(
+    const metadataObservable = this.indicatorService.getBenchmarkingMethod(benchmarkingMethodId).subscribe(
       data => {
-        let method = <ComparatorMethod>data;
+        const method = <ComparatorMethod>data;
         row.text = method.Name;
       },
       error => { });

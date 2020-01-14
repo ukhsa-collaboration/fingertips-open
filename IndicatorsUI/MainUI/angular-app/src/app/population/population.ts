@@ -1,11 +1,22 @@
-import { Population, PopulationSummary, Category } from '../typings/FT.d';
-import { AreaCodes, SexIds } from '../shared/shared';
 import * as _ from 'underscore';
+import { SexIds } from '../shared/constants';
+import { Population, PopulationSummary, Category } from '../typings/FT';
+import { isDefined } from '@angular/compiler/src/util';
 
 export class Populations {
-    public areaPopulation: Population;
-    public areaParentPopulation: Population;
     public nationalPopulation: Population;
+    public areaParentPopulation: Population;
+    public areaPopulation: Population;
+}
+
+export class PopulationTableData {
+    public ageBand: string;
+    public maleNational: string;
+    public femaleNational: string;
+    public maleAreaParent: string;
+    public femaleAreaParent: string;
+    public maleArea: string;
+    public femaleArea: string;
 }
 
 export class AllPopulationData {
@@ -37,11 +48,13 @@ export class PopulationModifier {
     }
 
     private makeMaleValuesNegative(population: Population) {
-        let values = population.Values;
-        if (!_.isUndefined(values[SexIds.Male]) || !_.isUndefined(SexIds.Female)) {
-            let maleValues = values[SexIds.Male];
-            for (let i in maleValues) {
-                maleValues[i] = -Math.abs(maleValues[i]);
+        const values = population.Values;
+        if (isDefined(values[SexIds.Male]) || isDefined(SexIds.Female)) {
+            const maleValues = values[SexIds.Male];
+            for (const i in maleValues) {
+                if (maleValues.hasOwnProperty(i)) {
+                    maleValues[i] = -Math.abs(maleValues[i]);
+                }
             }
         }
     }
@@ -49,7 +62,7 @@ export class PopulationModifier {
 
 export class PopulationMaxFinder {
 
-    /** Finds the maximum population value to enable equal axis limits to be 
+    /** Finds the maximum population value to enable equal axis limits to be
      * set on both the male and female sides
      */
     getMaximumValue(populations: Populations): number {
@@ -63,7 +76,7 @@ export class PopulationMaxFinder {
     private getPopulationMax(populations: Population[]): number {
         let max = 5;
         let min = -max;
-        for (let i in populations) {
+        for (const i in populations) {
             if (populations[i] != null) {
                 min = _.min([min, _.min(populations[i].Values[SexIds.Male])]);
                 max = _.max([max, _.max(populations[i].Values[SexIds.Female])]);

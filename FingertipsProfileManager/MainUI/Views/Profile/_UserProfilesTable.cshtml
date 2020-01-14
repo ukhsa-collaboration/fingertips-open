@@ -1,0 +1,60 @@
+﻿@using Fpm.MainUI.Helpers
+@model List<Fpm.ProfileData.Entities.Profile.ProfileDetails>
+
+@{
+    var siteUrl = CommonUtilities.GetTestSiteUrl();
+}
+
+<table class="grid user-profiles">
+    <thead>
+    <tr>
+        <th class="header">Name</th>
+        <th class="header">View</th>
+        <th class="header">Profile</th>
+        <th class="header">Indicators</th>
+        <th class="header">Documents</th>
+        <th class="header">Content</th>
+    </tr>
+    </thead>
+    @foreach (var item in Model)
+    {
+        var routeValues = new {profileId = item.Id};
+        var linkClass = new {@class = "profile-link"};
+
+        <tr>
+            <td class="left">
+                @item.Name
+            </td>
+            <td class="left">
+                @if (item.HasAnyData)
+                {
+                    <a href="@(siteUrl + item.UrlKey)" target="_blank">Fingertips</a>
+                }
+                else if (item.HasOwnFrontPage)
+                {
+                    <a href="@(siteUrl + "profile/" + item.UrlKey)" target="_blank">Fingertips</a>
+                }
+                else
+                {
+                    <div class="text-center">-</div>
+                }
+            </td>
+            <td class="left">
+                @Html.ActionLink("Profile", "EditProfileNonAdmin", 
+                    routeValues, linkClass)
+            </td>
+            <td class="left">
+                @Html.ActionLink("Indicators", "ListIndicatorsInProfile", "ProfilesAndIndicators",
+                    routeValues, linkClass)
+            </td>
+            <td class="left">
+                @Html.ActionLink("Documents", "DocumentsIndex", "Documents", 
+                    routeValues, linkClass)
+            </td>
+            <td class="left">
+                @Html.ActionLink("Content", "ContentIndex", "Content", 
+                    routeValues, linkClass)
+            </td>
+        </tr>
+    }
+</table>

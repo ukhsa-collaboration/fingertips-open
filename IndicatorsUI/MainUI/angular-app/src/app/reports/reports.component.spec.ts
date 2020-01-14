@@ -1,9 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ReportsComponent } from './reports.component';
-import { FTHelperService } from 'app/shared/service/helper/ftHelper.service';
-import { SsrsReportService } from 'app/shared/service/api/ssrs-report.service';
-import { ContentService } from 'app/shared/service/api/content.service';
+import { FTHelperService } from '../shared/service/helper/ftHelper.service';
+import { SsrsReportService } from '../shared/service/api/ssrs-report.service';
+import { ContentService } from '../shared/service/api/content.service';
 
 describe('ReportsComponent', () => {
   let component: ReportsComponent;

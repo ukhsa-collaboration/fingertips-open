@@ -11,8 +11,19 @@ function documentReady() {
         $('form').submit();
     });
 
-    $('.select-all-check-box').click(function () {
-        $('.indicator-check-box').attr('checked', $(this).is(':checked'));
+    $('.select-all-check-box').change(function () {
+        $('.indicator-check-box').prop('checked', $(this).prop('checked'));
+    });
+
+    $('.indicator-check-box').change(function () {
+        var selectAll = true;
+        $($('.indicator-check-box')).each(function () {
+            if (!$(this).prop('checked')) {
+                selectAll = false;
+            }
+        });
+
+        $('.select-all-check-box').prop('checked', selectAll);
     });
 
     $('#IsPlainText').click(function () {

@@ -22,7 +22,7 @@ namespace PholioVisualisation.DataConstructionTest
                 RestrictSearchProfileIds = new List<int> { ProfileIds.Tobacco },
                 ComparatorMap = new ComparatorMapBuilder(GetGorEastOfEngland()).ComparatorMap,
                 ParentAreaCode = AreaCodes.Gor_EastOfEngland,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
             Assert.IsTrue(data.IsDataOk);
             Assert.IsTrue(data.GroupRoots.Count > 0);
@@ -42,7 +42,7 @@ namespace PholioVisualisation.DataConstructionTest
                 RestrictSearchProfileIds = new List<int> { ProfileIds.Tobacco },
                 ComparatorMap = new ComparatorMapBuilder(GetGorEastOfEngland()).ComparatorMap,
                 ParentAreaCode = AreaCodes.Gor_EastOfEngland,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
             Assert.IsTrue(data.IsDataOk);
             Assert.IsTrue(data.GroupRoots.Count > 0);
@@ -59,7 +59,7 @@ namespace PholioVisualisation.DataConstructionTest
                 RestrictSearchProfileIds = new List<int> { ProfileIds.Tobacco },
                 ComparatorMap = new ComparatorMapBuilder(GetGorEastOfEngland()).ComparatorMap,
                 ParentAreaCode = AreaCodes.Gor_EastOfEngland,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019
             }.Build();
             Assert.IsTrue(data.IsDataOk);
             Assert.IsTrue(data.GroupRoots.Count > 0);

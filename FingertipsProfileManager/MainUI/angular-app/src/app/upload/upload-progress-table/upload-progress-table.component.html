@@ -1,0 +1,101 @@
+<div class="text-center" *ngIf="loading">
+  <img src="/images/ajax-loader.gif" />
+</div>
+<div *ngIf="isAnyJobs">
+  <table class="table table-bordered" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th class="col-xs-2">Date</th>
+        <th class="col-xs-1 text-center">Rows in file</th>
+        <th class="col-xs-1 text-center">Rows uploaded</th>
+        <th class="col-xs-2 text-center">Status</th>
+        <th class="col-xs-2 text-center">Summary</th>
+        <th class="col-xs-2 text-center">Actions</th>
+        <th class="col-xs-2">Download original files</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let job of uploadJobProgress.Jobs" [ngClass]="getRowClass(job)">
+        <!-- Date -->
+        <td>{{job.DateCreatedF}}</td>
+        <!-- Rows in file -->
+        <td class="text-center">
+          <span *ngIf="job.TotalRows === 0">-</span>
+          <span *ngIf="job.TotalRows !== 0">{{job.TotalRows}}</span>
+        </td>
+        <!-- Rows updated -->
+        <td class="text-center">
+          <span *ngIf="job.TotalRowsCommitted === -1">-</span>
+          <span *ngIf="job.TotalRowsCommitted !== -1">{{job.TotalRowsCommitted}}</span>
+        </td>
+        <!-- Status -->
+        <td class="text-center" [innerText]="getStatusDescription(job.Status)">
+        </td>
+        <!-- Summary -->
+        <td class="text-center">
+          <div class="progress" *ngIf="job.Status === 200">
+            <div class="progress-bar active progress-bar-striped" role="progressbar"
+              [attr.aria-valuenow]="getProgress(job).Percent" [attr.aria-valuemin]="0" [attr.aria-valuemax]="100"
+              [ngStyle]="{'width': getProgress(job).Percent + '%'}">
+              {{getProgress(job).Percent}}%
+            </div>
+          </div>
+          <div [innerHtml]="getProgress(job).Text" *ngIf="job.Status === 200"></div>
+          <a (click)="showSummary($event, job)" class="cursor-pointer" *ngIf="job.Status === 300">
+            View duplicated rows
+          </a>
+          <a (click)="showSummary($event, job)" class="cursor-pointer" *ngIf="job.Status === 310">
+            View small number warnings
+          </a>
+          <a (click)="showSummary($event, job)" class="cursor-pointer" *ngIf="job.Status === 400">
+            View validation failures
+          </a>
+          <a (click)="showSummary($event, job)" class="cursor-pointer" *ngIf="job.Status === 401">
+            View column error
+          </a>
+          <a (click)="showSummary($event, job)" class="cursor-pointer" *ngIf="job.Status === 500">
+            View details
+          </a>
+          <div class="progress" *ngIf="job.Status === 1000">
+            <div class="progress-bar width-100" role="progressbar" [attr.aria-valuenow]="100" [attr.aria-valuemin]="0"
+              [attr.aria-valuemax]="100">
+              100%
+            </div>
+          </div>
+        </td>
+        <!-- Actions -->
+        <td class="text-center">
+          <span *ngIf="job.Status === 300">
+            <a class="cursor-pointer" (click)="updateStatus(job, 301)" data-toggle="tooltip"
+              title="Uploading will replace the existing duplicated rows in the database with the rows in your file">Upload</a>
+            <br />
+            <span>or</span>
+            <br />
+            <a class="cursor-pointer" (click)="updateStatus(job, 302)">Cancel</a>
+          </span>
+          <span *ngIf="job.Status === 310">
+            <a (click)="updateStatus(job, 311)" data-toggle="tooltip"
+              title="Ignore all small number warnings and continue the upload process">Ignore</a>
+            <br />
+            <span>or</span>
+            <br />
+            <a (click)="updateStatus(job, 312)">Cancel</a>
+          </span>
+          <span *ngIf="job.Status !== 300 && job.Status !== 310">-</span>
+        </td>
+        <!-- Download original files -->
+        <td>
+          <a href="/api/upload/download-file/{{job.Guid}}">{{job.OriginalFile}}</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="row col text-center" *ngIf="showMoreUploadJobs">
+  <a class="show-more-upload-jobs-link" (click)="updateRowCount()">Show more upload jobs</a>
+</div>
+<div class="row col text-center" *ngIf="!isAnyJobs">
+  <strong>You have not uploaded any data files yet.</strong>
+</div>
+<ft-light-box [lightBoxConfig]="lightBoxConfig" (emitLightBoxActionConfirmed)="updateLightBoxActionConfirmed($event)">
+</ft-light-box>

@@ -57,17 +57,17 @@ namespace PholioVisualisation.ServicesWeb
                 {
                     "AreaList",
                     "Content",
+                    "DataInternalServices",
                     "Documents",
                     "Home",
+                    "IndicatorList",
+                    "InternalServices",
                     "Log",
-                    "NonPublicServices",
-                    "PdfReporting",
                     "Pholio",
                     "StaticReports",
                     "SSRSReport",
                     "UserFeedback"
                 };
-
                 foreach (var apiDescription in apiExplorer.ApiDescriptions)
                 {
                     if (omitedControllers.Contains(apiDescription.ActionDescriptor.ControllerDescriptor.ControllerName))

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
 using IndicatorsUI.DataConstruction;
 using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUI.Helpers;
 using IndicatorsUI.MainUI.Models;
 using IndicatorsUI.UserAccess.UserList.IRepository;
 
@@ -19,12 +19,15 @@ namespace IndicatorsUI.MainUI.Controllers
         private const string DataView = "Data";
 
         private IIndicatorListRepository _indicatorListRepository;
+        private readonly IIdentityWrapper _identity;
 
         public SearchController(IIndicatorListRepository indicatorListRepository,
+            IIdentityWrapper identity,
             IAppConfig appConfig) : base(appConfig)
 
         {
             _indicatorListRepository = indicatorListRepository;
+            _identity = identity;
         }
 
         [Route("search/{searchText}")]
@@ -47,8 +50,27 @@ namespace IndicatorsUI.MainUI.Controllers
             InitSearch(null);
             PageModel.PageType = PageType.IndicatorListDataPage;
 
-            ViewBag.IndicatorListName = _indicatorListRepository.GetListNameByPublicId(listId);
+            var indicatorList = _indicatorListRepository.GetListByPublicId(listId);
+            ViewBag.IndicatorListName = indicatorList.ListName;
             ViewBag.IndicatorListPublicId = listId;
+
+            var user = _identity.GetApplicationUser(User);
+            if (user == null)
+            {
+                ViewBag.ShowEditLink = false;
+            }
+            else
+            {
+                if (_indicatorListRepository.DoesUserOwnList(listId, user.Id))
+                {
+                    ViewBag.ShowEditLink = true;
+                }
+                else
+                {
+                    ViewBag.ShowEditLink = false;
+                }
+            }
+
             ((IList<string>)ViewBag.ExtraJsFiles).Add("js-indicator-list-view");
 
             return View(DataView, PageModel);

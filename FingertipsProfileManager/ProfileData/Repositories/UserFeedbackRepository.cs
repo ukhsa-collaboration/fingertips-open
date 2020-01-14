@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class UserFeedbackRepository : RepositoryBase
+    public class UserFeedbackRepository : RepositoryBase, IUserFeedbackRepository
     {
         public UserFeedbackRepository()
             : this(NHibernateSessionFactory.GetSession())
@@ -40,7 +40,7 @@ namespace Fpm.ProfileData.Repositories
                 .UniqueResult<UserFeedback>();
         }
 
-        public void UdateFeedback(UserFeedback feedback)
+        public void UpdateFeedback(UserFeedback feedback)
         {
             try
             {

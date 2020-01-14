@@ -1,0 +1,86 @@
+<div class="row" id="compare-area-container" style="display:none;">
+  <div class="col" *ngIf="!isEnglandAreaTypeSelected && isAnyData">
+    <div class="row">
+      <div class="col">
+        <ft-legend [legendConfig]="legendConfig" [showRecentTrends]="showRecentTrends"></ft-legend>
+      </div>
+    </div>
+    <div id="compare-area-tabs" class="row tab-options clearfix">
+      <div class="col">
+        <div>
+          <span>Areas </span>
+          <button id="compare-area-tab-option-0" [class]="subNationalButtonClass" (click)="showAllAreasInParent()" [innerHTML]="formattedParentAreaName"></button>
+          <button id="compare-area-tab-option-1" [class]="nationalButtonClass" (click)="showAllAreasInEngland()" *ngIf="!isAllInEnglandHidden()">All in England</button>
+        </div>
+        <div>
+          <span>Display </span>
+          <button id="compare-area-tab-option-2" [class]="tableButtonClass" (click)="displayData(1)">Table</button>
+          <button id="compare-area-tab-option-3" [class]="tableAndChartButtonClass" (click)="displayData(2)">Table and chart
+          </button>
+        </div>
+      </div>
+    </div>
+    <br />
+    <div id="trend-sort-multi-charts" class="row" style="display: none;">
+      <div class="col">
+        <br />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col data-header-container">
+        <div class="data-main-header">
+          <a id="indicator-header-link" class="trend-link" title="More about this indicator" (click)="goToMetadataPage()" [innerHtml]="selectedIndicatorName"></a>
+        </div>
+        <span class="new-data-badge-container" *ngIf="isNewData">
+          &nbsp;
+          <span style="margin-right:8px;" class="badge badge-success">New data</span>
+        </span>
+        <div class="data-main-header sub-content" [innerHtml]="selectedIndicatorPeriod">
+        </div>
+        <div class="data-secondary-header" [innerHtml]="selectedIndicatorUnit">
+        </div>
+      </div>
+    </div>
+    <!-- Table only -->
+    <div class="row" *ngIf="!displayChart">
+      <div class="col">
+        <div class="export-chart-box">
+          <a id="compare-areas-export-image" class="export-link" (click)="exportTable($event)">Export table as image</a>
+        </div>
+        <div id="export-chart-box-csv" class="export-chart-box-csv">
+          <a id="export-link-csv-compare-areas" class="export-link-csv" (click)="exportTableAsCsv($event)">Export table as CSV file</a>
+        </div>
+        <ft-compare-area-table [comparatorAreaRows]="comparatorAreaRows" [nonComparatorAreaRows]="nonComparatorAreaRows" [areaTypeId]="areaTypeId"
+          [comparatorId]="comparatorId" [displayOption]="displayOption" [areaCodeSelectedOnChart]="areaCodeSelectedOnChart"
+          [tooltipHelper]="tooltipHelper" [trendSource]="trendSource" [showRecentTrends]="showRecentTrends" (emitSortBy)="updateSortBy($event)"></ft-compare-area-table>
+      </div>
+    </div>
+    <!-- Funnel plot and small table -->
+    <div class="row" *ngIf="displayChart">
+      <div class="col-md-5" *ngIf="showFunnelPlot">
+        <ft-compare-area-chart [chartData]="chartData" (emitAreaCodeSelected)="updateAreaCode($event)">
+        </ft-compare-area-chart>
+      </div>
+      <div class="col-md-5" *ngIf="!showFunnelPlot">
+        <div class="no-funnel-plot">
+          Funnel plot not available
+        </div>
+      </div>
+      <div class="col-md-7">
+        <div class="export-chart-box">
+          <a class="export-link" (click)="exportTable($event)">Export table as image</a>
+        </div>
+        <div id="export-chart-box-csv" class="export-chart-box-csv">
+          <a class="export-link-csv" (click)="exportTableAsCsv($event)">Export table as CSV file</a>
+        </div>
+        <ft-compare-area-table [comparatorAreaRows]="comparatorAreaRows" [nonComparatorAreaRows]="nonComparatorAreaRows" [areaTypeId]="areaTypeId"
+          [comparatorId]="comparatorId" [displayOption]="displayOption" [areaCodeSelectedOnChart]="areaCodeSelectedOnChart"
+          [tooltipHelper]="tooltipHelper" [trendSource]="trendSource" [showRecentTrends]="showRecentTrends" (emitSortBy)="updateSortBy($event)"></ft-compare-area-table>
+      </div>
+    </div>
+  </div>
+  <div class="col do-not-display-for-england" *ngIf="isEnglandAreaTypeSelected && isAnyData">
+    Not applicable for England data
+  </div>
+  <ft-export-csv [csvConfig]="csvConfig"></ft-export-csv>
+</div>

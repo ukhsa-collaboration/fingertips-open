@@ -1,25 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Fpm.ProfileData;
+﻿using Fpm.ProfileData;
 using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System.Collections.Generic;
 
 namespace Fpm.MainUI.Helpers
 {
-    public interface IIndicatorOwnerChanger
-    {
-        void AssignIndicatorToProfile(int indicatorId, int newOwnerProfileId);
-    }
-
     public class IndicatorOwnerChanger : IIndicatorOwnerChanger
     {
-        private ProfilesReader _profilesReader;
-        private ProfileRepository _profileRepository;
+        private readonly IProfilesReader _profilesReader;
+        private readonly IProfileRepository _profileRepository;
 
-        public IndicatorOwnerChanger(ProfilesReader profilesReader, 
-            ProfileRepository profileRepository)
+        public IndicatorOwnerChanger(IProfilesReader profilesReader, IProfileRepository profileRepository)
         {
             _profilesReader = profilesReader;
             _profileRepository = profileRepository;

@@ -1,0 +1,21 @@
+<div class="standardWidth">
+  <h2 class="subheading">Upload data to PHOLIO</h2>
+</div>
+<div class="container">
+  <ul class="nav nav-tabs" id="upload-tabs">
+    <li [class]="uploadTabClass" id="upload-tab">
+      <a href="#" data-target="#" data-toggle="tab" (click)="setTabOption(0)">Upload new data</a>
+    </li>
+    <li [class]="progressTabClass" id="progress-tab">
+      <a href="#" data-target="#" data-toggle="tab" (click)="setTabOption(1)">Your upload jobs&nbsp;</a>
+    </li>
+    <li [class]="queueTabClass" id="queue-tab">
+      <a href="#" data-target="#" data-toggle="tab" (click)="setTabOption(2)">Active upload jobs&nbsp;</a>
+    </li>
+  </ul>
+  <app-upload-index *ngIf="tabOption === 0" [batchTemplateUrl]="batchTemplateUrl" [batchLastUpdated]="batchLastUpdated"
+    (emitNavigateToYourUploadJobsTab)="navigateToYourUploadJobsTab($event)">
+  </app-upload-index>
+  <app-upload-progress *ngIf="tabOption === 1" [currentUserId]="currentUserId"></app-upload-progress>
+  <app-upload-queue *ngIf="tabOption === 2" [currentUserId]="currentUserId"></app-upload-queue>
+</div>

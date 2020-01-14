@@ -1,19 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Fpm.ProfileData.Entities.Profile;
+﻿using Fpm.ProfileData.Entities.Profile;
 using Fpm.ProfileData.Repositories;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Fpm.ProfileData
 {
     public class ProfileBuilder
     {
-        private readonly ProfilesReader _reader = ReaderFactory.GetProfilesReader();
+        private readonly IProfilesReader _reader;
     
-        private ProfileRepository _profileRepository;
+        private IProfileRepository _profileRepository;
 
-        public ProfileBuilder(ProfileRepository profileRepository)
+        public ProfileBuilder(IProfilesReader reader, IProfileRepository profileRepository)
         {
             _profileRepository = profileRepository;
+            _reader = reader;
         }
 
         public Profile Build(string urlKey, int selectedDomainNumber = 0, int selectedAreaTypeId = AreaTypeIds.Undefined)
@@ -23,12 +24,13 @@ namespace Fpm.ProfileData
             ProfileDetails profileDetails = GetProfileDetails(urlKey);
             profile.Name = profileDetails.Name;
             profile.Id = profileDetails.Id;
-            profile.ContactUserId = profileDetails.ContactUserId;
+            profile.ContactUserIds = profileDetails.ContactUserIds.Split(',').ToList();
             profile.IsProfileViewable = profileDetails.IsProfileViewable;
 
             profileDetails.GroupIds = _reader.GetGroupingIds(profile.Id).ToList();
             profile.GroupingMetadatas = _reader.GetGroupingMetadataList(profileDetails.GroupIds);
             profile.AreIndicatorsToBeListed = profile.GroupingMetadatas.Any();
+            profile.AreIndicatorNamesDisplayedWithNumbers = profileDetails.AreIndicatorNamesDisplayedWithNumbers;
 
             // Groupings
             profile.SelectedDomain = selectedDomainNumber > 0 ? selectedDomainNumber : 1;
@@ -74,7 +76,7 @@ namespace Fpm.ProfileData
                         .Select(x => x.IndicatorId).Distinct();
 
                     profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId,
-                        selectedAreaTypeId, profile.Id);
+                        selectedAreaTypeId, profile.Id, profile.AreIndicatorNamesDisplayedWithNumbers);
                 }
                 else
                 {
@@ -84,7 +86,7 @@ namespace Fpm.ProfileData
                         .Distinct();
 
                     profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId,
-                        selectedAreaTypeId, profile.Id);
+                        selectedAreaTypeId, profile.Id, profile.AreIndicatorNamesDisplayedWithNumbers);
                 }
             }
             else if (profile.GroupingMetadatas.Count == 0)
@@ -94,7 +96,7 @@ namespace Fpm.ProfileData
                     allGroupings.Where(x => x.AreaTypeId == selectedAreaTypeId).Select(x => x.IndicatorId).Distinct();
 
                 profile.IndicatorNames = GetIndicatorsForGrid(indicatorIds, selectedDomainId, selectedAreaTypeId,
-                    profile.Id);
+                    profile.Id, profile.AreIndicatorNamesDisplayedWithNumbers);
             }
 
             //Handle IndicatorNames null condition if there is not domain present
@@ -107,14 +109,14 @@ namespace Fpm.ProfileData
         }
 
         private List<GroupingPlusName> GetIndicatorsForGrid(IEnumerable<int> indicatorIds, 
-            int? selectedDomainId, int areaTypeId, int profileId)
+            int? selectedDomainId, int areaTypeId, int profileId, bool areIndicatorNamesDisplayedWithNumbers)
         {
             var allGroupingPlusNames = new List<GroupingPlusName>();
 
             foreach (var indicatorId in indicatorIds)
             {
                 var groupingPlusNamesForIndicator = _profileRepository.GetGroupingPlusNames(indicatorId,
-                    selectedDomainId, areaTypeId, profileId);
+                    selectedDomainId, areaTypeId, profileId, areIndicatorNamesDisplayedWithNumbers);
                 allGroupingPlusNames.AddRange(groupingPlusNamesForIndicator);
             }
 

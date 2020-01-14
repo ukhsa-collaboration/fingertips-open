@@ -16,22 +16,20 @@ namespace PholioVisualisation.AnalysisTest
         }
 
         [TestMethod]
-        public void TestLower99_8()
+        public void Test_Benchmark_Value_Higher_Than_Upper_99_8()
         {
-            CoreDataSet parent = new CoreDataSet { Value = 4.0 };
-            CoreDataSet data = new CoreDataSet { Value = 3.0, LowerCI99_8 = 3.2, LowerCI95 = 3.4,
-                UpperCI95 = 3.6, UpperCI99_8 = 3.8 };
+            CoreDataSet parent = new CoreDataSet { Value = 3.0 };
+            var data = GetData();
 
             Assert.AreEqual(Significance.Best, Compare(data, parent, PolarityIds.RagLowIsGood));
             Assert.AreEqual(Significance.Worst, Compare(data, parent, PolarityIds.RagHighIsGood));
         }
 
         [TestMethod]
-        public void TestLower95()
+        public void Test_Benchmark_Value_Between_Upper_CIs()
         {
-            CoreDataSet parent = new CoreDataSet { Value = 3.0 };
-            CoreDataSet data = new CoreDataSet { Value = 3.2, LowerCI99_8 = 2.8, LowerCI95 = 3.2,
-                UpperCI95 = 3.5, UpperCI99_8 = 3.7 };
+            CoreDataSet parent = new CoreDataSet { Value = 2.8 };
+            var data = GetData();
 
             Assert.AreEqual(Significance.Better, Compare(data, parent, PolarityIds.RagLowIsGood));
             Assert.AreEqual(Significance.Worse, Compare(data, parent, PolarityIds.RagHighIsGood));
@@ -40,33 +38,41 @@ namespace PholioVisualisation.AnalysisTest
         [TestMethod]
         public void TestSame()
         {
-            CoreDataSet parent = new CoreDataSet { Value = 3.0 };
-            CoreDataSet data = new CoreDataSet { Value = 2.3, LowerCI99_8 = 2.5, LowerCI95 = 2.7,
-                UpperCI95 = 3.3, UpperCI99_8 = 3.7 };
+            CoreDataSet parent = new CoreDataSet { Value = 2.6 };
+            var data = GetData();
 
+            Assert.AreEqual(Significance.Same, Compare(data, parent, PolarityIds.RagLowIsGood));
             Assert.AreEqual(Significance.Same, Compare(data, parent, PolarityIds.RagHighIsGood));
         }
 
         [TestMethod]
-        public void TestHigher95()
+        public void Test_Benchmark_Value_Between_Lower_CIs()
         {
-            CoreDataSet parent = new CoreDataSet { Value = 3.0 };
-            CoreDataSet data = new CoreDataSet { Value = 3.0, LowerCI99_8 = 2.5, LowerCI95 = 2.7,
-                UpperCI95 = 2.9, UpperCI99_8 = 3.5 };
+            CoreDataSet parent = new CoreDataSet { Value = 2.4};
+            var data = GetData();
 
             Assert.AreEqual(Significance.Worse, Compare(data, parent, PolarityIds.RagLowIsGood));
             Assert.AreEqual(Significance.Better, Compare(data, parent, PolarityIds.RagHighIsGood));
         }
 
         [TestMethod]
-        public void TestHigher99_8()
+        public void Test_Benchmark_Value_Lower_Than_Upper_99_8()
         {
-            CoreDataSet parent = new CoreDataSet { Value = 3.0 };
-            CoreDataSet data = new CoreDataSet { Value = 3.0, LowerCI99_8 = 2.3, LowerCI95 = 2.5,
-                UpperCI95 = 2.7, UpperCI99_8 = 2.9 };
+            CoreDataSet parent = new CoreDataSet { Value = 2.2 };
+            var data = GetData();
 
             Assert.AreEqual(Significance.Worst, Compare(data, parent, PolarityIds.RagLowIsGood));
             Assert.AreEqual(Significance.Best, Compare(data, parent, PolarityIds.RagHighIsGood));
+        }
+
+        private static CoreDataSet GetData()
+        {
+            CoreDataSet data = new CoreDataSet
+            {
+                LowerCI99_8 = 2.3, LowerCI95 = 2.5, Value = 2.6,
+                UpperCI95 = 2.7, UpperCI99_8 = 2.9
+            };
+            return data;
         }
 
         private Significance Compare(CoreDataSet data, CoreDataSet parent, int polarity)

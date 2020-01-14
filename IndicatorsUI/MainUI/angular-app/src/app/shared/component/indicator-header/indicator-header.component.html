@@ -1,10 +1,24 @@
-<div id="indicator-details-header" *ngIf="header">
-    <div class="trend-header">
-        <div class="trend-title">
-            <a class="trend-link" title="More about this indicator" href="javascript:goToMetadataPage(rootIndex);">
-               {{header.indicatorName}} {{header.ageSexLabel}} </a><span *ngIf="header.hasNewData" style="margin-right: 8px;" class="badge badge-success">New data</span>
-            <span class="benchmark-name">{{header.comparatorName}}</span></div>
-        <div class="trend-unit"><span> {{header.valueType}} {{header.unit}} </span>
-        </div>
+<div class="row">
+  <div class="col data-header-container" *ngIf="header">
+
+    <!-- Indicator name -->
+    <div class="data-main-header">
+      <a class="trend-link" title="More about this indicator" href="javascript:goToMetadataPage(rootIndex);">
+        {{header.indicatorName}} {{header.ageSexLabel}} </a>
     </div>
+
+    <!-- New badge -->
+    <span class="new-data-badge-container" *ngIf="header.hasNewData">
+      &nbsp;
+      <span class="badge badge-success">New data</span>
+    </span>
+
+    <!-- Benchmark -->
+    <div class="data-main-header sub-content" [innerHtml]="header.comparatorName">
+    </div>
+
+    <!-- Unit -->
+    <div class="data-secondary-header"><span> {{header.valueType}} {{header.unit}} </span>
+    </div>
+  </div>
 </div>

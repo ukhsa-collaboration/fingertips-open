@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using IndicatorsUI.DomainObjects;
+using IndicatorsUI.MainUISeleniumTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NHibernate.Util;
 using OpenQA.Selenium;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 
 namespace IndicatorsUI.MainUISeleniumTest.Fingertips
@@ -10,7 +15,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
     public class FingertipsIndicatorListTest : FingertipsBaseUnitTest
     {
         [TestInitialize]
-        public void Initialize()
+        public void TestInitialize()
         {
             NavigateToSignInPage();
             SignIn();
@@ -23,29 +28,52 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
         }
 
         [TestMethod]
-        public void Test_Can_Create_New_Indicator_List()
+        public void Test_1_Can_Create_New_Indicator_List()
         {
             NavigateToCreateNewIndicatorListPage();
             CreateNewIndicatorList();
         }
 
         [TestMethod]
-        public void Test_Can_Edit_Indicator_List()
+        public void Test_2_Can_Edit_Indicator_List()
         {
             NavigateToEditIndicatorListPage();
             EditIndicatorList();
         }
 
         [TestMethod]
-        public void Test_Can_Copy_Indicator_List()
+        public void Test_3_Can_View_Indicator_List()
+        {
+            NavigateToViewIndicatorListPage();
+        }
+
+        [TestMethod]
+        public void Test_4_Redirect_To_Search_Page_After_Edit()
+        {
+            NavigateToViewIndicatorListPage();
+
+            var editIndicatorListLink = driver.FindElement(By.Id("edit-indicator-list-link"));
+            Assert.IsTrue(editIndicatorListLink.Displayed);
+
+            editIndicatorListLink.Click();
+            waitFor.EditIndicatorListPageToLoad();
+
+            driver.FindElement(By.Id("save-indicator-list-button")).Click();
+            waitFor.ViewIndicatorListPageToLoad();
+            Assert.IsTrue(driver.FindElement(By.Id("left-tartan-table")).Displayed);
+        }
+
+
+        [TestMethod]
+        public void Test_5_Can_Copy_Indicator_List()
         {
             CopyIndicatorList();
         }
 
         [TestMethod]
-        public void Text_Can_View_Indicator_List()
+        public void Test_6_Can_Delete_Indicator_Lists()
         {
-            NavigateToViewIndicatorListPage();
+            DeleteIndicatorLists();
         }
 
         private void NavigateToSignInPage()
@@ -87,8 +115,10 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
             waitFor.SignOutPageToLoad();
 
-            var signInLinkText = driver.FindElement(By.LinkText("Sign in"));
-            TestHelper.AssertElementTextIsEqual("Sign in", signInLinkText);
+            var signedOutTextElement = driver.FindElement(By.Id("div-content"))
+                .FindElement(By.TagName("h3"));
+
+            TestHelper.AssertElementTextIsEqual("You have successfully signed out", signedOutTextElement);
         }
 
         private IWebElement NavigateToYourDataMenu()
@@ -170,7 +200,7 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
             var profileDropDown = driver.FindElement(By.Id("profile-list"));
             var profileDropDownElement = new SelectElement(profileDropDown);
-            profileDropDownElement.SelectByValue("8");
+            profileDropDownElement.SelectByValue("139");
 
             driver.FindElement(By.Id("search-indicator-button")).Click();
 
@@ -186,7 +216,13 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
 
         private void SelectIndicators()
         {
-            driver.FindElement(By.Id("indicator-list")).FindElement(By.TagName("div")).Click();
+            var firstElement = driver.FindElement(By.Id("indicator-list")).FindElement(By.TagName("div"));
+
+            Actions actions = new Actions(driver);
+            actions.MoveToElement(firstElement).Perform();
+            
+            var innerElement = firstElement.FindElement(By.TagName("div"));
+            innerElement.Click();
         }
 
         private void SaveIndicatorList(bool updateName)
@@ -214,8 +250,53 @@ namespace IndicatorsUI.MainUISeleniumTest.Fingertips
             driver.FindElement(By.Id("btn-copy-indicator-list")).Click();
             waitFor.IndicatorListPageTableToLoad();
 
-            // Assert copy indicator list
-            TestHelper.AssertElementTextIsEqual(indicatorListName, driver.FindElement(By.XPath("//*[@id='grid-content']/table/tbody/tr[1]/td[1]")));
+            var copiedIndicatorElement = driver.FindElement(By.ClassName("webgrid-table"))
+                .FindElement(By.TagName("tbody"))
+                .FindElements(By.TagName("tr"))[0]
+                .FindElements(By.TagName("td"))[0];
+
+            TestHelper.AssertElementTextIsEqual(indicatorListName, copiedIndicatorElement);
+        }
+
+        private void DeleteIndicatorLists()
+        {
+            IWebElement firstIndicatorListElement;
+
+            // Check whether at least one indicator list record is present
+            // If not then exit this method
+            try
+            {
+                firstIndicatorListElement = driver.FindElements(By.Id("lnk-delete-indicator-list")).First();
+            }
+            catch (Exception)
+            {
+                // No indicator list to delete, exit this method
+                return;
+            }
+
+            // No indicator list to delete, exit this method
+            if (firstIndicatorListElement == null)
+            {
+                return;
+            }
+
+            // Delete the indicator list
+            DeleteIndicatorList(firstIndicatorListElement);
+
+            // Call this method recursively
+            DeleteIndicatorLists();
+        }
+
+        private void DeleteIndicatorList(IWebElement indicatorListElement)
+        {
+            indicatorListElement.Click();
+            waitFor.DeleteIndicatorListPopupToLoad();
+
+            // Click on Ok button in the info box
+            driver.FindElement(By.Id("btn-delete-confirm-indicator-list")).Click();
+
+            // Wait for page to refresh
+            Thread.Sleep(1000);
         }
     }
 }

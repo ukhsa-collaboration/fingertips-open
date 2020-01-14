@@ -46,12 +46,13 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
             return toEnglandSignificance;
         }
 
-        public static List<CoreDataSet> GetCoreDataForComparison(IEnumerable<CoreDataSet> coreData)
+
+        public static List<CoreDataSet> GetCoreDataForComparison(IEnumerable<CoreDataSet> coreData, int categoryTypeId)
         {
-            return coreData.Where(x => x.CategoryTypeId == CategoryTypeIds.Undefined).ToList();
+            return coreData.Where(x => x.CategoryTypeId == categoryTypeId).ToList();
         }
 
-        public Significance GetSubNationalParentSignificance(IReadOnlyDictionary<string, Area> childAreaCodeToParentAreaMap, CategoryComparisonManager categoryComparisonManager,
+        public Significance GetSubNationalParentSignificance(CategoryComparisonManager categoryComparisonManager,
             IEnumerable<CoreDataSet> parentCoreDataForComparison, IndicatorMetadata indicatorMetadata, CoreDataSet coreData, bool isParentEngland, out IArea parentArea)
         {
             // SubNational significances
@@ -63,9 +64,10 @@ namespace PholioVisualisation.Export.FileBuilder.Containers
             }
             else
             {
-                if (!childAreaCodeToParentAreaMap.ContainsKey(coreData.AreaCode)) return toSubNationalParentSignificance;
+                if (!_areaHelper.ChildAreaCodeToParentAreaMap.ContainsKey(coreData.AreaCode)) return toSubNationalParentSignificance;
 
-                parentArea = childAreaCodeToParentAreaMap[coreData.AreaCode];
+                parentArea = _areaHelper.ChildAreaCodeToParentAreaMap[coreData.AreaCode];
+
                 if (categoryComparisonManager != null)
                 {
                     // Find category

@@ -1,14 +1,13 @@
 import {
   TestBed,
-  getTestBed,
   async,
   inject
 } from '@angular/core/testing';
-import { HttpModule } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+import { HttpClientModule } from '@angular/common/http';
 import { IndicatorService } from './indicator.service';
 import { FTHelperService } from '../helper/ftHelper.service';
 import { HttpService } from './http.service';
+import { of } from 'rxjs';
 
 describe('Indicator Service', () => {
 
@@ -27,7 +26,7 @@ describe('Indicator Service', () => {
         { provide: HttpService, useValue: httpService }
       ],
       imports: [
-        HttpModule
+        HttpClientModule
       ]
     });
 
@@ -40,20 +39,20 @@ describe('Indicator Service', () => {
   it('should get indicator for all area async',
     async(inject([IndicatorService], (indicatorService: IndicatorService) => {
 
-      // Arrange: 
-      let data = [
+      // Arrange:
+      const data = [
         {
           AgeId: 1,
           SexId: 4
         }];
-      httpService.httpGet.and.returnValue(Observable.of(data));
+      httpService.httpGet.and.returnValue(of(data));
 
-      indicatorService.getSingleIndicatorForAllArea(1, 1, 'AA',
+      indicatorService.getSingleIndicatorForAllAreas(1, 1, 'AA',
         1, 1, 1, 1, 1).
         subscribe(
-          (data) => {
-            expect(data[0].AgeId).toBe(1);
-            expect(data[0].SexId).toBe(4);
+          (indicator) => {
+            expect(indicator[0].AgeId).toBe(1);
+            expect(indicator[0].SexId).toBe(4);
           });
     })));
 });

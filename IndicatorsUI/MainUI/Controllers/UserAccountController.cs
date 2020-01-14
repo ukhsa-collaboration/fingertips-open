@@ -1,17 +1,20 @@
-﻿using IndicatorsUI.MainUI.Models.UserAccess;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using IndicatorsUI.DataAccess;
+using IndicatorsUI.DataAccess.Repository;
 using IndicatorsUI.DomainObjects;
+using IndicatorsUI.DomainObjects.EmailTemplates;
 using IndicatorsUI.MainUI.ActionFilters;
 using IndicatorsUI.MainUI.Helpers;
-using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
+using IndicatorsUI.MainUI.Models.UserAccess;
 using IndicatorsUI.UserAccess;
+using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using Newtonsoft.Json;
 
 namespace IndicatorsUI.MainUI.Controllers
 {
@@ -23,18 +26,15 @@ namespace IndicatorsUI.MainUI.Controllers
 
         private readonly IIdentityWrapper _identity;
         private readonly IUserAccessDbContext _userAccessDbContext;
-        private readonly IEmailSender _emailSender;
         private readonly IExceptionLoggerWrapper _exceptionLogger;
         private readonly IUserAccountHelper _userAccountHelper;
 
         public UserAccountController(IIdentityWrapper identity, 
-            IUserAccessDbContext userAccessDbContext, IEmailSender emailSender, 
-            IExceptionLoggerWrapper exceptionLogger, IUserAccountHelper userAccountHelper,
-            IAppConfig appConfig) : base (appConfig)
+            IUserAccessDbContext userAccessDbContext, IExceptionLoggerWrapper exceptionLogger,
+            IUserAccountHelper userAccountHelper, IAppConfig appConfig) : base (appConfig)
         {
             _identity = identity;
             _userAccessDbContext = userAccessDbContext;
-            _emailSender = emailSender;
             _exceptionLogger = exceptionLogger;
             _userAccountHelper = userAccountHelper;
         }
@@ -45,7 +45,11 @@ namespace IndicatorsUI.MainUI.Controllers
         [Route("login")]
         public ActionResult Login()
         {
-            LoginViewModel loginModel = new LoginViewModel();
+            var loginModel = new LoginViewModel
+            {
+                ReturnUrl = Request.Form != null && Request.Form["returnUrl"] != null ? Request.Form["returnUrl"] : string.Empty
+            };
+
             return View(loginModel);
         }
 
@@ -71,7 +75,7 @@ namespace IndicatorsUI.MainUI.Controllers
         /// </summary>
         [Route("validate-login")]
         [MultipleButton(Name = "action", Argument = "SignIn")]
-        public async Task<ActionResult> ValidateLogin(LoginViewModel loginViewModel, string returnUrl)
+        public async Task<ActionResult> ValidateLogin(LoginViewModel loginViewModel)
         {
             if (_userAccessDbContext.HasEmailAddressAlreadyBeenRegistered(loginViewModel.UserName) == false)
             {
@@ -103,11 +107,12 @@ namespace IndicatorsUI.MainUI.Controllers
 
                 // User can be signed in
                 await SignInAsync(appUser, loginViewModel.KeepUserLoggedIn);
-                if (returnUrl == null)
+                if (string.IsNullOrEmpty(loginViewModel.ReturnUrl))
                 {
                     return RedirectToAction("Index", "IndicatorList");
                 }
-                return Redirect(returnUrl);
+
+                return Redirect(loginViewModel.ReturnUrl);
             }
 
             return InvalidSignIn(loginViewModel);
@@ -296,18 +301,28 @@ namespace IndicatorsUI.MainUI.Controllers
 
             PageMessageViewModel message = new PageMessageViewModel();
             var appUserManager = Request.GetOwinContext().GetUserManager<ApplicationUserManager>();
-            var usr = await appUserManager.FindByNameAsync(forgotPassword.EmailAddress);
+            var user = await appUserManager.FindByNameAsync(forgotPassword.EmailAddress);
 
-            if (usr != null)
+            if (user != null)
             {
-                var token = appUserManager.GeneratePasswordResetTokenAsync(usr.Id).Result;
+                var token = appUserManager.GeneratePasswordResetTokenAsync(user.Id).Result;
 
-                usr.AccessTokenResetPassword = token;
-                usr.TempGuid = Guid.NewGuid();
-                var result = await appUserManager.UpdateAsync(usr);
+                user.AccessTokenResetPassword = token;
+                user.TempGuid = Guid.NewGuid();
+                var result = await appUserManager.UpdateAsync(user);
                 if (result.Succeeded)
                 {
-                    _emailSender.SendResetPasswordEmail(usr, HttpUtility.UrlEncode(token));
+                    Email email = new Email()
+                    {
+                        To = user.Email,
+                        TemplateId = NotifyEmailTemplates.ResetPassword,
+                        TemplateParameters = NotifyMessageHelper.GenerateNotifyTemplateParameters(user, 
+                            EmailNotificationType.ResetPassword),
+                        CreatedTimestamp = DateTime.Now
+                    };
+
+                    CreateEmail(email);
+
                     message.Header = "Please check your email for reset password link";
                     return View("Message", message);
                 }
@@ -408,7 +423,22 @@ namespace IndicatorsUI.MainUI.Controllers
             try
             {
                 var user = _userAccessDbContext.GetUser(emailAddress);
-                _emailSender.SendVerificationEmail(emailAddress, user.FirstName, user.TempGuid.Value);
+
+                if (user == null)
+                {
+                    throw new Exception("There is no user associated with the email address " + emailAddress);
+                }
+
+                Email email = new Email()
+                {
+                    To = emailAddress,
+                    TemplateId = NotifyEmailTemplates.VerifyEmailAddress,
+                    TemplateParameters = NotifyMessageHelper.GenerateNotifyTemplateParameters(user, 
+                        EmailNotificationType.VerifyEmailAddress),
+                    CreatedTimestamp = DateTime.Now
+                };
+
+                CreateEmail(email);
             }
             catch (Exception ex)
             {
@@ -417,6 +447,12 @@ namespace IndicatorsUI.MainUI.Controllers
             }
 
             return null;
+        }
+
+        private void CreateEmail(Email email)
+        {
+            EmailRepository emailRepository = new EmailRepository(NHibernateSessionFactory.GetSession());
+            emailRepository.CreateEmail(email);
         }
     }
 }

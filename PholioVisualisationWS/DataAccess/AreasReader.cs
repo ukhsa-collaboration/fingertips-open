@@ -58,7 +58,6 @@ namespace PholioVisualisation.DataAccess
 
         IList<string> GetAreaCodesThatDoNotExist(IList<string> areaCodes);
         IList<string> GetAreaCodesForAreaType(int areaTypeId);
-        IList<string> GetProfileParentAreaCodes(int profileId, int parentAreaTypeId);
         IList<string> GetChildAreaCodes(string parentAreaCode, int areaTypeId);
 
         IList<CategorisedArea> GetCategorisedAreasForAllCategories(int parentAreaTypeId, int childAreaTypeId,
@@ -76,10 +75,10 @@ namespace PholioVisualisation.DataAccess
         IList<CategoryType> GetCategoryTypes(IList<int> categoryTypeIds);
         IList<CategoryType> GetAllCategoryTypes();
 
-        string GetNhsChoicesAreaId(string areaCode);
         IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId);
         IList<AreaCodeNeighbourMapping> GetNearestNeighbours(string areaCode, int neighbourTypeId);
 
+        Dictionary<string, Area> GetParentAreasFromCategoryTypeIdAndChildAreaTypeId(int parametersParentAreaTypeId, int parametersChildAreaTypeId);
         /// <summary>
         ///     Opens a data access session
         /// </summary>
@@ -293,6 +292,21 @@ namespace PholioVisualisation.DataAccess
             return map;
         }
 
+        public Dictionary<string, Area> GetParentAreasFromCategoryTypeIdAndChildAreaTypeId(int categoryTypeId, int childAreaTypeId)
+        {
+            var q = CurrentSession.CreateSQLQuery(@"SELECT areas.AreaCode as ParentAreaCode, areas.AreaName, areas.AreaShortName, areas.AreaTypeId, categAreas.AreaCode as ChildAreaCode
+                                                 FROM L_CategorisedAreas as categAreas
+                                                 INNER JOIN L_Areas as areas ON categAreas.ParentAreaTypeID = areas.AreaTypeID
+                                                 WHERE categAreas.CategoryTypeID = (:categoryTypeId) AND ChildAreaTypeID = (:childAreaTypeId)");
+
+            q.SetParameter("categoryTypeId", categoryTypeId);
+            q.SetParameter("childAreaTypeId", childAreaTypeId);
+
+            var results = q.List().Cast<object[]>();
+            var map = GetAreaCodeToAreaMap(results);
+            return map;
+        }
+
         public IList<string> GetParentCodesFromChildAreaId(int childAreaTypeId)
         {
             var q = CurrentSession.CreateQuery("select distinct h.ParentAreaCode from  Area a, AreaHierarchy h" +
@@ -393,22 +407,6 @@ namespace PholioVisualisation.DataAccess
             q.SetCacheable(true);
             q.SetParameterList("areaTypeIds", GetComponentAreaTypeIds(areaTypeId));
             return q.List<string>();
-        }
-
-        public virtual IList<string> GetProfileParentAreaCodes(int profileId, int parentAreaTypeId)
-        {
-            var q =
-                CurrentSession.CreateQuery(
-                    "select a from ProfileParentAreas a where a.ParentAreaTypeId = :areaTypeId and a.ProfileId = :profileId");
-            q.SetParameter("areaTypeId", parentAreaTypeId);
-            q.SetParameter("profileId", profileId);
-            var result = q.UniqueResult<ProfileParentAreas>();
-            if (result != null)
-            {
-                result.Init();
-                return result.ParentAreaCodes;
-            }
-            return new List<string>();
         }
 
         public IList<string> GetChildAreaCodes(string parentAreaCode, int areaTypeId)
@@ -512,15 +510,6 @@ namespace PholioVisualisation.DataAccess
             return CurrentSession.CreateCriteria<CategoryType>()
                 .SetCacheable(true)
                 .List<CategoryType>();
-        }
-
-        public string GetNhsChoicesAreaId(string areaCode)
-        {
-            var mapping = CurrentSession.CreateCriteria<AreaCodeNhsMapping>()
-                .Add(Restrictions.Eq("AreaCode", areaCode))
-                .UniqueResult<AreaCodeNhsMapping>();
-
-            return mapping == null ? string.Empty : mapping.NhsChoicesId;
         }
 
         public IList<NearByAreas> GetNearbyAreas(string easting, string northing, int areaTypeId)

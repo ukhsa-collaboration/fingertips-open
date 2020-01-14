@@ -26,7 +26,7 @@ namespace Fpm.MainUI.ViewModels.Profile
         [Display(Name = "Domain Description")]
 
         public int DefaultAreaTypeId { get; set; }
-        public int ContactUserId { get; set; }
+        public List<string> ContactUserIds { get; set; }
         public string ExtraCssFiles { get; set; }
         public string AreasIgnoredForSpineChart { get; set; }
         public int DefaultFingertipsTabId { get; set; }
@@ -38,6 +38,7 @@ namespace Fpm.MainUI.ViewModels.Profile
         public int? SkinId { get; set; }
         public bool IsProfileViewable { get; set; }
         public bool ShowDataQuality { get; set; }
+        public bool ShowOfficialStatistic { get; set; }
         public bool ShouldBuildExcel { get; set; }
         public bool HasTrendMarkers { get; set; }
         public bool UseTargetBenchmarkByDefault { get; set; }
@@ -61,6 +62,7 @@ namespace Fpm.MainUI.ViewModels.Profile
         public SelectList AllUsers { get; set; }
 
         public int NewDataDeploymentCount { get; set; }
+        public bool AreIndicatorNamesDisplayedWithNumbers { get; set; }
 
         // Tab options
         public bool IsMapTab { get; set; }
@@ -70,6 +72,6 @@ namespace Fpm.MainUI.ViewModels.Profile
         public bool IsReportsTab { get; set; }
         public bool IsBoxPlotTab { get; set; }
         public bool IsInequalitiesTab { get; set; }
-        public CompareAreasOption CompareAreasOption { get; set; }
+        public bool IsCompareAreasTab { get; set; }
     }
 }

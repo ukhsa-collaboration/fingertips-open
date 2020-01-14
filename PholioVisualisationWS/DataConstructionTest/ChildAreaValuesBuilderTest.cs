@@ -44,7 +44,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.SexualAndReproductiveHealth,
                 ComparatorId = ComparatorIds.England,
                 ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
-                AreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.DistrictAndUnitaryAuthorityPreApr2019,
                 YearRange = 3,
                 DataPointYear = 2011
             };
@@ -78,7 +78,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_HealthProtection,
                 ComparatorId = ComparatorIds.England,
                 ComparatorMethodId = (int) ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 YearRange = 3,
                 DataPointYear = 2010
             };
@@ -96,7 +96,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_HealthcarePrematureMortality,
                 ComparatorId = ComparatorIds.Subnational,
                 ComparatorMethodId = ComparatorMethodIds.SingleOverlappingCIsForOneCiLevel,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 YearRange = 3,
                 DataPointYear = 2010
             };
@@ -128,7 +128,7 @@ namespace PholioVisualisation.DataConstructionTest
                 GroupId = GroupIds.Phof_HealthcarePrematureMortality,
                 ComparatorId = ComparatorIds.Subnational,
                 ComparatorMethodId = ComparatorMethodIds.Quintiles,
-                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority,
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthorityPreApr2019,
                 YearRange = 3,
                 DataPointYear = 2010
             };

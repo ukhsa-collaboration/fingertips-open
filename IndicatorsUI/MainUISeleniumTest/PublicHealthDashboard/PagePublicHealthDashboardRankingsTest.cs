@@ -1,4 +1,5 @@
 ﻿using System;
+using IndicatorsUI.MainUISeleniumTest.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
@@ -7,10 +8,10 @@ using OpenQA.Selenium.Support.UI;
 namespace IndicatorsUI.MainUISeleniumTest.PublicHealthDashboard
 {
     [TestClass]
-    public class PagePublicHealthDashboardRankingsTest : BaseUnitTest
+    public class PagePublicHealthDashboardRankingsTest : PublicHealthDashboardBaseTest
     {
         [TestMethod]
-        public void TestPublicHealthDashboardgRankingsLoads()
+        public void TestPublicHealthDashboardRankingsLoads()
         {
             // Act
             var seleniumDriver = LoadRankingsPage();
@@ -25,10 +26,10 @@ namespace IndicatorsUI.MainUISeleniumTest.PublicHealthDashboard
         public void TestPublicHealthDashboardRankingsNavigationHeadersAsExpected()
         {
             navigateTo.PublicHealthDashboardRankings();
-            WaitFor.ThreadWait(3);
+            WaitFor.ThreadWaitInSeconds(3);
 
-            SeleniumHelper.ClickLinkText(driver, "Summary rank");
-            SeleniumHelper.ClickLinkText(driver, "Air Quality");
+            fingertipsHelper.ClickLinkByText("Summary rank");
+            fingertipsHelper.ClickLinkByText("Air Quality");
 
             PublicHealthDashboardHelper.CheckNavigationHeaders(LoadRankingsPage());
         }
@@ -49,6 +50,7 @@ namespace IndicatorsUI.MainUISeleniumTest.PublicHealthDashboard
 
         private IWebDriver LoadRankingsPage()
         {
+            navigateTo.PublicHealthDashboardRankings();
             new WaitFor(driver).RankingsToLoad();
             return driver;
         }

@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using PholioVisualisation.Analysis;
+﻿using PholioVisualisation.Analysis.TrendMarkers;
 using PholioVisualisation.DataAccess;
 using PholioVisualisation.DataConstruction;
+using System.Collections.Generic;
 
 namespace PholioVisualisation.Export.FileBuilder.Wrappers
 {

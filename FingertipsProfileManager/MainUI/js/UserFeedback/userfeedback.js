@@ -25,18 +25,12 @@
     $('[data-toggle="tooltip"]').tooltip();
 }
 
-function feedbackDetails(id) {
-    selectedFeedbackId = id;
-    lightbox.show($('#feedback-detail').html(), 300, 300, 700);
-}
-
-
 function feedbackCommentAndArchive() {
     var id = selectedFeedbackId,
         comment = $('#feedback-comment').val();
 
      if (!_.isUndefined(id) || !_.isNull(id) || id.trim().length !== 0) {
-        $.post("/userfeedback/archive", { id:id, comment: comment})
+        $.post("/user-feedback/archive", { id:id, comment: comment})
             .done(function () {
                 location.reload(true);
             })
@@ -46,8 +40,51 @@ function feedbackCommentAndArchive() {
      }    
 }
 
+function closeUserFeedbackItem() {
+
+    var comment = $('#feedback-comment').val().trim();
+
+    if (comment.length) {
+        saveUserFeedbackItem("/user-feedback/archive");
+    } else {
+        showSimpleMessagePopUp("Add a comment");
+    }
+}
+
+function saveUserFeedbackItem(url) {
+    var id = $('#Id').val();
+    var comment = $('#feedback-comment').val().trim();
+
+    $.post(url, { id: id, comment: comment })
+        .done(function () {
+            setUrl("/user-feedback");
+        })
+        .fail(function (e) {
+            showSimpleMessagePopUp("Failed to close");
+        });
+}
+
+function addComment(comment) {
+    var $comment = $('#feedback-comment');
+
+    var text = $comment.val().trim();
+
+    if (text.length) {
+        text += '. ' + comment;
+    } else {
+        text = comment;
+    }
+
+    $comment.val(text);
+}
+
+function clearComment() {
+    $('#feedback-comment').val('');
+}
+
+
 function feedbackCancel() {
-    $('#eedback-comment').val('');
+    $('#feedback-comment').val('');
     lightbox.hide();
 }
 

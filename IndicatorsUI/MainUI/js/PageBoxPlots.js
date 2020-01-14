@@ -11,16 +11,17 @@ function goToBoxPlotPage() {
 
     if (!areIndicatorsInDomain()) {
         displayNoData();
+        callAngularEvent('NoDataDisplayed', { 'isEnglandAreaType': isEnglandAreaType() });
     } else {
 
         showSpinner();
-        callAngularEvent('BoxplotSelected');
+        callAngularEvent('BoxplotSelected', { 'isEnglandAreaType': isEnglandAreaType() });
     }
 }
 
 pages.add(PAGE_MODES.BOX_PLOT, {
     id: 'boxplots',
-    title: 'Box<br/>Plots',
+    title: 'Box<br/>plots',
     goto: goToBoxPlotPage,
     gotoName: 'goToBoxPlotPage',
     needsContainer: false,

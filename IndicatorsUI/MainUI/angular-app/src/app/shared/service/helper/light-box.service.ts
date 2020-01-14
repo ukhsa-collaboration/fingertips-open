@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LightBoxConfig } from '../../component/light-box/light-box.component';
+import { LightBoxConfig } from '../../component/light-box/light-box';
 import { FTHelperService } from './ftHelper.service';
 
 @Injectable()

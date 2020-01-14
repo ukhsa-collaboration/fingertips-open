@@ -18,10 +18,12 @@ namespace PholioVisualisation.Services
 
         public List<GeographicalSearchResult> GetGeographicalSearchResults()
         {
-            return new GeographicalSearch
+            var search = new GeographicalSearch
             {
                 AreEastingAndNorthingRetrieved = _parameters.AreEastingAndNorthingRequired
-            }.SearchPlacePostcodes(_parameters.SearchText, _parameters.PolygonAreaTypeId,
+            };
+
+            return search.SearchPlacePostcodes(_parameters.SearchText, _parameters.PolygonAreaTypeId,
                 _parameters.ParentAreaTypesToIncludeInResults);
         }
     }

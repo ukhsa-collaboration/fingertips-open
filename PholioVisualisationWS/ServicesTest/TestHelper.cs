@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Configuration;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace PholioVisualisation.ServicesTest
 {
@@ -37,6 +36,11 @@ namespace PholioVisualisation.ServicesTest
         public static string GetDataString(byte[] data)
         {
             return Encoding.UTF8.GetString(data);
+        }
+
+        public static int GetRandomInt()
+        {
+            return BitConverter.ToInt32(Guid.NewGuid().ToByteArray(), 0);
         }
     }
 }

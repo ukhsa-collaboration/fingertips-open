@@ -16,7 +16,7 @@ namespace Fpm.MainUI.Helpers
         public bool IsReportsTab { get; set; }
         public bool IsBoxPlotTab { get; set; }
         public bool IsInequalitiesTab { get; set; }
-        public CompareAreasOption CompareAreasOption { get; set; }
+        public bool IsCompareAreasTab { get; set; }
 
         public const string MapFileName = "PageMap.js";
         public const string ScatterPlotFileName = "PageScatterPlot.js";
@@ -25,7 +25,7 @@ namespace Fpm.MainUI.Helpers
         public const string ReportsFileName = "PageReports.js";
         public const string BoxPlotFileName = "PageBoxPlots.js";
         public const string InequalitiesFileName = "PageInequalities.js";
-        public const string BarChartAndFunnelPlotFileName = "PageBarChartAndFunnelPlot.js";
+        public const string CompareAreasFileName = "PageBarChart.js";
 
         /// <summary>
         /// Sets default values
@@ -33,7 +33,6 @@ namespace Fpm.MainUI.Helpers
         public ExtraJsFileHelper()
         {
             IsMapTab = true;
-            CompareAreasOption = CompareAreasOption.BarChartAndFunnelPlot;
         }
 
         /// <summary>
@@ -48,10 +47,7 @@ namespace Fpm.MainUI.Helpers
             IsReportsTab = extraJsFiles.Contains(ReportsFileName);
             IsBoxPlotTab = extraJsFiles.Contains(BoxPlotFileName);
             IsInequalitiesTab = extraJsFiles.Contains(InequalitiesFileName);
-
-            CompareAreasOption = extraJsFiles.Contains(BarChartAndFunnelPlotFileName)
-                ? CompareAreasOption.BarChartAndFunnelPlot
-                : CompareAreasOption.BarChartOnly;
+            IsCompareAreasTab = extraJsFiles.Contains(CompareAreasFileName);
         }
 
         /// <summary>
@@ -68,9 +64,7 @@ namespace Fpm.MainUI.Helpers
 
             sb.Add("PageAreaTrends.js");
 
-            sb.Add(CompareAreasOption == CompareAreasOption.BarChartAndFunnelPlot
-                ? BarChartAndFunnelPlotFileName
-                : "PageBarChart.js");
+            sb.Add(CompareAreasFileName);
 
             sb.Add("PageAreaProfile.js");
 

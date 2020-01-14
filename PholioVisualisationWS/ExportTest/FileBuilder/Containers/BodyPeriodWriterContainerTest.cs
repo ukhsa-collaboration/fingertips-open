@@ -1,13 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using PholioVisualisation.DataAccess;
-using PholioVisualisation.DataConstruction;
 using PholioVisualisation.Export;
 using PholioVisualisation.Export.FileBuilder.Containers;
 using PholioVisualisation.Export.FileBuilder.Wrappers;
 using PholioVisualisation.Formatting;
 using PholioVisualisation.PholioObjects;
 using System.Collections.Generic;
+using PholioVisualisation.Export.FileBuilder.SupportModels;
 
 namespace PholioVisualisation.ExportTest.FileBuilder.Containers
 {
@@ -19,9 +19,9 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         private IndicatorExportParameters _generalParameters;
         private OnDemandQueryParametersWrapper _onDemandQueryParameters;
         private IndicatorMetadata _indicatorMetadata;
+        private CsvBuilderAttributesForBodyContainer _parameters;
 
         private IndicatorExportParameters _indicatorExportParameters;
-        private AreaFactory _areaFactory;
         private ExportAreaHelper _areaHelper;
         private IList<TimePeriod> _timePeriods;
         private SingleIndicatorFileWriter _singleIndicatorFileWriter;
@@ -39,12 +39,13 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
             _areasReaderMock = new Mock<IAreasReader>(MockBehavior.Strict);
             _pholioReaderMock = new Mock<PholioReader>(MockBehavior.Strict);
             _generalParameters = new IndicatorExportParameters();
-            _onDemandQueryParameters = new OnDemandQueryParametersWrapper(1, new List<int>{1}, new Dictionary<int, IList<Inequality>> { { 1, null } });
-            _indicatorMetadata = new IndicatorMetadata { Unit = new Unit { Value = 1 }, Descriptive = new Dictionary<string, string>{{"Name", "NameTest"}}};
+            _onDemandQueryParameters = new OnDemandQueryParametersWrapper(1, new List<int> { 1 }, new Dictionary<int, IList<InequalitySearch>> { { 1, null } });
+            _indicatorMetadata = new IndicatorMetadata { Unit = new Unit { Value = 1 }, Descriptive = new Dictionary<string, string> { { "Name", "NameTest" } } };
+
+            _parameters = new CsvBuilderAttributesForBodyContainer(_generalParameters, new OnDemandQueryParametersWrapper(1, new List<int>(), new Dictionary<int, IList<InequalitySearch>>(), null, new List<int>(), true));
 
             _indicatorExportParameters = new IndicatorExportParameters { ParentAreaCode = AreaCodes.England };
-            _areaFactory = new AreaFactory(_areasReaderMock.Object);
-            _areaHelper = new ExportAreaHelper(_areasReaderMock.Object, _indicatorExportParameters, _areaFactory);
+            _areaHelper = new ExportAreaHelper(_areasReaderMock.Object, _indicatorExportParameters);
             _timePeriods = new List<TimePeriod>
             {
                 new TimePeriod { Month = 1, Quarter = 1, Year = 2016, YearRange = 1 },
@@ -54,35 +55,93 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
                 new TimePeriod{ Month = 1, Quarter = 1, Year = 2020, YearRange = 1 }
             };
 
-
-            _areasReaderMock.Setup(x => x.GetCategoryTypes(It.IsAny<IList<int>>())).Returns(new List<CategoryType> ());
-            _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area { Code = "SubNationalTest", Name = "NameTest", ShortName = "shortNameTest"});
-            _areasReaderMock.Setup(x => x.GetChildAreas(It.IsAny<string>(), It.IsAny<int>())).Returns(new List<IArea> { new Area { Code = "SubNationalTest", Name = "NameTest"} });
-            _areasReaderMock.Setup(x => x.GetParentAreasFromChildAreaId(It.IsAny<int>(), It.IsAny<int>())).Returns(new Dictionary<string, Area> { { "SubNationalTest", new Area { Code = "SubNationalTest", Name = "NameTest"} } });
-            _areasReaderMock.Setup(x => x.GetAreaType(It.IsAny<int>())).Returns(new AreaType{ CanBeDisplayedOnMap = false, Id = 1, IsCurrent = true, IsSearchable = true, Name = "AreaTypeTest",
-                ParentAreaTypes = new List<IAreaType>(), ShortName = "shortNameTest"});
-            _areasReaderMock.Setup(x => x.GetAreasByAreaTypeId(It.IsAny<int>())).Returns(new List<IArea>{ new Area{ AreaTypeId = 1, Code = "SubNationalTest", Name = "NameTest", ShortName = "ShortNameTest"}});
+            _areasReaderMock.Setup(x => x.GetCategoryTypes(It.IsAny<IList<int>>())).Returns(new List<CategoryType>());
+            _areasReaderMock.Setup(x => x.GetAreaFromCode(It.IsAny<string>())).Returns(new Area { Code = "SubNationalTest", Name = "NameTest", ShortName = "shortNameTest" });
+            _areasReaderMock.Setup(x => x.GetChildAreas(It.IsAny<string>(), It.IsAny<int>())).Returns(new List<IArea> { new Area { Code = "SubNationalTest", Name = "NameTest" } });
+            _areasReaderMock.Setup(x => x.GetParentAreasFromChildAreaId(It.IsAny<int>(), It.IsAny<int>())).Returns(new Dictionary<string, Area> { { "SubNationalTest", new Area { Code = "SubNationalTest", Name = "NameTest" } } });
+            _areasReaderMock.Setup(x => x.GetAreaType(It.IsAny<int>())).Returns(new AreaType
+            {
+                CanBeDisplayedOnMap = false,
+                Id = 1,
+                IsCurrent = true,
+                IsSearchable = true,
+                Name = "AreaTypeTest",
+                ParentAreaTypes = new List<IAreaType>(),
+                ShortName = "shortNameTest"
+            });
+            _areasReaderMock.Setup(x => x.GetAreasByAreaTypeId(It.IsAny<int>())).Returns(new List<IArea> { new Area { AreaTypeId = 1, Code = "SubNationalTest", Name = "NameTest", ShortName = "ShortNameTest" } });
             _areaHelper.Init();
 
-            _singleIndicatorFileWriter = new SingleIndicatorFileWriter(1, _generalParameters);
+            _singleIndicatorFileWriter = new SingleIndicatorFileWriter(1, _parameters);
 
-            _pholioReaderMock.Setup(x => x.GetAllAges()).Returns(new List<Age> { new Age { Id = 1, Name = "AgeTest"}});
-            _pholioReaderMock.Setup(x => x.GetAllSexes()).Returns(new List<Sex> { new Sex { Id = 0, Name = "SexName", Sequence = 1 }});
-            _pholioReaderMock.Setup(x => x.GetAllValueNotes()).Returns(new List<ValueNote> { new ValueNote {Id = 1, Text = "NoteTest"}});
+            _pholioReaderMock.Setup(x => x.GetAllAges()).Returns(new List<Age> { new Age { Id = 1, Name = "AgeTest" } });
+            _pholioReaderMock.Setup(x => x.GetAllSexes()).Returns(new List<Sex> { new Sex { Id = 0, Name = "SexName", Sequence = 1 } });
+            _pholioReaderMock.Setup(x => x.GetAllValueNotes()).Returns(new List<ValueNote> { new ValueNote { Id = 1, Text = "NoteTest" } });
 
-            var lookUpManager = new LookUpManager(_pholioReaderMock.Object, _areasReaderMock.Object, new List<int> {1}, new List<int> {1});
+            var lookUpManager = new LookUpManager(_pholioReaderMock.Object, _areasReaderMock.Object, new List<int> { 1 }, new List<int> { 1 });
 
-            _singleIndicatorFileWriter.Init(lookUpManager, new TrendMarkerLabelProvider(1) , new SignificanceFormatter(1, 1), _indicatorMetadata);
-            _coreDataSetEnglandTest = new CoreDataSet {
-                AgeId = 1, CategoryTypeId = CategoryTypeUndefined, AreaCode = "EnglandTest", YearRange = 1, Count = 1, IndicatorId = 1, Denominator2 = 1, Month = 1, Denominator = 1, CategoryId = 1, HasBeenTruncated = true,
-                Value = 1, Year = 2020, Significance = new Dictionary<int, int>(), Quarter = 1, SexId = 0, LowerCI95 = 1, LowerCI95F = "", LowerCI99_8 = 1, LowerCI99_8F = "", SignificanceAgainstOneBenchmark = 1,
-                Uid = 1, UniqueId = 1, UpperCI95 = 1, UpperCI95F = "", UpperCI99_8 = 1, UpperCI99_8F = "", ValueFormatted = "", ValueNoteId = 1
+            _singleIndicatorFileWriter.Init(lookUpManager, new TrendMarkerLabelProvider(1), new SignificanceFormatter(1, 1), _indicatorMetadata);
+            _coreDataSetEnglandTest = new CoreDataSet
+            {
+                AgeId = 1,
+                CategoryTypeId = CategoryTypeUndefined,
+                AreaCode = "EnglandTest",
+                YearRange = 1,
+                Count = 1,
+                IndicatorId = 1,
+                Denominator2 = 1,
+                Month = 1,
+                Denominator = 1,
+                CategoryId = 1,
+                HasBeenTruncated = true,
+                Value = 1,
+                Year = 2020,
+                Significance = new Dictionary<int, int>(),
+                Quarter = 1,
+                SexId = 0,
+                LowerCI95 = 1,
+                LowerCI95F = "",
+                LowerCI99_8 = 1,
+                LowerCI99_8F = "",
+                SignificanceAgainstOneBenchmark = 1,
+                UniqueId = 1,
+                UpperCI95 = 1,
+                UpperCI95F = "",
+                UpperCI99_8 = 1,
+                UpperCI99_8F = "",
+                ValueFormatted = "",
+                ValueNoteId = 1
             };
             _coreDataSetSubNationalTest = new CoreDataSet
             {
-                AgeId = 1, CategoryTypeId = CategoryTypeUndefined, AreaCode = "SubNationalTest", YearRange = 1, Count = 1, IndicatorId = 1, Denominator2 = 1, Month = 1, Denominator = 1, CategoryId = 1, HasBeenTruncated = true,
-                Value = 1, Year = 2020, Significance = new Dictionary<int, int>(), Quarter = 1, SexId = 0, LowerCI95 = 1, LowerCI95F = "", LowerCI99_8 = 1, LowerCI99_8F = "", SignificanceAgainstOneBenchmark = 1,
-                Uid = 1, UniqueId = 1, UpperCI95 = 1, UpperCI95F = "",UpperCI99_8 = 1, UpperCI99_8F = "", ValueFormatted = "",ValueNoteId = 1
+                AgeId = 1,
+                CategoryTypeId = CategoryTypeUndefined,
+                AreaCode = "SubNationalTest",
+                YearRange = 1,
+                Count = 1,
+                IndicatorId = 1,
+                Denominator2 = 1,
+                Month = 1,
+                Denominator = 1,
+                CategoryId = 1,
+                HasBeenTruncated = true,
+                Value = 1,
+                Year = 2020,
+                Significance = new Dictionary<int, int>(),
+                Quarter = 1,
+                SexId = 0,
+                LowerCI95 = 1,
+                LowerCI95F = "",
+                LowerCI99_8 = 1,
+                LowerCI99_8F = "",
+                SignificanceAgainstOneBenchmark = 1,
+                UniqueId = 1,
+                UpperCI95 = 1,
+                UpperCI95F = "",
+                UpperCI99_8 = 1,
+                UpperCI99_8F = "",
+                ValueFormatted = "",
+                ValueNoteId = 1
             };
             _dataForEngland = new List<CoreDataSet> { _coreDataSetEnglandTest };
             _dataForSubNational = new List<CoreDataSet> { _coreDataSetSubNationalTest };
@@ -102,15 +161,17 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
             var dataCollector = new MultipleCoreDataCollector();
             var groupDataReaderMock = new Mock<GroupDataReader>(MockBehavior.Strict);
 
-            groupDataReaderMock.Setup(x => x.GetDataIncludingInequalities(It.IsAny<int>(),It.IsAny<TimePeriod>(), It.IsAny<IList<int>>(), It.IsAny<string>())).Returns(_dataForLocal);
+            groupDataReaderMock.Setup(x => x.GetDataIncludingInequalities(It.IsAny<int>(), It.IsAny<TimePeriod>(), It.IsAny<IList<int>>(), It.IsAny<string>())).Returns(_dataForLocal);
 
-            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(_generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _timePeriods,
-                dataCollector, new Grouping ());
+            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(_generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _areasReaderMock.Object, _timePeriods,
+                dataCollector, new Grouping());
 
             dataCollector.AddChildDataList(_dataForLocal);
-            
 
-            var result = bodyPeriodWriterContainer.WriteChildProcessedData(1, _timePeriods[_timePeriods.Count - 1],"timeStringTest", 1, ref _singleIndicatorFileWriter, _dataForEngland, _dataForSubNational);
+
+            var result = bodyPeriodWriterContainer.WriteChildProcessedData(1, _timePeriods[_timePeriods.Count - 1],
+                "timeStringTest", 1, _singleIndicatorFileWriter, _dataForEngland, _dataForSubNational,
+                new Grouping());
 
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Count == 1);
@@ -118,20 +179,116 @@ namespace PholioVisualisation.ExportTest.FileBuilder.Containers
         }
 
         [TestMethod]
-        public void ShouldWriteProcessedDataTest()
+        public void ShouldWriteNationalProcessedDataTest()
         {
             var dataCollector = new MultipleCoreDataCollector();
             var groupDataReaderMock = new Mock<GroupDataReader>(MockBehavior.Strict);
 
             groupDataReaderMock.Setup(x => x.GetDataIncludingInequalities(It.IsAny<int>(), It.IsAny<TimePeriod>(), It.IsAny<IList<int>>(), It.IsAny<string[]>())).Returns(_dataForSubNational);
 
-            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(_generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _timePeriods,
+            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(_generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _areasReaderMock.Object, _timePeriods,
                 dataCollector, new Grouping());
 
             dataCollector.AddParentDataList(_dataForSubNational);
 
             IList<CoreDataSet> coreDataSetComparision = null;
-            var result = bodyPeriodWriterContainer.WriteProcessedData(1, _timePeriods[_timePeriods.Count - 1], "timeStringTest", 1, ref _singleIndicatorFileWriter, ref coreDataSetComparision, null);
+
+            var grouping = new Grouping()
+            {
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+            };
+
+            var result = bodyPeriodWriterContainer.WriteProcessedNationalData(1, _timePeriods[_timePeriods.Count - 1],
+                "timeStringTest", 1, _singleIndicatorFileWriter, ref coreDataSetComparision, grouping, null);
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Count == 1);
+            Assert.IsNotNull(_singleIndicatorFileWriter.GetFileContent());
+        }
+
+        [TestMethod]
+        public void ShouldWriteSubNationalProcessedDataTest()
+        {
+            var dataCollector = new MultipleCoreDataCollector();
+            var groupDataReaderMock = new Mock<GroupDataReader>(MockBehavior.Strict);
+
+            groupDataReaderMock.Setup(x => x.GetDataIncludingInequalities(It.IsAny<int>(), It.IsAny<TimePeriod>(), It.IsAny<IList<int>>(), It.IsAny<string[]>())).Returns(_dataForSubNational);
+
+            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(_generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _areasReaderMock.Object, _timePeriods,
+                dataCollector, new Grouping());
+
+            dataCollector.AddParentDataList(_dataForSubNational);
+
+            IList<CoreDataSet> coreDataSetComparision = null;
+            var result = bodyPeriodWriterContainer.WriteProcessedSubNationalData(1,
+                _timePeriods[_timePeriods.Count - 1], "timeStringTest", 1, _singleIndicatorFileWriter,
+                ref coreDataSetComparision, new Grouping());
+
+            Assert.IsNotNull(result);
+            Assert.IsTrue(result.Count == 1);
+            Assert.IsNotNull(_singleIndicatorFileWriter.GetFileContent());
+        }
+
+        [TestMethod]
+        public void ShouldFindIsNotAreaMappingWithInCategoryAreaIdDataTest()
+        {
+            var dataCollector = new MultipleCoreDataCollector();
+            var groupDataReaderMock = new Mock<GroupDataReader>(MockBehavior.Strict);
+            var generalParameters = new IndicatorExportParameters
+            {
+                ParentAreaCode = AreaCodes.DeprivationDecile_Utla3,
+                ParentAreaTypeId = AreaTypeIds.District,
+                ChildAreaTypeId = AreaTypeIds.GoRegion,
+                ProfileId = ProfileIds.HealthProfiles
+            };
+
+            var coreDataSetTest = new CoreDataSet
+            {
+                AgeId = 1,
+                CategoryTypeId = CategoryTypeUndefined,
+                AreaCode = "dataTest",
+                YearRange = 1,
+                Count = 1,
+                IndicatorId = 1,
+                Denominator2 = 1,
+                Month = 1,
+                Denominator = 1,
+                CategoryId = 1,
+                HasBeenTruncated = true,
+                Value = 1,
+                Year = 2020,
+                Significance = new Dictionary<int, int>(),
+                Quarter = 1,
+                SexId = 0,
+                LowerCI95 = 1,
+                LowerCI95F = "",
+                LowerCI99_8 = 1,
+                LowerCI99_8F = "",
+                SignificanceAgainstOneBenchmark = 1,
+                UniqueId = 1,
+                UpperCI95 = 1,
+                UpperCI95F = "",
+                UpperCI99_8 = 1,
+                UpperCI99_8F = "",
+                ValueFormatted = "",
+                ValueNoteId = 1
+            };
+
+            var dataForLocal = new List<CoreDataSet> { coreDataSetTest };
+            groupDataReaderMock.Setup(x => x.GetDataIncludingInequalities(It.IsAny<int>(), It.IsAny<TimePeriod>(), It.IsAny<IList<int>>(), It.IsAny<string>())).Returns(dataForLocal);
+
+            var bodyPeriodWriterContainer = new BodyPeriodWriterContainer(generalParameters, _onDemandQueryParameters, _indicatorMetadata, _areaHelper, groupDataReaderMock.Object, _areasReaderMock.Object, _timePeriods,
+                dataCollector, new Grouping());
+
+            dataCollector.AddChildDataList(dataForLocal);
+
+            var grouping = new Grouping()
+            {
+                AreaTypeId = AreaTypeIds.CountyAndUnitaryAuthority
+            };
+
+            var result = bodyPeriodWriterContainer.WriteChildProcessedData(1, _timePeriods[_timePeriods.Count - 1],
+                "timeStringTest", 1, _singleIndicatorFileWriter, _dataForEngland, _dataForEngland, grouping);
 
             Assert.IsNotNull(result);
             Assert.IsTrue(result.Count == 1);

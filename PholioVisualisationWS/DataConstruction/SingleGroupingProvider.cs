@@ -62,6 +62,7 @@ namespace PholioVisualisation.DataConstruction
         }
 
         public virtual Grouping GetGroupingByProfileIdAndAreaTypeIdAndIndicatorIdAndSexId(int profileId, int areaTypeId, int indicatorId, int sexId)
+
         {
             SetWhetherToUseCommonestPolarity(profileId);
             var groupIds = groupIdProvider.GetGroupIds(profileId);
@@ -113,13 +114,13 @@ namespace PholioVisualisation.DataConstruction
         {
             foreach (var groupId in groupIds)
             {
-                var grouping = groupDataReader
-                    .GetGroupingsByGroupIdIndicatorIdAgeId(groupId, areaTypeId, indicatorId, ageId)
-                    .FirstOrDefault();
+                var groupings = groupDataReader
+                    .GetGroupingsByGroupIdIndicatorIdAgeId(groupId, areaTypeId, indicatorId, ageId);
 
+                var grouping = groupings.FirstOrDefault();
                 if (grouping != null)
                 {
-                    return grouping;
+                    return ReduceGroupings(groupings);
                 }
             }
             return null;
@@ -129,13 +130,13 @@ namespace PholioVisualisation.DataConstruction
         {
             foreach (var groupId in groupIds)
             {
-                var grouping = groupDataReader
-                    .GetGroupingsByGroupIdIndicatorIdSexId(groupId, areaTypeId, indicatorId, sexId)
-                    .FirstOrDefault();
+                var groupings = groupDataReader
+                    .GetGroupingsByGroupIdIndicatorIdSexId(groupId, areaTypeId, indicatorId, sexId);
 
+                var grouping = groupings.FirstOrDefault();
                 if (grouping != null)
                 {
-                    return grouping;
+                    return ReduceGroupings(groupings);
                 }
             }
             return null;
@@ -161,9 +162,15 @@ namespace PholioVisualisation.DataConstruction
         {
             if (groupings.Any() == false) return null;
 
-            var groupingSorter = new GroupingSorter(groupings);
-            var sortedGroupings = groupingSorter.SortByDataPointTimePeriodMostRecentFirst();
-            var grouping = sortedGroupings.First();
+            // Filter to get widest possible time range
+            var sortedGroupings = GroupingsSortedByDataPointTimePeriodMostRecentFirst(groupings);
+
+            // Filter to get earliest possible base line time period range
+            var filteredGroupings = GroupingFilteredByBaseLineTimePeriods(sortedGroupings);
+
+            // Sort groupings by base line time period earliest first
+            // and take the first grouping record
+            var grouping = GroupingsSortedByBaseLineTimePeriodEarliestFirst(filteredGroupings).First();
 
             // Use most common polarity for consistency
             if (useCommonestPolarity)
@@ -173,6 +180,32 @@ namespace PholioVisualisation.DataConstruction
             }
 
             return grouping;
+        }
+
+        private IList<Grouping> GroupingsSortedByDataPointTimePeriodMostRecentFirst(IList<Grouping> groupings)
+        {
+            var groupingSorter = new GroupingSorter(groupings);
+            var sortedGroupings = groupingSorter.SortByDataPointTimePeriodMostRecentFirst();
+
+            return sortedGroupings;
+        }
+
+        private IList<Grouping> GroupingsSortedByBaseLineTimePeriodEarliestFirst(IList<Grouping> groupings)
+        {
+            var groupingSorter = new GroupingSorter(groupings);
+            var sortedGroupings = groupingSorter.SortByBaseLineTimePeriodEarliestFirst();
+
+            return sortedGroupings;
+        }
+
+        private IList<Grouping> GroupingFilteredByBaseLineTimePeriods(IList<Grouping> groupings)
+        {
+            var grouping = groupings.First();
+
+            var groupingListFilter = new GroupingListFilter(groupings);
+            var filteredGroupings = groupingListFilter.SelectForBaseLineTimePeriods(grouping).ToList();
+
+            return filteredGroupings;
         }
 
         private IEnumerable<int> GetGroupIds(int groupId, int profileIdToSelectGroupingsFrom)
@@ -186,7 +219,7 @@ namespace PholioVisualisation.DataConstruction
 
         private void SetWhetherToUseCommonestPolarity(int profileId)
         {
-            useCommonestPolarity = profileId == ProfileIds.Search || profileId == ProfileIds.Undefined;
+            useCommonestPolarity = PolarityHelper.ShouldUseCommonestPolarity(profileId);
         }
     }
 }

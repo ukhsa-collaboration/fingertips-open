@@ -6,7 +6,7 @@ using NHibernate;
 
 namespace Fpm.ProfileData.Repositories
 {
-    public class ExceptionsRepository : RepositoryBase
+    public class ExceptionsRepository : RepositoryBase, IExceptionsRepository
     {
         /// <summary>
         /// APIs may generate lots of exceptions which would prevent the exception
@@ -14,7 +14,6 @@ namespace Fpm.ProfileData.Repositories
         /// </summary>
         public const int MaxExceptionCount = 500;
 
-        // poor man injection, should be removed when we use DI containers
         public ExceptionsRepository()
             : this(NHibernateSessionFactory.GetSession())
         {
@@ -25,14 +24,14 @@ namespace Fpm.ProfileData.Repositories
         {
         }
 
-        public IList<ExceptionLog> GetExceptionsByServer(int exceptionDays, string exceptionServer)
+        public IList<ExceptionLog> GetExceptionsForSpecificServers(int exceptionDays, params string[] exceptionServers)
         {
             DateTime initDate = DateTime.Today.AddDays(exceptionDays * -1);
 
             IQuery q = CurrentSession.CreateQuery(
-                "from ExceptionLog e where e.Date > :initDate and e.Server = :exceptionServer order by e.Date desc");
+                "from ExceptionLog e where e.Date > :initDate and e.Server in (:exceptionServers) order by e.Date desc");
             q.SetParameter("initDate", initDate);
-            q.SetParameter("exceptionServer", exceptionServer);
+            q.SetParameterList("exceptionServers", exceptionServers);
             q.SetMaxResults(MaxExceptionCount);
             return q.List<ExceptionLog>();
         }

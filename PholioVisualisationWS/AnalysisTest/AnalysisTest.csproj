@@ -96,7 +96,7 @@
     <Compile Include="TrendRequestTest.cs" />
     <Compile Include="TargetComparerTest.cs" />
     <Compile Include="MinMaxFinderTest.cs" />
-    <Compile Include="WhenUsingTrendMarkerCalculator.cs" />
+    <Compile Include="TrendMarkerCalculatorTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Analysis\Analysis.csproj">

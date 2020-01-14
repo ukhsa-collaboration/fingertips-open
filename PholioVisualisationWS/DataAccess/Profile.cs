@@ -32,5 +32,8 @@ namespace PholioVisualisation.DataAccess
 
         [JsonProperty]
         public IList<GroupingMetadata> GroupMetadata { get; set; }
+
+        [JsonIgnore]
+        public bool AreIndicatorNamesDisplayedWithNumbers { get; set; }
     }
 }

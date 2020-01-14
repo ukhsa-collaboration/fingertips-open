@@ -93,6 +93,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AreaListTestHelper.cs" />
     <Compile Include="IndicatorLists\IndicatorListRepositoryTest.cs" />
     <Compile Include="IndicatorLists\IndicatorListProviderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

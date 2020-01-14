@@ -1,0 +1,10 @@
+<div *ngIf="showBenchmarkAgainstGoal">
+  <table class="key-table p-2">
+    <tr>
+      <td class="key-text">Benchmarked against goal:</td>
+      <td class="key-spacer"></td>
+      <td [innerHtml]="targetLegendForBenchmark"></td>
+      <td class="tartan-legend-box not-compared">Not applicable</td>
+    </tr>
+  </table>
+</div>

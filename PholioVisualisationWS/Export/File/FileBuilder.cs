@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace PholioVisualisation.Export.File
 {
-    public interface IFileBuilder<T>
+    public interface IFileBuilder
     {
-        void AddContent(T content);
-        T GetFileContent();
+        void AddContent(byte[] content);
+        byte[] GetFileContent();
     }
 
-    public class CsvFileBuilder : IFileBuilder<byte[]>
+    public class CsvFileBuilder : IFileBuilder
     {
-        private List<byte[]> _contents = new List<byte[]>();
+        private readonly List<byte[]> _contents = new List<byte[]>();
 
         public void AddContent(byte[] content)
         {
@@ -33,7 +32,7 @@ namespace PholioVisualisation.Export.File
         }
     }
 
-    public class DummyFileBuilder : IFileBuilder<byte[]>
+    public class DummyFileBuilder : IFileBuilder
     {
         public void AddContent(byte[] content)
         {

@@ -1,34 +1,46 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { SpineChartDimensions } from '../spine-chart.classes';
-import { TooltipHelper } from 'app/shared/shared';
+import { TooltipHelper } from '../../shared/shared';
 import { IndicatorRow } from '../area-profile.component';
-import { FTHelperService } from 'app/shared/service/helper/ftHelper.service';
+import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
+import { isDefined } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'ft-spine-chart',
   templateUrl: './spine-chart.component.html',
   styleUrls: ['./spine-chart.component.css']
 })
-export class SpineChartComponent {
+export class SpineChartComponent implements OnChanges {
 
   @Input() public dimensions: SpineChartDimensions;
-  @Input() public tooltip: TooltipHelper;
+  @Input() public tooltipHelper: TooltipHelper;
   @Input() public indicatorRow: IndicatorRow;
+  public doesContainMarkerImage = false;
 
   private currentTooltipHtml: string;
   private html: string[];
 
   constructor(private ftHelperService: FTHelperService) { }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['dimensions']) {
+      if (this.dimensions) {
+        if (isDefined(this.dimensions.markerImage)) {
+          this.doesContainMarkerImage = true;
+        }
+      }
+    }
+  }
+
   public showMarkerTooltip(event: MouseEvent) {
     this.html = [];
-    let formatter = this.indicatorRow.formatter;
+    const formatter = this.indicatorRow.formatter;
 
     // Value
     this.addDataText(formatter.getAreaValue() + formatter.getSuffixIfNoShort());
 
     // Area name
-    var areaName = this.ftHelperService.getAreaNameToDisplay(this.indicatorRow.area);
+    const areaName = this.ftHelperService.getAreaNameToDisplay(this.indicatorRow.area);
     this.html.push('<span id="tooltipArea">', areaName, '</span>');
 
     this.addIndicatorName();
@@ -39,37 +51,37 @@ export class SpineChartComponent {
 
   public showInnerQuartilesTooltip(event: MouseEvent) {
 
-    let formatter = this.indicatorRow.formatter;
+    const formatter = this.indicatorRow.formatter;
 
-    let values = formatter.get25() + ' - ' + formatter.get75();
-    let labels = '25th Percentile to 75th Percentile';
+    const values = formatter.get25() + ' - ' + formatter.get75();
+    const labels = '25th Percentile to 75th Percentile';
 
     this.showRangeTooltip(event, values, labels);
   }
 
   public showLeftQuartileTooltip(event: MouseEvent) {
 
-    let formatter = this.indicatorRow.formatter;
+    const formatter = this.indicatorRow.formatter;
 
-    let values = formatter.getMin() + ' - ' + formatter.get25();
-    let labels = this.getSpineHeaders().min + ' to 25th Percentile';
+    const values = formatter.getMin() + ' - ' + formatter.get25();
+    const labels = this.getSpineHeaders().min + ' to 25th Percentile';
 
     this.showRangeTooltip(event, values, labels);
   }
 
   public showRightQuartileTooltip(event: MouseEvent) {
 
-    let formatter = this.indicatorRow.formatter;
+    const formatter = this.indicatorRow.formatter;
 
-    let values = formatter.get75() + ' - ' + formatter.getMax();
-    let labels = '75th Percentile to ' + this.getSpineHeaders().max;
+    const values = formatter.get75() + ' - ' + formatter.getMax();
+    const labels = '75th Percentile to ' + this.getSpineHeaders().max;
 
     this.showRangeTooltip(event, values, labels);
   }
 
   public showBenchmarkTooltip(event: MouseEvent) {
     this.html = [];
-    let formatter = this.indicatorRow.formatter;
+    const formatter = this.indicatorRow.formatter;
 
     this.addDataText(formatter.getAverage() + formatter.getSuffixIfNoShort());
     this.addComparatorName();
@@ -84,7 +96,6 @@ export class SpineChartComponent {
 
   private showRangeTooltip(event: MouseEvent, values: string, labels: string) {
     this.html = [];
-    let formatter = this.indicatorRow.formatter;
 
     this.addDataText(values);
     this.addRangeText(labels);
@@ -112,9 +123,9 @@ export class SpineChartComponent {
   }
 
   private addValueNote() {
-    let noteId = this.indicatorRow.areaData.NoteId;
+    const noteId = this.indicatorRow.areaData.NoteId;
     if (noteId) {
-      var valueNoteHtml = this.ftHelperService.newValueNoteTooltipProvider().getHtmlFromNoteId(noteId);
+      let valueNoteHtml = this.ftHelperService.newValueNoteTooltipProvider().getHtmlFromNoteId(noteId);
 
       // Add extra CSS class
       valueNoteHtml = valueNoteHtml.replace('tooltipValueNote',
@@ -126,15 +137,15 @@ export class SpineChartComponent {
 
   private showTooltip(event: MouseEvent) {
     this.currentTooltipHtml = this.html.join('');
-    this.tooltip.displayHtml(event, this.currentTooltipHtml);
+    this.tooltipHelper.displayHtml(event, this.currentTooltipHtml);
   }
 
   public hideTooltip() {
-    this.tooltip.hide();
+    this.tooltipHelper.hide();
     this.currentTooltipHtml = null;
   }
 
   public repositionTooltip(event: MouseEvent) {
-    this.tooltip.reposition(event);
+    this.tooltipHelper.reposition(event);
   }
 }

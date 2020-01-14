@@ -14,5 +14,12 @@ namespace PholioVisualisation.DataConstruction
                                     where d.Year == period.Year
                                     select d).FirstOrDefault();
         }
+
+        protected override TrendDataPoint GetTrendDataAtSpecificTimePeriod(IList<TrendDataPoint> dataList, TimePeriod period)
+        {
+            return (from d in dataList
+                where d.CoreDataSet.Year == period.Year
+                select d).FirstOrDefault();
+        }
     }
 }

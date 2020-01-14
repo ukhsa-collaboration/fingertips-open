@@ -1,12 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EnglandComponent } from './england.component';
-import { LegendModule } from 'app/shared/component/legend/legend.module';
+import { LegendModule } from '../shared/component/legend/legend.module';
+import { ExportCsvModule } from '../shared/component/export-csv/export-csv.module';
 
 @NgModule({
     imports: [
         CommonModule,
-        LegendModule
+        LegendModule,
+        ExportCsvModule
     ],
     declarations: [
         EnglandComponent

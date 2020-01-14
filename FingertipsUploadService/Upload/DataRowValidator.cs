@@ -31,21 +31,30 @@ namespace FingertipsUploadService.Upload
         private const int MinimumMonthValue = 1;
         private const int MaximumMonthValue = 12;
 
-        private static readonly ProfilesReader Reader = ReaderFactory.GetProfilesReader();
-
-        public static bool DoesIndicatorMetaDataExist(int indicatorId)
-        {
-            var indicatorMetaData = Reader.GetIndicatorMetadata(indicatorId);
-            return indicatorMetaData != null;
-        }
+        private readonly int _rowNumber;
+        private readonly int _indicatorId;
+        private readonly IndicatorMetadata _indicatorMetadata;
 
         public DataRow Row;
-        private int _rowNumber;
 
-        public DataRowValidator(DataRow row, int rowNumber)
+        public bool DoesIndicatorMetaDataExist()
+        {
+            return _indicatorMetadata != null;
+        }
+
+        public bool IsIndicatorUnderReview()
+        {
+            return _indicatorMetadata.OwnerProfileId == ProfileIds.IndicatorsForReview &&
+                   _indicatorMetadata.Status == IndicatorStatus.UnderReview;
+        }
+
+        public DataRowValidator(DataRow row, int rowNumber, ProfilesReader profilesReader)
         {
             Row = row;
             _rowNumber = rowNumber;
+
+            _indicatorId = (int)Row.Field<double>(UploadColumnNames.IndicatorId);
+            _indicatorMetadata = profilesReader.GetIndicatorMetadata(_indicatorId);
         }
 
         public UploadValidationFailure ValidateIndicatorId()
@@ -54,17 +63,21 @@ namespace FingertipsUploadService.Upload
             var columnName = UploadColumnNames.IndicatorId;
             try
             {
-                var indicatorId = (int)Row.Field<double>(columnName);
-
-                if (indicatorId < 1)
+                if (_indicatorId < 1)
                 {
                     return new UploadValidationFailure(_rowNumber, columnName, "Invalid " + columnName, null);
                 }
 
                 //Check that the indicator exists
-                if (!DoesIndicatorMetaDataExist(indicatorId))
+                if (!DoesIndicatorMetaDataExist())
                 {
                     return new UploadValidationFailure(_rowNumber, columnName, "Indicator does not exist", null);
+                }
+
+                // Check that the indicator does not belong to indicators for review domain
+                if (IsIndicatorUnderReview())
+                {
+                    return new UploadValidationFailure(_rowNumber, columnName, "Indicator is under review", null);
                 }
             }
             catch (Exception ex)
@@ -76,14 +89,13 @@ namespace FingertipsUploadService.Upload
             return null;
         }
 
-
         public UploadValidationFailure ValidateYear()
         {
             //Do other year validation
             var columnName = UploadColumnNames.Year;
             try
             {
-                var year = (int)Row.Field<double>(columnName);
+                var year = (int) Row.Field<double>(columnName);
 
                 if ((year < MinimumYearValue || year > MaximumYearValue) || year.ToString().Length != 4)
                 {
@@ -105,7 +117,7 @@ namespace FingertipsUploadService.Upload
             var columnName = UploadColumnNames.YearRange;
             try
             {
-                var yearRange = (int)Row.Field<double>(columnName);
+                var yearRange = (int) Row.Field<double>(columnName);
 
                 if ((yearRange < MinimumYearRangeValue || yearRange > MaximumYearRangeValue) ||
                     yearRange.ToString().Length != 1)
@@ -128,7 +140,7 @@ namespace FingertipsUploadService.Upload
             var columnName = UploadColumnNames.Quarter;
             try
             {
-                var quarter = (int)Row.Field<double>(columnName);
+                var quarter = (int) Row.Field<double>(columnName);
 
                 if (quarter != -1)
                 {
@@ -153,7 +165,7 @@ namespace FingertipsUploadService.Upload
             var columnName = UploadColumnNames.Month;
             try
             {
-                var month = (int)Row.Field<double>(columnName);
+                var month = (int) Row.Field<double>(columnName);
 
                 if (month != -1)
                 {
@@ -173,7 +185,7 @@ namespace FingertipsUploadService.Upload
             return null;
         }
 
-        public UploadValidationFailure ValidateAgeId(int ageId,  List<int> ageIds)
+        public UploadValidationFailure ValidateAgeId(int ageId, List<int> ageIds)
         {
             //Does the ageId actually exist?
             var columnName = UploadColumnNames.AgeId;
@@ -237,7 +249,6 @@ namespace FingertipsUploadService.Upload
 
         public UploadValidationFailure ValidateValueNoteId(int valueNoteId, List<int> valueNoteIds)
         {
-
             var columnName = UploadColumnNames.ValueNoteId;
             try
             {
@@ -254,12 +265,6 @@ namespace FingertipsUploadService.Upload
             }
 
             return null;
-        }
-
-        private int? ParseNullableInt(string fieldName)
-        {
-            var field = Row.Field<object>(fieldName);
-            return field == null ? null : (int?)Convert.ToInt32(field);
         }
 
         public UploadValidationFailure ValidateCategoryTypeIdAndCategoryId(IList<Category> categories)
@@ -310,7 +315,55 @@ namespace FingertipsUploadService.Upload
             {
                 return ex;
             }
+
             return null;
+        }
+
+        public UploadValidationFailure ValidateCIs()
+        {
+            //Do other YearRange validation
+            var columnName = UploadColumnNames.YearRange;
+            try
+            {
+                // Check 95 CIs
+                if (AreBothCIsZero(UploadColumnNames.LowerCI95, UploadColumnNames.UpperCI95))
+                {
+                    return new UploadValidationFailure(_rowNumber, columnName, "Both 95 CIs are zero", null);
+                }
+
+                // Check 99.8 CIs
+                if (AreBothCIsZero(UploadColumnNames.LowerCI99_8, UploadColumnNames.UpperCI99_8))
+                {
+                    return new UploadValidationFailure(_rowNumber, columnName, "Both 99.8 CIs are zero", null);
+                }
+            }
+            catch (Exception)
+            {
+                // CIs checked individually elsewhere
+            }
+
+            return null;
+        }
+
+        private bool AreBothCIsZero(string columnName1, string columnName2)
+        {
+            const double tolerance = 0.000000001;
+            var lowerCI = ParseNullableDouble(columnName1);
+            var upperCI = ParseNullableDouble(columnName2);
+            return lowerCI.HasValue && upperCI.HasValue && 
+                   Math.Abs(lowerCI.Value) < tolerance && Math.Abs(upperCI.Value) < tolerance;
+        }
+
+        private int? ParseNullableInt(string fieldName)
+        {
+            var field = Row.Field<object>(fieldName);
+            return field == null ? null : (int?) Convert.ToInt32(field);
+        }
+
+        private double? ParseNullableDouble(string fieldName)
+        {
+            var field = Row.Field<object>(fieldName);
+            return field == null ? null : (double?)Convert.ToDouble(field);
         }
     }
 }

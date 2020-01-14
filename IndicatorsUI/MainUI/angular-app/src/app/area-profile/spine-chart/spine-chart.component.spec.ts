@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SpineChartComponent } from './spine-chart.component';
-import { FTHelperService } from 'app/shared/service/helper/ftHelper.service';
+import { FTHelperService } from '../../shared/service/helper/ftHelper.service';
 
 describe('SpineChartComponent', () => {
   let component: SpineChartComponent;
