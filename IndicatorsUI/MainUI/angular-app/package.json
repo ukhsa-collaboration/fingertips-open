@@ -24,7 +24,7 @@
     "@angular/router": "^8.2.14",
     "@ng-bootstrap/ng-bootstrap": "^5.1.5",
     "@types/googlemaps": "^3.39.0",
-    "@types/jquery": "^3.3.22",
+    "@types/jquery": "^3.5.33",
     "@types/underscore": "^1.9.4",
     "angular7-csv": "^0.2.12",
     "bootstrap": "^4.4.1",
